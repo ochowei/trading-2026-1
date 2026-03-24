@@ -27,7 +27,7 @@
 2. `Entry Criteria`：進場條件（條件與閾值要可對應到 config）。
 3. `Exit Criteria`：出場條件與優先順序。
 4. `Current Limitations`：至少列出兩個當前限制。
-5. `嘗試提升績效`：至少三個下一步優化方向。
+5. `Next Iteration Ideas`：至少一個下一步優化方向（可寫成「嘗試提升績效」）。
 
 ## 4. 結果與可重現性
 - 回測執行完成後，需輸出 JSON 報告到 `output.report_path`。
