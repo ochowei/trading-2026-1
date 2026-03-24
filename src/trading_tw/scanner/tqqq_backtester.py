@@ -57,6 +57,7 @@ class TQQQBacktester:
             if future_df.empty:
                 trades.append({
                     "date": signal_date.strftime("%Y-%m-%d"),
+                    "exit_date": signal_date.strftime("%Y-%m-%d"),
                     "entry": round(float(entry_price), 2),
                     "exit": round(float(entry_price), 2),
                     "return_pct": 0.0,
@@ -73,10 +74,11 @@ class TQQQBacktester:
             trade_return = None
             exit_price = None
             exit_type = None
+            exit_date = None
             holding_days = 0
             min_low = float("inf")
 
-            for day_idx, (date, row) in enumerate(future_df.iterrows(), start=1):
+            for day_idx, (day_date, row) in enumerate(future_df.iterrows(), start=1):
                 min_low = min(min_low, row["Low"])
 
                 # 優先檢查停損（收盤價）(Priority 1: stop-loss on close)
@@ -84,6 +86,7 @@ class TQQQBacktester:
                     exit_price = row["Close"]
                     trade_return = (exit_price - entry_price) / entry_price
                     exit_type = "stop_loss"
+                    exit_date = day_date
                     holding_days = day_idx
                     break
 
@@ -92,6 +95,7 @@ class TQQQBacktester:
                     exit_price = target_price
                     trade_return = TQQQ_PROFIT_TARGET
                     exit_type = "target"
+                    exit_date = day_date
                     holding_days = day_idx
                     break
 
@@ -100,6 +104,7 @@ class TQQQBacktester:
                 exit_price = future_df["Close"].iloc[-1]
                 trade_return = (exit_price - entry_price) / entry_price
                 exit_type = "time_expiry"
+                exit_date = future_df.index[-1]
                 holding_days = len(future_df)
                 min_low = min(min_low, future_df["Low"].min())
 
@@ -115,6 +120,7 @@ class TQQQBacktester:
 
             trades.append({
                 "date": signal_date.strftime("%Y-%m-%d"),
+                "exit_date": exit_date.strftime("%Y-%m-%d"),
                 "entry": round(float(entry_price), 2),
                 "exit": round(float(exit_price), 2),
                 "return_pct": round(float(trade_return) * 100, 2),
