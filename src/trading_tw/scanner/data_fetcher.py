@@ -22,9 +22,17 @@ class DataFetcher:
     Downloads OHLCV daily data from yfinance with multi-threaded acceleration.
     """
 
-    def __init__(self, period: str = DATA_PERIOD, max_workers: int = MAX_WORKERS):
+    def __init__(
+        self,
+        period: str = DATA_PERIOD,
+        max_workers: int = MAX_WORKERS,
+        start: str | None = None,
+        end: str | None = None,
+    ):
         self.period = period
         self.max_workers = max_workers
+        self.start = start
+        self.end = end
 
     def _fetch_single(self, ticker: str) -> pd.DataFrame | None:
         """
@@ -32,12 +40,18 @@ class DataFetcher:
         Returns None if download fails.
         """
         try:
-            df = yf.download(
-                ticker,
-                period=self.period,
-                progress=False,
-                auto_adjust=True,
-            )
+            download_kwargs = {
+                "progress": False,
+                "auto_adjust": True,
+            }
+            if self.start:
+                download_kwargs["start"] = self.start
+                if self.end:
+                    download_kwargs["end"] = self.end
+            else:
+                download_kwargs["period"] = self.period
+
+            df = yf.download(ticker, **download_kwargs)
             if df is None or df.empty:
                 logger.warning(f"[DataFetcher] 無法取得 {ticker} 的數據 (No data for {ticker})")
                 return None
