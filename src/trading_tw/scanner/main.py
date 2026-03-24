@@ -14,6 +14,7 @@ from trading_tw.scanner.config import DEFAULT_TICKERS
 from trading_tw.scanner.data_fetcher import DataFetcher
 from trading_tw.scanner.reporter import Reporter
 from trading_tw.scanner.signal_detector import SignalDetector
+from trading_tw.scanner.tqqq_strategy import TQQQStrategy
 
 # 設定日誌格式 (Configure logging format)
 logging.basicConfig(
@@ -136,10 +137,18 @@ def run_scanner() -> None:
         "--period", default="5y",
         help="歷史資料期間 (Data period, e.g. 5y, 2y, 1y)",
     )
+    parser.add_argument(
+        "--strategy", choices=["default", "tqqq"], default="default",
+        help="策略選擇 (Strategy: default=均值回歸, tqqq=TQQQ 恐慌抄底)",
+    )
     args = parser.parse_args()
 
-    app = ScannerApp(tickers=args.tickers, period=args.period)
-    app.run()
+    if args.strategy == "tqqq":
+        strategy = TQQQStrategy(period=args.period)
+        strategy.run()
+    else:
+        app = ScannerApp(tickers=args.tickers, period=args.period)
+        app.run()
 
 
 if __name__ == "__main__":
