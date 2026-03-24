@@ -10,10 +10,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 import yfinance as yf
 
-from trading_tw.scanner.config import DATA_PERIOD, MAX_WORKERS
-
 logger = logging.getLogger(__name__)
 
+# 多線程下載 (Multi-threading)
+MAX_WORKERS: int = 8
 
 class DataFetcher:
     """
@@ -24,7 +24,7 @@ class DataFetcher:
 
     def __init__(
         self,
-        period: str = DATA_PERIOD,
+        period: str = "max",
         max_workers: int = MAX_WORKERS,
         start: str | None = None,
         end: str | None = None,

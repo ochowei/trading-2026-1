@@ -8,7 +8,6 @@ import logging
 
 import pandas as pd
 
-from trading_tw.scanner.signal_detector import SignalDetector
 from trading_tw.scanner.tqqq_config import (
     TQQQ_COOLDOWN_DAYS,
     TQQQ_DRAWDOWN_LOOKBACK,
@@ -33,6 +32,26 @@ class TQQQSignalDetector:
     """
 
     @staticmethod
+    def _compute_rsi(series: pd.Series, period: int) -> pd.Series:
+        """
+        計算 RSI (Compute RSI using Wilder's smoothing)
+
+        使用 Wilder 平滑法（指數移動平均），與大多數交易平台一致。
+        Uses Wilder's smoothing (EMA) consistent with most trading platforms.
+        """
+        delta = series.diff()
+        gain = delta.where(delta > 0, 0.0)
+        loss = (-delta).where(delta < 0, 0.0)
+
+        # Wilder's smoothing: EMA with alpha = 1/period
+        avg_gain = gain.ewm(alpha=1.0 / period, min_periods=period, adjust=False).mean()
+        avg_loss = loss.ewm(alpha=1.0 / period, min_periods=period, adjust=False).mean()
+
+        rs = avg_gain / avg_loss
+        rsi = 100.0 - (100.0 / (1.0 + rs))
+        return rsi
+
+    @staticmethod
     def compute_indicators(df: pd.DataFrame) -> pd.DataFrame:
         """
         計算 TQQQ 專屬技術指標 (Compute TQQQ-specific indicators)
@@ -51,8 +70,8 @@ class TQQQSignalDetector:
         # 回撤幅度 (Drawdown from 20-day high)
         df["Drawdown"] = (df["Close"] - df["High20"]) / df["High20"]
 
-        # RSI(5) — 重用現有的 RSI 計算方法 (Reuse existing RSI computation)
-        df["RSI5"] = SignalDetector._compute_rsi(df["Close"], TQQQ_RSI_PERIOD)
+        # RSI(5)
+        df["RSI5"] = TQQQSignalDetector._compute_rsi(df["Close"], TQQQ_RSI_PERIOD)
 
         # 成交量均線 (Volume SMA)
         df["Volume_SMA20"] = df["Volume"].rolling(window=TQQQ_VOLUME_SMA_PERIOD).mean()
