@@ -167,9 +167,9 @@ class TQQQStrategy:
         print(f"\n{thin_sep}")
         print("  逐筆交易明細 (Trade Details)")
         print(f"{thin_sep}")
-        print(f"  {'日期':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'持倉':>4} {'出場方式':<12}")
-        print(f"  {'Date':<12} {'Entry':>8} {'Exit':>8} {'Return':>8} {'Days':>4} {'Exit Type':<12}")
-        print(f"  {'-'*60}")
+        print(f"  {'進場日期':<12} {'出場日期':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'持倉':>4} {'出場方式':<12}")
+        print(f"  {'Entry Date':<12} {'Exit Date':<12} {'Entry':>8} {'Exit':>8} {'Return':>8} {'Days':>4} {'Exit Type':<12}")
+        print(f"  {'-'*72}")
 
         exit_type_labels = {
             "target": "達標 Target",
@@ -182,6 +182,7 @@ class TQQQStrategy:
             label_t = exit_type_labels.get(t["exit_type"], t["exit_type"])
             print(
                 f"  {t['date']:<12} "
+                f"{t['exit_date']:<12} "
                 f"{t['entry']:>8.2f} "
                 f"{t['exit']:>8.2f} "
                 f"{t['return_pct']:>+7.2f}% "
