@@ -1,0 +1,2 @@
+experiment_id,status,strategy_name,owner,universe,data_start,data_end,report_path
+EXP-0001-TQQQ-CAPITULATION,active,TQQQ Capitulation Buy,trading-tw,"TQQQ",2019-01-01,rolling_today,experiments/EXP-0001-tqqq-capitulation/results/latest_report.json

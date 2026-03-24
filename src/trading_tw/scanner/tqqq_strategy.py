@@ -8,6 +8,7 @@ import logging
 
 import pandas as pd
 
+from trading_tw.experiments import build_experiment_report, save_experiment_report
 from trading_tw.scanner.data_fetcher import DataFetcher
 from trading_tw.scanner.tqqq_backtester import TQQQBacktester
 from trading_tw.scanner.tqqq_config import (
@@ -114,11 +115,42 @@ class TQQQStrategy:
         # 今日訊號檢查 (Today's signal check)
         self._print_today_signal(df)
 
-        return {
+        strategy_results = {
             "part_a": results.get("Part A (In-Sample)", self.backtester._empty_result()),
             "part_b": results.get("Part B (Out-of-Sample)", self.backtester._empty_result()),
             "part_c": results.get("Part C (Live)", self.backtester._empty_result()),
         }
+
+        experiment_report = build_experiment_report(
+            experiment_id="EXP-0001-TQQQ-CAPITULATION",
+            hypothesis=(
+                "TQQQ 在極端恐慌時出現短線反彈，透過回撤 + RSI + 量能可篩出高勝率反轉點。"
+            ),
+            universe=[TQQQ_TICKER],
+            data_range={
+                "part_a": {"start": TQQQ_PART_A_START, "end": TQQQ_PART_A_END},
+                "part_b": {"start": TQQQ_PART_B_START, "end": TQQQ_PART_B_END},
+                "part_c": {"start": TQQQ_PART_C_START, "end": part_c_end},
+            },
+            features=["Drawdown20", "RSI5", "VolumeSpike20"],
+            signal_logic=(
+                "Drawdown<=threshold AND RSI<threshold AND Volume>multiplier*SMA20; "
+                "3-day cooldown"
+            ),
+            portfolio_rule=(
+                "Long-only single-asset event trade: signal-day close entry; "
+                "priority exit stop-loss(close) > target(high) > time-expiry"
+            ),
+            cost_model="No transaction/slippage model yet (to be added in next experiment iteration)",
+            results=strategy_results,
+        )
+        report_path = save_experiment_report(
+            experiment_report,
+            "experiments/EXP-0001-tqqq-capitulation/results/latest_report.json",
+        )
+        logger.info(f"Experiment report saved: {report_path}")
+
+        return strategy_results
 
     def _print_part_report(
         self, label: str, start: str, end: str, result: dict, df: pd.DataFrame

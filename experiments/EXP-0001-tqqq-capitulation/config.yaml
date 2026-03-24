@@ -1,0 +1,47 @@
+experiment_id: EXP-0001-TQQQ-CAPITULATION
+status: active
+strategy_name: TQQQ Capitulation Buy
+ticker_universe:
+  - TQQQ
+hypothesis: >
+  TQQQ 在急跌恐慌狀態下，通常伴隨超賣與量能放大，短期存在均值回歸反彈機會。
+data_range:
+  part_a:
+    start: 2019-01-01
+    end: 2023-12-31
+    role: in_sample
+  part_b:
+    start: 2024-01-01
+    end: 2025-12-31
+    role: out_of_sample
+  part_c:
+    start: 2026-01-01
+    end: rolling_today
+    role: live_validation
+features:
+  - Drawdown20
+  - RSI5
+  - VolumeSpike20
+signal:
+  drawdown_lookback_days: 20
+  drawdown_threshold: -0.15
+  rsi_period: 5
+  rsi_threshold: 25
+  volume_sma_period: 20
+  volume_multiplier: 1.5
+  cooldown_days: 3
+portfolio_rule:
+  entry: signal_day_close
+  max_holding_days: 7
+  stop_loss_close_pct: -0.08
+  profit_target_intraday_pct: 0.05
+  exit_priority:
+    - stop_loss
+    - target
+    - time_expiry
+cost_model:
+  transaction_cost_bps: 0
+  slippage_bps: 0
+  note: baseline backtest currently ignores explicit trading costs
+output:
+  report_path: experiments/EXP-0001-tqqq-capitulation/results/latest_report.json
