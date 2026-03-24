@@ -18,6 +18,8 @@ from trading_tw.scanner.tqqq_config import (
     TQQQ_PART_A_START,
     TQQQ_PART_B_END,
     TQQQ_PART_B_START,
+    TQQQ_PART_C_END,
+    TQQQ_PART_C_START,
     TQQQ_PROFIT_TARGET,
     TQQQ_RSI_PERIOD,
     TQQQ_RSI_THRESHOLD,
@@ -37,9 +39,10 @@ class TQQQStrategy:
     專為 TQQQ 設計的低頻高勝率策略，每年約 3-5 次訊號。
     Low-frequency, high-win-rate strategy designed for TQQQ, ~3-5 signals/year.
 
-    回測分為兩個區間 (Backtest split into two periods):
+    回測分為三個區間 (Backtest split into three periods):
     - Part A: 2019-01-01 ~ 2023-12-31 (樣本內 in-sample)
     - Part B: 2024-01-01 ~ 2025-12-31 (樣本外 out-of-sample)
+    - Part C: 2026-01-01 ~ 至今 (即時驗證 live validation)
     """
 
     def __init__(self, period: str = TQQQ_DATA_PERIOD):
@@ -79,12 +82,16 @@ class TQQQStrategy:
         logger.info("Step 2/3: 計算指標與偵測訊號 (Computing indicators & detecting signals)...")
         df = self.detector.compute_indicators(df)
 
-        # Step 3: 分區間回測 (Split into Part A / Part B)
-        logger.info("Step 3/3: 分區間回測 (Running backtests for Part A & Part B)...")
+        # Step 3: 分區間回測 (Split into Part A / Part B / Part C)
+        logger.info("Step 3/3: 分區間回測 (Running backtests for Part A, B & C)...")
+
+        # Part C end: 空字串表示至今 (empty = up to today)
+        part_c_end = TQQQ_PART_C_END or df.index[-1].strftime("%Y-%m-%d")
 
         parts = [
             ("Part A (In-Sample)", TQQQ_PART_A_START, TQQQ_PART_A_END),
             ("Part B (Out-of-Sample)", TQQQ_PART_B_START, TQQQ_PART_B_END),
+            ("Part C (Live)", TQQQ_PART_C_START, part_c_end),
         ]
 
         results = {}
@@ -110,6 +117,7 @@ class TQQQStrategy:
         return {
             "part_a": results.get("Part A (In-Sample)", self.backtester._empty_result()),
             "part_b": results.get("Part B (Out-of-Sample)", self.backtester._empty_result()),
+            "part_c": results.get("Part C (Live)", self.backtester._empty_result()),
         }
 
     def _print_part_report(
@@ -191,23 +199,25 @@ class TQQQStrategy:
             )
 
     def _print_comparison(self, results: dict) -> None:
-        """印出 Part A / Part B 比較表 (Print comparison table)"""
+        """印出 Part A / B / C 比較表 (Print comparison table)"""
         separator = "=" * 80
         thin_sep = "-" * 80
 
-        print(f"\n{separator}")
-        print("  Part A vs Part B 績效比較 (Performance Comparison)")
-        print(f"{separator}")
-        print(f"  {'指標 (Metric)':<36} {'Part A':>12} {'Part B':>12}")
-        print(f"  {thin_sep}")
-
         keys = list(results.keys())
         if len(keys) < 2:
-            print("  資料不足 (Insufficient data)\n")
             return
 
-        a = results[keys[0]]
-        b = results[keys[1]]
+        print(f"\n{separator}")
+        print("  績效比較 (Performance Comparison)")
+        print(f"{separator}")
+
+        # 動態產生表頭 (Dynamic header based on number of parts)
+        header = f"  {'指標 (Metric)':<36}"
+        for k in keys:
+            short = k.split(" (")[0]  # "Part A", "Part B", "Part C"
+            header += f" {short:>12}"
+        print(header)
+        print(f"  {thin_sep}")
 
         rows = [
             ("總訊號數 (Total signals)", "total_signals", "d"),
@@ -221,11 +231,11 @@ class TQQQStrategy:
         ]
 
         for label, key, fmt in rows:
-            va = a[key]
-            vb = b[key]
-            sa = f"{va:{fmt}}"
-            sb = f"{vb:{fmt}}"
-            print(f"  {label:<36} {sa:>12} {sb:>12}")
+            line = f"  {label:<36}"
+            for k in keys:
+                val = results[k][key]
+                line += f" {f'{val:{fmt}}':>12}"
+            print(line)
 
         print()
 

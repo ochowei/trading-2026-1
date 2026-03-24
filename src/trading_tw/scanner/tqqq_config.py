@@ -29,3 +29,5 @@ TQQQ_PART_A_START: str = "2019-01-01"
 TQQQ_PART_A_END: str = "2023-12-31"
 TQQQ_PART_B_START: str = "2024-01-01"
 TQQQ_PART_B_END: str = "2025-12-31"
+TQQQ_PART_C_START: str = "2026-01-01"
+TQQQ_PART_C_END: str = ""                # 空字串表示至今 (empty = up to today)
