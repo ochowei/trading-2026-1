@@ -115,8 +115,30 @@ class ScannerApp:
 
 
 def run_scanner() -> None:
-    """CLI 進入點 (CLI entry point)"""
-    app = ScannerApp()
+    """
+    CLI 進入點 (CLI entry point)
+
+    用法 (Usage):
+        trading-tw                              # 使用預設標的
+        trading-tw --tickers SPY QQQ NVDA       # 自訂標的清單
+        trading-tw --period 2y                  # 自訂回測期間
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="美股均值回歸訊號掃描器 (US Stock Mean-Reversion Scanner)"
+    )
+    parser.add_argument(
+        "--tickers", nargs="+", default=None,
+        help="要掃描的標的清單 (Ticker list to scan)",
+    )
+    parser.add_argument(
+        "--period", default="5y",
+        help="歷史資料期間 (Data period, e.g. 5y, 2y, 1y)",
+    )
+    args = parser.parse_args()
+
+    app = ScannerApp(tickers=args.tickers, period=args.period)
     app.run()
 
 
