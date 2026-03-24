@@ -22,4 +22,10 @@ TQQQ_COOLDOWN_DAYS: int = 3               # 同一波跌勢中僅取第一個訊
 
 # 資料參數 (Data parameters)
 TQQQ_TICKER: str = "TQQQ"
-TQQQ_DATA_PERIOD: str = "5y"
+TQQQ_DATA_PERIOD: str = "max"
+
+# 回測區間 (Backtest date ranges)
+TQQQ_PART_A_START: str = "2019-01-01"
+TQQQ_PART_A_END: str = "2023-12-31"
+TQQQ_PART_B_START: str = "2024-01-01"
+TQQQ_PART_B_END: str = "2025-12-31"
