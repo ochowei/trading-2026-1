@@ -144,7 +144,7 @@ def run_scanner() -> None:
     args = parser.parse_args()
 
     if args.strategy == "tqqq":
-        strategy = TQQQStrategy(period=args.period)
+        strategy = TQQQStrategy()
         strategy.run()
     else:
         app = ScannerApp(tickers=args.tickers, period=args.period)
