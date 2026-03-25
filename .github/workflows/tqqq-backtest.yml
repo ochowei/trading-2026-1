@@ -7,18 +7,26 @@ on:
         description: "選擇要執行的實驗 (Select experiment)"
         required: true
         type: choice
-        default: tqqq_capitulation
+        default: "TQQQ-001: tqqq_capitulation"
         options:
-          - tqqq_capitulation
-          - tqqq_cap_relaxed_entry
-          - tqqq_cap_wider_exit
-          - tqqq_cap_vix_filter
+          - "TQQQ-001: tqqq_capitulation"
+          - "TQQQ-002: tqqq_cap_relaxed_entry"
+          - "TQQQ-003: tqqq_cap_wider_exit"
+          - "TQQQ-004: tqqq_cap_vix_filter"
 
 jobs:
   backtest:
     name: "Run ${{ inputs.experiment }}"
     runs-on: ubuntu-latest
+    env:
+      EXPERIMENT_NAME: ""
     steps:
+      - name: Parse experiment name
+        run: |
+          # Extract the part after ": " (e.g. "TQQQ-001: tqqq_capitulation" -> "tqqq_capitulation")
+          EXPERIMENT_NAME=$(echo "${{ inputs.experiment }}" | cut -d':' -f2 | xargs)
+          echo "EXPERIMENT_NAME=$EXPERIMENT_NAME" >> "$GITHUB_ENV"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -41,4 +49,4 @@ jobs:
           echo " Part B: 2024-01-01 ~ 2025-12-31 (Out-of-Sample)"
           echo " Part C: 2026-01-01 ~ today       (Live)"
           echo "========================================="
-          uv run trading run ${{ inputs.experiment }}
+          uv run trading run "$EXPERIMENT_NAME"
