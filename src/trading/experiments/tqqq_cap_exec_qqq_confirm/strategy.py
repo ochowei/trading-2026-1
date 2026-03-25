@@ -44,8 +44,8 @@ class TQQQCapExecQqqConfirmStrategy(ExecutionModelStrategy):
 
     def run(self) -> dict:
         """覆寫 run() 以合併 QQQ 收盤價供 RSI 過濾使用。"""
-        config = create_default_config()
-        detector = TQQQCapQqqConfirmDetector(config)
+        config = self.create_config()
+        detector = self.create_detector()
         backtester = self.create_backtester(config)
         fetcher = DataFetcher(start=config.data_start)
 
@@ -67,7 +67,12 @@ class TQQQCapExecQqqConfirmStrategy(ExecutionModelStrategy):
 
         if config.qqq_ticker in data:
             qqq_df = data[config.qqq_ticker]
-            df["QQQ_Close"] = qqq_df["Close"].reindex(df.index, method="ffill")
+            qqq_close = qqq_df["Close"]
+            # yfinance 在部分版本/情境下可能回傳重複欄位，導致 qqq_df["Close"] 是 DataFrame
+            # In some yfinance variants, duplicate columns make qqq_df["Close"] a DataFrame.
+            if hasattr(qqq_close, "columns"):
+                qqq_close = qqq_close.iloc[:, 0]
+            df["QQQ_Close"] = qqq_close.reindex(df.index, method="ffill")
             logger.info(
                 f"[ExecQqqConfirm] QQQ 收盤價已合併，範圍 {df['QQQ_Close'].min():.2f} ~ {df['QQQ_Close'].max():.2f} "
                 "(QQQ close merged)"

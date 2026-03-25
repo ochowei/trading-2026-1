@@ -1,6 +1,6 @@
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-012 `tqqq_cap_exec_qqq_confirm`
+> **最新實驗 (Latest):** TQQQ-013 `tqqq_cap_exec_qqq_optimized`
 > **當前最佳 (Best):** TQQQ-008 `tqqq_cap_optimized_exit`（無成交模型）/ TQQQ-010 `tqqq_cap_exec_optimized`（含成交模型）
 
 ## 實驗清單 (Experiments)
@@ -19,6 +19,7 @@
 | TQQQ-010 | `tqqq_cap_exec_optimized` | 重做 TQQQ-008 + 成交模型 | 隔日開盤進場、stop_market、limit_order、0.1% 滑價、悲觀認定 | ✅ 完成 |
 | TQQQ-011 | `tqqq_cap_exec_baseline` | 重做 TQQQ-001 + 成交模型 | 同上成交模型 | ✅ 完成 |
 | TQQQ-012 | `tqqq_cap_exec_qqq_confirm` | 重做 TQQQ-007 + 成交模型 | 同上成交模型 + QQQ RSI 過濾 | ✅ 完成 |
+| TQQQ-013 | `tqqq_cap_exec_qqq_optimized` | QQQ RSI 過濾 + 優化出場 + 成交模型 | 在 TQQQ-012 基礎改為 TP +7%、持倉 10 天 | ❌ 失敗 |
 
 ## 演進路線 (Lineage)
 
@@ -36,7 +37,8 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 │   ── 成交模型重做系列 (Execution Model Redo Series) ──
 ├── TQQQ-010 tqqq_cap_exec_optimized  (重做 TQQQ-008 + 成交模型)
 ├── TQQQ-011 tqqq_cap_exec_baseline   (重做 TQQQ-001 + 成交模型)
-└── TQQQ-012 tqqq_cap_exec_qqq_confirm (重做 TQQQ-007 + 成交模型)
+├── TQQQ-012 tqqq_cap_exec_qqq_confirm (重做 TQQQ-007 + 成交模型)
+└── TQQQ-013 tqqq_cap_exec_qqq_optimized (QQQ 過濾 + 優化出場 + 成交模型)
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -90,19 +92,19 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 
 ## 成交模型參數 (Execution Model Parameters — TQQQ-010+)
 
-| 參數 | TQQQ-010 | TQQQ-011 | TQQQ-012 |
-|------|----------|----------|----------|
-| 來源實驗 (Source) | TQQQ-008 | TQQQ-001 | TQQQ-007 |
-| 進場模式 (Entry) | next_open_market | next_open_market | next_open_market |
-| 止盈委託 (Profit) | limit_order Day | limit_order Day | limit_order Day |
-| 停損委託 (Stop) | stop_market GTC | stop_market GTC | stop_market GTC |
-| 到期出場 (Expiry) | next_open_market | next_open_market | next_open_market |
-| 滑價 (Slippage) | 0.10% | 0.10% | 0.10% |
-| 悲觀認定 (Pessimistic) | ✅ | ✅ | ✅ |
-| Profit Target | +7% | +5% | +6% |
-| Stop Loss | -8% | -8% | -8% |
-| Holding Days | 10 | 7 | 8 |
-| QQQ RSI Filter | — | — | RSI(14) < 35 |
+| 參數 | TQQQ-010 | TQQQ-011 | TQQQ-012 | TQQQ-013 |
+|------|----------|----------|----------|----------|
+| 來源實驗 (Source) | TQQQ-008 | TQQQ-001 | TQQQ-007 | TQQQ-012 + TQQQ-010 出場 |
+| 進場模式 (Entry) | next_open_market | next_open_market | next_open_market | next_open_market |
+| 止盈委託 (Profit) | limit_order Day | limit_order Day | limit_order Day | limit_order Day |
+| 停損委託 (Stop) | stop_market GTC | stop_market GTC | stop_market GTC | stop_market GTC |
+| 到期出場 (Expiry) | next_open_market | next_open_market | next_open_market | next_open_market |
+| 滑價 (Slippage) | 0.10% | 0.10% | 0.10% | 0.10% |
+| 悲觀認定 (Pessimistic) | ✅ | ✅ | ✅ | ✅ |
+| Profit Target | +7% | +5% | +6% | +7% |
+| Stop Loss | -8% | -8% | -8% | -8% |
+| Holding Days | 10 | 7 | 8 | 10 |
+| QQQ RSI Filter | — | — | RSI(14) < 35 | RSI(14) < 35 |
 
 ### Part A — In-Sample (2019-01-01 ~ 2023-12-31)
 
@@ -111,6 +113,7 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-010 | 20    | 20    | 100.0%  | 70.0%  | +2.47%  | +55.44%  | -29.26%  | 0           |
 | TQQQ-011 | 20    | 20    | 100.0%  | 70.0%  | +1.07%  | +19.35%  | -29.26%  | 0           |
 | TQQQ-012 | 14    | 14    | 100.0%  | 71.4%  | +1.97%  | +27.79%  | -29.26%  | 0           |
+| TQQQ-013 | 1     | 1     | 100.0%  | 0.0%   | -8.09%  | -8.09%   | -12.11%  | 0           |
 
 ### Part B — Out-of-Sample (2024-01-01 ~ 2025-12-31)
 
@@ -119,13 +122,17 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-010 | 8     | 8     | 100.0%  | 87.5%  | +5.11%  | +47.59%  | -11.80%  | 0           |
 | TQQQ-011 | 8     | 8     | 100.0%  | 87.5%  | +3.36%  | +29.33%  | -11.80%  | 0           |
 | TQQQ-012 | 6     | 6     | 100.0%  | 83.3%  | +3.65%  | +23.00%  | -11.80%  | 0           |
+| TQQQ-013 | 1     | 1     | 100.0%  | 100.0% | +7.00%  | +7.00%   | +4.00%   | 0           |
 
 > **與無成交模型版本的比較 (Comparison with no-execution-model versions):**
 > - TQQQ-010 vs TQQQ-008: Part A 累計 +55.44% vs +120.21%（↓54%）、Part B 累計 +47.59% vs +45.44%（↑5%）
 > - TQQQ-011 vs TQQQ-001: Part A 累計 +19.35% vs +70.86%（↓73%）、Part B 累計 +29.33% vs +27.44%（↑7%）
 > - TQQQ-012 vs TQQQ-007: Part A 累計 +27.79% vs +59.18%（↓53%）、Part B 累計 +23.00% vs +21.20%（↑8%）
+> - TQQQ-013 vs TQQQ-010: Part A 累計 -8.09% vs +55.44%（顯著落後）、Part B 累計 +7.00% vs +47.59%（顯著落後）
 >
 > **分析：** In-Sample 累計報酬大幅下降，主因是舊實驗進場以「訊號日收盤價」成交（已知未來資訊），新實驗改為「隔日開盤市價」更貼近實盤。Out-of-Sample 反而略微提升，顯示隔日開盤進場在近期市場環境中表現更穩健。成交模型版本的績效更可信賴。
+>
+> **TQQQ-013 失敗紀錄：** 嘗試將 TQQQ-012 的出場參數改為 TQQQ-010 的 TP +7% / 持倉 10 天，期待提高單筆報酬；但 QQQ RSI 過濾後訊號數過少，Part A 只有 1 筆且為虧損，整體顯著落後，不採用。
 
 <!-- 更新指引：
   1. 執行 uv run trading run --all

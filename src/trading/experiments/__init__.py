@@ -54,3 +54,4 @@ from trading.experiments import tqqq_cap_gentle_entry  # noqa: F401, E402
 from trading.experiments import tqqq_cap_exec_optimized  # noqa: F401, E402
 from trading.experiments import tqqq_cap_exec_baseline  # noqa: F401, E402
 from trading.experiments import tqqq_cap_exec_qqq_confirm  # noqa: F401, E402
+from trading.experiments import tqqq_cap_exec_qqq_optimized  # noqa: F401, E402

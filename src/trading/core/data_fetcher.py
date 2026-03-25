@@ -59,7 +59,17 @@ class DataFetcher:
             # yfinance 回傳的 MultiIndex columns 需要處理
             # Handle MultiIndex columns from yfinance
             if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
+                # 常見格式: level 0 = OHLCV, level 1 = ticker
+                # Common format: level 0 = OHLCV, level 1 = ticker
+                if ticker in df.columns.get_level_values(-1):
+                    df = df.xs(ticker, axis=1, level=-1)
+                else:
+                    df.columns = df.columns.get_level_values(0)
+
+            # 防禦性處理：若仍有重複欄位，保留第一個
+            # Defensive: if duplicated columns remain, keep the first one
+            if df.columns.duplicated().any():
+                df = df.loc[:, ~df.columns.duplicated()]
 
             # 確保必要的欄位存在 (Ensure required columns exist)
             required = {"Open", "High", "Low", "Close", "Volume"}

@@ -84,6 +84,9 @@ src/trading/
 │   ├── tqqq_cap_exec_qqq_confirm/      # TQQQ 重做 007 + 成交模型（TQQQ-012）
 │   │   ├── config.py
 │   │   └── strategy.py
+│   ├── tqqq_cap_exec_qqq_optimized/    # TQQQ QQQ 確認 + 優化出場 + 成交模型（TQQQ-013，失敗）
+│   │   ├── config.py
+│   │   └── strategy.py
 │   └── _template/                      # 新實驗模板（複製即用）
 │       ├── __init__.py
 │       ├── config.py
@@ -299,3 +302,4 @@ uv run trading compare tqqq_capitulation my_strategy
 | [`tqqq_cap_exec_optimized`](src/trading/experiments/tqqq_cap_exec_optimized/) | 重做 TQQQ-008 + 成交模型（隔日開盤、滑價 0.1%、悲觀認定）(TQQQ-010) |
 | [`tqqq_cap_exec_baseline`](src/trading/experiments/tqqq_cap_exec_baseline/) | 重做 TQQQ-001 + 成交模型 (TQQQ-011) |
 | [`tqqq_cap_exec_qqq_confirm`](src/trading/experiments/tqqq_cap_exec_qqq_confirm/) | 重做 TQQQ-007 + 成交模型 (TQQQ-012) |
+| [`tqqq_cap_exec_qqq_optimized`](src/trading/experiments/tqqq_cap_exec_qqq_optimized/) | TQQQ-012 的 QQQ 過濾 + TQQQ-010 的優化出場（失敗嘗試）(TQQQ-013) |
