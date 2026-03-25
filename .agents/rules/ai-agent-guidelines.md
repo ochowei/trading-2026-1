@@ -54,7 +54,7 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
 
 | 目錄 | 用途 |
 |------|------|
-| `core/` | 共用基礎設施（設定、訊號偵測、回測引擎、資料擷取、結果儲存） |
+| `core/` | 共用基礎設施（設定、訊號偵測、回測引擎、成交模型回測引擎、資料擷取、結果儲存） |
 | `experiments/_template/` | 新實驗模板，複製即可快速建立新策略 |
 | `experiments/<name>/` | 各交易策略實驗，每個實驗包含 `config.py`、`signal_detector.py`、`strategy.py`，部分含自訂 `backtester.py` |
 
