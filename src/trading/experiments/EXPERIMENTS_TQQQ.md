@@ -12,7 +12,7 @@
 | TQQQ-003 | `tqqq_cap_wider_exit`     | 加寬獲利目標 +12%，追蹤停利 -4%          | TP +12%, 持倉 12 天, Trailing -4%  | ✅ 完成  |
 | TQQQ-004 | `tqqq_cap_vix_filter`     | 加入 VIX ≥ 25 過濾，僅在真正恐慌時進場   | VIX ≥ 25 額外條件       | ✅ 完成  |
 | TQQQ-005 | `tqqq_cap_vix_adaptive`   | 軟性 VIX ≥ 20 + 適應性出場（追蹤停利）   | VIX ≥ 20, TP +8%, Trailing -6%, 持倉 10 天 | ✅ 完成  |
-| TQQQ-006 | `tqqq_momentum_collapse`  | 多日動能崩潰：連續下跌 + 累計跌幅 + 趨勢過濾 | 5 日 4 跌、5 日報酬 ≤ -12%、Close < SMA50 | 🧪 開發中 |
+| TQQQ-006 | `tqqq_momentum_collapse`  | 多日動能崩潰：連續下跌 + 累計跌幅 + 趨勢過濾 | 5 日 4 跌、5 日報酬 ≤ -12%、Close < SMA50 | ✅ 完成 |
 
 ## 演進路線 (Lineage)
 
