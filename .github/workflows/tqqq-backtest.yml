@@ -21,6 +21,7 @@ on:
           - "TQQQ-010: tqqq_cap_exec_optimized"
           - "TQQQ-011: tqqq_cap_exec_baseline"
           - "TQQQ-012: tqqq_cap_exec_qqq_confirm"
+          - "TQQQ-013: tqqq_cap_exec_qqq_optimized"
 
 jobs:
   backtest:
