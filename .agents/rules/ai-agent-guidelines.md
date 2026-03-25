@@ -31,9 +31,10 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
 - **新實驗強制納入成交模型（Required for future experiments）**：
   - 自本規範更新後，所有新建實驗必須在回測中明確定義並實作成交模型，不可再默認「訊號必成交」。
   - 至少需包含：
-    1. **進場模式**（例如 `signal_close` / `next_open_market` / `next_open_limit`）
-    2. **未成交處理**（如取消、遞延、或視為錯失機會）
-    3. **成交統計**（至少揭露 filled / unfilled 數量與成交率）
+    1. **進場模式**（例如 `next_open_market` 隔日開市市價 / `next_open_limit` 隔日開市限價）
+    2. **出場模式**（基於 Firstrade 支援之功能，例如 `limit_order` (限價止盈) / `stop_market` (停損市價) / `stop_limit` (停損限價) / `trailing_stop` (移動停損) / `next_open_market` (隔日訊號出場市價)）
+    3. **未成交處理**（非常重要，需模擬限價單/停損單未觸價之情況，例如委託單為 Day (當日有效) 則收盤取消，或 GTC (取消前有效) 則遞延至隔日，或視為錯失機會）
+    4. **成交統計**（至少揭露 filled / unfilled 數量與成交率）
 - **文件同步要求**：
   - 新實驗若引入成交模型，必須同步更新 `README.md` 的實驗說明與參數/假設描述，確保讀者可辨識其與舊實驗的差異。
 
