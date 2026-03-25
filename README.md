@@ -66,6 +66,9 @@ src/trading/
 │   │   ├── config.py
 │   │   ├── signal_detector.py
 │   │   └── strategy.py
+│   ├── tqqq_cap_optimized_exit/        # TQQQ 優化出場變體（當前最佳）
+│   │   ├── config.py
+│   │   └── strategy.py
 │   └── _template/                      # 新實驗模板（複製即用）
 │       ├── __init__.py
 │       ├── config.py
@@ -265,7 +268,7 @@ uv run trading compare tqqq_capitulation my_strategy
 
 ## 範例參照 (Reference Example)
 
-`experiments/tqqq_capitulation/` 是基礎實作範例，其餘 6 個實驗為其變體：
+`experiments/tqqq_capitulation/` 是基礎實作範例，其餘 7 個實驗為其變體：
 
 | 實驗 | 說明 |
 |------|------|
@@ -276,3 +279,4 @@ uv run trading compare tqqq_capitulation my_strategy
 | [`tqqq_cap_vix_adaptive`](src/trading/experiments/tqqq_cap_vix_adaptive/) | 變體：軟性 VIX + 適應性出場 (TQQQ-005) |
 | [`tqqq_momentum_collapse`](src/trading/experiments/tqqq_momentum_collapse/) | 變體：多日動能崩潰 (TQQQ-006) |
 | [`tqqq_cap_qqq_confirm`](src/trading/experiments/tqqq_cap_qqq_confirm/) | 變體：加入 QQQ RSI 相對強度確認 (TQQQ-007) |
+| [`tqqq_cap_optimized_exit`](src/trading/experiments/tqqq_cap_optimized_exit/) | **當前最佳**：優化出場 +7%、10 天、無追蹤停利 (TQQQ-008) |
