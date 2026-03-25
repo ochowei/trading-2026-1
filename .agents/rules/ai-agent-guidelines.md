@@ -26,6 +26,7 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
     - `TQQQ-006`
     - `TQQQ-007`
     - `TQQQ-008`
+    - `TQQQ-009`
   - 若未來 `src/trading/experiments/EXPERIMENTS_TQQQ.md` 新增編號，預設不自動納入既往不咎，需在本規範明確追加後才生效。
 - **新實驗強制納入成交模型（Required for future experiments）**：
   - 自本規範更新後，所有新建實驗必須在回測中明確定義並實作成交模型，不可再默認「訊號必成交」。
