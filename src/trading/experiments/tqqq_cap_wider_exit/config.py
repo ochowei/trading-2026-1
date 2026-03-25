@@ -25,6 +25,7 @@ def create_default_config() -> TQQQCapWiderExitConfig:
     """建立預設加寬出場配置 (Create default wider exit config)"""
     return TQQQCapWiderExitConfig(
         name="tqqq_cap_wider_exit",
+        experiment_id="TQQQ-003",
         display_name="TQQQ 加寬出場策略 — Wider Exit with Trailing Stop",
         tickers=["TQQQ"],
         data_start="2019-01-01",

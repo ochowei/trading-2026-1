@@ -51,13 +51,22 @@ def compare_experiments(names: list[str]) -> None:
     separator = "=" * 80
     thin_sep = "-" * 80
 
+    from trading.experiments import get_experiment
+
     loaded = {}
+    display_ids = {}
     for name in names:
         result = load_latest(name)
         if result is None:
             print(f"  警告: {name} 無結果可載入 (Warning: no results for {name})")
             continue
         loaded[name] = result
+        try:
+            strategy = get_experiment(name)
+            config = strategy.create_config()
+            display_ids[name] = config.experiment_id or name[:12]
+        except KeyError:
+            display_ids[name] = name[:12]
 
     if len(loaded) < 2:
         print("  需要至少兩個實驗結果才能比較 (Need at least 2 experiment results to compare)")
@@ -78,7 +87,7 @@ def compare_experiments(names: list[str]) -> None:
 
         header = f"  {'指標 (Metric)':<36}"
         for name in loaded:
-            header += f" {name[:12]:>12}"
+            header += f" {display_ids.get(name, name[:12]):>12}"
         print(header)
         print(f"  {'-'*72}")
 

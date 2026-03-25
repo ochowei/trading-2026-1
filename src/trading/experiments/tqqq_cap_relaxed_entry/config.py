@@ -29,6 +29,7 @@ def create_default_config() -> TQQQCapRelaxedConfig:
     """建立預設放寬進場配置 (Create default relaxed entry config)"""
     return TQQQCapRelaxedConfig(
         name="tqqq_cap_relaxed_entry",
+        experiment_id="TQQQ-002",
         display_name="TQQQ 放寬進場策略 — Relaxed Entry Strategy",
         tickers=["TQQQ"],
         data_start="2019-01-01",

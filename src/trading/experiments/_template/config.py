@@ -20,7 +20,8 @@ class MyConfig(ExperimentConfig):
 def create_default_config() -> MyConfig:
     """建立預設配置 (Create default config)"""
     return MyConfig(
-        name="my_experiment",                    # 實驗 ID
+        name="my_experiment",                    # 實驗名稱
+        experiment_id="XXX-000",                 # 實驗 ID
         display_name="My Experiment",            # 顯示名稱
         tickers=["SPY"],                         # 標的
         data_start="2019-01-01",                 # 資料起始日
