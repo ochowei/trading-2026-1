@@ -32,7 +32,9 @@ src/trading/
 │   ├── base_config.py                  # ExperimentConfig dataclass
 │   ├── base_signal_detector.py         # BaseSignalDetector ABC
 │   ├── base_backtester.py              # 通用回測引擎（停利/停損/到期）
+│   ├── execution_backtester.py         # 成交模型回測引擎（滑價/悲觀認定/隔日開盤）
 │   ├── base_strategy.py                # BaseStrategy（fetch → 指標 → 訊號 → 回測 → 報表）
+│   ├── execution_strategy.py           # ExecutionModelStrategy（成交模型報表）
 │   ├── data_fetcher.py                 # yfinance 多線程資料抓取
 │   └── results.py                      # 結果儲存（JSON）與跨實驗比較
 ├── experiments/                        # 所有實驗放在這裡
@@ -72,6 +74,15 @@ src/trading/
 │   ├── tqqq_cap_gentle_entry/          # TQQQ 溫和放寬進場變體（❌ 失敗）
 │   │   ├── config.py
 │   │   ├── signal_detector.py
+│   │   └── strategy.py
+│   ├── tqqq_cap_exec_optimized/        # TQQQ 重做 008 + 成交模型（TQQQ-010）
+│   │   ├── config.py
+│   │   └── strategy.py
+│   ├── tqqq_cap_exec_baseline/         # TQQQ 重做 001 + 成交模型（TQQQ-011）
+│   │   ├── config.py
+│   │   └── strategy.py
+│   ├── tqqq_cap_exec_qqq_confirm/      # TQQQ 重做 007 + 成交模型（TQQQ-012）
+│   │   ├── config.py
 │   │   └── strategy.py
 │   └── _template/                      # 新實驗模板（複製即用）
 │       ├── __init__.py
@@ -285,3 +296,6 @@ uv run trading compare tqqq_capitulation my_strategy
 | [`tqqq_cap_qqq_confirm`](src/trading/experiments/tqqq_cap_qqq_confirm/) | 變體：加入 QQQ RSI 相對強度確認 (TQQQ-007) |
 | [`tqqq_cap_optimized_exit`](src/trading/experiments/tqqq_cap_optimized_exit/) | **當前最佳**：優化出場 +7%、10 天、無追蹤停利 (TQQQ-008) |
 | [`tqqq_cap_gentle_entry`](src/trading/experiments/tqqq_cap_gentle_entry/) | ❌ 失敗：僅放寬 DD -13% + 優化出場 (TQQQ-009) |
+| [`tqqq_cap_exec_optimized`](src/trading/experiments/tqqq_cap_exec_optimized/) | 重做 TQQQ-008 + 成交模型（隔日開盤、滑價 0.1%、悲觀認定）(TQQQ-010) |
+| [`tqqq_cap_exec_baseline`](src/trading/experiments/tqqq_cap_exec_baseline/) | 重做 TQQQ-001 + 成交模型 (TQQQ-011) |
+| [`tqqq_cap_exec_qqq_confirm`](src/trading/experiments/tqqq_cap_exec_qqq_confirm/) | 重做 TQQQ-007 + 成交模型 (TQQQ-012) |
