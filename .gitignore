@@ -207,4 +207,7 @@ marimo/_lsp/
 __marimo__/
 
 # Trading experiment results
-results/
+results/**/*.json
+!results/**/latest.json
+!results/**/prev_1.json
+!results/**/prev_2.json

@@ -24,16 +24,41 @@ def save_result(experiment_name: str, result: dict) -> Path:
     d = RESULTS_DIR / experiment_name
     d.mkdir(parents=True, exist_ok=True)
 
+    # 處理歷史檔案輪替 (latest -> prev_1 -> prev_2) (Rotate history files)
+    latest_path = d / "latest.json"
+    prev1_path = d / "prev_1.json"
+    prev2_path = d / "prev_2.json"
+
+    if prev1_path.exists():
+        prev1_path.replace(prev2_path)
+    if latest_path.exists():
+        latest_path.replace(prev1_path)
+
+    # 儲存最新的 latest.json (Save the latest result)
+    latest_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+
     # 帶時間戳的備份 (Timestamped copy)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    path = d / f"{ts}.json"
-    path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    ts_path = d / f"{ts}.json"
+    ts_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
 
-    # latest.json
-    (d / "latest.json").write_text(json.dumps(result, indent=2, ensure_ascii=False))
+    # 清理舊的時間戳備份，只保留最近的 10 個 (Clean up old timestamped backups, keep max 10)
+    import re
+    ts_files = []
+    for f in d.iterdir():
+        if f.is_file() and re.match(r"^\d{8}_\d{6}\.json$", f.name):
+            ts_files.append(f)
+    
+    ts_files.sort(key=lambda x: x.name)
+    if len(ts_files) > 10:
+        for f in ts_files[:-10]:
+            try:
+                f.unlink()
+            except Exception as e:
+                logger.warning(f"無法刪除舊結果檔案 {f}: {e}")
 
-    logger.info(f"[Results] 結果已存至 {path} (Result saved to {path})")
-    return path
+    logger.info(f"[Results] 結果已存至 {latest_path} 與 {ts_path} (Result saved to {latest_path} and {ts_path})")
+    return latest_path
 
 
 def load_latest(experiment_name: str) -> dict | None:
