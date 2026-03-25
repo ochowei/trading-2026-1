@@ -9,10 +9,10 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from trading_tw.core.base_backtester import BaseBacktester
-from trading_tw.core.base_config import ExperimentConfig
-from trading_tw.core.base_signal_detector import BaseSignalDetector
-from trading_tw.core.data_fetcher import DataFetcher
+from trading.core.base_backtester import BaseBacktester
+from trading.core.base_config import ExperimentConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.data_fetcher import DataFetcher
 
 logger = logging.getLogger(__name__)
 

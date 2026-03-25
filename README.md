@@ -11,22 +11,22 @@ Quantitative trading experiment framework — manage unlimited trading strategy 
 uv sync
 
 # 列出所有實驗 (List all experiments)
-uv run trading-tw list
+uv run trading list
 
 # 執行單一實驗 (Run a specific experiment)
-uv run trading-tw run tqqq_capitulation
+uv run trading run tqqq_capitulation
 
 # 執行全部實驗 (Run all experiments)
-uv run trading-tw run --all
+uv run trading run --all
 
 # 比較實驗結果 (Compare experiment results)
-uv run trading-tw compare tqqq_capitulation another_experiment
+uv run trading compare tqqq_capitulation another_experiment
 ```
 
 ## 專案架構 (Project Structure)
 
 ```
-src/trading_tw/
+src/trading/
 ├── cli.py                              # 統一 CLI 入口
 ├── core/                               # 共用基礎設施
 │   ├── base_config.py                  # ExperimentConfig dataclass
@@ -54,7 +54,7 @@ src/trading_tw/
 ### Step 1: 複製模板 (Copy Template)
 
 ```bash
-cp -r src/trading_tw/experiments/_template src/trading_tw/experiments/my_strategy
+cp -r src/trading/experiments/_template src/trading/experiments/my_strategy
 ```
 
 ### Step 2: 定義配置 `config.py` (Define Configuration)
@@ -63,7 +63,7 @@ cp -r src/trading_tw/experiments/_template src/trading_tw/experiments/my_strateg
 
 ```python
 from dataclasses import dataclass
-from trading_tw.core.base_config import ExperimentConfig
+from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class MyConfig(ExperimentConfig):
@@ -113,8 +113,8 @@ def create_default_config() -> MyConfig:
 
 ```python
 import pandas as pd
-from trading_tw.core.base_signal_detector import BaseSignalDetector
-from trading_tw.experiments.my_strategy.config import MyConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.experiments.my_strategy.config import MyConfig
 
 class MySignalDetector(BaseSignalDetector):
     def __init__(self, config: MyConfig):
@@ -153,11 +153,11 @@ class MySignalDetector(BaseSignalDetector):
 大多數實驗只需「接線」—— 把 config 和 detector 傳入即可：
 
 ```python
-from trading_tw.core.base_config import ExperimentConfig
-from trading_tw.core.base_signal_detector import BaseSignalDetector
-from trading_tw.core.base_strategy import BaseStrategy
-from trading_tw.experiments.my_strategy.config import MyConfig, create_default_config
-from trading_tw.experiments.my_strategy.signal_detector import MySignalDetector
+from trading.core.base_config import ExperimentConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.base_strategy import BaseStrategy
+from trading.experiments.my_strategy.config import MyConfig, create_default_config
+from trading.experiments.my_strategy.signal_detector import MySignalDetector
 
 class MyStrategy(BaseStrategy):
     def create_config(self) -> ExperimentConfig:
@@ -184,17 +184,17 @@ class MyStrategy(BaseStrategy):
 
 ### Step 5: 註冊實驗 (Register Experiment)
 
-在 `src/trading_tw/experiments/__init__.py` 底部加一行：
+在 `src/trading/experiments/__init__.py` 底部加一行：
 
 ```python
-from trading_tw.experiments import my_strategy  # noqa: F401, E402
+from trading.experiments import my_strategy  # noqa: F401, E402
 ```
 
 同時在 `experiments/my_strategy/__init__.py`：
 
 ```python
-from trading_tw.experiments import register
-from trading_tw.experiments.my_strategy.strategy import MyStrategy
+from trading.experiments import register
+from trading.experiments.my_strategy.strategy import MyStrategy
 
 register("my_strategy")(MyStrategy)
 ```
@@ -203,10 +203,10 @@ register("my_strategy")(MyStrategy)
 
 ```bash
 # 確認註冊成功
-uv run trading-tw list
+uv run trading list
 
 # 執行實驗
-uv run trading-tw run my_strategy
+uv run trading run my_strategy
 ```
 
 ## 進階用法 (Advanced Usage)
@@ -216,7 +216,7 @@ uv run trading-tw run my_strategy
 預設的 `BaseBacktester` 使用「停利 > 停損 > 到期」的日級出場邏輯，適用於大多數策略。如果你需要不同的出場機制（例如 trailing stop、多腿出場），可以覆寫 `create_backtester()`：
 
 ```python
-from trading_tw.core.base_backtester import BaseBacktester
+from trading.core.base_backtester import BaseBacktester
 
 class MyCustomBacktester(BaseBacktester):
     def run(self, df):
@@ -233,7 +233,7 @@ class MyStrategy(BaseStrategy):
 每次執行實驗時，結果會自動存為 JSON 到 `results/{experiment_name}/`。可以跨實驗比較：
 
 ```bash
-uv run trading-tw compare tqqq_capitulation my_strategy
+uv run trading compare tqqq_capitulation my_strategy
 ```
 
 ## 範例參照 (Reference Example)
@@ -242,6 +242,6 @@ uv run trading-tw compare tqqq_capitulation my_strategy
 
 | 檔案 | 說明 |
 |------|------|
-| [`config.py`](src/trading_tw/experiments/tqqq_capitulation/config.py) | 含 7 個策略專屬參數（drawdown, RSI, volume 等） |
-| [`signal_detector.py`](src/trading_tw/experiments/tqqq_capitulation/signal_detector.py) | 三條件恐慌抄底訊號 + 冷卻機制 |
-| [`strategy.py`](src/trading_tw/experiments/tqqq_capitulation/strategy.py) | 接線 + 自訂參數報表輸出 |
+| [`config.py`](src/trading/experiments/tqqq_capitulation/config.py) | 含 7 個策略專屬參數（drawdown, RSI, volume 等） |
+| [`signal_detector.py`](src/trading/experiments/tqqq_capitulation/signal_detector.py) | 三條件恐慌抄底訊號 + 冷卻機制 |
+| [`strategy.py`](src/trading/experiments/tqqq_capitulation/strategy.py) | 接線 + 自訂參數報表輸出 |

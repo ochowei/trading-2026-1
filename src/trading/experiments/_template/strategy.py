@@ -3,12 +3,12 @@
 串接配置 → 訊號偵測器 → 回測引擎。
 """
 
-from trading_tw.core.base_config import ExperimentConfig
-from trading_tw.core.base_signal_detector import BaseSignalDetector
-from trading_tw.core.base_strategy import BaseStrategy
+from trading.core.base_config import ExperimentConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.base_strategy import BaseStrategy
 
-# from trading_tw.experiments.<your_experiment>.config import create_default_config
-# from trading_tw.experiments.<your_experiment>.signal_detector import MySignalDetector
+# from trading.experiments.<your_experiment>.config import create_default_config
+# from trading.experiments.<your_experiment>.signal_detector import MySignalDetector
 
 
 class MyStrategy(BaseStrategy):

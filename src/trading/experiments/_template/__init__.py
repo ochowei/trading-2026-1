@@ -7,7 +7,7 @@
 3. 在 experiments/__init__.py 加一行 import
 """
 
-# from trading_tw.experiments import register
-# from trading_tw.experiments.<your_experiment>.strategy import YourStrategy
+# from trading.experiments import register
+# from trading.experiments.<your_experiment>.strategy import YourStrategy
 #
 # register("<your_experiment>")(YourStrategy)

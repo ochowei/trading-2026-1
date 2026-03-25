@@ -4,11 +4,11 @@ TQQQ 恐慌抄底策略 (TQQQ Capitulation Buy Strategy)
 Wires config → signal detector → backtester.
 """
 
-from trading_tw.core.base_config import ExperimentConfig
-from trading_tw.core.base_signal_detector import BaseSignalDetector
-from trading_tw.core.base_strategy import BaseStrategy
-from trading_tw.experiments.tqqq_capitulation.config import TQQQConfig, create_default_config
-from trading_tw.experiments.tqqq_capitulation.signal_detector import TQQQSignalDetector
+from trading.core.base_config import ExperimentConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.base_strategy import BaseStrategy
+from trading.experiments.tqqq_capitulation.config import TQQQConfig, create_default_config
+from trading.experiments.tqqq_capitulation.signal_detector import TQQQSignalDetector
 
 
 class TQQQStrategy(BaseStrategy):

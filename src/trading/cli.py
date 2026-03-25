@@ -8,8 +8,8 @@ import argparse
 import logging
 import sys
 
-from trading_tw.core.results import compare_experiments, save_result
-from trading_tw.experiments import get_experiment, list_experiments
+from trading.core.results import compare_experiments, save_result
+from trading.experiments import get_experiment, list_experiments
 
 # 設定日誌格式 (Configure logging format)
 logging.basicConfig(

@@ -8,8 +8,8 @@ import logging
 
 import pandas as pd
 
-from trading_tw.core.base_signal_detector import BaseSignalDetector
-from trading_tw.experiments.tqqq_capitulation.config import TQQQConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.experiments.tqqq_capitulation.config import TQQQConfig
 
 logger = logging.getLogger(__name__)
 

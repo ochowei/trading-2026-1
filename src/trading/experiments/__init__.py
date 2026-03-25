@@ -4,7 +4,7 @@
 Manages all registered trading experiments.
 """
 
-from trading_tw.core.base_strategy import BaseStrategy
+from trading.core.base_strategy import BaseStrategy
 
 _REGISTRY: dict[str, type[BaseStrategy]] = {}
 
@@ -42,4 +42,4 @@ def list_experiments() -> list[str]:
 
 # === 註冊所有實驗 (Register all experiments) ===
 # 新增實驗時在此加一行 import (Add one import line per new experiment)
-from trading_tw.experiments import tqqq_capitulation  # noqa: F401, E402
+from trading.experiments import tqqq_capitulation  # noqa: F401, E402

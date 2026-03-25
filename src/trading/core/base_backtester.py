@@ -9,7 +9,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from trading_tw.core.base_config import ExperimentConfig
+from trading.core.base_config import ExperimentConfig
 
 logger = logging.getLogger(__name__)
 
