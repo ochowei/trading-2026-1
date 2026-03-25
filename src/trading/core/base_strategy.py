@@ -110,6 +110,9 @@ class BaseStrategy(ABC):
         self._print_today_signal(df, detector, config)
 
         return {
+            "metadata": {
+                "execution_time": pd.Timestamp.now().isoformat()
+            },
             "part_a": results.get("Part A (In-Sample)", backtester._empty_result()),
             "part_b": results.get("Part B (Out-of-Sample)", backtester._empty_result()),
             "part_c": results.get("Part C (Live)", backtester._empty_result()),
