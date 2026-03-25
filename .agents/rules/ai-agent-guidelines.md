@@ -58,7 +58,7 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
 | `experiments/_template/` | 新實驗模板，複製即可快速建立新策略 |
 | `experiments/<name>/` | 各交易策略實驗，每個實驗包含 `config.py`、`signal_detector.py`、`strategy.py`，部分含自訂 `backtester.py` |
 
-> 各實驗的詳細說明請參考 `README.md` 的「範例參照」表與 `src/trading/experiments/EXPERIMENTS_TQQQ.md`。
+> 各實驗的詳細說明請參考 `README.md` 的「範例參照」表、`src/trading/experiments/EXPERIMENTS_TQQQ.md` 與 `src/trading/experiments/EXPERIMENTS_GLD.md`。
 
 ### 設定與 CI/CD
 
