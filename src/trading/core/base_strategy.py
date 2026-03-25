@@ -141,7 +141,7 @@ class BaseStrategy(ABC):
         trades = result["trades"]
 
         if not trades:
-            print(f"\n  無訊號觸發 (No signals detected)\n")
+            print("\n  無訊號觸發 (No signals detected)\n")
             return
 
         # 彙總績效 (Aggregate performance)
@@ -160,7 +160,7 @@ class BaseStrategy(ABC):
         print(f"  最大連續虧損 (Max consec. loss): {result['max_consecutive_losses']}")
 
         # 出場方式統計 (Exit type breakdown)
-        print(f"\n  出場方式 (Exit breakdown):")
+        print("\n  出場方式 (Exit breakdown):")
         print(f"    達標出場 (Target hit):         {result['target_exits']}")
         print(f"    停損出場 (Stop-loss):          {result['stop_loss_exits']}")
         print(f"    到期出場 (Time expiry):        {result['time_expiry_exits']}")

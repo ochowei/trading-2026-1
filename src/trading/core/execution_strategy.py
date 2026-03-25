@@ -6,7 +6,6 @@ Extends BaseStrategy with execution model report printing (slippage, fill rate, 
 
 import pandas as pd
 
-from trading.core.base_backtester import BaseBacktester
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_strategy import BaseStrategy
 from trading.core.execution_backtester import ExecutionModelBacktester
@@ -60,7 +59,7 @@ class ExecutionModelStrategy(BaseStrategy):
                 print(f"\n  無成交訊號，{unfilled} 個訊號未成交 "
                       f"(No filled trades, {unfilled} unfilled signals)\n")
             else:
-                print(f"\n  無訊號觸發 (No signals detected)\n")
+                print("\n  無訊號觸發 (No signals detected)\n")
             return
 
         # 成交統計 (Fill statistics)
@@ -91,7 +90,7 @@ class ExecutionModelStrategy(BaseStrategy):
         print(f"  最大連續虧損 (Max consec. loss): {result['max_consecutive_losses']}")
 
         # 出場方式統計 (Exit type breakdown)
-        print(f"\n  出場方式 (Exit breakdown):")
+        print("\n  出場方式 (Exit breakdown):")
         print(f"    達標出場 (Target hit):         {result['target_exits']}")
         print(f"    停損出場 (Stop-loss):          {result['stop_loss_exits']}")
         pessimistic = result.get("pessimistic_exits", 0)
