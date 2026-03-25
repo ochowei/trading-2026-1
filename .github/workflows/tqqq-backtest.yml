@@ -17,6 +17,7 @@ on:
           - "TQQQ-006: tqqq_momentum_collapse"
           - "TQQQ-007: tqqq_cap_qqq_confirm"
           - "TQQQ-008: tqqq_cap_optimized_exit"
+          - "TQQQ-009: tqqq_cap_gentle_entry"
 
 jobs:
   backtest:

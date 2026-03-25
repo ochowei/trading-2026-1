@@ -1,6 +1,6 @@
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-008 `tqqq_cap_optimized_exit`
+> **最新實驗 (Latest):** TQQQ-009 `tqqq_cap_gentle_entry`
 > **當前最佳 (Best):** TQQQ-008 `tqqq_cap_optimized_exit`
 
 ## 實驗清單 (Experiments)
@@ -15,6 +15,7 @@
 | TQQQ-006 | `tqqq_momentum_collapse`  | 多日動能崩潰：連續下跌 + 累計跌幅 + 趨勢過濾 | 5 日 4 跌、5 日報酬 ≤ -12%、Close < SMA50 | ✅ 完成 |
 | TQQQ-007 | `tqqq_cap_qqq_confirm`   | 恐慌抄底 + QQQ RSI 相對強度確認              | QQQ RSI(14) < 35、TP +6%、持倉 8 天 | ✅ 完成 |
 | TQQQ-008 | `tqqq_cap_optimized_exit` | 基線進場 + 優化出場（+7%、10 天、無追蹤停利） | TP +7%、持倉 10 天、無 Trailing | ✅ 完成 |
+| TQQQ-009 | `tqqq_cap_gentle_entry` | 僅放寬 DD -13% + 優化出場（+7%、10 天） | DD -13%、其餘進場不變 | ❌ 失敗 |
 
 ## 演進路線 (Lineage)
 
@@ -26,25 +27,26 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 ├── TQQQ-005 tqqq_cap_vix_adaptive   (軟性 VIX + 適應性出場)
 ├── TQQQ-006 tqqq_momentum_collapse  (多日動能崩潰新訊號)
 ├── TQQQ-007 tqqq_cap_qqq_confirm    (QQQ RSI 相對強度確認)
-└── TQQQ-008 tqqq_cap_optimized_exit (優化出場：+7%、10 天、無追蹤停利)
+├── TQQQ-008 tqqq_cap_optimized_exit (優化出場：+7%、10 天、無追蹤停利)
+└── TQQQ-009 tqqq_cap_gentle_entry  (僅放寬 DD -13% + 優化出場)
 ```
 
 ## 參數對照 (Parameter Comparison)
 
-| 參數              | TQQQ-001 | TQQQ-002 | TQQQ-003 | TQQQ-004 | TQQQ-005 | TQQQ-006 | TQQQ-007 | TQQQ-008 |
-|-------------------|----------|----------|----------|----------|----------|----------|----------|----------|
-| Drawdown          | -15%     | **-12%** | -15%     | -15%     | -15%     | — | -15% | -15% |
-| RSI(5)            | < 25     | **< 30** | < 25     | < 25     | < 25     | — | < 25 | < 25 |
-| Volume            | 1.5x     | **1.3x** | 1.5x     | 1.5x     | 1.5x     | — | 1.5x | 1.5x |
-| VIX Filter        | —        | —        | —        | **≥ 25** | **≥ 20** | — | — | — |
-| Down Days (5d)    | —        | —        | —        | —        | —        | **≥ 4/5** | — | — |
-| 5d Return         | —        | —        | —        | —        | —        | **≤ -12%** | — | — |
-| Trend Filter      | —        | —        | —        | —        | —        | **Close < SMA50** | — | — |
-| Profit Target     | +5%      | +5%      | **+12%** | +5%      | **+8%**  | **+7%** | **+6%** | **+7%** |
-| Stop Loss         | -8%      | **-6%**  | -8%      | -8%      | -8%      | **-10%** | -8% | -8% |
-| Holding Days      | 7        | 7        | **12**   | 7        | **10**   | **10** | **8** | **10** |
-| Trailing Stop     | —        | —        | **-4%**  | —        | **-6%**  | — | — | — |
-| Cooldown Days     | 3        | **5**    | 3        | 3        | 3        | **5** | 3 | 3 |
+| 參數              | TQQQ-001 | TQQQ-002 | TQQQ-003 | TQQQ-004 | TQQQ-005 | TQQQ-006 | TQQQ-007 | TQQQ-008 | TQQQ-009 |
+|-------------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+| Drawdown          | -15%     | **-12%** | -15%     | -15%     | -15%     | — | -15% | -15% | **-13%** |
+| RSI(5)            | < 25     | **< 30** | < 25     | < 25     | < 25     | — | < 25 | < 25 | < 25 |
+| Volume            | 1.5x     | **1.3x** | 1.5x     | 1.5x     | 1.5x     | — | 1.5x | 1.5x | 1.5x |
+| VIX Filter        | —        | —        | —        | **≥ 25** | **≥ 20** | — | — | — | — |
+| Down Days (5d)    | —        | —        | —        | —        | —        | **≥ 4/5** | — | — | — |
+| 5d Return         | —        | —        | —        | —        | —        | **≤ -12%** | — | — | — |
+| Trend Filter      | —        | —        | —        | —        | —        | **Close < SMA50** | — | — | — |
+| Profit Target     | +5%      | +5%      | **+12%** | +5%      | **+8%**  | **+7%** | **+6%** | **+7%** | **+7%** |
+| Stop Loss         | -8%      | **-6%**  | -8%      | -8%      | -8%      | **-10%** | -8% | -8% | -8% |
+| Holding Days      | 7        | 7        | **12**   | 7        | **10**   | **10** | **8** | **10** | **10** |
+| Trailing Stop     | —        | —        | **-4%**  | —        | **-6%**  | — | — | — | — |
+| Cooldown Days     | 3        | **5**    | 3        | 3        | 3        | **5** | 3 | 3 | 3 |
 
 ## 實驗結論 (Key Findings)
 
@@ -60,6 +62,7 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-006 | 25    | 72.0%  | +2.01%  | +50.42%  | -22.16% | 訊號數增加，但回撤顯著放大 |
 | TQQQ-007 | 14    | 85.7%  | +3.51%  | +59.18%  | -15.00% | 勝率高且回撤受控，但累計報酬仍低於基線 |
 | TQQQ-008 | 20    | 80.0%  | +4.19%  | +120.21% | -15.00% | **累計報酬大幅超越基線，新最佳** |
+| TQQQ-009 | 20    | 70.0%  | +2.56%  | +57.98%  | -15.00% | ❌ 訊號數未增加，勝率與報酬顯著下降 |
 
 ### Part B — Out-of-Sample (2024-01-01 ~ 2025-12-31)
 
@@ -73,12 +76,13 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-006 | 7     | 71.4%  | +0.93%  | +4.22%   | -14.96% | 勝率接近門檻，但樣本外報酬偏低 |
 | TQQQ-007 | 6     | 83.3%  | +3.43%  | +21.20%  | -14.82% | 勝率改善、品質提升，但樣本外累計仍未超越基線 |
 | TQQQ-008 | 8     | 87.5%  | +4.95%  | +45.44%  | -14.82% | **勝率與基線相同，累計報酬 +65.6% 超越基線，新最佳** |
+| TQQQ-009 | 9     | 77.8%  | +2.74%  | +23.75%  | -17.41% | ❌ 僅多 1 訊號但品質下降，累計報酬大幅落後 |
 
-> **目前結論：** TQQQ-008 (優化出場) 已超越 TQQQ-001 成為新最佳。關鍵發現：基線的 +5% 獲利目標過於保守，提高至 +7% 並延長持倉至 10 天（不使用追蹤停利），在相同訊號數和相同勝率下，Part B 累計報酬從 +27.44% 提升至 +45.44%（+65.6%），Part A 從 +70.86% 提升至 +120.21%（+69.5%）。此前 TQQQ-003 測試加寬出場搭配追蹤停利但效果不佳，證明追蹤停利是拖累因素而非加寬目標本身。其他失敗實驗：放寬進場 (TQQQ-002) 引入雜訊；VIX/QQQ 過濾 (TQQQ-004/005/007) 減少訊號但未改善報酬；多日動能崩潰 (TQQQ-006) 樣本外報酬不足。
+> **目前結論：** TQQQ-008 (優化出場) 仍為最佳。TQQQ-009 嘗試僅放寬 drawdown（-15% → -13%），搭配 TQQQ-008 出場參數，但結果失敗：Part A 訊號數未增加（仍 20 個），勝率下降 80%→70%，累計報酬下降 +120.21%→+57.98%；Part B 僅多 1 個訊號（9 vs 8），勝率下降 87.5%→77.8%，累計下降 +45.44%→+23.75%。結論：即使只放寬 drawdown 一項，也會捕捉到品質較差的訊號，證明基線 -15% 門檻已是最優。此前 TQQQ-002 (全部放寬) 也失敗，進一步確認進場條件敏感、不宜調整。
 
 <!-- 更新指引：
   1. 執行 uv run trading run --all
-  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter tqqq_cap_vix_adaptive tqqq_momentum_collapse tqqq_cap_qqq_confirm tqqq_cap_optimized_exit
+  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter tqqq_cap_vix_adaptive tqqq_momentum_collapse tqqq_cap_qqq_confirm tqqq_cap_optimized_exit tqqq_cap_gentle_entry
   3. 將關鍵數字填入上方表格（訊號數、勝率、平均報酬%、累計報酬%、最大回撤%）
   4. 更新「結論」欄、「目前結論」與頂部的「當前最佳」
 -->

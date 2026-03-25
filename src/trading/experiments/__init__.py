@@ -50,3 +50,4 @@ from trading.experiments import tqqq_cap_vix_adaptive  # noqa: F401, E402
 from trading.experiments import tqqq_momentum_collapse  # noqa: F401, E402
 from trading.experiments import tqqq_cap_qqq_confirm  # noqa: F401, E402
 from trading.experiments import tqqq_cap_optimized_exit  # noqa: F401, E402
+from trading.experiments import tqqq_cap_gentle_entry  # noqa: F401, E402
