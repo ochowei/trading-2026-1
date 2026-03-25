@@ -66,3 +66,8 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
 |------|------|
 | `pyproject.toml` | Python 專案設定，定義依賴、建置系統與 CLI 入口 |
 | `.github/workflows/tqqq-backtest.yml` | GitHub Actions 工作流程，可手動觸發執行指定實驗的回測 |
+
+## 4. 人類專用文件規範
+
+- **強調**：`HUMAN_PM_MEMO.md` 是專門讓人類來寫的。
+- **權限限制**：AI Agent 除非是自稱（或被明確指定為） `HUMAN_PM_HELPER`，否則**不可以**更動此檔案。
