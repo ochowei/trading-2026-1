@@ -19,7 +19,6 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
 |------|------|
 | `README.md` | 專案總覽、架構說明、快速開始指南、新實驗建立教學 |
 | `MEMO.md` | 研究備忘錄，記錄關注標的與未來研究方向 |
-| `PLAN_TQQQ_NEXT.md` | TQQQ 下一階段實驗規劃，包含未實作實驗的設計與評估標準 |
 | `CLAUDE.md` | Claude Code 的專案規則入口，指引 AI 遵循本規範 |
 | `.agents/rules/ai-agent-guidelines.md` | 本文件。定義 AI Agent 修改專案時必須遵守的規範 |
 
