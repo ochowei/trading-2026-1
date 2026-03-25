@@ -9,7 +9,7 @@ import logging
 import sys
 
 from trading.core.results import compare_experiments, save_result
-from trading.experiments import get_experiment, list_experiments
+from trading.experiments import get_experiment, list_experiments, EXPERIMENTS
 
 # 設定日誌格式 (Configure logging format)
 logging.basicConfig(
@@ -24,12 +24,24 @@ def cmd_list(args: argparse.Namespace) -> None:
     """列出所有已註冊的實驗 (List all registered experiments)"""
     experiments = list_experiments()
     print(f"\n  已註冊的實驗 (Registered experiments): {len(experiments)}")
-    print(f"  {'='*40}")
+    print(f"  {'='*80}")
+    print(f"  {'ID':<10} {'Name':<30} {'Status':<10} {'Tags':<30}")
+    print(f"  {'-'*80}")
     for name in experiments:
-        strategy = get_experiment(name)
-        config = strategy.create_config()
+        exp_data = EXPERIMENTS.get(name, {})
+        config = exp_data.get("config")
+
+        # Fallback if EXPERIMENTS dict is somehow missing data
+        if not config:
+            strategy = get_experiment(name)
+            config = strategy.create_config()
+
         eid = config.experiment_id or ""
-        print(f"  - {eid:<10} {name:<30} {config.display_name}")
+        status = config.status
+        tags_str = ", ".join(config.tags) if config.tags else ""
+
+        print(f"  {eid:<10} {name:<30} {status:<10} [{tags_str}]")
+        print(f"    └─ {config.display_name}")
     print()
 
 

@@ -31,6 +31,7 @@ def create_default_config() -> TQQQConfig:
         name="tqqq_capitulation",
         experiment_id="TQQQ-001",
         display_name="TQQQ 恐慌抄底策略 — Capitulation Buy Strategy",
+        tags=["tqqq", "capitulation", "baseline"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

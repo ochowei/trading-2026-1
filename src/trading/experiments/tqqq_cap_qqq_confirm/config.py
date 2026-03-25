@@ -24,6 +24,7 @@ def create_default_config() -> TQQQCapQqqConfirmConfig:
         name="tqqq_cap_qqq_confirm",
         experiment_id="TQQQ-007",
         display_name="TQQQ QQQ 相對強度確認策略 — Capitulation + QQQ RSI Confirm",
+        tags=["tqqq", "capitulation", "qqq_confirm"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

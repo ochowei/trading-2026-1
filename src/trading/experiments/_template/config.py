@@ -23,6 +23,7 @@ def create_default_config() -> MyConfig:
         name="my_experiment",                    # 實驗名稱
         experiment_id="XXX-000",                 # 實驗 ID
         display_name="My Experiment",            # 顯示名稱
+        tags=["template"],                       # 標籤
         tickers=["SPY"],                         # 標的
         data_start="2019-01-01",                 # 資料起始日
         profit_target=0.05,                      # 獲利目標

@@ -27,6 +27,7 @@ def create_default_config() -> TQQQCapExecOptimizedConfig:
         name="tqqq_cap_exec_optimized",
         experiment_id="TQQQ-010",
         display_name="TQQQ 優化出場 + 成交模型 — Optimized Exit + Execution Model",
+        tags=["tqqq", "capitulation", "execution", "optimized"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

@@ -31,6 +31,7 @@ def create_default_config() -> TQQQMomentumCollapseConfig:
         name="tqqq_momentum_collapse",
         experiment_id="TQQQ-006",
         display_name="TQQQ 多日動能崩潰策略 — Multi-Day Momentum Collapse",
+        tags=["tqqq", "momentum", "collapse"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

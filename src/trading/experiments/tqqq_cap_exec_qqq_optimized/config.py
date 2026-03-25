@@ -26,6 +26,8 @@ def create_default_config() -> TQQQCapExecQqqOptimizedConfig:
         name="tqqq_cap_exec_qqq_optimized",
         experiment_id="TQQQ-013",
         display_name="TQQQ QQQ 確認 + 優化出場 + 成交模型 — QQQ Confirm + Optimized Exit + Execution Model",
+        tags=["tqqq", "capitulation", "execution", "qqq_optimized"],
+        status="failed",
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

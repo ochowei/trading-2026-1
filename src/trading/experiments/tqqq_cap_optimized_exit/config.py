@@ -24,6 +24,7 @@ def create_default_config() -> TQQQCapOptimizedExitConfig:
         name="tqqq_cap_optimized_exit",
         experiment_id="TQQQ-008",
         display_name="TQQQ 優化出場策略 — Optimized Exit Strategy",
+        tags=["tqqq", "capitulation", "optimized_exit"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

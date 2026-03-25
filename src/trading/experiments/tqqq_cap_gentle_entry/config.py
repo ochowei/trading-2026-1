@@ -33,6 +33,8 @@ def create_default_config() -> TQQQCapGentleEntryConfig:
         name="tqqq_cap_gentle_entry",
         experiment_id="TQQQ-009",
         display_name="TQQQ 溫和放寬進場策略 — Gentle Entry Relaxation",
+        tags=["tqqq", "capitulation", "gentle_entry"],
+        status="failed",
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

@@ -31,6 +31,8 @@ def create_default_config() -> TQQQCapRelaxedConfig:
         name="tqqq_cap_relaxed_entry",
         experiment_id="TQQQ-002",
         display_name="TQQQ 放寬進場策略 — Relaxed Entry Strategy",
+        tags=["tqqq", "capitulation", "relaxed_entry"],
+        status="archived",
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

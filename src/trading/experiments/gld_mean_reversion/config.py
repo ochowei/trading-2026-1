@@ -19,6 +19,7 @@ def create_default_config() -> GLDMeanReversionConfig:
         name="gld_mean_reversion",
         experiment_id="GLD-001",
         display_name="GLD Deep Oversold Mean Reversion",
+        tags=["gld", "mean_reversion"],
         tickers=["GLD"],
         data_start="2010-01-01",
         profit_target=0.015, # 1.5% profit target

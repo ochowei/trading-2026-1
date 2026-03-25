@@ -23,6 +23,7 @@ def create_default_config() -> TQQQCapExecQqqConfirmConfig:
         name="tqqq_cap_exec_qqq_confirm",
         experiment_id="TQQQ-012",
         display_name="TQQQ QQQ 確認 + 成交模型 — QQQ Confirm + Execution Model",
+        tags=["tqqq", "capitulation", "execution", "qqq_confirm"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

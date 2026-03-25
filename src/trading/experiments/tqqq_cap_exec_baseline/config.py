@@ -28,6 +28,7 @@ def create_default_config() -> TQQQCapExecBaselineConfig:
         name="tqqq_cap_exec_baseline",
         experiment_id="TQQQ-011",
         display_name="TQQQ 基線恐慌抄底 + 成交模型 — Baseline Capitulation + Execution Model",
+        tags=["tqqq", "capitulation", "execution", "baseline"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

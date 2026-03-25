@@ -25,6 +25,7 @@ def create_default_config() -> TQQQCapVixAdaptiveConfig:
         name="tqqq_cap_vix_adaptive",
         experiment_id="TQQQ-005",
         display_name="TQQQ 軟性 VIX + 適應性出場策略 — Soft VIX + Adaptive Exit",
+        tags=["tqqq", "capitulation", "vix_adaptive"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

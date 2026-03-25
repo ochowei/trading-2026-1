@@ -5,6 +5,7 @@ All experiment configs inherit from this dataclass.
 """
 
 from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass
@@ -13,6 +14,9 @@ class ExperimentConfig:
 
     # 實驗識別 (Experiment identity)
     name: str                          # e.g. "tqqq_capitulation"
+    tags: List[str] = field(default_factory=list) # e.g. ["vix", "momentum", "tqqq"]
+    version: str = "1.0.0"             # 實驗版本號
+    status: str = "active"             # 實驗狀態 (e.g., active, archived, failed)
     experiment_id: str = ""            # e.g. "TQQQ-001"
     display_name: str = ""             # e.g. "TQQQ Capitulation Buy"
 

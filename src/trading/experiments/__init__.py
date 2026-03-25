@@ -6,7 +6,10 @@ Manages all registered trading experiments.
 
 from trading.core.base_strategy import BaseStrategy
 
+from typing import Dict, Any, List
+
 _REGISTRY: dict[str, type[BaseStrategy]] = {}
+EXPERIMENTS: Dict[str, Any] = {}
 
 
 def register(name: str):
@@ -20,6 +23,18 @@ def register(name: str):
     """
     def wrapper(cls: type[BaseStrategy]) -> type[BaseStrategy]:
         _REGISTRY[name] = cls
+
+        # Instantiate to grab config metadata
+        strategy_instance = cls()
+        config = strategy_instance.create_config()
+
+        EXPERIMENTS[name] = {
+            "cls": cls,
+            "tags": config.tags,
+            "status": config.status,
+            "config": config,
+        }
+
         return cls
     return wrapper
 
@@ -38,6 +53,14 @@ def get_experiment(name: str) -> BaseStrategy:
 def list_experiments() -> list[str]:
     """列出所有已註冊的實驗 (List all registered experiments)"""
     return sorted(_REGISTRY.keys())
+
+
+def get_experiments_by_tag(tag: str) -> List[str]:
+    """回傳符合標籤的實驗列表 (Return a list of experiments matching the tag)"""
+    return sorted([
+        name for name, data in EXPERIMENTS.items()
+        if tag in data["tags"]
+    ])
 
 
 # === 註冊所有實驗 (Register all experiments) ===

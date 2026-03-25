@@ -24,6 +24,7 @@ def create_default_config() -> TQQQCapVixFilterConfig:
         name="tqqq_cap_vix_filter",
         experiment_id="TQQQ-004",
         display_name="TQQQ VIX 過濾策略 — VIX Regime Filter Strategy",
+        tags=["tqqq", "capitulation", "vix_filter"],
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",

@@ -27,6 +27,8 @@ def create_default_config() -> TQQQCapWiderExitConfig:
         name="tqqq_cap_wider_exit",
         experiment_id="TQQQ-003",
         display_name="TQQQ 加寬出場策略 — Wider Exit with Trailing Stop",
+        tags=["tqqq", "capitulation", "wider_exit"],
+        status="archived",
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",
