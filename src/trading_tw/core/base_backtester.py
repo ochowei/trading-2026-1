@@ -1,7 +1,7 @@
 """
-TQQQ 恐慌抄底回測引擎 (TQQQ Capitulation Buy Backtester)
-對 TQQQ 恐慌抄底訊號進行歷史回測，含停損、獲利目標與時間到期。
-Backtests TQQQ capitulation buy signals with stop-loss, profit target, and time expiry.
+通用回測引擎 (Base Backtester)
+從 TQQQ 回測器提取的通用日級回測邏輯。
+Generic day-level backtest engine extracted from TQQQBacktester.
 """
 
 import logging
@@ -9,31 +9,32 @@ import logging
 import numpy as np
 import pandas as pd
 
-from trading_tw.scanner.tqqq_config import (
-    TQQQ_HOLDING_DAYS,
-    TQQQ_PROFIT_TARGET,
-    TQQQ_STOP_LOSS,
-)
+from trading_tw.core.base_config import ExperimentConfig
 
 logger = logging.getLogger(__name__)
 
 
-class TQQQBacktester:
+class BaseBacktester:
     """
-    TQQQ 回測引擎 (TQQQ Backtester)
+    通用回測引擎 (Generic Backtester)
 
     交易規則 (Trading rules):
     - 進場: 訊號日收盤價 (Entry: signal day close)
-    - 停損: 收盤價跌破進場價 -8% (Stop-loss: close drops 8% below entry)
-    - 獲利目標: 盤中最高價達 +5% (Profit target: intraday high reaches +5%)
-    - 時間到期: 第 7 個交易日收盤價出場 (Time expiry: day-7 close)
+    - 停損: 收盤價跌破進場價 (Stop-loss: close drops below entry by stop_loss %)
+    - 獲利目標: 盤中最高價達標 (Profit target: intraday high reaches target %)
+    - 時間到期: 最後一天收盤價出場 (Time expiry: last day close)
     - 優先順序: 停損 > 獲利目標 > 時間到期
     """
 
-    @staticmethod
-    def run(df: pd.DataFrame) -> dict:
+    def __init__(self, config: ExperimentConfig):
+        self.config = config
+
+    def run(self, df: pd.DataFrame) -> dict:
         """
-        執行 TQQQ 回測 (Run TQQQ backtest)
+        執行回測 (Run backtest)
+
+        Args:
+            df: DataFrame with 'Signal' boolean column
 
         Returns:
             dict with backtest results including per-trade details
@@ -41,18 +42,22 @@ class TQQQBacktester:
         signal_indices = df.index[df["Signal"]].tolist()
 
         if not signal_indices:
-            return TQQQBacktester._empty_result()
+            return self._empty_result()
 
         trades: list[dict] = []
         consecutive_losses = 0
         max_consecutive_losses = 0
+
+        profit_target = self.config.profit_target
+        stop_loss = self.config.stop_loss
+        holding_days = self.config.holding_days
 
         for signal_date in signal_indices:
             entry_price = df.loc[signal_date, "Close"]
 
             # 取得訊號日之後的交易日 (Get trading days after signal)
             future_mask = df.index > signal_date
-            future_df = df.loc[future_mask].head(TQQQ_HOLDING_DAYS)
+            future_df = df.loc[future_mask].head(holding_days)
 
             if future_df.empty:
                 trades.append({
@@ -67,15 +72,15 @@ class TQQQBacktester:
                 })
                 continue
 
-            target_price = entry_price * (1 + TQQQ_PROFIT_TARGET)
-            stop_price = entry_price * (1 + TQQQ_STOP_LOSS)
+            target_price = entry_price * (1 + profit_target)
+            stop_price = entry_price * (1 + stop_loss)
 
             # 逐日檢查出場條件 (Check exit conditions day by day)
             trade_return = None
             exit_price = None
             exit_type = None
             exit_date = None
-            holding_days = 0
+            days_held = 0
             min_low = float("inf")
 
             for day_idx, (day_date, row) in enumerate(future_df.iterrows(), start=1):
@@ -87,16 +92,16 @@ class TQQQBacktester:
                     trade_return = (exit_price - entry_price) / entry_price
                     exit_type = "stop_loss"
                     exit_date = day_date
-                    holding_days = day_idx
+                    days_held = day_idx
                     break
 
                 # 檢查獲利目標（盤中最高價）(Priority 2: profit target on high)
                 if row["High"] >= target_price:
                     exit_price = target_price
-                    trade_return = TQQQ_PROFIT_TARGET
+                    trade_return = profit_target
                     exit_type = "target"
                     exit_date = day_date
-                    holding_days = day_idx
+                    days_held = day_idx
                     break
 
             # 未觸發任何條件，以最後一天收盤價出場 (Time expiry)
@@ -105,7 +110,7 @@ class TQQQBacktester:
                 trade_return = (exit_price - entry_price) / entry_price
                 exit_type = "time_expiry"
                 exit_date = future_df.index[-1]
-                holding_days = len(future_df)
+                days_held = len(future_df)
                 min_low = min(min_low, future_df["Low"].min())
 
             # 計算最大回撤 (Max drawdown for this trade)
@@ -124,7 +129,7 @@ class TQQQBacktester:
                 "entry": round(float(entry_price), 2),
                 "exit": round(float(exit_price), 2),
                 "return_pct": round(float(trade_return) * 100, 2),
-                "holding_days": holding_days,
+                "holding_days": days_held,
                 "exit_type": exit_type,
                 "max_drawdown_pct": round(float(max_dd) * 100, 2),
             })
@@ -148,14 +153,15 @@ class TQQQBacktester:
         avg_holding = float(np.mean([t["holding_days"] for t in trades]))
         worst_dd = min(t["max_drawdown_pct"] for t in trades)
 
+        ticker_str = ", ".join(self.config.tickers)
         logger.info(
-            f"[TQQQBacktester] TQQQ: {total} 訊號, 勝率 {wins}/{total} = {wins/total:.1%}, "
+            f"[Backtester] {ticker_str}: {total} 訊號, 勝率 {wins}/{total} = {wins/total:.1%}, "
             f"累計報酬 {cumulative_return:.1f}% "
             f"({total} signals, WR {wins/total:.1%}, cumulative {cumulative_return:.1f}%)"
         )
 
         return {
-            "ticker": "TQQQ",
+            "ticker": ticker_str,
             "total_signals": total,
             "wins": wins,
             "win_rate": wins / total if total > 0 else 0.0,
@@ -171,10 +177,10 @@ class TQQQBacktester:
             "trades": trades,
         }
 
-    @staticmethod
-    def _empty_result() -> dict:
+    def _empty_result(self) -> dict:
+        ticker_str = ", ".join(self.config.tickers)
         return {
-            "ticker": "TQQQ",
+            "ticker": ticker_str,
             "total_signals": 0,
             "wins": 0,
             "win_rate": 0.0,

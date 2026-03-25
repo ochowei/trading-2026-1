@@ -1,127 +1,123 @@
 """
-TQQQ 恐慌抄底策略主程式 (TQQQ Capitulation Buy Strategy)
-串接資料擷取 → 訊號偵測 → 回測 → 報表輸出。
-Orchestrates: DataFetcher → TQQQSignalDetector → TQQQBacktester → Report.
+策略基礎類別 (Base Strategy)
+提供通用的 run 流程：fetch → indicators → split parts → signals → backtest → report。
+Provides the standard pipeline: fetch → indicators → split parts → signals → backtest → report.
 """
 
 import logging
+from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from trading_tw.scanner.data_fetcher import DataFetcher
-from trading_tw.scanner.tqqq_backtester import TQQQBacktester
-from trading_tw.scanner.tqqq_config import (
-    TQQQ_DATA_PERIOD,
-    TQQQ_DRAWDOWN_THRESHOLD,
-    TQQQ_HOLDING_DAYS,
-    TQQQ_PART_A_END,
-    TQQQ_PART_A_START,
-    TQQQ_PART_B_END,
-    TQQQ_PART_B_START,
-    TQQQ_PART_C_END,
-    TQQQ_PART_C_START,
-    TQQQ_PROFIT_TARGET,
-    TQQQ_RSI_PERIOD,
-    TQQQ_RSI_THRESHOLD,
-    TQQQ_STOP_LOSS,
-    TQQQ_TICKER,
-    TQQQ_VOLUME_MULTIPLIER,
-)
-from trading_tw.scanner.tqqq_signal_detector import TQQQSignalDetector
+from trading_tw.core.base_backtester import BaseBacktester
+from trading_tw.core.base_config import ExperimentConfig
+from trading_tw.core.base_signal_detector import BaseSignalDetector
+from trading_tw.core.data_fetcher import DataFetcher
 
 logger = logging.getLogger(__name__)
 
 
-class TQQQStrategy:
+class BaseStrategy(ABC):
     """
-    TQQQ 恐慌抄底策略 (TQQQ Capitulation Buy Strategy)
+    策略基礎類別 (Base Strategy)
 
-    專為 TQQQ 設計的低頻高勝率策略，每年約 3-5 次訊號。
-    Low-frequency, high-win-rate strategy designed for TQQQ, ~3-5 signals/year.
-
-    回測分為三個區間 (Backtest split into three periods):
-    - Part A: 2019-01-01 ~ 2023-12-31 (樣本內 in-sample)
-    - Part B: 2024-01-01 ~ 2025-12-31 (樣本外 out-of-sample)
-    - Part C: 2026-01-01 ~ 至今 (即時驗證 live validation)
+    子類需實作 create_config() 和 create_detector()。
+    Subclasses must implement create_config() and create_detector().
+    BaseStrategy.run() 提供完整的回測流程，大多數實驗不需要覆寫。
     """
 
-    def __init__(self, period: str = TQQQ_DATA_PERIOD):
-        # 使用 start/end 確保涵蓋完整的回測區間
-        # Use start/end to ensure full coverage of both backtest periods
-        self.fetcher = DataFetcher(start=TQQQ_PART_A_START)
-        self.detector = TQQQSignalDetector()
-        self.backtester = TQQQBacktester()
+    @abstractmethod
+    def create_config(self) -> ExperimentConfig:
+        """建立實驗配置 (Create experiment config)"""
+        ...
+
+    @abstractmethod
+    def create_detector(self) -> BaseSignalDetector:
+        """建立訊號偵測器 (Create signal detector)"""
+        ...
+
+    def create_backtester(self, config: ExperimentConfig) -> BaseBacktester:
+        """建立回測引擎（預設使用通用引擎，可覆寫）"""
+        return BaseBacktester(config)
 
     def run(self) -> dict:
         """
-        執行 TQQQ 恐慌抄底策略完整流程 (Run full TQQQ strategy pipeline)
+        執行完整策略流程 (Run full strategy pipeline)
 
         Returns:
-            dict with 'part_a', 'part_b' backtest results
+            dict with 'part_a', 'part_b', 'part_c' backtest results
         """
+        config = self.create_config()
+        detector = self.create_detector()
+        backtester = self.create_backtester(config)
+        fetcher = DataFetcher(start=config.data_start)
+
         separator = "=" * 80
 
         print(f"\n{separator}")
-        print("  TQQQ 恐慌抄底策略 — Capitulation Buy Strategy")
+        print(f"  {config.display_name}")
         print(f"{separator}\n")
 
-        # Step 1: 下載 TQQQ 數據 (Fetch TQQQ data)
-        logger.info("Step 1/3: 下載 TQQQ 歷史數據 (Fetching TQQQ data)...")
-        data = self.fetcher.fetch_all([TQQQ_TICKER])
+        # Step 1: 下載數據 (Fetch data)
+        logger.info(f"Step 1/3: 下載數據 (Fetching data for {config.tickers})...")
+        data = fetcher.fetch_all(config.tickers)
 
-        if TQQQ_TICKER not in data:
-            logger.error("無法取得 TQQQ 數據 (Failed to fetch TQQQ data)")
-            empty = self.backtester._empty_result()
-            return {"part_a": empty, "part_b": empty}
+        # 處理每個標的（目前大多數策略只有一個）
+        # Process each ticker (most strategies have just one)
+        primary_ticker = config.tickers[0]
+        if primary_ticker not in data:
+            logger.error(f"無法取得 {primary_ticker} 數據 (Failed to fetch {primary_ticker} data)")
+            empty = backtester._empty_result()
+            return {"part_a": empty, "part_b": empty, "part_c": empty}
 
-        df = data[TQQQ_TICKER]
+        df = data[primary_ticker]
         print(f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}")
         print(f"  原始資料筆數: {len(df)} 個交易日\n")
 
-        # Step 2: 計算指標（在完整資料上計算，避免 rolling 邊界問題）
+        # Step 2: 計算指標 (Compute indicators on full data)
         logger.info("Step 2/3: 計算指標與偵測訊號 (Computing indicators & detecting signals)...")
-        df = self.detector.compute_indicators(df)
+        df = detector.compute_indicators(df)
 
-        # Step 3: 分區間回測 (Split into Part A / Part B / Part C)
-        logger.info("Step 3/3: 分區間回測 (Running backtests for Part A, B & C)...")
+        # Step 3: 分區間回測 (Split into parts and backtest)
+        logger.info("Step 3/3: 分區間回測 (Running backtests for each part)...")
 
-        # Part C end: 空字串表示至今 (empty = up to today)
-        part_c_end = TQQQ_PART_C_END or df.index[-1].strftime("%Y-%m-%d")
-
-        parts = [
-            ("Part A (In-Sample)", TQQQ_PART_A_START, TQQQ_PART_A_END),
-            ("Part B (Out-of-Sample)", TQQQ_PART_B_START, TQQQ_PART_B_END),
-            ("Part C (Live)", TQQQ_PART_C_START, part_c_end),
-        ]
+        parts = config.get_parts()
+        # Part C end: 空字串表示至今
+        parts_resolved = []
+        for label, start, end in parts:
+            if not end:
+                end = df.index[-1].strftime("%Y-%m-%d")
+            parts_resolved.append((label, start, end))
 
         results = {}
-        for label, start, end in parts:
+        for label, start, end in parts_resolved:
             df_part = df.loc[start:end].copy()
             if df_part.empty:
                 logger.warning(f"{label}: 無資料 (no data)")
-                results[label] = self.backtester._empty_result()
+                results[label] = backtester._empty_result()
                 continue
 
-            df_part = self.detector.detect_signals(df_part)
-            result = self.backtester.run(df_part)
+            df_part = detector.detect_signals(df_part)
+            result = backtester.run(df_part)
             results[label] = result
 
-            self._print_part_report(label, start, end, result, df_part)
+            self._print_part_report(label, start, end, result, df_part, config)
 
-        # 印出兩區間比較表 (Print comparison table)
+        # 印出比較表 (Print comparison table)
         self._print_comparison(results)
 
         # 今日訊號檢查 (Today's signal check)
-        self._print_today_signal(df)
+        self._print_today_signal(df, detector, config)
 
         return {
-            "part_a": results.get("Part A (In-Sample)", self.backtester._empty_result()),
-            "part_b": results.get("Part B (Out-of-Sample)", self.backtester._empty_result()),
-            "part_c": results.get("Part C (Live)", self.backtester._empty_result()),
+            "part_a": results.get("Part A (In-Sample)", backtester._empty_result()),
+            "part_b": results.get("Part B (Out-of-Sample)", backtester._empty_result()),
+            "part_c": results.get("Part C (Live)", backtester._empty_result()),
         }
 
     def _print_part_report(
-        self, label: str, start: str, end: str, result: dict, df: pd.DataFrame
+        self, label: str, start: str, end: str, result: dict,
+        df: pd.DataFrame, config: ExperimentConfig
     ) -> None:
         """印出單一區間的報表 (Print report for one backtest period)"""
         separator = "=" * 80
@@ -137,12 +133,7 @@ class TQQQStrategy:
             print(f"\n{thin_sep}")
             print("  策略參數 (Strategy Parameters)")
             print(f"{thin_sep}")
-            print(f"  回撤閾值 (Drawdown threshold):  {TQQQ_DRAWDOWN_THRESHOLD:.0%}")
-            print(f"  RSI 週期/閾值 (RSI period/thr):  RSI({TQQQ_RSI_PERIOD}) < {TQQQ_RSI_THRESHOLD}")
-            print(f"  成交量倍數 (Volume multiplier):  {TQQQ_VOLUME_MULTIPLIER}x")
-            print(f"  獲利目標 (Profit target):        +{TQQQ_PROFIT_TARGET:.0%}")
-            print(f"  停損 (Stop-loss):                {TQQQ_STOP_LOSS:.0%}")
-            print(f"  最長持倉 (Max holding):          {TQQQ_HOLDING_DAYS} 天")
+            self._print_strategy_params(config)
 
         trades = result["trades"]
 
@@ -198,6 +189,12 @@ class TQQQStrategy:
                 f"{label_t:<12}"
             )
 
+    def _print_strategy_params(self, config: ExperimentConfig) -> None:
+        """印出策略參數（子類可覆寫以顯示額外參數）"""
+        print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")
+        print(f"  停損 (Stop-loss):                {config.stop_loss:.0%}")
+        print(f"  最長持倉 (Max holding):          {config.holding_days} 天")
+
     def _print_comparison(self, results: dict) -> None:
         """印出 Part A / B / C 比較表 (Print comparison table)"""
         separator = "=" * 80
@@ -211,10 +208,9 @@ class TQQQStrategy:
         print("  績效比較 (Performance Comparison)")
         print(f"{separator}")
 
-        # 動態產生表頭 (Dynamic header based on number of parts)
         header = f"  {'指標 (Metric)':<36}"
         for k in keys:
-            short = k.split(" (")[0]  # "Part A", "Part B", "Part C"
+            short = k.split(" (")[0]
             header += f" {short:>12}"
         print(header)
         print(f"  {thin_sep}")
@@ -239,21 +235,24 @@ class TQQQStrategy:
 
         print()
 
-    def _print_today_signal(self, df: pd.DataFrame) -> None:
+    def _print_today_signal(
+        self, df: pd.DataFrame, detector: BaseSignalDetector,
+        config: ExperimentConfig
+    ) -> None:
         """今日訊號檢查 (Today's signal check)"""
         separator = "=" * 80
 
-        # 在最新資料上重新偵測訊號以檢查今日
-        df_recent = self.detector.detect_signals(df.copy())
+        df_recent = detector.detect_signals(df.copy())
 
         print(f"{separator}")
         today = pd.Timestamp.now().normalize()
         latest_date = df_recent.index[-1]
+        ticker_str = ", ".join(config.tickers)
         if latest_date >= today and df_recent.loc[latest_date, "Signal"]:
-            print("  *** 今日 TQQQ 觸發恐慌抄底訊號！ ***")
-            print("  *** TODAY: TQQQ Capitulation Buy Signal TRIGGERED! ***")
+            print(f"  *** 今日 {ticker_str} 觸發訊號！ ***")
+            print(f"  *** TODAY: {ticker_str} Signal TRIGGERED! ***")
         else:
-            print("  今日 TQQQ 無訊號 (No TQQQ signal today)")
+            print(f"  今日 {ticker_str} 無訊號 (No {ticker_str} signal today)")
         print(f"{separator}\n")
 
     @staticmethod
