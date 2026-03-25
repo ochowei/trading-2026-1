@@ -5,7 +5,7 @@
 
 from dataclasses import dataclass
 
-from trading_tw.core.base_config import ExperimentConfig
+from trading.core.base_config import ExperimentConfig
 
 
 @dataclass
