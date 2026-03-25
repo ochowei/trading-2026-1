@@ -22,6 +22,8 @@ on:
           - "TQQQ-011: tqqq_cap_exec_baseline"
           - "TQQQ-012: tqqq_cap_exec_qqq_confirm"
           - "TQQQ-013: tqqq_cap_exec_qqq_optimized"
+          - "GLD-001: gld_mean_reversion"
+          - "GLD-002: gld_optimized_exit"
 
 jobs:
   backtest:
