@@ -15,6 +15,7 @@ on:
           - "TQQQ-004: tqqq_cap_vix_filter"
           - "TQQQ-005: tqqq_cap_vix_adaptive"
           - "TQQQ-006: tqqq_momentum_collapse"
+          - "TQQQ-007: tqqq_cap_qqq_confirm"
 
 jobs:
   backtest:

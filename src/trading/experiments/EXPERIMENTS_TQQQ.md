@@ -1,6 +1,6 @@
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-006 `tqqq_momentum_collapse`
+> **最新實驗 (Latest):** TQQQ-007 `tqqq_cap_qqq_confirm`
 > **當前最佳 (Best):** TQQQ-001 `tqqq_capitulation`
 
 ## 實驗清單 (Experiments)
@@ -13,6 +13,7 @@
 | TQQQ-004 | `tqqq_cap_vix_filter`     | 加入 VIX ≥ 25 過濾，僅在真正恐慌時進場   | VIX ≥ 25 額外條件       | ✅ 完成  |
 | TQQQ-005 | `tqqq_cap_vix_adaptive`   | 軟性 VIX ≥ 20 + 適應性出場（追蹤停利）   | VIX ≥ 20, TP +8%, Trailing -6%, 持倉 10 天 | ✅ 完成  |
 | TQQQ-006 | `tqqq_momentum_collapse`  | 多日動能崩潰：連續下跌 + 累計跌幅 + 趨勢過濾 | 5 日 4 跌、5 日報酬 ≤ -12%、Close < SMA50 | ✅ 完成 |
+| TQQQ-007 | `tqqq_cap_qqq_confirm`   | 恐慌抄底 + QQQ RSI 相對強度確認              | QQQ RSI(14) < 35、TP +6%、持倉 8 天 | ✅ 完成 |
 
 ## 演進路線 (Lineage)
 
@@ -22,25 +23,26 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 ├── TQQQ-003 tqqq_cap_wider_exit     (加寬出場 + 追蹤停利)
 ├── TQQQ-004 tqqq_cap_vix_filter     (加入 VIX 恐慌過濾)
 ├── TQQQ-005 tqqq_cap_vix_adaptive   (軟性 VIX + 適應性出場)
-└── TQQQ-006 tqqq_momentum_collapse  (多日動能崩潰新訊號)
+├── TQQQ-006 tqqq_momentum_collapse  (多日動能崩潰新訊號)
+└── TQQQ-007 tqqq_cap_qqq_confirm    (QQQ RSI 相對強度確認)
 ```
 
 ## 參數對照 (Parameter Comparison)
 
-| 參數              | TQQQ-001 | TQQQ-002 | TQQQ-003 | TQQQ-004 | TQQQ-005 | TQQQ-006 |
-|-------------------|----------|----------|----------|----------|----------|----------|
-| Drawdown          | -15%     | **-12%** | -15%     | -15%     | -15%     | — |
-| RSI(5)            | < 25     | **< 30** | < 25     | < 25     | < 25     | — |
-| Volume            | 1.5x     | **1.3x** | 1.5x     | 1.5x     | 1.5x     | — |
-| VIX Filter        | —        | —        | —        | **≥ 25** | **≥ 20** | — |
-| Down Days (5d)    | —        | —        | —        | —        | —        | **≥ 4/5** |
-| 5d Return         | —        | —        | —        | —        | —        | **≤ -12%** |
-| Trend Filter      | —        | —        | —        | —        | —        | **Close < SMA50** |
-| Profit Target     | +5%      | +5%      | **+12%** | +5%      | **+8%**  | **+7%** |
-| Stop Loss         | -8%      | **-6%**  | -8%      | -8%      | -8%      | **-10%** |
-| Holding Days      | 7        | 7        | **12**   | 7        | **10**   | **10** |
-| Trailing Stop     | —        | —        | **-4%**  | —        | **-6%**  | — |
-| Cooldown Days     | 3        | **5**    | 3        | 3        | 3        | **5** |
+| 參數              | TQQQ-001 | TQQQ-002 | TQQQ-003 | TQQQ-004 | TQQQ-005 | TQQQ-006 | TQQQ-007 |
+|-------------------|----------|----------|----------|----------|----------|----------|----------|
+| Drawdown          | -15%     | **-12%** | -15%     | -15%     | -15%     | — | -15% |
+| RSI(5)            | < 25     | **< 30** | < 25     | < 25     | < 25     | — | < 25 |
+| Volume            | 1.5x     | **1.3x** | 1.5x     | 1.5x     | 1.5x     | — | 1.5x |
+| VIX Filter        | —        | —        | —        | **≥ 25** | **≥ 20** | — | — |
+| Down Days (5d)    | —        | —        | —        | —        | —        | **≥ 4/5** | — |
+| 5d Return         | —        | —        | —        | —        | —        | **≤ -12%** | — |
+| Trend Filter      | —        | —        | —        | —        | —        | **Close < SMA50** | — |
+| Profit Target     | +5%      | +5%      | **+12%** | +5%      | **+8%**  | **+7%** | **+6%** |
+| Stop Loss         | -8%      | **-6%**  | -8%      | -8%      | -8%      | **-10%** | -8% |
+| Holding Days      | 7        | 7        | **12**   | 7        | **10**   | **10** | **8** |
+| Trailing Stop     | —        | —        | **-4%**  | —        | **-6%**  | — | — |
+| Cooldown Days     | 3        | **5**    | 3        | 3        | 3        | **5** | 3 |
 
 ## 實驗結論 (Key Findings)
 
@@ -54,6 +56,7 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-004 | 4     | 75.0%  | +0.77%  | +2.39%   | -15.00% | VIX 條件過於嚴格，錯失機會 |
 | TQQQ-005 | 7     | 57.1%  | +2.54%  | +17.51%  | -15.00% | 訊號數恢復，但勝率偏低，尚未超越基線 |
 | TQQQ-006 | 25    | 72.0%  | +2.01%  | +50.42%  | -22.16% | 訊號數增加，但回撤顯著放大 |
+| TQQQ-007 | 14    | 85.7%  | +3.51%  | +59.18%  | -15.00% | 勝率高且回撤受控，但累計報酬仍低於基線 |
 
 ### Part B — Out-of-Sample (2024-01-01 ~ 2025-12-31)
 
@@ -65,12 +68,13 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-004 | 6     | 83.3%  | +2.60%  | +15.59%  | -12.36% | 勝率佳，但訊號數較少、累計報酬低 |
 | TQQQ-005 | 8     | 50.0%  | +1.46%  | +10.21%  | -14.82% | 訊號數足夠但樣本外勝率與報酬偏弱 |
 | TQQQ-006 | 7     | 71.4%  | +0.93%  | +4.22%   | -14.96% | 勝率接近門檻，但樣本外報酬偏低 |
+| TQQQ-007 | 6     | 83.3%  | +3.43%  | +21.20%  | -14.82% | 勝率改善、品質提升，但樣本外累計仍未超越基線 |
 
-> **目前結論：** TQQQ-001 (基礎版) 仍是目前最佳。放寬進場條件 (TQQQ-002) 會引入雜訊並在樣本外嚴重虧損；加寬獲利目標並加入追蹤停利 (TQQQ-003) 在樣本外接近基線但仍略遜；VIX ≥ 25 (TQQQ-004) 勝率不錯但訊號太少；TQQQ-005（VIX ≥ 20 + 適應性出場）樣本外勝率與報酬偏弱；新加入的 TQQQ-006（多日動能崩潰）提升了訊號多樣性與數量，但目前樣本外累計報酬僅 +4.22%，且 Part A 最大回撤放大到 -22.16%，暫未優於基線。
+> **目前結論：** TQQQ-001 (基礎版) 仍是目前最佳。放寬進場條件 (TQQQ-002) 會引入雜訊並在樣本外嚴重虧損；加寬獲利目標並加入追蹤停利 (TQQQ-003) 在樣本外接近基線但仍略遜；VIX ≥ 25 (TQQQ-004) 勝率不錯但訊號太少；TQQQ-005（VIX ≥ 20 + 適應性出場）樣本外勝率與報酬偏弱；TQQQ-006（多日動能崩潰）提升了訊號多樣性但樣本外報酬不足；新實作 TQQQ-007（QQQ RSI 確認）在樣本外勝率提升至 83.3%，但累計報酬僅 +21.20%，仍未超越基線 +27.44%。
 
 <!-- 更新指引：
   1. 執行 uv run trading run --all
-  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter tqqq_cap_vix_adaptive tqqq_momentum_collapse
+  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter tqqq_cap_vix_adaptive tqqq_momentum_collapse tqqq_cap_qqq_confirm
   3. 將關鍵數字填入上方表格（訊號數、勝率、平均報酬%、累計報酬%、最大回撤%）
   4. 更新「結論」欄、「目前結論」與頂部的「當前最佳」
 -->
