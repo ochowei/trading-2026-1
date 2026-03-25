@@ -6,6 +6,7 @@ Filters capitulation signals to only enter when VIX > 25, eliminating weak signa
 
 import logging
 
+import pandas as pd
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
