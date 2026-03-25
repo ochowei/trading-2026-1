@@ -24,6 +24,7 @@ on:
           - "TQQQ-013: tqqq_cap_exec_qqq_optimized"
           - "GLD-001: gld_mean_reversion"
           - "GLD-002: gld_optimized_exit"
+          - "GLD-003: gld_trailing_stop"
 
 jobs:
   backtest:
