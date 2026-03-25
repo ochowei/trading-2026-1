@@ -1,11 +1,22 @@
-name: TQQQ Capitulation Buy Backtest
+name: TQQQ Backtest
 
 on:
   workflow_dispatch:
+    inputs:
+      experiment:
+        description: "選擇要執行的實驗 (Select experiment)"
+        required: true
+        type: choice
+        default: tqqq_capitulation
+        options:
+          - tqqq_capitulation
+          - tqqq_cap_relaxed_entry
+          - tqqq_cap_wider_exit
+          - tqqq_cap_vix_filter
 
 jobs:
   backtest:
-    name: Run TQQQ Capitulation Buy Strategy
+    name: "Run ${{ inputs.experiment }}"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,12 +33,12 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run TQQQ backtest (Part A + Part B + Part C)
+      - name: "Run backtest: ${{ inputs.experiment }}"
         run: |
           echo "========================================="
-          echo " Strategy: TQQQ Capitulation Buy"
+          echo " Experiment: ${{ inputs.experiment }}"
           echo " Part A: 2019-01-01 ~ 2023-12-31 (In-Sample)"
           echo " Part B: 2024-01-01 ~ 2025-12-31 (Out-of-Sample)"
-          echo " Part C: 2026-01-01 ~ today     (Live)"
+          echo " Part C: 2026-01-01 ~ today       (Live)"
           echo "========================================="
-          uv run trading run tqqq_capitulation
+          uv run trading run ${{ inputs.experiment }}
