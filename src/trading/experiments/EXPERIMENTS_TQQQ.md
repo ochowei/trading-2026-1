@@ -1,6 +1,6 @@
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-004 `tqqq_cap_vix_filter`
+> **最新實驗 (Latest):** TQQQ-005 `tqqq_cap_vix_adaptive`
 > **當前最佳 (Best):** TQQQ-001 `tqqq_capitulation`
 
 ## 實驗清單 (Experiments)
@@ -11,6 +11,7 @@
 | TQQQ-002 | `tqqq_cap_relaxed_entry`  | 放寬進場門檻，收緊停損                   | DD -12%, RSI<30, Vol 1.3x, SL -6% | ✅ 完成  |
 | TQQQ-003 | `tqqq_cap_wider_exit`     | 加寬獲利目標 +12%，追蹤停利 -4%          | TP +12%, 持倉 12 天, Trailing -4%  | ✅ 完成  |
 | TQQQ-004 | `tqqq_cap_vix_filter`     | 加入 VIX ≥ 25 過濾，僅在真正恐慌時進場   | VIX ≥ 25 額外條件       | ✅ 完成  |
+| TQQQ-005 | `tqqq_cap_vix_adaptive`   | 軟性 VIX ≥ 20 + 適應性出場（追蹤停利）   | VIX ≥ 20, TP +8%, Trailing -6%, 持倉 10 天 | ✅ 完成  |
 
 ## 演進路線 (Lineage)
 
@@ -18,22 +19,23 @@
 TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 ├── TQQQ-002 tqqq_cap_relaxed_entry  (放寬進場 + 收緊停損)
 ├── TQQQ-003 tqqq_cap_wider_exit     (加寬出場 + 追蹤停利)
-└── TQQQ-004 tqqq_cap_vix_filter     (加入 VIX 恐慌過濾)
+├── TQQQ-004 tqqq_cap_vix_filter     (加入 VIX 恐慌過濾)
+└── TQQQ-005 tqqq_cap_vix_adaptive   (軟性 VIX + 適應性出場)
 ```
 
 ## 參數對照 (Parameter Comparison)
 
-| 參數              | TQQQ-001 | TQQQ-002 | TQQQ-003 | TQQQ-004 |
-|-------------------|----------|----------|----------|----------|
-| Drawdown          | -15%     | **-12%** | -15%     | -15%     |
-| RSI(5)            | < 25     | **< 30** | < 25     | < 25     |
-| Volume            | 1.5x     | **1.3x** | 1.5x     | 1.5x     |
-| VIX Filter        | —        | —        | —        | **≥ 25** |
-| Profit Target     | +5%      | +5%      | **+12%** | +5%      |
-| Stop Loss         | -8%      | **-6%**  | -8%      | -8%      |
-| Holding Days      | 7        | 7        | **12**   | 7        |
-| Trailing Stop     | —        | —        | **-4%**  | —        |
-| Cooldown Days     | 3        | **5**    | 3        | 3        |
+| 參數              | TQQQ-001 | TQQQ-002 | TQQQ-003 | TQQQ-004 | TQQQ-005 |
+|-------------------|----------|----------|----------|----------|----------|
+| Drawdown          | -15%     | **-12%** | -15%     | -15%     | -15%     |
+| RSI(5)            | < 25     | **< 30** | < 25     | < 25     | < 25     |
+| Volume            | 1.5x     | **1.3x** | 1.5x     | 1.5x     | 1.5x     |
+| VIX Filter        | —        | —        | —        | **≥ 25** | **≥ 20** |
+| Profit Target     | +5%      | +5%      | **+12%** | +5%      | **+8%**  |
+| Stop Loss         | -8%      | **-6%**  | -8%      | -8%      | -8%      |
+| Holding Days      | 7        | 7        | **12**   | 7        | **10**   |
+| Trailing Stop     | —        | —        | **-4%**  | —        | **-6%**  |
+| Cooldown Days     | 3        | **5**    | 3        | 3        | 3        |
 
 ## 實驗結論 (Key Findings)
 
@@ -45,6 +47,7 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-002 | 31    | 61.3%  | +0.13%  | -2.03%   | -15.00% | 訊號變多但勝率與報酬大幅下降 |
 | TQQQ-003 | 20    | 55.0%  | +2.48%  | +54.03%  | -15.00% | 追蹤停利反而降低勝率與報酬 |
 | TQQQ-004 | 4     | 75.0%  | +0.77%  | +2.39%   | -15.00% | VIX 條件過於嚴格，錯失機會 |
+| TQQQ-005 | 7     | 57.1%  | +2.54%  | +17.51%  | -15.00% | 訊號數恢復，但勝率偏低，尚未超越基線 |
 
 ### Part B — Out-of-Sample (2024-01-01 ~ 2025-12-31)
 
@@ -54,12 +57,13 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-002 | 10    | 30.0%  | -6.11%  | -48.56%  | -18.43% | 放寬條件導致樣本外嚴重虧損 |
 | TQQQ-003 | 8     | 50.0%  | +3.35%  | +26.32%  | -14.82% | 表現尚可，但仍略遜於基線 |
 | TQQQ-004 | 6     | 83.3%  | +2.60%  | +15.59%  | -12.36% | 勝率佳，但訊號數較少、累計報酬低 |
+| TQQQ-005 | 8     | 50.0%  | +1.46%  | +10.21%  | -14.82% | 訊號數足夠但樣本外勝率與報酬偏弱 |
 
-> **目前結論：** TQQQ-001 (基礎版) 表現最佳。放寬進場條件 (TQQQ-002) 會引入太多雜訊導致嚴重虧損；加寬獲利目標並加入追蹤停利 (TQQQ-003) 反而降低了勝率與整體報酬；加入 VIX ≥ 25 的嚴格過濾 (TQQQ-004) 會過度限制進場次數，錯失許多獲利機會。保持現有的基礎參數配置是目前最佳選擇。
+> **目前結論：** TQQQ-001 (基礎版) 仍是目前最佳。放寬進場條件 (TQQQ-002) 會引入雜訊並在樣本外嚴重虧損；加寬獲利目標並加入追蹤停利 (TQQQ-003) 在樣本外接近基線但仍略遜；VIX ≥ 25 (TQQQ-004) 勝率不錯但訊號太少；新加入的 TQQQ-005（VIX ≥ 20 + 適應性出場）雖然提高了訊號數，但樣本外勝率 50% 且累計報酬 +10.21%，仍未超越基線。
 
 <!-- 更新指引：
   1. 執行 uv run trading run --all
-  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter
+  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter tqqq_cap_vix_adaptive
   3. 將關鍵數字填入上方表格（訊號數、勝率、平均報酬%、累計報酬%、最大回撤%）
   4. 更新「結論」欄、「目前結論」與頂部的「當前最佳」
 -->
