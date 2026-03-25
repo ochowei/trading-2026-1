@@ -58,6 +58,10 @@ src/trading/
 │   │   ├── config.py
 │   │   ├── signal_detector.py
 │   │   └── strategy.py
+│   ├── tqqq_momentum_collapse/         # TQQQ 多日動能崩潰變體
+│   │   ├── config.py
+│   │   ├── signal_detector.py
+│   │   └── strategy.py
 │   └── _template/                      # 新實驗模板（複製即用）
 │       ├── __init__.py
 │       ├── config.py
@@ -257,7 +261,7 @@ uv run trading compare tqqq_capitulation my_strategy
 
 ## 範例參照 (Reference Example)
 
-`experiments/tqqq_capitulation/` 是基礎實作範例，其餘 3 個實驗為其變體：
+`experiments/tqqq_capitulation/` 是基礎實作範例，其餘 5 個實驗為其變體：
 
 | 實驗 | 說明 |
 |------|------|
@@ -266,3 +270,4 @@ uv run trading compare tqqq_capitulation my_strategy
 | [`tqqq_cap_wider_exit`](src/trading/experiments/tqqq_cap_wider_exit/) | 變體：放寬出場條件（含自訂 backtester） |
 | [`tqqq_cap_vix_filter`](src/trading/experiments/tqqq_cap_vix_filter/) | 變體：加入 VIX 過濾器 |
 | [`tqqq_cap_vix_adaptive`](src/trading/experiments/tqqq_cap_vix_adaptive/) | 變體：軟性 VIX + 適應性出場 (TQQQ-005) |
+| [`tqqq_momentum_collapse`](src/trading/experiments/tqqq_momentum_collapse/) | 變體：多日動能崩潰 (TQQQ-006) |

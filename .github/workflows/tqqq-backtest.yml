@@ -13,6 +13,8 @@ on:
           - "TQQQ-002: tqqq_cap_relaxed_entry"
           - "TQQQ-003: tqqq_cap_wider_exit"
           - "TQQQ-004: tqqq_cap_vix_filter"
+          - "TQQQ-005: tqqq_cap_vix_adaptive"
+          - "TQQQ-006: tqqq_momentum_collapse"
 
 jobs:
   backtest:

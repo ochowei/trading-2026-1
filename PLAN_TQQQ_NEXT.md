@@ -112,6 +112,7 @@
 - 使用標準 `BaseBacktester`（不需自訂回測器）
 - 新建 `src/trading/experiments/tqqq_momentum_collapse/` 目錄
 - 實作複雜度：**中**
+- **目前進度（2026-03-25）：已建立實驗骨架（config / detector / strategy），可透過 `uv run trading run tqqq_momentum_collapse` 執行初版回測**
 
 ---
 

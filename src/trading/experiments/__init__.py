@@ -47,3 +47,4 @@ from trading.experiments import tqqq_cap_relaxed_entry  # noqa: F401, E402
 from trading.experiments import tqqq_cap_wider_exit  # noqa: F401, E402
 from trading.experiments import tqqq_cap_vix_filter  # noqa: F401, E402
 from trading.experiments import tqqq_cap_vix_adaptive  # noqa: F401, E402
+from trading.experiments import tqqq_momentum_collapse  # noqa: F401, E402
