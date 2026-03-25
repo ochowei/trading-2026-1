@@ -62,6 +62,18 @@ src/trading/
 │   ├── tqqq_cap_exec_qqq_optimized/    # TQQQ QQQ 確認 + 優化出場 + 成交模型（TQQQ-013，失敗）
 │   │   ├── config.py
 │   │   └── strategy.py
+│   ├── gld_mean_reversion/              # GLD 黃金極度超賣均值回歸基線（GLD-001）
+│   │   ├── config.py
+│   │   ├── signal_detector.py
+│   │   └── strategy.py
+│   ├── gld_optimized_exit/              # GLD 優化出場（GLD-002）
+│   │   ├── config.py
+│   │   └── strategy.py
+│   ├── gld_trailing_stop/               # GLD 追蹤停損（GLD-003，新最佳）
+│   │   ├── config.py
+│   │   ├── signal_detector.py
+│   │   ├── strategy.py
+│   │   └── trailing_backtester.py
 │   └── _template/                      # 新實驗模板（複製即用）
 │       ├── __init__.py
 │       ├── config.py

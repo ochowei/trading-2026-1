@@ -237,4 +237,5 @@ uv run trading compare tqqq_capitulation my_strategy
 | [`tqqq_cap_exec_qqq_confirm`](src/trading/experiments/tqqq_cap_exec_qqq_confirm/) | 重做 TQQQ-007 + 成交模型 (TQQQ-012) |
 | [`tqqq_cap_exec_qqq_optimized`](src/trading/experiments/tqqq_cap_exec_qqq_optimized/) | TQQQ-013：TQQQ-012 的 QQQ 過濾 + TQQQ-010 的優化出場（失敗嘗試） |
 | [`gld_mean_reversion`](src/trading/experiments/gld_mean_reversion/) | GLD 黃金極度超賣均值回歸基線 (約 3 次/年，高勝率) (GLD-001) |
-| [`gld_optimized_exit`](src/trading/experiments/gld_optimized_exit/) | **當前最佳**：GLD 優化出場 (TP +2.5%, SL -4%, Hold 15d) (GLD-002) |
+| [`gld_optimized_exit`](src/trading/experiments/gld_optimized_exit/) | GLD 優化出場 (TP +2.5%, SL -4%, Hold 15d) (GLD-002) |
+| [`gld_trailing_stop`](src/trading/experiments/gld_trailing_stop/) | **新最佳**：GLD 追蹤停損 — 進場同 GLD-002，出場加追蹤停損 (啟動 +1.5%, 距離 1.0%) (GLD-003) |
