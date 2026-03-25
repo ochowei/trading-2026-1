@@ -67,7 +67,7 @@
 
 - 複用 `tqqq_cap_vix_filter` 的 VIX 資料擷取和偵測器模式
 - 複用 `tqqq_cap_wider_exit` 的 `TrailingStopBacktester` 模式
-- 新建 `src/trading/experiments/tqqq_cap_vix_adaptive/` 目錄
+- 目錄已建立：`src/trading/experiments/tqqq_cap_vix_adaptive/`
 - 實作複雜度：**低-中**
 
 ---
