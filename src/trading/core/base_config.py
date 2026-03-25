@@ -13,7 +13,8 @@ class ExperimentConfig:
 
     # 實驗識別 (Experiment identity)
     name: str                          # e.g. "tqqq_capitulation"
-    display_name: str                  # e.g. "TQQQ Capitulation Buy"
+    experiment_id: str = ""            # e.g. "TQQQ-001"
+    display_name: str = ""             # e.g. "TQQQ Capitulation Buy"
 
     # 標的與資料 (Tickers and data)
     tickers: list[str] = field(default_factory=lambda: [])

@@ -28,7 +28,8 @@ def cmd_list(args: argparse.Namespace) -> None:
     for name in experiments:
         strategy = get_experiment(name)
         config = strategy.create_config()
-        print(f"  - {name:<30} {config.display_name}")
+        eid = config.experiment_id or ""
+        print(f"  - {eid:<10} {name:<30} {config.display_name}")
     print()
 
 
