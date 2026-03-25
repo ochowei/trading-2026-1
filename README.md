@@ -37,11 +37,25 @@ src/trading/
 │   └── results.py                      # 結果儲存（JSON）與跨實驗比較
 ├── experiments/                        # 所有實驗放在這裡
 │   ├── __init__.py                     # 實驗註冊表
-│   ├── tqqq_capitulation/              # 範例：TQQQ 恐慌抄底策略
+│   ├── tqqq_capitulation/              # TQQQ 恐慌抄底策略（基礎版）
+│   │   ├── config.py
+│   │   ├── signal_detector.py
+│   │   └── strategy.py
+│   ├── tqqq_cap_relaxed_entry/         # TQQQ 放寬進場條件變體
+│   │   ├── config.py
+│   │   ├── signal_detector.py
+│   │   └── strategy.py
+│   ├── tqqq_cap_wider_exit/            # TQQQ 放寬出場條件變體
+│   │   ├── backtester.py
+│   │   ├── config.py
+│   │   ├── signal_detector.py
+│   │   └── strategy.py
+│   ├── tqqq_cap_vix_filter/            # TQQQ VIX 過濾器變體
 │   │   ├── config.py
 │   │   ├── signal_detector.py
 │   │   └── strategy.py
 │   └── _template/                      # 新實驗模板（複製即用）
+│       ├── __init__.py
 │       ├── config.py
 │       ├── signal_detector.py
 │       └── strategy.py
@@ -97,6 +111,7 @@ def create_default_config() -> MyConfig:
 | 欄位 | 型別 | 預設值 | 說明 |
 |------|------|--------|------|
 | `name` | `str` | (必填) | 實驗唯一 ID，用於 CLI 和檔案命名 |
+| `experiment_id` | `str` | `""` | 實驗編號（如 `"TQQQ-001"`），用於 `list` 指令顯示 |
 | `display_name` | `str` | (必填) | 報表中的顯示名稱 |
 | `tickers` | `list[str]` | `[]` | 交易標的清單 |
 | `data_start` | `str` | `"2019-01-01"` | 資料下載起始日 |
@@ -238,10 +253,11 @@ uv run trading compare tqqq_capitulation my_strategy
 
 ## 範例參照 (Reference Example)
 
-`experiments/tqqq_capitulation/` 是一個完整的實作範例：
+`experiments/tqqq_capitulation/` 是基礎實作範例，其餘 3 個實驗為其變體：
 
-| 檔案 | 說明 |
+| 實驗 | 說明 |
 |------|------|
-| [`config.py`](src/trading/experiments/tqqq_capitulation/config.py) | 含 7 個策略專屬參數（drawdown, RSI, volume 等） |
-| [`signal_detector.py`](src/trading/experiments/tqqq_capitulation/signal_detector.py) | 三條件恐慌抄底訊號 + 冷卻機制 |
-| [`strategy.py`](src/trading/experiments/tqqq_capitulation/strategy.py) | 接線 + 自訂參數報表輸出 |
+| [`tqqq_capitulation`](src/trading/experiments/tqqq_capitulation/) | 基礎版：三條件恐慌抄底訊號 + 冷卻機制 |
+| [`tqqq_cap_relaxed_entry`](src/trading/experiments/tqqq_cap_relaxed_entry/) | 變體：放寬進場條件 |
+| [`tqqq_cap_wider_exit`](src/trading/experiments/tqqq_cap_wider_exit/) | 變體：放寬出場條件（含自訂 backtester） |
+| [`tqqq_cap_vix_filter`](src/trading/experiments/tqqq_cap_vix_filter/) | 變體：加入 VIX 過濾器 |

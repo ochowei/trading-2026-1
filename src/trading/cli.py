@@ -64,7 +64,7 @@ def main() -> None:
     """CLI 主程式 (CLI main)"""
     parser = argparse.ArgumentParser(
         description="量化交易實驗框架 (Quantitative Trading Experiment Framework)",
-        prog="trading-tw",
+        prog="trading",
     )
     sub = parser.add_subparsers(dest="command")
 
