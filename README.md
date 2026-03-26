@@ -6,30 +6,11 @@ Quantitative trading experiment framework — manage unlimited trading strategy 
 
 ## 快速開始 (Quick Start)
 
-```bash
-# 安裝依賴 (Install dependencies)
-uv sync
-
-# 列出所有實驗 (List all experiments)
-uv run trading list
-
-# 執行單一實驗 (Run a specific experiment)
-uv run trading run tqqq_001_capitulation
-
-# 執行全部實驗 (Run all experiments)
-uv run trading run --all
-
-# 比較實驗結果 (Compare experiment results)
-uv run trading compare tqqq_001_capitulation another_experiment
-```
-
-## 專案架構 (Project Structure)
-
-詳細的資料夾與檔案結構說明，請參考 [STRUCTURE.md](STRUCTURE.md)。
+開發指令與專案架構請參考 [CLAUDE.md](CLAUDE.md)。
 
 ## 如何設計新實驗 (How to Design a New Experiment)
 
-新增一個實驗只需 **3 個檔案 + 1 行註冊**。以下是完整步驟：
+新增一個實驗只需 **3 個檔案**（config / signal_detector / strategy）。框架使用 `pkgutil` 自動發現實驗，無需手動註冊。以下是完整步驟：
 
 ### Step 1: 複製模板 (Copy Template)
 
@@ -165,13 +146,7 @@ class MyStrategy(BaseStrategy):
 
 ### Step 5: 註冊實驗 (Register Experiment)
 
-在 `src/trading/experiments/__init__.py` 底部加一行：
-
-```python
-from trading.experiments import my_strategy  # noqa: F401, E402
-```
-
-同時在 `experiments/my_strategy/__init__.py`：
+在 `experiments/my_strategy/__init__.py`：
 
 ```python
 from trading.experiments import register
