@@ -12,7 +12,7 @@ class ExperimentConfig:
     """實驗配置基礎類別 (Base config every experiment must provide)"""
 
     # 實驗識別 (Experiment identity)
-    name: str                          # e.g. "tqqq_capitulation"
+    name: str                          # e.g. "tqqq_001_capitulation"
     experiment_id: str = ""            # e.g. "TQQQ-001"
     display_name: str = ""             # e.g. "TQQQ Capitulation Buy"
 

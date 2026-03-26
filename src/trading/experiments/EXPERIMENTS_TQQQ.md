@@ -1,44 +1,44 @@
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-013 `tqqq_cap_exec_qqq_optimized`
-> **當前最佳 (Best):** TQQQ-008 `tqqq_cap_optimized_exit`（無成交模型）/ TQQQ-010 `tqqq_cap_exec_optimized`（含成交模型）
+> **最新實驗 (Latest):** TQQQ-013 `tqqq_013_cap_exec_qqq_optimized`
+> **當前最佳 (Best):** TQQQ-008 `tqqq_008_cap_optimized_exit`（無成交模型）/ TQQQ-010 `tqqq_010_cap_exec_optimized`（含成交模型）
 
 ## 實驗清單 (Experiments)
 
 | ID       | 資料夾                     | 說明                                   | 關鍵差異                | 狀態     |
 |----------|---------------------------|----------------------------------------|------------------------|----------|
-| TQQQ-001 | `tqqq_capitulation`       | 基礎版：三條件恐慌抄底 + 冷卻機制        | 基線                    | ✅ 基線  |
-| TQQQ-002 | `tqqq_cap_relaxed_entry`  | 放寬進場門檻，收緊停損                   | DD -12%, RSI<30, Vol 1.3x, SL -6% | ✅ 完成  |
-| TQQQ-003 | `tqqq_cap_wider_exit`     | 加寬獲利目標 +12%，追蹤停利 -4%          | TP +12%, 持倉 12 天, Trailing -4%  | ✅ 完成  |
-| TQQQ-004 | `tqqq_cap_vix_filter`     | 加入 VIX ≥ 25 過濾，僅在真正恐慌時進場   | VIX ≥ 25 額外條件       | ✅ 完成  |
-| TQQQ-005 | `tqqq_cap_vix_adaptive`   | 軟性 VIX ≥ 20 + 適應性出場（追蹤停利）   | VIX ≥ 20, TP +8%, Trailing -6%, 持倉 10 天 | ✅ 完成  |
-| TQQQ-006 | `tqqq_momentum_collapse`  | 多日動能崩潰：連續下跌 + 累計跌幅 + 趨勢過濾 | 5 日 4 跌、5 日報酬 ≤ -12%、Close < SMA50 | ✅ 完成 |
-| TQQQ-007 | `tqqq_cap_qqq_confirm`   | 恐慌抄底 + QQQ RSI 相對強度確認              | QQQ RSI(14) < 35、TP +6%、持倉 8 天 | ✅ 完成 |
-| TQQQ-008 | `tqqq_cap_optimized_exit` | 基線進場 + 優化出場（+7%、10 天、無追蹤停利） | TP +7%、持倉 10 天、無 Trailing | ✅ 完成 |
-| TQQQ-009 | `tqqq_cap_gentle_entry` | 僅放寬 DD -13% + 優化出場（+7%、10 天） | DD -13%、其餘進場不變 | ❌ 失敗 |
-| TQQQ-010 | `tqqq_cap_exec_optimized` | 重做 TQQQ-008 + 成交模型 | 隔日開盤進場、stop_market、limit_order、0.1% 滑價、悲觀認定 | ✅ 完成 |
-| TQQQ-011 | `tqqq_cap_exec_baseline` | 重做 TQQQ-001 + 成交模型 | 同上成交模型 | ✅ 完成 |
-| TQQQ-012 | `tqqq_cap_exec_qqq_confirm` | 重做 TQQQ-007 + 成交模型 | 同上成交模型 + QQQ RSI 過濾 | ✅ 完成 |
-| TQQQ-013 | `tqqq_cap_exec_qqq_optimized` | QQQ RSI 過濾 + 優化出場 + 成交模型 | 在 TQQQ-012 基礎改為 TP +7%、持倉 10 天 | ❌ 失敗 |
+| TQQQ-001 | `tqqq_001_capitulation`       | 基礎版：三條件恐慌抄底 + 冷卻機制        | 基線                    | ✅ 基線  |
+| TQQQ-002 | `tqqq_002_cap_relaxed_entry`  | 放寬進場門檻，收緊停損                   | DD -12%, RSI<30, Vol 1.3x, SL -6% | ✅ 完成  |
+| TQQQ-003 | `tqqq_003_cap_wider_exit`     | 加寬獲利目標 +12%，追蹤停利 -4%          | TP +12%, 持倉 12 天, Trailing -4%  | ✅ 完成  |
+| TQQQ-004 | `tqqq_004_cap_vix_filter`     | 加入 VIX ≥ 25 過濾，僅在真正恐慌時進場   | VIX ≥ 25 額外條件       | ✅ 完成  |
+| TQQQ-005 | `tqqq_005_cap_vix_adaptive`   | 軟性 VIX ≥ 20 + 適應性出場（追蹤停利）   | VIX ≥ 20, TP +8%, Trailing -6%, 持倉 10 天 | ✅ 完成  |
+| TQQQ-006 | `tqqq_006_momentum_collapse`  | 多日動能崩潰：連續下跌 + 累計跌幅 + 趨勢過濾 | 5 日 4 跌、5 日報酬 ≤ -12%、Close < SMA50 | ✅ 完成 |
+| TQQQ-007 | `tqqq_007_cap_qqq_confirm`   | 恐慌抄底 + QQQ RSI 相對強度確認              | QQQ RSI(14) < 35、TP +6%、持倉 8 天 | ✅ 完成 |
+| TQQQ-008 | `tqqq_008_cap_optimized_exit` | 基線進場 + 優化出場（+7%、10 天、無追蹤停利） | TP +7%、持倉 10 天、無 Trailing | ✅ 完成 |
+| TQQQ-009 | `tqqq_009_cap_gentle_entry` | 僅放寬 DD -13% + 優化出場（+7%、10 天） | DD -13%、其餘進場不變 | ❌ 失敗 |
+| TQQQ-010 | `tqqq_010_cap_exec_optimized` | 重做 TQQQ-008 + 成交模型 | 隔日開盤進場、stop_market、limit_order、0.1% 滑價、悲觀認定 | ✅ 完成 |
+| TQQQ-011 | `tqqq_011_cap_exec_baseline` | 重做 TQQQ-001 + 成交模型 | 同上成交模型 | ✅ 完成 |
+| TQQQ-012 | `tqqq_012_cap_exec_qqq_confirm` | 重做 TQQQ-007 + 成交模型 | 同上成交模型 + QQQ RSI 過濾 | ✅ 完成 |
+| TQQQ-013 | `tqqq_013_cap_exec_qqq_optimized` | QQQ RSI 過濾 + 優化出場 + 成交模型 | 在 TQQQ-012 基礎改為 TP +7%、持倉 10 天 | ❌ 失敗 |
 
 ## 演進路線 (Lineage)
 
 ```
-TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
-├── TQQQ-002 tqqq_cap_relaxed_entry  (放寬進場 + 收緊停損)
-├── TQQQ-003 tqqq_cap_wider_exit     (加寬出場 + 追蹤停利)
-├── TQQQ-004 tqqq_cap_vix_filter     (加入 VIX 恐慌過濾)
-├── TQQQ-005 tqqq_cap_vix_adaptive   (軟性 VIX + 適應性出場)
-├── TQQQ-006 tqqq_momentum_collapse  (多日動能崩潰新訊號)
-├── TQQQ-007 tqqq_cap_qqq_confirm    (QQQ RSI 相對強度確認)
-├── TQQQ-008 tqqq_cap_optimized_exit (優化出場：+7%、10 天、無追蹤停利)
-├── TQQQ-009 tqqq_cap_gentle_entry  (僅放寬 DD -13% + 優化出場)
+TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
+├── TQQQ-002 tqqq_002_cap_relaxed_entry  (放寬進場 + 收緊停損)
+├── TQQQ-003 tqqq_003_cap_wider_exit     (加寬出場 + 追蹤停利)
+├── TQQQ-004 tqqq_004_cap_vix_filter     (加入 VIX 恐慌過濾)
+├── TQQQ-005 tqqq_005_cap_vix_adaptive   (軟性 VIX + 適應性出場)
+├── TQQQ-006 tqqq_006_momentum_collapse  (多日動能崩潰新訊號)
+├── TQQQ-007 tqqq_007_cap_qqq_confirm    (QQQ RSI 相對強度確認)
+├── TQQQ-008 tqqq_008_cap_optimized_exit (優化出場：+7%、10 天、無追蹤停利)
+├── TQQQ-009 tqqq_009_cap_gentle_entry  (僅放寬 DD -13% + 優化出場)
 │
 │   ── 成交模型重做系列 (Execution Model Redo Series) ──
-├── TQQQ-010 tqqq_cap_exec_optimized  (重做 TQQQ-008 + 成交模型)
-├── TQQQ-011 tqqq_cap_exec_baseline   (重做 TQQQ-001 + 成交模型)
-├── TQQQ-012 tqqq_cap_exec_qqq_confirm (重做 TQQQ-007 + 成交模型)
-└── TQQQ-013 tqqq_cap_exec_qqq_optimized (QQQ 過濾 + 優化出場 + 成交模型)
+├── TQQQ-010 tqqq_010_cap_exec_optimized  (重做 TQQQ-008 + 成交模型)
+├── TQQQ-011 tqqq_011_cap_exec_baseline   (重做 TQQQ-001 + 成交模型)
+├── TQQQ-012 tqqq_012_cap_exec_qqq_confirm (重做 TQQQ-007 + 成交模型)
+└── TQQQ-013 tqqq_013_cap_exec_qqq_optimized (QQQ 過濾 + 優化出場 + 成交模型)
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -136,7 +136,7 @@ TQQQ-001 tqqq_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 
 <!-- 更新指引：
   1. 執行 uv run trading run --all
-  2. 執行 uv run trading compare tqqq_capitulation tqqq_cap_relaxed_entry tqqq_cap_wider_exit tqqq_cap_vix_filter tqqq_cap_vix_adaptive tqqq_momentum_collapse tqqq_cap_qqq_confirm tqqq_cap_optimized_exit tqqq_cap_gentle_entry
+  2. 執行 uv run trading compare tqqq_001_capitulation tqqq_002_cap_relaxed_entry tqqq_003_cap_wider_exit tqqq_004_cap_vix_filter tqqq_005_cap_vix_adaptive tqqq_006_momentum_collapse tqqq_007_cap_qqq_confirm tqqq_008_cap_optimized_exit tqqq_009_cap_gentle_entry
   3. 將關鍵數字填入上方表格（訊號數、勝率、平均報酬%、累計報酬%、最大回撤%）
   4. 更新「結論」欄、「目前結論」與頂部的「當前最佳」
 -->

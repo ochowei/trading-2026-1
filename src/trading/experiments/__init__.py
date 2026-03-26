@@ -42,19 +42,19 @@ def list_experiments() -> list[str]:
 
 # === 註冊所有實驗 (Register all experiments) ===
 # 新增實驗時在此加一行 import (Add one import line per new experiment)
-from trading.experiments import tqqq_capitulation  # noqa: F401, E402
-from trading.experiments import tqqq_cap_relaxed_entry  # noqa: F401, E402
-from trading.experiments import tqqq_cap_wider_exit  # noqa: F401, E402
-from trading.experiments import tqqq_cap_vix_filter  # noqa: F401, E402
-from trading.experiments import tqqq_cap_vix_adaptive  # noqa: F401, E402
-from trading.experiments import tqqq_momentum_collapse  # noqa: F401, E402
-from trading.experiments import tqqq_cap_qqq_confirm  # noqa: F401, E402
-from trading.experiments import tqqq_cap_optimized_exit  # noqa: F401, E402
-from trading.experiments import tqqq_cap_gentle_entry  # noqa: F401, E402
-from trading.experiments import tqqq_cap_exec_optimized  # noqa: F401, E402
-from trading.experiments import tqqq_cap_exec_baseline  # noqa: F401, E402
-from trading.experiments import tqqq_cap_exec_qqq_confirm  # noqa: F401, E402
-from trading.experiments import tqqq_cap_exec_qqq_optimized  # noqa: F401, E402
-from trading.experiments import gld_mean_reversion  # noqa: F401, E402
-from trading.experiments import gld_optimized_exit  # noqa: F401, E402
-from trading.experiments import gld_trailing_stop  # noqa: F401, E402
+from trading.experiments import tqqq_001_capitulation  # noqa: F401, E402
+from trading.experiments import tqqq_002_cap_relaxed_entry  # noqa: F401, E402
+from trading.experiments import tqqq_003_cap_wider_exit  # noqa: F401, E402
+from trading.experiments import tqqq_004_cap_vix_filter  # noqa: F401, E402
+from trading.experiments import tqqq_005_cap_vix_adaptive  # noqa: F401, E402
+from trading.experiments import tqqq_006_momentum_collapse  # noqa: F401, E402
+from trading.experiments import tqqq_007_cap_qqq_confirm  # noqa: F401, E402
+from trading.experiments import tqqq_008_cap_optimized_exit  # noqa: F401, E402
+from trading.experiments import tqqq_009_cap_gentle_entry  # noqa: F401, E402
+from trading.experiments import tqqq_010_cap_exec_optimized  # noqa: F401, E402
+from trading.experiments import tqqq_011_cap_exec_baseline  # noqa: F401, E402
+from trading.experiments import tqqq_012_cap_exec_qqq_confirm  # noqa: F401, E402
+from trading.experiments import tqqq_013_cap_exec_qqq_optimized  # noqa: F401, E402
+from trading.experiments import gld_001_mean_reversion  # noqa: F401, E402
+from trading.experiments import gld_002_optimized_exit  # noqa: F401, E402
+from trading.experiments import gld_003_trailing_stop  # noqa: F401, E402
