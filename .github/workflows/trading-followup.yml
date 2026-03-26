@@ -1,0 +1,32 @@
+name: Trading Followup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  followup:
+    name: "Generate Trading Signals"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Generate followup report
+        run: |
+          echo "========================================="
+          echo " Trading Followup Report"
+          echo " Run time: $(TZ='America/New_York' date '+%Y-%m-%d %H:%M ET')"
+          echo " Strategies: TQQQ-010 (best TQQQ), GLD-003 (best GLD)"
+          echo "========================================="
+          uv run trading followup
