@@ -11,7 +11,7 @@ Runs best strategies per ticker with 60-day lookback and generates Firstrade ord
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pandas as pd
 
@@ -50,8 +50,15 @@ def run_followup() -> None:
     print(f"  This report is generated after T-1 close. Place orders before T-day open.")
     print(f"{separator}")
 
+    # 收集所有待執行的委託 (Collect all pending orders across tickers)
+    all_orders: list[dict] = []
+
     for strategy_info in STRATEGIES:
-        _run_single_strategy(strategy_info, today)
+        orders = _run_single_strategy(strategy_info, today)
+        all_orders.extend(orders)
+
+    # 印出 T 日下單清單 (Print consolidated T-day order sheet)
+    _print_order_sheet(all_orders, today)
 
     print(f"\n{separator}")
     print(f"  報告結束 (End of Report)")
@@ -60,8 +67,32 @@ def run_followup() -> None:
     print(f"{separator}\n")
 
 
-def _run_single_strategy(strategy_info: dict, today: pd.Timestamp) -> None:
-    """執行單一策略並輸出報告 (Run one strategy and print report)"""
+def _estimate_next_trading_day(last_data_date: pd.Timestamp) -> pd.Timestamp:
+    """估算下一個交易日（跳過週末）"""
+    next_day = last_data_date + timedelta(days=1)
+    # 跳過週末
+    while next_day.weekday() >= 5:  # 5=Saturday, 6=Sunday
+        next_day += timedelta(days=1)
+    return next_day
+
+
+def _estimate_trading_days_later(
+    from_date: pd.Timestamp, trading_days: int
+) -> pd.Timestamp:
+    """估算 N 個交易日後的日期（跳過週末）"""
+    current = from_date
+    count = 0
+    while count < trading_days:
+        current += timedelta(days=1)
+        if current.weekday() < 5:
+            count += 1
+    return current
+
+
+def _run_single_strategy(
+    strategy_info: dict, today: pd.Timestamp
+) -> list[dict]:
+    """執行單一策略並輸出報告，回傳待執行委託清單"""
     experiment_name = strategy_info["experiment_name"]
     label = strategy_info["label"]
     ticker = strategy_info["ticker"]
@@ -81,14 +112,13 @@ def _run_single_strategy(strategy_info: dict, today: pd.Timestamp) -> None:
     backtester = strategy.create_backtester(config)
 
     # 2. 抓取資料（往前抓 365 天確保指標暖身）
-    # Fetch data (365 days back for indicator warm-up)
     data_start = (today - timedelta(days=365)).strftime("%Y-%m-%d")
     fetcher = DataFetcher(start=data_start)
     data = fetcher.fetch_all([ticker])
 
     if ticker not in data:
         print(f"\n  [ERROR] 無法取得 {ticker} 資料 (Failed to fetch {ticker} data)\n")
-        return
+        return []
 
     df = data[ticker]
     logger.info(f"Fetched {len(df)} rows for {ticker}")
@@ -119,58 +149,82 @@ def _run_single_strategy(strategy_info: dict, today: pd.Timestamp) -> None:
     # 7. 印出逐筆交易明細 (Print trade details)
     trades = result["trades"]
     if trades:
-        print(f"\n{thin_sep}")
-        print(f"  近 60 日交易明細 (Recent 60-Day Trade Details)")
-        print(f"{thin_sep}")
-
-        exit_type_labels = {
-            "target": "達標 Target",
-            "stop_loss": "停損 Stop",
-            "stop_loss_pessimistic": "停損悲觀 Pessim.",
-            "trailing_stop": "追蹤停損 Trail",
-            "time_expiry": "到期 Expiry",
-            "no_data": "無資料 N/A",
-        }
-
-        print(f"  {'訊號日':<12} {'進場日':<12} {'出場日':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'天數':>4} {'出場方式':<16}")
-        print(f"  {'-' * 88}")
-        for t in trades:
-            entry_date = t.get("entry_date", t["date"])
-            label_t = exit_type_labels.get(t["exit_type"], t["exit_type"])
-            print(
-                f"  {t['date']:<12} "
-                f"{entry_date:<12} "
-                f"{t.get('exit_date', 'N/A'):<12} "
-                f"{t['entry']:>8.2f} "
-                f"{t['exit']:>8.2f} "
-                f"{t['return_pct']:>+7.2f}% "
-                f"{t['holding_days']:>4d} "
-                f"{label_t:<16}"
-            )
+        _print_trade_details(trades)
 
     # 8. 檢查今日訊號 (Check today's signal)
-    # 用完整資料重新偵測，確保最新一天的訊號狀態正確
     df_full_signals = detector.detect_signals(df.copy())
     latest_date = df_full_signals.index[-1]
     latest_close = float(df_full_signals.iloc[-1]["Close"])
     signal_today = bool(df_full_signals.loc[latest_date, "Signal"])
 
+    # T 日 = 資料最後一天的下一個交易日
+    t_day = _estimate_next_trading_day(latest_date)
+    t_day_str = t_day.strftime("%Y-%m-%d")
+
     print(f"\n{thin_sep}")
-    print(f"  最新資料日期 (Latest data date): {latest_date.strftime('%Y-%m-%d')}")
-    print(f"  {ticker} 收盤價 (Close): ${latest_close:.2f}")
+    print(f"  最新資料日期 (Latest data): {latest_date.strftime('%Y-%m-%d')}")
+    print(f"  T 日 (Next trading day):    {t_day_str}")
+    print(f"  {ticker} 收盤價 (Close):     ${latest_close:.2f}")
     print(f"{thin_sep}")
 
+    # 收集委託 (Collect orders)
+    orders: list[dict] = []
+
     if signal_today:
-        _print_buy_signal(ticker, config, latest_close, latest_date, has_trailing_stop)
+        orders.extend(
+            _print_buy_signal(ticker, config, latest_close, latest_date,
+                              t_day, has_trailing_stop)
+        )
     else:
         print(f"\n  ┌{'─' * 48}┐")
         print(f"  │  今日訊號: 無動作 NO ACTION{' ' * 20}│")
         print(f"  └{'─' * 48}┘")
         print(f"\n  {ticker} 於 {latest_date.strftime('%Y-%m-%d')} 無買入訊號")
-        print(f"  No buy signal for {ticker} on {latest_date.strftime('%Y-%m-%d')}.")
 
     # 9. 未結部位 (Open positions)
-    _print_open_positions(trades, config, today, ticker, has_trailing_stop, df_full_signals)
+    open_orders = _print_open_positions(
+        trades, config, today, t_day, ticker, has_trailing_stop, df_full_signals
+    )
+    orders.extend(open_orders)
+
+    return orders
+
+
+def _print_trade_details(trades: list[dict]) -> None:
+    """印出逐筆交易明細"""
+    thin_sep = "-" * 80
+
+    print(f"\n{thin_sep}")
+    print(f"  近 60 日交易明細 (Recent 60-Day Trade Details)")
+    print(f"{thin_sep}")
+
+    exit_type_labels = {
+        "target": "達標 Target",
+        "stop_loss": "停損 Stop",
+        "stop_loss_pessimistic": "停損悲觀 Pessim.",
+        "trailing_stop": "追蹤停損 Trail",
+        "time_expiry": "到期 Expiry",
+        "no_data": "無資料 N/A",
+    }
+
+    print(
+        f"  {'訊號日':<12} {'進場日':<12} {'出場日':<12} "
+        f"{'進場':>8} {'出場':>8} {'報酬':>8} {'天數':>4} {'出場方式':<16}"
+    )
+    print(f"  {'-' * 88}")
+    for t in trades:
+        entry_date = t.get("entry_date", t["date"])
+        label_t = exit_type_labels.get(t["exit_type"], t["exit_type"])
+        print(
+            f"  {t['date']:<12} "
+            f"{entry_date:<12} "
+            f"{t.get('exit_date', 'N/A'):<12} "
+            f"{t['entry']:>8.2f} "
+            f"{t['exit']:>8.2f} "
+            f"{t['return_pct']:>+7.2f}% "
+            f"{t['holding_days']:>4d} "
+            f"{label_t:<16}"
+        )
 
 
 def _print_buy_signal(
@@ -178,102 +232,160 @@ def _print_buy_signal(
     config,
     last_close: float,
     signal_date: pd.Timestamp,
+    t_day: pd.Timestamp,
     has_trailing_stop: bool,
-) -> None:
-    """印出買入訊號與 Firstrade 下單指令"""
+) -> list[dict]:
+    """印出買入訊號與下單指令，回傳委託清單"""
     slippage = 0.001  # 0.1%
     estimated_entry = last_close * (1 + slippage)
     target_price = estimated_entry * (1 + config.profit_target)
     stop_price = estimated_entry * (1 + config.stop_loss)
 
-    # 預估到期日（大約 holding_days 個交易日後）
-    est_expiry = signal_date + timedelta(days=int(config.holding_days * 1.5))
+    t_day_str = t_day.strftime("%Y-%m-%d")
+    est_expiry = _estimate_trading_days_later(t_day, config.holding_days)
+    est_expiry_sell = _estimate_next_trading_day(est_expiry)
 
     print(f"\n  ┌{'─' * 48}┐")
     print(f"  │  ★ 今日訊號: 買入 BUY TRIGGERED{' ' * 15}│")
     print(f"  └{'─' * 48}┘")
 
-    print(f"\n  {'═' * 50}")
+    print(f"\n  {'═' * 60}")
     print(f"  Firstrade 下單指令 (Order Instructions)")
-    print(f"  {'═' * 50}")
+    print(f"  {'═' * 60}")
 
     # 步驟 1: 買入
-    print(f"\n  步驟 1: 開盤買入 (Step 1: Market Buy at Open)")
-    print(f"  {'─' * 50}")
-    print(f"    下單方式 (Order type): MARKET BUY (市價買入)")
-    print(f"    標的 (Symbol):         {ticker}")
-    print(f"    時機 (Timing):         T 日開盤前掛單 (Pre-market)")
-    print(f"    預估成交價 (Est. fill): ~${estimated_entry:.2f}")
-    print(f"      (T-1 收盤 ${last_close:.2f} + 0.1% 滑價)")
+    print(f"\n  步驟 1: {t_day_str} 開盤前掛單買入")
+    print(f"  {'─' * 60}")
+    print(f"    日期:     {t_day_str} (開盤前)")
+    print(f"    標的:     {ticker}")
+    print(f"    方向:     BUY (買入)")
+    print(f"    類型:     MARKET (市價單)")
+    print(f"    限價:     N/A (市價)")
+    print(f"    有效期:   Day")
+    print(f"    預估成交: ~${estimated_entry:.2f} (T-1 收盤 ${last_close:.2f} + 0.1% 滑價)")
+    print(f"    Firstrade: Buy > Market > Day")
 
-    # 步驟 2: 掛出止盈/停損委託
-    print(f"\n  步驟 2: 成交後立即掛出委託 (Step 2: Place Exit Orders After Fill)")
-    print(f"  {'─' * 50}")
+    # 步驟 2: 止盈單
+    print(f"\n  步驟 2: 買入成交後，立即掛止盈賣出")
+    print(f"  {'─' * 60}")
+    print(f"    日期:     {t_day_str} (買入成交後)")
+    print(f"    標的:     {ticker}")
+    print(f"    方向:     SELL (賣出)")
+    print(f"    類型:     LIMIT (限價單)")
+    print(f"    限價:     ${target_price:.2f} (+{config.profit_target:.1%} 目標)")
+    print(f"    有效期:   Day (每日收盤自動取消，隔日需重新掛單)")
+    print(f"    Firstrade: Sell > Limit > ${target_price:.2f} > Day")
 
-    print(f"    (a) 止盈單 — LIMIT SELL (限價賣出)")
-    print(f"        限價 (Limit price):  ${target_price:.2f} (+{config.profit_target:.1%} 獲利目標)")
-    print(f"        有效期 (Duration):   Day Order (每日需重新掛單)")
-    print(f"        Firstrade 操作:      Sell > Limit > 輸入 ${target_price:.2f} > Day")
+    # 步驟 3: 停損單
+    print(f"\n  步驟 3: 同時掛停損賣出")
+    print(f"  {'─' * 60}")
+    print(f"    日期:     {t_day_str} (買入成交後)")
+    print(f"    標的:     {ticker}")
+    print(f"    方向:     SELL (賣出)")
+    print(f"    類型:     STOP (停損市價單)")
+    print(f"    觸發價:   ${stop_price:.2f} ({config.stop_loss:.1%} 停損)")
+    print(f"    有效期:   GTC (長效單，直到成交或取消)")
+    print(f"    Firstrade: Sell > Stop > ${stop_price:.2f} > GTC")
 
-    print(f"\n    (b) 停損單 — STOP SELL (停損市價賣出)")
-    print(f"        觸發價 (Stop price): ${stop_price:.2f} ({config.stop_loss:.1%} 停損)")
-    print(f"        有效期 (Duration):   GTC (Good Till Cancel)")
-    print(f"        Firstrade 操作:      Sell > Stop > 輸入 ${stop_price:.2f} > GTC")
+    # 收集委託
+    orders = [
+        {
+            "date": t_day_str,
+            "timing": "開盤前",
+            "ticker": ticker,
+            "action": "BUY",
+            "order_type": "MARKET",
+            "price": None,
+            "price_display": f"市價 (~${estimated_entry:.2f})",
+            "duration": "Day",
+            "note": "新訊號買入",
+        },
+        {
+            "date": t_day_str,
+            "timing": "成交後",
+            "ticker": ticker,
+            "action": "SELL",
+            "order_type": "LIMIT",
+            "price": target_price,
+            "price_display": f"${target_price:.2f}",
+            "duration": "Day",
+            "note": f"止盈 +{config.profit_target:.1%}",
+        },
+        {
+            "date": t_day_str,
+            "timing": "成交後",
+            "ticker": ticker,
+            "action": "SELL",
+            "order_type": "STOP",
+            "price": stop_price,
+            "price_display": f"${stop_price:.2f}",
+            "duration": "GTC",
+            "note": f"停損 {config.stop_loss:.1%}",
+        },
+    ]
+
+    step_num = 4
 
     if has_trailing_stop:
-        # GLD-003 追蹤停損指令
         trail_activation = getattr(config, "trail_activation_pct", 0.015)
         trail_distance = getattr(config, "trail_distance_pct", 0.01)
         trail_activate_price = estimated_entry * (1 + trail_activation)
 
-        print(f"\n  步驟 3: 追蹤停損 — 需每日手動調整 (Step 3: Manual Trailing Stop)")
-        print(f"  {'─' * 50}")
-        print(f"    啟動條件 (Activation):   最高價達 ${trail_activate_price:.2f}")
-        print(f"                            (進場價 +{trail_activation:.1%})")
-        print(f"    追蹤方式 (Trail method): 新停損 = 最高價 × (1 - {trail_distance:.1%})")
-        print(f"    操作方式 (How to):")
-        print(f"      1. 每日收盤後檢查 {ticker} 最高價")
-        print(f"      2. 若最高價 >= ${trail_activate_price:.2f}，計算新停損價:")
-        print(f"         新停損 = 當日最高價 × {1 - trail_distance:.4f}")
-        print(f"      3. 若新停損 > 現有停損，登入 Firstrade 修改 STOP SELL 價格")
-        print(f"      4. 停損價只能上調，不可下調")
+        print(f"\n  步驟 {step_num}: 追蹤停損 — 每日收盤後手動調整")
+        print(f"  {'─' * 60}")
+        print(f"    啟動條件:  {ticker} 盤中最高價 >= ${trail_activate_price:.2f} (進場 +{trail_activation:.1%})")
+        print(f"    追蹤方式:  新停損 = 持倉最高價 × {1 - trail_distance:.4f}")
+        print(f"    操作:")
+        print(f"      每日收盤後:")
+        print(f"      1. 記錄 {ticker} 當日最高價")
+        print(f"      2. 若 最高價 >= ${trail_activate_price:.2f}:")
+        print(f"         計算: 新停損 = 最高價 × {1 - trail_distance:.4f}")
+        print(f"      3. 若 新停損 > 現有 STOP 價格:")
+        print(f"         → 登入 Firstrade 修改 STOP SELL 觸發價（只上調不下調）")
         print(f"    注意: Firstrade 不支援自動追蹤停損，必須手動調整")
-        print(f"    Note: Firstrade does not support auto trailing stops.")
+        step_num += 1
 
-        step_num = 4
-    else:
-        step_num = 3
-
-    # 持倉管理
-    print(f"\n  步驟 {step_num}: 持倉管理 (Step {step_num}: Position Management)")
-    print(f"  {'─' * 50}")
-    print(f"    最長持倉 (Max holding):  {config.holding_days} 個交易日")
-    print(f"    預估到期日 (Est. expiry): ~{est_expiry.strftime('%Y-%m-%d')}")
-    print(f"    到期處理 (On expiry):")
-    print(f"      1. 取消所有未成交委託 (Cancel all open orders)")
-    print(f"      2. 下一交易日開盤掛 MARKET SELL (市價賣出)")
-    print(f"         Firstrade: Sell > Market > Day")
+    # 持倉到期
+    print(f"\n  步驟 {step_num}: 持倉到期處理")
+    print(f"  {'─' * 60}")
+    print(f"    最長持倉:    {config.holding_days} 個交易日")
+    print(f"    到期日 (約):  {est_expiry.strftime('%Y-%m-%d')}")
+    print(f"    若到期未出場:")
+    print(f"      日期:     {est_expiry.strftime('%Y-%m-%d')} 收盤後")
+    print(f"      操作:     取消所有 {ticker} 未成交委託")
+    print(f"      然後:")
+    print(f"      日期:     {est_expiry_sell.strftime('%Y-%m-%d')} 開盤前")
+    print(f"      標的:     {ticker}")
+    print(f"      方向:     SELL (賣出)")
+    print(f"      類型:     MARKET (市價單)")
+    print(f"      有效期:   Day")
+    print(f"      Firstrade: Sell > Market > Day")
 
     # 重要提醒
-    print(f"\n  ⚠ 重要提醒 (Important Notes)")
-    print(f"  {'─' * 50}")
+    print(f"\n  ⚠ 重要提醒")
+    print(f"  {'─' * 60}")
     print(f"    • 上述價格為預估值，實際成交價以 Firstrade 回報為準")
-    print(f"    • 請依實際成交價重新計算目標價與停損價:")
-    print(f"      目標價 = 成交價 × {1 + config.profit_target:.4f}")
-    print(f"      停損價 = 成交價 × {1 + config.stop_loss:.4f}")
-    print(f"    • Prices above are estimates. Recalculate based on actual fill price.")
+    print(f"    • 買入成交後，請依實際成交價重新計算:")
+    print(f"      目標價 = 實際成交價 × {1 + config.profit_target:.4f}")
+    print(f"      停損價 = 實際成交價 × {1 + config.stop_loss:.4f}")
+    print(f"    • LIMIT SELL (止盈) 為 Day 單，每日開盤前需重新掛單")
+    print(f"    • STOP SELL (停損) 為 GTC 單，不需每日重掛")
+
+    return orders
 
 
 def _print_open_positions(
     trades: list[dict],
     config,
     today: pd.Timestamp,
+    t_day: pd.Timestamp,
     ticker: str,
     has_trailing_stop: bool,
     df: pd.DataFrame,
-) -> None:
-    """印出未結部位 (Print open positions from recent trades)"""
+) -> list[dict]:
+    """印出未結部位及應掛委託，回傳委託清單"""
     thin_sep = "-" * 80
+    t_day_str = t_day.strftime("%Y-%m-%d")
 
     print(f"\n{thin_sep}")
     print(f"  未結部位 (Open Positions) — {ticker}")
@@ -281,24 +393,23 @@ def _print_open_positions(
 
     if not trades:
         print(f"  無未結部位 (No open positions)\n")
-        return
+        return []
 
     # 找出仍在持倉期內的交易
-    # 判斷方式: exit_date >= today 表示該交易在現實中可能尚未結束
     today_str = today.strftime("%Y-%m-%d")
     open_positions = []
 
     for t in trades:
         exit_date_str = t.get("exit_date", "")
-        entry_date_str = t.get("entry_date", t["date"])
-
         # 如果出場日期 >= 今日，該部位可能仍然開放
         if exit_date_str >= today_str:
             open_positions.append(t)
 
     if not open_positions:
         print(f"  無未結部位 (No open positions)\n")
-        return
+        return []
+
+    orders: list[dict] = []
 
     for pos in open_positions:
         entry_date = pos.get("entry_date", pos["date"])
@@ -306,7 +417,7 @@ def _print_open_positions(
         target_price = entry_price * (1 + config.profit_target)
         stop_price = entry_price * (1 + config.stop_loss)
 
-        # 計算已持倉天數（從 entry_date 到 today 的交易日數）
+        # 計算已持倉天數
         try:
             entry_ts = pd.Timestamp(entry_date)
             trading_days_held = len(df.loc[entry_ts:today]) - 1
@@ -314,21 +425,26 @@ def _print_open_positions(
             trading_days_held = pos["holding_days"]
 
         days_remaining = max(0, config.holding_days - trading_days_held)
+        est_expiry = _estimate_trading_days_later(
+            pd.Timestamp(entry_date), config.holding_days
+        )
+        est_expiry_sell = _estimate_next_trading_day(est_expiry)
 
         print(f"\n  部位 (Position):")
-        print(f"    進場日期 (Entry date):   {entry_date}")
-        print(f"    進場價格 (Entry price):  ${entry_price:.2f}")
-        print(f"    目標價 (Target):         ${target_price:.2f} (+{config.profit_target:.1%})")
-        print(f"    停損價 (Stop):           ${stop_price:.2f} ({config.stop_loss:.1%})")
-        print(f"    已持倉 (Days held):      {trading_days_held} 交易日")
-        print(f"    剩餘天數 (Remaining):    {days_remaining} 交易日")
+        print(f"    進場日期:   {entry_date}")
+        print(f"    進場價格:   ${entry_price:.2f}")
+        print(f"    目標價:     ${target_price:.2f} (+{config.profit_target:.1%})")
+        print(f"    停損價:     ${stop_price:.2f} ({config.stop_loss:.1%})")
+        print(f"    已持倉:     {trading_days_held} 交易日")
+        print(f"    剩餘天數:   {days_remaining} 交易日")
+        print(f"    預估到期日: {est_expiry.strftime('%Y-%m-%d')}")
 
+        # 追蹤停損狀態
+        effective_stop = stop_price
         if has_trailing_stop:
             trail_activation = getattr(config, "trail_activation_pct", 0.015)
             trail_distance = getattr(config, "trail_distance_pct", 0.01)
-            activate_price = entry_price * (1 + trail_activation)
 
-            # 計算持倉期間最高價
             try:
                 entry_ts = pd.Timestamp(entry_date)
                 hold_df = df.loc[entry_ts:today]
@@ -337,20 +453,113 @@ def _print_open_positions(
                     unrealized_gain = (highest - entry_price) / entry_price
                     trail_activated = unrealized_gain >= trail_activation
 
-                    print(f"    持倉最高價 (Highest):    ${highest:.2f}")
-                    print(f"    追蹤停損啟動 (Trailing):  {'是 YES' if trail_activated else '否 NO'}")
+                    print(f"    持倉最高價: ${highest:.2f}")
+                    print(
+                        f"    追蹤停損:   "
+                        f"{'已啟動 ACTIVE' if trail_activated else '未啟動 INACTIVE'}"
+                    )
 
                     if trail_activated:
                         current_trail_stop = highest * (1 - trail_distance)
                         effective_stop = max(stop_price, current_trail_stop)
-                        print(f"    當前追蹤停損 (Trail stop): ${effective_stop:.2f}")
-                        print(f"    → 請更新 Firstrade STOP SELL 至 ${effective_stop:.2f}")
+                        print(f"    當前停損價: ${effective_stop:.2f} (追蹤停損已上調)")
             except Exception:
                 pass
 
+        # T 日需要的委託
         if days_remaining == 0:
-            print(f"\n    ⚠ 持倉已到期！請於下一交易日開盤賣出")
-            print(f"    ⚠ Holding period expired! Sell at next market open.")
-            print(f"    → 取消所有委託，掛 MARKET SELL")
+            # 到期 → 明天賣出
+            print(f"\n    ⚠ 持倉已到期！")
+            print(f"    {t_day_str} 開盤前操作:")
+            print(f"      1. 取消 {ticker} 所有未成交委託")
+            print(f"      2. 掛 MARKET SELL:")
+            print(f"         日期:   {t_day_str}")
+            print(f"         標的:   {ticker}")
+            print(f"         方向:   SELL (賣出)")
+            print(f"         類型:   MARKET (市價單)")
+            print(f"         有效期: Day")
+            print(f"         Firstrade: Sell > Market > Day")
 
+            orders.append({
+                "date": t_day_str,
+                "timing": "開盤前",
+                "ticker": ticker,
+                "action": "SELL",
+                "order_type": "MARKET",
+                "price": None,
+                "price_display": "市價 (到期出場)",
+                "duration": "Day",
+                "note": f"持倉到期，進場 {entry_date} @ ${entry_price:.2f}",
+            })
+        else:
+            # 仍在持倉中 → 重新掛 LIMIT SELL (Day 單每日需重掛)
+            print(f"\n    {t_day_str} 開盤前操作:")
+            print(f"      掛 LIMIT SELL (每日重新掛單):")
+            print(f"         日期:   {t_day_str}")
+            print(f"         標的:   {ticker}")
+            print(f"         方向:   SELL (賣出)")
+            print(f"         類型:   LIMIT (限價單)")
+            print(f"         限價:   ${target_price:.2f}")
+            print(f"         有效期: Day")
+            print(f"         Firstrade: Sell > Limit > ${target_price:.2f} > Day")
+
+            print(f"      STOP SELL (GTC 長效單，已掛則免操作):")
+            print(f"         觸發價: ${effective_stop:.2f}")
+            if has_trailing_stop and effective_stop > stop_price:
+                print(f"         → 若尚未更新，請修改 STOP 價至 ${effective_stop:.2f}")
+
+            orders.append({
+                "date": t_day_str,
+                "timing": "開盤前",
+                "ticker": ticker,
+                "action": "SELL",
+                "order_type": "LIMIT",
+                "price": target_price,
+                "price_display": f"${target_price:.2f}",
+                "duration": "Day",
+                "note": f"止盈 (進場 {entry_date} @ ${entry_price:.2f})",
+            })
+
+    print()
+    return orders
+
+
+def _print_order_sheet(orders: list[dict], today: pd.Timestamp) -> None:
+    """印出合併下單清單 (Print consolidated order sheet)"""
+    separator = "=" * 80
+    thin_sep = "-" * 80
+
+    print(f"\n{separator}")
+    print(f"  T 日下單清單 (T-Day Order Sheet)")
+    print(f"{separator}")
+
+    if not orders:
+        print(f"\n  無需下單 (No orders needed)\n")
+        return
+
+    # 表頭
+    print(
+        f"\n  {'#':>2}  {'日期':<12} {'時機':<8} {'標的':<6} "
+        f"{'方向':<6} {'類型':<8} {'價格':<20} {'有效期':<6} {'備註'}"
+    )
+    print(f"  {thin_sep}")
+
+    for i, order in enumerate(orders, 1):
+        print(
+            f"  {i:>2}  "
+            f"{order['date']:<12} "
+            f"{order['timing']:<8} "
+            f"{order['ticker']:<6} "
+            f"{order['action']:<6} "
+            f"{order['order_type']:<8} "
+            f"{order['price_display']:<20} "
+            f"{order['duration']:<6} "
+            f"{order['note']}"
+        )
+
+    print(f"\n  共 {len(orders)} 筆委託 (Total: {len(orders)} orders)")
+    print(f"\n  操作順序: 按編號依序執行")
+    print(f"  • MARKET BUY 必須在成交後才能掛 SELL 委託")
+    print(f"  • LIMIT SELL 為 Day 單，每日開盤前需重新掛單")
+    print(f"  • STOP SELL 為 GTC 單，掛一次即可（除非需調整追蹤停損）")
     print()
