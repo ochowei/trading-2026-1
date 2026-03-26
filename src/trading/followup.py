@@ -149,7 +149,7 @@ def _run_single_strategy(
     # 7. 印出逐筆交易明細 (Print trade details)
     trades = result["trades"]
     if trades:
-        _print_trade_details(trades)
+        _print_trade_details(trades, config, ticker, has_trailing_stop)
 
     # 8. 檢查今日訊號 (Check today's signal)
     df_full_signals = detector.detect_signals(df.copy())
@@ -190,8 +190,8 @@ def _run_single_strategy(
     return orders
 
 
-def _print_trade_details(trades: list[dict]) -> None:
-    """印出逐筆交易明細"""
+def _print_trade_details(trades: list[dict], config, ticker: str, has_trailing_stop: bool) -> None:
+    """印出逐筆交易明細與回顧性訂單資訊"""
     thin_sep = "-" * 80
 
     print(f"\n{thin_sep}")
@@ -207,24 +207,78 @@ def _print_trade_details(trades: list[dict]) -> None:
         "no_data": "無資料 N/A",
     }
 
-    print(
-        f"  {'訊號日':<12} {'進場日':<12} {'出場日':<12} "
-        f"{'進場':>8} {'出場':>8} {'報酬':>8} {'天數':>4} {'出場方式':<16}"
-    )
-    print(f"  {'-' * 88}")
-    for t in trades:
+    for i, t in enumerate(trades):
         entry_date = t.get("entry_date", t["date"])
+        exit_date = t.get("exit_date", "N/A")
+        entry_price = t["entry"]
+        exit_price = t["exit"]
         label_t = exit_type_labels.get(t["exit_type"], t["exit_type"])
-        print(
-            f"  {t['date']:<12} "
-            f"{entry_date:<12} "
-            f"{t.get('exit_date', 'N/A'):<12} "
-            f"{t['entry']:>8.2f} "
-            f"{t['exit']:>8.2f} "
-            f"{t['return_pct']:>+7.2f}% "
-            f"{t['holding_days']:>4d} "
-            f"{label_t:<16}"
-        )
+        target_price = entry_price * (1 + config.profit_target)
+        stop_price = entry_price * (1 + config.stop_loss)
+
+        if i > 0:
+            print()
+        print(f"\n  交易 #{i + 1}")
+        print(f"  {'─' * 60}")
+        print(f"    訊號日:     {t['date']}")
+        print(f"    進場日:     {entry_date}")
+        print(f"    出場日:     {exit_date}")
+        print(f"    進場價:     ${entry_price:.2f}")
+        print(f"    出場價:     ${exit_price:.2f}")
+        print(f"    報酬:       {t['return_pct']:+.2f}%")
+        print(f"    持倉天數:   {t['holding_days']}")
+        print(f"    出場方式:   {label_t}")
+
+        # 回顧性訂單資訊
+        print(f"\n    訂單明細 (Order Details):")
+
+        # 步驟 1: BUY
+        print(f"    {'─' * 50}")
+        print(f"      步驟 1: 買入")
+        print(f"        日期:     {entry_date} (開盤前)")
+        print(f"        標的:     {ticker}")
+        print(f"        方向:     BUY (買入)")
+        print(f"        類型:     MARKET (市價單)")
+        print(f"        限價:     N/A (市價)")
+        print(f"        有效期:   Day")
+        print(f"        實際成交: ${entry_price:.2f}")
+        print(f"        Firstrade: Buy > Market > Day")
+
+        # 步驟 2: 止盈
+        print(f"      步驟 2: 止盈賣出")
+        print(f"        日期:     {entry_date} (買入成交後)")
+        print(f"        標的:     {ticker}")
+        print(f"        方向:     SELL (賣出)")
+        print(f"        類型:     LIMIT (限價單)")
+        print(f"        限價:     ${target_price:.2f} (+{config.profit_target:.1%} 目標)")
+        print(f"        有效期:   Day (每日收盤自動取消，隔日需重新掛單)")
+        print(f"        Firstrade: Sell > Limit > ${target_price:.2f} > Day")
+
+        # 步驟 3: 停損
+        print(f"      步驟 3: 停損賣出")
+        print(f"        日期:     {entry_date} (買入成交後)")
+        print(f"        標的:     {ticker}")
+        print(f"        方向:     SELL (賣出)")
+        print(f"        類型:     STOP (停損市價單)")
+        print(f"        觸發價:   ${stop_price:.2f} ({config.stop_loss:.1%} 停損)")
+        print(f"        有效期:   GTC (長效單，直到成交或取消)")
+        print(f"        Firstrade: Sell > Stop > ${stop_price:.2f} > GTC")
+
+        # 追蹤停損（若適用）
+        if has_trailing_stop:
+            trail_activation = getattr(config, "trail_activation_pct", 0.015)
+            trail_distance = getattr(config, "trail_distance_pct", 0.01)
+            trail_activate_price = entry_price * (1 + trail_activation)
+            print(f"      追蹤停損:")
+            print(f"        啟動條件: 盤中最高價 >= ${trail_activate_price:.2f} (進場 +{trail_activation:.1%})")
+            print(f"        追蹤方式: 新停損 = 持倉最高價 × {1 - trail_distance:.4f}")
+
+        # 實際出場結果
+        print(f"      實際出場:")
+        print(f"        出場日:   {exit_date}")
+        print(f"        出場價:   ${exit_price:.2f}")
+        print(f"        出場方式: {label_t}")
+        print(f"        報酬:     {t['return_pct']:+.2f}%")
 
 
 def _print_buy_signal(
