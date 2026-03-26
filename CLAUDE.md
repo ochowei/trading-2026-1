@@ -26,6 +26,9 @@ uv run trading run <experiment_name>
 
 # 比較實驗結果
 uv run trading compare <exp1> <exp2>
+
+# 產生跟單訊號報告（Firstrade 下單用）
+uv run trading followup
 ```
 
 ## 架構速覽
@@ -33,6 +36,7 @@ uv run trading compare <exp1> <exp2>
 ```
 src/trading/
 ├── cli.py                       # 統一 CLI 入口
+├── followup.py                  # 跟單訊號產生器（60 天回測 + Firstrade 下單指令）
 ├── core/                        # 共用基礎設施
 │   ├── base_config.py           # ExperimentConfig dataclass
 │   ├── base_signal_detector.py  # BaseSignalDetector ABC
