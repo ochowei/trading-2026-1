@@ -57,4 +57,5 @@ src/trading/
 - TQQQ 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TQQQ.md](src/trading/experiments/EXPERIMENTS_TQQQ.md)
 - GLD 實驗總覽 → [src/trading/experiments/EXPERIMENTS_GLD.md](src/trading/experiments/EXPERIMENTS_GLD.md)
 - SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
+- FCX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_FCX.md](src/trading/experiments/EXPERIMENTS_FCX.md)
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
