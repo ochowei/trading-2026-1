@@ -99,6 +99,7 @@ class BaseStrategy(ABC):
 
             df_part = detector.detect_signals(df_part)
             result = backtester.run(df_part)
+            result["backtest_period"] = {"start": start, "end": end}
             results[label] = result
 
             self._print_part_report(label, start, end, result, df_part, config)
