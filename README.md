@@ -219,23 +219,7 @@ uv run trading compare tqqq_001_capitulation my_strategy
 
 ## 範例參照 (Reference Example)
 
-`experiments/tqqq_001_capitulation/` 是基礎實作範例，其餘 7 個實驗為其變體：
+各實驗的完整說明、參數比較與績效數據請參考：
 
-| 實驗 | 說明 |
-|------|------|
-| [`tqqq_001_capitulation`](src/trading/experiments/tqqq_001_capitulation/) | 基礎版：三條件恐慌抄底訊號 + 冷卻機制 |
-| [`tqqq_002_cap_relaxed_entry`](src/trading/experiments/tqqq_002_cap_relaxed_entry/) | 變體：放寬進場條件 |
-| [`tqqq_003_cap_wider_exit`](src/trading/experiments/tqqq_003_cap_wider_exit/) | 變體：放寬出場條件（含自訂 backtester） |
-| [`tqqq_004_cap_vix_filter`](src/trading/experiments/tqqq_004_cap_vix_filter/) | 變體：加入 VIX 過濾器 |
-| [`tqqq_005_cap_vix_adaptive`](src/trading/experiments/tqqq_005_cap_vix_adaptive/) | 變體：軟性 VIX + 適應性出場 (TQQQ-005) |
-| [`tqqq_006_momentum_collapse`](src/trading/experiments/tqqq_006_momentum_collapse/) | 變體：多日動能崩潰 (TQQQ-006) |
-| [`tqqq_007_cap_qqq_confirm`](src/trading/experiments/tqqq_007_cap_qqq_confirm/) | 變體：加入 QQQ RSI 相對強度確認 (TQQQ-007) |
-| [`tqqq_008_cap_optimized_exit`](src/trading/experiments/tqqq_008_cap_optimized_exit/) | **當前最佳**：優化出場 +7%、10 天、無追蹤停利 (TQQQ-008) |
-| [`tqqq_009_cap_gentle_entry`](src/trading/experiments/tqqq_009_cap_gentle_entry/) | ❌ 失敗：僅放寬 DD -13% + 優化出場 (TQQQ-009) |
-| [`tqqq_010_cap_exec_optimized`](src/trading/experiments/tqqq_010_cap_exec_optimized/) | 重做 TQQQ-008 + 成交模型（隔日開盤、滑價 0.1%、悲觀認定）(TQQQ-010) |
-| [`tqqq_011_cap_exec_baseline`](src/trading/experiments/tqqq_011_cap_exec_baseline/) | 重做 TQQQ-001 + 成交模型 (TQQQ-011) |
-| [`tqqq_012_cap_exec_qqq_confirm`](src/trading/experiments/tqqq_012_cap_exec_qqq_confirm/) | 重做 TQQQ-007 + 成交模型 (TQQQ-012) |
-| [`tqqq_013_cap_exec_qqq_optimized`](src/trading/experiments/tqqq_013_cap_exec_qqq_optimized/) | TQQQ-013：TQQQ-012 的 QQQ 過濾 + TQQQ-010 的優化出場（失敗嘗試） |
-| [`gld_001_mean_reversion`](src/trading/experiments/gld_001_mean_reversion/) | GLD 黃金極度超賣均值回歸基線 (約 3 次/年，高勝率) (GLD-001) |
-| [`gld_002_optimized_exit`](src/trading/experiments/gld_002_optimized_exit/) | GLD 優化出場 (TP +2.5%, SL -4%, Hold 15d) (GLD-002) |
-| [`gld_003_trailing_stop`](src/trading/experiments/gld_003_trailing_stop/) | **新最佳**：GLD 追蹤停損 — 進場同 GLD-002，出場加追蹤停損 (啟動 +1.5%, 距離 1.0%) (GLD-003) |
+- [TQQQ 實驗總覽](src/trading/experiments/EXPERIMENTS_TQQQ.md)
+- [GLD 實驗總覽](src/trading/experiments/EXPERIMENTS_GLD.md)

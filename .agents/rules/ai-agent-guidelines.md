@@ -37,7 +37,7 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
     4. **成交統計**（至少揭露 filled / unfilled 數量與成交率）
     5. **日內路徑假設 (Intrabar Assumption)**：若實驗同時使用「限價/觸價進場」與「盤中觸價出場 (如停損/停利)」，必須在程式碼與實驗文件中明確定義單根日 K 線內的觸發先後順序（建議採取 **「悲觀認定 Pessimistic Execution」** 原則：若最高與最低價皆穿越限價與停損價，強制假定發生最差的虧損結果，避免高估績效）。
 - **文件同步要求**：
-  - 新實驗若引入成交模型，必須同步更新 `README.md` 的實驗說明與參數/假設描述，確保讀者可辨識其與舊實驗的差異。
+  - 新實驗若引入成交模型，必須同步更新 `EXPERIMENTS_TQQQ.md` 或 `EXPERIMENTS_GLD.md` 的實驗說明與參數/假設描述，確保讀者可辨識其與舊實驗的差異。
 
 ## 3. 專案檔案用途說明
 
@@ -58,7 +58,7 @@ AI Agent 在修改專案時，必須確保程式碼與文件保持同步：
 | `experiments/_template/` | 新實驗模板，複製即可快速建立新策略 |
 | `experiments/<name>/` | 各交易策略實驗，每個實驗包含 `config.py`、`signal_detector.py`、`strategy.py`，部分含自訂 `backtester.py` |
 
-> 各實驗的詳細說明請參考 `README.md` 的「範例參照」表、`src/trading/experiments/EXPERIMENTS_TQQQ.md` 與 `src/trading/experiments/EXPERIMENTS_GLD.md`。
+> 各實驗的詳細說明請參考 `src/trading/experiments/EXPERIMENTS_TQQQ.md` 與 `src/trading/experiments/EXPERIMENTS_GLD.md`。
 
 ### 設定與 CI/CD
 
