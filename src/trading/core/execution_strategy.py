@@ -6,7 +6,6 @@ Extends BaseStrategy with execution model report printing (slippage, fill rate, 
 
 import pandas as pd
 
-from trading.core.base_backtester import BaseBacktester
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_strategy import BaseStrategy
 from trading.core.execution_backtester import ExecutionModelBacktester
@@ -27,8 +26,13 @@ class ExecutionModelStrategy(BaseStrategy):
         return ExecutionModelBacktester(config, slippage_pct=self.slippage_pct)
 
     def _print_part_report(
-        self, label: str, start: str, end: str, result: dict,
-        df: pd.DataFrame, config: ExperimentConfig
+        self,
+        label: str,
+        start: str,
+        end: str,
+        result: dict,
+        df: pd.DataFrame,
+        config: ExperimentConfig,
     ) -> None:
         """覆寫以顯示成交模型資訊 (Override to show execution model info)"""
         separator = "=" * 80
@@ -57,10 +61,12 @@ class ExecutionModelStrategy(BaseStrategy):
         if not trades:
             unfilled = result.get("unfilled_count", 0)
             if unfilled > 0:
-                print(f"\n  無成交訊號，{unfilled} 個訊號未成交 "
-                      f"(No filled trades, {unfilled} unfilled signals)\n")
+                print(
+                    f"\n  無成交訊號，{unfilled} 個訊號未成交 "
+                    f"(No filled trades, {unfilled} unfilled signals)\n"
+                )
             else:
-                print(f"\n  無訊號觸發 (No signals detected)\n")
+                print("\n  無訊號觸發 (No signals detected)\n")
             return
 
         # 成交統計 (Fill statistics)
@@ -91,7 +97,7 @@ class ExecutionModelStrategy(BaseStrategy):
         print(f"  最大連續虧損 (Max consec. loss): {result['max_consecutive_losses']}")
 
         # 出場方式統計 (Exit type breakdown)
-        print(f"\n  出場方式 (Exit breakdown):")
+        print("\n  出場方式 (Exit breakdown):")
         print(f"    達標出場 (Target hit):         {result['target_exits']}")
         print(f"    停損出場 (Stop-loss):          {result['stop_loss_exits']}")
         pessimistic = result.get("pessimistic_exits", 0)
@@ -103,9 +109,13 @@ class ExecutionModelStrategy(BaseStrategy):
         print(f"\n{thin_sep}")
         print("  逐筆交易明細 (Trade Details)")
         print(f"{thin_sep}")
-        print(f"  {'訊號日期':<12} {'進場日期':<12} {'出場日期':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'持倉':>4} {'出場方式':<16}")
-        print(f"  {'Signal':<12} {'Entry':<12} {'Exit Date':<12} {'Entry':>8} {'Exit':>8} {'Return':>8} {'Days':>4} {'Exit Type':<16}")
-        print(f"  {'-'*88}")
+        print(
+            f"  {'訊號日期':<12} {'進場日期':<12} {'出場日期':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'持倉':>4} {'出場方式':<16}"
+        )
+        print(
+            f"  {'Signal':<12} {'Entry':<12} {'Exit Date':<12} {'Entry':>8} {'Exit':>8} {'Return':>8} {'Days':>4} {'Exit Type':<16}"
+        )
+        print(f"  {'-' * 88}")
 
         exit_type_labels = {
             "target": "達標 Target",
@@ -155,8 +165,12 @@ class ExecutionModelStrategy(BaseStrategy):
         pessimistic = em.get("pessimistic_execution", False)
 
         print(f"  進場模式 (Entry mode):           {entry_labels.get(entry_mode, entry_mode)}")
-        print(f"  止盈委託 (Profit exit):          {exit_profit_labels.get(exit_profit, exit_profit)}")
+        print(
+            f"  止盈委託 (Profit exit):          {exit_profit_labels.get(exit_profit, exit_profit)}"
+        )
         print(f"  停損委託 (Stop exit):            {exit_stop_labels.get(exit_stop, exit_stop)}")
-        print(f"  到期出場 (Expiry exit):          {exit_expiry_labels.get(exit_expiry, exit_expiry)}")
+        print(
+            f"  到期出場 (Expiry exit):          {exit_expiry_labels.get(exit_expiry, exit_expiry)}"
+        )
         print(f"  滑價 (Slippage):                 {slippage:.2%}")
         print(f"  悲觀認定 (Pessimistic exec.):    {'是 Yes' if pessimistic else '否 No'}")

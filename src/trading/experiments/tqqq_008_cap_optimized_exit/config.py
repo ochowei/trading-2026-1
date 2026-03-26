@@ -14,8 +14,8 @@ class TQQQCapOptimizedExitConfig(TQQQConfig):
     """TQQQ 優化出場策略配置"""
 
     # 優化的出場參數 (Optimized exit parameters)
-    profit_target: float = 0.07   # +5% -> +7%
-    holding_days: int = 10        # 7 -> 10
+    profit_target: float = 0.07  # +5% -> +7%
+    holding_days: int = 10  # 7 -> 10
 
 
 def create_default_config() -> TQQQCapOptimizedExitConfig:

@@ -14,15 +14,15 @@ class TQQQConfig(ExperimentConfig):
     """TQQQ 恐慌抄底策略配置"""
 
     # 訊號指標參數 (Signal indicator parameters)
-    drawdown_lookback: int = 20        # 回撤計算的高點回望天數
+    drawdown_lookback: int = 20  # 回撤計算的高點回望天數
     drawdown_threshold: float = -0.15  # 從 20 日高點回撤 ≥ 15%
-    rsi_period: int = 5                # 短週期 RSI 捕捉急性恐慌
-    rsi_threshold: float = 25.0        # RSI(5) < 25 極端超賣
-    volume_multiplier: float = 1.5     # 成交量 > 1.5 倍均量
-    volume_sma_period: int = 20        # 均量計算週期
+    rsi_period: int = 5  # 短週期 RSI 捕捉急性恐慌
+    rsi_threshold: float = 25.0  # RSI(5) < 25 極端超賣
+    volume_multiplier: float = 1.5  # 成交量 > 1.5 倍均量
+    volume_sma_period: int = 20  # 均量計算週期
 
     # 訊號冷卻 (Signal cooldown)
-    cooldown_days: int = 3             # 同一波跌勢中僅取第一個訊號
+    cooldown_days: int = 3  # 同一波跌勢中僅取第一個訊號
 
 
 def create_default_config() -> TQQQConfig:

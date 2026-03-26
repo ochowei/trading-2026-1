@@ -14,7 +14,7 @@ class TQQQCapExecQqqConfirmConfig(TQQQCapQqqConfirmConfig):
     """TQQQ QQQ 確認 + 成交模型配置"""
 
     # 成交模型參數 (Execution model parameters)
-    slippage_pct: float = 0.001   # 0.1%
+    slippage_pct: float = 0.001  # 0.1%
 
 
 def create_default_config() -> TQQQCapExecQqqConfirmConfig:

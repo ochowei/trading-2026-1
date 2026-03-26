@@ -44,11 +44,12 @@ def save_result(experiment_name: str, result: dict) -> Path:
 
     # 清理舊的時間戳備份，只保留最近的 10 個 (Clean up old timestamped backups, keep max 10)
     import re
+
     ts_files = []
     for f in d.iterdir():
         if f.is_file() and re.match(r"^\d{8}_\d{6}\.json$", f.name):
             ts_files.append(f)
-    
+
     ts_files.sort(key=lambda x: x.name)
     if len(ts_files) > 10:
         for f in ts_files[:-10]:
@@ -57,7 +58,9 @@ def save_result(experiment_name: str, result: dict) -> Path:
             except Exception as e:
                 logger.warning(f"無法刪除舊結果檔案 {f}: {e}")
 
-    logger.info(f"[Results] 結果已存至 {latest_path} 與 {ts_path} (Result saved to {latest_path} and {ts_path})")
+    logger.info(
+        f"[Results] 結果已存至 {latest_path} 與 {ts_path} (Result saved to {latest_path} and {ts_path})"
+    )
     return latest_path
 
 
@@ -114,7 +117,7 @@ def compare_experiments(names: list[str]) -> None:
         for name in loaded:
             header += f" {display_ids.get(name, name[:12]):>12}"
         print(header)
-        print(f"  {'-'*72}")
+        print(f"  {'-' * 72}")
 
         rows = [
             ("總訊號數 (Total signals)", "total_signals", "d"),

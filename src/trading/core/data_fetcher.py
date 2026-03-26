@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 # 多線程下載 (Multi-threading)
 MAX_WORKERS: int = 8
 
+
 class DataFetcher:
     """
     資料擷取器 (Data Fetcher)
@@ -108,10 +109,7 @@ class DataFetcher:
         )
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            futures = {
-                executor.submit(self._fetch_single, ticker): ticker
-                for ticker in tickers
-            }
+            futures = {executor.submit(self._fetch_single, ticker): ticker for ticker in tickers}
 
             for future in as_completed(futures):
                 ticker = futures[future]
@@ -120,9 +118,7 @@ class DataFetcher:
                     if df is not None and not df.empty:
                         results[ticker] = df
                 except Exception as e:
-                    logger.error(
-                        f"[DataFetcher] {ticker} 處理失敗 (Processing failed): {e}"
-                    )
+                    logger.error(f"[DataFetcher] {ticker} 處理失敗 (Processing failed): {e}")
 
         logger.info(
             f"[DataFetcher] 下載完成: {len(results)}/{len(tickers)} 成功 "

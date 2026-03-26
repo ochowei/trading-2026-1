@@ -14,9 +14,8 @@ class TQQQCapVixAdaptiveConfig(TQQQCapWiderExitConfig):
     """TQQQ 軟性 VIX + 適應性出場策略配置"""
 
     # VIX 過濾參數 (VIX filter parameters)
-    vix_ticker: str = "^VIX"            # VIX 標的代碼
-    vix_threshold: float = 20.0         # VIX 必須高於此值才觸發訊號
-
+    vix_ticker: str = "^VIX"  # VIX 標的代碼
+    vix_threshold: float = 20.0  # VIX 必須高於此值才觸發訊號
 
 
 def create_default_config() -> TQQQCapVixAdaptiveConfig:

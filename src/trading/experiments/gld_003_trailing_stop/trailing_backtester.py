@@ -24,8 +24,8 @@ class TrailingStopBacktester:
         self,
         config: ExperimentConfig,
         slippage_pct: float = 0.001,
-        trail_activation_pct: float = 0.01,   # 獲利 +1% 後啟動追蹤
-        trail_distance_pct: float = 0.015,     # 追蹤距離 1.5%
+        trail_activation_pct: float = 0.01,  # 獲利 +1% 後啟動追蹤
+        trail_distance_pct: float = 0.015,  # 追蹤距離 1.5%
     ):
         self.config = config
         self.slippage_pct = slippage_pct
@@ -52,17 +52,19 @@ class TrailingStopBacktester:
             future_df = df.loc[future_mask]
 
             if future_df.empty:
-                unfilled_signals.append({
-                    "date": signal_date.strftime("%Y-%m-%d"),
-                    "reason": "no_next_day_data",
-                })
+                unfilled_signals.append(
+                    {
+                        "date": signal_date.strftime("%Y-%m-%d"),
+                        "reason": "no_next_day_data",
+                    }
+                )
                 continue
 
             entry_date = future_df.index[0]
             raw_entry_price = future_df.iloc[0]["Open"]
             entry_price = raw_entry_price * (1 + self.slippage_pct)
 
-            hold_df = future_df.iloc[1:holding_days + 1]
+            hold_df = future_df.iloc[1 : holding_days + 1]
 
             target_price = entry_price * (1 + profit_target)
             initial_stop_price = entry_price * (1 + stop_loss)
@@ -162,17 +164,19 @@ class TrailingStopBacktester:
             else:
                 consecutive_losses = 0
 
-            trades.append({
-                "date": signal_date.strftime("%Y-%m-%d"),
-                "entry_date": entry_date.strftime("%Y-%m-%d"),
-                "exit_date": exit_date.strftime("%Y-%m-%d"),
-                "entry": round(float(entry_price), 2),
-                "exit": round(float(exit_price), 2),
-                "return_pct": round(float(trade_return) * 100, 2),
-                "holding_days": days_held,
-                "exit_type": exit_type,
-                "max_drawdown_pct": round(float(max_dd) * 100, 2),
-            })
+            trades.append(
+                {
+                    "date": signal_date.strftime("%Y-%m-%d"),
+                    "entry_date": entry_date.strftime("%Y-%m-%d"),
+                    "exit_date": exit_date.strftime("%Y-%m-%d"),
+                    "entry": round(float(entry_price), 2),
+                    "exit": round(float(exit_price), 2),
+                    "return_pct": round(float(trade_return) * 100, 2),
+                    "holding_days": days_held,
+                    "exit_type": exit_type,
+                    "max_drawdown_pct": round(float(max_dd) * 100, 2),
+                }
+            )
 
         if not trades:
             result = self._empty_result()
@@ -187,18 +191,15 @@ class TrailingStopBacktester:
         wins = sum(1 for r in returns if r > 0)
         target_exits = sum(1 for t in trades if t["exit_type"] == "target")
         stop_exits = sum(
-            1 for t in trades
-            if t["exit_type"] in ("stop_loss", "stop_loss_pessimistic")
+            1 for t in trades if t["exit_type"] in ("stop_loss", "stop_loss_pessimistic")
         )
         trailing_exits = sum(1 for t in trades if t["exit_type"] == "trailing_stop")
-        pessimistic_exits = sum(
-            1 for t in trades if t["exit_type"] == "stop_loss_pessimistic"
-        )
+        pessimistic_exits = sum(1 for t in trades if t["exit_type"] == "stop_loss_pessimistic")
         time_exits = sum(1 for t in trades if t["exit_type"] == "time_expiry")
 
         cumulative = 1.0
         for r in returns:
-            cumulative *= (1 + r / 100)
+            cumulative *= 1 + r / 100
         cumulative_return = (cumulative - 1) * 100
 
         avg_return = float(np.mean(returns))
@@ -213,7 +214,7 @@ class TrailingStopBacktester:
         logger.info(
             f"[TrailingStopBacktester] {ticker_str}: {total} 成交/{total_signals} 訊號 "
             f"(成交率 {fill_rate:.1%}), "
-            f"勝率 {wins}/{total} = {wins/total:.1%}, "
+            f"勝率 {wins}/{total} = {wins / total:.1%}, "
             f"累計報酬 {cumulative_return:.1f}%"
         )
 

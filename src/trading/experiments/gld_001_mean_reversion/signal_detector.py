@@ -3,11 +3,14 @@ GLD 均值回歸訊號偵測器
 """
 
 import logging
+
 import pandas as pd
+
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.experiments.gld_001_mean_reversion.config import GLDMeanReversionConfig
 
 logger = logging.getLogger(__name__)
+
 
 class GLDSignalDetector(BaseSignalDetector):
     def __init__(self, config: GLDMeanReversionConfig):
@@ -32,17 +35,17 @@ class GLDSignalDetector(BaseSignalDetector):
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
-        
+
         cond_rsi = df["RSI14"] < self.config.rsi_threshold
         cond_sma_dev = df["SMA_Deviation"] <= self.config.sma_deviation_threshold
-        
+
         df["Signal"] = cond_rsi & cond_sma_dev
-        
+
         # Cooldown mechanism
         signal_indices = df.index[df["Signal"]].tolist()
         suppressed = []
         last_signal = None
-        
+
         for idx in signal_indices:
             if last_signal is not None:
                 gap = len(df.loc[last_signal:idx]) - 1
@@ -50,10 +53,10 @@ class GLDSignalDetector(BaseSignalDetector):
                     suppressed.append(idx)
                     continue
             last_signal = idx
-            
+
         if suppressed:
             df.loc[suppressed, "Signal"] = False
-        
+
         signal_count = df["Signal"].sum()
         logger.info(f"GLD: Detected {signal_count} mean reversion signals")
         return df

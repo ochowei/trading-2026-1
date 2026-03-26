@@ -8,14 +8,14 @@ import logging
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.data_fetcher import DataFetcher
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
-from trading.core.data_fetcher import DataFetcher
+from trading.experiments.tqqq_007_cap_qqq_confirm.signal_detector import TQQQCapQqqConfirmDetector
 from trading.experiments.tqqq_012_cap_exec_qqq_confirm.config import (
     TQQQCapExecQqqConfirmConfig,
     create_default_config,
 )
-from trading.experiments.tqqq_007_cap_qqq_confirm.signal_detector import TQQQCapQqqConfirmDetector
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,9 @@ class TQQQCapExecQqqConfirmStrategy(ExecutionModelStrategy):
         print(f"  {config.display_name}")
         print(f"{separator}\n")
 
-        logger.info(f"Step 1/3: 下載數據 (Fetching data for {config.tickers} + {config.qqq_ticker})...")
+        logger.info(
+            f"Step 1/3: 下載數據 (Fetching data for {config.tickers} + {config.qqq_ticker})..."
+        )
         data = fetcher.fetch_all(config.tickers + [config.qqq_ticker])
 
         primary_ticker = config.tickers[0]
@@ -83,7 +85,9 @@ class TQQQCapExecQqqConfirmStrategy(ExecutionModelStrategy):
                 f"(Failed to fetch {config.qqq_ticker}, QQQ filter will be skipped)"
             )
 
-        print(f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}")
+        print(
+            f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}"
+        )
         print(f"  原始資料筆數: {len(df)} 個交易日\n")
 
         logger.info("Step 2/3: 計算指標與偵測訊號...")
@@ -125,9 +129,13 @@ class TQQQCapExecQqqConfirmStrategy(ExecutionModelStrategy):
             return
 
         print(f"  回撤閾值 (Drawdown threshold):  {config.drawdown_threshold:.0%}")
-        print(f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}")
+        print(
+            f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}"
+        )
         print(f"  成交量倍數 (Volume multiplier):  {config.volume_multiplier}x")
-        print(f"  QQQ RSI 過濾 (QQQ RSI filter):  RSI({config.qqq_rsi_period}) < {config.qqq_rsi_threshold}")
+        print(
+            f"  QQQ RSI 過濾 (QQQ RSI filter):  RSI({config.qqq_rsi_period}) < {config.qqq_rsi_threshold}"
+        )
         print(f"  冷卻天數 (Cooldown):             {config.cooldown_days} 天")
         print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")
         print(f"  停損 (Stop-loss):                {config.stop_loss:.0%}")

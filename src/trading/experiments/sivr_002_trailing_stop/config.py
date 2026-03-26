@@ -16,8 +16,9 @@ from trading.experiments.sivr_001_mean_reversion.config import SIVRMeanReversion
 @dataclass
 class SIVRTrailingStopConfig(SIVRMeanReversionConfig):
     """SIVR 追蹤停損配置 — 繼承 SIVR-001 進場參數，新增追蹤停損出場"""
-    trail_activation_pct: float = 0.02     # 獲利 +2.0% 後啟動追蹤
-    trail_distance_pct: float = 0.015      # 追蹤距離 1.5%
+
+    trail_activation_pct: float = 0.02  # 獲利 +2.0% 後啟動追蹤
+    trail_distance_pct: float = 0.015  # 追蹤距離 1.5%
 
 
 def create_default_config() -> SIVRTrailingStopConfig:
@@ -27,7 +28,7 @@ def create_default_config() -> SIVRTrailingStopConfig:
         display_name="SIVR Trailing Stop Mean Reversion",
         tickers=["SIVR"],
         data_start="2010-01-01",
-        profit_target=0.03,     # +3.0% (同 SIVR-001)
-        stop_loss=-0.045,       # -4.5% (同 SIVR-001)
-        holding_days=15,        # 15 天 (同 SIVR-001)
+        profit_target=0.03,  # +3.0% (同 SIVR-001)
+        stop_loss=-0.045,  # -4.5% (同 SIVR-001)
+        holding_days=15,  # 15 天 (同 SIVR-001)
     )

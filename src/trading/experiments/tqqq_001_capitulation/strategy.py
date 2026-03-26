@@ -32,7 +32,9 @@ class TQQQStrategy(BaseStrategy):
             return
 
         print(f"  回撤閾值 (Drawdown threshold):  {config.drawdown_threshold:.0%}")
-        print(f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}")
+        print(
+            f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}"
+        )
         print(f"  成交量倍數 (Volume multiplier):  {config.volume_multiplier}x")
         print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")
         print(f"  停損 (Stop-loss):                {config.stop_loss:.0%}")

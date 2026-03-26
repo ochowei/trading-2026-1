@@ -13,8 +13,8 @@ from trading.experiments.tqqq_001_capitulation.config import TQQQConfig
 class TQQQCapQqqConfirmConfig(TQQQConfig):
     """TQQQ + QQQ 相對強度確認策略配置"""
 
-    qqq_ticker: str = "QQQ"         # 底層指數 ETF
-    qqq_rsi_period: int = 14         # QQQ RSI 週期
+    qqq_ticker: str = "QQQ"  # 底層指數 ETF
+    qqq_rsi_period: int = 14  # QQQ RSI 週期
     qqq_rsi_threshold: float = 35.0  # QQQ RSI 必須低於此值
 
 

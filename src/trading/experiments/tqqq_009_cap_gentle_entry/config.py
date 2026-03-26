@@ -16,15 +16,15 @@ class TQQQCapGentleEntryConfig(TQQQConfig):
     """TQQQ 溫和放寬進場策略配置"""
 
     # 溫和放寬的進場閾值（僅 drawdown）(Gently relaxed entry - drawdown only)
-    drawdown_threshold: float = -0.13   # -15% -> -13%
+    drawdown_threshold: float = -0.13  # -15% -> -13%
 
     # RSI 和 Volume 保持基線嚴格值不變
     # rsi_threshold: float = 25.0       # 不變 (unchanged)
     # volume_multiplier: float = 1.5    # 不變 (unchanged)
 
     # 搭配 TQQQ-008 的優化出場參數 (TQQQ-008's optimized exit)
-    profit_target: float = 0.07   # +5% -> +7%
-    holding_days: int = 10        # 7 -> 10
+    profit_target: float = 0.07  # +5% -> +7%
+    holding_days: int = 10  # 7 -> 10
 
 
 def create_default_config() -> TQQQCapGentleEntryConfig:

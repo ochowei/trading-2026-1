@@ -14,11 +14,11 @@ class TQQQCapExecOptimizedConfig(TQQQConfig):
     """TQQQ 優化出場 + 成交模型配置"""
 
     # 優化的出場參數 — 與 TQQQ-008 相同 (Same exit params as TQQQ-008)
-    profit_target: float = 0.07   # +7%
-    holding_days: int = 10        # 10 天
+    profit_target: float = 0.07  # +7%
+    holding_days: int = 10  # 10 天
 
     # 成交模型參數 (Execution model parameters)
-    slippage_pct: float = 0.001   # 0.1%
+    slippage_pct: float = 0.001  # 0.1%
 
 
 def create_default_config() -> TQQQCapExecOptimizedConfig:

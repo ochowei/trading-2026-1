@@ -30,8 +30,12 @@ class FCXExtremeOversoldStrategy(ExecutionModelStrategy):
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
         if isinstance(config, FCXExtremeOversoldConfig):
-            print(f"  回撤閾值 (Drawdown thr): {config.drawdown_lookback}日高點跌幅 <= {config.drawdown_threshold:.0%}")
+            print(
+                f"  回撤閾值 (Drawdown thr): {config.drawdown_lookback}日高點跌幅 <= {config.drawdown_threshold:.0%}"
+            )
             print(f"  RSI 週期/閾值 (RSI): RSI({config.rsi_period}) < {config.rsi_threshold}")
-            print(f"  SMA 乖離閾值 (SMA dev): Close / SMA({config.sma_period}) - 1 <= {config.sma_deviation_threshold:.0%}")
+            print(
+                f"  SMA 乖離閾值 (SMA dev): Close / SMA({config.sma_period}) - 1 <= {config.sma_deviation_threshold:.0%}"
+            )
             print(f"  冷卻期 (Cooldown): {config.cooldown_days} 交易日")
         super()._print_strategy_params(config)

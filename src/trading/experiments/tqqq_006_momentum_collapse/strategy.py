@@ -11,7 +11,9 @@ from trading.experiments.tqqq_006_momentum_collapse.config import (
     TQQQMomentumCollapseConfig,
     create_default_config,
 )
-from trading.experiments.tqqq_006_momentum_collapse.signal_detector import TQQQMomentumCollapseDetector
+from trading.experiments.tqqq_006_momentum_collapse.signal_detector import (
+    TQQQMomentumCollapseDetector,
+)
 
 
 class TQQQMomentumCollapseStrategy(BaseStrategy):
@@ -29,7 +31,9 @@ class TQQQMomentumCollapseStrategy(BaseStrategy):
             return
 
         print(f"  回看區間 (Lookback):             {config.lookback_days} 天")
-        print(f"  下跌日門檻 (Min down days):      >= {config.min_down_days} / {config.lookback_days}")
+        print(
+            f"  下跌日門檻 (Min down days):      >= {config.min_down_days} / {config.lookback_days}"
+        )
         print(f"  累計跌幅門檻 (5d return):        <= {config.cumulative_drop_threshold:.0%}")
         print(f"  趨勢條件 (Trend filter):         Close < SMA({config.trend_sma_period})")
         print(f"  冷卻天數 (Cooldown):             {config.cooldown_days} 天")

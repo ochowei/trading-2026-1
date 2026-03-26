@@ -14,8 +14,8 @@ class TQQQCapVixFilterConfig(TQQQConfig):
     """TQQQ VIX 過濾策略配置"""
 
     # VIX 過濾參數 (VIX filter parameters)
-    vix_ticker: str = "^VIX"            # VIX 標的代碼
-    vix_threshold: float = 25.0         # VIX 必須高於此值才觸發訊號
+    vix_ticker: str = "^VIX"  # VIX 標的代碼
+    vix_threshold: float = 25.0  # VIX 必須高於此值才觸發訊號
 
 
 def create_default_config() -> TQQQCapVixFilterConfig:

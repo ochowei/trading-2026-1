@@ -21,9 +21,11 @@ def register(name: str):
         class MyStrategy(BaseStrategy):
             ...
     """
+
     def wrapper(cls: type[BaseStrategy]) -> type[BaseStrategy]:
         _REGISTRY[name] = cls
         return cls
+
     return wrapper
 
 
