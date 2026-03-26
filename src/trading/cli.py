@@ -76,6 +76,9 @@ def main() -> None:
     run_p.add_argument("experiment", nargs="?", help="實驗名稱 (Experiment name)")
     run_p.add_argument("--all", action="store_true", help="執行全部實驗 (Run all experiments)")
 
+    # followup
+    sub.add_parser("followup", help="產生跟單訊號報告 (Generate Firstrade trading signals)")
+
     # compare
     cmp_p = sub.add_parser("compare", help="比較實驗結果 (Compare experiment results)")
     cmp_p.add_argument("experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)")
@@ -86,6 +89,9 @@ def main() -> None:
         cmd_list(args)
     elif args.command == "run":
         cmd_run(args)
+    elif args.command == "followup":
+        from trading.followup import run_followup
+        run_followup()
     elif args.command == "compare":
         cmd_compare(args)
     else:
