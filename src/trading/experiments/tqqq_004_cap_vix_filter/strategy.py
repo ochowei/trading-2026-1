@@ -6,8 +6,6 @@ Filters capitulation signals to only enter when VIX > 25, eliminating weak signa
 
 import logging
 
-import pandas as pd
-
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.base_strategy import BaseStrategy
@@ -52,7 +50,9 @@ class TQQQCapVixFilterStrategy(BaseStrategy):
         print(f"{separator}\n")
 
         # Step 1: 下載 TQQQ 和 VIX 數據
-        logger.info(f"Step 1/3: 下載數據 (Fetching data for {config.tickers} + {config.vix_ticker})...")
+        logger.info(
+            f"Step 1/3: 下載數據 (Fetching data for {config.tickers} + {config.vix_ticker})..."
+        )
         all_tickers = config.tickers + [config.vix_ticker]
         data = fetcher.fetch_all(all_tickers)
 
@@ -78,7 +78,9 @@ class TQQQCapVixFilterStrategy(BaseStrategy):
                 f"(Failed to fetch {config.vix_ticker}, VIX filter will be skipped)"
             )
 
-        print(f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}")
+        print(
+            f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}"
+        )
         print(f"  原始資料筆數: {len(df)} 個交易日\n")
 
         # Step 2: 計算指標
@@ -124,7 +126,9 @@ class TQQQCapVixFilterStrategy(BaseStrategy):
             return
 
         print(f"  回撤閾值 (Drawdown threshold):  {config.drawdown_threshold:.0%}")
-        print(f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}")
+        print(
+            f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}"
+        )
         print(f"  成交量倍數 (Volume multiplier):  {config.volume_multiplier}x")
         print(f"  VIX 門檻 (VIX threshold):        > {config.vix_threshold}")
         print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")

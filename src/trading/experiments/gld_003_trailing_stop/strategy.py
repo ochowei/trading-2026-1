@@ -39,8 +39,12 @@ class GLDTrailingStopStrategy(ExecutionModelStrategy):
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
         if isinstance(config, GLDTrailingStopConfig):
-            print(f"  RSI 週期/閾值 (RSI period/thr): RSI({config.rsi_period}) < {config.rsi_threshold}")
-            print(f"  SMA 乖離閾值 (SMA dev thr): Close / SMA({config.sma_period}) - 1 <= {config.sma_deviation_threshold:.1%}")
+            print(
+                f"  RSI 週期/閾值 (RSI period/thr): RSI({config.rsi_period}) < {config.rsi_threshold}"
+            )
+            print(
+                f"  SMA 乖離閾值 (SMA dev thr): Close / SMA({config.sma_period}) - 1 <= {config.sma_deviation_threshold:.1%}"
+            )
             print(f"  追蹤啟動 (Trail activation): +{config.trail_activation_pct:.1%}")
             print(f"  追蹤距離 (Trail distance): {config.trail_distance_pct:.1%}")
         super()._print_strategy_params(config)

@@ -14,15 +14,15 @@ class TQQQMomentumCollapseConfig(ExperimentConfig):
     """TQQQ 多日動能崩潰策略配置"""
 
     # 多日動能崩潰參數 (Multi-day collapse parameters)
-    lookback_days: int = 5                  # 回看區間天數
-    min_down_days: int = 4                  # 至少 N 天下跌
+    lookback_days: int = 5  # 回看區間天數
+    min_down_days: int = 4  # 至少 N 天下跌
     cumulative_drop_threshold: float = -0.12  # N 日累計跌幅需 <= -12%
 
     # 趨勢過濾 (Trend filter)
-    trend_sma_period: int = 50              # 價格需低於 SMA50
+    trend_sma_period: int = 50  # 價格需低於 SMA50
 
     # 訊號冷卻 (Signal cooldown)
-    cooldown_days: int = 5                  # 避免同波段重複進場
+    cooldown_days: int = 5  # 避免同波段重複進場
 
 
 def create_default_config() -> TQQQMomentumCollapseConfig:

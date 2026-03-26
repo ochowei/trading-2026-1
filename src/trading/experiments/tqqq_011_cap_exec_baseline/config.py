@@ -14,12 +14,12 @@ class TQQQCapExecBaselineConfig(TQQQConfig):
     """TQQQ 基線恐慌抄底 + 成交模型配置"""
 
     # 出場參數 — 與 TQQQ-001 相同 (Same exit params as TQQQ-001)
-    profit_target: float = 0.05   # +5%
-    stop_loss: float = -0.08      # -8%
-    holding_days: int = 7         # 7 天
+    profit_target: float = 0.05  # +5%
+    stop_loss: float = -0.08  # -8%
+    holding_days: int = 7  # 7 天
 
     # 成交模型參數 (Execution model parameters)
-    slippage_pct: float = 0.001   # 0.1%
+    slippage_pct: float = 0.001  # 0.1%
 
 
 def create_default_config() -> TQQQCapExecBaselineConfig:

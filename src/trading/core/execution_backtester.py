@@ -83,10 +83,12 @@ class ExecutionModelBacktester:
 
             if future_df.empty:
                 # 訊號後無資料 → unfilled
-                unfilled_signals.append({
-                    "date": signal_date.strftime("%Y-%m-%d"),
-                    "reason": "no_next_day_data",
-                })
+                unfilled_signals.append(
+                    {
+                        "date": signal_date.strftime("%Y-%m-%d"),
+                        "reason": "no_next_day_data",
+                    }
+                )
                 continue
 
             entry_date = future_df.index[0]
@@ -96,7 +98,7 @@ class ExecutionModelBacktester:
 
             # 持倉期間: 進場日起算 holding_days 個交易日
             # Holding period: holding_days trading days starting from entry day
-            hold_df = future_df.iloc[1:holding_days + 1]  # 進場日之後的交易日
+            hold_df = future_df.iloc[1 : holding_days + 1]  # 進場日之後的交易日
 
             target_price = entry_price * (1 + profit_target)
             stop_price = entry_price * (1 + stop_loss)
@@ -187,17 +189,19 @@ class ExecutionModelBacktester:
             else:
                 consecutive_losses = 0
 
-            trades.append({
-                "date": signal_date.strftime("%Y-%m-%d"),
-                "entry_date": entry_date.strftime("%Y-%m-%d"),
-                "exit_date": exit_date.strftime("%Y-%m-%d"),
-                "entry": round(float(entry_price), 2),
-                "exit": round(float(exit_price), 2),
-                "return_pct": round(float(trade_return) * 100, 2),
-                "holding_days": days_held,
-                "exit_type": exit_type,
-                "max_drawdown_pct": round(float(max_dd) * 100, 2),
-            })
+            trades.append(
+                {
+                    "date": signal_date.strftime("%Y-%m-%d"),
+                    "entry_date": entry_date.strftime("%Y-%m-%d"),
+                    "exit_date": exit_date.strftime("%Y-%m-%d"),
+                    "entry": round(float(entry_price), 2),
+                    "exit": round(float(exit_price), 2),
+                    "return_pct": round(float(trade_return) * 100, 2),
+                    "holding_days": days_held,
+                    "exit_type": exit_type,
+                    "max_drawdown_pct": round(float(max_dd) * 100, 2),
+                }
+            )
 
         # === 彙總統計 (Aggregate statistics) ===
         if not trades:
@@ -213,18 +217,15 @@ class ExecutionModelBacktester:
         wins = sum(1 for r in returns if r > 0)
         target_exits = sum(1 for t in trades if t["exit_type"] == "target")
         stop_exits = sum(
-            1 for t in trades
-            if t["exit_type"] in ("stop_loss", "stop_loss_pessimistic")
+            1 for t in trades if t["exit_type"] in ("stop_loss", "stop_loss_pessimistic")
         )
-        pessimistic_exits = sum(
-            1 for t in trades if t["exit_type"] == "stop_loss_pessimistic"
-        )
+        pessimistic_exits = sum(1 for t in trades if t["exit_type"] == "stop_loss_pessimistic")
         time_exits = sum(1 for t in trades if t["exit_type"] == "time_expiry")
 
         # 累計報酬 (Cumulative return)
         cumulative = 1.0
         for r in returns:
-            cumulative *= (1 + r / 100)
+            cumulative *= 1 + r / 100
         cumulative_return = (cumulative - 1) * 100
 
         avg_return = float(np.mean(returns))
@@ -240,11 +241,11 @@ class ExecutionModelBacktester:
         logger.info(
             f"[ExecutionModelBacktester] {ticker_str}: {total} 成交/{total_signals} 訊號 "
             f"(成交率 {fill_rate:.1%}), "
-            f"勝率 {wins}/{total} = {wins/total:.1%}, "
+            f"勝率 {wins}/{total} = {wins / total:.1%}, "
             f"累計報酬 {cumulative_return:.1f}% "
             f"({total} filled/{total_signals} signals, "
             f"fill rate {fill_rate:.1%}, "
-            f"WR {wins/total:.1%}, cumulative {cumulative_return:.1f}%)"
+            f"WR {wins / total:.1%}, cumulative {cumulative_return:.1f}%)"
         )
 
         return {

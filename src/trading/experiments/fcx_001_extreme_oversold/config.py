@@ -36,7 +36,7 @@ def create_default_config() -> FCXExtremeOversoldConfig:
         display_name="FCX Extreme Oversold Mean Reversion",
         tickers=["FCX"],
         data_start="2018-01-01",
-        profit_target=0.10,   # +10% 獲利目標（銅礦反彈力道強）
-        stop_loss=-0.12,      # -12% 停損（極端超賣給更多空間）
-        holding_days=25,      # 25 天持倉
+        profit_target=0.10,  # +10% 獲利目標（銅礦反彈力道強）
+        stop_loss=-0.12,  # -12% 停損（極端超賣給更多空間）
+        holding_days=25,  # 25 天持倉
     )

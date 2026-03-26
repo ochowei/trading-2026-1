@@ -12,8 +12,9 @@ from trading.experiments.gld_001_mean_reversion.config import GLDMeanReversionCo
 @dataclass
 class GLDTrailingStopConfig(GLDMeanReversionConfig):
     """GLD 追蹤停損配置 — 繼承 GLD-001 進場參數，新增追蹤停損出場"""
-    trail_activation_pct: float = 0.015    # 獲利 +1.5% 後啟動追蹤
-    trail_distance_pct: float = 0.01       # 追蹤距離 1.0%
+
+    trail_activation_pct: float = 0.015  # 獲利 +1.5% 後啟動追蹤
+    trail_distance_pct: float = 0.01  # 追蹤距離 1.0%
 
 
 def create_default_config() -> GLDTrailingStopConfig:
@@ -23,7 +24,7 @@ def create_default_config() -> GLDTrailingStopConfig:
         display_name="GLD Trailing Stop Mean Reversion",
         tickers=["GLD"],
         data_start="2010-01-01",
-        profit_target=0.025,    # +2.5% (同 GLD-002)
-        stop_loss=-0.04,        # -4.0% (同 GLD-002)
-        holding_days=15,        # 15 天 (同 GLD-002)
+        profit_target=0.025,  # +2.5% (同 GLD-002)
+        stop_loss=-0.04,  # -4.0% (同 GLD-002)
+        holding_days=15,  # 15 天 (同 GLD-002)
     )

@@ -7,11 +7,11 @@ Signal logic identical to GLD-001, only exit parameters changed.
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.execution_strategy import ExecutionModelStrategy
+from trading.experiments.gld_001_mean_reversion.signal_detector import GLDSignalDetector
 from trading.experiments.gld_002_optimized_exit.config import (
     GLDOptimizedExitConfig,
     create_default_config,
 )
-from trading.experiments.gld_001_mean_reversion.signal_detector import GLDSignalDetector
 
 
 class GLDOptimizedExitStrategy(ExecutionModelStrategy):
@@ -25,6 +25,10 @@ class GLDOptimizedExitStrategy(ExecutionModelStrategy):
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
         if isinstance(config, GLDOptimizedExitConfig):
-            print(f"  RSI 週期/閾值 (RSI period/thr): RSI({config.rsi_period}) < {config.rsi_threshold}")
-            print(f"  SMA 乖離閾值 (SMA dev thr): Close / SMA({config.sma_period}) - 1 <= {config.sma_deviation_threshold:.1%}")
+            print(
+                f"  RSI 週期/閾值 (RSI period/thr): RSI({config.rsi_period}) < {config.rsi_threshold}"
+            )
+            print(
+                f"  SMA 乖離閾值 (SMA dev thr): Close / SMA({config.sma_period}) - 1 <= {config.sma_deviation_threshold:.1%}"
+            )
         super()._print_strategy_params(config)

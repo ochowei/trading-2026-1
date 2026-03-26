@@ -60,16 +60,18 @@ class BaseBacktester:
             future_df = df.loc[future_mask].head(holding_days)
 
             if future_df.empty:
-                trades.append({
-                    "date": signal_date.strftime("%Y-%m-%d"),
-                    "exit_date": signal_date.strftime("%Y-%m-%d"),
-                    "entry": round(float(entry_price), 2),
-                    "exit": round(float(entry_price), 2),
-                    "return_pct": 0.0,
-                    "holding_days": 0,
-                    "exit_type": "no_data",
-                    "max_drawdown_pct": 0.0,
-                })
+                trades.append(
+                    {
+                        "date": signal_date.strftime("%Y-%m-%d"),
+                        "exit_date": signal_date.strftime("%Y-%m-%d"),
+                        "entry": round(float(entry_price), 2),
+                        "exit": round(float(entry_price), 2),
+                        "return_pct": 0.0,
+                        "holding_days": 0,
+                        "exit_type": "no_data",
+                        "max_drawdown_pct": 0.0,
+                    }
+                )
                 continue
 
             target_price = entry_price * (1 + profit_target)
@@ -123,16 +125,18 @@ class BaseBacktester:
             else:
                 consecutive_losses = 0
 
-            trades.append({
-                "date": signal_date.strftime("%Y-%m-%d"),
-                "exit_date": exit_date.strftime("%Y-%m-%d"),
-                "entry": round(float(entry_price), 2),
-                "exit": round(float(exit_price), 2),
-                "return_pct": round(float(trade_return) * 100, 2),
-                "holding_days": days_held,
-                "exit_type": exit_type,
-                "max_drawdown_pct": round(float(max_dd) * 100, 2),
-            })
+            trades.append(
+                {
+                    "date": signal_date.strftime("%Y-%m-%d"),
+                    "exit_date": exit_date.strftime("%Y-%m-%d"),
+                    "entry": round(float(entry_price), 2),
+                    "exit": round(float(exit_price), 2),
+                    "return_pct": round(float(trade_return) * 100, 2),
+                    "holding_days": days_held,
+                    "exit_type": exit_type,
+                    "max_drawdown_pct": round(float(max_dd) * 100, 2),
+                }
+            )
 
         # 彙總統計 (Aggregate statistics)
         returns = [t["return_pct"] for t in trades]
@@ -145,7 +149,7 @@ class BaseBacktester:
         # 累計報酬 (Cumulative return)
         cumulative = 1.0
         for r in returns:
-            cumulative *= (1 + r / 100)
+            cumulative *= 1 + r / 100
         cumulative_return = (cumulative - 1) * 100
 
         avg_return = float(np.mean(returns))
@@ -155,9 +159,9 @@ class BaseBacktester:
 
         ticker_str = ", ".join(self.config.tickers)
         logger.info(
-            f"[Backtester] {ticker_str}: {total} 訊號, 勝率 {wins}/{total} = {wins/total:.1%}, "
+            f"[Backtester] {ticker_str}: {total} 訊號, 勝率 {wins}/{total} = {wins / total:.1%}, "
             f"累計報酬 {cumulative_return:.1f}% "
-            f"({total} signals, WR {wins/total:.1%}, cumulative {cumulative_return:.1f}%)"
+            f"({total} signals, WR {wins / total:.1%}, cumulative {cumulative_return:.1f}%)"
         )
 
         return {

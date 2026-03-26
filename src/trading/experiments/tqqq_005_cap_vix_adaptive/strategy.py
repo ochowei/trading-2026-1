@@ -11,12 +11,12 @@ from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.base_strategy import BaseStrategy
 from trading.core.data_fetcher import DataFetcher
+from trading.experiments.tqqq_003_cap_wider_exit.backtester import TrailingStopBacktester
 from trading.experiments.tqqq_005_cap_vix_adaptive.config import (
     TQQQCapVixAdaptiveConfig,
     create_default_config,
 )
 from trading.experiments.tqqq_005_cap_vix_adaptive.signal_detector import TQQQCapVixAdaptiveDetector
-from trading.experiments.tqqq_003_cap_wider_exit.backtester import TrailingStopBacktester
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,9 @@ class TQQQCapVixAdaptiveStrategy(BaseStrategy):
         print(f"  {config.display_name}")
         print(f"{separator}\n")
 
-        logger.info(f"Step 1/3: 下載數據 (Fetching data for {config.tickers} + {config.vix_ticker})...")
+        logger.info(
+            f"Step 1/3: 下載數據 (Fetching data for {config.tickers} + {config.vix_ticker})..."
+        )
         all_tickers = config.tickers + [config.vix_ticker]
         data = fetcher.fetch_all(all_tickers)
 
@@ -78,7 +80,9 @@ class TQQQCapVixAdaptiveStrategy(BaseStrategy):
                 f"(Failed to fetch {config.vix_ticker}, VIX filter will be skipped)"
             )
 
-        print(f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}")
+        print(
+            f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}"
+        )
         print(f"  原始資料筆數: {len(df)} 個交易日\n")
 
         logger.info("Step 2/3: 計算指標與偵測訊號...")
@@ -122,7 +126,9 @@ class TQQQCapVixAdaptiveStrategy(BaseStrategy):
             return
 
         print(f"  回撤閾值 (Drawdown threshold):  {config.drawdown_threshold:.0%}")
-        print(f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}")
+        print(
+            f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}"
+        )
         print(f"  成交量倍數 (Volume multiplier):  {config.volume_multiplier}x")
         print(f"  VIX 門檻 (VIX threshold):        >= {config.vix_threshold}")
         print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")

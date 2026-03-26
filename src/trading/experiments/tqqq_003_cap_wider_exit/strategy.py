@@ -10,12 +10,12 @@ from trading.core.base_backtester import BaseBacktester
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.base_strategy import BaseStrategy
+from trading.experiments.tqqq_001_capitulation.signal_detector import TQQQSignalDetector
 from trading.experiments.tqqq_003_cap_wider_exit.backtester import TrailingStopBacktester
 from trading.experiments.tqqq_003_cap_wider_exit.config import (
     TQQQCapWiderExitConfig,
     create_default_config,
 )
-from trading.experiments.tqqq_001_capitulation.signal_detector import TQQQSignalDetector
 
 
 class TQQQCapWiderExitStrategy(BaseStrategy):
@@ -43,7 +43,9 @@ class TQQQCapWiderExitStrategy(BaseStrategy):
             return
 
         print(f"  回撤閾值 (Drawdown threshold):  {config.drawdown_threshold:.0%}")
-        print(f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}")
+        print(
+            f"  RSI 週期/閾值 (RSI period/thr):  RSI({config.rsi_period}) < {config.rsi_threshold}"
+        )
         print(f"  成交量倍數 (Volume multiplier):  {config.volume_multiplier}x")
         print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")
         print(f"  追蹤停利 (Trailing stop):        {config.trailing_stop_pct:.0%} from peak")
@@ -51,8 +53,13 @@ class TQQQCapWiderExitStrategy(BaseStrategy):
         print(f"  最長持倉 (Max holding):          {config.holding_days} 天")
 
     def _print_part_report(
-        self, label: str, start: str, end: str, result: dict,
-        df: pd.DataFrame, config: ExperimentConfig
+        self,
+        label: str,
+        start: str,
+        end: str,
+        result: dict,
+        df: pd.DataFrame,
+        config: ExperimentConfig,
     ) -> None:
         """覆寫以在出場統計與交易明細中加入追蹤停利類型"""
         # 呼叫父類報表

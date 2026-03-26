@@ -12,6 +12,7 @@ from trading.experiments.gld_001_mean_reversion.config import GLDMeanReversionCo
 @dataclass
 class GLDOptimizedExitConfig(GLDMeanReversionConfig):
     """GLD 優化出場配置 — 繼承 GLD-001 進場參數，覆寫出場參數"""
+
     pass
 
 
@@ -22,7 +23,7 @@ def create_default_config() -> GLDOptimizedExitConfig:
         display_name="GLD Optimized Exit Mean Reversion",
         tickers=["GLD"],
         data_start="2010-01-01",
-        profit_target=0.025,    # +2.5% (GLD-001: +1.5%)
-        stop_loss=-0.04,        # -4.0% (GLD-001: -3.0%)
-        holding_days=15,        # 15 天 (GLD-001: 10)
+        profit_target=0.025,  # +2.5% (GLD-001: +1.5%)
+        stop_loss=-0.04,  # -4.0% (GLD-001: -3.0%)
+        holding_days=15,  # 15 天 (GLD-001: 10)
     )

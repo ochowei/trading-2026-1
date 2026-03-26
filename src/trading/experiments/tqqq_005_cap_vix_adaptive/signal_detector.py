@@ -8,8 +8,8 @@ import logging
 
 import pandas as pd
 
-from trading.experiments.tqqq_005_cap_vix_adaptive.config import TQQQCapVixAdaptiveConfig
 from trading.experiments.tqqq_001_capitulation.signal_detector import TQQQSignalDetector
+from trading.experiments.tqqq_005_cap_vix_adaptive.config import TQQQCapVixAdaptiveConfig
 
 logger = logging.getLogger(__name__)
 

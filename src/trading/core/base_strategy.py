@@ -71,7 +71,9 @@ class BaseStrategy(ABC):
             return {"part_a": empty, "part_b": empty, "part_c": empty}
 
         df = data[primary_ticker]
-        print(f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}")
+        print(
+            f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}"
+        )
         print(f"  原始資料筆數: {len(df)} 個交易日\n")
 
         # Step 2: 計算指標 (Compute indicators on full data)
@@ -111,17 +113,20 @@ class BaseStrategy(ABC):
         self._print_today_signal(df, detector, config)
 
         return {
-            "metadata": {
-                "execution_time": pd.Timestamp.now().isoformat()
-            },
+            "metadata": {"execution_time": pd.Timestamp.now().isoformat()},
             "part_a": results.get("Part A (In-Sample)", backtester._empty_result()),
             "part_b": results.get("Part B (Out-of-Sample)", backtester._empty_result()),
             "part_c": results.get("Part C (Live)", backtester._empty_result()),
         }
 
     def _print_part_report(
-        self, label: str, start: str, end: str, result: dict,
-        df: pd.DataFrame, config: ExperimentConfig
+        self,
+        label: str,
+        start: str,
+        end: str,
+        result: dict,
+        df: pd.DataFrame,
+        config: ExperimentConfig,
     ) -> None:
         """印出單一區間的報表 (Print report for one backtest period)"""
         separator = "=" * 80
@@ -142,7 +147,7 @@ class BaseStrategy(ABC):
         trades = result["trades"]
 
         if not trades:
-            print(f"\n  無訊號觸發 (No signals detected)\n")
+            print("\n  無訊號觸發 (No signals detected)\n")
             return
 
         # 彙總績效 (Aggregate performance)
@@ -161,7 +166,7 @@ class BaseStrategy(ABC):
         print(f"  最大連續虧損 (Max consec. loss): {result['max_consecutive_losses']}")
 
         # 出場方式統計 (Exit type breakdown)
-        print(f"\n  出場方式 (Exit breakdown):")
+        print("\n  出場方式 (Exit breakdown):")
         print(f"    達標出場 (Target hit):         {result['target_exits']}")
         print(f"    停損出場 (Stop-loss):          {result['stop_loss_exits']}")
         print(f"    到期出場 (Time expiry):        {result['time_expiry_exits']}")
@@ -170,9 +175,13 @@ class BaseStrategy(ABC):
         print(f"\n{thin_sep}")
         print("  逐筆交易明細 (Trade Details)")
         print(f"{thin_sep}")
-        print(f"  {'進場日期':<12} {'出場日期':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'持倉':>4} {'出場方式':<12}")
-        print(f"  {'Entry Date':<12} {'Exit Date':<12} {'Entry':>8} {'Exit':>8} {'Return':>8} {'Days':>4} {'Exit Type':<12}")
-        print(f"  {'-'*72}")
+        print(
+            f"  {'進場日期':<12} {'出場日期':<12} {'進場':>8} {'出場':>8} {'報酬':>8} {'持倉':>4} {'出場方式':<12}"
+        )
+        print(
+            f"  {'Entry Date':<12} {'Exit Date':<12} {'Entry':>8} {'Exit':>8} {'Return':>8} {'Days':>4} {'Exit Type':<12}"
+        )
+        print(f"  {'-' * 72}")
 
         exit_type_labels = {
             "target": "達標 Target",
@@ -240,8 +249,7 @@ class BaseStrategy(ABC):
         print()
 
     def _print_today_signal(
-        self, df: pd.DataFrame, detector: BaseSignalDetector,
-        config: ExperimentConfig
+        self, df: pd.DataFrame, detector: BaseSignalDetector, config: ExperimentConfig
     ) -> None:
         """今日訊號檢查 (Today's signal check)"""
         separator = "=" * 80

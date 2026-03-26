@@ -14,11 +14,11 @@ class TQQQCapWiderExitConfig(TQQQConfig):
     """TQQQ 加寬出場策略配置"""
 
     # 加寬的獲利目標與持倉天數 (Wider profit target and holding period)
-    profit_target: float = 0.12         # +5% -> +12%
-    holding_days: int = 12              # 7 -> 12
+    profit_target: float = 0.12  # +5% -> +12%
+    holding_days: int = 12  # 7 -> 12
 
     # 追蹤停利 (Trailing stop from peak close since entry)
-    trailing_stop_pct: float = -0.04    # 從持倉期間最高收盤價回落 4% 即出場
+    trailing_stop_pct: float = -0.04  # 從持倉期間最高收盤價回落 4% 即出場
 
 
 def create_default_config() -> TQQQCapWiderExitConfig:

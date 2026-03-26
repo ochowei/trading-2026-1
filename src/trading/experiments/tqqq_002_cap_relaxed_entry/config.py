@@ -14,15 +14,15 @@ class TQQQCapRelaxedConfig(TQQQConfig):
     """TQQQ 放寬進場策略配置"""
 
     # 放寬的進場閾值 (Relaxed entry thresholds)
-    drawdown_threshold: float = -0.12   # -15% -> -12%
-    rsi_threshold: float = 30.0         # 25 -> 30
-    volume_multiplier: float = 1.3      # 1.5x -> 1.3x
+    drawdown_threshold: float = -0.12  # -15% -> -12%
+    rsi_threshold: float = 30.0  # 25 -> 30
+    volume_multiplier: float = 1.3  # 1.5x -> 1.3x
 
     # 收緊的停損 (Tighter stop-loss)
-    stop_loss: float = -0.06            # -8% -> -6%
+    stop_loss: float = -0.06  # -8% -> -6%
 
     # 增加冷卻期（防止放寬後過度交易）
-    cooldown_days: int = 5              # 3 -> 5
+    cooldown_days: int = 5  # 3 -> 5
 
 
 def create_default_config() -> TQQQCapRelaxedConfig:

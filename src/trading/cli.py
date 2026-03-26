@@ -24,7 +24,7 @@ def cmd_list(args: argparse.Namespace) -> None:
     """列出所有已註冊的實驗 (List all registered experiments)"""
     experiments = list_experiments()
     print(f"\n  已註冊的實驗 (Registered experiments): {len(experiments)}")
-    print(f"  {'='*40}")
+    print(f"  {'=' * 40}")
     for name in experiments:
         strategy = get_experiment(name)
         config = strategy.create_config()
@@ -81,7 +81,9 @@ def main() -> None:
 
     # compare
     cmp_p = sub.add_parser("compare", help="比較實驗結果 (Compare experiment results)")
-    cmp_p.add_argument("experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)")
+    cmp_p.add_argument(
+        "experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)"
+    )
 
     args = parser.parse_args()
 
@@ -91,6 +93,7 @@ def main() -> None:
         cmd_run(args)
     elif args.command == "followup":
         from trading.followup import run_followup
+
         run_followup()
     elif args.command == "compare":
         cmd_compare(args)
