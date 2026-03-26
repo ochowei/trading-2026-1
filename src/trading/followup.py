@@ -11,7 +11,8 @@ Runs best strategies per ticker with 60-day lookback and generates Firstrade ord
 """
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
@@ -37,6 +38,33 @@ STRATEGIES = [
 ]
 
 LOOKBACK_TRADING_DAYS = 60
+
+_NY_TZ = ZoneInfo("America/New_York")
+
+
+def _drop_incomplete_bar(df: pd.DataFrame) -> pd.DataFrame:
+    """若最後一根 bar 為盤中未收盤的當日資料，則丟棄。
+
+    判斷條件：最後 bar 日期 == 美東今天 且 美東時間尚未過 16:30（收盤後 30 分鐘緩衝）。
+    使用 America/New_York 時區，自動處理 EST/EDT 日光節約切換。
+    """
+    if df.empty:
+        return df
+
+    now_et = datetime.now(_NY_TZ)
+    today_et = now_et.date()
+    last_bar_date = df.index[-1].date()
+
+    market_closed = now_et.hour > 16 or (now_et.hour == 16 and now_et.minute >= 30)
+
+    if last_bar_date == today_et and not market_closed:
+        logger.info(
+            f"[Followup] 丟棄盤中未收盤資料 {last_bar_date} "
+            f"(Dropping incomplete bar, market still open at {now_et.strftime('%H:%M ET')})"
+        )
+        return df.iloc[:-1]
+
+    return df
 
 
 def run_followup() -> None:
@@ -117,6 +145,7 @@ def _run_single_strategy(strategy_info: dict, today: pd.Timestamp) -> list[dict]
         return []
 
     df = data[ticker]
+    df = _drop_incomplete_bar(df)
     logger.info(f"Fetched {len(df)} rows for {ticker}")
 
     # 3. 計算指標 (Compute indicators on full data)
