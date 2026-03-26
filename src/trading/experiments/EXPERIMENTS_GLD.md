@@ -1,22 +1,22 @@
 # GLD 實驗總覽 (GLD Experiment Index)
 
-> **最新實驗 (Latest):** GLD-003 `gld_trailing_stop`
-> **當前最佳 (Best):** GLD-003 `gld_trailing_stop`
+> **最新實驗 (Latest):** GLD-003 `gld_003_trailing_stop`
+> **當前最佳 (Best):** GLD-003 `gld_003_trailing_stop`
 
 ## 實驗清單 (Experiments)
 
 | ID | 模組名稱 | 說明 | 關鍵條件 | 狀態 |
 |---|---|---|---|---|
-| GLD-001 | `gld_mean_reversion` | GLD 極度超賣均值回歸基礎版 | RSI(10) < 30, SMA20 乖離 ≤ -1.5%, 10天冷卻 | ✅ 基線 |
-| GLD-002 | `gld_optimized_exit` | 進場不變，優化出場（TP +2.5%、SL -4%、15 天） | 同 GLD-001 進場，TP +2.5%, SL -4%, Hold 15d | ✅ 前最佳 |
-| GLD-003 | `gld_trailing_stop` | 進場不變，出場加追蹤停損（啟動 +1.5%，距離 1.0%） | 同 GLD-002 進場+出場，追蹤停損保護獲利 | ✅ 新最佳 |
+| GLD-001 | `gld_001_mean_reversion` | GLD 極度超賣均值回歸基礎版 | RSI(10) < 30, SMA20 乖離 ≤ -1.5%, 10天冷卻 | ✅ 基線 |
+| GLD-002 | `gld_002_optimized_exit` | 進場不變，優化出場（TP +2.5%、SL -4%、15 天） | 同 GLD-001 進場，TP +2.5%, SL -4%, Hold 15d | ✅ 前最佳 |
+| GLD-003 | `gld_003_trailing_stop` | 進場不變，出場加追蹤停損（啟動 +1.5%，距離 1.0%） | 同 GLD-002 進場+出場，追蹤停損保護獲利 | ✅ 新最佳 |
 
 ## 演進路線 (Lineage)
 
 ```text
-GLD-001 gld_mean_reversion (基礎版：RSI(10)<30, SMA20 Dev -1.5%, cooldown 10d)
-└── GLD-002 gld_optimized_exit (優化出場：TP +2.5%, SL -4%, Hold 15d)
-    └── GLD-003 gld_trailing_stop (追蹤停損：啟動 +1.5%, 距離 1.0%)
+GLD-001 gld_001_mean_reversion (基礎版：RSI(10)<30, SMA20 Dev -1.5%, cooldown 10d)
+└── GLD-002 gld_002_optimized_exit (優化出場：TP +2.5%, SL -4%, Hold 15d)
+    └── GLD-003 gld_003_trailing_stop (追蹤停損：啟動 +1.5%, 距離 1.0%)
 ```
 
 ## 參數對照 (Parameter Comparison)

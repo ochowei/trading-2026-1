@@ -7,24 +7,24 @@ on:
         description: "選擇要執行的實驗 (Select experiment)"
         required: true
         type: choice
-        default: "TQQQ-001: tqqq_capitulation"
+        default: "TQQQ-001: tqqq_001_capitulation"
         options:
-          - "TQQQ-001: tqqq_capitulation"
-          - "TQQQ-002: tqqq_cap_relaxed_entry"
-          - "TQQQ-003: tqqq_cap_wider_exit"
-          - "TQQQ-004: tqqq_cap_vix_filter"
-          - "TQQQ-005: tqqq_cap_vix_adaptive"
-          - "TQQQ-006: tqqq_momentum_collapse"
-          - "TQQQ-007: tqqq_cap_qqq_confirm"
-          - "TQQQ-008: tqqq_cap_optimized_exit"
-          - "TQQQ-009: tqqq_cap_gentle_entry"
-          - "TQQQ-010: tqqq_cap_exec_optimized"
-          - "TQQQ-011: tqqq_cap_exec_baseline"
-          - "TQQQ-012: tqqq_cap_exec_qqq_confirm"
-          - "TQQQ-013: tqqq_cap_exec_qqq_optimized"
-          - "GLD-001: gld_mean_reversion"
-          - "GLD-002: gld_optimized_exit"
-          - "GLD-003: gld_trailing_stop"
+          - "TQQQ-001: tqqq_001_capitulation"
+          - "TQQQ-002: tqqq_002_cap_relaxed_entry"
+          - "TQQQ-003: tqqq_003_cap_wider_exit"
+          - "TQQQ-004: tqqq_004_cap_vix_filter"
+          - "TQQQ-005: tqqq_005_cap_vix_adaptive"
+          - "TQQQ-006: tqqq_006_momentum_collapse"
+          - "TQQQ-007: tqqq_007_cap_qqq_confirm"
+          - "TQQQ-008: tqqq_008_cap_optimized_exit"
+          - "TQQQ-009: tqqq_009_cap_gentle_entry"
+          - "TQQQ-010: tqqq_010_cap_exec_optimized"
+          - "TQQQ-011: tqqq_011_cap_exec_baseline"
+          - "TQQQ-012: tqqq_012_cap_exec_qqq_confirm"
+          - "TQQQ-013: tqqq_013_cap_exec_qqq_optimized"
+          - "GLD-001: gld_001_mean_reversion"
+          - "GLD-002: gld_002_optimized_exit"
+          - "GLD-003: gld_003_trailing_stop"
 
 jobs:
   backtest:
@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Parse experiment name
         run: |
-          # Extract the part after ": " (e.g. "TQQQ-001: tqqq_capitulation" -> "tqqq_capitulation")
+          # Extract the part after ": " (e.g. "TQQQ-001: tqqq_001_capitulation" -> "tqqq_001_capitulation")
           EXPERIMENT_NAME=$(echo "${{ inputs.experiment }}" | cut -d':' -f2 | xargs)
           echo "EXPERIMENT_NAME=$EXPERIMENT_NAME" >> "$GITHUB_ENV"
 
