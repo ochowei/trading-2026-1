@@ -35,6 +35,18 @@ STRATEGIES = [
         "ticker": "GLD",
         "has_trailing_stop": True,
     },
+    {
+        "experiment_name": "fcx_001_extreme_oversold",
+        "label": "FCX-001",
+        "ticker": "FCX",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "sivr_001_mean_reversion",
+        "label": "SIVR-001",
+        "ticker": "SIVR",
+        "has_trailing_stop": False,
+    },
 ]
 
 LOOKBACK_TRADING_DAYS = 60
