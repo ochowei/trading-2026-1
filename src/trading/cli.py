@@ -98,6 +98,9 @@ def main() -> None:
         help="檢查 Markdown 文件與 latest.json 是否同步 (Check if Markdown docs are in sync with latest.json)",
     )
 
+    # freshness
+    sub.add_parser("freshness", help="檢查知識新鮮度 (Check knowledge freshness)")
+
     args = parser.parse_args()
 
     if args.command == "list":
@@ -112,6 +115,10 @@ def main() -> None:
         cmd_compare(args)
     elif args.command == "sync-docs":
         cmd_sync_docs(args)
+    elif args.command == "freshness":
+        from trading.core.freshness import check_freshness
+
+        check_freshness()
     else:
         # 無子命令時顯示幫助 (Show help when no subcommand)
         parser.print_help()

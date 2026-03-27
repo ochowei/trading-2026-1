@@ -1,4 +1,7 @@
-<!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新 -->
+<!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
+  last_validated: 2026-03-27
+  data_through: 2025-12-31
+-->
 ## AI Agent 快速索引
 
 **當前最佳：** FCX-001（三重條件極端超賣均值回歸：60日回撤≤-18% + RSI<28 + SMA50乖離≤-8%）

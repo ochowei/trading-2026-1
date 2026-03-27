@@ -4,6 +4,7 @@
 
 設計新實驗時，按以下順序讀取，夠用就停：
 1. **先讀** [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md) 的跨資產共通教訓
+1b. **檢查新鮮度**：若任何教訓的 `data_through` 距今超過 6 個月，在實驗提案中標註「基於較舊數據，建議先重新驗證」
 2. **再讀** EXPERIMENTS_*.md 的 `AI Agent 快速索引` 區塊
 3. **再讀** 參數對照表（Parameter Comparison）
 4. **只有需要了解實作細節時**，才讀個別實驗的 config.py / signal_detector.py
@@ -15,6 +16,7 @@
 - **檔案結構變更**：新增、刪除或搬移檔案時，必須更新本文件的「架構速覽」段落。
 - **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、`EXPERIMENTS_TQQQ.md`、`EXPERIMENTS_GLD.md` 或 `EXPERIMENTS_SIVR.md`。
 - **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
+- **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
 - **人類專用文件**：`HUMAN_PM_MEMO.md` 由人類維護，AI Agent 除非被明確指定為 `HUMAN_PM_HELPER`，否則不可編輯。
 
@@ -71,6 +73,9 @@ uv run trading compare <exp1> <exp2>
 
 # 產生跟單訊號報告（Firstrade 下單用）
 uv run trading followup
+
+# 檢查知識新鮮度
+uv run trading freshness
 ```
 
 ## 架構速覽
@@ -87,6 +92,7 @@ src/trading/
 │   ├── base_strategy.py         # BaseStrategy（fetch → 指標 → 訊號 → 回測 → 報表）
 │   ├── execution_strategy.py    # ExecutionModelStrategy（成交模型報表）
 │   ├── data_fetcher.py          # yfinance 多線程資料抓取
+│   ├── freshness.py             # 知識新鮮度檢查（data_through 過期掃描）
 │   └── results.py               # 結果儲存（JSON）與跨實驗比較
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
