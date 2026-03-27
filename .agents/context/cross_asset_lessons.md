@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001]
   validated: 2026-03-27
   data_through: 2025-12-31
   confidence: high
@@ -197,6 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
+| USO | USO-001 | 回調 + Williams %R | ~9.5 | 56.2%/57.9% | 波動度縮放、禁用 trailing stop、低滑價 |
 
 ---
 
@@ -246,7 +247,7 @@
 ## 12. 新資產實驗啟動流程
 
 <!-- freshness:
-  derived_from: [GLD-007, SIVR-003, FCX-001, FCX-002]
+  derived_from: [GLD-007, SIVR-003, FCX-001, FCX-002, USO-001]
   validated: 2026-03-27
   data_through: 2025-12-31
   confidence: medium

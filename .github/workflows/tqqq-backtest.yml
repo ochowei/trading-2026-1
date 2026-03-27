@@ -35,6 +35,7 @@ on:
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "FCX-002: fcx_002_pullback_wr"
+          - "USO-001: uso_001_pullback_wr"
           - "SPY-001: spy_001_pullback_wr"
 
 jobs:
