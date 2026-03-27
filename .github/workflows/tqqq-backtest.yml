@@ -27,6 +27,7 @@ on:
           - "GLD-003: gld_003_trailing_stop"
           - "GLD-004: gld_004_bollinger_reversion"
           - "GLD-005: gld_005_keltner_reversion"
+          - "GLD-006: gld_006_pullback_wr"
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "FCX-001: fcx_001_extreme_oversold"
