@@ -60,6 +60,13 @@ def cmd_compare(args: argparse.Namespace) -> None:
     compare_experiments(args.experiments)
 
 
+def cmd_sync_docs(args: argparse.Namespace) -> None:
+    """同步與檢查文件 (Sync and check documentation)"""
+    from trading.core.sync_docs import compare_docs_and_results
+
+    compare_docs_and_results()
+
+
 def main() -> None:
     """CLI 主程式 (CLI main)"""
     parser = argparse.ArgumentParser(
@@ -85,6 +92,12 @@ def main() -> None:
         "experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)"
     )
 
+    # sync-docs
+    sub.add_parser(
+        "sync-docs",
+        help="檢查 Markdown 文件與 latest.json 是否同步 (Check if Markdown docs are in sync with latest.json)",
+    )
+
     args = parser.parse_args()
 
     if args.command == "list":
@@ -97,6 +110,8 @@ def main() -> None:
         run_followup()
     elif args.command == "compare":
         cmd_compare(args)
+    elif args.command == "sync-docs":
+        cmd_sync_docs(args)
     else:
         # 無子命令時顯示幫助 (Show help when no subcommand)
         parser.print_help()
