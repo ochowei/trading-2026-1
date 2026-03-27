@@ -25,6 +25,7 @@ on:
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
+          - "GLD-004: gld_004_bollinger_reversion"
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "FCX-001: fcx_001_extreme_oversold"
