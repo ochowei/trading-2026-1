@@ -5,6 +5,7 @@
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **檔案結構變更**：新增、刪除或搬移檔案時，必須更新本文件的「架構速覽」段落。
 - **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、`EXPERIMENTS_TQQQ.md`、`EXPERIMENTS_GLD.md` 或 `EXPERIMENTS_SIVR.md`。
+- **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
 - **人類專用文件**：`HUMAN_PM_MEMO.md` 由人類維護，AI Agent 除非被明確指定為 `HUMAN_PM_HELPER`，否則不可編輯。
 
