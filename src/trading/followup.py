@@ -11,7 +11,9 @@ Runs best strategies per ticker with 60-day lookback and generates Firstrade ord
 """
 
 import logging
+from contextlib import redirect_stdout
 from datetime import datetime, timedelta
+from io import StringIO
 from zoneinfo import ZoneInfo
 
 import pandas as pd
@@ -90,15 +92,21 @@ def run_followup() -> None:
     print("  This report is generated after T-1 close. Place orders before T-day open.")
     print(f"{separator}")
 
-    # 收集所有待執行的委託 (Collect all pending orders across tickers)
+    # 先執行策略並收集各段輸出，讓下單清單可置頂顯示
+    strategy_sections: list[str] = []
     all_orders: list[dict] = []
 
     for strategy_info in STRATEGIES:
-        orders = _run_single_strategy(strategy_info, today)
+        section_buffer = StringIO()
+        with redirect_stdout(section_buffer):
+            orders = _run_single_strategy(strategy_info, today)
+        strategy_sections.append(section_buffer.getvalue())
         all_orders.extend(orders)
 
     # 印出 T 日下單清單 (Print consolidated T-day order sheet)
     _print_order_sheet(all_orders, today)
+    for section in strategy_sections:
+        print(section, end="")
 
     print(f"\n{separator}")
     print("  報告結束 (End of Report)")
@@ -670,38 +678,6 @@ def _print_order_sheet(orders: list[dict], today: pd.Timestamp) -> None:
     if not orders:
         print("\n  無需下單 (No orders needed)\n")
         return
-
-    # 今日動作摘要（置頂，讓使用者先掌握待辦）
-    unique_tickers = sorted({order["ticker"] for order in orders})
-    pre_open_orders = [order for order in orders if order["timing"] == "開盤前"]
-    post_fill_orders = [order for order in orders if order["timing"] == "成交後"]
-    buy_orders = [order for order in orders if order["action"] == "BUY"]
-    sell_orders = [order for order in orders if order["action"] == "SELL"]
-    market_orders = [order for order in orders if order["order_type"] == "MARKET"]
-    limit_orders = [order for order in orders if order["order_type"] == "LIMIT"]
-    stop_orders = [order for order in orders if order["order_type"] == "STOP"]
-
-    print("\n  Trading Followup Summary — 今日動作總覽")
-    print(f"  {thin_sep}")
-    print(f"  • 日期: {today.strftime('%Y-%m-%d')}")
-    print(f"  • 涵蓋標的: {', '.join(unique_tickers)}")
-    print(
-        "  • 委託統計: "
-        f"總計 {len(orders)} 筆 / "
-        f"開盤前 {len(pre_open_orders)} 筆 / "
-        f"成交後 {len(post_fill_orders)} 筆"
-    )
-    print(f"  • 方向統計: BUY {len(buy_orders)} 筆 / SELL {len(sell_orders)} 筆")
-    print(
-        "  • 單別統計: "
-        f"MARKET {len(market_orders)} 筆 / "
-        f"LIMIT {len(limit_orders)} 筆 / "
-        f"STOP {len(stop_orders)} 筆"
-    )
-    print("\n  今日執行重點:")
-    print("  1) 開盤前：先完成所有「開盤前」委託")
-    print("  2) 成交後：若有 BUY 成交，立即補掛 LIMIT/STOP 賣單")
-    print("  3) 收盤前：確認 Day 單狀態，隔日需重掛 LIMIT SELL")
 
     # 表頭
     print(
