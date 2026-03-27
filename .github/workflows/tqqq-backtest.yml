@@ -34,6 +34,7 @@ on:
           - "SIVR-003: sivr_003_pullback_wr"
           - "FCX-001: fcx_001_extreme_oversold"
           - "FCX-002: fcx_002_pullback_wr"
+          - "SOXL-001: soxl_001_extreme_oversold"
 
 jobs:
   backtest:
