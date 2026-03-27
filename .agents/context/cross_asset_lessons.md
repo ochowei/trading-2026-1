@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002]
   validated: 2026-03-27
   data_through: 2025-12-31
   confidence: high
@@ -220,10 +220,33 @@
 
 ---
 
-## 11. 新資產實驗啟動流程
+## 11. 回檔+WR 模式對個股高 Beta 資產效果有限
 
 <!-- freshness:
-  derived_from: [GLD-007, SIVR-003, FCX-001]
+  derived_from: [FCX-002, GLD-007, SIVR-003]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+回檔 + Williams %R 模式在 ETF（GLD、SIVR）上表現優異，但移植到個股高 Beta 資產（FCX）效果大幅下降。
+
+| 資產 | 類型 | Part A 累計 | Part B 累計 | 訊號/年 | WR (A/B) |
+|------|------|-----------|-----------|---------|----------|
+| GLD-007 | ETF | +39.01% | +28.52% | 6.2/6.0 | 77.4%/100% |
+| SIVR-003 | ETF | +31.01% | +9.69% | 6.6/5.5 | 60.6%/63.6% |
+| FCX-002 | 個股 | +34.88% | +5.07% | 6.6/6.0 | 60.6%/66.7% |
+
+**問題**：FCX-002 訊號多（6.6/年）但平均報酬低（+1.27%），2022 熊市連續 4 次停損。個股受公司特定因素影響，單純技術面超賣不足以保證反彈。
+
+**規則**：個股高 Beta 資產優先使用極端超賣多重條件過濾（如 FCX-001 的三重條件），而非 ETF 風格的淺回檔策略。
+
+---
+
+## 12. 新資產實驗啟動流程
+
+<!-- freshness:
+  derived_from: [GLD-007, SIVR-003, FCX-001, FCX-002]
   validated: 2026-03-27
   data_through: 2025-12-31
   confidence: medium
