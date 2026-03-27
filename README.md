@@ -184,6 +184,19 @@ class MyStrategy(BaseStrategy):
         return MyCustomBacktester(config)
 ```
 
+### 記錄實驗筆記與結論 (Recording Experiment Notes)
+
+AI Agent 可以在執行完實驗後，將 `_notes` 欄位加入結果中，再呼叫 `save_result()`。這可以用來記錄「為什麼這個實驗成功/失敗」，供未來參考：
+
+```python
+result["_notes"] = {
+    "outcome": "failed",
+    "reason": "trailing stop triggered too early on high-volatility asset",
+    "do_not_repeat": ["trailing_stop_on_sivr"]
+}
+save_result(name, result)
+```
+
 ### 比較實驗結果 (Compare Results)
 
 每次執行實驗時，結果會自動存為 JSON 到 `results/{experiment_name}/`。可以跨實驗比較：
