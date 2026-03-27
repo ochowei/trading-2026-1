@@ -629,6 +629,44 @@ def _print_order_sheet(orders: list[dict], today: pd.Timestamp) -> None:
     print("  T 日下單清單 (T-Day Order Sheet)")
     print(f"{separator}")
 
+    # 今日動作摘要（置頂，讓使用者先掌握待辦）
+    unique_tickers = sorted({order["ticker"] for order in orders})
+    pre_open_orders = [order for order in orders if order["timing"] == "開盤前"]
+    post_fill_orders = [order for order in orders if order["timing"] == "成交後"]
+    buy_orders = [order for order in orders if order["action"] == "BUY"]
+    sell_orders = [order for order in orders if order["action"] == "SELL"]
+    market_orders = [order for order in orders if order["order_type"] == "MARKET"]
+    limit_orders = [order for order in orders if order["order_type"] == "LIMIT"]
+    stop_orders = [order for order in orders if order["order_type"] == "STOP"]
+
+    print("\n  Trading Followup Summary — 今日動作總覽")
+    print(f"  {thin_sep}")
+    print(f"  • 日期: {today.strftime('%Y-%m-%d')}")
+    covered_tickers = ", ".join(unique_tickers) if unique_tickers else "無"
+    print(f"  • 涵蓋標的: {covered_tickers}")
+    print(
+        "  • 委託統計: "
+        f"總計 {len(orders)} 筆 / "
+        f"開盤前 {len(pre_open_orders)} 筆 / "
+        f"成交後 {len(post_fill_orders)} 筆"
+    )
+    print(f"  • 方向統計: BUY {len(buy_orders)} 筆 / SELL {len(sell_orders)} 筆")
+    print(
+        "  • 單別統計: "
+        f"MARKET {len(market_orders)} 筆 / "
+        f"LIMIT {len(limit_orders)} 筆 / "
+        f"STOP {len(stop_orders)} 筆"
+    )
+    print("\n  今日執行重點:")
+    if orders:
+        print("  1) 開盤前：先完成所有「開盤前」委託")
+        print("  2) 成交後：若有 BUY 成交，立即補掛 LIMIT/STOP 賣單")
+        print("  3) 收盤前：確認 Day 單狀態，隔日需重掛 LIMIT SELL")
+    else:
+        print("  1) 今日無新委託")
+        print("  2) 僅需例行檢查既有 GTC 停損單是否仍正確")
+        print("  3) 無部位時可跳過下單流程")
+
     if not orders:
         print("\n  無需下單 (No orders needed)\n")
         return
