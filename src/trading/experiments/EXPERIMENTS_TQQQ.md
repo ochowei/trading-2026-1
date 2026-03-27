@@ -1,4 +1,7 @@
-<!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新 -->
+<!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
+  last_validated: 2026-03-27
+  data_through: 2025-12-31
+-->
 ## AI Agent 快速索引
 
 **當前最佳：** TQQQ-010（含成交模型：隔日開盤進場，TP +7%，SL -8%，持倉 10 天，無追蹤停利）

@@ -7,6 +7,13 @@
 
 ## 1. 訊號品質 > 訊號數量
 
+<!-- freshness:
+  derived_from: [TQQQ-002, TQQQ-009, GLD-007]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
+
 放寬進場條件會增加訊號數量，但品質下降往往抵銷數量優勢。
 
 | 資產 | 放寬前 | 放寬後 | 結果 |
@@ -19,6 +26,13 @@
 ---
 
 ## 2. Trailing Stop 取決於波動度
+
+<!-- freshness:
+  derived_from: [TQQQ-003, TQQQ-005, GLD-003, SIVR-002]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
 
 這是跨資產最重要的教訓之一。Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
@@ -39,6 +53,13 @@
 
 ## 3. 成交模型的現實修正
 
+<!-- freshness:
+  derived_from: [TQQQ-008, TQQQ-010]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
+
 從「訊號日收盤進場」改為「隔日開盤市價進場」後，In-Sample 報酬會下降 30-70%，但 Out-of-Sample 更可信。
 
 | 實驗 | 無成交模型 (IS) | 有成交模型 (IS) | OOS 變化 |
@@ -51,6 +72,13 @@
 
 ## 4. 進場參數敏感度 >> 出場參數
 
+<!-- freshness:
+  derived_from: [TQQQ-002, TQQQ-009, TQQQ-010]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
+
 進場條件的微小改動對績效影響 3-5 倍於出場參數。
 
 - **進場（高敏感）**：TQQQ DD 從 -15% 改 -13% 就多一個壞訊號，WR 從 85% → 70%
@@ -61,6 +89,13 @@
 ---
 
 ## 5. 趨勢濾波器 + 均值回歸 = 災難
+
+<!-- freshness:
+  derived_from: [GLD-005, SIVR-003]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
 
 在均值回歸策略上加趨勢濾波器（如 SMA50 > SMA200）會殺死最好的訊號。
 
@@ -77,6 +112,13 @@
 
 ## 6. 確認指標的邊際效益遞減
 
+<!-- freshness:
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
+
 當核心訊號已經精確時，額外的確認指標反而減少訊號數量而不提升品質。
 
 | 資產 | 確認指標 | 結果 |
@@ -91,6 +133,13 @@
 ---
 
 ## 7. 波動度縮放法則（新資產入門）
+
+<!-- freshness:
+  derived_from: [GLD-007, SIVR-003]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
 
 當策略從低波動資產移植到高波動資產時，各參數需按比例調整。
 
@@ -112,6 +161,13 @@
 
 ## 8. Part A / Part B 平衡是關鍵指標
 
+<!-- freshness:
+  derived_from: [SIVR-003, GLD-007, GLD-001, TQQQ-010]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
+
 訊號頻率在 In-Sample (Part A) 和 Out-of-Sample (Part B) 之間的比例反映策略的市場適應性。
 
 | 比例 | 意義 | 範例 |
@@ -128,6 +184,13 @@
 
 ## 9. 各資產最佳策略速覽
 
+<!-- freshness:
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
+
 | 資產 | 最佳實驗 | 策略類型 | 訊號/年 | WR (A/B) | 關鍵成功因素 |
 |------|----------|----------|---------|----------|-------------|
 | TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing |
@@ -138,6 +201,13 @@
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
+
+<!-- freshness:
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: high
+-->
 
 以下做法在多個資產上證明無效，新實驗不應再嘗試：
 
@@ -151,6 +221,13 @@
 ---
 
 ## 11. 新資產實驗啟動流程
+
+<!-- freshness:
+  derived_from: [GLD-007, SIVR-003, FCX-001]
+  validated: 2026-03-27
+  data_through: 2025-12-31
+  confidence: medium
+-->
 
 1. **計算日波動度**：取過去 5 年日報酬的標準差，與 GLD (≈1.2%) 比較得到倍率
 2. **選擇策略模板**：
