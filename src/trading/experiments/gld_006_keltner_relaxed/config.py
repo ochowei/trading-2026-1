@@ -23,11 +23,11 @@ class GLDRelaxedKeltnerConfig(ExperimentConfig):
 
     # 進場指標
     rsi_period: int = 10
-    rsi_threshold: float = 37.0      # 放寬至 37.0 (GLD-005: 35.0)
+    rsi_threshold: float = 37.0  # 放寬至 37.0 (GLD-005: 35.0)
     ema_period: int = 20
     atr_period: int = 14
     keltner_multiplier: float = 1.5
-    cooldown_days: int = 3           # 縮短至 3 天 (GLD-005: 7 天)
+    cooldown_days: int = 3  # 縮短至 3 天 (GLD-005: 7 天)
 
     # 追蹤停損（同 GLD-004/005）
     trail_activation_pct: float = 0.015
