@@ -4,7 +4,7 @@
 
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **檔案結構變更**：新增、刪除或搬移檔案時，必須更新本文件的「架構速覽」段落。
-- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、`EXPERIMENTS_TQQQ.md`、`EXPERIMENTS_GLD.md` 或 `EXPERIMENTS_SIVR.md`。
+- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、對應的 `EXPERIMENTS_*.md`（含 AI Agent 快速索引區塊）、以及 `.agents/context/cross_asset_lessons.md`（若有跨資產新發現）。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
 - **人類專用文件**：`HUMAN_PM_MEMO.md` 由人類維護，AI Agent 除非被明確指定為 `HUMAN_PM_HELPER`，否則不可編輯。
 
@@ -83,9 +83,26 @@ src/trading/
     └── <name>/                  # config.py + signal_detector.py + strategy.py + __init__.py
 ```
 
+## 設計新實驗時的分層讀取策略（節省 token）
+
+設計新實驗時，按以下順序讀取，**資訊夠用就停**，不需要一次讀完所有文件：
+
+1. **先讀** 跨資產通用規律 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
+2. **再讀** 目標資產 `EXPERIMENTS_*.md` 的 `AI Agent 快速索引` 區塊（位於檔案最頂端，`AI_CONTEXT_START` ~ `AI_CONTEXT_END` 之間）
+3. **需要了解參數細節時**，才繼續讀該檔案的「參數對照」和「實驗結論」段落
+4. **需要了解實作細節時**，才讀個別實驗的 `config.py` / `signal_detector.py`
+5. **不需要** 逐一讀每個實驗的完整程式碼，快速索引已包含關鍵參數與結論
+
+### 更新 AI 快速索引的時機
+
+每次新增或更新實驗時，必須同步更新：
+- 對應 `EXPERIMENTS_*.md` 的 `AI Agent 快速索引` 區塊
+- `.agents/context/cross_asset_lessons.md`（若有跨資產新發現）
+
 ## 按需參考（不需要時不用讀）
 
 - 建立新實驗教學 → [README.md](README.md)
+- 跨資產通用規律 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
 - TQQQ 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TQQQ.md](src/trading/experiments/EXPERIMENTS_TQQQ.md)
 - GLD 實驗總覽 → [src/trading/experiments/EXPERIMENTS_GLD.md](src/trading/experiments/EXPERIMENTS_GLD.md)
 - SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
