@@ -106,6 +106,7 @@ src/trading/
 - GLD 實驗總覽 → [src/trading/experiments/EXPERIMENTS_GLD.md](src/trading/experiments/EXPERIMENTS_GLD.md)
 - SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
 - FCX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_FCX.md](src/trading/experiments/EXPERIMENTS_FCX.md)
+- SPY 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SPY.md](src/trading/experiments/EXPERIMENTS_SPY.md)
 - DIA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_DIA.md](src/trading/experiments/EXPERIMENTS_DIA.md)
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
 - 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
