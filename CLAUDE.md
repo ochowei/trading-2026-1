@@ -106,6 +106,7 @@ src/trading/
 - GLD 實驗總覽 → [src/trading/experiments/EXPERIMENTS_GLD.md](src/trading/experiments/EXPERIMENTS_GLD.md)
 - SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
 - FCX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_FCX.md](src/trading/experiments/EXPERIMENTS_FCX.md)
+- SOXL 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SOXL.md](src/trading/experiments/EXPERIMENTS_SOXL.md)
 - USO 實驗總覽 → [src/trading/experiments/EXPERIMENTS_USO.md](src/trading/experiments/EXPERIMENTS_USO.md)
 - SPY 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SPY.md](src/trading/experiments/EXPERIMENTS_SPY.md)
 - DIA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_DIA.md](src/trading/experiments/EXPERIMENTS_DIA.md)
