@@ -3,10 +3,11 @@
 ## AI Agent 讀取策略（節省 token）
 
 設計新實驗時，按以下順序讀取，夠用就停：
-1. **先讀** EXPERIMENTS_*.md 的 `AI Agent 快速索引` 區塊
-2. **再讀** 參數對照表（Parameter Comparison）
-3. **只有需要了解實作細節時**，才讀個別實驗的 config.py / signal_detector.py
-4. **不需要** 讀每個實驗的完整程式碼，mdoc 已包含關鍵參數
+1. **先讀** [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md) 的跨資產共通教訓
+2. **再讀** EXPERIMENTS_*.md 的 `AI Agent 快速索引` 區塊
+3. **再讀** 參數對照表（Parameter Comparison）
+4. **只有需要了解實作細節時**，才讀個別實驗的 config.py / signal_detector.py
+5. **不需要** 讀每個實驗的完整程式碼，mdoc 已包含關鍵參數
 
 ## 規則（必讀）
 
@@ -100,3 +101,4 @@ src/trading/
 - SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
 - FCX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_FCX.md](src/trading/experiments/EXPERIMENTS_FCX.md)
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
+- 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
