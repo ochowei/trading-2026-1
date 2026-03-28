@@ -124,6 +124,10 @@ def compare_experiments(names: list[str]) -> None:
             ("勝率 (Win rate)", "win_rate", ".1%"),
             ("平均報酬 (Avg return %)", "avg_return_pct", ".2f"),
             ("累計報酬 (Cumulative %)", "cumulative_return_pct", ".2f"),
+            ("盈虧比 (Profit factor)", "profit_factor", ".2f"),
+            ("夏普比率 (Sharpe ratio)", "sharpe_ratio", ".2f"),
+            ("索提諾比率 (Sortino ratio)", "sortino_ratio", ".2f"),
+            ("卡瑪比率 (Calmar ratio)", "calmar_ratio", ".2f"),
         ]
 
         for label, key, fmt in rows:

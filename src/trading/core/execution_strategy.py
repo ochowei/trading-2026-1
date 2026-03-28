@@ -94,6 +94,10 @@ class ExecutionModelStrategy(BaseStrategy):
         print(f"  累計報酬 (Cumulative return):    {result['cumulative_return_pct']:+.2f}%")
         print(f"  平均持倉 (Avg holding days):     {result['avg_holding_days']:.1f} 天")
         print(f"  最大單筆回撤 (Max drawdown):     {result['max_drawdown_pct']:.2f}%")
+        print(f"  盈虧比 (Profit factor):          {self._fmt_ratio(result['profit_factor'])}")
+        print(f"  夏普比率 (Sharpe ratio):          {result['sharpe_ratio']:.2f}")
+        print(f"  索提諾比率 (Sortino ratio):       {self._fmt_ratio(result['sortino_ratio'])}")
+        print(f"  卡瑪比率 (Calmar ratio):          {self._fmt_ratio(result['calmar_ratio'])}")
         print(f"  最大連續虧損 (Max consec. loss): {result['max_consecutive_losses']}")
 
         # 出場方式統計 (Exit type breakdown)
