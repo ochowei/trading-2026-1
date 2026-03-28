@@ -113,7 +113,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -125,6 +125,8 @@
 |------|----------|------|
 | TQQQ-007 | 加 QQQ RSI < 35 | 訊號 20 → 14，累積下降 |
 | TQQQ-012/013 | 同上 + 成交模型 | 訊號降到 1 個，幾乎無法評估 |
+| USO-018 Att2 | RSI(5) < 30 雙時框 | Part B 訊號 12 → 10，Sharpe 0.82 → 0.68 |
+| USO-018 Att3 | 累積 RSI(2) 2日 < 25 | Part B 訊號 12 → 9，Sharpe 0.82 → 0.60 |
 
 **例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。
 
@@ -185,7 +187,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017, USO-018]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -197,7 +199,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017 再驗證：Close-based 回檔、K線方向過濾、回檔速度均失敗，已確認為全域最優） |
+| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017/018 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI 均失敗，已確認為全域最優） |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -205,7 +207,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -237,6 +239,9 @@
 22. **Close-based 回檔參考不如 High-based** — Close 降低回檔深度過濾力，MDD 惡化且丟失好訊號（USO-017 Att1：Sharpe 0.20/0.75 vs 0.26/0.82）
 23. **K線方向過濾在均值回歸策略中無效** — 好訊號不一定出現在空方K線日，過濾器隨機移除好壞訊號（USO-017 Att2：Sharpe 0.22/0.64）
 24. **回檔速度不提供額外區分力** — 慢速回檔也能產生有效均值回歸，速度過濾大幅減少訊號但品質未提升（USO-017 Att3：Sharpe 0.20/0.51）
+25. **15日回看窗口不優於 10日（USO）** — 較寬回看捕捉更遠高點，新增 2 筆到期邊際訊號拖累績效（USO-018 Att1：Sharpe 0.12/0.68）
+26. **RSI(5) 雙時框確認在精確訊號上有害** — RSI(5) < 30 移除 2 筆 Part B 達標訊號（USO-018 Att2：Sharpe 0.14/0.68）
+27. **累積 RSI(2) 不優於單日 RSI(2)** — Connors 累積概念（2日和 < 25）遺失 3 筆好的 Part B 訊號（USO-018 Att3：Sharpe 0.23/0.60）
 
 ---
 
