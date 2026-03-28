@@ -60,6 +60,19 @@ def cmd_compare(args: argparse.Namespace) -> None:
     compare_experiments(args.experiments)
 
 
+def cmd_analyze(args: argparse.Namespace) -> None:
+    """滾動窗口績效分析 (Rolling window performance analysis)"""
+    from trading.core.performance_analyzer import PerformanceAnalyzer
+
+    strategy = get_experiment(args.experiment)
+    analyzer = PerformanceAnalyzer(
+        strategy,
+        window_years=args.window_years,
+        step_months=args.step_months,
+    )
+    analyzer.run()
+
+
 def cmd_sync_docs(args: argparse.Namespace) -> None:
     """同步與檢查文件 (Sync and check documentation)"""
     from trading.core.sync_docs import compare_docs_and_results
@@ -92,6 +105,21 @@ def main() -> None:
         "experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)"
     )
 
+    # analyze
+    analyze_p = sub.add_parser(
+        "analyze", help="滾動窗口績效分析 (Rolling window performance analysis)"
+    )
+    analyze_p.add_argument("experiment", help="實驗名稱 (Experiment name)")
+    analyze_p.add_argument(
+        "--window-years",
+        type=int,
+        default=2,
+        help="窗口大小（年）(Window size in years, default: 2)",
+    )
+    analyze_p.add_argument(
+        "--step-months", type=int, default=6, help="步進（月）(Step size in months, default: 6)"
+    )
+
     # sync-docs
     sub.add_parser(
         "sync-docs",
@@ -113,6 +141,8 @@ def main() -> None:
         run_followup()
     elif args.command == "compare":
         cmd_compare(args)
+    elif args.command == "analyze":
+        cmd_analyze(args)
     elif args.command == "sync-docs":
         cmd_sync_docs(args)
     elif args.command == "freshness":
