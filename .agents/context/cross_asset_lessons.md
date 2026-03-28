@@ -185,8 +185,8 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001]
-  validated: 2026-03-27
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004]
+  validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
 -->
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -220,6 +220,7 @@
 5. **無成交模型的 In-Sample 數字當參考** — 高估 50-120%
 6. **不同波動度資產直接複製參數** — 必須按波動度比例縮放
 7. **VIX 閾值過濾均值回歸進場** — VIX 在熊市持續偏高，反而過濾掉牛市好訊號（SPY-003 驗證）
+8. **Close Position Filter 不可跨資產通用** — GLD 有效但 USO 反效果（USO-002/004 驗證），原油超賣反彈常伴隨低 close position
 
 ---
 
