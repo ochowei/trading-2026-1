@@ -113,7 +113,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-016 再驗證：連續下跌、z-score、混合進場均失敗，已確認為全域最優） |
+| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017 再驗證：Close-based 回檔、K線方向過濾、回檔速度均失敗，已確認為全域最優） |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -234,6 +234,9 @@
 19. **SL -3.25% 是 USO 的全域最優** — -3.0%（太近悲觀認定翻轉）、-3.5%（增加虧損不挽救停損）均失敗，即使搭配更精確的進場條件（USO-014 Att3、USO-015 Att3 驗證）
 20. **連續下跌天數不可替代回檔門檻或 2日跌幅** — 單獨使用缺乏深度過濾（USO-016 Att1：Sharpe 0.16/0.35）；搭配回檔範圍取代 2日跌幅則過嚴，訊號減少但品質未提升（USO-016 Att3：Sharpe 0.26/0.75）
 21. **日報酬 z-score 自適應進場對 USO 完全無效** — 缺乏最低回檔深度門檻時，z-score 在不同波動環境產生大量錯誤進場，Part A/B 均負報酬（USO-016 Att2：Sharpe -0.26/-0.06）
+22. **Close-based 回檔參考不如 High-based** — Close 降低回檔深度過濾力，MDD 惡化且丟失好訊號（USO-017 Att1：Sharpe 0.20/0.75 vs 0.26/0.82）
+23. **K線方向過濾在均值回歸策略中無效** — 好訊號不一定出現在空方K線日，過濾器隨機移除好壞訊號（USO-017 Att2：Sharpe 0.22/0.64）
+24. **回檔速度不提供額外區分力** — 慢速回檔也能產生有效均值回歸，速度過濾大幅減少訊號但品質未提升（USO-017 Att3：Sharpe 0.20/0.51）
 
 ---
 
