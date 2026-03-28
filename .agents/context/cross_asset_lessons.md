@@ -198,14 +198,14 @@
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
 | USO | USO-001 | 回調 + Williams %R | ~9.5 | 56.2%/57.9% | 波動度縮放、禁用 trailing stop、低滑價 |
-| SPY | SPY-002 | 回調 + Williams %R | ~4/2 | 60%/75% | 無 trailing stop、對稱 TP/SL、A/B 績效一致 |
+| SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
