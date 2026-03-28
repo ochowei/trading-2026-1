@@ -40,6 +40,7 @@ on:
           - "USO-005: uso_005_symmetric_tight"
           - "USO-007: uso_007_sharp_pullback"
           - "USO-009: uso_009_momentum_pullback"
+          - "USO-010: uso_010_deep_pullback"
           - "SPY-001: spy_001_pullback_wr"
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
