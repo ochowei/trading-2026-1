@@ -233,6 +233,23 @@ class ExecutionModelBacktester:
         avg_holding = float(np.mean([t["holding_days"] for t in trades]))
         worst_dd = min(t["max_drawdown_pct"] for t in trades)
 
+        # 風險調整後報酬指標 (Risk-adjusted return metrics)
+        gross_profit = sum(r for r in returns if r > 0)
+        gross_loss = sum(r for r in returns if r < 0)
+        profit_factor = gross_profit / abs(gross_loss) if gross_loss != 0 else 999.99
+
+        sharpe_ratio = avg_return / std_return if std_return > 0 else 0.0
+
+        downside_returns = [min(r, 0) for r in returns]
+        downside_dev = float(np.sqrt(np.mean(np.square(downside_returns))))
+        sortino_ratio = (
+            avg_return / downside_dev if downside_dev > 0 else (999.99 if avg_return > 0 else 0.0)
+        )
+
+        calmar_ratio = (
+            avg_return / abs(worst_dd) if worst_dd != 0 else (999.99 if avg_return > 0 else 0.0)
+        )
+
         # 成交統計 (Fill statistics)
         total_signals = total + len(unfilled_signals)
         fill_rate = total / total_signals if total_signals > 0 else 0.0
@@ -258,6 +275,10 @@ class ExecutionModelBacktester:
             "cumulative_return_pct": round(cumulative_return, 2),
             "avg_holding_days": round(avg_holding, 1),
             "max_drawdown_pct": round(worst_dd, 2),
+            "profit_factor": round(min(profit_factor, 999.99), 2),
+            "sharpe_ratio": round(sharpe_ratio, 2),
+            "sortino_ratio": round(min(sortino_ratio, 999.99), 2),
+            "calmar_ratio": round(min(calmar_ratio, 999.99), 2),
             "max_consecutive_losses": max_consecutive_losses,
             "target_exits": target_exits,
             "stop_loss_exits": stop_exits,
@@ -292,6 +313,10 @@ class ExecutionModelBacktester:
             "cumulative_return_pct": 0.0,
             "avg_holding_days": 0.0,
             "max_drawdown_pct": 0.0,
+            "profit_factor": 0.0,
+            "sharpe_ratio": 0.0,
+            "sortino_ratio": 0.0,
+            "calmar_ratio": 0.0,
             "max_consecutive_losses": 0,
             "target_exits": 0,
             "stop_loss_exits": 0,

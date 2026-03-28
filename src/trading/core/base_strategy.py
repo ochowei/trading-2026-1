@@ -163,6 +163,10 @@ class BaseStrategy(ABC):
         print(f"  累計報酬 (Cumulative return):    {result['cumulative_return_pct']:+.2f}%")
         print(f"  平均持倉 (Avg holding days):     {result['avg_holding_days']:.1f} 天")
         print(f"  最大單筆回撤 (Max drawdown):     {result['max_drawdown_pct']:.2f}%")
+        print(f"  盈虧比 (Profit factor):          {self._fmt_ratio(result['profit_factor'])}")
+        print(f"  夏普比率 (Sharpe ratio):          {result['sharpe_ratio']:.2f}")
+        print(f"  索提諾比率 (Sortino ratio):       {self._fmt_ratio(result['sortino_ratio'])}")
+        print(f"  卡瑪比率 (Calmar ratio):          {self._fmt_ratio(result['calmar_ratio'])}")
         print(f"  最大連續虧損 (Max consec. loss): {result['max_consecutive_losses']}")
 
         # 出場方式統計 (Exit type breakdown)
@@ -236,6 +240,10 @@ class BaseStrategy(ABC):
             ("累計報酬 (Cumulative %)", "cumulative_return_pct", ".2f"),
             ("平均持倉天數 (Avg hold)", "avg_holding_days", ".1f"),
             ("最大回撤 (Max DD %)", "max_drawdown_pct", ".2f"),
+            ("盈虧比 (Profit factor)", "profit_factor", ".2f"),
+            ("夏普比率 (Sharpe ratio)", "sharpe_ratio", ".2f"),
+            ("索提諾比率 (Sortino ratio)", "sortino_ratio", ".2f"),
+            ("卡瑪比率 (Calmar ratio)", "calmar_ratio", ".2f"),
             ("最大連續虧損 (Max consec.)", "max_consecutive_losses", "d"),
         ]
 
@@ -266,6 +274,11 @@ class BaseStrategy(ABC):
         else:
             print(f"  今日 {ticker_str} 無訊號 (No {ticker_str} signal today)")
         print(f"{separator}\n")
+
+    @staticmethod
+    def _fmt_ratio(val: float, threshold: float = 999.0) -> str:
+        """格式化比率，超過閾值顯示 ∞ (Format ratio, show ∞ if above threshold)"""
+        return "∞" if val >= threshold else f"{val:.2f}"
 
     @staticmethod
     def _signals_per_year(trades: list[dict], df: pd.DataFrame) -> float:
