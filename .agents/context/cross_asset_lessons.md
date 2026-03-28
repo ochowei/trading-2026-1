@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-007]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-009]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-007 | 回調 + RSI(2) | ~9.5 | 59.6%/68.4% | RSI(2)<15 甜蜜點（10/12/18 均失敗）、TP +3.0% 上限、禁用 trailing stop |
+| USO | USO-009 | 回調 + RSI(2) + 2日急跌 | ~9.2/8.0 | 60.9%/75.0% | RSI(2)<15 + 2日跌幅≤-2.5% 動量濾波、TP +3.0% 上限、禁用 trailing stop |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-009]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -276,7 +276,7 @@
 ## 13. 超賣指標週期應匹配持倉週期
 
 <!-- freshness:
-  derived_from: [USO-005, USO-007, SPY-004]
+  derived_from: [USO-005, USO-007, USO-009, SPY-004]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: medium

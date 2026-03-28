@@ -1,20 +1,20 @@
 {
   "metadata": {
-    "execution_time": "2026-03-28T05:40:38.424318"
+    "execution_time": "2026-03-28T06:35:17.145513"
   },
   "part_a": {
     "ticker": "USO",
     "total_signals": 47,
-    "wins": 28,
-    "win_rate": 0.5957446808510638,
-    "avg_return_pct": 0.41,
-    "std_return_pct": 3.1,
-    "cumulative_return_pct": 18.29,
+    "wins": 29,
+    "win_rate": 0.6170212765957447,
+    "avg_return_pct": 0.54,
+    "std_return_pct": 3.07,
+    "cumulative_return_pct": 26.06,
     "avg_holding_days": 2.4,
     "max_drawdown_pct": -9.18,
     "max_consecutive_losses": 7,
-    "target_exits": 27,
-    "stop_loss_exits": 19,
+    "target_exits": 28,
+    "stop_loss_exits": 18,
     "time_expiry_exits": 1,
     "pessimistic_exits": 1,
     "trades": [
@@ -96,15 +96,15 @@
         "max_drawdown_pct": 8.25
       },
       {
-        "date": "2019-09-27",
-        "entry_date": "2019-09-30",
-        "exit_date": "2019-10-01",
-        "entry": 92.17,
-        "exit": 89.09,
+        "date": "2019-09-30",
+        "entry_date": "2019-10-01",
+        "exit_date": "2019-10-02",
+        "entry": 91.21,
+        "exit": 88.16,
         "return_pct": -3.35,
         "holding_days": 1,
         "exit_type": "stop_loss",
-        "max_drawdown_pct": -3.92
+        "max_drawdown_pct": -4.49
       },
       {
         "date": "2020-01-09",
@@ -371,15 +371,15 @@
         "max_drawdown_pct": -7.73
       },
       {
-        "date": "2022-09-20",
-        "entry_date": "2022-09-21",
-        "exit_date": "2022-09-23",
-        "entry": 70.56,
-        "exit": 68.2,
-        "return_pct": -3.35,
-        "holding_days": 2,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -8.38
+        "date": "2022-09-23",
+        "entry_date": "2022-09-26",
+        "exit_date": "2022-09-29",
+        "entry": 65.44,
+        "exit": 67.4,
+        "return_pct": 3.0,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.67
       },
       {
         "date": "2022-10-18",
@@ -560,17 +560,17 @@
   },
   "part_b": {
     "ticker": "USO",
-    "total_signals": 19,
+    "total_signals": 18,
     "wins": 13,
-    "win_rate": 0.6842105263157895,
-    "avg_return_pct": 0.84,
-    "std_return_pct": 2.92,
-    "cumulative_return_pct": 16.36,
-    "avg_holding_days": 3.6,
+    "win_rate": 0.7222222222222222,
+    "avg_return_pct": 1.08,
+    "std_return_pct": 2.82,
+    "cumulative_return_pct": 20.4,
+    "avg_holding_days": 3.4,
     "max_drawdown_pct": -4.23,
     "max_consecutive_losses": 2,
     "target_exits": 12,
-    "stop_loss_exits": 6,
+    "stop_loss_exits": 5,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
@@ -751,40 +751,29 @@
         "max_drawdown_pct": -4.23
       },
       {
-        "date": "2025-10-01",
-        "entry_date": "2025-10-02",
-        "exit_date": "2025-10-10",
-        "entry": 72.35,
-        "exit": 69.93,
-        "return_pct": -3.35,
-        "holding_days": 6,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -4.22
-      },
-      {
-        "date": "2025-10-16",
-        "entry_date": "2025-10-17",
-        "exit_date": "2025-10-22",
-        "entry": 67.79,
-        "exit": 69.82,
+        "date": "2025-10-02",
+        "entry_date": "2025-10-03",
+        "exit_date": "2025-10-08",
+        "entry": 71.84,
+        "exit": 74.0,
         "return_pct": 3.0,
         "holding_days": 3,
         "exit_type": "target",
-        "max_drawdown_pct": -1.19
+        "max_drawdown_pct": 0.53
       },
       {
-        "date": "2025-12-15",
-        "entry_date": "2025-12-16",
+        "date": "2025-12-16",
+        "entry_date": "2025-12-17",
         "exit_date": "2025-12-22",
-        "entry": 66.82,
-        "exit": 68.82,
+        "entry": 67.29,
+        "exit": 69.31,
         "return_pct": 3.0,
-        "holding_days": 4,
+        "holding_days": 3,
         "exit_type": "target",
-        "max_drawdown_pct": 0.02
+        "max_drawdown_pct": -0.28
       }
     ],
-    "filled_count": 19,
+    "filled_count": 18,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
