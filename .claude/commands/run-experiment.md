@@ -14,7 +14,20 @@ uv run trading run <experiment_name>
 
 Display the full output to the user.
 
-## Step 2: Read and summarize results
+## Step 2: Rolling window performance analysis
+
+Run the rolling window analysis to check performance stability across time periods:
+
+```bash
+uv run trading analyze <experiment_name>
+```
+
+Display the full output to the user. Key things to note:
+- Whether win rate and return are stable across windows or show sudden shifts
+- Any windows with significantly worse performance (potential regime sensitivity)
+- Overall trend: improving, degrading, or stable
+
+## Step 3: Read and summarize results
 
 Read `results/<experiment_name>/latest.json` and produce a concise summary:
 
@@ -39,7 +52,7 @@ Read `results/<experiment_name>/latest.json` and produce a concise summary:
 - Execution Model: Yes/No (WARNING if No for non-grandfathered experiment)
 ```
 
-## Step 3: Offer documentation update
+## Step 4: Offer documentation update
 
 After showing the summary, ask:
 
