@@ -113,8 +113,8 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013]
-  validated: 2026-03-27
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006]
+  validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
 -->
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -216,11 +216,13 @@
 1. **放寬進場門檻以增加訊號** — 品質下降的速度永遠快過數量增加的速度
 2. **高波動資產上使用 trailing stop** — 日內震盪會觸發悲觀認定出場
 3. **均值回歸策略加趨勢方向濾波** — 邏輯上自相矛盾
-4. **已精確訊號上疊加確認指標** — 減少訊號但不提升品質
+4. **已精確訊號上疊加確認指標** — 減少訊號但不提升品質（USO-006 Att2 再驗證：成交量過濾移除好訊號比壞訊號多）
 5. **無成交模型的 In-Sample 數字當參考** — 高估 50-120%
 6. **不同波動度資產直接複製參數** — 必須按波動度比例縮放
 7. **VIX 閾值過濾均值回歸進場** — VIX 在熊市持續偏高，反而過濾掉牛市好訊號（SPY-003 驗證）
 8. **Close Position Filter 不可跨資產通用** — GLD 有效但 USO 反效果（USO-002/004 驗證），原油超賣反彈常伴隨低 close position
+9. **降低 TP 不改變勝率** — 達標交易必經低 TP，降低只壓縮利潤（USO-006 Att1 驗證：TP +2.5% 累計暴跌至 +1.00%）
+10. **縮短冷卻期需檢查 A/B 平衡** — 冷卻期縮短增加 Part A 二次探底訊號，但 Part B 品質未必跟上（USO-006 Att3 驗證：A/B 累計比 6.5:1）
 
 ---
 
