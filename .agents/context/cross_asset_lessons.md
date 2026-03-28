@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-001 | 回調 + Williams %R | ~9.5 | 56.2%/57.9% | 波動度縮放、禁用 trailing stop、低滑價 |
+| USO | USO-005 | 回調 + Williams %R | ~9.5 | 58.3%/63.2% | 波動度縮放、禁用 trailing stop、短持倉、SL -3.25% |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
