@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-007 | 回調 + RSI(2) | ~9.5 | 59.6%/68.4% | RSI(2)<15 與短持倉匹配、禁用 trailing stop、SL -3.25% |
+| USO | USO-007 | 回調 + RSI(2) | ~9.5 | 59.6%/68.4% | RSI(2)<15 甜蜜點（10/12/18 均失敗）、TP +3.0% 上限、禁用 trailing stop |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -223,6 +223,8 @@
 8. **Close Position Filter 不可跨資產通用** — GLD 有效但 USO 反效果（USO-002/004 驗證），原油超賣反彈常伴隨低 close position
 9. **降低 TP 不改變勝率** — 達標交易必經低 TP，降低只壓縮利潤（USO-006 Att1 驗證：TP +2.5% 累計暴跌至 +1.00%）
 10. **縮短冷卻期需檢查 A/B 平衡** — 冷卻期縮短增加 Part A 二次探底訊號，但 Part B 品質未必跟上（USO-006 Att3 驗證：A/B 累計比 6.5:1）
+11. **USO RSI(2) < 15 是甜蜜點** — < 10 太緊、< 12 只改善 Part A 不影響 Part B、< 18 太鬆（USO-007 Att3、USO-008 Att1/3 驗證）
+12. **USO TP +3.0% 是上限** — +3.5% 在兩個獨立實驗失敗（USO-003、USO-008 Att2），contango 限制均值回歸幅度
 
 ---
 
