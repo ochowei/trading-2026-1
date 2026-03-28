@@ -38,6 +38,7 @@ on:
           - "SOXL-001: soxl_001_extreme_oversold"
           - "USO-001: uso_001_pullback_wr"
           - "USO-005: uso_005_symmetric_tight"
+          - "USO-007: uso_007_sharp_pullback"
           - "SPY-001: spy_001_pullback_wr"
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
