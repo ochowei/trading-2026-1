@@ -113,7 +113,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82 |
+| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-015 再驗證：已確認為理論最優） |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -229,7 +229,9 @@
 14. **反向 Close Position Filter（要求低 close position）也無效** — 即使利用資產特性設計，過濾器仍不可預測地重組訊號日期，MDD 可能倍增（USO-011 Att2 驗證）
 15. **SMA 偏離作為額外過濾器嚴重損害品質** — SMA(20) -4% 門檻使 Part B 訊號從 12 降至 8，Sharpe 從 0.82 崩至 0.20（USO-012 Att2 驗證）
 16. **緊縮 SL 在悲觀認定下翻轉勝負** — SL -3.0% 搭配 TP +3.0% 使停損/達標距離過近，日內路徑同時觸及時悲觀認定選擇停損（USO-014 Att3 驗證）
-17. **動量過濾窗口應匹配持倉週期** — USO 平均持倉 2-3 天，2日跌幅最佳；3日跌幅反而放鬆過濾（USO-014 Att1 驗證）
+17. **動量過濾窗口應匹配持倉週期** — USO 平均持倉 2-3 天，2日跌幅最佳；3日跌幅反而放鬆過濾（USO-014 Att1 驗證）；1日跌幅改變訊號日期而非收緊過濾（USO-015 Att1 驗證）
+18. **Bollinger Band 進場不可替代回檔門檻** — BB(20,2) 對 USO 產生完全不同且遠更差的訊號集，Part B Sharpe -0.48（USO-015 Att2 驗證）
+19. **SL -3.25% 是 USO 的全域最優** — -3.0%（太近悲觀認定翻轉）、-3.5%（增加虧損不挽救停損）均失敗，即使搭配更精確的進場條件（USO-014 Att3、USO-015 Att3 驗證）
 
 ---
 
