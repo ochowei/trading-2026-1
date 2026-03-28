@@ -113,7 +113,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -224,7 +224,9 @@
 9. **降低 TP 不改變勝率** — 達標交易必經低 TP，降低只壓縮利潤（USO-006 Att1 驗證：TP +2.5% 累計暴跌至 +1.00%）
 10. **縮短冷卻期需檢查 A/B 平衡** — 冷卻期縮短增加 Part A 二次探底訊號，但 Part B 品質未必跟上（USO-006 Att3 驗證：A/B 累計比 6.5:1）
 11. **USO RSI(2) < 15 是甜蜜點** — < 10 太緊、< 12 只改善 Part A 不影響 Part B、< 18 太鬆（USO-007 Att3、USO-008 Att1/3 驗證）
-12. **USO TP +3.0% 是上限** — +3.5% 在兩個獨立實驗失敗（USO-003、USO-008 Att2），contango 限制均值回歸幅度
+12. **USO TP +3.0% 是硬上限** — +3.5%（USO-003、USO-008 Att2）和 +3.25%（USO-011 Att3）均失敗，contango 限制均值回歸幅度嚴格在 +3.0%
+13. **ATR 自適應回檔門檻對有極端尾部事件的資產無效** — 中等波動期過濾好訊號，極端崩盤回檔遠超 ATR 門檻仍通過（USO-011 Att1 驗證）
+14. **反向 Close Position Filter（要求低 close position）也無效** — 即使利用資產特性設計，過濾器仍不可預測地重組訊號日期，MDD 可能倍增（USO-011 Att2 驗證）
 
 ---
 
