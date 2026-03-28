@@ -32,8 +32,8 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "gld_003_trailing_stop",
-        "label": "GLD-003",
+        "experiment_name": "gld_007_pullback_wr_reversal",
+        "label": "GLD-007",
         "ticker": "GLD",
         "has_trailing_stop": True,
     },
@@ -44,9 +44,15 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "sivr_001_mean_reversion",
-        "label": "SIVR-001",
+        "experiment_name": "sivr_003_pullback_wr",
+        "label": "SIVR-003",
         "ticker": "SIVR",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "spy_002_no_trailing",
+        "label": "SPY-002",
+        "ticker": "SPY",
         "has_trailing_stop": False,
     },
 ]
