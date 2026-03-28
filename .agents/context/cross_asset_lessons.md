@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-009]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-005 | 回調 + Williams %R | ~9.5 | 58.3%/63.2% | 波動度縮放、禁用 trailing stop、短持倉、SL -3.25% |
+| USO | USO-009 | 回調 + RSI(2) + 2日急跌 | ~9.2/8.0 | 60.9%/75.0% | RSI(2)<15 + 2日跌幅≤-2.5% 動量濾波、TP +3.0% 上限、禁用 trailing stop |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-009]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -223,6 +223,8 @@
 8. **Close Position Filter 不可跨資產通用** — GLD 有效但 USO 反效果（USO-002/004 驗證），原油超賣反彈常伴隨低 close position
 9. **降低 TP 不改變勝率** — 達標交易必經低 TP，降低只壓縮利潤（USO-006 Att1 驗證：TP +2.5% 累計暴跌至 +1.00%）
 10. **縮短冷卻期需檢查 A/B 平衡** — 冷卻期縮短增加 Part A 二次探底訊號，但 Part B 品質未必跟上（USO-006 Att3 驗證：A/B 累計比 6.5:1）
+11. **USO RSI(2) < 15 是甜蜜點** — < 10 太緊、< 12 只改善 Part A 不影響 Part B、< 18 太鬆（USO-007 Att3、USO-008 Att1/3 驗證）
+12. **USO TP +3.0% 是上限** — +3.5% 在兩個獨立實驗失敗（USO-003、USO-008 Att2），contango 限制均值回歸幅度
 
 ---
 
@@ -268,3 +270,25 @@
 4. **啟用成交模型**：使用 execution_backtester，設定合理 slippage
 5. **檢查 A/B 平衡**：訊號頻率比控制在 1.0-1.5:1
 6. **迭代調優**：先調進場條件（步進 1%），再調出場參數（步進較粗）
+
+---
+
+## 13. 超賣指標週期應匹配持倉週期
+
+<!-- freshness:
+  derived_from: [USO-005, USO-007, USO-009, SPY-004]
+  validated: 2026-03-28
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+超賣指標的回看週期與策略平均持倉天數匹配時，效果顯著提升。
+
+| 資產 | 平均持倉 | 原指標 | 新指標 | Part B 改善 |
+|------|----------|--------|--------|-------------|
+| USO | 2-3 天 | WR(10) ≤ -80 | RSI(2) < 15 | +9.19% → +16.36% (+78%) |
+| SPY | 2-3 天 | — | RSI(2) < 10 | 直接使用 RSI(2)，Part B WR 75% |
+
+**原因**：WR(10) 衡量 10 天內的超賣，但持倉僅 2-3 天。10 天超賣不代表 2 天後會反彈。RSI(2) 專注於 2 天動量，與持倉週期匹配，進場時機更精準。
+
+**規則**：短持倉策略（平均 ≤ 5 天）優先使用 RSI(2) 或類似短期指標，而非長週期的 WR(10) 或 RSI(14)。
