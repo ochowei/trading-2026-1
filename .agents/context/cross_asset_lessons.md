@@ -113,7 +113,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -128,6 +128,7 @@
 | USO-018 Att2 | RSI(5) < 30 雙時框 | Part B 訊號 12 → 10，Sharpe 0.82 → 0.68 |
 | USO-018 Att3 | 累積 RSI(2) 2日 < 25 | Part B 訊號 12 → 9，Sharpe 0.82 → 0.60 |
 | USO-019 Att3 | ADX(14) < 25 趨勢強度 | Part B 訊號 12 → 10，Sharpe 0.82 → 0.68 |
+| USO-020 Att1 | 20日實現波動率 < 45% | Part B 訊號 12 → 11，Sharpe 0.82 → 0.75 |
 
 **例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。
 
@@ -188,7 +189,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -200,7 +201,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～019 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾均失敗，已確認為全域最優） |
+| USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗，已確認為全域最優） |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -208,7 +209,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -246,6 +247,9 @@
 28. **RSI 週期 3 不適用 USO** — RSI(3) < 20 產生大量不同且更差的訊號，Part A Sharpe 從 0.26 崩至 0.07（USO-019 Att2 驗證）
 29. **ADX 趨勢強度過濾在均值回歸中無效** — ADX(14) < 25 移除好訊號多於壞訊號，Part A/B Sharpe 均下降（USO-019 Att3：Sharpe 0.21/0.68）
 30. **持倉 7 天搭配精確進場仍不優於 10 天** — 平均持倉 2-3 天但少數好交易需要更長時間達標，縮短持倉嚴格劣化（USO-019 Att1：Sharpe 0.26/0.81）
+31. **實現波動率過濾無法區分 USO 好壞訊號** — 停損交易 avg vol 35.1% vs 達標交易 35.9%，vol momentum（vol10/vol20）avg 1.04 vs 1.05，完全重疊（USO-020 Att1 驗證）
+32. **回復日進場要求與均值回歸進場條件衝突** — RSI(2) < 15 + 2日跌幅 ≤ -2.5% 意味著訊號日幾乎必然是下跌日，要求 Close > Prev Close 後訊號歸零（USO-020 Att2 驗證）
+33. **2日跌幅條件對 USO 訊號品質至關重要不可省略** — 移除 2日跌幅並收緊 RSI 至 < 12 雖增加訊號但引入低品質交易，Part B Sharpe 0.82→0.61，連續虧損 2→4（USO-020 Att3 驗證）
 
 ---
 
