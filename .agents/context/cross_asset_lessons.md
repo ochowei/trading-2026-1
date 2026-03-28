@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -228,6 +228,8 @@
 13. **ATR 自適應回檔門檻對有極端尾部事件的資產無效** — 中等波動期過濾好訊號，極端崩盤回檔遠超 ATR 門檻仍通過（USO-011 Att1 驗證）
 14. **反向 Close Position Filter（要求低 close position）也無效** — 即使利用資產特性設計，過濾器仍不可預測地重組訊號日期，MDD 可能倍增（USO-011 Att2 驗證）
 15. **SMA 偏離作為額外過濾器嚴重損害品質** — SMA(20) -4% 門檻使 Part B 訊號從 12 降至 8，Sharpe 從 0.82 崩至 0.20（USO-012 Att2 驗證）
+16. **緊縮 SL 在悲觀認定下翻轉勝負** — SL -3.0% 搭配 TP +3.0% 使停損/達標距離過近，日內路徑同時觸及時悲觀認定選擇停損（USO-014 Att3 驗證）
+17. **動量過濾窗口應匹配持倉週期** — USO 平均持倉 2-3 天，2日跌幅最佳；3日跌幅反而放鬆過濾（USO-014 Att1 驗證）
 
 ---
 
