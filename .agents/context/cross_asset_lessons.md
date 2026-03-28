@@ -198,14 +198,15 @@
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
 | USO | USO-001 | 回調 + Williams %R | ~9.5 | 56.2%/57.9% | 波動度縮放、禁用 trailing stop、低滑價 |
+| SPY | SPY-002 | 回調 + Williams %R | ~4/2 | 60%/75% | 無 trailing stop、對稱 TP/SL、A/B 績效一致 |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003]
-  validated: 2026-03-27
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003]
+  validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
 -->
@@ -218,6 +219,7 @@
 4. **已精確訊號上疊加確認指標** — 減少訊號但不提升品質
 5. **無成交模型的 In-Sample 數字當參考** — 高估 50-120%
 6. **不同波動度資產直接複製參數** — 必須按波動度比例縮放
+7. **VIX 閾值過濾均值回歸進場** — VIX 在熊市持續偏高，反而過濾掉牛市好訊號（SPY-003 驗證）
 
 ---
 
