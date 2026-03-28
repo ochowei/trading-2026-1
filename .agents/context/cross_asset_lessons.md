@@ -113,7 +113,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -185,7 +185,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-010]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-012]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -197,7 +197,7 @@
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波 |
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
-| USO | USO-010 | 深回調 + RSI(2) + 2日急跌 | ~8.2/6.0 | 63.4%/83.3% | 回檔 7%（較 6% 收緊）+ RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part B Sharpe 0.82 |
+| USO | USO-012 | 回檔範圍 + RSI(2) + 2日急跌 | ~7.4/6.0 | 64.9%/83.3% | 回檔 7-13% 範圍過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、回檔上限過濾崩盤、Part B Sharpe 0.82 |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
 
 ---
@@ -205,7 +205,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -216,7 +216,7 @@
 1. **放寬進場門檻以增加訊號** — 品質下降的速度永遠快過數量增加的速度
 2. **高波動資產上使用 trailing stop** — 日內震盪會觸發悲觀認定出場
 3. **均值回歸策略加趨勢方向濾波** — 邏輯上自相矛盾
-4. **已精確訊號上疊加確認指標** — 減少訊號但不提升品質（USO-006 Att2 再驗證：成交量過濾移除好訊號比壞訊號多）
+4. **已精確訊號上疊加確認指標** — 減少訊號但不提升品質（USO-006 Att2 再驗證：成交量過濾移除好訊號比壞訊號多；USO-012 Att2 再驗證：SMA(20) 偏離 -4% 使 Part B Sharpe 從 0.82 崩潰至 0.20）
 5. **無成交模型的 In-Sample 數字當參考** — 高估 50-120%
 6. **不同波動度資產直接複製參數** — 必須按波動度比例縮放
 7. **VIX 閾值過濾均值回歸進場** — VIX 在熊市持續偏高，反而過濾掉牛市好訊號（SPY-003 驗證）
@@ -227,6 +227,7 @@
 12. **USO TP +3.0% 是硬上限** — +3.5%（USO-003、USO-008 Att2）和 +3.25%（USO-011 Att3）均失敗，contango 限制均值回歸幅度嚴格在 +3.0%
 13. **ATR 自適應回檔門檻對有極端尾部事件的資產無效** — 中等波動期過濾好訊號，極端崩盤回檔遠超 ATR 門檻仍通過（USO-011 Att1 驗證）
 14. **反向 Close Position Filter（要求低 close position）也無效** — 即使利用資產特性設計，過濾器仍不可預測地重組訊號日期，MDD 可能倍增（USO-011 Att2 驗證）
+15. **SMA 偏離作為額外過濾器嚴重損害品質** — SMA(20) -4% 門檻使 Part B 訊號從 12 降至 8，Sharpe 從 0.82 崩至 0.20（USO-012 Att2 驗證）
 
 ---
 
