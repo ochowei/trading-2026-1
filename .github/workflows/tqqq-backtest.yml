@@ -47,6 +47,7 @@ on:
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
           - "SPY-004: spy_004_rsi2_reversal"
+          - "SPY-005: spy_005_rsi2_relaxed_cp"
 
 jobs:
   backtest:

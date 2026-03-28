@@ -189,7 +189,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020]
+  derived_from: [TQQQ-010, GLD-007, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -202,14 +202,14 @@
 | SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號 |
 | USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗，已確認為全域最優） |
-| SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12% |
+| SPY | SPY-005 | RSI(2) 放寬收盤位置 | ~5.8/4.0 | 65.5%/87.5% | RSI(2)<10 + 2日跌幅≥1.5% + ClosePos≥25%、對稱 TP/SL、Part A +22.65%、Part B Sharpe 1.10 |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, SPY-005, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020]
   validated: 2026-03-28
   data_through: 2025-12-31
   confidence: high
@@ -250,6 +250,8 @@
 31. **實現波動率過濾無法區分 USO 好壞訊號** — 停損交易 avg vol 35.1% vs 達標交易 35.9%，vol momentum（vol10/vol20）avg 1.04 vs 1.05，完全重疊（USO-020 Att1 驗證）
 32. **回復日進場要求與均值回歸進場條件衝突** — RSI(2) < 15 + 2日跌幅 ≤ -2.5% 意味著訊號日幾乎必然是下跌日，要求 Close > Prev Close 後訊號歸零（USO-020 Att2 驗證）
 33. **2日跌幅條件對 USO 訊號品質至關重要不可省略** — 移除 2日跌幅並收緊 RSI 至 < 12 雖增加訊號但引入低品質交易，Part B Sharpe 0.82→0.61，連續虧損 2→4（USO-020 Att3 驗證）
+34. **Bollinger Band 進場在 SPY 上同樣失敗** — BB(20,2) + RSI(2) < 15 僅產生 7+3 訊號，Part A -3.23%，呼應 USO-015 的結論（SPY-005 Att1 驗證）
+35. **RSI(2) < 12 對 SPY 同樣無效** — 放寬 RSI 門檻增加低品質訊號，Part B 從 +4.89% 降至 +2.16%（SPY-005 Att2 驗證，呼應教訓 #1）
 
 ---
 
