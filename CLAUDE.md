@@ -18,7 +18,7 @@
 - **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
 - **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
-- **人類專用文件**：`HUMAN_PM_MEMO.md` 由人類維護，AI Agent 除非被明確指定為 `HUMAN_PM_HELPER`，否則不可編輯。
+- **人類專用文件**：`pm/` 資料夾由人類維護，AI Agent 除非被明確指定為 `HUMAN_PM_HELPER`，否則不可編輯其中的任何文件。
 
 ## 程式碼風格（必讀）
 
@@ -81,6 +81,9 @@ uv run trading freshness
 ## 架構速覽
 
 ```
+pm/                              # 人類 PM 專用文件（AI Agent 禁止編輯）
+└── HUMAN_PM_MEMO.md             # 關注標的、策略想法、執行模型備忘、更新紀錄
+
 src/trading/
 ├── cli.py                       # 統一 CLI 入口
 ├── followup.py                  # 跟單訊號產生器（60 天回測 + Firstrade 下單指令）
