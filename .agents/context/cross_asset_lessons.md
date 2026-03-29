@@ -114,7 +114,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -132,8 +132,9 @@
 | USO-020 Att1 | 20日實現波動率 < 45% | Part B 訊號 12 → 11，Sharpe 0.82 → 0.75 |
 | TSM-004 Att1 | SMH 回檔 ≥5% 板塊確認 | Part A 訊號 11 → 8，Sharpe 0.23 → 0.06；Part B 訊號 4 → 3，Sharpe 0.32 → -0.29 |
 | FCX-003 Att3 | ClosePos ≥40% 反轉K線 | Part A 訊號 18 → 11，Sharpe 0.43 → 0.54（但 MDD 惡化 -15.83% → -19.54%）；Part B 訊號 5 → 4，Sharpe 0.74 → 0.28 |
+| SIVR-006 Att1 | ClosePos ≥40% 反轉K線 | Part A 訊號 32 → 26，Sharpe 0.22 → 0.12；Part B 訊號 11 → 9，Sharpe 0.26 → 0.09 |
 
-**例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。但此過濾器在 FCX 個股上行為不可預測——改變訊號日期而非單純移除壞訊號（FCX-003 Att3 驗證）。
+**例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。但此過濾器在高波動資產（FCX、SIVR）上失效——FCX 改變訊號日期而非移除壞訊號（FCX-003 Att3），SIVR 的高日內波動使好訊號也常收在低位（SIVR-006 Att1）。
 
 **規則**：只在確認能修復某個已知失敗模式時才加濾波器，不要隨意「加一個指標看看」。
 
@@ -192,7 +193,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, TSM-004, VOO-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, TSM-004, VOO-002]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -216,7 +217,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -231,7 +232,7 @@
 5. **無成交模型的 In-Sample 數字當參考** — 高估 50-120%
 6. **不同波動度資產直接複製參數** — 必須按波動度比例縮放
 7. **VIX 閾值過濾均值回歸進場** — VIX 在熊市持續偏高，反而過濾掉牛市好訊號（SPY-003 驗證）。滾動窗口分析進一步確認：近期 100% WR 窗口不穩定（最新窗口回落至 71.4%，ΔWR 28.6pp），底線與無 VIX 過濾相同
-8. **Close Position Filter 不可跨資產通用** — GLD 有效但 USO 反效果（USO-002/004 驗證），原油超賣反彈常伴隨低 close position
+8. **Close Position Filter 不可跨資產通用** — GLD 有效但 USO 反效果（USO-002/004 驗證），原油超賣反彈常伴隨低 close position。SIVR 亦失效（SIVR-006 Att1 驗證），高波動資產好訊號也常收在日內低位
 9. **降低 TP 不改變勝率** — 達標交易必經低 TP，降低只壓縮利潤（USO-006 Att1 驗證：TP +2.5% 累計暴跌至 +1.00%）
 10. **縮短冷卻期需檢查 A/B 平衡** — 冷卻期縮短增加 Part A 二次探底訊號，但 Part B 品質未必跟上（USO-006 Att3 驗證：A/B 累計比 6.5:1）
 11. **USO RSI(2) < 15 是甜蜜點** — < 10 太緊、< 12 只改善 Part A 不影響 Part B、< 18 太鬆（USO-007 Att3、USO-008 Att1/3 驗證）
