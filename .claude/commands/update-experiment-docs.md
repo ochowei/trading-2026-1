@@ -40,12 +40,34 @@ Find the Part A, Part B, and Part C results sections in the EXPERIMENTS_*.md fil
 
 Match the existing table format exactly — different EXPERIMENTS_*.md files may have slightly different column structures.
 
+### Step 3.5: Update rolling window analysis summary (漸變性評估)
+
+If `trading analyze` was already run in the same session (e.g., via `/run-experiment`), use those results. Otherwise, run:
+
+```bash
+uv run trading analyze <experiment_name>
+```
+
+Update the **滾動窗口分析摘要** section in the AI_CONTEXT block. This section should be placed **after「當前最佳」and before「已證明無效」**.
+
+**Standard format** (one line per experiment):
+```
+**滾動窗口分析摘要（YYYY-MM-DD）：**
+- **<實驗ID>：** X/12 窗口正累計（最低 X%，最高 X%），勝率 X-X%，漸變性判定（ΔWR Xpp），[簡短結論]
+```
+
+**Rules:**
+- Only update/add the line for the current experiment — do NOT delete other experiments' summaries
+- Include: positive window count, min/max cumulative return, win rate range, ΔWR max jump, gradual/abrupt verdict
+- Add a brief conclusion highlighting the most important finding (e.g., regime sensitivity, trailing stop issue, best-in-class stability)
+- Update the date in parentheses to today's date
+
 ### Step 4: Update AI_CONTEXT block
 
 Read the `<!-- AI_CONTEXT_START ... AI_CONTEXT_END -->` block and update:
 
-1. **當前最佳**: If this experiment beats the current best (by cumulative return with acceptable win rate in both Part A and Part B), update to this experiment
-2. **已證明無效**: If the experiment performed poorly (negative cumulative return, or WR < 50%), add to this list with a brief explanation
+1. **當前最佳**: If this experiment beats the current best (by cumulative return with acceptable win rate in both Part A and Part B), update to this experiment. When two experiments have similar performance, prefer the one with gradual (漸變) regime stability over abrupt (突變) — gradual strategies are more trustworthy for live trading
+2. **已證明無效**: If the experiment performed poorly (negative cumulative return, or WR < 50%), add to this list with a brief explanation. Include rolling window analysis findings if available (e.g., "精準度突變 ΔWR 27pp", "11/12 窗口負累計")
 3. **已掃描的參數空間**: If new parameter values were tested, add them to the scanned range
 4. **尚未嘗試的方向**: Remove any directions that this experiment has now explored
 5. Update `last_validated` to today's date
@@ -57,6 +79,7 @@ Only update `.agents/context/cross_asset_lessons.md` if the experiment results r
 - A **new** cross-asset lesson (novel finding not covered by existing lessons)
 - A **contradiction** to an existing lesson (requires updating the lesson)
 - A **confirmation** of an existing lesson (update `derived_from` and `validated` date)
+- A **cross-asset pattern from 漸變性評估** — e.g., a strategy type consistently passes/fails gradual assessment across multiple assets, or a parameter choice (like trailing stop) consistently causes regime instability. Update the relevant lesson's evidence and `derived_from` list
 
 If no new lessons, skip this step.
 
