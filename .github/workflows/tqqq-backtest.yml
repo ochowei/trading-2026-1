@@ -52,6 +52,7 @@ on:
           - "SPY-004: spy_004_rsi2_reversal"
           - "VOO-001: voo_001_rsi2_reversal"
           - "TSM-001: tsm_001_extreme_oversold"
+          - "TSM-002: tsm_002_pullback_wr_reversal"
 
 jobs:
   backtest:
