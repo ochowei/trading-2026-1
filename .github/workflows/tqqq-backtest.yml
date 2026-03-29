@@ -66,6 +66,7 @@ on:
           - "TSM-004: tsm_004_smh_confirm"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "NVDA-001: nvda_001_extreme_oversold"
+          - "XBI-001: xbi_001_pullback_wr"
           - "XLU-001: xlu_001_pullback_wr_reversal"
 
 jobs:
