@@ -1,0 +1,283 @@
+{
+  "metadata": {
+    "execution_time": "2026-03-29T09:41:34.118244"
+  },
+  "part_a": {
+    "ticker": "FCX",
+    "total_signals": 11,
+    "wins": 8,
+    "win_rate": 0.7272727272727273,
+    "avg_return_pct": 4.74,
+    "std_return_pct": 8.85,
+    "cumulative_return_pct": 59.5,
+    "avg_holding_days": 11.9,
+    "max_drawdown_pct": -19.54,
+    "profit_factor": 2.87,
+    "sharpe_ratio": 0.54,
+    "sortino_ratio": 0.9,
+    "calmar_ratio": 0.24,
+    "max_consecutive_losses": 1,
+    "target_exits": 8,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-05-21",
+        "entry_date": "2019-05-22",
+        "exit_date": "2019-06-18",
+        "entry": 9.42,
+        "exit": 10.37,
+        "return_pct": 10.0,
+        "holding_days": 18,
+        "exit_type": "target",
+        "max_drawdown_pct": -7.48
+      },
+      {
+        "date": "2019-08-16",
+        "entry_date": "2019-08-19",
+        "exit_date": "2019-09-12",
+        "entry": 8.62,
+        "exit": 9.49,
+        "return_pct": 10.0,
+        "holding_days": 17,
+        "exit_type": "target",
+        "max_drawdown_pct": -7.98
+      },
+      {
+        "date": "2019-10-03",
+        "entry_date": "2019-10-04",
+        "exit_date": "2019-10-17",
+        "entry": 8.23,
+        "exit": 9.05,
+        "return_pct": 10.0,
+        "holding_days": 9,
+        "exit_type": "target",
+        "max_drawdown_pct": -5.21
+      },
+      {
+        "date": "2020-02-28",
+        "entry_date": "2020-03-02",
+        "exit_date": "2020-03-09",
+        "entry": 9.39,
+        "exit": 8.25,
+        "return_pct": -12.13,
+        "holding_days": 5,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -19.54
+      },
+      {
+        "date": "2021-06-17",
+        "entry_date": "2021-06-18",
+        "exit_date": "2021-06-25",
+        "entry": 32.58,
+        "exit": 35.84,
+        "return_pct": 10.0,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.88
+      },
+      {
+        "date": "2021-07-19",
+        "entry_date": "2021-07-20",
+        "exit_date": "2021-07-26",
+        "entry": 30.42,
+        "exit": 33.46,
+        "return_pct": 10.0,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": 3.21
+      },
+      {
+        "date": "2022-01-28",
+        "entry_date": "2022-01-31",
+        "exit_date": "2022-02-02",
+        "entry": 33.97,
+        "exit": 37.37,
+        "return_pct": 10.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 4.12
+      },
+      {
+        "date": "2022-04-25",
+        "entry_date": "2022-04-26",
+        "exit_date": "2022-05-09",
+        "entry": 39.3,
+        "exit": 34.53,
+        "return_pct": -12.13,
+        "holding_days": 9,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -14.93
+      },
+      {
+        "date": "2022-07-01",
+        "entry_date": "2022-07-05",
+        "exit_date": "2022-07-29",
+        "entry": 26.37,
+        "exit": 29.0,
+        "return_pct": 10.0,
+        "holding_days": 18,
+        "exit_type": "target",
+        "max_drawdown_pct": -10.55
+      },
+      {
+        "date": "2023-09-27",
+        "entry_date": "2023-09-28",
+        "exit_date": "2023-11-03",
+        "entry": 35.84,
+        "exit": 34.54,
+        "return_pct": -3.63,
+        "holding_days": 25,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -10.44
+      },
+      {
+        "date": "2023-10-23",
+        "entry_date": "2023-10-24",
+        "exit_date": "2023-11-20",
+        "entry": 32.68,
+        "exit": 35.95,
+        "return_pct": 10.0,
+        "holding_days": 19,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.53
+      }
+    ],
+    "filled_count": 11,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "FCX",
+    "total_signals": 4,
+    "wins": 3,
+    "win_rate": 0.75,
+    "avg_return_pct": 2.49,
+    "std_return_pct": 9.04,
+    "cumulative_return_pct": 8.53,
+    "avg_holding_days": 11.0,
+    "max_drawdown_pct": -14.13,
+    "profit_factor": 1.82,
+    "sharpe_ratio": 0.28,
+    "sortino_ratio": 0.41,
+    "calmar_ratio": 0.18,
+    "max_consecutive_losses": 1,
+    "target_exits": 2,
+    "stop_loss_exits": 1,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-07-25",
+        "entry_date": "2024-07-26",
+        "exit_date": "2024-08-05",
+        "entry": 44.58,
+        "exit": 39.17,
+        "return_pct": -12.13,
+        "holding_days": 6,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -14.13
+      },
+      {
+        "date": "2024-12-30",
+        "entry_date": "2024-12-31",
+        "exit_date": "2025-02-10",
+        "entry": 37.51,
+        "exit": 38.29,
+        "return_pct": 2.08,
+        "holding_days": 25,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -8.26
+      },
+      {
+        "date": "2025-04-07",
+        "entry_date": "2025-04-08",
+        "exit_date": "2025-04-22",
+        "entry": 31.27,
+        "exit": 34.4,
+        "return_pct": 10.0,
+        "holding_days": 9,
+        "exit_type": "target",
+        "max_drawdown_pct": -8.67
+      },
+      {
+        "date": "2025-09-26",
+        "entry_date": "2025-09-29",
+        "exit_date": "2025-10-03",
+        "entry": 36.18,
+        "exit": 39.8,
+        "return_pct": 10.0,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.19
+      }
+    ],
+    "filled_count": 4,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "FCX",
+    "total_signals": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": 0.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 0.0,
+    "avg_holding_days": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 0.0,
+    "calmar_ratio": 0.0,
+    "max_consecutive_losses": 0,
+    "target_exits": 0,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [],
+    "filled_count": 0,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 0.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-03-27"
+    }
+  }
+}
