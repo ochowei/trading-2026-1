@@ -41,6 +41,7 @@ on:
           - "FCX-003: fcx_003_optimized_exit"
           - "SOXL-001: soxl_001_extreme_oversold"
           - "SOXL-002: soxl_002_deep_oversold"
+          - "SOXL-003: soxl_003_wide_sl"
           - "USO-001: uso_001_pullback_wr"
           - "USO-005: uso_005_symmetric_tight"
           - "USO-007: uso_007_sharp_pullback"
