@@ -192,7 +192,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, TSM-004]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, TSM-004]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -202,7 +202,7 @@
 |------|----------|----------|---------|----------|-------------|
 | TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing |
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波。GLD-006/007 滾動分析均 12/12 窗口全正、雙漸變通過，GLD-007 的 close position 過濾使低谷期累計從 +0.41% 提升至 +9.52% |
-| SIVR | SIVR-003 | 回調 + Williams %R | ~6 | 60.6%/63.6% | 波動度縮放、禁用 trailing stop。SIVR-004 驗證 RSI(2) 替換 WR(10) 失敗，WR(10) 寬視角更適合 SIVR 高波動 |
+| SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-005 Att1 驗證成交量過濾對 SIVR 無效（跨資產教訓 #6 再確認） |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號，滾動分析 12/12 窗口正累計（最低+13.05%），近期虧損收窄但差點成功比例升高。FCX-003 驗證 SL收窄/延長持倉/ClosePos過濾均無效，已確認為全域最優 |
 | USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗，已確認為全域最優）。USO-012 滾動分析：11/12 窗口正累計、**唯一雙漸變通過實驗**（精準度+績效均漸變）。USO-009/010 滾動分析驗證回檔上限的必要性：無上限（USO-009）最差窗口 -13.60%，加 7-12%（USO-010）改善至 -7.50%，加 7-13%（USO-012）改善至 -3.86% |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12%。SPY-002 滾動分析：8/12 窗口正累計，熊市底線勝率 40%（優於 SPY-004 的 20%），底線保護較好但回報較低 |
@@ -215,7 +215,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -262,6 +262,8 @@
 37. **FCX SL -12% 是底線不可收窄** — -10% 將可恢復的 -10%~-12% 深跌轉為停損（2019-08-09: +10%→-10%），FCX 日波動 2-4% 需要寬停損呼吸空間（FCX-003 Att1 驗證）
 38. **延長持倉期是雙面刃** — 可讓慢速反彈達標（FCX 2023-05-04: +8.95%→+10%），但對持續下跌的交易加深虧損（FCX 2024-07-24: -0.59%→-8.00%），淨效果通常為負（FCX-003 Att2 驗證）
 39. **Close Position 過濾在個股極端超賣信號上不可預測** — 與 GLD-007 不同，FCX 的極端超賣日常伴隨低 close position，加入 ClosePos≥40% 改變訊號日期而非移除壞訊號，Part B Sharpe 0.74→0.28（FCX-003 Att3 驗證）
+40. **成交量過濾對 SIVR 無效** — Volume ≥ 1.2x 20日均量使 Part A Sharpe 改善（0.18→0.25）但 Part B 訊號 11→7、Sharpe 0.26→0.12。低量日和高量日的訊號品質分布相似，過濾器移除 4 筆 Part B 好訊號。再次確認教訓 #6（SIVR-005 Att1 驗證）
+41. **SIVR 回檔上限 13% 與 15% 等價** — 歷史回檔訊號分布在 7-12% 和 15%+ 兩個區間，13-15% 無訊號。選擇 15% 更保守（SIVR-005 Att3 驗證）
 
 ---
 

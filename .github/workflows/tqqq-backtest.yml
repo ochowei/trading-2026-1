@@ -33,6 +33,7 @@ on:
           - "SIVR-002: sivr_002_trailing_stop"
           - "SIVR-003: sivr_003_pullback_wr"
           - "SIVR-004: sivr_004_rsi2_pullback"
+          - "SIVR-005: sivr_005_capped_pullback_wr"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
