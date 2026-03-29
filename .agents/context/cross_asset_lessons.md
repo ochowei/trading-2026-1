@@ -114,8 +114,8 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020]
-  validated: 2026-03-28
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004]
+  validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
 -->
@@ -130,6 +130,7 @@
 | USO-018 Att3 | 累積 RSI(2) 2日 < 25 | Part B 訊號 12 → 9，Sharpe 0.82 → 0.60 |
 | USO-019 Att3 | ADX(14) < 25 趨勢強度 | Part B 訊號 12 → 10，Sharpe 0.82 → 0.68 |
 | USO-020 Att1 | 20日實現波動率 < 45% | Part B 訊號 12 → 11，Sharpe 0.82 → 0.75 |
+| TSM-004 Att1 | SMH 回檔 ≥5% 板塊確認 | Part A 訊號 11 → 8，Sharpe 0.23 → 0.06；Part B 訊號 4 → 3，Sharpe 0.32 → -0.29 |
 
 **例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。
 
@@ -190,7 +191,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, FCX-001, FCX-002, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, TSM-004]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -206,14 +207,15 @@
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12%。SPY-002 滾動分析：8/12 窗口正累計，熊市底線勝率 40%（優於 SPY-004 的 20%），底線保護較好但回報較低 |
 | DIA | DIA-002 | RSI(2) 極端超賣 + 固定 TP/SL | ~2.8/2.0 | 57.1%/75% | RSI(2)<10 + 2日跌幅≥1.5%，Part A +5.67%/Part B +4.89%（A/B 平衡優秀），固定 TP/SL 優於追蹤停損 |
 | SOXL | SOXL-002 | 深度超賣買入 | ~2.6/4.5 | 38.5%/44.4% | 回撤 -25% + TP +15% 改善盈虧比至 1.25:1，Part A -20.48%/Part B -8.17%（vs SOXL-001 -38.89%/-15.44%），PF 0.86/0.99 接近損益平衡。仍為負報酬，3x 槓桿 ETF 均值回歸的根本限制 |
+| TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020]
-  validated: 2026-03-28
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004]
+  validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
 -->
@@ -253,6 +255,9 @@
 31. **實現波動率過濾無法區分 USO 好壞訊號** — 停損交易 avg vol 35.1% vs 達標交易 35.9%，vol momentum（vol10/vol20）avg 1.04 vs 1.05，完全重疊（USO-020 Att1 驗證）
 32. **回復日進場要求與均值回歸進場條件衝突** — RSI(2) < 15 + 2日跌幅 ≤ -2.5% 意味著訊號日幾乎必然是下跌日，要求 Close > Prev Close 後訊號歸零（USO-020 Att2 驗證）
 33. **2日跌幅條件對 USO 訊號品質至關重要不可省略** — 移除 2日跌幅並收緊 RSI 至 < 12 雖增加訊號但引入低品質交易，Part B Sharpe 0.82→0.61，連續虧損 2→4（USO-020 Att3 驗證）
+34. **板塊指數確認（SMH）對個股（TSM）無效** — SMH 回檔是 TSM 回檔的弱化版本，過濾器只移除好訊號（11→8），Part A Sharpe 0.23→0.06（TSM-004 Att1 驗證）
+35. **TSM TP +7% 是硬上限** — +8% 導致原本達標交易變成停損或到期，Part B Sharpe 0.32→-0.29。類似 USO TP +3.0% 硬上限現象（TSM-004 Att1/Att2 驗證）
+36. **TSM 10日回檔上限 -20% 無作用** — TSM 所有訊號均在 -10% 到 -20% 之間，不同於 USO 有極端崩盤（負油價），TSM 極端事件表現為持續下跌而非單日暴跌（TSM-004 Att3 驗證）
 
 ---
 
