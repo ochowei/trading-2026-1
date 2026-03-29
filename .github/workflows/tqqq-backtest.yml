@@ -32,10 +32,13 @@ on:
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "SIVR-003: sivr_003_pullback_wr"
+          - "SIVR-004: sivr_004_rsi2_pullback"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
+          - "DIA-002: dia_002_rsi2_reversal"
           - "FCX-002: fcx_002_pullback_wr"
           - "SOXL-001: soxl_001_extreme_oversold"
+          - "SOXL-002: soxl_002_deep_oversold"
           - "USO-001: uso_001_pullback_wr"
           - "USO-005: uso_005_symmetric_tight"
           - "USO-007: uso_007_sharp_pullback"
@@ -47,6 +50,9 @@ on:
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
           - "SPY-004: spy_004_rsi2_reversal"
+          - "VOO-001: voo_001_rsi2_reversal"
+          - "TSM-001: tsm_001_extreme_oversold"
+          - "TSM-002: tsm_002_pullback_wr_reversal"
 
 jobs:
   backtest:
