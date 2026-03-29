@@ -41,7 +41,7 @@
 1. **設計新實驗以取得更好結果**
    - 閱讀各標的既有實驗的 AI Agent 快速索引
    - 針對各標的，根據已有實驗的教訓與未嘗試方向，設計並執行新實驗
-   - 將實驗中學到的知識更新至各 EXPERIMENTS_*.md 的 AI Agent 快速索引，以及 `.agents/context/cross_asset_lessons.md`
+   - 將實驗中學到的知識更新至各 EXPERIMENTS_*.md（包含其 AI Agent 快速索引），以及 `.agents/context/cross_asset_lessons.md`
 
 2. **彙整各標的最佳實驗結果至 Trading Followup**
    - 取得每個標的目前表現最好的實驗
