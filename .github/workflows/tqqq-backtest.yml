@@ -32,6 +32,7 @@ on:
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "SIVR-003: sivr_003_pullback_wr"
+          - "SIVR-004: sivr_004_rsi2_pullback"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
