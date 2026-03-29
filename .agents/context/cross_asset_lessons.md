@@ -193,7 +193,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001]
   validated: 2026-03-29
   data_through: 2025-12-31
   confidence: high
@@ -211,6 +211,7 @@
 | VOO | VOO-002 | RSI(2) 非對稱出場 | ~2.8/2.0 | 78.6%/75% | 同 VOO-001 進場（= SPY-004），非對稱出場 SL -3.0%/20d，Part A Sharpe 0.54/Part B 0.45。VOO-002 驗證 SL -3.5%（過寬）、SL -3.0%/15d（短持倉損失 WR）均不如 SL -3.0%/20d |
 | SOXL | SOXL-005 | 回撤範圍限制 + 2日急跌 | ~2.6/5.0 | 53.8%/60.0% | 回撤 [-40%,-25%] + RSI(5)<25 + 2日跌幅≤-8%，TP +18%/SL -12%/20天。Part A +69.11%/Sharpe 0.36，Part B +43.39%/Sharpe 0.33，PF 2.10/1.96。回撤上限 -40% 過濾極端崩盤，2日跌幅取代成交量（更直接衡量恐慌賣壓）。A/B 訊號比 1.3:1，Sharpe 差距僅 0.03（極佳平衡） |
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
+| IWM | IWM-001 | RSI(2) 非對稱寬停損 | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+3.0%/SL-4.5%/20天。WR 完美 A/B 平衡，SL -4.5% 是關鍵（-3.5% 使 Part A 為負）。Part A Sharpe 0.20/Part B 0.13 |
 
 ---
 
