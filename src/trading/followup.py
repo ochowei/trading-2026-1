@@ -50,8 +50,8 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "spy_002_no_trailing",
-        "label": "SPY-002",
+        "experiment_name": "spy_004_rsi2_reversal",
+        "label": "SPY-004",
         "ticker": "SPY",
         "has_trailing_stop": False,
     },
