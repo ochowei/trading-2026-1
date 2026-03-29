@@ -55,6 +55,12 @@ STRATEGIES = [
         "ticker": "SPY",
         "has_trailing_stop": False,
     },
+    {
+        "experiment_name": "uso_013_tight_cap",
+        "label": "USO-013",
+        "ticker": "USO",
+        "has_trailing_stop": False,
+    },
 ]
 
 LOOKBACK_TRADING_DAYS = 60
