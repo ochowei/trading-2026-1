@@ -114,5 +114,6 @@ src/trading/
 - SPY 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SPY.md](src/trading/experiments/EXPERIMENTS_SPY.md)
 - DIA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_DIA.md](src/trading/experiments/EXPERIMENTS_DIA.md)
 - VOO 實驗總覽 → [src/trading/experiments/EXPERIMENTS_VOO.md](src/trading/experiments/EXPERIMENTS_VOO.md)
+- TSM 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TSM.md](src/trading/experiments/EXPERIMENTS_TSM.md)
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
 - 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
