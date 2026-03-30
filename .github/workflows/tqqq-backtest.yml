@@ -39,6 +39,7 @@ on:
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
           - "DIA-003: dia_003_rsi2_bb"
+          - "DIA-004: dia_004_wider_tp"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
           - "SOXL-001: soxl_001_extreme_oversold"
