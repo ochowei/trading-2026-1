@@ -1,11 +1,11 @@
 """
-COPX-002 訊號偵測器：20日回檔 + Williams %R 均值回歸
-(COPX-002 Signal Detector: 20-Day Pullback + Williams %R Mean Reversion)
+COPX-002 訊號偵測器：回檔 10-18% + Williams %R 均值回歸
+(COPX-002 Signal Detector: Pullback 10-18% + Williams %R Mean Reversion)
 
 進場條件（全部滿足）：
-1. 收盤價相對 20 日最高價回檔 10-20%（過濾淺回檔與極端崩盤）
+1. 收盤價相對 10 日最高價回檔 10-18%（比 COPX-001 的 9% 更嚴格）
 2. Williams %R(10) ≤ -80（超賣確認）
-3. 冷卻期 12 個交易日
+3. 冷卻期 10 個交易日
 """
 
 import logging
@@ -13,15 +13,15 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.experiments.copx_002_deep_drawdown.config import COPXDeepDrawdownConfig
+from trading.experiments.copx_002_deep_drawdown.config import COPX002Config
 
 logger = logging.getLogger(__name__)
 
 
-class COPXDeepDrawdownSignalDetector(BaseSignalDetector):
-    """COPX 20日回檔 + Williams %R 訊號偵測器"""
+class COPX002Detector(BaseSignalDetector):
+    """COPX 回檔 10-18% + WR 訊號偵測器"""
 
-    def __init__(self, config: COPXDeepDrawdownConfig):
+    def __init__(self, config: COPX002Config):
         self.config = config
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -73,5 +73,5 @@ class COPXDeepDrawdownSignalDetector(BaseSignalDetector):
             logger.info("COPX: %d duplicate signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
-        logger.info("COPX: Detected %d 20-day pullback+WR signals", signal_count)
+        logger.info("COPX: Detected %d Pullback(10-18%%)+WR signals", signal_count)
         return df

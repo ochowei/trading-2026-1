@@ -1,25 +1,24 @@
 """
-COPX-002: 20日回檔 + Williams %R + 延長持倉 均值回歸策略
-(COPX 20-Day Pullback + Williams %R + Extended Holding Strategy)
+COPX-002: 回檔 10-18% + Williams %R 均值回歸策略
+(COPX Pullback 10-18% + WR Mean Reversion Strategy)
 
-相比 COPX-001：使用 20 日回看窗口（vs 10 日）確認更深的回檔，
-搭配 20 天持倉（vs 15 天）給予更充裕的反彈時間。
+基於 COPX-001 架構，收緊回檔下限至 10% 以移除低品質淺回檔訊號。
 """
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_002_deep_drawdown.config import (
-    COPXDeepDrawdownConfig,
+    COPX002Config,
     create_default_config,
 )
 from trading.experiments.copx_002_deep_drawdown.signal_detector import (
-    COPXDeepDrawdownSignalDetector,
+    COPX002Detector,
 )
 
 
 class COPXDeepDrawdownStrategy(ExecutionModelStrategy):
-    """COPX-002：20日回檔 + Williams %R + 延長持倉"""
+    """COPX-002：回檔 10-18% + WR 均值回歸"""
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
 
@@ -27,10 +26,10 @@ class COPXDeepDrawdownStrategy(ExecutionModelStrategy):
         return create_default_config()
 
     def create_detector(self) -> BaseSignalDetector:
-        return COPXDeepDrawdownSignalDetector(create_default_config())
+        return COPX002Detector(create_default_config())
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
-        if isinstance(config, COPXDeepDrawdownConfig):
+        if isinstance(config, COPX002Config):
             print(
                 f"  回檔範圍 (Pullback): {config.pullback_lookback} 日高點回檔"
                 f" {abs(config.pullback_threshold):.0%}-{abs(config.pullback_upper):.0%}"
