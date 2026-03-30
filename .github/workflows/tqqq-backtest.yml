@@ -65,6 +65,7 @@ on:
           - "TSM-003: tsm_003_rsi2_reversal"
           - "TLT-001: tlt_001_pullback_wr_reversal"
           - "TSLA-001: tsla_001_extreme_oversold"
+          - "TSLA-002: tsla_002_wider_exit"
           - "TSM-004: tsm_004_smh_confirm"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
