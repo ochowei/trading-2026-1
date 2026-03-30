@@ -193,7 +193,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, XBI-001, XBI-002-failed, COPX-001, URA-001, URA-002, IBIT-001]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, XBI-001, XBI-002-failed, COPX-001, COPX-002, URA-001, URA-002, IBIT-001]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -213,7 +213,7 @@
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
 | IWM | IWM-001 | RSI(2) 非對稱寬停損 | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+3.0%/SL-4.5%/20天。WR 完美 A/B 平衡，SL -4.5% 是關鍵（-3.5% 使 Part A 為負）。Part A Sharpe 0.20/Part B 0.13。IWM-002 驗證回檔+WR 架構不適用（Part A Sharpe 最高 0.07，3 次嘗試均劣於 RSI(2) 框架） |
 | XBI | XBI-001 | 回檔範圍 + Williams %R | ~7.2/5.0 | 63.9%/70.0% | 回檔 8-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.23 優於 Part A 0.11（無過擬合），回檔上限 20% 過濾極端崩盤。3 次改進嘗試均失敗：2日急跌過濾移除好訊號（Att1/2）、RSI(2) 框架 Part B WR 44.4%（Att3），已確認為全域最優 |
-| COPX | COPX-001 | 回檔範圍 + Williams %R | ~6.0/5.0 | 63.3%/70.0% | 回檔 9-18% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.36 遠優於 Part A 0.08（無過擬合），A/B 訊號比 1.2:1（優秀）。初始 8% 門檻 Sharpe 0.00（恰在盈虧平衡線），1% 提升至 9% 後顯著改善 |
+| COPX | COPX-002 | 20日回檔 + Williams %R | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/20天。Part A Sharpe 0.34/Part B 0.30（A/B 比 1.13x，近乎完美平衡）。20日回看是關鍵改進（vs COPX-001 的 10日），Part A Sharpe 從 0.08 提升至 0.34（+325%），Part B 僅微降 0.36→0.30。60日回撤三重條件架構（FCX-001 風格）已驗證不適用 COPX |
 | URA | URA-002 | 回檔範圍 + Williams %R + 非對稱出場 | ~4.8/8.0 | 62.5%/62.5% | 回檔 10-20% + WR(10)≤-80，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.28/Part B 0.29（A/B 幾乎一致，極佳平衡）。SL 從 -6.0% 收窄至 -5.5% 是純粹改善（WR 不變，每筆虧損降低 0.5%）。SL -5.0% 太緊（一筆可恢復交易被停損），回檔收窄 10-15% 損害 Part B（3 筆好訊號被移除） |
 | IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1） |
 
