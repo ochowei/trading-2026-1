@@ -193,7 +193,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -213,7 +213,7 @@
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
 | IWM | IWM-003 | RSI(2) 非對稱寬停損 + TP優化 | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+3.5%/SL-4.5%/20天。TP 從 +3.0% 提升至 +3.5% 是純粹改善：Part A Sharpe 0.20→0.28（+40%），Part B 0.13→0.21（+62%），WR 不變。SL -4.5% 是關鍵（-3.5% 使 Part A 為負）。IWM-003 Att2 驗證 25天持倉拉大 A/B 差距（1.76:1），Att3 驗證 2d≥3.0% 收緊進場使 Part B 僅 3 筆 |
 | XBI | XBI-001 | 回檔範圍 + Williams %R | ~7.2/5.0 | 63.9%/70.0% | 回檔 8-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.23 優於 Part A 0.11（無過擬合），回檔上限 20% 過濾極端崩盤。3 次改進嘗試均失敗：2日急跌過濾移除好訊號（Att1/2）、RSI(2) 框架 Part B WR 44.4%（Att3），已確認為全域最優 |
-| COPX | COPX-001 | 回檔範圍 + Williams %R | ~6.0/5.0 | 63.3%/70.0% | 回檔 9-18% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.36 遠優於 Part A 0.08（無過擬合），A/B 訊號比 1.2:1（優秀）。初始 8% 門檻 Sharpe 0.00（恰在盈虧平衡線），1% 提升至 9% 後顯著改善。COPX-002（回檔 10-18%）A/B 更平衡（Sharpe gap 0.07 vs 0.28）但平均 Sharpe 較低（0.175 vs 0.22）。60日回撤架構、2日跌幅過濾均失敗 |
+| COPX | COPX-003 | 20日回檔範圍 + Williams %R + 出場優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.39/Part B 0.35（A/B gap 僅 0.04，極佳平衡）。20日回看框架 + SL 收窄是關鍵突破（vs COPX-001 Part A 0.08→0.39）。COPX-004 驗證回檔 9-20%（Part A 劣化）、15天持倉（Part B WR 降 9pp）、冷卻 10天（無效果）均失敗，已確認為全域最優 |
 | URA | URA-001 | 回檔範圍 + Williams %R | ~4.8/8.0 | 62.5%/62.5% | 回檔 10-20% + WR(10)≤-80，TP+6.0%/SL-6.0%/20天。Part A Sharpe 0.23/Part B 0.25（A/B 幾乎一致，極佳平衡）。對稱出場（盈虧平衡 WR=50%），10% 回檔門檻比 8% 顯著改善（WR 51%→62.5%），TP+6% 是甜蜜點（+7% Part A 崩潰） |
 | NVDA | NVDA-001 | RSI(2) 極端超賣 + 2日急跌 | ~1.2/2.0 | 66.7%/75.0% | RSI(2)<5 + 2日跌幅≤-7%，TP+8%/SL-10%/15天。Part A Sharpe 0.23/Part B 0.44（無過擬合）。NVDA-002 驗證回撤過濾（移除好訊號）、TP+10%（翻轉邊際交易）、SL-12%（更大虧損抵銷救回交易）均失敗，已確認為全域最優。訊號極稀少（1.2/年），統計可信度有限 |
 | IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2) 替代 WR（訊號日期偏移）、2日跌幅+RSI 過嚴、SL-6% 翻轉勝負均失敗，已確認為全域最優 |
