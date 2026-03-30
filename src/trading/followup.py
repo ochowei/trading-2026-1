@@ -26,16 +26,16 @@ logger = logging.getLogger(__name__)
 # 各標的最佳策略 (Best strategy per ticker)
 STRATEGIES = [
     {
-        "experiment_name": "tqqq_010_cap_exec_optimized",
-        "label": "TQQQ-010",
-        "ticker": "TQQQ",
+        "experiment_name": "copx_001_pullback_wr",
+        "label": "COPX-001",
+        "ticker": "COPX",
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "gld_007_pullback_wr_reversal",
-        "label": "GLD-007",
-        "ticker": "GLD",
-        "has_trailing_stop": True,
+        "experiment_name": "dia_003_rsi2_bb",
+        "label": "DIA-003",
+        "ticker": "DIA",
+        "has_trailing_stop": False,
     },
     {
         "experiment_name": "fcx_001_extreme_oversold",
@@ -44,9 +44,33 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "sivr_003_pullback_wr",
-        "label": "SIVR-003",
+        "experiment_name": "gld_006_pullback_wr",
+        "label": "GLD-006",
+        "ticker": "GLD",
+        "has_trailing_stop": True,
+    },
+    {
+        "experiment_name": "iwm_001_rsi2_reversal",
+        "label": "IWM-001",
+        "ticker": "IWM",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "nvda_001_extreme_oversold",
+        "label": "NVDA-001",
+        "ticker": "NVDA",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "sivr_006_closepos_pullback_wr",
+        "label": "SIVR-006",
         "ticker": "SIVR",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "soxl_005_capped_drawdown",
+        "label": "SOXL-005",
+        "ticker": "SOXL",
         "has_trailing_stop": False,
     },
     {
@@ -56,9 +80,45 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "uso_013_tight_cap",
-        "label": "USO-013",
+        "experiment_name": "tqqq_012_cap_exec_qqq_confirm",
+        "label": "TQQQ-012",
+        "ticker": "TQQQ",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "tsm_002_pullback_wr_reversal",
+        "label": "TSM-002",
+        "ticker": "TSM",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "ura_001_pullback_wr",
+        "label": "URA-001",
+        "ticker": "URA",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "uso_009_momentum_pullback",
+        "label": "USO-009",
         "ticker": "USO",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "voo_002_asymmetric_exit",
+        "label": "VOO-002",
+        "ticker": "VOO",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "xbi_001_pullback_wr",
+        "label": "XBI-001",
+        "ticker": "XBI",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "xlu_001_pullback_wr_reversal",
+        "label": "XLU-001",
+        "ticker": "XLU",
         "has_trailing_stop": False,
     },
 ]
