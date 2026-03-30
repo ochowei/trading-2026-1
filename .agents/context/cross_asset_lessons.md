@@ -193,8 +193,8 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, XBI-001, COPX-001, URA-001]
-  validated: 2026-03-29
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, XBI-001, COPX-001, URA-001, IBIT-001]
+  validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
 -->
@@ -215,6 +215,7 @@
 | XBI | XBI-001 | 回檔範圍 + Williams %R | ~7.2/5.0 | 63.9%/70.0% | 回檔 8-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.23 優於 Part A 0.11（無過擬合），回檔上限 20% 過濾極端崩盤。初始 6% 無上限失敗（Part A -14.86%） |
 | COPX | COPX-001 | 回檔範圍 + Williams %R | ~6.0/5.0 | 63.3%/70.0% | 回檔 9-18% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.36 遠優於 Part A 0.08（無過擬合），A/B 訊號比 1.2:1（優秀）。初始 8% 門檻 Sharpe 0.00（恰在盈虧平衡線），1% 提升至 9% 後顯著改善 |
 | URA | URA-001 | 回檔範圍 + Williams %R | ~4.8/8.0 | 62.5%/62.5% | 回檔 10-20% + WR(10)≤-80，TP+6.0%/SL-6.0%/20天。Part A Sharpe 0.23/Part B 0.25（A/B 幾乎一致，極佳平衡）。對稱出場（盈虧平衡 WR=50%），10% 回檔門檻比 8% 顯著改善（WR 51%→62.5%），TP+6% 是甜蜜點（+7% Part A 崩潰） |
+| IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1） |
 
 ---
 

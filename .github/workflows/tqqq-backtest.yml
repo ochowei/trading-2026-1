@@ -71,6 +71,7 @@ on:
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "COPX-001: copx_001_pullback_wr"
           - "URA-001: ura_001_pullback_wr"
+          - "IBIT-001: ibit_001_pullback_wr"
 
 jobs:
   backtest:
