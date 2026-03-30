@@ -193,7 +193,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, XBI-001, XBI-002-failed, COPX-001, COPX-002, URA-001, URA-002, IBIT-001]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, URA-001, URA-002, IBIT-001]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -213,7 +213,7 @@
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
 | IWM | IWM-003 | RSI(2) 非對稱寬停損 + TP優化 | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+3.5%/SL-4.5%/20天。TP 從 +3.0% 提升至 +3.5% 是純粹改善：Part A Sharpe 0.20→0.28（+40%），Part B 0.13→0.21（+62%），WR 不變。SL -4.5% 是關鍵（-3.5% 使 Part A 為負）。IWM-003 Att2 驗證 25天持倉拉大 A/B 差距（1.76:1），Att3 驗證 2d≥3.0% 收緊進場使 Part B 僅 3 筆 |
 | XBI | XBI-001 | 回檔範圍 + Williams %R | ~7.2/5.0 | 63.9%/70.0% | 回檔 8-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.23 優於 Part A 0.11（無過擬合），回檔上限 20% 過濾極端崩盤。3 次改進嘗試均失敗：2日急跌過濾移除好訊號（Att1/2）、RSI(2) 框架 Part B WR 44.4%（Att3），已確認為全域最優 |
-| COPX | COPX-002 | 20日回檔 + Williams %R | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/20天。Part A Sharpe 0.34/Part B 0.30（A/B 比 1.13x，近乎完美平衡）。20日回看是關鍵改進（vs COPX-001 的 10日），Part A Sharpe 從 0.08 提升至 0.34（+325%），Part B 僅微降 0.36→0.30。60日回撤三重條件架構（FCX-001 風格）已驗證不適用 COPX |
+| COPX | COPX-003 | 20日回檔 + Williams %R + SL優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天。Part A Sharpe 0.39/Part B 0.35（A/B 比 1.11x，近乎完美平衡）。SL 從 -5.0% 收窄至 -4.5% 是純粹改善（WR 不變，每筆虧損降低 0.5%），SL -4.0% 太緊翻轉 Part B 好交易。TP +4.0% 不可行（Part A 退化 26%） |
 | URA | URA-002 | 回檔範圍 + Williams %R + 非對稱出場 | ~4.8/8.0 | 62.5%/62.5% | 回檔 10-20% + WR(10)≤-80，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.28/Part B 0.29（A/B 幾乎一致，極佳平衡）。SL 從 -6.0% 收窄至 -5.5% 是純粹改善（WR 不變，每筆虧損降低 0.5%）。SL -5.0% 太緊（一筆可恢復交易被停損），回檔收窄 10-15% 損害 Part B（3 筆好訊號被移除） |
 | IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1） |
 
@@ -222,7 +222,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -276,6 +276,8 @@
 44. **SOXL TP +18% 是甜蜜點** — 盈虧比 1.5:1（平衡點 WR 40%），所有歷史贏利交易均能達標 +18%，Part A/B 首次雙正報酬（SOXL-003 Att3 驗證）
 45. **URA SL -5.5% 是甜蜜點** — 從 -6.0% 收窄至 -5.5% 是純粹改善：Part A/B Sharpe 0.23/0.25→0.28/0.29，WR 不變（62.5%/62.5%），累計 +32.85%/+22.84%→+39.36%/+26.81%。SL -5.0% 太緊（一筆 2021-01-22 交易被提前停損，Part A WR 58.3%）（URA-002 驗證）
 46. **URA 回檔上限 15% 嚴格劣於 20%** — Part B 損失 3 筆好訊號（回檔 15-20%），Sharpe 0.29→0.16。URA 歷史回檔分布較均勻（不像 USO 有極端崩盤），收窄無助品質（URA-002 Att2 驗證）
+47. **COPX SL -4.5% 是甜蜜點** — 從 -5.0% 收窄至 -4.5% 是純粹改善：Part A/B Sharpe 0.34/0.30→0.39/0.35，WR 不變（74.2%/72.7%），累計 +44.64%/+12.40%→+50.85%/+14.19%。SL -4.0% 太緊（Part B 2 筆好交易被提前停損，WR 72.7%→54.5%，Sharpe 0.01）。類似 URA-002 的 SL 收窄模式（COPX-003 驗證）
+48. **COPX TP +4.0% 不可行** — 2 筆 Part A 達標交易無法觸及 +4.0%（變為到期/停損），Part A Sharpe 0.34→0.25（-26%），Part B 改善至 0.34 但不足以補償。TP +3.5% 是 COPX 的硬上限（COPX-003 Att1 驗證）
 
 ---
 
