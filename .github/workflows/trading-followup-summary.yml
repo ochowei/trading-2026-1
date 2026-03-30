@@ -27,7 +27,7 @@ jobs:
           {
             echo "### Trading Followup Report"
             echo "**Run time:** \`$(TZ='America/New_York' date '+%Y-%m-%d %H:%M ET')\`"
-            echo "**Strategies:** COPX-001, DIA-003, FCX-001, GLD-006, IWM-001, NVDA-001, SIVR-006, SOXL-005, SPY-004, TQQQ-012, TSM-002, URA-001, USO-009, VOO-002, XBI-001, XLU-001"
+            echo "**Strategies:** COPX-001, DIA-004, FCX-001, GLD-007, IWM-001, NVDA-001, SIVR-005, SOXL-005, SPY-004, TQQQ-010, TSM-002, URA-001, USO-013, VOO-002, XBI-001, XLU-001"
             echo ""
             echo '```text'
             uv run trading followup
