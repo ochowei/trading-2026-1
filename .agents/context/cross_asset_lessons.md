@@ -114,8 +114,8 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006]
-  validated: 2026-03-29
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006, SIVR-007]
+  validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
 -->
@@ -133,6 +133,7 @@
 | TSM-004 Att1 | SMH 回檔 ≥5% 板塊確認 | Part A 訊號 11 → 8，Sharpe 0.23 → 0.06；Part B 訊號 4 → 3，Sharpe 0.32 → -0.29 |
 | FCX-003 Att3 | ClosePos ≥40% 反轉K線 | Part A 訊號 18 → 11，Sharpe 0.43 → 0.54（但 MDD 惡化 -15.83% → -19.54%）；Part B 訊號 5 → 4，Sharpe 0.74 → 0.28 |
 | SIVR-006 Att1 | ClosePos ≥40% 反轉K線 | Part A 訊號 32 → 26，Sharpe 0.22 → 0.12；Part B 訊號 11 → 9，Sharpe 0.26 → 0.09 |
+| SIVR-007 Att1 | RSI(14) > 5日最低值（動能回復） | Part A 訊號 32 → 19，Sharpe 0.22 → -0.08；Part B 訊號 11 → 7，Sharpe 0.26 → 0.03 |
 
 **例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。但此過濾器在高波動資產（FCX、SIVR）上失效——FCX 改變訊號日期而非移除壞訊號（FCX-003 Att3），SIVR 的高日內波動使好訊號也常收在低位（SIVR-006 Att1）。
 
@@ -193,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -203,7 +204,7 @@
 |------|----------|----------|---------|----------|-------------|
 | TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing |
 | GLD | GLD-007 | 回調 + Williams %R | ~6 | 77.4%/100% | A/B 平衡、trailing stop 有效、close position 濾波。GLD-006/007 滾動分析均 12/12 窗口全正、雙漸變通過，GLD-007 的 close position 過濾使低谷期累計從 +0.41% 提升至 +9.52% |
-| SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-005 Att1 驗證成交量過濾對 SIVR 無效（跨資產教訓 #6 再確認） |
+| SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-007 驗證 RSI 動能回復/20日回看均失敗，已確認為全域最優（9 次實驗、18 次嘗試） |
 | FCX | FCX-001 | 三重極端超賣 | ~3.6 | 72.2%/60% | 寬出場 (+10%/-12%)、稀有但精確的訊號，滾動分析 12/12 窗口正累計（最低+13.05%），近期虧損收窄但差點成功比例升高。FCX-003 驗證 SL收窄/延長持倉/ClosePos過濾均無效，已確認為全域最優 |
 | USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗，已確認為全域最優）。USO-012 滾動分析：11/12 窗口正累計、**唯一雙漸變通過實驗**（精準度+績效均漸變）。USO-009/010 滾動分析驗證回檔上限的必要性：無上限（USO-009）最差窗口 -13.60%，加 7-12%（USO-010）改善至 -7.50%，加 7-13%（USO-012）改善至 -3.86% |
 | SPY | SPY-004 | RSI(2) 極端超賣 | ~3.2/2 | 62.5%/75% | RSI(2)<10 + 2日跌幅≥1.5%、對稱 TP/SL、Part A +9.12%。SPY-002 滾動分析：8/12 窗口正累計，熊市底線勝率 40%（優於 SPY-004 的 20%），底線保護較好但回報較低 |
@@ -224,7 +225,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002, IWM-004, TLT-002]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002, IWM-004, TLT-002]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -289,6 +290,8 @@
 51. **TLT 深度回檔 5-10% 使訊號過少** — Part A 僅 10 訊號（2.0/年），Part B 僅 3 訊號無統計意義。TLT 2022 回檔多在 5-10% 範圍內，加深門檻反而保留 2022 假訊號同時大砍其他時期好訊號（TLT-002 Att1 驗證）
 52. **降低 TP 不改變 TLT 勝率** — TP 從 +2.5% 降至 +2.0%，WR 完全不變（47.6%/68.8%），只壓縮每筆利潤。TLT 的差點成功交易（到期正報酬但未達 TP）多在 +1.0%~+1.5% 範圍，降至 +2.0% 不足以轉換。類似 USO 的 TP 硬上限現象但成因不同（TLT-002 Att2 驗證）
 53. **中期跌幅過濾（60日）對 TLT 僅邊際有效** — 60 日跌幅 ≤10% 移除 10 筆 Part A 訊號但同時移除好壞訊號，Sharpe -0.21→-0.20（邊際）。Part B 完全不受影響（16→16）。TLT 的 2022 假訊號本質是利率政策驅動，純技術面過濾器無法有效區分（TLT-002 Att3 驗證）
+54. **回檔回看窗口不可跨資產直接移植** — COPX-003 的 20 日回看成功（Sharpe 0.08→0.39）不可移植到 SIVR：20 日回看使 SIVR Part A Sharpe 從 0.22 崩至 -0.00/-0.10，但 Part B 反而改善（0.26→0.28/0.42）。原因：SIVR 2019-2023 波動劇烈期頻繁出現淺回檔假訊號，20 日窗口全部捕捉；COPX 回檔分布更均勻無此問題（SIVR-007 Att2/Att3 驗證）
+55. **RSI(14) 動能回復是確認指標的變形** — 即使以「動能轉折」概念包裝（RSI > 5日最低值），本質仍是在精確訊號上加過濾，移除的好訊號多於壞訊號。SIVR Part A 32→19 訊號，WR 62.5%→52.6%（SIVR-007 Att1 驗證）
 
 ---
 

@@ -35,6 +35,7 @@ on:
           - "SIVR-004: sivr_004_rsi2_pullback"
           - "SIVR-005: sivr_005_capped_pullback_wr"
           - "SIVR-006: sivr_006_closepos_pullback_wr"
+          - "SIVR-007: sivr_007_divergence_pullback_wr"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
