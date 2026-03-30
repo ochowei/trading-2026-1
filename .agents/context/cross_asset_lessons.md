@@ -193,7 +193,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, URA-001, URA-002, IBIT-001, NVDA-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-002, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, XBI-001, XBI-002-failed, COPX-001, COPX-002, COPX-003, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -216,14 +216,14 @@
 | COPX | COPX-001 | 回檔範圍 + Williams %R | ~6.0/5.0 | 63.3%/70.0% | 回檔 9-18% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.36 遠優於 Part A 0.08（無過擬合），A/B 訊號比 1.2:1（優秀）。初始 8% 門檻 Sharpe 0.00（恰在盈虧平衡線），1% 提升至 9% 後顯著改善。COPX-002（回檔 10-18%）A/B 更平衡（Sharpe gap 0.07 vs 0.28）但平均 Sharpe 較低（0.175 vs 0.22）。60日回撤架構、2日跌幅過濾均失敗 |
 | URA | URA-001 | 回檔範圍 + Williams %R | ~4.8/8.0 | 62.5%/62.5% | 回檔 10-20% + WR(10)≤-80，TP+6.0%/SL-6.0%/20天。Part A Sharpe 0.23/Part B 0.25（A/B 幾乎一致，極佳平衡）。對稱出場（盈虧平衡 WR=50%），10% 回檔門檻比 8% 顯著改善（WR 51%→62.5%），TP+6% 是甜蜜點（+7% Part A 崩潰） |
 | NVDA | NVDA-001 | RSI(2) 極端超賣 + 2日急跌 | ~1.2/2.0 | 66.7%/75.0% | RSI(2)<5 + 2日跌幅≤-7%，TP+8%/SL-10%/15天。Part A Sharpe 0.23/Part B 0.44（無過擬合）。NVDA-002 驗證回撤過濾（移除好訊號）、TP+10%（翻轉邊際交易）、SL-12%（更大虧損抵銷救回交易）均失敗，已確認為全域最優。訊號極稀少（1.2/年），統計可信度有限 |
-| IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1） |
+| IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2) 替代 WR（訊號日期偏移）、2日跌幅+RSI 過嚴、SL-6% 翻轉勝負均失敗，已確認為全域最優 |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002]
   validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
@@ -282,6 +282,8 @@
 46. **URA 回檔上限 15% 嚴格劣於 20%** — Part B 損失 3 筆好訊號（回檔 15-20%），Sharpe 0.29→0.16。URA 歷史回檔分布較均勻（不像 USO 有極端崩盤），收窄無助品質（URA-002 Att2 驗證）
 47. **COPX SL -4.5% 是甜蜜點** — 從 -5.0% 收窄至 -4.5% 是純粹改善：Part A/B Sharpe 0.34/0.30→0.39/0.35，WR 不變（74.2%/72.7%），累計 +44.64%/+12.40%→+50.85%/+14.19%。SL -4.0% 太緊（Part B 2 筆好交易被提前停損，WR 72.7%→54.5%，Sharpe 0.01）。類似 URA-002 的 SL 收窄模式（COPX-003 驗證）
 48. **COPX TP +4.0% 不可行** — 2 筆 Part A 達標交易無法觸及 +4.0%（變為到期/停損），Part A Sharpe 0.34→0.25（-26%），Part B 改善至 0.34 但不足以補償。TP +3.5% 是 COPX 的硬上限（COPX-003 Att1 驗證）
+49. **RSI(2) 不適合 IBIT 等高波動加密 ETF** — WR(10) 的 10 日回看與回檔 lookback 結構一致，RSI(2) 產生不同訊號日期且品質更差（IBIT-002 Att1：Part B Sharpe 0.37→-0.18，失去 Nov 6 關鍵勝利交易）。高波動（日波動 3.17%）使 2 日動量極度嘈雜
+50. **IBIT SL -7% 是底線不可收窄** — SL -6% 使 Feb 26 交易從 +5%（SL-7% 下倖存反彈）翻轉為 -6.14%，Part B Sharpe 0.37→-0.10。類似 FCX SL -12% 底線現象：高波動資產需要寬 SL 呼吸空間（IBIT-002 Att3 驗證）
 
 ---
 
@@ -335,8 +337,8 @@
 ## 13. 超賣指標週期應匹配持倉週期
 
 <!-- freshness:
-  derived_from: [USO-005, USO-007, USO-009, USO-010, SPY-004, SIVR-004, TSM-003]
-  validated: 2026-03-29
+  derived_from: [USO-005, USO-007, USO-009, USO-010, SPY-004, SIVR-004, TSM-003, IBIT-002]
+  validated: 2026-03-30
   data_through: 2025-12-31
   confidence: high
 -->
@@ -349,12 +351,13 @@
 | SPY | 2-3 天 | — | RSI(2) < 10 | 直接使用 RSI(2)，Part B WR 75% |
 | SIVR | 4-7 天 | WR(10) ≤ -80 | RSI(2) < 15 | +9.69% → +5.98% (**-38%**) ❌ |
 | TSM | ~9.5 天 | WR(10) ≤ -85 | RSI(2) < 10~15 | Part A Sharpe 0.23 → **-0.36~-0.49** ❌ |
+| IBIT | ~4 天 | WR(10) ≤ -80 | RSI(2) < 12~15 | Part B Sharpe 0.37 → **-0.18** ❌ |
 
 **原因**：WR(10) 衡量 10 天內的超賣，但持倉僅 2-3 天。10 天超賣不代表 2 天後會反彈。RSI(2) 專注於 2 天動量，與持倉週期匹配，進場時機更精準。
 
-**例外**：SIVR 雖平均持倉 4-7 天，但 RSI(2) 替換 WR(10) 後 Part B 反而下降 38%。TSM-003 進一步驗證：三次嘗試（純 RSI(2)、收緊 RSI(2)、回檔+RSI(2) 混合）Part A Sharpe 均為負（-0.36~-0.49），遠遜 TSM-002 的 WR(10) 架構（+0.23）。高波動資產（日波動 >2%）中 RSI(2) 過於敏感，在熊市持續產生假訊號。WR(10) 的寬視角在高波動環境提供更穩定判斷。
+**例外**：SIVR 雖平均持倉 4-7 天，但 RSI(2) 替換 WR(10) 後 Part B 反而下降 38%。TSM-003 進一步驗證：三次嘗試（純 RSI(2)、收緊 RSI(2)、回檔+RSI(2) 混合）Part A Sharpe 均為負（-0.36~-0.49），遠遜 TSM-002 的 WR(10) 架構（+0.23）。IBIT-002 再驗證：即使平均持倉 4 天（理論上適合 RSI(2)），日波動 3.17% 使 RSI(2) 訊號日期偏移，失去關鍵勝利交易，Part B Sharpe 0.37→-0.18。高波動資產（日波動 >2%）中 RSI(2) 過於敏感，在熊市持續產生假訊號。WR(10) 的寬視角在高波動環境提供更穩定判斷。
 
-**規則**：短持倉策略（平均 ≤ 5 天）優先使用 RSI(2)，但高波動資產（日波動 > 2%）需實測驗證，WR(10) 可能更適合。
+**規則**：短持倉策略（平均 ≤ 5 天）優先使用 RSI(2)，但高波動資產（日波動 > 2%）需實測驗證，WR(10) 可能更適合。IBIT（3.17%）、SIVR（2-3%）、TSM（2-3%）均為反例。
 
 ---
 
