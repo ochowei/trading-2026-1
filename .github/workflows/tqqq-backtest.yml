@@ -71,6 +71,7 @@ on:
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
           - "NVDA-001: nvda_001_extreme_oversold"
+          - "NVDA-002: nvda_002_capped_drawdown"
           - "XBI-001: xbi_001_pullback_wr"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "COPX-001: copx_001_pullback_wr"
