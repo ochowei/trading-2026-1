@@ -62,7 +62,24 @@ Produce a ranking table:
 
 ---
 
-## Step 5: Evaluate "good enough" for followup
+## Step 5: Run gradient assessment on best experiment
+
+Run the rolling window analysis on the best experiment identified in Step 4:
+
+```bash
+uv run trading analyze <best_experiment_name>
+```
+
+From the output, extract the **漸變性評估 (Gradual Change Assessment)** verdict section. Record:
+
+- **預測精準度**: ✓ 漸變 or ✗ 突變 (WR max jump vs 20pp threshold)
+- **下游績效**: ✓ 漸變 or ✗ 突變 (cum return max jump vs 3×σ threshold)
+
+If the output shows "有效窗口不足 3 個" (insufficient windows), record as "窗口不足，無法評估".
+
+---
+
+## Step 6: Evaluate "good enough" for followup
 
 The best experiment must meet ALL of the following thresholds to qualify for Trading Followup:
 
@@ -73,6 +90,14 @@ The best experiment must meet ALL of the following thresholds to qualify for Tra
 | Part B 年均訊號 | ≥ 2 | 足夠的交易頻率 |
 | A/B 勝率差 | < 15pp | 非過擬合 |
 | 策略類型 | ExecutionModelStrategy | 有成交模型 |
+| 漸變性評估 | 預測精準度或下游績效至少一項漸變 | 策略行為非隨機突變 |
+
+**漸變性評估判定規則：**
+- 預測精準度 ✓ 且下游績效 ✓ → ✅ 通過
+- 預測精準度 ✗ 但下游績效 ✓ → ✅ 通過（勝/虧報酬互補，可接受）
+- 預測精準度 ✓ 但下游績效 ✗ → ✅ 通過（精準度穩定，出場參數可調）
+- 預測精準度 ✗ 且下游績效 ✗ → ❌ 不通過（策略行為不穩定）
+- 窗口不足無法評估 → ⚠️ 警告但不阻擋（在結論中標註需人工確認）
 
 Produce a qualification checklist:
 
@@ -86,22 +111,23 @@ Produce a qualification checklist:
 | 3 | Part B 年均訊號 ≥ 2 | ✅/❌ | X/year |
 | 4 | A/B 勝率差 < 15pp | ✅/❌ | Xpp |
 | 5 | ExecutionModelStrategy | ✅/❌ | Yes/No |
+| 6 | 漸變性評估 | ✅/❌/⚠️ | 精準度:✓/✗ 績效:✓/✗ |
 
-結論: 合格 ✅ / 不合格 ❌
+結論: 合格 ✅ / 不合格 ❌ / 合格(需人工確認漸變性) ⚠️
 ```
 
 ---
 
-## Step 6: Update followup.py (only if qualified)
+## Step 7: Update followup.py (only if qualified)
 
 If the best experiment qualifies, check `src/trading/followup.py`:
 
-### 6a. If asset already in STRATEGIES list
+### 7a. If asset already in STRATEGIES list
 - Compare with the currently listed experiment
 - If the new best is better, update the entry
 - If the current entry is already the best, inform user — no change needed
 
-### 6b. If asset not yet in STRATEGIES list
+### 7b. If asset not yet in STRATEGIES list
 - Add a new entry to the `STRATEGIES` list in `src/trading/followup.py`:
 ```python
 {
@@ -113,14 +139,14 @@ If the best experiment qualifies, check `src/trading/followup.py`:
 ```
 - Insert in alphabetical order by ticker
 
-### 6c. If not qualified
+### 7c. If not qualified
 - Inform the user which thresholds were not met
 - Suggest possible next steps (e.g., "consider designing a new experiment with `/new-experiment`")
 - Do NOT modify followup.py
 
 ---
 
-## Step 7: Validation (if followup.py was modified)
+## Step 8: Validation (if followup.py was modified)
 
 ```bash
 uv run ruff check src/trading/followup.py
@@ -139,7 +165,7 @@ uv run trading followup
 
 ---
 
-## Step 8: Summary
+## Step 9: Summary
 
 ```
 ## Evaluate Best Summary: <TICKER>
@@ -147,6 +173,7 @@ uv run trading followup
 - 實驗總數: X
 - 最佳實驗: <TICKER>-<NNN> (<module_name>)
 - Part B 勝率: X% | 累計: +X% | Sharpe: X
+- 漸變性: 精準度 ✓/✗ | 績效 ✓/✗
 - Followup 資格: 合格 ✅ / 不合格 ❌
 - Followup 更新: 已新增 / 已更新 / 未變更 / 不合格未加入
 ```
