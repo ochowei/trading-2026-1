@@ -62,7 +62,16 @@ on:
           - "TSM-001: tsm_001_extreme_oversold"
           - "TSM-002: tsm_002_pullback_wr_reversal"
           - "TSM-003: tsm_003_rsi2_reversal"
+          - "TLT-001: tlt_001_pullback_wr_reversal"
+          - "TSLA-001: tsla_001_extreme_oversold"
           - "TSM-004: tsm_004_smh_confirm"
+          - "IWM-001: iwm_001_rsi2_reversal"
+          - "NVDA-001: nvda_001_extreme_oversold"
+          - "XBI-001: xbi_001_pullback_wr"
+          - "XLU-001: xlu_001_pullback_wr_reversal"
+          - "COPX-001: copx_001_pullback_wr"
+          - "URA-001: ura_001_pullback_wr"
+          - "IBIT-001: ibit_001_pullback_wr"
 
 jobs:
   backtest:
