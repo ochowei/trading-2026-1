@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -225,8 +225,8 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002, IWM-004, TLT-002]
-  validated: 2026-03-30
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002, IWM-004, TLT-002, TSLA-003]
+  validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
 -->
@@ -252,6 +252,7 @@
 17. **跨資產相對表現過濾在 RSI(2) 框架下無效** — IWM/SPY 10日相對表現 <= -2% 過濾掉所有訊號，因 RSI(2) 極端超賣觸發時市場同步下跌，相對表現無區分力（IWM-004 Att1 驗證）
 17. **動量過濾窗口應匹配持倉週期** — USO 平均持倉 2-3 天，2日跌幅最佳；3日跌幅反而放鬆過濾（USO-014 Att1 驗證）；1日跌幅改變訊號日期而非收緊過濾（USO-015 Att1 驗證）
 18. **Bollinger Band 進場不可替代回檔門檻** — BB(20,2) 對 USO 產生完全不同且遠更差的訊號集，Part B Sharpe -0.48（USO-015 Att2 驗證）
+19. **收窄回撤範圍會改變訊號日期而非單純增減訊號** — 回撤門檻微調（-20%→-22%、-45%→-40%）導致不同日期滿足條件，產生不可預測的進場價格偏移。TSLA-003 三次嘗試均因此惡化 Part A（0.04、-0.22、-0.08 vs 基準 0.07），同時 Part B 反而改善（0.24～1.33），表明效果完全不可控（TSLA-003 驗證）
 19. **SL -3.25% 是 USO 的全域最優** — -3.0%（太近悲觀認定翻轉）、-3.5%（增加虧損不挽救停損）均失敗，即使搭配更精確的進場條件（USO-014 Att3、USO-015 Att3 驗證）
 20. **連續下跌天數不可替代回檔門檻或 2日跌幅** — 單獨使用缺乏深度過濾（USO-016 Att1：Sharpe 0.16/0.35）；搭配回檔範圍取代 2日跌幅則過嚴，訊號減少但品質未提升（USO-016 Att3：Sharpe 0.26/0.75）
 21. **日報酬 z-score 自適應進場對 USO 完全無效** — 缺乏最低回檔深度門檻時，z-score 在不同波動環境產生大量錯誤進場，Part A/B 均負報酬（USO-016 Att2：Sharpe -0.26/-0.06）
