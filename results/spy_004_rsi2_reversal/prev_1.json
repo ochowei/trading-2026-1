@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-28T03:05:25.869052"
+    "execution_time": "2026-03-30T03:51:33.911581"
   },
   "part_a": {
     "ticker": "SPY",
@@ -12,6 +12,10 @@
     "cumulative_return_pct": 9.12,
     "avg_holding_days": 5.7,
     "max_drawdown_pct": -3.62,
+    "profit_factor": 1.67,
+    "sharpe_ratio": 0.25,
+    "sortino_ratio": 0.39,
+    "calmar_ratio": 0.16,
     "max_consecutive_losses": 3,
     "target_exits": 9,
     "stop_loss_exits": 5,
@@ -222,6 +226,10 @@
     "cumulative_return_pct": 4.89,
     "avg_holding_days": 2.5,
     "max_drawdown_pct": -5.62,
+    "profit_factor": 2.88,
+    "sharpe_ratio": 0.55,
+    "sortino_ratio": 0.94,
+    "calmar_ratio": 0.22,
     "max_consecutive_losses": 1,
     "target_exits": 3,
     "stop_loss_exits": 1,
@@ -300,6 +308,10 @@
     "cumulative_return_pct": -2.6,
     "avg_holding_days": 9.0,
     "max_drawdown_pct": -3.08,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": -1.0,
+    "calmar_ratio": -0.84,
     "max_consecutive_losses": 1,
     "target_exits": 0,
     "stop_loss_exits": 1,
