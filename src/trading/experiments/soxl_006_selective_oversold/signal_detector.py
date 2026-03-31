@@ -1,7 +1,8 @@
 """
-SOXL 優化出場訊號偵測模組 (SOXL Optimized Exit Signal Detector)
-同 SOXL-005 進場邏輯，調整冷卻期。
-三次嘗試均未能超越 SOXL-005。
+SOXL 精選超賣 + 延長持倉訊號偵測模組
+SOXL Selective Oversold + Extended Holding Signal Detector
+
+基於 SOXL-005，收緊 RSI(5) 門檻至 <20。
 """
 
 import logging
@@ -9,22 +10,24 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.experiments.soxl_006_optimized_exit.config import SOXL006Config
+from trading.experiments.soxl_006_selective_oversold.config import (
+    SOXLSelectiveOversoldConfig,
+)
 
 logger = logging.getLogger(__name__)
 
 
-class SOXL006SignalDetector(BaseSignalDetector):
+class SOXLSelectiveOversoldSignalDetector(BaseSignalDetector):
     """
-    SOXL 優化出場訊號偵測器
+    SOXL 精選超賣訊號偵測器
 
     條件同時成立時觸發訊號:
     1. 從 N 日高點回撤在 [cap, threshold] 範圍內（-40% ~ -25%）
-    2. RSI(5) < 25
+    2. RSI(5) < 20（收緊自 SOXL-005 的 < 25）
     3. 2 日累積跌幅 ≤ -8%
     """
 
-    def __init__(self, config: SOXL006Config):
+    def __init__(self, config: SOXLSelectiveOversoldConfig):
         self.config = config
 
     @staticmethod
@@ -49,7 +52,7 @@ class SOXL006SignalDetector(BaseSignalDetector):
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
-        """偵測訊號"""
+        """偵測精選超賣訊號"""
         df = df.copy()
         cfg = self.config
 
@@ -75,8 +78,10 @@ class SOXL006SignalDetector(BaseSignalDetector):
 
         if suppressed:
             df.loc[suppressed, "Signal"] = False
-            logger.info(f"[SOXL006Detector] 冷卻機制抑制了 {len(suppressed)} 個重複訊號")
+            logger.info(
+                f"[SOXLSelectiveOversoldDetector] 冷卻機制抑制了 {len(suppressed)} 個重複訊號"
+            )
 
         signal_count = df["Signal"].sum()
-        logger.info(f"[SOXL006Detector] SOXL: 偵測到 {signal_count} 個訊號")
+        logger.info(f"[SOXLSelectiveOversoldDetector] SOXL: 偵測到 {signal_count} 個精選超賣訊號")
         return df

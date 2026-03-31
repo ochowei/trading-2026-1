@@ -48,7 +48,7 @@ on:
           - "SOXL-003: soxl_003_wide_sl"
           - "SOXL-004: soxl_004_reversal_confirm"
           - "SOXL-005: soxl_005_capped_drawdown"
-          - "SOXL-006: soxl_006_optimized_exit"
+          - "SOXL-006: soxl_006_selective_oversold"
           - "USO-001: uso_001_pullback_wr"
           - "USO-005: uso_005_symmetric_tight"
           - "USO-007: uso_007_sharp_pullback"

@@ -1,27 +1,29 @@
 """
-SOXL 優化出場 + 成交模型策略 (SOXL Optimized Exit + Execution Model Strategy)
-基於 SOXL-005，調整持倉天數與冷卻期。
+SOXL 精選超賣 + 延長持倉 + 成交模型策略
+SOXL Selective Oversold + Extended Holding + Execution Model Strategy
+
+基於 SOXL-005，收緊 RSI(5) 門檻至 <20，延長持倉至 25 天。
 """
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
-from trading.experiments.soxl_006_optimized_exit.config import (
-    SOXL006Config,
+from trading.experiments.soxl_006_selective_oversold.config import (
+    SOXLSelectiveOversoldConfig,
     create_default_config,
 )
-from trading.experiments.soxl_006_optimized_exit.signal_detector import (
-    SOXL006SignalDetector,
+from trading.experiments.soxl_006_selective_oversold.signal_detector import (
+    SOXLSelectiveOversoldSignalDetector,
 )
 
 
-class SOXL006Strategy(ExecutionModelStrategy):
+class SOXLSelectiveOversoldStrategy(ExecutionModelStrategy):
     """
-    SOXL 優化出場 + 成交模型策略 (SOXL-006)
+    SOXL 精選超賣 + 延長持倉 + 成交模型策略 (SOXL-006)
 
-    訊號邏輯: 回撤範圍 [-40%, -25%] + RSI(5) < 25 + 2日急跌 ≤ -8%
-    出場: TP +18% / SL -12% / 15 天
+    訊號邏輯: 回撤範圍 [-40%, -25%] + RSI(5) < 20 + 2日急跌 ≤ -8%
+    出場: TP +18% / SL -12% / 25 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
 
@@ -29,16 +31,16 @@ class SOXL006Strategy(ExecutionModelStrategy):
         return create_default_config()
 
     def create_detector(self) -> BaseSignalDetector:
-        return SOXL006SignalDetector(create_default_config())
+        return SOXLSelectiveOversoldSignalDetector(create_default_config())
 
     def create_backtester(self, config: ExperimentConfig) -> ExecutionModelBacktester:
         slippage = 0.001
-        if isinstance(config, SOXL006Config):
+        if isinstance(config, SOXLSelectiveOversoldConfig):
             slippage = config.slippage_pct
         return ExecutionModelBacktester(config, slippage_pct=slippage)
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
-        if not isinstance(config, SOXL006Config):
+        if not isinstance(config, SOXLSelectiveOversoldConfig):
             super()._print_strategy_params(config)
             return
 
