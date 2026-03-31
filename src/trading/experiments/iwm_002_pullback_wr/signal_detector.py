@@ -3,9 +3,10 @@ IWM-002 訊號偵測器：回檔 + Williams %R 均值回歸
 (IWM-002 Signal Detector: Pullback + Williams %R Mean Reversion)
 
 進場條件（全部滿足）：
-1. 收盤價相對 10 日最高價回檔 6-15%（過濾淺回檔與極端崩盤）
+1. 收盤價相對 10 日最高價回檔 7-18%（過濾淺回檔與極端崩盤）
 2. Williams %R(10) ≤ -80（超賣確認）
-3. 冷卻期 10 個交易日
+3. 收盤位置 ≥ 40%（反轉K線確認）
+4. 冷卻期 10 個交易日
 """
 
 import logging
@@ -22,10 +23,11 @@ class IWMPullbackWRSignalDetector(BaseSignalDetector):
     """
     IWM 回檔 + Williams %R 訊號偵測器
 
-    三條件同時成立時觸發訊號：
-    1. 收盤價相對 10 日最高價回檔 ≥ 6%
-    2. 回檔幅度 ≤ 15%（過濾極端崩盤）
+    四條件同時成立時觸發訊號：
+    1. 收盤價相對 10 日最高價回檔 ≥ 7%
+    2. 回檔幅度 ≤ 18%（過濾極端崩盤）
     3. Williams %R(10) ≤ -80（超賣）
+    4. 收盤位置 ≥ 40%（反轉K線確認）
     """
 
     def __init__(self, config: IWMPullbackWRConfig):
@@ -45,6 +47,11 @@ class IWMPullbackWRSignalDetector(BaseSignalDetector):
         lowest = df["Low"].rolling(wr_n).min()
         df["WR"] = (highest - df["Close"]) / (highest - lowest) * -100
 
+        # 收盤位置 (Close Position): 0=收在最低, 1=收在最高
+        day_range = df["High"] - df["Low"]
+        df["ClosePos"] = (df["Close"] - df["Low"]) / day_range
+        df.loc[day_range == 0, "ClosePos"] = 0.5
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -59,8 +66,11 @@ class IWMPullbackWRSignalDetector(BaseSignalDetector):
         # 條件三：Williams %R 超賣
         cond_wr = df["WR"] <= self.config.wr_threshold
 
-        # 三條件同時成立
-        df["Signal"] = cond_pullback & cond_upper & cond_wr
+        # 條件四：反轉K線確認
+        cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
+
+        # 四條件同時成立
+        df["Signal"] = cond_pullback & cond_upper & cond_wr & cond_reversal
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()
@@ -77,10 +87,7 @@ class IWMPullbackWRSignalDetector(BaseSignalDetector):
 
         if suppressed:
             df.loc[suppressed, "Signal"] = False
-            logger.info(
-                "IWM-002: %d duplicate signals suppressed by cooldown",
-                len(suppressed),
-            )
+            logger.info("IWM: %d duplicate signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
         logger.info("IWM-002: Detected %d Pullback+WR reversion signals", signal_count)
