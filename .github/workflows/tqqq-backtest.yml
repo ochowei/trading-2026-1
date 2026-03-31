@@ -67,6 +67,7 @@ on:
           - "TSM-003: tsm_003_rsi2_reversal"
           - "TLT-001: tlt_001_pullback_wr_reversal"
           - "TLT-002: tlt_002_deep_pullback_lower_tp"
+          - "TLT-003: tlt_003_wide_asymmetric"
           - "TSLA-001: tsla_001_extreme_oversold"
           - "TSLA-002: tsla_002_wider_exit"
           - "TSLA-003: tsla_003_tight_retracement"
