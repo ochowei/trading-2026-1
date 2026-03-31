@@ -14,7 +14,7 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.experiments.iwm_005_short_holding.config import IWM005Config
+from trading.experiments.iwm_005_shorter_hold.config import IWM005Config
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 """
-IWM-005: RSI(2) 極端超賣均值回歸（短持倉優化）
-(IWM RSI(2) Extreme Oversold Mean Reversion - Short Holding Optimization)
+IWM-005: RSI(2) 極端超賣均值回歸（縮短持倉測試）
+(IWM RSI(2) Extreme Oversold Mean Reversion - Shorter Hold Test)
 
 使用 RSI(2) 訊號架構搭配 ExecutionModelBacktester 固定 TP/SL 出場。
 """
@@ -8,17 +8,17 @@ IWM-005: RSI(2) 極端超賣均值回歸（短持倉優化）
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.execution_strategy import ExecutionModelStrategy
-from trading.experiments.iwm_005_short_holding.config import (
+from trading.experiments.iwm_005_shorter_hold.config import (
     IWM005Config,
     create_default_config,
 )
-from trading.experiments.iwm_005_short_holding.signal_detector import (
+from trading.experiments.iwm_005_shorter_hold.signal_detector import (
     IWM005SignalDetector,
 )
 
 
 class IWM005Strategy(ExecutionModelStrategy):
-    """IWM RSI(2) 短持倉優化 (IWM-005)"""
+    """IWM RSI(2) 縮短持倉測試 (IWM-005)"""
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

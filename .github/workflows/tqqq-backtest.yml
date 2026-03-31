@@ -79,7 +79,7 @@ on:
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
           - "IWM-004: iwm_004_relative_weakness"
-          - "IWM-005: iwm_005_short_holding"
+          - "IWM-005: iwm_005_shorter_hold"
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "XBI-001: xbi_001_pullback_wr"
