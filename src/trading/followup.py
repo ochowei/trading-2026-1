@@ -24,10 +24,10 @@ from trading.experiments import get_experiment
 logger = logging.getLogger(__name__)
 
 # 各標的最佳策略 (Best strategy per ticker)
-STRATEGIES = [
+STRATEGIES: list[dict[str, str | bool]] = [
     {
-        "experiment_name": "copx_001_pullback_wr",
-        "label": "COPX-001",
+        "experiment_name": "copx_003_exit_optimized",
+        "label": "COPX-003",
         "ticker": "COPX",
         "has_trailing_stop": False,
     },
@@ -44,14 +44,14 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "gld_007_pullback_wr_reversal",
-        "label": "GLD-007",
+        "experiment_name": "gld_006_pullback_wr",
+        "label": "GLD-006",
         "ticker": "GLD",
         "has_trailing_stop": True,
     },
     {
-        "experiment_name": "iwm_001_rsi2_reversal",
-        "label": "IWM-001",
+        "experiment_name": "iwm_002_pullback_wr",
+        "label": "IWM-002",
         "ticker": "IWM",
         "has_trailing_stop": False,
     },
@@ -62,8 +62,8 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "sivr_005_capped_pullback_wr",
-        "label": "SIVR-005",
+        "experiment_name": "sivr_006_closepos_pullback_wr",
+        "label": "SIVR-006",
         "ticker": "SIVR",
         "has_trailing_stop": False,
     },
@@ -74,15 +74,21 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "spy_004_rsi2_reversal",
-        "label": "SPY-004",
+        "experiment_name": "spy_005_asymmetric_exit",
+        "label": "SPY-005",
         "ticker": "SPY",
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "tqqq_010_cap_exec_optimized",
-        "label": "TQQQ-010",
+        "experiment_name": "tqqq_012_cap_exec_qqq_confirm",
+        "label": "TQQQ-012",
         "ticker": "TQQQ",
+        "has_trailing_stop": False,
+    },
+    {
+        "experiment_name": "tsla_002_wider_exit",
+        "label": "TSLA-002",
+        "ticker": "TSLA",
         "has_trailing_stop": False,
     },
     {
@@ -92,14 +98,14 @@ STRATEGIES = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "ura_001_pullback_wr",
-        "label": "URA-001",
+        "experiment_name": "ura_003_pullback_rsi2",
+        "label": "URA-003",
         "ticker": "URA",
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "uso_013_tight_cap",
-        "label": "USO-013",
+        "experiment_name": "uso_009_momentum_pullback",
+        "label": "USO-009",
         "ticker": "USO",
         "has_trailing_stop": False,
     },
