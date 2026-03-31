@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T05:20:04.058479"
+    "execution_time": "2026-03-30T03:51:41.186801"
   },
   "part_a": {
     "ticker": "TSLA",
@@ -479,15 +479,15 @@
     "total_signals": 1,
     "wins": 0,
     "win_rate": 0.0,
-    "avg_return_pct": -5.06,
+    "avg_return_pct": -3.31,
     "std_return_pct": 0.0,
-    "cumulative_return_pct": -5.06,
-    "avg_holding_days": 5.0,
-    "max_drawdown_pct": -5.76,
+    "cumulative_return_pct": -3.31,
+    "avg_holding_days": 4.0,
+    "max_drawdown_pct": -3.79,
     "profit_factor": 0.0,
     "sharpe_ratio": 0.0,
     "sortino_ratio": -1.0,
-    "calmar_ratio": -0.88,
+    "calmar_ratio": -0.87,
     "max_consecutive_losses": 1,
     "target_exits": 0,
     "stop_loss_exits": 0,
@@ -497,13 +497,13 @@
       {
         "date": "2026-03-20",
         "entry_date": "2026-03-23",
-        "exit_date": "2026-03-30",
+        "exit_date": "2026-03-27",
         "entry": 373.65,
-        "exit": 354.75,
-        "return_pct": -5.06,
-        "holding_days": 5,
+        "exit": 361.29,
+        "return_pct": -3.31,
+        "holding_days": 4,
         "exit_type": "time_expiry",
-        "max_drawdown_pct": -5.76
+        "max_drawdown_pct": -3.79
       }
     ],
     "filled_count": 1,
@@ -520,7 +520,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-27"
     }
   }
 }

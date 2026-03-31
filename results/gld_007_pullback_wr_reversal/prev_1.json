@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:05.759764"
+    "execution_time": "2026-03-27T04:57:28.931201"
   },
   "part_a": {
     "ticker": "GLD",
@@ -12,10 +12,6 @@
     "cumulative_return_pct": 32.47,
     "avg_holding_days": 11.9,
     "max_drawdown_pct": -4.62,
-    "profit_factor": 2.56,
-    "sharpe_ratio": 0.41,
-    "sortino_ratio": 0.66,
-    "calmar_ratio": 0.2,
     "max_consecutive_losses": 1,
     "target_exits": 6,
     "stop_loss_exits": 18,
@@ -396,10 +392,6 @@
     "cumulative_return_pct": 28.52,
     "avg_holding_days": 10.0,
     "max_drawdown_pct": -2.47,
-    "profit_factor": 999.99,
-    "sharpe_ratio": 2.04,
-    "sortino_ratio": 999.99,
-    "calmar_ratio": 0.86,
     "max_consecutive_losses": 0,
     "target_exits": 3,
     "stop_loss_exits": 8,
@@ -571,10 +563,6 @@
     "cumulative_return_pct": -4.1,
     "avg_holding_days": 2.0,
     "max_drawdown_pct": -9.58,
-    "profit_factor": 0.0,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": -1.0,
-    "calmar_ratio": -0.43,
     "max_consecutive_losses": 1,
     "target_exits": 0,
     "stop_loss_exits": 1,
@@ -612,7 +600,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-26"
     }
   }
 }

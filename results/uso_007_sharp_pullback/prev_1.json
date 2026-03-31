@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:49.810902"
+    "execution_time": "2026-03-28T06:32:57.918301"
   },
   "part_a": {
     "ticker": "USO",
@@ -12,10 +12,6 @@
     "cumulative_return_pct": 18.29,
     "avg_holding_days": 2.4,
     "max_drawdown_pct": -9.18,
-    "profit_factor": 1.3,
-    "sharpe_ratio": 0.13,
-    "sortino_ratio": 0.19,
-    "calmar_ratio": 0.04,
     "max_consecutive_losses": 7,
     "target_exits": 27,
     "stop_loss_exits": 19,
@@ -572,10 +568,6 @@
     "cumulative_return_pct": 16.36,
     "avg_holding_days": 3.6,
     "max_drawdown_pct": -4.23,
-    "profit_factor": 1.8,
-    "sharpe_ratio": 0.29,
-    "sortino_ratio": 0.45,
-    "calmar_ratio": 0.2,
     "max_consecutive_losses": 2,
     "target_exits": 12,
     "stop_loss_exits": 6,
@@ -819,10 +811,6 @@
     "cumulative_return_pct": 0.0,
     "avg_holding_days": 0.0,
     "max_drawdown_pct": 0.0,
-    "profit_factor": 0.0,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": 0.0,
-    "calmar_ratio": 0.0,
     "max_consecutive_losses": 0,
     "target_exits": 0,
     "stop_loss_exits": 0,

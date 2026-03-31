@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T05:18:48.868101"
+    "execution_time": "2026-03-30T03:51:29.985987"
   },
   "part_a": {
     "ticker": "SPY",
@@ -357,19 +357,19 @@
     "total_signals": 2,
     "wins": 1,
     "win_rate": 0.5,
-    "avg_return_pct": -1.64,
-    "std_return_pct": 2.46,
-    "cumulative_return_pct": -3.32,
-    "avg_holding_days": 4.5,
-    "max_drawdown_pct": -4.24,
-    "profit_factor": 0.2,
-    "sharpe_ratio": -0.67,
-    "sortino_ratio": -0.57,
-    "calmar_ratio": -0.39,
+    "avg_return_pct": -1.4,
+    "std_return_pct": 2.21,
+    "cumulative_return_pct": -2.83,
+    "avg_holding_days": 4.0,
+    "max_drawdown_pct": -3.66,
+    "profit_factor": 0.22,
+    "sharpe_ratio": -0.63,
+    "sortino_ratio": -0.55,
+    "calmar_ratio": -0.38,
     "max_consecutive_losses": 1,
     "target_exits": 0,
-    "stop_loss_exits": 2,
-    "time_expiry_exits": 0,
+    "stop_loss_exits": 1,
+    "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trailing_stop_exits": 1,
     "trades": [
@@ -387,13 +387,13 @@
       {
         "date": "2026-03-19",
         "entry_date": "2026-03-20",
-        "exit_date": "2026-03-30",
+        "exit_date": "2026-03-27",
         "entry": 657.17,
-        "exit": 630.25,
-        "return_pct": -4.1,
-        "holding_days": 6,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -4.24
+        "exit": 633.46,
+        "return_pct": -3.61,
+        "holding_days": 5,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -3.66
       }
     ],
     "filled_count": 2,
@@ -414,7 +414,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-27"
     }
   }
 }

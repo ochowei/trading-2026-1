@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T05:15:40.848657"
+    "execution_time": "2026-03-30T03:50:55.161152"
   },
   "part_a": {
     "ticker": "FCX",
@@ -336,15 +336,15 @@
     "total_signals": 1,
     "wins": 1,
     "win_rate": 1.0,
-    "avg_return_pct": 0.4,
+    "avg_return_pct": 3.32,
     "std_return_pct": 0.0,
-    "cumulative_return_pct": 0.4,
-    "avg_holding_days": 5.0,
+    "cumulative_return_pct": 3.32,
+    "avg_holding_days": 4.0,
     "max_drawdown_pct": -0.68,
     "profit_factor": 999.99,
     "sharpe_ratio": 0.0,
     "sortino_ratio": 999.99,
-    "calmar_ratio": 0.59,
+    "calmar_ratio": 4.88,
     "max_consecutive_losses": 0,
     "target_exits": 0,
     "stop_loss_exits": 0,
@@ -354,11 +354,11 @@
       {
         "date": "2026-03-20",
         "entry_date": "2026-03-23",
-        "exit_date": "2026-03-30",
+        "exit_date": "2026-03-27",
         "entry": 54.35,
-        "exit": 54.57,
-        "return_pct": 0.4,
-        "holding_days": 5,
+        "exit": 56.16,
+        "return_pct": 3.32,
+        "holding_days": 4,
         "exit_type": "time_expiry",
         "max_drawdown_pct": -0.68
       }
@@ -377,7 +377,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-27"
     }
   }
 }

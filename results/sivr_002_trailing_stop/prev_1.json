@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:12.808218"
+    "execution_time": "2026-03-27T04:56:00.934652"
   },
   "part_a": {
     "ticker": "SIVR",
@@ -12,10 +12,6 @@
     "cumulative_return_pct": 7.41,
     "avg_holding_days": 5.7,
     "max_drawdown_pct": -7.66,
-    "profit_factor": 1.55,
-    "sharpe_ratio": 0.18,
-    "sortino_ratio": 0.23,
-    "calmar_ratio": 0.06,
     "max_consecutive_losses": 3,
     "target_exits": 2,
     "stop_loss_exits": 14,
@@ -242,10 +238,6 @@
     "cumulative_return_pct": 3.04,
     "avg_holding_days": 2.0,
     "max_drawdown_pct": -1.65,
-    "profit_factor": 999.99,
-    "sharpe_ratio": 7.95,
-    "sortino_ratio": 999.99,
-    "calmar_ratio": 0.92,
     "max_consecutive_losses": 0,
     "target_exits": 0,
     "stop_loss_exits": 2,
@@ -307,10 +299,6 @@
     "cumulative_return_pct": 2.08,
     "avg_holding_days": 1.0,
     "max_drawdown_pct": -0.07,
-    "profit_factor": 999.99,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": 999.99,
-    "calmar_ratio": 29.71,
     "max_consecutive_losses": 0,
     "target_exits": 0,
     "stop_loss_exits": 1,
@@ -348,7 +336,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-26"
     }
   }
 }

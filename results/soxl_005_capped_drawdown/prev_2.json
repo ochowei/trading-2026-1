@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "execution_time": "2026-03-29T16:37:30.956585"
+    "execution_time": "2026-03-29T16:37:07.539551"
   },
   "part_a": {
     "ticker": "SOXL",
-    "total_signals": 13,
+    "total_signals": 12,
     "wins": 7,
-    "win_rate": 0.5384615384615384,
-    "avg_return_pct": 5.14,
-    "std_return_pct": 14.43,
-    "cumulative_return_pct": 69.11,
-    "avg_holding_days": 7.5,
+    "win_rate": 0.5833333333333334,
+    "avg_return_pct": 5.58,
+    "std_return_pct": 14.94,
+    "cumulative_return_pct": 69.28,
+    "avg_holding_days": 6.3,
     "max_drawdown_pct": -23.35,
-    "profit_factor": 2.1,
-    "sharpe_ratio": 0.36,
-    "sortino_ratio": 0.69,
-    "calmar_ratio": 0.22,
+    "profit_factor": 2.11,
+    "sharpe_ratio": 0.37,
+    "sortino_ratio": 0.72,
+    "calmar_ratio": 0.24,
     "max_consecutive_losses": 3,
     "target_exits": 6,
     "stop_loss_exits": 5,
-    "time_expiry_exits": 2,
+    "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
       {
@@ -133,17 +133,6 @@
         "max_drawdown_pct": -8.17
       },
       {
-        "date": "2023-08-11",
-        "entry_date": "2023-08-14",
-        "exit_date": "2023-09-13",
-        "entry": 20.49,
-        "exit": 20.47,
-        "return_pct": -0.1,
-        "holding_days": 20,
-        "exit_type": "time_expiry",
-        "max_drawdown_pct": -8.48
-      },
-      {
         "date": "2023-09-21",
         "entry_date": "2023-09-22",
         "exit_date": "2023-10-12",
@@ -155,18 +144,18 @@
         "max_drawdown_pct": -5.74
       },
       {
-        "date": "2023-10-25",
-        "entry_date": "2023-10-26",
+        "date": "2023-10-26",
+        "entry_date": "2023-10-27",
         "exit_date": "2023-11-03",
-        "entry": 14.89,
-        "exit": 17.57,
+        "entry": 15.06,
+        "exit": 17.77,
         "return_pct": 18.0,
-        "holding_days": 6,
+        "holding_days": 5,
         "exit_type": "target",
-        "max_drawdown_pct": -7.5
+        "max_drawdown_pct": -8.52
       }
     ],
-    "filled_count": 13,
+    "filled_count": 12,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

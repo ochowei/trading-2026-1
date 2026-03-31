@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T05:15:07.232983"
+    "execution_time": "2026-03-30T03:50:52.313386"
   },
   "part_a": {
     "ticker": "DIA",
@@ -281,15 +281,15 @@
     "total_signals": 2,
     "wins": 0,
     "win_rate": 0.0,
-    "avg_return_pct": -2.12,
-    "std_return_pct": 0.48,
-    "cumulative_return_pct": -4.21,
-    "avg_holding_days": 7.0,
+    "avg_return_pct": -2.2,
+    "std_return_pct": 0.4,
+    "cumulative_return_pct": -4.35,
+    "avg_holding_days": 6.5,
     "max_drawdown_pct": -2.8,
     "profit_factor": 0.0,
-    "sharpe_ratio": -4.47,
+    "sharpe_ratio": -5.5,
     "sortino_ratio": -0.98,
-    "calmar_ratio": -0.76,
+    "calmar_ratio": -0.79,
     "max_consecutive_losses": 2,
     "target_exits": 0,
     "stop_loss_exits": 1,
@@ -310,13 +310,13 @@
       {
         "date": "2026-03-19",
         "entry_date": "2026-03-20",
-        "exit_date": "2026-03-30",
+        "exit_date": "2026-03-27",
         "entry": 459.19,
-        "exit": 451.61,
-        "return_pct": -1.65,
-        "holding_days": 6,
+        "exit": 450.94,
+        "return_pct": -1.8,
+        "holding_days": 5,
         "exit_type": "time_expiry",
-        "max_drawdown_pct": -1.91
+        "max_drawdown_pct": -1.89
       }
     ],
     "filled_count": 2,
@@ -333,7 +333,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-27"
     }
   }
 }

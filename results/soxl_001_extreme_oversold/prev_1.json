@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:24.021355"
+    "execution_time": "2026-03-27T18:04:59.275800"
   },
   "part_a": {
     "ticker": "SOXL",
@@ -12,10 +12,6 @@
     "cumulative_return_pct": -38.89,
     "avg_holding_days": 1.8,
     "max_drawdown_pct": -34.84,
-    "profit_factor": 0.64,
-    "sharpe_ratio": -0.22,
-    "sortino_ratio": -0.27,
-    "calmar_ratio": -0.07,
     "max_consecutive_losses": 2,
     "target_exits": 7,
     "stop_loss_exits": 9,
@@ -226,10 +222,6 @@
     "cumulative_return_pct": -15.44,
     "avg_holding_days": 1.8,
     "max_drawdown_pct": -28.13,
-    "profit_factor": 0.83,
-    "sharpe_ratio": -0.09,
-    "sortino_ratio": -0.12,
-    "calmar_ratio": -0.04,
     "max_consecutive_losses": 3,
     "target_exits": 5,
     "stop_loss_exits": 5,
@@ -374,10 +366,6 @@
     "cumulative_return_pct": -12.09,
     "avg_holding_days": 2.0,
     "max_drawdown_pct": -16.45,
-    "profit_factor": 0.0,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": -1.0,
-    "calmar_ratio": -0.73,
     "max_consecutive_losses": 1,
     "target_exits": 0,
     "stop_loss_exits": 1,

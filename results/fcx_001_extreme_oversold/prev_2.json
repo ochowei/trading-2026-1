@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-29T09:39:14.790319"
+    "execution_time": "2026-03-26T06:51:53.963149"
   },
   "part_a": {
     "ticker": "FCX",
@@ -12,10 +12,6 @@
     "cumulative_return_pct": 90.41,
     "avg_holding_days": 9.6,
     "max_drawdown_pct": -15.83,
-    "profit_factor": 2.34,
-    "sharpe_ratio": 0.43,
-    "sortino_ratio": 0.69,
-    "calmar_ratio": 0.26,
     "max_consecutive_losses": 1,
     "target_exits": 12,
     "stop_loss_exits": 4,
@@ -248,10 +244,6 @@
     "cumulative_return_pct": 25.34,
     "avg_holding_days": 14.6,
     "max_drawdown_pct": -11.36,
-    "profit_factor": 5.12,
-    "sharpe_ratio": 0.74,
-    "sortino_ratio": 2.04,
-    "calmar_ratio": 0.43,
     "max_consecutive_losses": 2,
     "target_exits": 3,
     "stop_loss_exits": 0,
@@ -336,15 +328,11 @@
     "total_signals": 1,
     "wins": 1,
     "win_rate": 1.0,
-    "avg_return_pct": 3.32,
+    "avg_return_pct": 4.88,
     "std_return_pct": 0.0,
-    "cumulative_return_pct": 3.32,
-    "avg_holding_days": 4.0,
+    "cumulative_return_pct": 4.88,
+    "avg_holding_days": 2.0,
     "max_drawdown_pct": -0.68,
-    "profit_factor": 999.99,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": 999.99,
-    "calmar_ratio": 4.88,
     "max_consecutive_losses": 0,
     "target_exits": 0,
     "stop_loss_exits": 0,
@@ -354,11 +342,11 @@
       {
         "date": "2026-03-20",
         "entry_date": "2026-03-23",
-        "exit_date": "2026-03-27",
+        "exit_date": "2026-03-25",
         "entry": 54.35,
-        "exit": 56.16,
-        "return_pct": 3.32,
-        "holding_days": 4,
+        "exit": 57.0,
+        "return_pct": 4.88,
+        "holding_days": 2,
         "exit_type": "time_expiry",
         "max_drawdown_pct": -0.68
       }
@@ -377,7 +365,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-25"
     }
   }
 }
