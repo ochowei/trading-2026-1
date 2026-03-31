@@ -114,7 +114,7 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006, SIVR-007, IWM-005]
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006, SIVR-007, IWM-005, XBI-005]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -135,7 +135,7 @@
 | SIVR-006 Att1 | ClosePos ≥40% 反轉K線 | Part A 訊號 32 → 26，Sharpe 0.22 → 0.12；Part B 訊號 11 → 9，Sharpe 0.26 → 0.09 |
 | SIVR-007 Att1 | RSI(14) > 5日最低值（動能回復） | Part A 訊號 32 → 19，Sharpe 0.22 → -0.08；Part B 訊號 11 → 7，Sharpe 0.26 → 0.03 |
 
-**例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。IWM-005 Att3 進一步驗證：移除 ClosePos 後 Part A 訊號從 15→41、WR 從 66.7%→48.8%、累計從 +20.92%→-17.90%，ClosePos 在中低波動資產是必要的品質過濾器。但此過濾器在高波動資產（FCX、SIVR）上失效——FCX 改變訊號日期而非移除壞訊號（FCX-003 Att3），SIVR 的高日內波動使好訊號也常收在低位（SIVR-006 Att1）。
+**例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。IWM-005 Att3 進一步驗證：移除 ClosePos 後 Part A 訊號從 15→41、WR 從 66.7%→48.8%、累計從 +20.92%→-17.90%，ClosePos 在中低波動資產是必要的品質過濾器。**XBI-005 再次驗證**：ClosePos ≥ 35% 使 Part A Sharpe 0.11→0.36（+227%），Part B 0.23→0.64（+178%），XBI 日波動 2.0% 在 ClosePos 有效邊界內。但此過濾器在高波動資產（FCX、SIVR）上失效——FCX 改變訊號日期而非移除壞訊號（FCX-003 Att3），SIVR 的高日內波動使好訊號也常收在低位（SIVR-006 Att1）。ClosePos 有效邊界約為日波動 ≤ 2.0%（GLD 1.1%、IWM 1.5-2%、XBI 2.0% 有效；SIVR 2-3%、FCX 2-4% 無效）。
 
 **規則**：只在確認能修復某個已知失敗模式時才加濾波器，不要隨意「加一個指標看看」。
 
@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, TSM-004, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003, TSLA-004]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, TSM-004, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003, TSLA-004]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -213,7 +213,7 @@
 | SOXL | SOXL-006 | 精選超賣 + 延長持倉 | ~2.0/2.5 | 60.0%/80.0% | 回撤 [-40%,-25%] + RSI(5)<20 + 2日跌幅≤-8%，TP +18%/SL -12%/25天。Part A +72.80%/Sharpe 0.47，Part B +51.57%/Sharpe 0.79，PF 2.57/4.88。RSI(5) 收緊 25→20 移除 3 個停損訊號，持倉延長 20→25天。A/B 訊號比 2.0:1（退步但可接受），Part B 大幅優於 Part A（無過擬合）。SOXL-007 驗證 RSI(5)<22/DD-23%/15日回看均無效，**已確認為全域最優**（8 次實驗、21 次嘗試） |
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
 | IWM | IWM-005 | RSI(2) 非對稱寬停損 + TP+4.0% + SL微調 | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+4.0%/SL-4.25%/20天。SL 從 -4.5% 微調至 -4.25% 是純粹改善：Part A Sharpe 0.35→0.38（+8.6%），Part B 0.28→0.31（+10.7%），WR 不變。-4.0% 太緊（翻轉 1 筆贏家），-4.25% 是甜蜜點。持倉 15-20d 無差異（平均 3-6d） |
-| XBI | XBI-001 | 回檔範圍 + Williams %R | ~7.2/5.0 | 63.9%/70.0% | 回檔 8-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.23 優於 Part A 0.11（無過擬合），回檔上限 20% 過濾極端崩盤。6 次改進嘗試均失敗：2日急跌過濾移除好訊號（XBI-002 Att1/2）、RSI(2) 框架 Part B WR 44.4%（XBI-002 Att3）、SL收緊(-4.0%/-4.5%)傷害Part A（XBI-003 Att1/2）、延長持倉無效（XBI-003 Att3），已確認為全域最優 |
+| XBI | XBI-005 | 回檔範圍 + Williams %R + 反轉K線 | ~4.2/3.0 | 76.2%/83.3% | 回檔 8-20% + WR(10)≤-80 + ClosePos≥35%，TP+3.5%/SL-5.0%/15天。Part A Sharpe 0.36/Part B 0.64（vs XBI-001 的 0.11/0.23，分別 +227%/+178%）。ClosePos 35% 是甜蜜點（40% Part B Sharpe 0.16，30% Part A Sharpe 0.30）。XBI 日波動 2.0% 在 ClosePos 有效邊界內（類似 IWM），與 FCX/SIVR 不同 |
 | COPX | COPX-003 | 20日回檔範圍 + Williams %R + 出場優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.39/Part B 0.35（A/B gap 僅 0.04，極佳平衡）。20日回看框架 + SL 收窄是關鍵突破（vs COPX-001 Part A 0.08→0.39）。COPX-004 驗證回檔 9-20%（Part A 劣化）、15天持倉（Part B WR 降 9pp）、冷卻 10天（無效果）均失敗，已確認為全域最優 |
 | URA | URA-004 | 回檔範圍 + RSI(2) + 2日急跌 | ~4.4/7.5 | 68.2%/66.7% | 回檔 10-20% + RSI(2)<15 + 2日跌幅≤-3%，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.41/Part B 0.39（A/B gap 0.02，極佳平衡）。vs URA-003：Part A Sharpe +21%（0.34→0.41），min(A,B) +15%（0.34→0.39）。2日跌幅 -3% 是甜蜜點：-2.5% 引入日期偏移（lesson #19）、-4% 搭配 WR(10) 過嚴。20日回看在 URA 嚴格劣化（確認 lesson #54） |
 | NVDA | NVDA-001 | RSI(2) 極端超賣 + 2日急跌 | ~1.2/2.0 | 66.7%/75.0% | RSI(2)<5 + 2日跌幅≤-7%，TP+8%/SL-10%/15天。Part A Sharpe 0.23/Part B 0.44（無過擬合）。NVDA-002 驗證回撤過濾（移除好訊號）、TP+10%（翻轉邊際交易）、SL-12%（更大虧損抵銷救回交易）均失敗，已確認為全域最優。訊號極稀少（1.2/年），統計可信度有限 |
@@ -226,7 +226,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, SOXL-006, SOXL-007, URA-002, URA-004, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003, VOO-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, SOXL-006, SOXL-007, URA-002, URA-004, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003, VOO-003, XBI-005]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -302,6 +302,7 @@
 61. **同指數 ETF 的 TP 上限不同** — VOO TP +2.85% 為甜蜜點（+2.9% 翻轉 2022-05-12 交易），SPY TP +3.0% 為甜蜜點。追蹤相同 S&P 500 指數但 OHLC 微差（不同管理公司、費用率、流動性）使邊際交易在 VOO 上反彈幅度較小。設計同指數 ETF 策略時，不可直接複製 TP 參數，需獨立驗證上限（VOO-003 驗證）
 62. **縮短回撤回看窗口在 3x 槓桿 ETF 上產生熊市假訊號** — SOXL 回看從 20 日縮至 15 日，Part A 新增 2022-09-01、09-22 兩筆停損訊號（均為持續熊市中的假超賣），WR 60%→50%，Sharpe 0.47→0.24，Part B 不變。原因：較短回看使高點下降更慢，持續下跌中更容易觸發回撤門檻（SOXL-007 Att3 驗證）
 63. **RSI(5) 中間值閾值只影響 OOS** — SOXL RSI(5) 從 <20 放寬至 <22，Part A 完全不變（所有 Part A 訊號 RSI 本就 <20），Part B 新增 4 筆中 3 筆為停損。IS/OOS 樣本在不同市場環境下，RSI 閾值的約束力不對稱（SOXL-007 Att1 驗證）
+64. **ClosePos 門檻需按資產微調** — XBI ClosePos ≥ 35% 是甜蜜點：≥ 40% Part B Sharpe 0.64→0.16（門檻太高移除 Part B 好訊號，訊號日期偏移），≥ 30% Part A Sharpe 0.36→0.30（門檻太低引入 Part A 壞訊號）。GLD-007/IWM-005 使用 40%，但 XBI 日波動較高（2.0% vs GLD 1.1%/IWM 1.5-2%），好訊號 ClosePos 常在 35-40% 區間（XBI-005 驗證）
 
 ---
 
