@@ -114,8 +114,8 @@
 ## 6. 確認指標的邊際效益遞減
 
 <!-- freshness:
-  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006, SIVR-007]
-  validated: 2026-03-30
+  derived_from: [TQQQ-007, TQQQ-012, TQQQ-013, USO-006, USO-010, USO-011, USO-012, USO-015, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SIVR-006, SIVR-007, IWM-005]
+  validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
 -->
@@ -135,7 +135,7 @@
 | SIVR-006 Att1 | ClosePos ≥40% 反轉K線 | Part A 訊號 32 → 26，Sharpe 0.22 → 0.12；Part B 訊號 11 → 9，Sharpe 0.26 → 0.09 |
 | SIVR-007 Att1 | RSI(14) > 5日最低值（動能回復） | Part A 訊號 32 → 19，Sharpe 0.22 → -0.08；Part B 訊號 11 → 7，Sharpe 0.26 → 0.03 |
 
-**例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。但此過濾器在高波動資產（FCX、SIVR）上失效——FCX 改變訊號日期而非移除壞訊號（FCX-003 Att3），SIVR 的高日內波動使好訊號也常收在低位（SIVR-006 Att1）。
+**例外**：針對特定失敗模式的濾波器有效。GLD-007 的 close position ≥ 40% 是針對「仍在下跌」的訊號，精準移除低品質進場點。IWM-005 Att3 進一步驗證：移除 ClosePos 後 Part A 訊號從 15→41、WR 從 66.7%→48.8%、累計從 +20.92%→-17.90%，ClosePos 在中低波動資產是必要的品質過濾器。但此過濾器在高波動資產（FCX、SIVR）上失效——FCX 改變訊號日期而非移除壞訊號（FCX-003 Att3），SIVR 的高日內波動使好訊號也常收在低位（SIVR-006 Att1）。
 
 **規則**：只在確認能修復某個已知失敗模式時才加濾波器，不要隨意「加一個指標看看」。
 
