@@ -62,6 +62,7 @@ on:
           - "SPY-003: spy_003_optimized_wr"
           - "SPY-004: spy_004_rsi2_reversal"
           - "SPY-005: spy_005_asymmetric_exit"
+          - "SPY-006: spy_006_roc_reversal"
           - "VOO-001: voo_001_rsi2_reversal"
           - "VOO-002: voo_002_asymmetric_exit"
           - "VOO-003: voo_003_wider_tp"

@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T01:39:58.162528"
+    "execution_time": "2026-03-31T22:40:33.031364"
   },
   "part_a": {
     "ticker": "SPY",
-    "total_signals": 16,
-    "wins": 12,
-    "win_rate": 0.75,
-    "avg_return_pct": 1.38,
-    "std_return_pct": 2.61,
-    "cumulative_return_pct": 23.93,
-    "avg_holding_days": 7.9,
+    "total_signals": 15,
+    "wins": 11,
+    "win_rate": 0.7333333333333333,
+    "avg_return_pct": 1.28,
+    "std_return_pct": 2.66,
+    "cumulative_return_pct": 20.32,
+    "avg_holding_days": 7.7,
     "max_drawdown_pct": -4.17,
-    "profit_factor": 2.79,
-    "sharpe_ratio": 0.53,
-    "sortino_ratio": 0.89,
-    "calmar_ratio": 0.33,
+    "profit_factor": 2.54,
+    "sharpe_ratio": 0.48,
+    "sortino_ratio": 0.8,
+    "calmar_ratio": 0.31,
     "max_consecutive_losses": 3,
-    "target_exits": 11,
+    "target_exits": 10,
     "stop_loss_exits": 4,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
@@ -43,17 +43,6 @@
         "holding_days": 20,
         "exit_type": "time_expiry",
         "max_drawdown_pct": -2.2
-      },
-      {
-        "date": "2019-12-03",
-        "entry_date": "2019-12-04",
-        "exit_date": "2019-12-19",
-        "entry": 282.83,
-        "exit": 291.32,
-        "return_pct": 3.0,
-        "holding_days": 11,
-        "exit_type": "target",
-        "max_drawdown_pct": -0.14
       },
       {
         "date": "2020-02-28",
@@ -199,7 +188,7 @@
         "max_drawdown_pct": -3.42
       }
     ],
-    "filled_count": 16,
+    "filled_count": 15,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -245,7 +234,7 @@
         "return_pct": 3.0,
         "holding_days": 4,
         "exit_type": "target",
-        "max_drawdown_pct": -0.32
+        "max_drawdown_pct": -0.33
       },
       {
         "date": "2025-04-07",
@@ -344,7 +333,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-31"
     }
   }
 }
