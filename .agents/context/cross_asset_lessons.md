@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, TSM-004, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -209,7 +209,7 @@
 | USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗，已確認為全域最優）。USO-012 滾動分析：11/12 窗口正累計、**唯一雙漸變通過實驗**（精準度+績效均漸變）。USO-009/010 滾動分析驗證回檔上限的必要性：無上限（USO-009）最差窗口 -13.60%，加 7-12%（USO-010）改善至 -7.50%，加 7-13%（USO-012）改善至 -3.86% |
 | SPY | SPY-005 | RSI(2) 寬出場 | ~3.2/2 | 75%/75% | 同 SPY-004 進場（RSI(2)<10 + 2日跌幅≥1.5%），寬出場 TP+3.0%/SL-3.0%/20d。Part A Sharpe 0.53/Part B 0.56（A/B gap 0.03，極佳平衡）。vs SPY-004: Part A Sharpe +112%（0.25→0.53），關鍵：寬 SL 避開 2-3 日暫跌假停損（3 筆翻正），長持倉挽回慢反彈。SL -3.0% 是甜蜜點（-2.5% 太緊 WR 62.5%，-3.5% 太寬）。SPY-002 滾動分析：8/12 窗口正累計，熊市底線較好但回報較低 |
 | DIA | DIA-004 | RSI(2) 寬獲利目標 | ~2.8/2.0 | 78.6%/75% | RSI(2)<10 + 2日跌幅≥1.5%，TP+3.0%/SL-3.5%/20d，Part A Sharpe 0.52/Part B 0.47（A/B 平衡優秀，vs DIA-003 +25%）。TP+3.0% 是甜蜜點（+2.5% 壓縮獲利、+3.5% 翻轉 1 筆交易）、SL-4.0% Part A 過擬合（gap 0.33） |
-| VOO | VOO-002 | RSI(2) 非對稱出場 | ~2.8/2.0 | 78.6%/75% | 同 VOO-001 進場（= SPY-004），非對稱出場 SL -3.0%/20d，Part A Sharpe 0.54/Part B 0.45。VOO-002 驗證 SL -3.5%（過寬）、SL -3.0%/15d（短持倉損失 WR）均不如 SL -3.0%/20d |
+| VOO | VOO-003 | RSI(2) 寬獲利目標 | ~2.8/2.0 | 78.6%/75% | 同 VOO-001/002 進場（= SPY-004），TP +2.85%/SL -3.0%/20d，Part A Sharpe 0.61/Part B 0.53（A/B gap 0.08，極佳平衡）。TP +2.85% 為 VOO 甜蜜點：所有贏利交易均達標，+2.9% 翻轉 2022-05-12 交易（vs SPY TP +3.0%，VOO OHLC 微差導致上限更低）。**已確認全域最優**（3 次實驗、7 次嘗試） |
 | SOXL | SOXL-005 | 回撤範圍限制 + 2日急跌 | ~2.6/5.0 | 53.8%/60.0% | 回撤 [-40%,-25%] + RSI(5)<25 + 2日跌幅≤-8%，TP +18%/SL -12%/20天。Part A +69.11%/Sharpe 0.36，Part B +43.39%/Sharpe 0.33，PF 2.10/1.96。回撤上限 -40% 過濾極端崩盤，2日跌幅取代成交量（更直接衡量恐慌賣壓）。A/B 訊號比 1.3:1，Sharpe 差距僅 0.03（極佳平衡）。SOXL-006 驗證持倉15天/回撤-28%/RSI(2)<15 均失敗，已確認為全域最優（6次實驗、21次嘗試） |
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
 | IWM | IWM-004 | RSI(2) 非對稱寬停損 + TP+4.0% | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+4.0%/SL-4.5%/20天。TP 從 +3.5% 提升至 +4.0% 是純粹改善：Part A Sharpe 0.28→0.35（+25%），Part B 0.21→0.28（+33%），WR 不變。+4.5% 超過天花板（Part A WR 降至 60%）。IWM-002 驗證回檔+WR架構 6 次嘗試均 Part A 系統性偏弱（Sharpe 0.01~0.09），RSI(2) 仍為最佳進場框架。SL -4.5% 是甜蜜點（-3.5% Part A 為負，-4.0% 翻轉贏利交易，-5.0% 增加虧損），持倉 15-20d 無差異（平均 3-6d）。**已確認全域最優**（IWM-005 驗證） |
@@ -225,7 +225,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, SOXL-006, URA-002, URA-004, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, SOXL-006, URA-002, URA-004, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003, VOO-003]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -298,6 +298,7 @@
 58. **SOXL 持倉 20 天不可縮短至 15 天** — 雖然平均持倉僅 4.2 天，關鍵交易（2023-08-11）需要 15-20 天才能達標 +18%，縮短後從 +18% 降至 +14.20% 到期，Part A Sharpe 0.36→0.32（SOXL-006 Att1 驗證）
 59. **SOXL 回撤 -25% 是甜蜜點不可加深至 -28%** — -28% 丟失 2020-01-31、2024-10-31 兩筆 +18% 好訊號，並改變其他訊號日期（同 lesson #19），Part A/B Sharpe 0.36/0.33→0.29/0.22（SOXL-006 Att2 驗證）
 60. **RSI(2) 在日波動 >5% 的 3x 槓桿 ETF 上完全不適用** — SOXL 日波動 6.6%，RSI(2)<15 訊號從 13 暴增至 22（+69%），WR 53.8%→45.5%，Part A 出現 6 連續虧損。比 SIVR（日波動 2-4%）和 TSM 的 RSI(2) 失敗更為嚴重（SOXL-006 Att3 驗證）
+61. **同指數 ETF 的 TP 上限不同** — VOO TP +2.85% 為甜蜜點（+2.9% 翻轉 2022-05-12 交易），SPY TP +3.0% 為甜蜜點。追蹤相同 S&P 500 指數但 OHLC 微差（不同管理公司、費用率、流動性）使邊際交易在 VOO 上反彈幅度較小。設計同指數 ETF 策略時，不可直接複製 TP 參數，需獨立驗證上限（VOO-003 驗證）
 
 ---
 
