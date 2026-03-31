@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T22:44:01.461807"
+    "execution_time": "2026-03-31T05:19:13.124727"
   },
   "part_a": {
     "ticker": "TLT",
@@ -214,7 +214,7 @@
         "entry_date": "2022-01-05",
         "exit_date": "2022-02-04",
         "entry": 124.39,
-        "exit": 120.62,
+        "exit": 120.61,
         "return_pct": -3.04,
         "holding_days": 20,
         "exit_type": "time_expiry",

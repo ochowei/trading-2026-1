@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:46.567613"
+    "execution_time": "2026-03-31T05:20:44.611020"
   },
   "part_a": {
     "ticker": "URA",
@@ -523,15 +523,15 @@
     "total_signals": 3,
     "wins": 1,
     "win_rate": 0.3333333333333333,
-    "avg_return_pct": -0.55,
-    "std_return_pct": 4.99,
-    "cumulative_return_pct": -2.02,
-    "avg_holding_days": 2.3,
+    "avg_return_pct": -1.5,
+    "std_return_pct": 5.35,
+    "cumulative_return_pct": -4.84,
+    "avg_holding_days": 2.7,
     "max_drawdown_pct": -9.58,
-    "profit_factor": 0.78,
-    "sharpe_ratio": -0.11,
-    "sortino_ratio": -0.15,
-    "calmar_ratio": -0.06,
+    "profit_factor": 0.57,
+    "sharpe_ratio": -0.28,
+    "sortino_ratio": -0.35,
+    "calmar_ratio": -0.16,
     "max_consecutive_losses": 1,
     "target_exits": 1,
     "stop_loss_exits": 1,
@@ -563,13 +563,13 @@
       {
         "date": "2026-03-20",
         "entry_date": "2026-03-23",
-        "exit_date": "2026-03-27",
+        "exit_date": "2026-03-30",
         "entry": 47.33,
-        "exit": 46.58,
-        "return_pct": -1.57,
-        "holding_days": 4,
+        "exit": 45.24,
+        "return_pct": -4.4,
+        "holding_days": 5,
         "exit_type": "time_expiry",
-        "max_drawdown_pct": -2.87
+        "max_drawdown_pct": -5.42
       }
     ],
     "filled_count": 3,
@@ -586,7 +586,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-30"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:28.473623"
+    "execution_time": "2026-03-31T05:18:31.811891"
   },
   "part_a": {
     "ticker": "SOXL",
@@ -364,9 +364,14 @@
       }
     ],
     "filled_count": 1,
-    "unfilled_count": 0,
-    "unfilled_signals": [],
-    "fill_rate": 1.0,
+    "unfilled_count": 1,
+    "unfilled_signals": [
+      {
+        "date": "2026-03-30",
+        "reason": "no_next_day_data"
+      }
+    ],
+    "fill_rate": 0.5,
     "execution_model": {
       "entry_mode": "next_open_market",
       "exit_profit": "limit_order_day",
@@ -377,7 +382,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-30"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T01:38:11.056431"
+    "execution_time": "2026-03-31T05:18:52.480576"
   },
   "part_a": {
     "ticker": "SPY",
@@ -245,7 +245,7 @@
         "return_pct": 2.5,
         "holding_days": 3,
         "exit_type": "target",
-        "max_drawdown_pct": -0.33
+        "max_drawdown_pct": -0.32
       },
       {
         "date": "2025-04-07",

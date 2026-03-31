@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:27.353405"
+    "execution_time": "2026-03-31T05:18:30.766458"
   },
   "part_a": {
     "ticker": "SOXL",
@@ -333,7 +333,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-30"
     }
   }
 }
