@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003]
+  derived_from: [TQQQ-010, GLD-007, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, TSM-004, VOO-002, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
@@ -212,7 +212,7 @@
 | VOO | VOO-002 | RSI(2) 非對稱出場 | ~2.8/2.0 | 78.6%/75% | 同 VOO-001 進場（= SPY-004），非對稱出場 SL -3.0%/20d，Part A Sharpe 0.54/Part B 0.45。VOO-002 驗證 SL -3.5%（過寬）、SL -3.0%/15d（短持倉損失 WR）均不如 SL -3.0%/20d |
 | SOXL | SOXL-005 | 回撤範圍限制 + 2日急跌 | ~2.6/5.0 | 53.8%/60.0% | 回撤 [-40%,-25%] + RSI(5)<25 + 2日跌幅≤-8%，TP +18%/SL -12%/20天。Part A +69.11%/Sharpe 0.36，Part B +43.39%/Sharpe 0.33，PF 2.10/1.96。回撤上限 -40% 過濾極端崩盤，2日跌幅取代成交量（更直接衡量恐慌賣壓）。A/B 訊號比 1.3:1，Sharpe 差距僅 0.03（極佳平衡） |
 | TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
-| IWM | IWM-004 | RSI(2) 非對稱寬停損 + TP+4.0% | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+4.0%/SL-4.5%/20天。TP 從 +3.5% 提升至 +4.0% 是純粹改善：Part A Sharpe 0.28→0.35（+25%），Part B 0.21→0.28（+33%），WR 不變。+4.5% 超過天花板（Part A WR 降至 60%）。IWM-002 驗證回檔+WR架構 6 次嘗試均 Part A 系統性偏弱（Sharpe 0.01~0.09），RSI(2) 仍為最佳進場框架。SL -4.5% 是關鍵（-3.5% 使 Part A 為負） |
+| IWM | IWM-004 | RSI(2) 非對稱寬停損 + TP+4.0% | ~3.0/3.0 | 66.7%/66.7% | RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+4.0%/SL-4.5%/20天。TP 從 +3.5% 提升至 +4.0% 是純粹改善：Part A Sharpe 0.28→0.35（+25%），Part B 0.21→0.28（+33%），WR 不變。+4.5% 超過天花板（Part A WR 降至 60%）。IWM-002 驗證回檔+WR架構 6 次嘗試均 Part A 系統性偏弱（Sharpe 0.01~0.09），RSI(2) 仍為最佳進場框架。SL -4.5% 是甜蜜點（-3.5% Part A 為負，-4.0% 翻轉贏利交易，-5.0% 增加虧損），持倉 15-20d 無差異（平均 3-6d）。**已確認全域最優**（IWM-005 驗證） |
 | XBI | XBI-001 | 回檔範圍 + Williams %R | ~7.2/5.0 | 63.9%/70.0% | 回檔 8-20% + WR(10)≤-80，TP+3.5%/SL-5.0%/15天。Part B Sharpe 0.23 優於 Part A 0.11（無過擬合），回檔上限 20% 過濾極端崩盤。6 次改進嘗試均失敗：2日急跌過濾移除好訊號（XBI-002 Att1/2）、RSI(2) 框架 Part B WR 44.4%（XBI-002 Att3）、SL收緊(-4.0%/-4.5%)傷害Part A（XBI-003 Att1/2）、延長持倉無效（XBI-003 Att3），已確認為全域最優 |
 | COPX | COPX-003 | 20日回檔範圍 + Williams %R + 出場優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.39/Part B 0.35（A/B gap 僅 0.04，極佳平衡）。20日回看框架 + SL 收窄是關鍵突破（vs COPX-001 Part A 0.08→0.39）。COPX-004 驗證回檔 9-20%（Part A 劣化）、15天持倉（Part B WR 降 9pp）、冷卻 10天（無效果）均失敗，已確認為全域最優 |
 | URA | URA-003 | 回檔範圍 + RSI(2) | ~4.6/8.0 | 65.2%/68.8% | 回檔 10-20% + RSI(2)<15，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.34/Part B 0.44（+21%/+52% vs URA-002）。RSI(2)<15 替代 WR(10)≤-80 是關鍵突破：訊號幾乎不變（23/16 vs 24/16）但品質顯著提升。URA 是 RSI(2) 在日波動 >2% 資產成功的反例（SIVR/TSM/IBIT 均失敗），可能因 10% 回檔門檻已提供充分深度過濾 |
@@ -225,7 +225,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002, IWM-004, TLT-002, TSLA-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, URA-002, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003]
   validated: 2026-03-31
   data_through: 2025-12-31
   confidence: high
