@@ -78,6 +78,7 @@ on:
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "XBI-001: xbi_001_pullback_wr"
+          - "XBI-004: xbi_004_capped_cooldown"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
