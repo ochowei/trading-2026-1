@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:50:56.293456"
+    "execution_time": "2026-04-01T05:11:53.878491"
   },
   "part_a": {
     "ticker": "FCX",
@@ -9,7 +9,7 @@
     "win_rate": 0.6060606060606061,
     "avg_return_pct": 1.27,
     "std_return_pct": 8.35,
-    "cumulative_return_pct": 34.88,
+    "cumulative_return_pct": 34.9,
     "avg_holding_days": 7.4,
     "max_drawdown_pct": -14.93,
     "profit_factor": 1.36,
@@ -325,7 +325,7 @@
         "exit_date": "2023-03-15",
         "entry": 37.31,
         "exit": 33.53,
-        "return_pct": -10.14,
+        "return_pct": -10.13,
         "holding_days": 1,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -10.2
@@ -619,7 +619,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T06:00:45.602092"
+    "execution_time": "2026-03-31T06:02:03.829686"
   },
   "part_a": {
     "ticker": "XBI",
@@ -9,7 +9,7 @@
     "win_rate": 0.6388888888888888,
     "avg_return_pct": 0.44,
     "std_return_pct": 4.08,
-    "cumulative_return_pct": 13.66,
+    "cumulative_return_pct": 13.68,
     "avg_holding_days": 3.4,
     "max_drawdown_pct": -9.38,
     "profit_factor": 1.25,
@@ -50,7 +50,7 @@
         "exit_date": "2019-10-02",
         "entry": 76.8,
         "exit": 72.89,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 3,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.72

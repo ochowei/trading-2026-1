@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T12:42:09.164466"
+    "execution_time": "2026-04-01T05:22:15.000660"
   },
   "part_a": {
     "ticker": "VOO",
@@ -322,7 +322,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-31"
     }
   }
 }

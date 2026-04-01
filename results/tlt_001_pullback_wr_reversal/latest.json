@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:35.460102"
+    "execution_time": "2026-04-01T05:18:09.761313"
   },
   "part_a": {
     "ticker": "TLT",
@@ -225,7 +225,7 @@
         "entry_date": "2022-01-05",
         "exit_date": "2022-02-04",
         "entry": 124.39,
-        "exit": 120.61,
+        "exit": 120.62,
         "return_pct": -3.04,
         "holding_days": 20,
         "exit_type": "time_expiry",
@@ -721,15 +721,15 @@
     "total_signals": 1,
     "wins": 0,
     "win_rate": 0.0,
-    "avg_return_pct": -1.68,
+    "avg_return_pct": -0.48,
     "std_return_pct": 0.0,
-    "cumulative_return_pct": -1.68,
-    "avg_holding_days": 10.0,
+    "cumulative_return_pct": -0.48,
+    "avg_holding_days": 12.0,
     "max_drawdown_pct": -1.8,
     "profit_factor": 0.0,
     "sharpe_ratio": 0.0,
     "sortino_ratio": -1.0,
-    "calmar_ratio": -0.93,
+    "calmar_ratio": -0.27,
     "max_consecutive_losses": 1,
     "target_exits": 0,
     "stop_loss_exits": 0,
@@ -739,11 +739,11 @@
       {
         "date": "2026-03-12",
         "entry_date": "2026-03-13",
-        "exit_date": "2026-03-27",
+        "exit_date": "2026-03-31",
         "entry": 87.02,
-        "exit": 85.55,
-        "return_pct": -1.68,
-        "holding_days": 10,
+        "exit": 86.6,
+        "return_pct": -0.48,
+        "holding_days": 12,
         "exit_type": "time_expiry",
         "max_drawdown_pct": -1.8
       }
@@ -762,7 +762,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

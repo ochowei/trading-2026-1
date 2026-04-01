@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T02:36:27.504107"
+    "execution_time": "2026-03-31T06:00:45.602092"
   },
   "part_a": {
     "ticker": "XBI",
@@ -9,7 +9,7 @@
     "win_rate": 0.6388888888888888,
     "avg_return_pct": 0.44,
     "std_return_pct": 4.08,
-    "cumulative_return_pct": 13.65,
+    "cumulative_return_pct": 13.66,
     "avg_holding_days": 3.4,
     "max_drawdown_pct": -9.38,
     "profit_factor": 1.25,
@@ -127,7 +127,7 @@
         "exit_date": "2021-03-05",
         "entry": 139.04,
         "exit": 131.95,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 1,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -8.14
@@ -270,7 +270,7 @@
         "exit_date": "2022-04-18",
         "entry": 87.82,
         "exit": 83.34,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 3,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.71
@@ -413,7 +413,7 @@
         "exit_date": "2023-10-31",
         "entry": 66.85,
         "exit": 63.44,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 7,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.07
@@ -443,7 +443,7 @@
     "win_rate": 0.7,
     "avg_return_pct": 0.92,
     "std_return_pct": 3.94,
-    "cumulative_return_pct": 8.75,
+    "cumulative_return_pct": 8.74,
     "avg_holding_days": 5.1,
     "max_drawdown_pct": -9.5,
     "profit_factor": 1.6,
@@ -473,7 +473,7 @@
         "exit_date": "2024-04-17",
         "entry": 88.59,
         "exit": 84.08,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 8,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.05

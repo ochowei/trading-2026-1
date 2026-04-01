@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T19:45:03.582479"
+    "execution_time": "2026-04-01T05:13:36.776504"
   },
   "part_a": {
     "ticker": "IBIT",
@@ -223,7 +223,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-30"
+      "end": "2026-03-31"
     }
   }
 }

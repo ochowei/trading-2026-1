@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:32.835713"
+    "execution_time": "2026-04-01T05:17:27.580661"
   },
   "part_a": {
     "ticker": "SPY",
@@ -366,7 +366,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "execution_time": "2026-03-29T14:38:00.902786"
+    "execution_time": "2026-03-29T14:38:22.663678"
   },
   "part_a": {
     "ticker": "VOO",
     "total_signals": 14,
-    "wins": 10,
-    "win_rate": 0.7142857142857143,
-    "avg_return_pct": 0.92,
-    "std_return_pct": 2.29,
-    "cumulative_return_pct": 13.27,
-    "avg_holding_days": 6.9,
+    "wins": 11,
+    "win_rate": 0.7857142857142857,
+    "avg_return_pct": 1.23,
+    "std_return_pct": 2.28,
+    "cumulative_return_pct": 18.3,
+    "avg_holding_days": 7.6,
     "max_drawdown_pct": -3.63,
-    "profit_factor": 2.3,
-    "sharpe_ratio": 0.4,
-    "sortino_ratio": 0.64,
-    "calmar_ratio": 0.25,
-    "max_consecutive_losses": 2,
-    "target_exits": 9,
+    "profit_factor": 2.86,
+    "sharpe_ratio": 0.54,
+    "sortino_ratio": 0.86,
+    "calmar_ratio": 0.34,
+    "max_consecutive_losses": 1,
+    "target_exits": 10,
     "stop_loss_exits": 3,
-    "time_expiry_exits": 2,
+    "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
       {
@@ -36,11 +36,11 @@
       {
         "date": "2019-08-02",
         "entry_date": "2019-08-05",
-        "exit_date": "2019-08-27",
+        "exit_date": "2019-09-04",
         "entry": 239.75,
-        "exit": 240.5,
-        "return_pct": 0.31,
-        "holding_days": 15,
+        "exit": 243.51,
+        "return_pct": 1.57,
+        "holding_days": 20,
         "exit_type": "time_expiry",
         "max_drawdown_pct": -2.21
       },
@@ -91,12 +91,12 @@
       {
         "date": "2021-09-20",
         "entry_date": "2021-09-21",
-        "exit_date": "2021-10-13",
+        "exit_date": "2021-10-19",
         "entry": 377.77,
-        "exit": 375.42,
-        "return_pct": -0.62,
-        "holding_days": 15,
-        "exit_type": "time_expiry",
+        "exit": 387.22,
+        "return_pct": 2.5,
+        "holding_days": 20,
+        "exit_type": "target",
         "max_drawdown_pct": -2.44
       },
       {
