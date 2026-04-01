@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-01T01:47:58.779845"
+    "execution_time": "2026-04-01T05:10:44.164386"
   },
   "part_a": {
     "ticker": "DIA",
@@ -241,7 +241,7 @@
         "entry_date": "2025-04-08",
         "exit_date": "2025-04-09",
         "entry": 387.82,
-        "exit": 373.87,
+        "exit": 373.88,
         "return_pct": -3.6,
         "holding_days": 1,
         "exit_type": "stop_loss_pessimistic",

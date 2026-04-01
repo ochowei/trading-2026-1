@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-03-31T21:41:37.673461"
+    "execution_time": "2026-03-31T21:42:09.472066"
   },
   "part_a": {
     "ticker": "XBI",
-    "total_signals": 21,
-    "wins": 16,
-    "win_rate": 0.7619047619047619,
-    "avg_return_pct": 1.3,
-    "std_return_pct": 3.64,
-    "cumulative_return_pct": 29.34,
-    "avg_holding_days": 3.6,
-    "max_drawdown_pct": -9.08,
-    "profit_factor": 2.07,
-    "sharpe_ratio": 0.36,
-    "sortino_ratio": 0.52,
-    "calmar_ratio": 0.14,
+    "total_signals": 23,
+    "wins": 17,
+    "win_rate": 0.7391304347826086,
+    "avg_return_pct": 1.12,
+    "std_return_pct": 3.75,
+    "cumulative_return_pct": 27.03,
+    "avg_holding_days": 3.4,
+    "max_drawdown_pct": -8.43,
+    "profit_factor": 1.84,
+    "sharpe_ratio": 0.3,
+    "sortino_ratio": 0.43,
+    "calmar_ratio": 0.13,
     "max_consecutive_losses": 1,
-    "target_exits": 15,
-    "stop_loss_exits": 5,
+    "target_exits": 16,
+    "stop_loss_exits": 6,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
@@ -67,6 +67,17 @@
         "max_drawdown_pct": 6.7
       },
       {
+        "date": "2020-07-31",
+        "entry_date": "2020-08-03",
+        "exit_date": "2020-08-04",
+        "entry": 109.28,
+        "exit": 113.1,
+        "return_pct": 3.5,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.63
+      },
+      {
         "date": "2021-01-05",
         "entry_date": "2021-01-06",
         "exit_date": "2021-01-07",
@@ -78,15 +89,15 @@
         "max_drawdown_pct": 3.03
       },
       {
-        "date": "2021-02-19",
-        "entry_date": "2021-02-22",
+        "date": "2021-02-18",
+        "entry_date": "2021-02-19",
         "exit_date": "2021-02-23",
-        "entry": 158.14,
-        "exit": 150.08,
-        "return_pct": -5.09,
-        "holding_days": 1,
+        "entry": 157.02,
+        "exit": 149.02,
+        "return_pct": -5.1,
+        "holding_days": 2,
         "exit_type": "stop_loss",
-        "max_drawdown_pct": -9.08
+        "max_drawdown_pct": -8.43
       },
       {
         "date": "2021-03-30",
@@ -105,7 +116,7 @@
         "exit_date": "2021-05-11",
         "entry": 126.58,
         "exit": 120.13,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 2,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -7.09
@@ -122,15 +133,26 @@
         "max_drawdown_pct": -4.74
       },
       {
-        "date": "2021-12-06",
-        "entry_date": "2021-12-07",
-        "exit_date": "2021-12-08",
-        "entry": 111.21,
-        "exit": 115.11,
+        "date": "2021-11-26",
+        "entry_date": "2021-11-29",
+        "exit_date": "2021-11-30",
+        "entry": 118.33,
+        "exit": 112.3,
+        "return_pct": -5.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -5.34
+      },
+      {
+        "date": "2021-12-14",
+        "entry_date": "2021-12-15",
+        "exit_date": "2021-12-16",
+        "entry": 108.61,
+        "exit": 112.41,
         "return_pct": 3.5,
         "holding_days": 1,
         "exit_type": "target",
-        "max_drawdown_pct": 1.72
+        "max_drawdown_pct": 0.26
       },
       {
         "date": "2022-01-06",
@@ -138,7 +160,7 @@
         "exit_date": "2022-01-13",
         "entry": 104.72,
         "exit": 99.39,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 4,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -7.17
@@ -254,7 +276,7 @@
         "max_drawdown_pct": 2.47
       }
     ],
-    "filled_count": 21,
+    "filled_count": 23,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

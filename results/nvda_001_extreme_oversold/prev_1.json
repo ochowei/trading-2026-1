@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-29T20:39:55.062051"
+    "execution_time": "2026-03-30T03:51:10.392090"
   },
   "part_a": {
     "ticker": "NVDA",
@@ -111,9 +111,9 @@
     "total_signals": 4,
     "wins": 3,
     "win_rate": 0.75,
-    "avg_return_pct": 3.47,
+    "avg_return_pct": 3.46,
     "std_return_pct": 7.85,
-    "cumulative_return_pct": 13.21,
+    "cumulative_return_pct": 13.2,
     "avg_holding_days": 4.0,
     "max_drawdown_pct": -12.89,
     "profit_factor": 2.37,
@@ -143,7 +143,7 @@
         "exit_date": "2024-07-25",
         "entry": 121.97,
         "exit": 109.61,
-        "return_pct": -10.13,
+        "return_pct": -10.14,
         "holding_days": 5,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -12.89

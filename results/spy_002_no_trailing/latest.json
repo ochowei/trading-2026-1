@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:31.312477"
+    "execution_time": "2026-04-01T05:17:25.510064"
   },
   "part_a": {
     "ticker": "SPY",
@@ -70,7 +70,7 @@
         "date": "2020-09-24",
         "entry_date": "2020-09-25",
         "exit_date": "2020-09-28",
-        "entry": 299.33,
+        "entry": 299.32,
         "exit": 306.81,
         "return_pct": 2.5,
         "holding_days": 1,
@@ -399,7 +399,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

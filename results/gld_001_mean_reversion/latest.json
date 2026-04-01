@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:50:59.067460"
+    "execution_time": "2026-04-01T05:12:38.028921"
   },
   "part_a": {
     "ticker": "GLD",
@@ -322,7 +322,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

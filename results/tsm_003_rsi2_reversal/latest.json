@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:51:44.175877"
+    "execution_time": "2026-04-01T05:20:01.111573"
   },
   "part_a": {
     "ticker": "TSM",
@@ -130,7 +130,7 @@
         "return_pct": -6.09,
         "holding_days": 3,
         "exit_type": "stop_loss",
-        "max_drawdown_pct": -6.88
+        "max_drawdown_pct": -6.89
       },
       {
         "date": "2022-10-24",
@@ -355,7 +355,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-29T16:37:30.956585"
+    "execution_time": "2026-03-31T14:36:04.869077"
   },
   "part_a": {
     "ticker": "SOXL",
@@ -333,22 +333,22 @@
   },
   "part_c": {
     "ticker": "SOXL",
-    "total_signals": 1,
+    "total_signals": 2,
     "wins": 0,
     "win_rate": 0.0,
-    "avg_return_pct": -12.09,
-    "std_return_pct": 0.0,
-    "cumulative_return_pct": -12.09,
-    "avg_holding_days": 2.0,
+    "avg_return_pct": -6.09,
+    "std_return_pct": 6.0,
+    "cumulative_return_pct": -12.18,
+    "avg_holding_days": 1.0,
     "max_drawdown_pct": -16.45,
     "profit_factor": 0.0,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": -1.0,
-    "calmar_ratio": -0.73,
-    "max_consecutive_losses": 1,
+    "sharpe_ratio": -1.02,
+    "sortino_ratio": -0.71,
+    "calmar_ratio": -0.37,
+    "max_consecutive_losses": 2,
     "target_exits": 0,
     "stop_loss_exits": 1,
-    "time_expiry_exits": 0,
+    "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
       {
@@ -361,9 +361,20 @@
         "holding_days": 2,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -16.45
+      },
+      {
+        "date": "2026-03-30",
+        "entry_date": "2026-03-31",
+        "exit_date": "2026-03-31",
+        "entry": 42.92,
+        "exit": 42.88,
+        "return_pct": -0.1,
+        "holding_days": 0,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": 0.0
       }
     ],
-    "filled_count": 1,
+    "filled_count": 2,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -377,7 +388,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }

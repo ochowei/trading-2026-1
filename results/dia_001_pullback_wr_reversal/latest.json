@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-03-30T03:50:51.244100"
+    "execution_time": "2026-04-01T05:10:37.118526"
   },
   "part_a": {
     "ticker": "DIA",
@@ -272,7 +272,7 @@
     "win_rate": 1.0,
     "avg_return_pct": 1.52,
     "std_return_pct": 0.83,
-    "cumulative_return_pct": 11.11,
+    "cumulative_return_pct": 11.12,
     "avg_holding_days": 13.4,
     "max_drawdown_pct": -3.83,
     "profit_factor": 999.99,
@@ -358,7 +358,7 @@
         "exit_date": "2025-12-10",
         "entry": 463.76,
         "exit": 472.22,
-        "return_pct": 1.82,
+        "return_pct": 1.83,
         "holding_days": 13,
         "exit_type": "trailing_stop",
         "max_drawdown_pct": -1.86
@@ -388,18 +388,18 @@
   "part_c": {
     "ticker": "DIA",
     "total_signals": 2,
-    "wins": 1,
-    "win_rate": 0.5,
-    "avg_return_pct": -0.49,
-    "std_return_pct": 1.31,
-    "cumulative_return_pct": -1.0,
-    "avg_holding_days": 3.0,
-    "max_drawdown_pct": -1.89,
-    "profit_factor": 0.45,
-    "sharpe_ratio": -0.38,
-    "sortino_ratio": -0.39,
-    "calmar_ratio": -0.26,
-    "max_consecutive_losses": 1,
+    "wins": 2,
+    "win_rate": 1.0,
+    "avg_return_pct": 0.79,
+    "std_return_pct": 0.02,
+    "cumulative_return_pct": 1.59,
+    "avg_holding_days": 4.0,
+    "max_drawdown_pct": -1.91,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 39.5,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 0.41,
+    "max_consecutive_losses": 0,
     "target_exits": 0,
     "stop_loss_exits": 1,
     "time_expiry_exits": 1,
@@ -420,13 +420,13 @@
       {
         "date": "2026-03-19",
         "entry_date": "2026-03-20",
-        "exit_date": "2026-03-27",
+        "exit_date": "2026-03-31",
         "entry": 459.19,
-        "exit": 450.94,
-        "return_pct": -1.8,
-        "holding_days": 5,
+        "exit": 462.73,
+        "return_pct": 0.77,
+        "holding_days": 7,
         "exit_type": "time_expiry",
-        "max_drawdown_pct": -1.89
+        "max_drawdown_pct": -1.91
       }
     ],
     "filled_count": 2,
@@ -447,7 +447,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-27"
+      "end": "2026-03-31"
     }
   }
 }
