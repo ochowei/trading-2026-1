@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "execution_time": "2026-04-01T01:34:32.854404"
+    "execution_time": "2026-04-01T01:38:48.997239"
   },
   "part_a": {
     "ticker": "DIA",
-    "total_signals": 14,
-    "wins": 11,
-    "win_rate": 0.7857142857142857,
-    "avg_return_pct": 1.41,
-    "std_return_pct": 2.69,
-    "cumulative_return_pct": 21.06,
-    "avg_holding_days": 7.9,
+    "total_signals": 10,
+    "wins": 7,
+    "win_rate": 0.7,
+    "avg_return_pct": 0.78,
+    "std_return_pct": 2.95,
+    "cumulative_return_pct": 7.56,
+    "avg_holding_days": 8.3,
     "max_drawdown_pct": -4.4,
-    "profit_factor": 2.83,
-    "sharpe_ratio": 0.52,
-    "sortino_ratio": 0.85,
-    "calmar_ratio": 0.32,
+    "profit_factor": 1.72,
+    "sharpe_ratio": 0.26,
+    "sortino_ratio": 0.39,
+    "calmar_ratio": 0.18,
     "max_consecutive_losses": 1,
-    "target_exits": 10,
+    "target_exits": 6,
     "stop_loss_exits": 3,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
@@ -34,17 +34,6 @@
         "max_drawdown_pct": -1.98
       },
       {
-        "date": "2019-12-03",
-        "entry_date": "2019-12-04",
-        "exit_date": "2019-12-20",
-        "entry": 246.73,
-        "exit": 254.13,
-        "return_pct": 3.0,
-        "holding_days": 12,
-        "exit_type": "target",
-        "max_drawdown_pct": -0.41
-      },
-      {
         "date": "2020-01-27",
         "entry_date": "2020-01-28",
         "exit_date": "2020-02-12",
@@ -54,17 +43,6 @@
         "holding_days": 11,
         "exit_type": "target",
         "max_drawdown_pct": -1.71
-      },
-      {
-        "date": "2020-02-28",
-        "entry_date": "2020-03-02",
-        "exit_date": "2020-03-03",
-        "entry": 230.1,
-        "exit": 237.0,
-        "return_pct": 3.0,
-        "holding_days": 1,
-        "exit_type": "target",
-        "max_drawdown_pct": 0.08
       },
       {
         "date": "2020-09-21",
@@ -133,28 +111,6 @@
         "max_drawdown_pct": -3.62
       },
       {
-        "date": "2022-06-14",
-        "entry_date": "2022-06-15",
-        "exit_date": "2022-06-27",
-        "entry": 286.51,
-        "exit": 295.1,
-        "return_pct": 3.0,
-        "holding_days": 7,
-        "exit_type": "target",
-        "max_drawdown_pct": -3.14
-      },
-      {
-        "date": "2022-09-23",
-        "entry_date": "2022-09-26",
-        "exit_date": "2022-10-05",
-        "entry": 277.5,
-        "exit": 285.82,
-        "return_pct": 3.0,
-        "holding_days": 7,
-        "exit_type": "target",
-        "max_drawdown_pct": -2.66
-      },
-      {
         "date": "2022-12-16",
         "entry_date": "2022-12-19",
         "exit_date": "2023-01-09",
@@ -177,7 +133,7 @@
         "max_drawdown_pct": -2.41
       }
     ],
-    "filled_count": 14,
+    "filled_count": 10,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -196,23 +152,23 @@
   },
   "part_b": {
     "ticker": "DIA",
-    "total_signals": 4,
+    "total_signals": 3,
     "wins": 3,
-    "win_rate": 0.75,
-    "avg_return_pct": 1.35,
-    "std_return_pct": 2.86,
-    "cumulative_return_pct": 5.34,
-    "avg_holding_days": 8.0,
-    "max_drawdown_pct": -5.54,
-    "profit_factor": 2.5,
-    "sharpe_ratio": 0.47,
-    "sortino_ratio": 0.75,
-    "calmar_ratio": 0.24,
-    "max_consecutive_losses": 1,
+    "win_rate": 1.0,
+    "avg_return_pct": 3.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 9.27,
+    "avg_holding_days": 10.3,
+    "max_drawdown_pct": -0.17,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 17.65,
+    "max_consecutive_losses": 0,
     "target_exits": 3,
-    "stop_loss_exits": 1,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 0,
-    "pessimistic_exits": 1,
+    "pessimistic_exits": 0,
     "trades": [
       {
         "date": "2024-05-30",
@@ -237,17 +193,6 @@
         "max_drawdown_pct": -0.17
       },
       {
-        "date": "2025-04-07",
-        "entry_date": "2025-04-08",
-        "exit_date": "2025-04-09",
-        "entry": 387.82,
-        "exit": 373.88,
-        "return_pct": -3.6,
-        "holding_days": 1,
-        "exit_type": "stop_loss_pessimistic",
-        "max_drawdown_pct": -5.54
-      },
-      {
         "date": "2025-08-01",
         "entry_date": "2025-08-04",
         "exit_date": "2025-08-15",
@@ -259,7 +204,7 @@
         "max_drawdown_pct": -0.08
       }
     ],
-    "filled_count": 4,
+    "filled_count": 3,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

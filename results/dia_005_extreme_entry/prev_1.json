@@ -1,21 +1,21 @@
 {
   "metadata": {
-    "execution_time": "2026-04-01T01:34:32.854404"
+    "execution_time": "2026-04-01T01:40:28.305840"
   },
   "part_a": {
     "ticker": "DIA",
     "total_signals": 14,
     "wins": 11,
     "win_rate": 0.7857142857142857,
-    "avg_return_pct": 1.41,
+    "avg_return_pct": 1.53,
     "std_return_pct": 2.69,
-    "cumulative_return_pct": 21.06,
-    "avg_holding_days": 7.9,
+    "cumulative_return_pct": 23.1,
+    "avg_holding_days": 8.2,
     "max_drawdown_pct": -4.4,
-    "profit_factor": 2.83,
-    "sharpe_ratio": 0.52,
-    "sortino_ratio": 0.85,
-    "calmar_ratio": 0.32,
+    "profit_factor": 2.99,
+    "sharpe_ratio": 0.57,
+    "sortino_ratio": 0.92,
+    "calmar_ratio": 0.35,
     "max_consecutive_losses": 1,
     "target_exits": 10,
     "stop_loss_exits": 3,
@@ -168,11 +168,11 @@
       {
         "date": "2023-05-04",
         "entry_date": "2023-05-05",
-        "exit_date": "2023-06-06",
+        "exit_date": "2023-06-13",
         "entry": 318.2,
-        "exit": 319.94,
-        "return_pct": 0.55,
-        "holding_days": 20,
+        "exit": 325.37,
+        "return_pct": 2.25,
+        "holding_days": 25,
         "exit_type": "time_expiry",
         "max_drawdown_pct": -2.41
       }
