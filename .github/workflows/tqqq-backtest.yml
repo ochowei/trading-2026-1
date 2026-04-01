@@ -91,6 +91,7 @@ on:
           - "XBI-005: xbi_005_closepos_reversal"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "XLU-002: xlu_002_capped_pullback_wr"
+          - "XLU-003: xlu_003_tight_pullback_wr"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
