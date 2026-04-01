@@ -1,12 +1,14 @@
 """
-DIA-005 訊號偵測器：RSI(2) 收窄停損均值回歸
-(DIA-005 Signal Detector: RSI(2) Tighter SL Mean Reversion)
+DIA-005 訊號偵測器：RSI(2) 延長持倉均值回歸
+(DIA-005 Signal Detector: RSI(2) Extended Holding Mean Reversion)
 
 進場條件（同 DIA-004，全部滿足）：
 1. RSI(2) < 10（極端超賣）
 2. 2 日累計跌幅 >= 1.5%（幅度過濾）
 3. 收盤位置 >= 40%（日內反轉確認）
 4. 冷卻期 5 個交易日
+
+出場差異：持倉期 25 天（DIA-004 為 20 天）
 """
 
 import logging
@@ -14,13 +16,13 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.experiments.dia_005_tighter_sl.config import DIARsi2TighterSLConfig
+from trading.experiments.dia_005_extreme_entry.config import DIAExtendedHoldConfig
 
 logger = logging.getLogger(__name__)
 
 
-class DIARsi2TighterSLSignalDetector(BaseSignalDetector):
-    def __init__(self, config: DIARsi2TighterSLConfig):
+class DIAExtendedHoldSignalDetector(BaseSignalDetector):
+    def __init__(self, config: DIAExtendedHoldConfig):
         self.config = config
 
     @staticmethod
@@ -77,5 +79,5 @@ class DIARsi2TighterSLSignalDetector(BaseSignalDetector):
             df.loc[suppressed, "Signal"] = False
 
         signal_count = df["Signal"].sum()
-        logger.info("DIA-005: Detected %d RSI(2) extreme oversold signals", signal_count)
+        logger.info("DIA-005: Detected %d RSI(2) extended hold signals", signal_count)
         return df

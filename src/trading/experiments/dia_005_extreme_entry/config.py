@@ -1,9 +1,9 @@
 """
-DIA-005: RSI(2) 收窄停損均值回歸
-(DIA RSI(2) Tighter SL Mean Reversion)
+DIA-005: RSI(2) 延長持倉均值回歸
+(DIA RSI(2) Extended Holding Mean Reversion)
 
-基於 DIA-004 測試收窄停損 SL -3.0%（原 -3.5%），
-參考 SPY-005 在相似波動度下 SL -3.0% 的成功經驗。
+同 DIA-004 進場條件與出場參數，僅延長持倉期至 25 天，
+讓接近達標的到期交易有更多時間觸及 TP +3.0%。
 """
 
 from dataclasses import dataclass
@@ -12,8 +12,8 @@ from trading.core.base_config import ExperimentConfig
 
 
 @dataclass
-class DIARsi2TighterSLConfig(ExperimentConfig):
-    """DIA RSI(2) 收窄停損參數"""
+class DIAExtendedHoldConfig(ExperimentConfig):
+    """DIA RSI(2) 延長持倉參數"""
 
     # RSI(2) 參數（同 DIA-004）
     rsi_period: int = 2
@@ -30,14 +30,14 @@ class DIARsi2TighterSLConfig(ExperimentConfig):
     cooldown_days: int = 5
 
 
-def create_default_config() -> DIARsi2TighterSLConfig:
-    return DIARsi2TighterSLConfig(
-        name="dia_005_tighter_sl",
+def create_default_config() -> DIAExtendedHoldConfig:
+    return DIAExtendedHoldConfig(
+        name="dia_005_extreme_entry",
         experiment_id="DIA-005",
-        display_name="DIA RSI(2) Tighter SL Mean Reversion",
+        display_name="DIA RSI(2) Extended Holding Mean Reversion",
         tickers=["DIA"],
         data_start="2010-01-01",
         profit_target=0.030,  # +3.0%（同 DIA-004）
         stop_loss=-0.035,  # -3.5%（同 DIA-004）
-        holding_days=20,  # 20 天（同 DIA-004）
+        holding_days=25,  # 25 天（DIA-004 為 20 天）
     )
