@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, GLD-008, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003, TSLA-004]
+  derived_from: [TQQQ-010, GLD-007, GLD-008, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, COPX-001, COPX-002, COPX-003, COPX-004, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, TLT-001, TLT-002, TSLA-003, TSLA-004, XLU-002]
   validated: 2026-04-01
   data_through: 2025-12-31
   confidence: high
@@ -220,14 +220,15 @@
 | IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2) 替代 WR（訊號日期偏移）、2日跌幅+RSI 過嚴、SL-6% 翻轉勝負均失敗，已確認為全域最優 |
 | TSLA | TSLA-004 | WR(10) + 回撤 + 2日急跌 | ~5.2/4.5 | 73.1%/66.7% | DD[-45%,-20%] + WR(10)≤-80 + 2日跌幅≤-6%，TP+7%/SL-13%/25天。Part A Sharpe 0.14/Part B 0.13（A/B gap 0.01，優秀平衡）。vs TSLA-002：Sharpe +100%/+86%，MDD -18%/-42%。WR(10) 取代 RSI(2) 再次驗證教訓 #13（高波動資產 WR 優於 RSI），SL -13% 是 WR 進場下的甜蜜點（-15% 浪費呼吸空間） |
 | TLT | TLT-002 | 回檔 + WR + 反轉K線 + 60日跌幅過濾 | ~6.4/8.0 | 46.9%/68.8% | 回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + 60日跌幅≤10%，TP+2.5%/SL-3.5%/20天。Part A Sharpe -0.20/Part B 0.24。**Part A 結構性負**（2022 升息制約），3 次改進嘗試（深回檔/低TP/中期跌幅過濾）僅邊際改善。真正改善需利率相關外部資料 |
+| XLU | XLU-002 | 回檔範圍 + Williams %R + 反轉K線 | ~4.8/6.0 | 58.3%/66.7% | 回檔 3-7% + WR(10)≤-80 + ClosePos≥40%，TP+2.5%/SL-4.0%/20天。Part A Sharpe 0.00/Part B 0.32（vs XLU-001 -0.02/0.15，Part B +113%）。回檔上限 7% 成功過濾 2022 升息期持續下跌訊號。RSI(2) 框架在 XLU 完全失敗（2 次嘗試，SL 太緊或訊號太少） |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, SOXL-006, SOXL-007, SOXL-008, URA-002, URA-004, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003, VOO-003, XBI-005]
-  validated: 2026-03-31
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, SOXL-003, SOXL-006, SOXL-007, SOXL-008, URA-002, URA-004, COPX-003, NVDA-002, IBIT-002, IWM-004, IWM-005, TLT-002, TSLA-003, VOO-003, XBI-005, XLU-002]
+  validated: 2026-04-01
   data_through: 2025-12-31
   confidence: high
 -->
@@ -307,6 +308,7 @@
 66. **ClosePos 門檻需按資產微調** — XBI ClosePos ≥ 35% 是甜蜜點：≥ 40% Part B Sharpe 0.64→0.16（門檻太高移除 Part B 好訊號，訊號日期偏移），≥ 30% Part A Sharpe 0.36→0.30（門檻太低引入 Part A 壞訊號）。GLD-007/IWM-005 使用 40%，但 XBI 日波動較高（2.0% vs GLD 1.1%/IWM 1.5-2%），好訊號 ClosePos 常在 35-40% 區間（XBI-005 驗證）
 65. **ROC(5) 進場架構品質遠不如 RSI(2)** — SPY ROC(5) ≤ -3% 產生 24 個 Part A 訊號（vs RSI(2) 16 個），但 WR 僅 58.3%（vs 75.0%），Sharpe 0.13（vs 0.53）。ROC 捕捉「慢速下跌」但這些場景均值回歸力道不足，RSI(2) 對單日極端超賣的敏感性反而是優勢而非劣勢（SPY-006 Att1 驗證）
 66. **SPY TP +3.0% 是甜蜜點（RSI(2) 進場）** — TP +3.5% 改善 Part B Sharpe（0.56→0.65）但 Part A WR 從 75%→68.8%（1 筆交易達 +3.0% 但未達 +3.5% 後反轉），A/B gap 從 0.03 擴大至 0.22。類似 USO TP +3.0%、TSM TP +7%、VOO TP +2.85% 的甜蜜點現象（SPY-006 Att3 驗證）
+67. **RSI(2) 框架在利率敏感型低波動 ETF（XLU）完全失效** — RSI(2)<10 + SL -3.0%：Part A 16 訊號中 8 停損，Sharpe -0.20/-0.92。RSI(2)<5 + SL -4.0%：Part A 僅 4 訊號（0.8/年），Sharpe -0.86/-0.53。XLU 在升息期持續下跌，RSI(2) 在回檔初期觸發但價格繼續下跌觸及 SL。回檔範圍過濾（3-7%）才是正確解法（XLU-002 Att1/Att2 驗證）
 
 ---
 
