@@ -81,6 +81,13 @@ uv run trading freshness
 ## 架構速覽
 
 ```
+.agents/
+├── context/
+│   ├── cross_asset_lessons.md   # 跨資產共通教訓（波動率分類、禁忌、參數縮放）
+│   └── use_cases.md             # Use Cases 總覽（情境 → Skill 對照）
+└── rules/
+    └── execution-model.md       # 成交模型完整規格
+
 pm/                              # 人類 PM 專用文件（AI Agent 禁止編輯）
 └── HUMAN_PM_MEMO.md             # 關注標的、策略想法、執行模型備忘、更新紀錄
 
@@ -126,3 +133,4 @@ src/trading/
 - IBIT 實驗總覽 → [src/trading/experiments/EXPERIMENTS_IBIT.md](src/trading/experiments/EXPERIMENTS_IBIT.md)
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
 - 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
+- Use Cases 總覽（情境 → Skill 對照）→ [.agents/context/use_cases.md](.agents/context/use_cases.md)
