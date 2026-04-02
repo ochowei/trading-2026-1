@@ -79,7 +79,7 @@
 
 ## 回測區間與過擬合防護策略
 
-### 現行回測區間
+### 現行回測區間（Generation 1）
 
 | 區間 | 期間 | 用途 |
 |------|------|------|
@@ -87,16 +87,48 @@
 | Part B (Out-of-Sample) | 2024-01-01 ~ 2025-12-31 | 驗證泛化能力，納入 followup 的主要依據 |
 | Part C (Live) | 2026-01-01 ~ 至今 | 實盤追蹤 |
 
-### 決策：Part A/B 不隨時間推移
+### 世代制（Generation System）
 
-Part A/B 固定不動，理由：
-- 它們是策略設計時的歷史紀錄，移動會破壞原始 out-of-sample 的完整性
-- 重跑舊實驗後數字不同，文件追溯會混亂
-- Part C 自然成為新的驗證層，且是唯一「策略上線後才產生」的數據
+Part A/B 在同一世代內固定不動，但 Part C 累積滿 2 年後觸發世代交替：舊 Part B 併入 Part A，舊 Part C 升格為新 Part B，新 Part C 從零開始。
 
-**持續驗證靠兩個機制：**
-1. `uv run trading analyze` 的滾動窗口會自動涵蓋最新數據
-2. Part C 累積足夠樣本後（≥ 3 筆交易），應加入 evaluate-best 的判定條件
+```
+Generation 1（現在 ~ 2027 年底）
+  Part A: 2019-2023  (In-Sample)
+  Part B: 2024-2025  (Out-of-Sample)
+  Part C: 2026-2027  (Live)
+
+Generation 2（2028 年起）
+  Part A: 2019-2025  (In-Sample，合併舊 A+B)
+  Part B: 2026-2027  (Out-of-Sample，舊 Part C 升格)
+  Part C: 2028+      (Live)
+
+Generation 3（2030 年起）
+  Part A: 2019-2027  (In-Sample)
+  Part B: 2028-2029  (Out-of-Sample)
+  Part C: 2030+      (Live)
+```
+
+**為什麼 2 年一個世代？**
+- 太短（1 年）：Part B 樣本不夠，訊號太少無法判斷
+- 太長（3+ 年）：市場 regime 可能已漂移，驗證意義遞減
+- 2 年與現行 Part B 長度一致，門檻標準可直接沿用
+
+**世代交替時的操作：**
+
+策略程式碼和參數都不動，只改 `base_config.py` 的日期區間，然後：
+
+1. `uv run trading run <每個實驗>` — 用新區間重新產出 latest.json
+2. `uv run trading analyze <每個實驗>` — 重新做滾動窗口分析
+3. `/rebuild-followup` — 用新結果重新評估所有策略，不通過的從 followup 移除
+
+這個流程的價值：**舊 Part C 升格為 Part B 時，這段數據在策略設計時是真正 unseen 的，能有效淘汰過擬合策略。**
+
+### 同一世代內的持續驗證
+
+世代交替之間，靠兩個機制持續監控：
+
+1. `uv run trading analyze` 的滾動窗口自動涵蓋最新數據
+2. Part C 累積足夠樣本後（≥ 3 筆交易），加入 evaluate-best 的判定條件
 
 ### 現行防過擬合機制
 
@@ -106,19 +138,19 @@ Part A/B 固定不動，理由：
 | 2 | A/B 一致性（WR 差 < 15pp） | 過度擬合 Part A 的策略會在 B 崩潰 |
 | 3 | 滾動窗口漸變性評估 | 策略是否對特定 regime 敏感 |
 | 4 | 悲觀成交模型 | TP/SL 同日觸及時假設最差情況 |
+| 5 | 世代交替 | 每 2 年用真正 unseen 數據重新驗證，淘汰過擬合策略 |
 
 ### 已知漏洞：多重測試問題 (Multiple Testing)
 
 為同一資產設計多個實驗後，即使沒有直接在 Part B 調參數，設計者已經知道 Part B 的市場環境（2024-2025 的行情），會不自覺影響策略設計。跑 N 個實驗後，有 1 個在 Part B 表現好可能只是運氣——這是 p-hacking 的變形。
 
-### 建議補強方向
+世代交替能部分緩解此問題（新 Part B 是 unseen 的），但同一世代內仍需注意。
 
-**短期（低成本）：**
-- **重視 Part C 表現**：Part C 是唯一不可能被 peek 的數據。當 Part C 勝率明顯低於 Part B（差距 > 20pp），應發出警告或從 followup 移除
-- **記錄策略設計時間**：在 EXPERIMENTS 文件標記設計日期。2026 年設計的策略，Part B 已不是真正的 out-of-sample
+### 未來可補強方向
 
-**中期（需開發）：**
-- **Walk-forward validation**：每個窗口用前半段選參數、後半段驗證，多窗口都穩定才算通過
+- **Part C 提前預警**：Part C 勝率低於 Part B 超過 20pp 時，發出警告或從 followup 移除
+- **記錄策略設計時間**：在 EXPERIMENTS 文件標記設計日期，判斷 Part B 對該策略是否真正 out-of-sample
+- **Walk-forward validation**：每個窗口用前半段選參數、後半段驗證
 - **策略數量懲罰**：同一資產實驗越多，Part B 通過門檻應越高（類似 Bonferroni correction）
 
 ---
@@ -133,7 +165,7 @@ Part A/B 固定不動，理由：
 
 | 日期       | 內容                         |
 |------------|------------------------------|
-| 2026-04-02 | 新增「回測區間與過擬合防護策略」：Part A/B 固定不移、Part C 持續驗證、多重測試漏洞與補強方向 |
+| 2026-04-02 | 完善「回測區間與過擬合防護策略」：新增世代制規劃（每 2 年交替 Part A/B/C）、交替時操作流程 |
 | 2026-04-02 | 新增 USE_CASES.md — 所有可用操作情境與指令的快速參考 |
 | 2026-03-29 | 新增「開發任務」區塊，記錄三項進行中任務：設計新實驗、彙整最佳結果至 Followup、每日開盤前執行 Followup |
 | 2026-03-29 | 將本文件移入 pm/ 資料夾 |
