@@ -16,9 +16,12 @@ If no experiments exist for this asset, inform the user and stop.
 
 ---
 
-## Step 2: Run all experiments and collect results
+## Step 2: Run experiments and collect results
 
-For each experiment found in Step 1:
+For each experiment found in Step 1, check if `results/<experiment_name>/latest.json` already exists:
+
+- **If `latest.json` exists**: Skip running, use the existing results. Display: `⏭️ <experiment_name>: using existing latest.json`
+- **If `latest.json` does NOT exist**: Run the experiment:
 
 ```bash
 uv run trading run <experiment_name>
