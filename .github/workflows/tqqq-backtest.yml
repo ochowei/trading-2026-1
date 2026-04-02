@@ -78,6 +78,7 @@ on:
           - "TSLA-002: tsla_002_wider_exit"
           - "TSLA-003: tsla_003_tight_retracement"
           - "TSLA-004: tsla_004_wr_reversion"
+          - "TSLA-005: tsla_005_bb_squeeze_breakout"
           - "TSM-004: tsm_004_smh_confirm"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
