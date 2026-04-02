@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, GLD-008, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, NVDA-003, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, XLU-002, XLU-003]
+  derived_from: [TQQQ-010, GLD-007, GLD-008, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, NVDA-003, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, XLU-002, XLU-003]
   validated: 2026-04-02
   data_through: 2025-12-31
   confidence: high
@@ -211,7 +211,7 @@
 | DIA | DIA-004 | RSI(2) 寬獲利目標 | ~2.8/2.0 | 78.6%/75% | RSI(2)<10 + 2日跌幅≥1.5%，TP+3.0%/SL-3.5%/20d，Part A Sharpe 0.52/Part B 0.47（A/B 平衡優秀，vs DIA-003 +25%）。TP+3.0% 是甜蜜點（+2.5% 壓縮獲利、+3.5% 翻轉 1 筆交易）、SL-4.0% Part A 過擬合（gap 0.33）。**已確認全域最優**（5 次實驗、10+ 次嘗試，DIA-005 驗證 SL 收窄/RSI 收緊/跌幅收緊均失敗） |
 | VOO | VOO-003 | RSI(2) 寬獲利目標 | ~2.8/2.0 | 78.6%/75% | 同 VOO-001/002 進場（= SPY-004），TP +2.85%/SL -3.0%/20d，Part A Sharpe 0.61/Part B 0.53（A/B gap 0.08，極佳平衡）。TP +2.85% 為 VOO 甜蜜點：所有贏利交易均達標，+2.9% 翻轉 2022-05-12 交易（vs SPY TP +3.0%，VOO OHLC 微差導致上限更低）。**已確認全域最優**（3 次實驗、7 次嘗試） |
 | SOXL | SOXL-006 | 精選超賣 + 延長持倉 | ~2.0/2.5 | 60.0%/80.0% | 回撤 [-40%,-25%] + RSI(5)<20 + 2日跌幅≤-8%，TP +18%/SL -12%/25天。Part A +72.80%/Sharpe 0.47，Part B +51.57%/Sharpe 0.79，PF 2.57/4.88。RSI(5) 收緊 25→20 移除 3 個停損訊號，持倉延長 20→25天。A/B 訊號比 2.0:1（退步但可接受），Part B 大幅優於 Part A（無過擬合）。SOXL-007 驗證 RSI(5)<22/DD-23%/15日回看、SOXL-008 驗證 WR(10) 振盪器/cap -35%/cooldown 10d、SOXL-009 驗證 BB 擠壓突破（3 次嘗試，突破策略在 6.6% 日波動下完全無效）均失敗，**已確認為全域最優**（10 次實驗、30 次嘗試，含突破策略獨立驗證） |
-| TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效，已確認為全域最優（12次嘗試） |
+| TSM | TSM-002 | 回檔 + WR + 反轉K線 | ~2.2/2.0 | 63.6%/75% | 10日回檔≥10% + WR(10)≤-85 + ClosePos≥40%，TP+7%/SL-7%/20天。TSM-004 驗證 SMH確認/非對稱出場/回檔上限均無效。TSM-005 驗證 BB 擠壓突破（3次嘗試，Part B Sharpe -0.42/-0.16/-0.18），突破策略因地緣政治假突破而失敗。**已確認為全域最優**（5 次實驗、15 次嘗試，含均值回歸和突破兩大策略類型） |
 | IWM | IWM-005（均值回歸）/ IWM-006（突破） | RSI(2) 非對稱寬停損 + SL微調 / BB Squeeze Breakout | ~3.0/3.0 | 66.7%/66.7% / 62.5%/66.7% | IWM-005：RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+4.0%/SL-4.25%/20天。SL -4.25% 是甜蜜點。IWM-006：BB(20,2) Squeeze + SMA(50)，TP+5.0%/SL-4.5%/20天。Part A Sharpe 0.31/Part B 0.37（vs IWM-005 0.38/0.31），min(A,B) 同為 0.31。突破可行但未超越均值回歸，BB(2.5) 太嚴格（Part B 僅 3 訊號），IWM 高流動性部分抵消 ETF 分散化效應（顯著優於 COPX-005） |
 | XBI | XBI-005 | 回檔範圍 + Williams %R + 反轉K線 | ~4.2/3.0 | 76.2%/83.3% | 回檔 8-20% + WR(10)≤-80 + ClosePos≥35%，TP+3.5%/SL-5.0%/15天。Part A Sharpe 0.36/Part B 0.64（vs XBI-001 的 0.11/0.23，分別 +227%/+178%）。ClosePos 35% 是甜蜜點（40% Part B Sharpe 0.16，30% Part A Sharpe 0.30）。XBI 日波動 2.0% 在 ClosePos 有效邊界內（類似 IWM），與 FCX/SIVR 不同。XBI-006 驗證 BB 擠壓突破（3 次嘗試：突破 Part A 0.05/0.18、ROC Part A 0.27）均失敗，**已確認為全域最優**（6 次實驗、20+ 次嘗試，含突破與 ROC 策略獨立驗證） |
 | COPX | COPX-003 | 20日回檔範圍 + Williams %R + 出場優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.39/Part B 0.35（A/B gap 僅 0.04，極佳平衡）。20日回看框架 + SL 收窄是關鍵突破（vs COPX-001 Part A 0.08→0.39）。COPX-004 驗證回檔 9-20%（Part A 劣化）、15天持倉（Part B WR 降 9pp）、冷卻 10天（無效果）均失敗。COPX-005 驗證 BB 擠壓突破（3 次嘗試，Part B Sharpe -0.17~0.01）完全無效（ETF 分散化削弱突破動能），已確認為全域最優 |
@@ -227,7 +227,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, COPX-003, COPX-005, NVDA-002, IBIT-002, IWM-004, IWM-005, IWM-006, TLT-002, TLT-004, TSLA-003, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, COPX-003, COPX-005, NVDA-002, IBIT-002, IWM-004, IWM-005, IWM-006, TLT-002, TLT-004, TSLA-003, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003]
   validated: 2026-04-02
   data_through: 2025-12-31
   confidence: high
@@ -328,6 +328,7 @@
 78. **BB 擠壓突破在分散化 ETF（COPX）上完全無效** — COPX（日波動 2.25%）BB 擠壓突破 3 次嘗試：Att1 TP+6%/SL-5%/30th pct Part B Sharpe -0.17；Att2 TP+7%/SL-6%/30th pct Part B -0.17；Att3 TP+7%/SL-6%/20th pct Part B 0.01。vs COPX-003 均值回歸 Sharpe 0.39/0.35。Part B 僅 5-6 訊號，假突破率 60-67%。原因：(1) ETF 持有多家銅礦公司，個股動量在 ETF 層面被分散化稀釋；(2) 2024-2025 COPX 處於盤整期（$36-$48），突破後缺乏持續動能。**突破策略成功案例（TSLA/NVDA/FCX）均為個股**，ETF 的分散化可能天然削弱突破持續性。lesson #71 的有效日波動下限可能需從 2.0% 上修至 ~2.5%，且限定個股而非 ETF（COPX-005 驗證）
 78. **FCX TP +8% 是突破策略硬上限** — TP+10% 使 5 筆 Part A 贏利交易（原達 +8%）變為到期或停損（+4.65%、+7.14%、-1.70%、+0.24%、+5.32%），Part A Sharpe 從 0.51 崩至 0.29。FCX 均值回歸（FCX-001）使用 TP+10% 是因為買在極端低點，反彈幅度更大；突破（買在高點）動能有限，+8% 是天花板。再次驗證 lesson #76：TP 硬上限由資產特性決定，但同一資產不同策略的 TP 上限可能不同（FCX-004 Att3 驗證）
 79. **BB 擠壓百分位和冷卻期影響 A/B 訊號平衡** — FCX 25th 百分位 + 15 天冷卻產生 A/B 訊號比 5.25:1（21:4），放寬至 30th 百分位 + 10 天冷卻改善至 1.53:1（23:6/年化 4.6:3.0）。原因：2024-2025（Part B）FCX 波動環境較平穩，更嚴格的擠壓定義過濾掉大部分 Part B 信號。設計突破策略時需同時調校擠壓嚴格度和冷卻期以確保 A/B 平衡（FCX-004 Att1 vs Att2 驗證）
+80. **BB 擠壓突破在地緣政治敏感個股上失效** — TSM（台灣半導體）BB(20,2) 擠壓突破 Part A Sharpe 0.37（優於均值回歸 0.23），但 Part B Sharpe -0.16（3 次嘗試均負值：-0.42/-0.16/-0.18）。NVDA/TSLA 突破成功但 TSM 失敗的原因：TSM 作為台灣公司受台海局勢、美中科技戰等地緣政治消息驅動，2024-2025 突破後常因政策消息急速反轉（9 個 Part B 訊號中 5 個停損）。**突破策略有效前提是動量延續性，地緣政治風險破壞此前提**。收緊擠壓條件（20th pct）或放寬 SL（-8%）均無法修復此結構性問題（TSM-005 驗證）
 
 ---
 
