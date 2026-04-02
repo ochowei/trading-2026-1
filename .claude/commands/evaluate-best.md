@@ -20,7 +20,8 @@ If no experiments exist for this asset, inform the user and stop.
 
 For each experiment found in Step 1, check if `results/<experiment_name>/latest.json` already exists:
 
-- **If `latest.json` exists**: Skip running, use the existing results. Display: `⏭️ <experiment_name>: using existing latest.json`
+- **If `latest.json` exists AND `metadata.execution_time` is within 200 days of today**: Skip running, use the existing results. Display: `⏭️ <experiment_name>: using existing latest.json (executed <N> days ago)`
+- **If `latest.json` exists BUT `metadata.execution_time` is more than 200 days ago**: Re-run the experiment. Display: `🔄 <experiment_name>: latest.json is stale (<N> days old), re-running`
 - **If `latest.json` does NOT exist**: Run the experiment:
 
 ```bash
