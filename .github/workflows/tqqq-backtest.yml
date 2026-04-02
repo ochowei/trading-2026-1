@@ -100,6 +100,7 @@ on:
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
+          - "COPX-005: copx_005_bb_squeeze_breakout"
           - "URA-001: ura_001_pullback_wr"
           - "URA-002: ura_002_asymmetric_narrow"
           - "URA-003: ura_003_pullback_rsi2"
