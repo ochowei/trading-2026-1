@@ -24,15 +24,7 @@ def save_result(experiment_name: str, result: dict) -> Path:
     d = RESULTS_DIR / experiment_name
     d.mkdir(parents=True, exist_ok=True)
 
-    # 處理歷史檔案輪替 (latest -> prev_1 -> prev_2) (Rotate history files)
     latest_path = d / "latest.json"
-    prev1_path = d / "prev_1.json"
-    prev2_path = d / "prev_2.json"
-
-    if prev1_path.exists():
-        prev1_path.replace(prev2_path)
-    if latest_path.exists():
-        latest_path.replace(prev1_path)
 
     # 儲存最新的 latest.json (Save the latest result)
     latest_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
