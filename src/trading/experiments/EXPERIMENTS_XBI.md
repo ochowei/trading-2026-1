@@ -1,10 +1,10 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-03-31
+  last_validated: 2026-04-02
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）
+**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（6 次實驗、20+ 次嘗試，含突破策略與 ROC 策略獨立驗證）
 **前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
 **滾動窗口分析摘要：** XBI-001 ✗✓（精準度突變 ΔWR 23.8pp，績效漸變，2023 生技低迷為主因）
 
@@ -21,6 +21,9 @@
 - 回檔 8-15% + 冷卻15天 + 15天持倉（XBI-004 Att3：Part A 0.05 / Part B 0.44，收窄上限改善 Part B 但惡化 Part A）
 - ClosePos ≥ 40%（XBI-005 Att1：Part A Sharpe 0.28 改善但 Part B 0.16 劣化，門檻太高移除 Part B 好訊號）
 - ClosePos ≥ 30%（XBI-005 Att3：Part A Sharpe 0.30 vs 35% 的 0.36，門檻太低引入 Part A 壞訊號）
+- BB Squeeze Breakout BB(20,2) 25th pct + SMA(50)（XBI-006 Att1：Part A Sharpe 0.05 / Part B 0.17，WR 50%/55.6%，假突破率過高）
+- BB Squeeze Breakout BB(20,2) 15th pct + TP +4.0%（XBI-006 Att2：Part A Sharpe 0.18 / Part B 0.10，收緊百分位改善 Part A 但 Part B 劣化）
+- 5日 ROC ≤ -8% + WR + ClosePos（XBI-006 Att3：Part A Sharpe 0.27 / Part B -0.19，僅 2 筆 Part B 訊號無統計意義）
 
 **已掃描的參數空間：**
 - 進場條件：回檔 6~8% + 上限 15~20% + WR(10) ≤ -80（有/無 2日急跌 ≤ -3%）
@@ -28,11 +31,14 @@
 - ClosePos ≥ 30% / 35% / 40%（35% 為甜蜜點）
 - 回檔回看：10日、20日（20日回看在 XBI 無效，與 COPX 相反）
 - 冷卻期：10、12、15天
-- 出場參數：TP +3.5~4.0% / SL -4.0~-5.0% / 持倉 15~20 天
+- 出場參數：TP +3.5~5.0% / SL -4.0~-5.0% / 持倉 15~20 天
+- 突破策略：BB(20,2) Squeeze 15th/25th pct + SMA(50)，TP +4~5% / SL -5% / 20天（已驗證無效，ETF 分散化削弱突破動能）
+- ROC 策略：5日 ROC ≤ -8% + WR + ClosePos（已驗證 Part B 訊號過少）
 - 最佳組合：回檔 8-20% + WR ≤ -80 + ClosePos ≥ 35% + SL -5.0% / 15天（WR 76.2%/83.3%）
 
-**尚未嘗試的方向（可探索但預期效益低）：**
-- XBI-005 已大幅改善，進一步優化空間有限
+**尚未嘗試的方向（預期效益極低）：**
+- XBI-005 已確認為全域最優，突破策略和 ROC 策略均已驗證無效
+- 配對交易（XBI vs IBB）理論上可行但實作複雜且數據有限
 
 **關鍵資產特性：**
 - XBI (SPDR S&P Biotech ETF) 日波動約 2.0%，GLD 比率 1.81x
@@ -44,6 +50,8 @@
 - 持倉 15天 vs 20天 無差異（平均持倉僅 3-5 天）
 - 20日回看對 XBI 無效（與 COPX 相反）：XBI 淺回檔（8-10%）包含高品質訊號，20日回看過濾掉這些
 - ClosePos 35% 是 XBI 甜蜜點：40% 太緊移除 Part B 好訊號（Sharpe 0.16），30% 太鬆引入 Part A 壞訊號（Sharpe 0.30 vs 0.36）
+- **突破策略在 XBI 上無效**：ETF 分散化削弱突破動能（類似 COPX-005），WR 僅 50-56%，假突破率過高
+- **ROC-based 進場不優於 pullback-from-high**：5日 ROC 在 Part B 僅產生 2 個訊號，市場狀態依賴性過高
 <!-- AI_CONTEXT_END -->
 
 # XBI 實驗總覽 (XBI Experiments Overview)
@@ -61,7 +69,8 @@
 |---------|-------------------------|--------------------------------------|-------|
 | XBI-001 | `xbi_001_pullback_wr`    | 回檔範圍 8-20% + Williams %R 均值回歸 | 已完成 |
 | XBI-004 | `xbi_004_capped_cooldown` | 回檔 8-15% + WR + 冷卻15天（未勝出） | 已完成 |
-| XBI-005 | `xbi_005_closepos_reversal` | 回檔 8-20% + WR + ClosePos ≥ 35%（**新最佳**） | 已完成 |
+| XBI-005 | `xbi_005_closepos_reversal` | 回檔 8-20% + WR + ClosePos ≥ 35%（**全域最佳**） | 已完成 |
+| XBI-006 | `xbi_006_bb_squeeze_breakout` | BB Squeeze Breakout + 3次嘗試（未勝出） | 已完成 |
 
 ---
 
@@ -373,3 +382,69 @@ XBI-001 (回檔 8-20% + WR(10) ≤ -80) ← 前任最佳
 4. **平均贏利完全固定**：TP +3.50% 在所有窗口一致觸發
 5. **10/12 正報酬窗口**：整體穩健，僅窗口 4（-0.59%）和窗口 9（-8.72%）為負
 6. **勝率波動主要由 2023 谷底造成**：若排除窗口 9，ΔWR 最大跳動僅 13.3pp（通過閾值）
+
+---
+
+## XBI-006: Bollinger Band Squeeze Breakout（已完成，未勝出）
+
+### 目標 (Goal)
+
+測試突破策略是否能超越 XBI-005 均值回歸。突破策略在類似波動度資產上已成功（NVDA-003 Sharpe 0.40/0.47、TSLA-005 0.35/0.37、IWM-006 0.31/0.37）。XBI 日波動 ~2.0% 與 IWM 接近，且生技板塊有動量驅動特性。
+
+### 基準 (Baseline)
+
+XBI-005：Part A Sharpe 0.36 / Part B Sharpe 0.64（回檔 8-20% + WR + ClosePos）
+
+### 嘗試紀錄 (Attempt Log)
+
+#### Attempt 1: BB(20,2) Squeeze 25th pct + SMA(50)，TP +5.0% / SL -5.0% / 20d
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 12 | 9 |
+| 勝率 | 50.0% | 55.6% |
+| Sharpe | 0.05 | 0.17 |
+| 累計 | +1.78% | +5.89% |
+| MDD | -6.04% | -6.05% |
+
+**分析**：WR 僅 50-55%，5/12 Part A 交易停損。假突破率過高——XBI 作為分散化 ETF，個別成分股突破被其他成分股拖累，整體 ETF 突破動能不足。
+
+#### Attempt 2: 收緊擠壓至 15th 百分位 + TP 降至 +4.0%
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 10 | 9 |
+| 勝率 | 60.0% | 55.6% |
+| Sharpe | 0.18 | 0.10 |
+| 累計 | +6.69% | +3.12% |
+| MDD | -5.40% | -6.05% |
+
+**分析**：Part A 改善（WR 50→60%，Sharpe 0.05→0.18），但 Part B 劣化（0.17→0.10）。更嚴格的擠壓篩選在 IS 有效但 OOS 無區分力。降低 TP 讓 2025-06-03 交易從到期轉為達標，但整體改善不足。
+
+#### Attempt 3: 完全不同策略——5日 ROC ≤ -8% + WR + ClosePos
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 7 | 2 |
+| 勝率 | 71.4% | 50.0% |
+| Sharpe | 0.27 | -0.19 |
+| 累計 | +6.96% | -1.78% |
+| MDD | -7.09% | -9.50% |
+
+**分析**：ROC-based 進場改善了 Part A 品質（WR 71.4%，Sharpe 0.27），但 Part B 僅 2 個訊號無統計意義。A/B 訊號比 3.5:1 表示嚴重市場狀態依賴。ROC 在 2022 熊市產生高品質訊號但在 2024-2025 幾乎無觸發。
+
+### 結論 (Conclusion)
+
+三次嘗試均大幅落後 XBI-005：
+
+| 嘗試 | 策略 | Part A Sharpe | Part B Sharpe | vs XBI-005 |
+|------|------|---------------|---------------|------------|
+| Att1 | BB Squeeze 25th pct | 0.05 | 0.17 | -86% / -73% |
+| Att2 | BB Squeeze 15th pct | 0.18 | 0.10 | -50% / -84% |
+| Att3 | 5日 ROC | 0.27 | -0.19 | -25% / -130% |
+| **XBI-005** | **Pullback+WR+ClosePos** | **0.36** | **0.64** | **baseline** |
+
+**關鍵發現**：
+1. **突破策略在 XBI 上無效**——ETF 分散化削弱突破動能（同 COPX-005 結論）。130+ 成分股的等權重 ETF，個股突破被群體稀釋
+2. **ROC 進場不優於 pullback-from-high**——5日 ROC 對市場狀態依賴性過高，Part B 訊號不足
+3. **XBI-005 已確認為全域最優**（6 次實驗、20+ 次嘗試，涵蓋均值回歸、突破、ROC 三種策略類型）
