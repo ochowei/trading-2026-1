@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-03-31
+  last_validated: 2026-04-02
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -25,16 +25,21 @@
 - 15天持倉與20天完全等價（IWM-005 Att1 驗證：所有交易於15天內結束，Sharpe 不變 0.35/0.28）
 - SL -5.0% 比 -4.5% 更差（IWM-005 Att2 驗證：Part A Sharpe 0.30，Part B Sharpe 0.23，每筆虧損加大但無停損翻勝）
 - 移除 ClosePos 過濾器災難（IWM-005 Att3 驗證：Part A 訊號 15→41，WR 48.8%，Sharpe -0.10，累計 -17.90%）
+- BB Squeeze Breakout 可行但未超越均值回歸（IWM-006：Part A Sharpe 0.31/Part B 0.37 vs IWM-005 0.38/0.31，min(A,B) 同為 0.31）
+  - BB(20,2.5) 太嚴格：Part B 僅 3 訊號 1.5/yr，A/B 比 3.33:1（IWM-006 Att3）
+  - TP+4.5%/SL-5.0% 退化：SL 加寬未救回停損，Part A Sharpe 0.24（IWM-006 Att2）
 
 **已掃描的參數空間：**
 - 進場條件：RSI(2) < 10 + 2日跌幅 ≥ 2.0~3.0% + ClosePos ≥ 40%（及無 ClosePos）
 - 進場條件：回檔 6-8% ~ 15-18% + WR(10) ≤ -80（± ClosePos ≥ 40%）
-- 出場參數：TP +3.0~4.5% / SL -3.5~-5.0%（含 -4.0% 和 -4.25%）/ 持倉 15~25 天
+- 進場條件：BB(20,2.0/2.5) Squeeze Breakout + SMA(50) 趨勢確認（IWM-006）
+- 出場參數：TP +3.0~5.0% / SL -3.5~-5.0%（含 -4.0% 和 -4.25%）/ 持倉 15~25 天
 - 相對弱勢過濾：IWM vs SPY 10日相對表現 <= -2%（完全失效）
 - 最佳組合：RSI(2) + 2日跌幅 ≥ 2.5% + ClosePos ≥ 40% + TP +4.0% / SL -4.25% / 20天
 
 **尚未嘗試的方向（可探索，但預期邊際效益低）：**
 - SL -4.25% 已確認為甜蜜點，進一步微調（如 -4.3%/-4.2%）預期改善有限
+- BB Squeeze Breakout 已測試（IWM-006），可行但未超越均值回歸（見下方）
 
 **關鍵資產特性：**
 - IWM (iShares Russell 2000 ETF) 日波動約 1.5-2%，高於 SPY (1.2%)，SPY 比率 ~1.3x
@@ -421,11 +426,57 @@
 
 ---
 
+## IWM-006: BB Squeeze Breakout（Bollinger Band 擠壓突破）
+
+<!-- freshness: validated=2026-04-02, data_through=2025-12-31 -->
+
+**假說**：IWM 小型股 ETF 在波動收縮後突破時，可產生可觀的動量上漲。BB Squeeze Breakout 已在 TSLA-005（0.35/0.37）、NVDA-003（0.40/0.47）、FCX-004（0.51/0.41）驗證成功。
+
+**風險**：COPX-005 驗證 ETF 分散化可能削弱突破動能（Part B Sharpe -0.17~0.01）。
+
+**進場**：BB(20,2) Squeeze（60日25th百分位，5日內）+ Close > Upper BB + Close > SMA(50) + 冷卻15天
+**出場**：TP +5.0% / SL -4.5% / 20天（按 IWM 日波動 1.5-2% 縮放）
+**成交模型**：隔日開盤市價，滑價 0.1%
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 16 (3.2/yr) | 9 (4.5/yr) |
+| WR | 62.5% | 66.7% |
+| Sharpe | 0.31 | 0.37 |
+| Cum Return | +21.49% | +13.64% |
+| PF | 1.86 | 2.15 |
+| MDD | -7.43% | -5.95% |
+| Max Consec Loss | 2 | 1 |
+
+**A/B 訊號比**：1.78:1（可接受），**Part B > Part A**（無過擬合）
+
+### 嘗試記錄
+
+**Att1（最終配置）**：BB(20,2.0) + TP+5.0%/SL-4.5%/20d → Part A 0.31 / Part B 0.37 ← 最佳
+**Att2**：TP+4.5%/SL-5.0% → Part A 0.24 / Part B 0.28（SL 加寬未救回任何停損，每筆虧損加大）
+**Att3**：BB(20,2.5) + TP+5.0%/SL-4.5% → Part A 0.30 / Part B 0.00*（Part B 僅 3 訊號 1.5/yr，A/B 比 3.33:1 失衡）
+
+*Part B Sharpe 0.00 因所有 3 筆交易均 +5.00%（零方差）
+
+### 與 IWM-005 比較
+
+| 指標 | IWM-005 (均值回歸) | IWM-006 (突破) |
+|------|-------------------|----------------|
+| Part A Sharpe | **0.38** | 0.31 |
+| Part B Sharpe | 0.31 | **0.37** |
+| min(A,B) | 0.31 | 0.31 |
+| 策略類型 | RSI(2) 超賣反轉 | BB 擠壓突破 |
+
+**結論**：BB Squeeze Breakout 在 IWM 上**可行但未超越均值回歸**。min(A,B) 同為 0.31。突破策略的 Part B 更強（0.37 vs 0.31），但 Part A 更弱（0.31 vs 0.38）。兩種策略互補（不同訊號時間），但單獨使用時 IWM-005 仍為首選（Part A 更穩健）。IWM 作為廣基 ETF，突破動能弱於個股（TSLA/NVDA/FCX），但顯著優於 COPX-005（Part B -0.17~0.01），確認 IWM 高流動性部分抵消了分散化效應。
+
+---
+
 ## 演進路線圖 (Roadmap)
 
 ```
 IWM-001 (RSI(2) < 10 + 2日跌幅 ≥ 2.5% + 反轉K線)
   ├── IWM-002 (回檔 + Williams %R 架構) ← 已完成，未超越
+  ├── IWM-006 (BB Squeeze Breakout) ← 突破策略，可行但未超越
   └── IWM-003 (TP+3.5%/SL-4.5%/20d)
         └── IWM-004 (TP+4.0%/SL-4.5%/20d)
               └── IWM-005 (TP+4.0%/SL-4.25%/20d) ← 當前最佳
