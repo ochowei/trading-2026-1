@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, NVDA-002, NVDA-003, NVDA-004, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, XLU-002, XLU-003, XLU-004]
+  derived_from: [TQQQ-010, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, NVDA-002, NVDA-003, NVDA-004, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, XLU-002, XLU-003, XLU-004, XLU-005]
   validated: 2026-04-03
   data_through: 2025-12-31
   confidence: high
@@ -220,14 +220,14 @@
 | IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2) 替代 WR（訊號日期偏移）、2日跌幅+RSI 過嚴、SL-6% 翻轉勝負均失敗，已確認為全域最優 |
 | TSLA | TSLA-005 | BB 擠壓突破 | ~3.2/2.5 | 56.2%/60.0% | BB(20,2) 擠壓（60日 25th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+10%/SL-7%/20天。Part A Sharpe 0.35/Part B 0.37（A/B gap 0.02，極佳平衡）。**突破策略首次超越均值回歸**（vs TSLA-004 Sharpe 0.14/0.13，+150%/+185%）。WR 較低但盈虧比補償（PF 2.04/2.10）。TSLA 動量驅動，順勢突破優於逆勢均值回歸。TSLA-006 驗證趨勢回調（Part B 0.22/-0.02）和 Donchian 突破（Part B 0.07）均失敗，**已接近全域最優**（6 次實驗、20+ 次嘗試，含 4 種策略類型） |
 | TLT | TLT-002 | 回檔 + WR + 反轉K線 + 60日跌幅過濾 | ~6.4/8.0 | 46.9%/68.8% | 回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + 60日跌幅≤10%，TP+2.5%/SL-3.5%/20天。Part A Sharpe -0.20/Part B 0.24。**Part A 結構性負**（2022 升息制約）。TLT-004 驗證突破/趨勢策略：BB 擠壓突破 Part A 0.31 改善但 Part B -1.15（橫盤假突破），SMA 黃金交叉 Part A 0.89 但 Part B 僅 2 訊號。**均值回歸被升息殺、突破被橫盤殺**，TLT 無純技術面解法（10 次實驗、20+ 次嘗試，含突破策略驗證） |
-| XLU | XLU-003（均值回歸）/ XLU-004（突破） | 緊縮回檔範圍 + WR + 反轉K線 / BB Squeeze Breakout | ~4.2/5.0 / ~2.6/2.0 | 61.9%/70.0% / 53.8%/75.0% | XLU-003：回檔 3.5-7% + WR(10)≤-80 + ClosePos≥40%，TP+2.5%/SL-4.0%/20天。Part A Sharpe 0.06/Part B 0.35。XLU-004：BB(20,2) 擠壓 60日25th百分位 + 突破上軌 + SMA(50)，TP+3.0%/SL-4.0%/20天/冷卻7天。Part A Sharpe 0.18/Part B 0.26，min(A,B) 0.18（vs XLU-003 0.06，+200%）。突破策略大幅改善 Part A 但 Part B 較弱，A/B 訊號比 3.25:1 偏高。兩種策略互補：均值回歸捕捉超賣反彈，突破捕捉波動收縮後動量。SL -4.0% 是 XLU 全域甜蜜點（均值回歸+突破均適用） |
+| XLU | XLU-003（均值回歸）/ XLU-004（突破） | 緊縮回檔範圍 + WR + 反轉K線 / BB Squeeze Breakout | ~4.2/5.0 / ~2.6/2.0 | 61.9%/70.0% / 53.8%/75.0% | XLU-003：回檔 3.5-7% + WR(10)≤-80 + ClosePos≥40%，TP+2.5%/SL-4.0%/20天。Part A Sharpe 0.06/Part B 0.35。XLU-004：BB(20,2) 擠壓 60日25th百分位 + 突破上軌 + SMA(50)，TP+3.0%/SL-4.0%/20天/冷卻7天。Part A Sharpe 0.18/Part B 0.26，min(A,B) 0.18（vs XLU-003 0.06，+200%）。突破策略大幅改善 Part A 但 Part B 較弱，A/B 訊號比 3.25:1 偏高。兩種策略互補：均值回歸捕捉超賣反彈，突破捕捉波動收縮後動量。SL -4.0% 是 XLU 全域甜蜜點（均值回歸+突破均適用）。XLU-005 驗證趨勢回檔（3次嘗試）和跨資產 TLT 配對（1次嘗試）均失敗，**已接近全域最優**（5 次實驗、25+ 次嘗試，含均值回歸、突破、趨勢回檔、跨資產配對四種策略類型） |
 
 ---
 
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, NVDA-002, NVDA-004, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, NVDA-002, NVDA-004, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004, XLU-005]
   validated: 2026-04-03
   data_through: 2025-12-31
   confidence: high
@@ -446,3 +446,46 @@
 3. USO 需要回檔上限是因為 2020 年原油負價格事件產生 >12% 的極端回檔訊號，這些訊號品質極差
 
 **規則**：高波動或受極端事件影響的資產（如商品 ETF），設計均值回歸策略時必須考慮回檔上限以隔離極端崩盤訊號。回檔上限宜設在日波動率的 5-6σ 附近。
+
+---
+
+## 14. 趨勢回檔（Trend Pullback）在低波動防禦型 ETF 上無效
+
+<!-- freshness:
+  derived_from: [XLU-005, TSLA-006]
+  validated: 2026-04-03
+  data_through: 2025-12-31
+  confidence: high
+-->
+
+「在上升趨勢中買回檔」（SMA(20)>SMA(50) + 回檔至 SMA(20)）在 XLU 上完全無效。
+
+| 嘗試 | 資產 | 結果 |
+|------|------|------|
+| XLU-005 Att1 | XLU (1.08%) | 31 訊號 Part A Sharpe -0.29，回檔至 SMA(20) 在低波動中過於頻繁 |
+| XLU-005 Att2 | XLU (1.08%) | 嚴格化至 9 訊號 Part A Sharpe -0.14，Part B 僅 3 訊號無統計意義 |
+| TSLA-006 Att1/2 | TSLA (3.72%) | Part A 0.49 但 Part B 0.22/-0.02，市場狀態依賴嚴重 |
+
+**原因**：低波動 ETF 價格頻繁穿越 SMA(20)，「回檔」不是稀有事件，缺乏訊號品質。高波動個股有市場狀態依賴問題。
+
+**規則**：趨勢回檔策略在技術面交易框架中不可靠，均值回歸或突破是更好的選擇。
+
+---
+
+## 15. 跨資產相關性配對策略的結構性風險
+
+<!-- freshness:
+  derived_from: [XLU-005]
+  validated: 2026-04-03
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+TLT-XLU 跨資產配對（TLT 漲但 XLU 滯後時買 XLU）在 Part A (2019-2023) 有效但 Part B (2024-2025) 崩潰。
+
+| 期間 | TLT-XLU 相關性 | Part Sharpe | 原因 |
+|------|---------------|------------|------|
+| 2019-2023 | 穩定正相關 | 0.20 | 利率主導公用事業股價 |
+| 2024-2025 | 相關性弱化 | -0.66 | 高利率常態化 + AI/科技輪動主導市場 |
+
+**規則**：跨資產相關性可能隨宏觀環境改變而失效（regime change）。若使用配對策略，需檢驗相關性在 Part A/B 兩期間的穩定性。Part A 正 + Part B 負 Sharpe 是相關性崩潰的典型特徵。

@@ -106,6 +106,7 @@ on:
           - "XLU-002: xlu_002_capped_pullback_wr"
           - "XLU-003: xlu_003_tight_pullback_wr"
           - "XLU-004: xlu_004_bb_squeeze_breakout"
+          - "XLU-005: xlu_005_trend_pullback"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
