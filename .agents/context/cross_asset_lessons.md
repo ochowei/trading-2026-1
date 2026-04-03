@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, XLU-002, XLU-003, XLU-004, XLU-005]
+  derived_from: [TQQQ-010, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, XLU-002, XLU-003, XLU-004, XLU-005]
   validated: 2026-04-03
   data_through: 2025-12-31
   confidence: high
@@ -204,7 +204,7 @@
 |------|----------|----------|---------|----------|-------------|
 | TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing |
 | GLD | GLD-008 | 20日回調 + Williams %R | ~7.2/6.5 | 77.8%/100% | 20日回看（vs GLD-007 10日）+ TP +3.0%（vs +3.5%），Part A Sharpe 0.45/Part B 2.33（vs GLD-007 的 0.41/2.04），累計 +45.40%/+32.83%。20日回看多捕捉 5 個 Part A 好訊號，TP +3.0% 讓更多交易直接達標。RSI(2) 進場在 GLD 上無效（Att1 Sharpe 0.28/1.59），回檔+WR 是 GLD 最佳進場架構。GLD-009 驗證 BB 擠壓突破無效（Sharpe 0.28/0.27，日波動 1.1% 限制突破幅度），**已確認為全域最優**（9 次實驗、30+ 次嘗試，含均值回歸和突破兩大策略類型） |
-| SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-007 驗證 RSI 動能回復/20日回看均失敗，已確認為全域最優（9 次實驗、18 次嘗試） |
+| SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-007 驗證 RSI 動能回復/20日回看均失敗，SIVR-008 驗證 BB Squeeze Breakout（3 次嘗試，最佳 Sharpe 0.11/0.10）完全無效，**已確認為全域最優**（10 次實驗、21 次嘗試，含均值回歸和突破兩大策略類型） |
 | FCX | FCX-001（均值回歸）/ FCX-004（突破） | 三重極端超賣 / BB Squeeze Breakout | ~3.6/4.6 | 72.2%/60% / 69.6%/66.7% | FCX-001：寬出場 (+10%/-12%)、稀有但精確的訊號，滾動分析 12/12 窗口正累計。FCX-004：BB(20,2) 擠壓 60日30th百分位 + 突破上軌 + SMA(50)，TP+8%/SL-7%/20天。Part A Sharpe 0.51（vs FCX-001 0.43，+18.6%），Part B 0.41（vs 0.74）。兩種策略互補：均值回歸捕捉恐慌抄底，突破捕捉趨勢啟動。FCX-005 驗證動量回檔（3次嘗試）和 RSI(2)（1次嘗試）均失敗，FCX-001/004 已確認為全域最優 |
 | USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗，已確認為全域最優）。USO-012 滾動分析：11/12 窗口正累計、**唯一雙漸變通過實驗**（精準度+績效均漸變）。USO-009/010 滾動分析驗證回檔上限的必要性：無上限（USO-009）最差窗口 -13.60%，加 7-12%（USO-010）改善至 -7.50%，加 7-13%（USO-012）改善至 -3.86% |
 | SPY | SPY-005 | RSI(2) 寬出場 | ~3.2/2 | 75%/75% | 同 SPY-004 進場（RSI(2)<10 + 2日跌幅≥1.5%），寬出場 TP+3.0%/SL-3.0%/20d。Part A Sharpe 0.53/Part B 0.56（A/B gap 0.03，極佳平衡）。vs SPY-004: Part A Sharpe +112%（0.25→0.53），關鍵：寬 SL 避開 2-3 日暫跌假停損（3 筆翻正），長持倉挽回慢反彈。SL -3.0% 是甜蜜點（-2.5% 太緊 WR 62.5%，-3.5% 太寬）。SPY-006 驗證 ROC(5)進場（Sharpe 0.13/0.34）、RSI+回檔（0.48/0.56）、TP+3.5%（0.43/0.65）均失敗，**已確認為全域最優**（6 次實驗、30+ 次嘗試） |
@@ -227,7 +227,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, NVDA-002, NVDA-004, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, TSLA-007, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004, XLU-005]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, NVDA-002, NVDA-004, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, TSLA-007, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004, XLU-005]
   validated: 2026-04-03
   data_through: 2025-12-31
   confidence: high
@@ -341,6 +341,8 @@
 
 85. **Keltner Channel 突破不如 BB 擠壓突破** — TSLA Keltner Channel（EMA(20)+ATR(10)）3 次嘗試（ATR x2.0 25th pct、ATR x2.0 15th pct、ATR x2.5 25th pct），最佳 Part A Sharpe 0.10 / Part B 0.53（vs BB 擠壓 0.35/0.37）。ATR 包含跳空缺口使通道在高波動期更寬，擠壓條件需更長低波動期才觸發，導致信號品質下降（Part A WR 44-47% vs BB 56.2%）。收緊擠壓百分位（15th）適得其反（改變訊號日期，同 lesson #19），寬通道（x2.5）僅邊際改善。**BB 標準差對真正的波動收縮更敏感**——同一窗口內價格回歸均值時標準差下降更快，而 ATR 因缺口記憶而下降更慢。突破策略應優先使用 BB Width 而非 ATR-based 衡量波動收縮（TSLA-007 驗證）
 86. **BB 擠壓突破在加密 ETF（IBIT）完全無效** — IBIT（日波動 3.17%）BB(20,2) 擠壓+SMA(50)+TP+8%/SL-7%/20d，Part A Sharpe -0.29/Part B -1.11，6 筆交易中 5 筆停損。雖日波動在有效區間（2-4%），但加密 ETF 的擠壓後突破缺乏機構追漲動能，突破後快速反��。同時驗證趨��動量回檔（SMA50+2日跌5%+WR-70，Part A -0.07/Part B 0.00 僅 1 訊號）和 RSI(5) 趨勢回檔（RSI(5)<25+SMA20，Part A 0.00/Part B -0.18 僅 2 訊號）均失敗。**根本��頸：IBIT 僅 2 年數據（2024-01 起），非均值回���策略每年僅 1-3 訊號，統計不可靠**。均��回歸（IBIT-001 Sharpe 0.15/0.37）仍為唯一可行策略（IBIT-003 驗證）
+
+87. **BB 擠壓突破在單一商品 ETF（SIVR）上無效** — SIVR（日波動 2-3%，白銀實體 ETF）BB(20,2) 擠壓突破 3 次嘗試：Att1 30th pct+TP+5%/SL-5%/cd10 Part A Sharpe 0.10/Part B 0.09；Att2 25th pct+TP+4%/SL-5%/cd10 Part A -0.01/Part B -0.02；Att3 20th pct+TP+5%/SL-5%/cd15 Part A 0.11/Part B 0.10。vs SIVR-005 均值回歸 0.22/0.26。~43% 停損率：白銀突破缺乏持續動能，投機性突破常快速反轉。與 GLD-009（日波動 1.1%，突破幅度不足）失敗原因不同——SIVR 有足夠波動但突破不持久。**更新 BB 擠壓突破適用排序：個股（日波動 2-4%）> 高流動 ETF（日波動 1.5-2%）> 單一商品 ETF（SIVR 2-3%、GLD 1.1%）> 利率驅動 ETF ≈ 3x 槓桿 ETF > 小眾 ETF**（SIVR-008 驗證）
 
 ---
 
