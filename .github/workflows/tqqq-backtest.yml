@@ -85,6 +85,7 @@ on:
           - "TSLA-004: tsla_004_wr_reversion"
           - "TSLA-005: tsla_005_bb_squeeze_breakout"
           - "TSLA-006: tsla_006_trend_pullback"
+          - "TSLA-007: tsla_007_keltner_breakout"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
           - "IWM-001: iwm_001_rsi2_reversal"
