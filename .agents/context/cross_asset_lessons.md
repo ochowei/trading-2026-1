@@ -194,8 +194,8 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, GLD-008, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, NVDA-003, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, XLU-002, XLU-003]
-  validated: 2026-04-02
+  derived_from: [TQQQ-010, GLD-007, GLD-008, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, URA-001, URA-002, URA-003, URA-004, IBIT-001, IBIT-002, NVDA-002, NVDA-003, NVDA-004, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, XLU-002, XLU-003]
+  validated: 2026-04-03
   data_through: 2025-12-31
   confidence: high
 -->
@@ -216,7 +216,7 @@
 | XBI | XBI-005 | 回檔範圍 + Williams %R + 反轉K線 | ~4.2/3.0 | 76.2%/83.3% | 回檔 8-20% + WR(10)≤-80 + ClosePos≥35%，TP+3.5%/SL-5.0%/15天。Part A Sharpe 0.36/Part B 0.64（vs XBI-001 的 0.11/0.23，分別 +227%/+178%）。ClosePos 35% 是甜蜜點（40% Part B Sharpe 0.16，30% Part A Sharpe 0.30）。XBI 日波動 2.0% 在 ClosePos 有效邊界內（類似 IWM），與 FCX/SIVR 不同。XBI-006 驗證 BB 擠壓突破（3 次嘗試：突破 Part A 0.05/0.18、ROC Part A 0.27）均失敗，**已確認為全域最優**（6 次實驗、20+ 次嘗試，含突破與 ROC 策略獨立驗證） |
 | COPX | COPX-003 | 20日回檔範圍 + Williams %R + 出場優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.39/Part B 0.35（A/B gap 僅 0.04，極佳平衡）。20日回看框架 + SL 收窄是關鍵突破（vs COPX-001 Part A 0.08→0.39）。COPX-004 驗證回檔 9-20%（Part A 劣化）、15天持倉（Part B WR 降 9pp）、冷卻 10天（無效果）均失敗。COPX-005 驗證 BB 擠壓突破（3 次嘗試，Part B Sharpe -0.17~0.01）完全無效（ETF 分散化削弱突破動能），已確認為全域最優 |
 | URA | URA-004 | 回檔範圍 + RSI(2) + 2日急跌 | ~4.4/7.5 | 68.2%/66.7% | 回檔 10-20% + RSI(2)<15 + 2日跌幅≤-3%，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.41/Part B 0.39（A/B gap 0.02，極佳平衡）。vs URA-003：Part A Sharpe +21%（0.34→0.41），min(A,B) +15%（0.34→0.39）。2日跌幅 -3% 是甜蜜點：-2.5% 引入日期偏移（lesson #19）、-4% 搭配 WR(10) 過嚴。20日回看在 URA 嚴格劣化（確認 lesson #54） |
-| NVDA | NVDA-003 | BB 擠壓突破 | ~3.0/4.0 | 66.7%/62.5% | BB(20,2) 擠壓（60日 25th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+8%/SL-7%/20天。Part A Sharpe 0.40/Part B 0.47（vs NVDA-001 均值回歸 0.23/0.44，+74%/+7%）。**突破再次超越均值回歸**（繼 TSLA-005 後第二個驗證），訊號頻率 3.0/年（vs 1.2/年），統計可信度大幅提升。TP +8% 是硬上限（均值回歸和突破均驗證），SL -7% 是突破甜蜜點（-5% 太緊 WR 53.3%） |
+| NVDA | NVDA-004 | BB 擠壓突破（優化） | ~3.4/4.0 | 70.6%/62.5% | BB(20,2) 擠壓（60日 25th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+8%/SL-7%/20天，冷卻10天。Part A Sharpe 0.50/Part B 0.47（vs NVDA-003 0.40/0.47，Part A +25%），A/B Sharpe 比 1.06:1（近乎完美平衡）。冷卻期 15→10 天捕捉 2 個 Part A 好訊號（Part B 不變）。SL -8% 驗證失敗（虧損更大不救回交易），SMA(20) 驗證失敗（讓通熊市假突破） |
 | IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2) 替代 WR（訊號日期偏移）、2日跌幅+RSI 過嚴、SL-6% 翻轉勝負均失敗，已確認為全域最優 |
 | TSLA | TSLA-005 | BB 擠壓突破 | ~3.2/2.5 | 56.2%/60.0% | BB(20,2) 擠壓（60日 25th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+10%/SL-7%/20天。Part A Sharpe 0.35/Part B 0.37（A/B gap 0.02，極佳平衡）。**突破策略首次超越均值回歸**（vs TSLA-004 Sharpe 0.14/0.13，+150%/+185%）。WR 較低但盈虧比補償（PF 2.04/2.10）。TSLA 動量驅動，順勢突破優於逆勢均值回歸 |
 | TLT | TLT-002 | 回檔 + WR + 反轉K線 + 60日跌幅過濾 | ~6.4/8.0 | 46.9%/68.8% | 回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + 60日跌幅≤10%，TP+2.5%/SL-3.5%/20天。Part A Sharpe -0.20/Part B 0.24。**Part A 結構性負**（2022 升息制約）。TLT-004 驗證突破/趨勢策略：BB 擠壓突破 Part A 0.31 改善但 Part B -1.15（橫盤假突破），SMA 黃金交叉 Part A 0.89 但 Part B 僅 2 訊號。**均值回歸被升息殺、突破被橫盤殺**，TLT 無純技術面解法（10 次實驗、20+ 次嘗試，含突破策略驗證） |
@@ -227,8 +227,8 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, COPX-003, COPX-005, NVDA-002, IBIT-002, IWM-004, IWM-005, IWM-006, TLT-002, TLT-004, TSLA-003, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003]
-  validated: 2026-04-02
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, GLD-005, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SPY-003, SPY-004, SPY-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, COPX-003, COPX-005, NVDA-002, NVDA-004, IBIT-002, IWM-004, IWM-005, IWM-006, TLT-002, TLT-004, TSLA-003, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003]
+  validated: 2026-04-03
   data_through: 2025-12-31
   confidence: high
 -->
@@ -317,6 +317,9 @@
 71. **BB 擠壓突破在板塊分散化 ETF 上系統性失敗** — XBI（130+ 生技股等權重）BB Squeeze Breakout WR 僅 50-56%，Part A Sharpe 0.05-0.18（vs 均值回歸 0.36）。個股突破動能被 ETF 內部其他成分股稀釋。COPX-005（銅礦 ETF）同樣失敗（Part B Sharpe -0.17~0.01）。**但 IWM 例外**（Part A 0.31/Part B 0.37），因 Russell 2000 市值廣度與高流動性部分抵消分散化效應。突破策略僅適用於個股（NVDA、TSLA）或流動性極高的廣基指數 ETF（IWM），板塊/主題 ETF 應使用均值回歸（XBI-006、COPX-005 驗證）
 72. **5日 ROC 進場在 XBI 上市場狀態依賴過強** — 5日 ROC ≤ -8% + WR + ClosePos 在 Part A 產生 7 個訊號（WR 71.4%），但 Part B 僅 2 個（WR 50%），A/B 比 3.5:1。ROC 對 2022 熊市高敏感（大量急跌觸發），但 2024-2025 低波動環境幾乎無觸發。相比之下 pullback-from-high A/B 比 3.5:1（XBI-005 的 21:6）但品質更穩定。ROC 不可作為板塊 ETF 的主要進場觸發器（XBI-006 Att3 驗證）
 71. **動量驅動個股突破策略可優於均值回歸** — TSLA BB 擠壓突破 Sharpe 0.35/0.37 vs 均值回歸最佳 0.14/0.13（+150%/+185%）。NVDA 再次驗證：BB 擠壓突破 Sharpe 0.40/0.47 vs 均值回歸 0.23/0.44（+74%/+7%）。**FCX 第三次驗證**：BB 擠壓突破 Part A Sharpe 0.51 vs 均值回歸最佳 0.43（+18.6%），但 Part B 0.41 vs 0.74（突破策略 OOS 較弱）。FCX 突破訊號數 4.6/年（vs 均值回歸 3.6/年），BB 擠壓時間窗口需放寬（同日太嚴，5日內較佳），SL 應比均值回歸更緊（-7% vs -10~-13%），因突破失敗後反轉速度更快。**有效日波動範圍 2-4%**（FCX 2-4%、TSLA 3-4%、NVDA 3.26%），>5% 失效（lesson #73）（TSLA-005、NVDA-003、FCX-004 驗證）
+73. **NVDA 突破策略冷卻期 10天優於 15天** — 冷卻 15→10 天使 Part A 新增 2 個好訊號（2020-07-08、2020-08-03 均達標 +8%），Part A Sharpe 0.40→0.50（+25%），Part B 完全不變（8 訊號、Sharpe 0.47）。A/B Sharpe 比從 0.85:1 改善至 1.06:1。原因：NVDA 突破動量周期短（平均持倉 8.6 天），15 天冷卻期錯過同一波上漲中的第二次有效突破（NVDA-004 Att2 驗證）
+74. **NVDA SL -7% 是突破策略底線不可放寬至 -8%** — SL -8% 使每筆停損虧損增加 1pp（-7.14%→-8.14%），但未救回任何交易（所有停損交易跌幅遠超 -8%），Part B Sharpe 0.47→0.41。類似 lesson #42（SOXL SL -15% 不優於 -12%）：當跌勢超過 -7% 時通常也遠超 -8%（NVDA-004 Att1 驗證）
+75. **SMA(50) 優於 SMA(20) 作為突破趨勢確認** — SMA(20) 對 NVDA 讓通 2022-06-02 熊市反彈假突破（停損 -7.14%），Part A Sharpe 0.50→0.40。SMA(50) 的長期趨勢過濾在熊市期間更能有效排除假突破，因熊市反彈常短暫穿越 SMA(20) 但無法維持在 SMA(50) 之上（NVDA-004 Att3 驗證）
 72. **BB 擠壓+突破同日發生過於嚴格** — TSLA BB Width 20日最低值 + 同日 Close > Upper BB 僅產生 3 個 Part A 訊號和 0 個 Part B 訊號。放寬為「60日 25th 百分位，5日內曾發生」後訊號增至 16/5 且品質不變。波動收縮與突破之間通常需要數日醞釀（TSLA-005 Att1 vs Att2 驗證）
 73. **BB 擠壓突破在 3x 槓桿 ETF（日波動 >5%）完全無效** — SOXL（日波動 6.6%）BB 擠壓突破 3 次嘗試均 Part B 負報酬（Sharpe -0.15～-0.51），vs SOXL-006 均值回歸 Sharpe 0.47/0.79。TP +15%/SL -10%、TP +12%/SL -8%、TP +18%/SL -12% 三組出場參數均失敗。原因：3x 槓桿放大日內回撤，失敗突破在悲觀認定下立即停損，且突破進場（買在高點）vs 均值回歸（買在低點）在高波動資產上天然劣勢。lesson #71 的 TSLA 成功（日波動 3-4%）不可推廣至 3x 槓桿 ETF（SOXL-009 驗證）
 74. **BB 擠壓突破在利率驅動 ETF（TLT）完全無效** — TLT（日波動 1.0%）BB 擠壓突破 Part A Sharpe 0.31（vs 均值回歸 -0.20，大幅改善），但 Part B -1.15（13 筆中僅 1 達標、8 停損）。2024-2025 TLT 在 $85-$93 橫盤，每次突破上軌後均迅速回落。寬出場（TP+4%/SL-5%）仍 Part B -0.63。SMA(20)×SMA(50) 黃金交叉改善 Part A 至 0.89 但 Part B 僅 2 訊號無統計意義。**TSLA 突破成功不可推廣至利率驅動 ETF**：TSLA 動量驅動有持續力，TLT 受宏觀政策驅動，突破無跟隨動能（TLT-004 驗證）

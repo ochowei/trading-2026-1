@@ -94,6 +94,7 @@ on:
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "NVDA-003: nvda_003_bb_squeeze_breakout"
+          - "NVDA-004: nvda_004_bb_squeeze_optimized"
           - "XBI-001: xbi_001_pullback_wr"
           - "XBI-004: xbi_004_capped_cooldown"
           - "XBI-005: xbi_005_closepos_reversal"
