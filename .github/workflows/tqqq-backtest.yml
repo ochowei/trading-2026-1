@@ -92,6 +92,7 @@ on:
           - "IWM-004: iwm_004_relative_weakness"
           - "IWM-005: iwm_005_shorter_hold"
           - "IWM-006: iwm_006_bb_squeeze_breakout"
+          - "IWM-007: iwm_007_trend_pullback"
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "NVDA-003: nvda_003_bb_squeeze_breakout"
