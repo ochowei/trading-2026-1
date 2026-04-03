@@ -45,6 +45,7 @@ on:
           - "DIA-003: dia_003_rsi2_bb"
           - "DIA-004: dia_004_wider_tp"
           - "DIA-005: dia_005_extreme_entry"
+          - "DIA-006: dia_006_bb_squeeze_breakout"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
           - "FCX-004: fcx_004_bb_squeeze_breakout"
