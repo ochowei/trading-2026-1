@@ -114,6 +114,7 @@ on:
           - "URA-002: ura_002_asymmetric_narrow"
           - "URA-003: ura_003_pullback_rsi2"
           - "URA-004: ura_004_20d_pullback_rsi2"
+          - "URA-005: ura_005_bb_squeeze_breakout"
           - "IBIT-001: ibit_001_pullback_wr"
           - "IBIT-002: ibit_002_rsi2_pullback"
 
