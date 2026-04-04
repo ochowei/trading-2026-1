@@ -1,10 +1,10 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-03
+  last_validated: 2026-04-04
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** SIVR-005（回檔 7-15% + WR ≤ -80，回檔上限過濾極端崩盤），已確認為全域最優（10 次實驗、21 次嘗試，含突破策略驗證）
+**當前最佳：** SIVR-005（回檔 7-15% + WR ≤ -80，回檔上限過濾極端崩盤），已確認為全域最優（11 次實驗、24 次嘗試，含突破策略和配對交易驗證）
 - Part A: Sharpe 0.22, 累計 +24.06%, 32 訊號 (6.4/年)
 - Part B: Sharpe 0.26, 累計 +9.69%, 11 訊號 (5.5/年)
 - vs SIVR-003: Part A Sharpe +22%, 累計 +23%，Part B 完全相同
@@ -38,6 +38,11 @@
 - BB Squeeze Breakout Att2（25th pct + TP+4%/SL-5%/cd10）：Part A Sharpe -0.01，Part B -0.02。降低 TP 使盈虧比不對稱，累計為負
 - BB Squeeze Breakout Att3（20th pct + TP+5%/SL-5%/cd15）：Part A 14 訊號 Sharpe 0.11，Part B 9 訊號 Sharpe 0.10。最佳嘗試但仍遠不如 SIVR-005（0.22/0.26）
 
+**已證明無效（配對交易策略，SIVR-009 驗證）：**
+- GLD/SIVR 比率 z-score(60d) ≥ 1.5 + WR(10)（Att1）：Part A Sharpe 0.06（23 訊號，WR 52.2%），Part B Sharpe 0.64（9 訊號）。Part B 極佳但 Part A 嚴重不足，2021-2023 金銀比結構性偏高產生大量假訊號
+- GLD/SIVR 比率 z-score(90d) ≥ 2.0 + WR(10)（Att2）：Part A Sharpe 0.22（17 訊號），Part B Sharpe 0.18（5 訊號）。提高門檻改善 Part A 但殺死 Part B，A/B 比 3.4:1
+- GLD/SIVR 比率 z-score(60d) ≥ 1.5 + 回檔 7-15% + WR(10)（Att3）：Part A Sharpe 0.18（13 訊號），Part B Sharpe 0.55（4 訊號）。最佳嘗試 min(A,B) = 0.18 仍不如 SIVR-005 的 0.22。核心瓶頸：金銀比在市場壓力期（2021-2023 聯儲升息）結構性偏高，無法用 z-score 有效區分暫時偏離 vs 結構性偏移
+
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - 多根 K 線確認（連續 2-3 根收高）— 但跨資產教訓 #23 顯示 K 線方向過濾在均值回歸中無效
 
@@ -54,11 +59,12 @@
 - TP/SL ±3.5% (1:1 風報比) 是全域最佳，非對稱出場犧牲 Part A 換取 A/B 均衡
 - 10 日回檔回看是最佳窗口，20 日回看產生 Part A/B 市場狀態依賴性（2019-2023 多噪音訊號）
 - **BB Squeeze Breakout 在 SIVR 上完全無效**：三次嘗試最佳 Sharpe 0.11/0.10（vs 均值回歸 0.22/0.26）。白銀 ETF 突破缺乏持續動能，~43% 的突破訊號最終停損
+- **GLD/SIVR 配對交易（比率 z-score 均值回歸）無效**：三次嘗試最佳 min(A,B) = 0.18（vs SIVR-005 的 0.22）。金銀比在升息期結構性偏高，z-score 無法區分暫時偏離 vs 結構性偏移
 <!-- AI_CONTEXT_END -->
 
 # SIVR 實驗總覽 (SIVR Experiment Index)
 
-> **最新實驗 (Latest):** SIVR-008 `sivr_008_bb_squeeze_breakout`（BB Squeeze 突破策略，3 次嘗試均失敗）
+> **最新實驗 (Latest):** SIVR-009 `sivr_009_ratio_reversion`（GLD/SIVR 配對交易，3 次嘗試均失敗）
 > **當前最佳 (Best):** SIVR-005 `sivr_005_capped_pullback_wr`（回檔上限過濾極端崩盤，Part A Sharpe +22%，已確認全域最優）
 
 ## 實驗清單 (Experiments)
@@ -73,6 +79,7 @@
 | SIVR-006 | `sivr_006_closepos_pullback_wr` | SIVR 非對稱出場 + 回檔範圍 + WR 均值回歸 | 同 SIVR-005 進場，TP +4.0% / SL -3.5% / 20d | ❌ 失敗（3次嘗試） |
 | SIVR-007 | `sivr_007_divergence_pullback_wr` | SIVR 20日回檔 + WR + RSI動能回復 | 20d 高點回檔 8-15%, WR(10) ≤ -80, 10天冷卻 | ❌ 失敗（3次嘗試） |
 | SIVR-008 | `sivr_008_bb_squeeze_breakout` | SIVR BB Squeeze Breakout（突破策略） | BB(20,2) 60日20th pct擠壓 + 突破上軌 + SMA(50), TP+5%/SL-5%/20d | ❌ 失敗（3次嘗試） |
+| SIVR-009 | `sivr_009_ratio_reversion` | SIVR GLD/SIVR 配對交易（相對價值） | GLD/SIVR 比率 z-score(60d) ≥ 1.5 + 回檔 7-15% + WR(10) ≤ -80, TP+3.5%/SL-3.5%/15d | ❌ 失敗（3次嘗試） |
 
 ## 演進路線 (Lineage)
 
@@ -84,24 +91,27 @@ SIVR-001 sivr_001_mean_reversion (基礎版：RSI(10)<28, SMA20 Dev -2.5%, coold
     └── SIVR-005 sivr_005_capped_pullback_wr (回檔上限 15% 過濾極端崩盤) ✅ 當前最佳（全域最優）
         ├── SIVR-006 sivr_006_closepos_pullback_wr (非對稱出場 / 收盤位置過濾) ❌ 三次嘗試均失敗
         └── SIVR-007 sivr_007_divergence_pullback_wr (20日回看 / RSI動能回復) ❌ 三次嘗試均失敗
+
+SIVR-009 sivr_009_ratio_reversion (獨立分支：GLD/SIVR 配對交易 z-score 均值回歸) ❌ 三次嘗試均失敗
 ```
 
 ## 參數對照 (Parameter Comparison)
 
-| 參數 | SIVR-001 | SIVR-002 | SIVR-003 | SIVR-004 | SIVR-005 | SIVR-006 | SIVR-007 |
-|---|---|---|---|---|---|---|---|
-| RSI | 10 日 < 28.0 | 同左 | — | **RSI(2) < 15** | — | — | — |
-| SMA Deviation | 20 日 ≤ -2.5% | 同左 | — | — | — | — | — |
-| Pullback | — | — | **10d 高點回檔 ≥ 7%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **20d 回檔 8-15%** |
-| Williams %R | — | — | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** |
-| Profit Target | +3.0% | +3.0% | **+3.5%** | +3.5% | +3.5% | **+4.0%** | +3.5% |
-| Stop Loss | -4.5% | -4.5% | **-3.5%** | -3.5% | -3.5% | -3.5% | -3.5% |
-| Holding Days | 15 | 15 | 15 | 15 | 15 | **20** | 15 |
-| Cooldown Days | 15 | 15 | **10** | 10 | 10 | 10 | 10 |
-| Slippage | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% |
-| Trail Activation | — | +2.0% | — | — | — | — | — |
-| Trail Distance | — | 1.5% | — | — | — | — | — |
-| Execution Mode | 悲觀認定, 隔日開市進場 | 同左 | 同左 | 同左 | 同左 | 同左 | 同左 |
+| 參數 | SIVR-001 | SIVR-002 | SIVR-003 | SIVR-004 | SIVR-005 | SIVR-006 | SIVR-007 | SIVR-009 |
+|---|---|---|---|---|---|---|---|---|
+| RSI | 10 日 < 28.0 | 同左 | — | **RSI(2) < 15** | — | — | — | — |
+| SMA Deviation | 20 日 ≤ -2.5% | 同左 | — | — | — | — | — | — |
+| Ratio Z-score | — | — | — | — | — | — | — | **GLD/SIVR 60d ≥ 1.5** |
+| Pullback | — | — | **10d 高點回檔 ≥ 7%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **20d 回檔 8-15%** | **10d 回檔 7-15%** |
+| Williams %R | — | — | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** |
+| Profit Target | +3.0% | +3.0% | **+3.5%** | +3.5% | +3.5% | **+4.0%** | +3.5% | +3.5% |
+| Stop Loss | -4.5% | -4.5% | **-3.5%** | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% |
+| Holding Days | 15 | 15 | 15 | 15 | 15 | **20** | 15 | 15 |
+| Cooldown Days | 15 | 15 | **10** | 10 | 10 | 10 | 10 | 10 |
+| Slippage | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% |
+| Trail Activation | — | +2.0% | — | — | — | — | — | — |
+| Trail Distance | — | 1.5% | — | — | — | — | — | — |
+| Execution Mode | 悲觀認定, 隔日開市進場 | 同左 | 同左 | 同左 | 同左 | 同左 | 同左 | 同左 |
 
 ## 與 GLD 實驗差異說明 (Differences from GLD)
 
