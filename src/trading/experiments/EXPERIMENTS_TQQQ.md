@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-03-29
+  last_validated: 2026-04-04
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -14,27 +14,29 @@
 - 追蹤停利：TQQQ-003, TQQQ-005 已證明在高波動標的上容易提前被洗出，表現不如固定停利
 - 過嚴的 VIX 過濾（VIX ≥ 25）：TQQQ-004 導致訊號數過少，錯失機會
 - 出場疊加額外過濾器（QQQ RSI < 35 加上短停利）：TQQQ-013 證明訊號數大幅降低，表現落後。**滾動窗口分析（2026-03-29）：** QQQ 數據不可用時退化為 TQQQ-010（數值完全相同），進一步確認 QQQ RSI 過濾不應納入
+- VIX 自適應出場（VIX 區間動態調整 TP/SL）：TQQQ-014 三次嘗試均失敗。原因：(1) 絕大多數 TQQQ 恐慌訊號的 VIX < 30，自適應機制幾乎不啟動；(2) 放寬 TP（+9%）導致原本可達標的交易錯過目標轉為停損；(3) 放寬 SL（-10%）增加虧損但不挽救交易。固定 TP +7%/SL -8% 已是甜蜜點
 
 **已掃描的參數空間：**
-- 出場目標（TP）：+5%, +6%, +7%, +8%, +12% → +7% 最佳
+- 出場目標（TP）：+5%, +6%, +7%, +8%, +9%, +12% → +7% 最佳
 - 停損目標（SL）：-6%, -8%, -10% → -8% 最佳
 - 持倉天數：7, 8, 10, 12 天 → 10 天最佳
 - 進場 Drawdown：-12%, -13%, -15% → -15% 最佳（需極端恐慌）
+- VIX 自適應出場：3 種 VIX 分層 / 2 層（VIX ≥ 35）/ 2 層（VIX ≥ 30, 不放寬 SL）→ 全部劣化或平手
 
 **尚未嘗試的方向（可探索）：**
 - 分批進場/出場（如達到 +5% 賣出一半，剩餘追蹤）
-- 結合大盤均線（例如 SPY SMA200）確認多空趨勢背景
-- 針對不同波動度（VIX 區間）動態調整 TP/SL
+- 結合大盤均線（例如 SPY SMA200）確認多空趨勢背景（但 cross-asset lesson #5 警告均值回歸+趨勢過濾=災難）
 
 **關鍵資產特性：**
 - 高槓桿 (3x)，波動極大，不適合過緊的停損或追蹤停利
 - "極端恐慌抄底" (Drawdown -15%) 是核心獲利來源，不可輕易放寬
 - 隔日開盤進場（成交模型）會顯著影響 In-Sample 報酬（因濾除未來資訊），但更能反映真實表現
+- TQQQ 恐慌訊號大多在 VIX < 30 時觸發，VIX 自適應調整的有效空間極為有限
 <!-- AI_CONTEXT_END -->
 
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-013 `tqqq_013_cap_exec_qqq_optimized`
+> **最新實驗 (Latest):** TQQQ-014 `tqqq_014_cap_exec_vix_adaptive`
 > **當前最佳 (Best):** TQQQ-008 `tqqq_008_cap_optimized_exit`（無成交模型）/ TQQQ-010 `tqqq_010_cap_exec_optimized`（含成交模型）
 
 ## 實驗清單 (Experiments)
@@ -54,6 +56,7 @@
 | TQQQ-011 | `tqqq_011_cap_exec_baseline` | 重做 TQQQ-001 + 成交模型 | 同上成交模型 | ✅ 完成 |
 | TQQQ-012 | `tqqq_012_cap_exec_qqq_confirm` | 重做 TQQQ-007 + 成交模型 | 同上成交模型 + QQQ RSI 過濾 | ✅ 完成 |
 | TQQQ-013 | `tqqq_013_cap_exec_qqq_optimized` | QQQ RSI 過濾 + 優化出場 + 成交模型 | 在 TQQQ-012 基礎改為 TP +7%、持倉 10 天 | ❌ 失敗 |
+| TQQQ-014 | `tqqq_014_cap_exec_vix_adaptive` | VIX 自適應出場 + 成交模型 | 訊號日 VIX 決定 TP/SL/持倉：VIX≥35 → +9%/-10%/12d，<35 → +7%/-8%/10d | ❌ 失敗 |
 
 ## 演進路線 (Lineage)
 
@@ -72,7 +75,10 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 ├── TQQQ-010 tqqq_010_cap_exec_optimized  (重做 TQQQ-008 + 成交模型)
 ├── TQQQ-011 tqqq_011_cap_exec_baseline   (重做 TQQQ-001 + 成交模型)
 ├── TQQQ-012 tqqq_012_cap_exec_qqq_confirm (重做 TQQQ-007 + 成交模型)
-└── TQQQ-013 tqqq_013_cap_exec_qqq_optimized (QQQ 過濾 + 優化出場 + 成交模型)
+├── TQQQ-013 tqqq_013_cap_exec_qqq_optimized (QQQ 過濾 + 優化出場 + 成交模型)
+│
+│   ── VIX 自適應出場系列 (VIX-Adaptive Exit Series) ──
+└── TQQQ-014 tqqq_014_cap_exec_vix_adaptive (VIX 自適應出場 + 成交模型)
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -126,19 +132,20 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 
 ## 成交模型參數 (Execution Model Parameters — TQQQ-010+)
 
-| 參數 | TQQQ-010 | TQQQ-011 | TQQQ-012 | TQQQ-013 |
-|------|----------|----------|----------|----------|
-| 來源實驗 (Source) | TQQQ-008 | TQQQ-001 | TQQQ-007 | TQQQ-012 + TQQQ-010 出場 |
-| 進場模式 (Entry) | next_open_market | next_open_market | next_open_market | next_open_market |
-| 止盈委託 (Profit) | limit_order Day | limit_order Day | limit_order Day | limit_order Day |
-| 停損委託 (Stop) | stop_market GTC | stop_market GTC | stop_market GTC | stop_market GTC |
-| 到期出場 (Expiry) | next_open_market | next_open_market | next_open_market | next_open_market |
-| 滑價 (Slippage) | 0.10% | 0.10% | 0.10% | 0.10% |
-| 悲觀認定 (Pessimistic) | ✅ | ✅ | ✅ | ✅ |
-| Profit Target | +7% | +5% | +6% | +7% |
-| Stop Loss | -8% | -8% | -8% | -8% |
-| Holding Days | 10 | 7 | 8 | 10 |
-| QQQ RSI Filter | — | — | RSI(14) < 35 | RSI(14) < 35 |
+| 參數 | TQQQ-010 | TQQQ-011 | TQQQ-012 | TQQQ-013 | TQQQ-014 |
+|------|----------|----------|----------|----------|----------|
+| 來源實驗 (Source) | TQQQ-008 | TQQQ-001 | TQQQ-007 | TQQQ-012 + TQQQ-010 出場 | TQQQ-010 + VIX 自適應 |
+| 進場模式 (Entry) | next_open_market | next_open_market | next_open_market | next_open_market | next_open_market |
+| 止盈委託 (Profit) | limit_order Day | limit_order Day | limit_order Day | limit_order Day | limit_order Day |
+| 停損委託 (Stop) | stop_market GTC | stop_market GTC | stop_market GTC | stop_market GTC | stop_market GTC |
+| 到期出場 (Expiry) | next_open_market | next_open_market | next_open_market | next_open_market | next_open_market |
+| 滑價 (Slippage) | 0.10% | 0.10% | 0.10% | 0.10% | 0.10% |
+| 悲觀認定 (Pessimistic) | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Profit Target | +7% | +5% | +6% | +7% | **VIX≥35: +9%, <35: +7%** |
+| Stop Loss | -8% | -8% | -8% | -8% | **VIX≥35: -10%, <35: -8%** |
+| Holding Days | 10 | 7 | 8 | 10 | **VIX≥35: 12, <35: 10** |
+| QQQ RSI Filter | — | — | RSI(14) < 35 | RSI(14) < 35 | — |
+| VIX Adaptive Exit | — | — | — | — | **✅ 2-tier** |
 
 ### Part A — In-Sample (2019-01-01 ~ 2023-12-31)
 
@@ -148,6 +155,7 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-011 | 20    | 20    | 100.0%  | 70.0%  | +1.07%  | +19.35%  | -29.26%  | 0           |
 | TQQQ-012 | 14    | 14    | 100.0%  | 71.4%  | +1.97%  | +27.79%  | -29.26%  | 0           |
 | TQQQ-013 | 1     | 1     | 100.0%  | 0.0%   | -8.09%  | -8.09%   | -12.11%  | 0           |
+| TQQQ-014 | 20    | 20    | 100.0%  | 70.0%  | +2.47%  | +55.44%  | -29.26%  | 0           |
 
 ### Part B — Out-of-Sample (2024-01-01 ~ 2025-12-31)
 
@@ -157,6 +165,7 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 | TQQQ-011 | 8     | 8     | 100.0%  | 87.5%  | +3.36%  | +29.33%  | -11.80%  | 0           |
 | TQQQ-012 | 6     | 6     | 100.0%  | 83.3%  | +3.65%  | +23.00%  | -11.80%  | 0           |
 | TQQQ-013 | 1     | 1     | 100.0%  | 100.0% | +7.00%  | +7.00%   | +4.00%   | 0           |
+| TQQQ-014 | 8     | 8     | 100.0%  | 75.0%  | +3.23%  | +26.33%  | -12.08%  | 0           |
 
 > **與無成交模型版本的比較 (Comparison with no-execution-model versions):**
 > - TQQQ-010 vs TQQQ-008: Part A 累計 +55.44% vs +120.21%（↓54%）、Part B 累計 +47.59% vs +45.44%（↑5%）
@@ -167,6 +176,12 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 > **分析：** In-Sample 累計報酬大幅下降，主因是舊實驗進場以「訊號日收盤價」成交（已知未來資訊），新實驗改為「隔日開盤市價」更貼近實盤。Out-of-Sample 反而略微提升，顯示隔日開盤進場在近期市場環境中表現更穩健。成交模型版本的績效更可信賴。
 >
 > **TQQQ-013 失敗紀錄：** 嘗試將 TQQQ-012 的出場參數改為 TQQQ-010 的 TP +7% / 持倉 10 天，期待提高單筆報酬；但 QQQ RSI 過濾後訊號數過少，Part A 只有 1 筆且為虧損，整體顯著落後，不採用。
+>
+> **TQQQ-014 失敗紀錄（VIX 自適應出場，3 次嘗試）：**
+> - **Att1（3-tier VIX）：** VIX≥35 → +9%/-10%/12d，VIX 25-35 → +7%/-8%/10d，VIX<25 → +5%/-6%/8d。Part A Sharpe 0.23（vs TQQQ-010 的 0.36），Part B Sharpe 0.39（vs 0.45 隱含）。失敗原因：16/20 Part A 訊號 VIX < 25，SL -6% 對 TQQQ 過緊
+> - **Att2（2-tier，VIX≥35 放寬 TP+SL）：** VIX≥35 → +9%/-10%/12d，<35 → +7%/-8%/10d。Part A 與 TQQQ-010 完全相同（全部訊號 VIX < 35）。Part B 累計 +26.33%（vs +47.59%），因 2025-02-27 的 SL -10% 多虧 2%，2025-11-18 的 TP +9% 多賺 2%，淨虧損
+> - **Att3（2-tier，VIX≥30 只放寬 TP 不放寬 SL）：** VIX≥30 → +9%/-8%/12d，<30 → +7%/-8%/10d。Part B Sharpe -0.07，累計 -6.46%。失敗原因：2024-07-24 和 2025-11-18 的 TP +9% 太高，原本可在 +7% 達標的交易變為停損
+> - **結論：** TQQQ 恐慌訊號大多在 VIX < 30 時觸發，VIX 自適應的有效空間極為有限。固定 TP +7%/SL -8% 是全域甜蜜點，任何方向的放寬都會劣化。此方向已確認無效
 
 <!-- 更新指引：
   1. 執行 uv run trading run --all

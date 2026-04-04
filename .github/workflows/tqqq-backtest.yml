@@ -22,6 +22,7 @@ on:
           - "TQQQ-011: tqqq_011_cap_exec_baseline"
           - "TQQQ-012: tqqq_012_cap_exec_qqq_confirm"
           - "TQQQ-013: tqqq_013_cap_exec_qqq_optimized"
+          - "TQQQ-014: tqqq_014_cap_exec_vix_adaptive"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
