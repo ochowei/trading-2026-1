@@ -23,9 +23,21 @@
 - 進場 Drawdown：-12%, -13%, -15% → -15% 最佳（需極端恐慌）
 - VIX 自適應出場：3 種 VIX 分層 / 2 層（VIX ≥ 35）/ 2 層（VIX ≥ 30, 不放寬 SL）→ 全部劣化或平手
 
-**尚未嘗試的方向（可探索）：**
+**TQQQ-015 實驗摘要（2026-04-04，趨勢/動量策略，3 次嘗試均失敗）：**
+- **Att1**（QQQ BB Squeeze Breakout, TP+12%/SL-8%/20d）：Part A Sharpe 0.25 / Part B -0.28。TP +12% 太高，Part B 零達標
+- **Att2**（QQQ BB Squeeze Breakout, TP+8%/SL-8%/15d）：Part A Sharpe 0.54 / Part B -0.10。QQQ 突破訊號在 TQQQ 幅度不足（Part B 零達標，最高 +3.68%）
+- **Att3**（QQQ Momentum ROC(10)>5%, TP+10%/SL-10%/15d）：Part A Sharpe 0.19 / Part B 0.17。A/B 平衡極佳（gap 0.02），Part B +21.41%，但 min Sharpe 0.17 遠低於 TQQQ-010 的 0.36
+
+**已證明無效（禁止重複嘗試）：**（更新）
+原有項目加上：
+- QQQ BB Squeeze Breakout → Trade TQQQ：QQQ 突破訊號在 TQQQ 幅度不足，Part B 零達標（TQQQ-015 Att1/Att2）
+- QQQ 動量策略 ROC(10)>5% → Trade TQQQ：A/B 平衡好但 Sharpe ~0.17 遠低於均值回歸（TQQQ-015 Att3）
+- **趨勢/突破/動量策略在 3x 槓桿 ETF 上無效**：高日波動使停損過寬但突破/動量訊號幅度不足（與 SOXL-009 一致）
+
+**尚未嘗試的方向（可探索，但預期改善極低）：**
 - 分批進場/出場（如達到 +5% 賣出一半，剩餘追蹤）
 - 結合大盤均線（例如 SPY SMA200）確認多空趨勢背景（但 cross-asset lesson #5 警告均值回歸+趨勢過濾=災難）
+- **TQQQ-010 已確認為全域最優**（15 次實驗、含均值回歸和趨勢/動量/突破三大策略類型）
 
 **關鍵資產特性：**
 - 高槓桿 (3x)，波動極大，不適合過緊的停損或追蹤停利
@@ -36,7 +48,7 @@
 
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-014 `tqqq_014_cap_exec_vix_adaptive`
+> **最新實驗 (Latest):** TQQQ-015 `tqqq_015_qqq_trend_breakout`
 > **當前最佳 (Best):** TQQQ-008 `tqqq_008_cap_optimized_exit`（無成交模型）/ TQQQ-010 `tqqq_010_cap_exec_optimized`（含成交模型）
 
 ## 實驗清單 (Experiments)
@@ -57,6 +69,7 @@
 | TQQQ-012 | `tqqq_012_cap_exec_qqq_confirm` | 重做 TQQQ-007 + 成交模型 | 同上成交模型 + QQQ RSI 過濾 | ✅ 完成 |
 | TQQQ-013 | `tqqq_013_cap_exec_qqq_optimized` | QQQ RSI 過濾 + 優化出場 + 成交模型 | 在 TQQQ-012 基礎改為 TP +7%、持倉 10 天 | ❌ 失敗 |
 | TQQQ-014 | `tqqq_014_cap_exec_vix_adaptive` | VIX 自適應出場 + 成交模型 | 訊號日 VIX 決定 TP/SL/持倉：VIX≥35 → +9%/-10%/12d，<35 → +7%/-8%/10d | ❌ 失敗 |
+| TQQQ-015 | `tqqq_015_qqq_trend_breakout` | QQQ 趨勢/動量策略 → Trade TQQQ + 成交模型 | Att1: BB Squeeze, Att2: BB 降TP, Att3: Momentum ROC(10)>5% | ❌ 失敗 |
 
 ## 演進路線 (Lineage)
 
@@ -78,7 +91,10 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 ├── TQQQ-013 tqqq_013_cap_exec_qqq_optimized (QQQ 過濾 + 優化出場 + 成交模型)
 │
 │   ── VIX 自適應出場系列 (VIX-Adaptive Exit Series) ──
-└── TQQQ-014 tqqq_014_cap_exec_vix_adaptive (VIX 自適應出場 + 成交模型)
+├── TQQQ-014 tqqq_014_cap_exec_vix_adaptive (VIX 自適應出場 + 成交模型)
+│
+│   ── 趨勢/動量策略系列 (Trend/Momentum Strategy Series) ──
+└── TQQQ-015 tqqq_015_qqq_trend_breakout (QQQ 趨勢/動量 → Trade TQQQ + 成交模型)
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -364,3 +380,72 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 1. **與 TQQQ-010 完全一致**：由於 QQQ 數據不可用，QQQ RSI 過濾被跳過，所有 12 個窗口的訊號數、勝率、累計報酬均與 TQQQ-010 完全相同。這進一步驗證了 TQQQ-013 的原始回測結論——QQQ RSI 過濾大幅減少訊號數（Part A 僅 1 筆），是績效顯著落後的主因。
 2. **QQQ 過濾的價值存疑**：即使能獲取 QQQ 數據，TQQQ-013 的原始回測已顯示 QQQ RSI < 35 條件過嚴（Part A 累計 -8.09%，Part B +7.00%），顯著落後 TQQQ-010（Part A +55.44%，Part B +47.59%）。cross_asset_lessons #6（確認指標的邊際效益遞減）在此再次驗證。
 3. **結論**：TQQQ-013 的滾動分析無法提供獨立價值（因等同 TQQQ-010），但確認了 QQQ RSI 過濾不應納入 TQQQ 恐慌抄底策略。
+
+---
+
+## TQQQ-015: QQQ Trend/Momentum → Trade TQQQ (Execution Model)
+
+**目標**：首次在 TQQQ 上測試非均值回歸策略。利用 QQQ（1x NASDAQ）的趨勢/動量訊號進場交易 TQQQ（3x），避免 TQQQ 高波動干擾訊號生成。
+
+### 嘗試紀錄 (Attempt Log)
+
+#### Att1: QQQ BB Squeeze Breakout (TP+12%/SL-8%/20d)
+
+**假說**：QQQ 日波動 ~1.2%，BB 擠壓突破訊號比 TQQQ 更乾淨。突破後 TQQQ 應有 3x 放大報酬。
+
+**進場條件**：QQQ BB(20,2) 擠壓（60日 25th 百分位，5日內） + QQQ Close > Upper BB + QQQ Close > SMA(50)
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 19 (3.8/yr) | 6 (3.0/yr) |
+| WR | 57.9% | 33.3% |
+| Sharpe | 0.25 | **-0.28** |
+| 累計 | +42.17% | -12.31% |
+
+**失敗原因**：TP +12% 過高，Part B 零達標。QQQ 突破只能推動 TQQQ 上漲 0-5%，遠不及 +12% 目標。
+
+#### Att2: QQQ BB Squeeze Breakout (TP+8%/SL-8%/15d)
+
+**改動**：降低 TP 至 +8%，縮短持倉至 15 天。
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 16 (3.2/yr) | 7 (3.5/yr) |
+| WR | 68.8% | 71.4% |
+| Sharpe | **0.54** | **-0.10** |
+| 累計 | +39.02% | -2.78% |
+
+**分析**：Part A 大幅改善（Sharpe 0.54），WR 提升但 Part B 仍為負。Part B 依然零達標（最高 +3.68%），所有 Part B 交易都以到期或停損結束。BB 擠壓突破訊號在 2024-2025 QQQ 穩定上漲環境中缺乏爆發力。
+
+#### Att3: QQQ Momentum ROC(10)>5% (TP+10%/SL-10%/15d)
+
+**策略轉向**：放棄突破策略，改用純動量進場。買入條件改為 QQQ 10日 ROC > 5% + QQQ Close > SMA(50) + QQQ Close > SMA(200)。
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 35 (7.0/yr) | 17 (8.5/yr) |
+| WR | 60.0% | 58.8% |
+| Sharpe | 0.19 | 0.17 |
+| 累計 | +57.93% | +21.41% |
+| MDD | -19.92% | -15.06% |
+| PF | 1.48 | 1.44 |
+
+**分析**：A/B 平衡極佳（Sharpe gap 0.02），Part B 正報酬。但 min(A,B) Sharpe 0.17 遠低於 TQQQ-010 的 0.36。動量策略 WR ~60% + TP/SL 1:1 只能產生邊際正報酬，MDD 偏高。
+
+### 對比 TQQQ-010 基準
+
+| 策略 | Part A Sharpe | Part B Sharpe | min(A,B) | A/B balance |
+|------|--------------|--------------|----------|-------------|
+| **TQQQ-010 (均值回歸)** | **0.36** | **1.02** | **0.36** | 0.66 gap |
+| TQQQ-015 Att1 (BB TP+12%) | 0.25 | -0.28 | -0.28 | 0.53 gap |
+| TQQQ-015 Att2 (BB TP+8%) | 0.54 | -0.10 | -0.10 | 0.64 gap |
+| TQQQ-015 Att3 (Momentum) | 0.19 | 0.17 | 0.17 | **0.02 gap** |
+
+### 結論
+
+趨勢/突破/動量策略在 3x 槓桿 ETF (TQQQ) 上無法超越均值回歸。根本原因：
+1. **噪音放大**：3x 槓桿將 QQQ 1.2% 日波動放大至 TQQQ 4-8%，需要寬 SL（≥8%）
+2. **訊號幅度不足**：QQQ 突破/動量只能推動 TQQQ 0-5% 正向報酬，無法補償 8-10% 停損
+3. **均值回歸的結構性優勢**：極端恐慌（DD -15%）創造的 7%+ 反彈是唯一能克服高波動 SL 需求的訊號類型
+
+TQQQ-010 確認為全域最優（15 次實驗，含均值回歸和趨勢/動量/突破三大策略類型）。

@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, DIA-006, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, NVDA-005, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
+  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, DIA-006, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, NVDA-005, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
   validated: 2026-04-04
   data_through: 2025-12-31
   confidence: high
@@ -202,7 +202,7 @@
 
 | 資產 | 最佳實驗 | 策略類型 | 訊號/年 | WR (A/B) | 關鍵成功因素 |
 |------|----------|----------|---------|----------|-------------|
-| TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing |
+| TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing。TQQQ-015 驗證 QQQ BB Squeeze Breakout（Part B Sharpe -0.28/-0.10）和 QQQ Momentum ROC(10)>5%（Part B 0.17，A/B 平衡佳但 min 0.17 < 0.36）均失敗，**已確認為全域最優**（15 次實驗，含均值回歸和趨勢/動量/突破三大策略類型） |
 | GLD | GLD-008 | 20日回調 + Williams %R | ~7.2/6.5 | 77.8%/100% | 20日回看（vs GLD-007 10日）+ TP +3.0%（vs +3.5%），Part A Sharpe 0.45/Part B 2.33（vs GLD-007 的 0.41/2.04），累計 +45.40%/+32.83%。20日回看多捕捉 5 個 Part A 好訊號，TP +3.0% 讓更多交易直接達標。RSI(2) 進場在 GLD 上無效（Att1 Sharpe 0.28/1.59），回檔+WR 是 GLD 最佳進場架構。GLD-009 驗證 BB 擠壓突破無效（Sharpe 0.28/0.27，日波動 1.1% 限制突破幅度），**已確認為全域最優**（9 次實驗、30+ 次嘗試，含均值回歸和突破兩大策略類型） |
 | SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-007 驗證 RSI 動能回復/20日回看均失敗，SIVR-008 驗證 BB Squeeze Breakout（3 次嘗試，最佳 Sharpe 0.11/0.10）完全無效，**已確認為全域最優**（10 次實驗、21 次嘗試，含均值回歸和突破兩大策略類型） |
 | FCX | FCX-001（均值回歸）/ FCX-004（突破） | 三重極端超賣 / BB Squeeze Breakout | ~3.6/4.6 | 72.2%/60% / 69.6%/66.7% | FCX-001：寬出場 (+10%/-12%)、稀有但精確的訊號，滾動分析 12/12 窗口正累計。FCX-004：BB(20,2) 擠壓 60日30th百分位 + 突破上軌 + SMA(50)，TP+8%/SL-7%/20天。Part A Sharpe 0.51（vs FCX-001 0.43，+18.6%），Part B 0.41（vs 0.74）。兩種策略互補：均值回歸捕捉恐慌抄底，突破捕捉趨勢啟動。FCX-005 驗證動量回檔（3次嘗試）和 RSI(2)（1次嘗試）均失敗，FCX-001/004 已確認為全域最優 |
@@ -227,7 +227,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, TQQQ-014, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SPY-003, SPY-004, SPY-006, DIA-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, COPX-006, NVDA-002, NVDA-004, NVDA-005, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, TSLA-007, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, TQQQ-014, TQQQ-015, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SPY-003, SPY-004, SPY-006, DIA-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, COPX-006, NVDA-002, NVDA-004, NVDA-005, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, TSLA-007, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
   validated: 2026-04-04
   data_through: 2025-12-31
   confidence: high
@@ -346,7 +346,8 @@
 88. **RSI(2) 寬停損（SL-4.0%）在 XLU 上仍然失敗** — RSI(2)<10 + 2日跌幅≥1.0% + ClosePos≥40%，SL-4.0% Part A Sharpe -0.33（WR 43.8%，6 連續停損），Part B -0.73（WR 16.7%）。vs SL-3.0% 的 -0.20/-0.92。寬停損不救信號品質，只讓虧損交易持續更久。**RSI(2) 在利率敏感型低波動 ETF 上的失敗與 SL 無關，是訊號本身品質問題**——升息期 RSI(2) 在回檔初期觸發但結構性下跌持續超過任何 SL。填補了 XLU RSI(2) SL-4.0% 參數缺口，雙重確認 RSI(2) 在 XLU 無效（XLU-006 Att1 驗證）
 89. **60日跌幅過濾對利率敏感 ETF（XLU）無效** — XLU-003 進場 + XLU 60日 ROC > -10%，Part A Sharpe 0.02（vs 基準 0.06），Part B 0.35（不變）。問題：XLU 在 2022 升息期的下跌太漸進，60日 ROC 從未跌破 -10%，過濾器形同虛設。與 TLT-002 使用 60日跌幅≤10% 的邊際有效性一致（lesson #53）。自身價格的中期跌幅過濾對漸進式結構性下跌無效（XLU-006 Att2 驗證）
 90. **TLT 作為利率過濾器對 XLU 均值回歸反效果** — XLU-003 進場 + TLT 60日 ROC > -5%，Part A Sharpe -0.07（vs 基準 0.06），Part B 0.35（不變）。TLT 60日 ROC 的延遲性使其在 2022 最壞 XLU 訊號通過後才開始生效，反而在 2021/2023 移除好訊號（2021-03-03 +2.50%、2023-09-06 +2.50%）。TLT 作為訊號源（XLU-005 Att3 Part B -0.66）和作為過濾器均對 XLU 無效。**跨資產利率指標對利率敏感 ETF 的過濾效果不可靠**——TLT 和 XLU 對利率變化的響應速度和方式不同（XLU-006 Att3 驗證）
-91. **VIX 自適應出場對 TQQQ 恐慌策略無效** — TQQQ-014 三次嘗試：(1) 3-tier VIX（<25/25-35/≥35 對應 TP +5%/+7%/+9%）Part A Sharpe 0.23，因 80% 訊號 VIX < 25 使 SL -6% 過緊；(2) 2-tier VIX≥35 放寬 TP+SL，Part A 完全等同 TQQQ-010（全部 VIX < 35），Part B 累計 +26.33%（vs +47.59%）因放寬 SL 多虧；(3) 2-tier VIX≥30 只放寬 TP 不放寬 SL，Part B Sharpe -0.07，TP +9% 使原本 +7% 可達標的交易變為停損。**根本原因：TQQQ 恐慌訊號（DD -15% + RSI<25 + Vol 1.5x）大多在 VIX < 30 時觸發（板塊性賣壓而非系統性恐慌），VIX 自適應的有效空間極為有限。固定 TP +7%/SL -8% 是全域甜蜜點**（TQQQ-014 驗證）
+91. **趨勢/突破/動量策略在 3x 槓桿 ETF 上無效** — TQQQ-015 三次嘗試：(1) QQQ BB Squeeze Breakout + TP+12%/SL-8%/20d：Part B Sharpe -0.28，QQQ 突破訊號幅度不足以使 TQQQ 達標（Part B 零達標，最高 +3.68%）；(2) 同上降 TP+8%/SL-8%/15d：Part A Sharpe 0.54 但 Part B -0.10，仍零達標；(3) QQQ Momentum ROC(10)>5% + TP+10%/SL-10%/15d：Part A 0.19/Part B 0.17（A/B 平衡極佳 gap 0.02），但 min Sharpe 0.17 遠低於 TQQQ-010 的 0.36。**根本原因：3x 槓桿放大噪音至日波動 4-8%，需要寬 SL（≥8%）避免被洗出，但突破/動量訊號只能產生 0-5% TQQQ 正向報酬，無法補償 8-10% 停損。與 SOXL-009（日波動 6.6%）BB Squeeze 完全失敗一致。均值回歸利用極端恐慌產生的 7%+ 大幅反彈才能克服高波動 SL 需求**（TQQQ-015 驗證）
+92. **VIX 自適應出場對 TQQQ 恐慌策略無效** — TQQQ-014 三次嘗試：(1) 3-tier VIX（<25/25-35/≥35 對應 TP +5%/+7%/+9%）Part A Sharpe 0.23，因 80% 訊號 VIX < 25 使 SL -6% 過緊；(2) 2-tier VIX≥35 放寬 TP+SL，Part A 完全等同 TQQQ-010（全部 VIX < 35），Part B 累計 +26.33%（vs +47.59%）因放寬 SL 多虧；(3) 2-tier VIX≥30 只放寬 TP 不放寬 SL，Part B Sharpe -0.07，TP +9% 使原本 +7% 可達標的交易變為停損。**根本原因：TQQQ 恐慌訊號（DD -15% + RSI<25 + Vol 1.5x）大多在 VIX < 30 時觸發（板塊性賣壓而非系統性恐慌），VIX 自適應的有效空間極為有限。固定 TP +7%/SL -8% 是全域甜蜜點**（TQQQ-014 驗證）
 
 ---
 
