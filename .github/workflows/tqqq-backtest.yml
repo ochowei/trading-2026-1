@@ -93,6 +93,7 @@ on:
           - "TSLA-007: tsla_007_keltner_breakout"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
+          - "TSM-006: tsm_006_momentum_pullback"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
