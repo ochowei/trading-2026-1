@@ -96,6 +96,7 @@ on:
           - "TSM-006: tsm_006_momentum_pullback"
           - "TSM-007: tsm_007_relative_strength"
           - "TSM-008: tsm_008_rs_exit_optimization"
+          - "TSM-009: tsm_009_pairs_trading"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
