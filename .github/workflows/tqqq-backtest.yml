@@ -110,6 +110,7 @@ on:
           - "XBI-004: xbi_004_capped_cooldown"
           - "XBI-005: xbi_005_closepos_reversal"
           - "XBI-006: xbi_006_bb_squeeze_breakout"
+          - "XBI-007: xbi_007_momentum_pullback"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "XLU-002: xlu_002_capped_pullback_wr"
           - "XLU-003: xlu_003_tight_pullback_wr"

@@ -1,10 +1,10 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-02
+  last_validated: 2026-04-05
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（6 次實驗、20+ 次嘗試，含突破策略與 ROC 策略獨立驗證）
+**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（7 次實驗、23+ 次嘗試，含突破策略、ROC 策略、動量回調策略獨立驗證）
 **前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
 **滾動窗口分析摘要：** XBI-001 ✗✓（精準度突變 ΔWR 23.8pp，績效漸變，2023 生技低迷為主因）
 
@@ -24,6 +24,9 @@
 - BB Squeeze Breakout BB(20,2) 25th pct + SMA(50)（XBI-006 Att1：Part A Sharpe 0.05 / Part B 0.17，WR 50%/55.6%，假突破率過高）
 - BB Squeeze Breakout BB(20,2) 15th pct + TP +4.0%（XBI-006 Att2：Part A Sharpe 0.18 / Part B 0.10，收緊百分位改善 Part A 但 Part B 劣化）
 - 5日 ROC ≤ -8% + WR + ClosePos（XBI-006 Att3：Part A Sharpe 0.27 / Part B -0.19，僅 2 筆 Part B 訊號無統計意義）
+- 動量回調 ROC(20)≥8% + 5日回撤 2.5-5% + SMA(50)，TP+5%/SL-5%（XBI-007 Att1：Part A Sharpe -0.01 / Part B -0.23，WR 50%/42.9%，動量回調在 XBI 上假訊號過多）
+- 動量回調 ROC(20)≥12% + 5日回撤 3-7% + SMA(50)，TP+6%/SL-5%（XBI-007 Att2：Part A Sharpe 0.34 / Part B 僅 2 訊號全停損，ROC 12% 過嚴導致 Part B 訊號不足）
+- 動量回調 ROC(20)≥8% + 5日回撤 3.5-6% + SMA(50)，TP+4%/SL-5%（XBI-007 Att3：Part A Sharpe 0.02 / Part B 0.44，最佳但 Part A 幾乎為零，A/B 比 3.5:1 嚴重失衡）
 
 **已掃描的參數空間：**
 - 進場條件：回檔 6~8% + 上限 15~20% + WR(10) ≤ -80（有/無 2日急跌 ≤ -3%）
@@ -34,11 +37,15 @@
 - 出場參數：TP +3.5~5.0% / SL -4.0~-5.0% / 持倉 15~20 天
 - 突破策略：BB(20,2) Squeeze 15th/25th pct + SMA(50)，TP +4~5% / SL -5% / 20天（已驗證無效，ETF 分散化削弱突破動能）
 - ROC 策略：5日 ROC ≤ -8% + WR + ClosePos（已驗證 Part B 訊號過少）
+- 動量回調：ROC(20) ≥ 8%/12% + 5日回撤 2.5-7% + SMA(50)，TP +4~6% / SL -5%（已驗證無效，Part A Sharpe 最高 0.34 但 A/B 嚴重失衡）
 - 最佳組合：回檔 8-20% + WR ≤ -80 + ClosePos ≥ 35% + SL -5.0% / 15天（WR 76.2%/83.3%）
 
 **尚未嘗試的方向（預期效益極低）：**
-- XBI-005 已確認為全域最優，突破策略和 ROC 策略均已驗證無效
+- XBI-005 已確認為全域最優，突破策略、ROC 策略、動量回調策略均已驗證無效
 - 配對交易（XBI vs IBB）理論上可行但實作複雜且數據有限
+
+**已排除的方向：**
+- **動量回調策略（TSM-006 風格）**：XBI-007 三次嘗試全部失敗，最佳 min(A,B) Sharpe 僅 0.02（vs XBI-005 的 0.36）。根本原因：XBI 作為生技板塊 ETF（130+股等權重），個股事件驅動（FDA、臨床數據）使板塊層級動量訊號不可靠，上升趨勢中的回調常因個股利空演變為板塊性回撤
 
 **關鍵資產特性：**
 - XBI (SPDR S&P Biotech ETF) 日波動約 2.0%，GLD 比率 1.81x
@@ -71,6 +78,7 @@
 | XBI-004 | `xbi_004_capped_cooldown` | 回檔 8-15% + WR + 冷卻15天（未勝出） | 已完成 |
 | XBI-005 | `xbi_005_closepos_reversal` | 回檔 8-20% + WR + ClosePos ≥ 35%（**全域最佳**） | 已完成 |
 | XBI-006 | `xbi_006_bb_squeeze_breakout` | BB Squeeze Breakout + 3次嘗試（未勝出） | 已完成 |
+| XBI-007 | `xbi_007_momentum_pullback` | 動量回調 ROC+回撤+SMA50 + 3次嘗試（未勝出） | 已完成 |
 
 ---
 
@@ -448,3 +456,36 @@ XBI-005：Part A Sharpe 0.36 / Part B Sharpe 0.64（回檔 8-20% + WR + ClosePos
 1. **突破策略在 XBI 上無效**——ETF 分散化削弱突破動能（同 COPX-005 結論）。130+ 成分股的等權重 ETF，個股突破被群體稀釋
 2. **ROC 進場不優於 pullback-from-high**——5日 ROC 對市場狀態依賴性過高，Part B 訊號不足
 3. **XBI-005 已確認為全域最優**（6 次實驗、20+ 次嘗試，涵蓋均值回歸、突破、ROC 三種策略類型）
+
+---
+
+## XBI-007: 動量回調 (Momentum Pullback)
+
+### 目標 (Goal)
+
+測試 TSM-006 風格的動量回調策略是否適用於 XBI。在上升趨勢中買入短期回調，捕捉趨勢延續的動量。
+
+### 策略設計 (Strategy Design)
+
+- **進場條件**：20日 ROC ≥ 8% + 5日高點回撤 3.5-6% + Close > SMA(50) + 冷卻 10天
+- **出場條件**：TP +4% / SL -5% / 20天
+- **成交模型**：隔日開盤市價進場，滑價 0.10%
+- **參考**：TSM-006 架構，按 XBI 日波動 ~2.0%（vs TSM ~2.5%）縮放
+
+### 三次嘗試結果 (Attempt Results)
+
+| 嘗試 | 參數 | Part A Sharpe | Part B Sharpe | Part A 訊號 | Part B 訊號 | min(A,B) |
+|------|------|---------------|---------------|-------------|-------------|----------|
+| Att1 | ROC 8%, PB 2.5-5%, TP+5% | -0.01 | -0.23 | 18 | 7 | -0.23 |
+| Att2 | ROC 12%, PB 3-7%, TP+6% | 0.34 | -1019* | 8 | 2 | -1019* |
+| Att3 | ROC 8%, PB 3.5-6%, TP+4% | 0.02 | 0.44 | 14 | 4 | 0.02 |
+| **XBI-005** | **基準** | **0.36** | **0.64** | **21** | **6** | **0.36** |
+
+*Part B 僅 2 訊號且標準差為 0，Sharpe 計算異常
+
+### 失敗分析 (Failure Analysis)
+
+1. **Part A 表現極差**：最佳 Attempt 3 Part A Sharpe 僅 0.02，2020 生技泡沫期產生大量假動量訊號（4 筆停損），2022 熊市反彈動量不持續（2 筆停損）
+2. **A/B 嚴重失衡**：Att1 比例 2.6:1，Att2 4:1，Att3 3.5:1，均遠超 2:1 警戒線
+3. **根本原因**：XBI 作為板塊 ETF（130+ 等權重生技股），個股事件驅動（FDA 審批、臨床數據）使板塊層級動量訊號不可靠。上升趨勢中的回調常因個股利空演變為板塊性回撤，與 TSM（單一公司、半導體景氣循環驅動）有本質差異
+4. **動量回調策略有效範圍確認**：僅適用於個股（TSM 日波動 2-3%）或動量驅動型標的，不適用於多成分等權重板塊 ETF

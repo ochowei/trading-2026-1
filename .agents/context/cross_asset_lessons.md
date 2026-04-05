@@ -194,8 +194,8 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, DIA-006, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, TSM-006, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, NVDA-005, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
-  validated: 2026-04-04
+  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, SPY-005, SPY-006, DIA-001, DIA-006, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, TSM-004, TSM-005, TSM-006, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, XBI-007, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, URA-001, URA-002, URA-003, URA-004, URA-005, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, NVDA-005, TLT-001, TLT-002, TLT-004, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
+  validated: 2026-04-05
   data_through: 2025-12-31
   confidence: high
 -->
@@ -213,7 +213,7 @@
 | SOXL | SOXL-006 | 精選超賣 + 延長持倉 | ~2.0/2.5 | 60.0%/80.0% | 回撤 [-40%,-25%] + RSI(5)<20 + 2日跌幅≤-8%，TP +18%/SL -12%/25天。Part A +72.80%/Sharpe 0.47，Part B +51.57%/Sharpe 0.79，PF 2.57/4.88。RSI(5) 收緊 25→20 移除 3 個停損訊號，持倉延長 20→25天。A/B 訊號比 2.0:1（退步但可接受），Part B 大幅優於 Part A（無過擬合）。SOXL-007 驗證 RSI(5)<22/DD-23%/15日回看、SOXL-008 驗證 WR(10) 振盪器/cap -35%/cooldown 10d、SOXL-009 驗證 BB 擠壓突破（3 次嘗試，突破策略在 6.6% 日波動下完全無效）均失敗，**已確認為全域最優**（10 次實驗、30 次嘗試，含突破策略獨立驗證） |
 | TSM | TSM-006 | 動量回調 (Momentum Pullback) | ~3.6/7.5 | 66.7%/73.3% | ROC(20)≥10% + 5日回撤3-7% + Close>SMA(50)，TP+7%/SL-7%/20天/冷卻10天。Part A Sharpe 0.46/Part B 0.57（vs TSM-002 均值回歸 0.23/0.32，+100%/+78%），A/B 訊號比 1.2:1（極佳平衡）。**動量回調首次超越均值回歸**，SMA(50) 有效避開 2022 熊市，ROC 10% 為甜蜜點（12%/15% 過嚴）。TSM-006 三次嘗試：Att1 ROC12%/3-8% min 0.43、Att2 ROC15%/3-10% min 0.20、Att3 ROC10%/3-7% min 0.46（6 次實驗、18 次嘗試，含均值回歸、突破、動量回調三大策略類型） |
 | IWM | IWM-005（均值回歸）/ IWM-006（突破） | RSI(2) 非對稱寬停損 + SL微調 / BB Squeeze Breakout | ~3.0/3.0 | 66.7%/66.7% / 62.5%/66.7% | IWM-005：RSI(2)<10 + 2日跌幅≥2.5% + ClosePos≥40%，TP+4.0%/SL-4.25%/20天。SL -4.25% 是甜蜜點。IWM-006：BB(20,2) Squeeze + SMA(50)，TP+5.0%/SL-4.5%/20天。Part A Sharpe 0.31/Part B 0.37（vs IWM-005 0.38/0.31），min(A,B) 同為 0.31。突破可行但未超越均值回歸，BB(2.5) 太嚴格（Part B 僅 3 訊號），IWM 高流動性部分抵消 ETF 分散化效應（顯著優於 COPX-005）。IWM-007 驗證趨勢跟蹤（3次嘗試）均失敗，**已確認為全域最優**（7 次實驗、25+ 次嘗試，含均值回歸、突破、趨勢跟蹤三大策略類型） |
-| XBI | XBI-005 | 回檔範圍 + Williams %R + 反轉K線 | ~4.2/3.0 | 76.2%/83.3% | 回檔 8-20% + WR(10)≤-80 + ClosePos≥35%，TP+3.5%/SL-5.0%/15天。Part A Sharpe 0.36/Part B 0.64（vs XBI-001 的 0.11/0.23，分別 +227%/+178%）。ClosePos 35% 是甜蜜點（40% Part B Sharpe 0.16，30% Part A Sharpe 0.30）。XBI 日波動 2.0% 在 ClosePos 有效邊界內（類似 IWM），與 FCX/SIVR 不同。XBI-006 驗證 BB 擠壓突破（3 次嘗試：突破 Part A 0.05/0.18、ROC Part A 0.27）均失敗，**已確認為全域最優**（6 次實驗、20+ 次嘗試，含突破與 ROC 策略獨立驗證） |
+| XBI | XBI-005 | 回檔範圍 + Williams %R + 反轉K線 | ~4.2/3.0 | 76.2%/83.3% | 回檔 8-20% + WR(10)≤-80 + ClosePos≥35%，TP+3.5%/SL-5.0%/15天。Part A Sharpe 0.36/Part B 0.64（vs XBI-001 的 0.11/0.23，分別 +227%/+178%）。ClosePos 35% 是甜蜜點（40% Part B Sharpe 0.16，30% Part A Sharpe 0.30）。XBI 日波動 2.0% 在 ClosePos 有效邊界內（類似 IWM），與 FCX/SIVR 不同。XBI-006 驗證 BB 擠壓突破（3 次嘗試：突破 Part A 0.05/0.18、ROC Part A 0.27）均失敗。XBI-007 驗證動量回調（TSM-006 風格，3 次嘗試，最佳 Part A 0.02/Part B 0.44，min 0.02），板塊 ETF 個股事件驅動使動量訊號不可靠。**已確認為全域最優**（7 次實驗、23+ 次嘗試，含均值回歸、突破、ROC、動量回調四大策略類型） |
 | COPX | COPX-003 | 20日回檔範圍 + Williams %R + 出場優化 | ~6.2/5.5 | 74.2%/72.7% | 20日回檔 10-20% + WR(10)≤-80，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.39/Part B 0.35（A/B gap 僅 0.04，極佳平衡）。20日回看框架 + SL 收窄是關鍵突破（vs COPX-001 Part A 0.08→0.39）。COPX-004 驗證回檔 9-20%（Part A 劣化）、15天持倉（Part B WR 降 9pp）、冷卻 10天（無效果）均失敗。COPX-005 驗證 BB 擠壓突破（3 次嘗試，Part B Sharpe -0.17~0.01）完全無效（ETF 分散化削弱突破動能）。COPX-006 驗證配對交易（COPX/FCX z-score，Part A -0.06/Part B -0.50）、動量回檔（SMA50+RSI5，Part A -0.28/Part B 0.00）、RSI(2) 均值回歸（Part A 0.01/Part B 0.21）三種策略均失敗，**已確認為全域最優**（6 次實驗、30+ 次嘗試，含均值回歸、突破、配對交易、動量回檔四大策略類型） |
 | URA | URA-004 | 回檔範圍 + RSI(2) + 2日急跌 | ~4.4/7.5 | 68.2%/66.7% | 回檔 10-20% + RSI(2)<15 + 2日跌幅≤-3%，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.41/Part B 0.39（A/B gap 0.02，極佳平衡）。vs URA-003：Part A Sharpe +21%（0.34→0.41），min(A,B) +15%（0.34→0.39）。2日跌幅 -3% 是甜蜜點：-2.5% 引入日期偏移（lesson #19）、-4% 搭配 WR(10) 過嚴。20日回看在 URA 嚴格劣化（確認 lesson #54）。URA-005 驗證 BB 擠壓突破（3 次嘗試，Part A Sharpe -0.13~-0.28，Part B -0.37~-0.87）完全無效，鈾礦 ETF 事件驅動突破不具持續性，**已確認為全域最優**（5 次實驗、15+ 次嘗試，含均值回歸和突破兩大策略類型） |
 | NVDA | NVDA-004 | BB 擠壓突破（優化） | ~3.4/4.0 | 70.6%/62.5% | BB(20,2) 擠壓（60日 25th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+8%/SL-7%/20天，冷卻10天。Part A Sharpe 0.50/Part B 0.47（vs NVDA-003 0.40/0.47，Part A +25%），A/B Sharpe 比 1.06:1（近乎完美平衡）。冷卻期 15→10 天捕捉 2 個 Part A 好訊號（Part B 不變）。SL -8% 驗證失敗（虧損更大不救回交易），SMA(20) 驗證失敗（讓通熊市假突破）。NVDA-005 驗證動量回調（ROC+短期回撤+SMA50，3次嘗試，最佳 Part A 0.38/Part B 0.74），Part B 優異但 Part A 受 2021 泡沫期假訊號拖累，min(A,B)=0.36 < 0.47。**已確認為全域最優**（5 次實驗、15+ 次嘗試，含均值回歸、突破、動量回調三大策略類型） |
@@ -227,8 +227,8 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, TQQQ-014, TQQQ-015, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SPY-003, SPY-004, SPY-006, DIA-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, COPX-006, NVDA-002, NVDA-004, NVDA-005, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, TSLA-007, VOO-003, XBI-005, XBI-006, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
-  validated: 2026-04-04
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, TQQQ-014, TQQQ-015, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SPY-003, SPY-004, SPY-006, DIA-006, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, TSM-004, TSM-005, FCX-003, FCX-004, FCX-005, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, COPX-006, NVDA-002, NVDA-004, NVDA-005, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, TLT-002, TLT-004, TSLA-003, TSLA-006, TSLA-007, VOO-003, XBI-005, XBI-006, XBI-007, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006]
+  validated: 2026-04-05
   data_through: 2025-12-31
   confidence: high
 -->
@@ -538,3 +538,27 @@ SMA(50) 趨勢確認 + RSI(5) 短期超賣 + 回檔的動量回檔策略在 COPX
 **原因**：礦業股/ETF 波動高且趨勢不穩定，SMA(50) 無法區分健康回檔 vs 趨勢反轉。在趨勢頂部頻繁產生假訊號。
 
 **規則**：動量回檔（買上升趨勢中的回檔）在日波動 > 2% 的礦業資產上無效，SMA 趨勢濾波的假陽性率過高。
+
+---
+
+## 16. 動量回調策略在多成分等權重板塊 ETF 上無效
+
+<!-- freshness:
+  derived_from: [XBI-007, COPX-006]
+  validated: 2026-04-05
+  data_through: 2025-12-31
+  confidence: high
+-->
+
+TSM-006 風格的動量回調（ROC(20) + 短期回撤 + SMA(50)）在板塊 ETF 上系統性失敗。
+
+| 資產 | 策略 | Part A Sharpe | Part B Sharpe | 問題 |
+|------|------|---------------|---------------|------|
+| XBI (130+ 生技股) | ROC≥8%, PB 3.5-6%, TP+4% | 0.02 | 0.44 | Part A ~0，A/B 比 3.5:1 |
+| XBI | ROC≥12%, PB 3-7%, TP+6% | 0.34 | -1019* | Part B 僅 2 訊號 |
+| COPX (銅礦 ETF) | SMA50+RSI5 動量回檔 | -0.28 | 0.00 | 完全無效 |
+| **TSM (個股)** | **ROC≥10%, PB 3-7%, TP+7%** | **0.46** | **0.57** | **成功基準** |
+
+**原因**：板塊 ETF 的動量來源分散——130+ 成分股各有獨立催化劑（FDA、臨床數據、併購），板塊層級的 ROC 反映的是個股事件的加總而非板塊性趨勢。當 ROC ≥ 8% 後出現回調，可能是某些成分股利空導致板塊回撤，而非健康的趨勢整理。個股（TSM）的 ROC 直接反映公司基本面/景氣趨勢，回調更可能是暫時性的。
+
+**規則**：動量回調策略僅適用於個股（TSM、NVDA）或動量驅動型標的，不適用於多成分等權重板塊 ETF（XBI、COPX）。板塊 ETF 應使用均值回歸策略。
