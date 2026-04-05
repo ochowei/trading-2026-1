@@ -94,6 +94,7 @@ on:
           - "TSLA-005: tsla_005_bb_squeeze_breakout"
           - "TSLA-006: tsla_006_trend_pullback"
           - "TSLA-007: tsla_007_keltner_breakout"
+          - "TSLA-008: tsla_008_rs_momentum_pullback"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
           - "TSM-006: tsm_006_momentum_pullback"
