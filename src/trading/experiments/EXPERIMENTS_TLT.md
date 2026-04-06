@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-02
+  last_validated: 2026-04-06
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -21,12 +21,16 @@
 - cooldown 15d（TLT-003 驗證：Part A 從 42→32 訊號，移除的訊號好壞各半，淨效果為 Sharpe 劣化 -0.33）
 - **BB 擠壓突破（TLT-004 Att1/Att2）**：Part A Sharpe 0.31（大幅改善），但 Part B -1.15（2024-2025 橫盤環境所有突破失敗，13 筆中僅 1 筆達標）。寬出場 TP+4%/SL-5%（Att2）Part A 降至 0.13，Part B 仍 -0.63
 - **SMA 黃金交叉（TLT-004 Att3）**：Part A Sharpe 0.89（極佳），但 Part B 僅 2 個訊號（無統計意義），A/B 訊號比 3.5:1
-- **趨勢跟蹤/突破策略整體對 TLT 無效**：均值回歸被 2022 升息殺死，突破策略被 2024-2025 橫盤殺死。TLT 受宏觀利率政策驅動，純技術面策略無法同時適應升息、降息、穩定三種環境
+- **Donchian(20) 突破 + SMA(50)（TLT-005 Att1/Att2）**：Part A Sharpe 0.15（SL-2.0%）→0.20（SL-3.5%），但 Part B -1.12/-0.83。與 TLT-004 BB 擠壓突破類似結論，進一步驗證突破類策略對 TLT Part B 的結構性失效
+- **ROC(10) > 3% 動量策略（TLT-005 Att3）**：Part A Sharpe -0.06，Part B -1.43。買入短期動量後立即回吐，表現最差
+- **趨勢跟蹤/突破策略整體對 TLT 無效**：均值回歸被 2022 升息殺死，突破策略被 2024-2025 橫盤殺死。TLT 受宏觀利率政策驅動，純技術面策略無法同時適應升息、降息、穩定三種環境。TLT-004（BB擠壓/SMA交叉）和 TLT-005（Donchian突破/ROC動量）共 6 次嘗試全面驗證
 
 **已掃描的參數空間：**
 - 均值回歸進場：回檔 3-7% / 5-10% + WR(10) ≤ -80 + ClosePos ≥ 40%（有/無 60日跌幅過濾）
 - 均值回歸進場：RSI(2) < 10 + 2日跌幅 ≥ 1.5% + ClosePos ≥ 40%
 - 突破進場：BB(20,2) 擠壓（60日 25th/20th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)
+- 突破進場：Donchian(20) 突破（Close > 20日最高 High）+ Close > SMA(50)
+- 動量進場：ROC(10) > 3% + Close > SMA(50)
 - 趨勢進場：SMA(20) 黃金交叉 SMA(50) + Close > SMA(20)
 - 出場參數：TP +2.0~4.0% / SL -3.0~-5.0% / 持倉 20 天
 - 冷卻期：7 / 10 / 15 / 20 天
@@ -63,6 +67,7 @@
 | TLT-002 | `tlt_002_deep_pullback_lower_tp` | 回檔 3-7% + WR + 反轉K線 + 60日跌幅過濾 | 已完成 |
 | TLT-003 | `tlt_003_wide_asymmetric`       | 回檔 3-7% + WR + 反轉K線 + SL -4.0% + cd10（未超越 TLT-002）| 已完成 |
 | TLT-004 | `tlt_004_bb_squeeze_breakout`   | BB 擠壓突破 / SMA 黃金交叉（趨勢策略，未超越 TLT-002）| 已完成 |
+| TLT-005 | `tlt_005_donchian_momentum`     | Donchian 突破 / ROC 動量（趨勢策略，未超越 TLT-002）| 已完成 |
 
 ---
 
@@ -233,10 +238,14 @@ TLT-001 (回檔範圍 3-7% + WR + 反轉K線)
   │     ├── [失敗] Att1: TP+3.0%/SL-5.0%/cd10（Part A -0.27，寬 SL 加大停損虧損）
   │     ├── [失敗] Att2: TP+3.0%/SL-3.5%/cd15（Part A -0.33，高 TP 翻轉達標為停損）
   │     └── [持平] Att3: TP+2.5%/SL-4.0%/cd10（Part A -0.20 持平，Part B 0.46 大幅改善）
-  └── TLT-004 (趨勢跟蹤/突破策略，3 次嘗試均未超越 TLT-002) ← Part A 改善但 Part B 崩潰
-        ├── [失敗] Att1: BB 擠壓突破 TP+3%/SL-3%（Part A 0.31 大幅改善，Part B -1.15 橫盤假突破）
-        ├── [失敗] Att2: BB 擠壓突破 TP+4%/SL-5%（Part A 0.13 退化，Part B -0.63 仍負）
-        └── [失敗] Att3: SMA(20)×SMA(50) 黃金交叉（Part A 0.89 極佳，Part B 僅 2 訊號無統計意義）
+  ├── TLT-004 (趨勢跟蹤/突破策略，3 次嘗試均未超越 TLT-002) ← Part A 改善但 Part B 崩潰
+  │     ├── [失敗] Att1: BB 擠壓突破 TP+3%/SL-3%（Part A 0.31 大幅改善，Part B -1.15 橫盤假突破）
+  │     ├── [失敗] Att2: BB 擠壓突破 TP+4%/SL-5%（Part A 0.13 退化，Part B -0.63 仍負）
+  │     └── [失敗] Att3: SMA(20)×SMA(50) 黃金交叉（Part A 0.89 極佳，Part B 僅 2 訊號無統計意義）
+  └── TLT-005 (Donchian 突破/ROC 動量，3 次嘗試均未超越 TLT-002) ← 再次驗證趨勢策略限制
+        ├── [失敗] Att1: Donchian(20)+SMA(50)/SL-2.0%/15d（Part A 0.15，Part B -1.12）
+        ├── [失敗] Att2: Donchian(20)+SMA(50)/SL-3.5%/20d（Part A 0.20，Part B -0.83）
+        └── [失敗] Att3: ROC(10)>3%+SMA(50)/SL-2.5%/15d（Part A -0.06，Part B -1.43）
 ```
 
 ## TLT-003: 寬停損非對稱出場 (Wide Asymmetric Exit Mean Reversion)
@@ -404,6 +413,83 @@ TLT-001~003 均為均值回歸策略，受 2022 升息環境結構性制約（Pa
 1. **BB 擠壓突破改善 Part A**（0.31 vs -0.20）但摧毀 Part B（-1.15），因 2024-2025 TLT 橫盤環境產生大量假突破
 2. **SMA 黃金交叉 Part A 極佳**（0.89）但訊號過少（Part B 僅 2 個），無統計可信度
 3. **TLT 的根本問題**：受宏觀利率政策驅動而非技術面。均值回歸被升息殺死（Part A），突破策略被利率高原橫盤殺死（Part B）。純技術面策略無法同時適應升息、降息、穩定三種利率環境
+
+---
+
+## TLT-005: Donchian 突破 / ROC 動量（趨勢策略）(Donchian Channel Breakout / ROC Momentum - Trend Following)
+
+### 目標 (Goal)
+
+延續 TLT-004 對趨勢策略的探索，使用 Donchian Channel 突破和 ROC 動量兩種不同的非均值回歸進場方法，從不同角度驗證趨勢/動量方向對 TLT 的適用性。
+
+### 進場條件 (Entry Conditions) — 最終版 (Att2)
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| 1 | Donchian(20) 突破 | Close > 過去 20 日最高 High | 新高突破（排除當日） |
+| 2 | SMA(50) 趨勢確認 | Close > SMA(50) | 上升趨勢過濾 |
+| 3 | 冷卻期 | 10 天 | 避免連續進場 |
+
+### 出場參數 (Exit Parameters) — 最終版 (Att2)
+
+| 參數 | 值 | 說明 |
+|------|------|------|
+| 獲利目標 (TP) | +2.5% | 與 TLT-001/002 相同 |
+| 停損 (SL) | -3.5% | 給突破進場更多呼吸空間 |
+| 最長持倉 | 20 天 | 等待趨勢展開 |
+
+### 成交模型 (Execution Model)
+
+| 項目 | 設定 |
+|------|------|
+| 進場模式 | 隔日開盤市價 (next_open_market) |
+| 止盈委託 | 限價賣單 Day (limit_order_day) |
+| 停損委託 | 停損市價 GTC (stop_market_gtc) |
+| 到期出場 | 隔日開盤市價 (next_open_market) |
+| 滑價 | 0.10% |
+| 悲觀認定 | 是 |
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+| 嘗試 | 策略 | 參數 | Part A Sharpe | Part B Sharpe | 結果 |
+|------|------|------|:---:|:---:|------|
+| Att1 | Donchian(20) + SMA(50) | TP+2.5%/SL-2.0%/15d/cd10 | 0.15 | -1.12 | SL -2.0% 太緊，Part B 11/14 停損 |
+| Att2 | Donchian(20) + SMA(50) | TP+2.5%/SL-3.5%/20d/cd10 | **0.20** | -0.83 | 最佳 Part A，但 Part B 仍全面失敗 |
+| Att3 | ROC(10) > 3% + SMA(50) | TP+2.5%/SL-2.5%/15d/cd15 | -0.06 | -1.43 | 動量策略更差：買入短期強勢 → 立即回吐 |
+
+### 回測結果 (Backtest Results) — 最終版 (Att2)
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 29 | 14 |
+| 每年訊號 | 5.8 | 7.0 |
+| 勝率 | 58.6% | 14.3% |
+| 平均報酬 | +0.51% | -1.77% |
+| 累計報酬 | +14.74% | -22.33% |
+| Sharpe | 0.20 | -0.83 |
+| Sortino | 0.29 | -0.68 |
+| Profit Factor | 1.53 | 0.17 |
+| 最大連續虧損 | 2 | 7 |
+| 達標出場 | 17 | 2 |
+| 停損出場 | 6 | 5 |
+| 到期出場 | 6 | 7 |
+
+### 分析
+
+**Part A 觀察（TLT 歷史最佳 Part A 之一）**：
+- Sharpe 0.20，與 TLT-004 Att1 的 Part A Sharpe 0.31 相比略低，但方向一致
+- 2022 全年僅 3 個訊號（7月、11月、12月），全部達標 — SMA(50) 趨勢確認自然過濾了升息期假訊號
+- Donchian 突破較 BB 擠壓更不挑剔（29 vs 20 訊號），但品質略低（Sharpe 0.20 vs 0.31）
+
+**Part B 觀察（全面失敗）**：
+- 與 TLT-004 BB 擠壓結論一致：2024-2025 區間震盪中所有突破策略失效
+- Donchian 突破 Part B Sharpe -0.83，BB 擠壓 -1.15，量級相近
+
+**ROC 動量策略（Att3）洞察**：
+- ROC(10) > 3% 買入強動量後 TLT 立即回吐，Part A/B 均負
+- 進一步證實 TLT 的短期動量不可持續，與利率政策的低頻驅動特性一致
+
+**結論**：TLT-005 再次驗證趨勢跟蹤/動量策略對 TLT 的結構性限制。結合 TLT-004（BB擠壓/SMA交叉）和 TLT-005（Donchian/ROC），共 6 次嘗試全面確認：**TLT 受宏觀利率政策驅動，純技術面策略無論均值回歸或趨勢跟蹤，都無法同時在 Part A（含升息期）和 Part B（含橫盤期）獲得正 Sharpe**。
 
 ---
 
