@@ -131,6 +131,7 @@ on:
           - "XBI-005: xbi_005_closepos_reversal"
           - "XBI-006: xbi_006_bb_squeeze_breakout"
           - "XBI-007: xbi_007_momentum_pullback"
+          - "XBI-008: xbi_008_pairs_ibb"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "XLU-002: xlu_002_capped_pullback_wr"
           - "XLU-003: xlu_003_tight_pullback_wr"
