@@ -112,6 +112,7 @@ on:
           - "IWM-006: iwm_006_bb_squeeze_breakout"
           - "IWM-007: iwm_007_trend_pullback"
           - "IWM-008: iwm_008_bb_squeeze_optimized"
+          - "IWM-009: iwm_009_momentum_rotation"
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "NVDA-003: nvda_003_bb_squeeze_breakout"
