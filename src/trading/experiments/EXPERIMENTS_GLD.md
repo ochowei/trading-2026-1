@@ -1,6 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-04-06
   data_through: 2025-12-31
+  last_experiment_attempt: GLD-011 (3 attempts, 0 success — GLD-008 仍為最佳)
 -->
 ## AI Agent 快速索引
 
@@ -27,6 +28,9 @@
 - 回檔回看窗口：10日（GLD-007）/ 20日（GLD-008 最佳，多捕捉 5 個 Part A 好訊號）
 - 收盤位置過濾：Close Position ≥ 40% 有效過濾日內弱勢訊號
 - RSI(2) 進場架構（GLD-008 Att1 驗證無效）
+- BB Squeeze Breakout：BB(20,2) 擠壓 25th pct + Close > Upper BB + SMA(50)（GLD-009，3 次嘗試）
+- 動量回檔：ROC(20) > 3%/5% + 5日回檔 ≥1.5% + SMA(50)（GLD-010，3 次嘗試）
+- Donchian 突破：Donchian(20/30/50) + SMA(50/100) ± ATR(14) 過濾（GLD-011，3 次嘗試）
 
 **GLD-008 嘗試記錄（3 次嘗試，Att3 成功超越 GLD-007）：**
 - Att1: RSI(2)<10 + 2日跌幅≥1.5% + ClosePos≥40%，TP +3.5%/SL -4.0%/20d + 追蹤停損 → Part A Sharpe 0.28 / Part B 1.59（RSI(2) 在 GLD 不如回檔+WR）
@@ -43,14 +47,19 @@
 - Att2: ROC(20)>5% + 5日回檔≥1.5% + SMA(50) + trailing stop, TP+3.0%/SL-4.0% → Part A Sharpe 0.22 / Part B 0.50（ROC>5% 有效過濾，trailing stop 仍截斷贏利）
 - Att3: ROC(20)>5% + 5日回檔≥1.5% + SMA(50)，無trailing stop, TP+3.5%/SL-4.0%/25d → Part A Sharpe 0.38 / Part B 0.84（**最佳嘗試**，A/B比1.15:1極佳，但min(A,B)=0.38 < GLD-008的0.45）
 
+**GLD-011 嘗試記錄（3 次嘗試，均未超越 GLD-008）：**
+- Att1: Donchian(20) + SMA(50) + ATR(14)/Close<1.2%，TP+3.5%/SL-3.0%/20d/cd10 → Part A Sharpe 0.18 / Part B 0.34（WR 54.3%/64.7%，35/17 訊號，ATR 過濾無效）
+- Att2: Donchian(30) + SMA(50)，移除 ATR，TP+3.5%/SL-3.5%/25d/cd15 → Part A Sharpe 0.08 / Part B 0.73（Part B 極佳但 Part A 極差，A/B 嚴重失衡）
+- Att3: Donchian(50) + SMA(100)，TP+4.0%/SL-3.5%/25d/cd20 → Part A Sharpe 0.29 / Part B 0.22（**最佳 A/B 平衡** gap 0.07，但 min(A,B)=0.22 仍遠低於 GLD-008 的 0.45）
+
 **已證明無效（新增 — 禁止重複嘗試）：**
 - BB Squeeze Breakout（GLD-009）：GLD 日波動 1.1% 限制突破幅度，WR 65% × TP/SL ±3.0% 盈虧比僅 ~1:1，Sharpe 0.28/0.27 遠低於均值回歸 0.45/2.33。SL 放寬和追蹤停損均無法改善
 - 動量回檔（GLD-010）：ROC(20)>5% + 5日回檔≥1.5% + SMA(50)，最佳 Sharpe 0.38/0.84（min 0.38 < 0.45）。動量進場在 Part B（2024-2025 強趨勢）表現優異但 Part A 訊號品質不如極端超賣進場。追蹤停損在動量策略中反而有害（截斷趨勢延續）
+- Donchian Channel Breakout（GLD-011）：3 次嘗試（Donchian 20/30/50 + SMA 50/100 ± ATR 過濾），最佳 min(A,B)=0.22（Att3）。與 BB Squeeze 同樣受限於 GLD 1.1% 日波動，且趨勢策略對市場狀態依賴嚴重（Att2 Part A 0.08 vs Part B 0.73）
 
-**尚未嘗試的方向（可探索，但預期邊際效益低）：**
-- 結合其他相關資產的確認（如 VIX 或 TLT 表現）— 跨資產教訓 #6 警告確認指標通常無效
-- 根據不同波動度環境（VIX 高低）調整參數
+**尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - 配對交易（GLD/TLT 或 GLD/SLV）— SIVR-009 已驗證金銀比結構性偏移問題
+- **GLD-008 已確認為全域最優**（11 次實驗、42+ 次嘗試，含均值回歸、BB 擠壓突破、動量回檔、Donchian 通道突破四大策略類型）
 
 **關鍵資產特性：**
 - 波動率較低（~1.1%），適合使用追蹤停損（Trailing Stop）鎖定獲利
@@ -64,7 +73,7 @@
 
 # GLD 實驗總覽 (GLD Experiment Index)
 
-> **最新實驗 (Latest):** GLD-010 `gld_010_momentum_pullback`
+> **最新實驗 (Latest):** GLD-011 `gld_011_donchian_breakout`
 > **當前最佳 (Best):** GLD-008 `gld_008_rsi2_trailing`（20日回看 + TP +3.0%，風險調整後報酬全面超越 GLD-007）
 
 ## 實驗清單 (Experiments)
@@ -81,6 +90,7 @@
 | GLD-008 | `gld_008_rsi2_trailing` | 20日回檔 + WR + 反轉K線 + 追蹤停損 | Pullback ≥ 3% from 20d high, WR(10) ≤ -80, ClosePos ≥ 40%, cooldown 7d, TP +3.0%, 追蹤停損 | ✅ 新最佳 |
 | GLD-009 | `gld_009_bb_squeeze_breakout` | BB 擠壓突破 | BB(20,2) Squeeze 60日25th百分位 + 突破上軌 + SMA(50), TP +3.0%, SL -3.0% | ❌ 未超越 |
 | GLD-010 | `gld_010_momentum_pullback` | 動量回檔 | ROC(20) > 5% + 5日回檔 ≥1.5% + SMA(50), TP +3.5%, SL -4.0%, 25d | ❌ 未超越 |
+| GLD-011 | `gld_011_donchian_breakout` | Donchian 突破 | Donchian(50) + SMA(100), TP +4.0%, SL -3.5%, 25d | ❌ 未超越 |
 
 ## 演進路線 (Lineage)
 
@@ -96,6 +106,7 @@ GLD-001 gld_001_mean_reversion (基礎版：RSI(10)<30, SMA20 Dev -1.5%, cooldow
 
 GLD-009 gld_009_bb_squeeze_breakout (BB 擠壓突破：獨立策略線，Sharpe 0.28/0.27 ❌)
 GLD-010 gld_010_momentum_pullback (動量回檔：ROC(20)>5% + 5日回檔≥1.5% + SMA(50)，Sharpe 0.38/0.84 ❌)
+GLD-011 gld_011_donchian_breakout (Donchian 突破：Donchian(50) + SMA(100)，Sharpe 0.29/0.22 ❌)
 ```
 
 ## 參數對照 (Parameter Comparison)

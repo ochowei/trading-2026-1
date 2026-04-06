@@ -34,6 +34,7 @@ on:
           - "GLD-008: gld_008_rsi2_trailing"
           - "GLD-009: gld_009_bb_squeeze_breakout"
           - "GLD-010: gld_010_momentum_pullback"
+          - "GLD-011: gld_011_donchian_breakout"
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "SIVR-003: sivr_003_pullback_wr"
