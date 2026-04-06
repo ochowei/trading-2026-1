@@ -1,6 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-04-06
   data_through: 2025-12-31
+  note: SPY-008 added 2026-04-06
 -->
 ## AI Agent 快速索引
 
@@ -73,10 +74,15 @@
 
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - ~~趨勢跟蹤/動量回檔~~ → SPY-007 已驗證失敗（3 次嘗試，Part A 結構性弱）
-- Bollinger Band 訊號架構（DIA-006 已證明低波動指數 BB 突破無效）
+- ~~BB Squeeze Breakout~~ → SPY-008 已驗證失敗（3 次嘗試，最佳 Sharpe 0.35/0.34，A/B 平衡極佳但絕對水準不足）
 - 動態出場（根據進場時 VIX 水平調整 TP/SL）
 - 多因子加權（非硬門檻，改用評分制）
-- **SPY-005 已確認為全域最優**（7 次實驗、33+ 次嘗試，含均值���歸和趨勢跟蹤/動量回檔兩大策略類型）
+- **SPY-005 已確認為全域最優**（8 次實驗、36+ 次嘗試，含均值���歸、趨勢跟蹤/動量回檔和突破三大策略類型）
+
+**SPY-008 嘗試記錄（3 次嘗試均失敗，BB Squeeze Breakout 在 SPY 上不可行）：**
+- Att1: BB(20,2) 30th pct, TP+4%/SL-3.5%/20d, cd7 → Part A Sharpe 0.30 / Part B 0.27（TP+4% 太高，8/19 到期出場，突破動能不足）
+- Att2: BB(20,2) 25th pct, TP+3%/SL-3%/20d, cd10 → Part A Sharpe 0.35 / Part B 0.34（**最佳嘗試**，A/B gap 0.01 極佳平衡，但 min 0.34 vs SPY-005 的 0.53，差距 36%）
+- Att3: BB(20,2.5) 25th pct, TP+3.5%/SL-3.5%/25d, cd10 → Part A 僅 2 訊號 / Part B 僅 1 訊號（BB 2.5σ 太嚴格，SPY 低波動下幾乎無突破信號）
 
 **核心發現：**
 - TP +3.0% / SL -3.0% / Hold 20d 搭配 RSI(2) 進場是 SPY 最佳出場組合（SPY-005 驗證，SPY-006 三次嘗試再確認）
@@ -101,7 +107,7 @@
 
 # SPY 實驗總覽 (SPY Experiment Index)
 
-> **最新實驗 (Latest):** SPY-007 `spy_007_trend_pullback`
+> **最新實驗 (Latest):** SPY-008 `spy_008_bb_squeeze_breakout`
 > **當前最佳 (Best):** SPY-005 `spy_005_asymmetric_exit` ✅ 全域最優
 
 ## 資產特性 (Asset Characteristics)
@@ -127,6 +133,7 @@
 | SPY-005 | `spy_005_asymmetric_exit` | RSI(2) 寬出場均值回歸 | 同 SPY-004 進場, TP +3.0%, SL -3.0%, Hold 20d | ✅ 全域最優 |
 | SPY-006 | `spy_006_roc_reversal` | 3 次嘗試：ROC 進場/RSI+回檔/寬 TP | Att1: ROC(5)≤-3%, Att2: RSI+PB≥2%, Att3: TP+3.5% | ❌ 均不如 SPY-005 |
 | SPY-007 | `spy_007_trend_pullback` | 3 次嘗試：趨勢跟蹤/動量回檔 | Att1: SMA50回測, Att2: SMA20回測, Att3: +ClosePos | ❌ Part A 結構性弱 |
+| SPY-008 | `spy_008_bb_squeeze_breakout` | 3 次嘗試：BB Squeeze Breakout | BB(20,2/2.5) + SMA(50), TP+3~4%/SL-3~3.5%/20~25d | ❌ 不如 SPY-005 |
 
 ## 演進路線 (Lineage)
 
@@ -140,6 +147,8 @@ SPY-004 spy_004_rsi2_reversal (全新訊號架構：RSI(2) < 10 + 2日跌幅 ≥
       └─ SPY-006 spy_006_roc_reversal (3次嘗試：ROC進場/RSI+回檔/TP+3.5%) ❌ 均劣化
 
 SPY-007 spy_007_trend_pullback (全新策略類型：趨勢跟蹤/動量回檔，3次嘗試) ❌ Part A 結構性弱
+
+SPY-008 spy_008_bb_squeeze_breakout (全新策略類型：BB Squeeze Breakout，3次嘗試) ❌ 不如 SPY-005
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -989,3 +998,70 @@ A/B 績效差異較大（4.23% vs 0.13%）是因為 Part A 大幅改善而非 Pa
 - 即使 SMA(200) 過濾排除了 2022 熊市核心，轉折期（SMA(200) 上方但動能衰退）仍無法避免
 - Part B 表現尚可（最高 0.45）但無法彌補 Part A 的結構性缺陷
 - 與 DIA-007 發現一致：趨勢跟蹤在低波動指數 ETF 上 Part A 系統性弱於均值回歸
+
+---
+
+## SPY-008: BB Squeeze Breakout (Bollinger Band 擠壓突破)
+
+> **策略類型**：突破策略（Breakout）
+> **狀態**：❌ 3 次嘗試均失敗，不如 SPY-005
+> **設計動機**：SPY 僅測試過均值回歸和趨勢跟蹤兩大策略類型，突破策略尚未驗證。BB Squeeze Breakout 在 TSLA/NVDA/FCX（日波動 2-5%）上成功，需驗證 SPY（日波動 ~1.0-1.2%）是否因科技股權重較高而有更好表現。DIA-006 已在類似低波動指數上失敗（Part A 0.10），但 SPY ≠ DIA。
+
+### 進場條件
+
+- BB(20, 2.0 或 2.5) Width 在過去 5 日內曾低於 60 日 25th/30th 百分位（波動收縮）
+- 收盤價 > Upper BB（突破上軌）
+- 收盤價 > SMA(50)（趨勢向上）
+- 冷卻期 7-10 天
+
+### 出場條件
+
+- 成交模型：隔日開盤市價進場，限價/停損出場
+- 滑價 0.10%
+
+### 嘗試記錄
+
+#### Attempt 1: BB(20,2) 30th pct, TP+4%/SL-3.5%/20d, cd7
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 19 | 12 |
+| 勝率 | 68.4% | 75.0% |
+| Sharpe | 0.30 | 0.27 |
+| 累計報酬 | +17.59% | +8.49% |
+| MDD | -4.94% | -3.88% |
+| 達標/停損/到期 | 6/5/8 | 2/3/7 |
+
+**分析**：TP +4.0% 太高，Part A 僅 6/19 達標，8/19 到期出場。SPY 突破後動能不足以在 20 天內達到 +4%。A/B 平衡尚可（gap 0.03）但絕對水準低。
+
+#### Attempt 2: BB(20,2) 25th pct, TP+3%/SL-3%/20d, cd10（最佳嘗試）
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 17 | 12 |
+| 勝率 | 70.6% | 75.0% |
+| Sharpe | 0.35 | 0.34 |
+| 累計報酬 | +16.77% | +9.85% |
+| MDD | -4.94% | -3.88% |
+| 達標/停損/到期 | 9/5/3 | 4/3/5 |
+
+**分析**：降低 TP 至 +3.0% 後達標率大幅提升（Part A 9/17 vs 6/19），Sharpe 改善至 0.35/0.34。A/B gap 僅 0.01（極佳平衡）。但 min(A,B) = 0.34 仍遠不如 SPY-005 的 0.53（差距 36%）。
+
+#### Attempt 3: BB(20,2.5) 25th pct, TP+3.5%/SL-3.5%/25d, cd10
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 2 | 1 |
+| 勝率 | 100.0% | 0.0% |
+| Sharpe | 2.01 | 0.00 |
+| 累計報酬 | +3.20% | -3.60% |
+
+**分析**：BB 2.5σ 太嚴格，SPY 低波動下幾乎無法突破 2.5σ 上軌。Part A 僅 2 訊號、Part B 僅 1 訊號，統計上無法評估。
+
+### 總結 (Summary)
+
+❌ **SPY-005 再次確認為全域最優**（8 次實驗、36+ 次嘗試，含均值回歸、趨勢跟蹤和突破三大策略類型）
+- BB Squeeze Breakout 在 SPY 上最佳 Sharpe 為 0.35/0.34（Att2），A/B 平衡極佳但絕對水準不足
+- SPY 日波動 ~1.0-1.2% 限制突破幅度，與 DIA-006（0.10/0.37）、GLD-009（0.28/0.27）結論一致
+- 突破策略在日波動 ≤ 1.5% 的指數 ETF 上系統性弱於均值回歸
+- SPY 科技股權重較高確實使表現優於 DIA（Part A 0.35 vs 0.10），但仍不足以超越均值回歸
