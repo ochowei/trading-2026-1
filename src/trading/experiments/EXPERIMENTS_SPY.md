@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-03-31
+  last_validated: 2026-04-06
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -53,16 +53,30 @@
 - ROC(5) ≤ -3% 進場架構（SPY-006 Att1 測試，品質過低）
 - RSI(2) + 10日回檔 ≥ 2% 組合進場（SPY-006 Att2 測試，過濾移除好訊號）
 - TP +3.5% / SL -3.0% / 20d 搭配 RSI(2) 進場（SPY-006 Att3 測試，Part A 劣化）
+- **趨勢跟蹤/動量回檔（SPY-007，3 次嘗試）**：SMA(50) 回測/SMA(20) 回測/+ClosePos，Part A Sharpe 最高 0.17（遠不如 0.53）
 
 **SPY-006 嘗試記錄（3 次嘗試均失敗，SPY-005 確認為全域最優）：**
 - Att1: ROC(5) ≤ -3% + ClosePos ≥ 40% → Part A Sharpe 0.13 / Part B 0.34（ROC 產生過多低品質訊號，WR 58.3%，品質遠不如 RSI(2)）
 - Att2: RSI(2) < 10 + 10日回檔 ≥ 2% + 2日跌幅 + ClosePos → Part A Sharpe 0.48 / Part B 0.56（回檔過濾移除 1 個好訊號，Part A 劣化，Part B 不變）
 - Att3: 同 SPY-005 進場，TP +3.5% / SL -3.0% / 20d → Part A Sharpe 0.43 / Part B 0.65（TP +3.5% 使 1 筆 Part A 達標交易翻為到期/停損，WR 75%→68.8%，A/B gap 擴大至 0.22）
 
+**SPY-007 嘗試記錄（3 次嘗試均失敗，趨勢跟蹤/動量回檔策略在 SPY 上不可行）：**
+- Att1: SMA(50)>SMA(200) + Low≤SMA(50) + Close>SMA(50) + SMA斜率上升 → Part A Sharpe 0.11 / Part B 0.15（7 個 Part A 停損，SMA(50) 回測在熊市/轉折市產生大量假訊號）
+- Att2: Close>SMA(200) + SMA(20)>SMA(50) + Low≤SMA(20) + Close>SMA(20) + cd10 → Part A Sharpe 0.17 / Part B 0.45（SMA(200) 過濾改善 Part B，但 Part A 仍有 10 停損，2021Q4-2022Q1 轉折期 3 連停損）
+- Att3: 同 Att2 + ClosePos≥40% + cd15 → Part A Sharpe 0.12 / Part B 0.42（ClosePos 改變訊號日期而非移除壞訊號，Part A 反而劣化）
+
+**已證明無效（SPY-007 趨勢跟蹤/動量回檔）：**
+- SMA(50)>SMA(200) 黃金交叉 + SMA(50) 回測 + 反彈（Part A 0.11/Part B 0.15）：與 DIA-007 相同失敗模式，2022 熊市轉折期連續停損
+- Close>SMA(200) + SMA(20)>SMA(50) + SMA(20) 回測（Part A 0.17/Part B 0.45）：SMA(200) 過濾不足以排除轉折期假訊號
+- 上述 + ClosePos≥40%（Part A 0.12/Part B 0.42）：ClosePos 在趨勢策略進場上改變日期而非過濾
+- **結論**：趨勢跟蹤/動量回檔策略在 SPY 上結構性無法解決 Part A 問題，2019-2022 期間市場轉折/震盪產生太多假訊號，min(A,B) 最高僅 0.17（vs SPY-005 的 0.53）
+
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
-- Bollinger Band 訊號架構
+- ~~趨勢跟蹤/動量回檔~~ → SPY-007 已驗證失敗（3 次嘗試，Part A 結構性弱）
+- Bollinger Band 訊號架構（DIA-006 已證明低波動指數 BB 突破無效）
 - 動態出場（根據進場時 VIX 水平調整 TP/SL）
 - 多因子加權（非硬門檻，改用評分制）
+- **SPY-005 已確認為全域最優**（7 次實驗、33+ 次嘗試，含均值���歸和趨勢跟蹤/動量回檔兩大策略類型）
 
 **核心發現：**
 - TP +3.0% / SL -3.0% / Hold 20d 搭配 RSI(2) 進場是 SPY 最佳出場組合（SPY-005 驗證，SPY-006 三次嘗試再確認）
@@ -87,7 +101,7 @@
 
 # SPY 實驗總覽 (SPY Experiment Index)
 
-> **最新實驗 (Latest):** SPY-006 `spy_006_roc_reversal`
+> **最新實驗 (Latest):** SPY-007 `spy_007_trend_pullback`
 > **當前最佳 (Best):** SPY-005 `spy_005_asymmetric_exit` ✅ 全域最優
 
 ## 資產特性 (Asset Characteristics)
@@ -112,6 +126,7 @@
 | SPY-004 | `spy_004_rsi2_reversal` | RSI(2) 極端超賣均值回歸 | RSI(2) < 10, 2日跌幅 ≥1.5%, ClosePos ≥ 40%, cooldown 5d, TP +2.5%, SL -2.5%, Hold 15d | ✅ 前最佳 |
 | SPY-005 | `spy_005_asymmetric_exit` | RSI(2) 寬出場均值回歸 | 同 SPY-004 進場, TP +3.0%, SL -3.0%, Hold 20d | ✅ 全域最優 |
 | SPY-006 | `spy_006_roc_reversal` | 3 次嘗試：ROC 進場/RSI+回檔/寬 TP | Att1: ROC(5)≤-3%, Att2: RSI+PB≥2%, Att3: TP+3.5% | ❌ 均不如 SPY-005 |
+| SPY-007 | `spy_007_trend_pullback` | 3 次嘗試：趨勢跟蹤/動量回檔 | Att1: SMA50回測, Att2: SMA20回測, Att3: +ClosePos | ❌ Part A 結構性弱 |
 
 ## 演進路線 (Lineage)
 
@@ -123,6 +138,8 @@ SPY-001 spy_001_pullback_wr (基礎版：Pullback ≥3%, WR(10) ≤ -80, ClosePo
 SPY-004 spy_004_rsi2_reversal (全新訊號架構：RSI(2) < 10 + 2日跌幅 ≥1.5%)
   └─ SPY-005 spy_005_asymmetric_exit (寬出場：TP +3.0% / SL -3.0% / Hold 20d) ✅ 全域最優
       └─ SPY-006 spy_006_roc_reversal (3次嘗試：ROC進場/RSI+回檔/TP+3.5%) ❌ 均劣化
+
+SPY-007 spy_007_trend_pullback (全新策略類型：趨勢跟蹤/動量回檔，3次嘗試) ❌ Part A 結構性弱
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -904,3 +921,71 @@ A/B 績效差異較大（4.23% vs 0.13%）是因為 Part A 大幅改善而非 Pa
 - TP +3.0% / SL -3.0% / Hold 20d 搭配 RSI(2) < 10 進場是 SPY 最佳組合
 - ROC 速度衰減已從「尚未嘗試」移至「已證明無效」
 - 進場架構（RSI(2) vs ROC）對績效影響巨大，確認跨資產教訓 #4
+
+---
+
+## SPY-007: 三次嘗試（趨勢跟蹤 / 動量回檔）
+
+### 目標 (Goal)
+
+探索趨勢跟蹤/動量回檔策略能否超越 SPY-005 的均值回歸（Sharpe 0.53/0.56）。
+參考 DIA-007 Att3（Part B Sharpe 1.07），嘗試在 SPY 上復現順勢策略。
+
+### Attempt 1: SMA(50) 回測 + SMA(50)>SMA(200) 黃金交叉 + 斜率上升
+
+**假設**：SPY 在上升趨勢中回測 SMA(50) 支撐後反彈，提供順勢買入機會。
+
+進場：SMA(50)>SMA(200) + SMA(50) 斜率上升 10 日 + Low≤SMA(50) + Close>SMA(50) + cd15
+出場：TP +3.0% / SL -3.0% / 25d
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 16 | 8 |
+| 勝率 | 56.2% | 62.5% |
+| Sharpe | 0.11 | 0.15 |
+| 累計報酬 | +4.66% | +3.01% |
+| MDD | -4.38% | -5.84% |
+
+**判定**：❌ 失敗。7 個 Part A 停損（含 2022-01-07 轉折期），與 DIA-007 相同失敗模式。SMA(50) 回測在市場轉折期產生大量假訊號，黃金交叉反應太慢無法及時避開。
+
+### Attempt 2: SMA(20) 回測 + Close>SMA(200) + SMA(20)>SMA(50) + cd10
+
+**假設**：改用更快的 SMA(20) 作為回調支撐，SMA(200) 排除熊市。
+
+進場：Close>SMA(200) + SMA(20)>SMA(50) + Low≤SMA(20) + Close>SMA(20) + cd10
+出場：TP +3.0% / SL -3.0% / 20d
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 27 | 16 |
+| 勝率 | 59.3% | 75.0% |
+| Sharpe | 0.17 | 0.45 |
+| 累計報酬 | +12.82% | +19.40% |
+| MDD | -4.62% | -4.41% |
+
+**判定**：❌ 失敗。SMA(200) 過濾大幅改善 Part B（0.15→0.45），但 Part A 仍弱（0.17）。2021-11-23、2021-12-15、2022-01-11、2022-04-06 四筆停損發生在 SPY 仍在 SMA(200) 上方但動能已衰退的轉折期。A/B gap 0.28 過大。
+
+### Attempt 3: Att2 + ClosePos≥40% + cd15
+
+**假設**：ClosePos 在 SPY 上有效（SPY-005 驗證），加入以過濾弱反彈。延長冷卻至 15d 打散 2021Q4 壞訊號群。
+
+進場：同 Att2 + ClosePos≥40% + cd15
+出場：TP +3.0% / SL -3.0% / 20d
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 21 | 16 |
+| 勝率 | 57.1% | 68.8% |
+| Sharpe | 0.12 | 0.42 |
+| 累計報酬 | +6.75% | +18.35% |
+| MDD | -4.70% | -3.38% |
+
+**判定**：❌ 失敗。ClosePos 改變訊號日期而非移除壞訊號（與跨資產教訓 #6 一致），Part A 反而劣化（0.17→0.12）。cd15 減少訊號但未選擇性過濾壞訊號。
+
+### 總結 (Summary)
+
+❌ **SPY-005 確認為全域最優**（7 次實驗、33+ 次嘗試，含均值回歸和趨勢跟蹤兩大策略類型）
+- 趨勢跟蹤/動量回檔策略在 SPY 上有結構性 Part A 弱點：2019-2022 的市場轉折期產生太多假訊號
+- 即使 SMA(200) 過濾排除了 2022 熊市核心，轉折期（SMA(200) 上方但動能衰退）仍無法避免
+- Part B 表現尚可（最高 0.45）但無法彌補 Part A 的結構性缺陷
+- 與 DIA-007 發現一致：趨勢跟蹤在低波動指數 ETF 上 Part A 系統性弱於均值回歸
