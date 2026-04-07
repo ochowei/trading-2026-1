@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-05
+  last_validated: 2026-04-07
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -54,10 +54,19 @@
 原有項目加上：
 - FCX-006 相對強度策略（FCX vs COPX RS）：FCX-COPX RS 在 2020 銅礦復甦期集中爆發但 2024-2025 兩者高度同步，RS 訊號在 OOS 期間無預測力。與 TSM-SMH RS（Sharpe 0.79/0.83）不同，FCX-COPX 缺乏持續性的個股超額表現驅動因素
 
+**FCX-007 實驗摘要（2026-04-07，3 次嘗試，全部失敗）：**
+- **Att1**（Donchian 20, SMA50, cd10）：Part A Sharpe -0.06 / Part B 0.23。42訊號品質極差（WR 45.2%），A/B 比 3.5:1
+- **Att2**（Donchian 50, SMA50, cd15）：Part A Sharpe 0.23 / Part B 0.06。延長回看改善 Part A 但 Part B 崩潰，A/B 比 3.4:1
+- **Att3**（Donchian 30 + BB Squeeze 30th pct, SMA50, cd10）：Part A Sharpe 0.02 / Part B 0.64。BB Squeeze 大幅改善 Part B 但 A/B 訊號比 6:1 嚴重不平衡
+
+**已證明無效（禁止重複嘗試）：**（更新）
+原有項目加上：
+- FCX-007 Donchian 通道突破：Donchian 基於固定回看期高點，不如 BB 上軌的統計自適應門檻。短回看（20日）訊號過多、長回看（50日）Part B 崩潰、加 BB Squeeze 造成 A/B 6:1 不平衡。商品週期導致不同時期突破模式差異巨大
+
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - 加入銅價/HG 指標確認（減少 2022 熊市等大環境的誤判，但 cross-asset lesson #6 警告額外確認指標通常無效）
 - 引入追蹤停損（Trailing Stop）捕捉更大型的反彈（但 cross-asset lesson #2 警告日波動 2-4% 禁用 trailing stop）
-- FCX-001/004 已確認為全域最優（6 次實驗、18+ 次嘗試，含均值回歸、突破、動量回檔、RSI(2)、相對強度五大策略類型）
+- FCX-001/004 已確認為全域最優（7 次實驗、24+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度六大策略類型）
 
 **關鍵資產特性：**
 - 高 Beta、週期性強，與銅價高度相關
@@ -85,6 +94,8 @@
 | FCX-003 | `fcx_003_optimized_exit`      | 三重超賣+反轉K線過濾（3次嘗試均失敗） | 已完成 |
 | FCX-004 | `fcx_004_bb_squeeze_breakout` | BB Squeeze Breakout 突破策略（3次嘗試，Att2 最佳） | 已完成 |
 | FCX-005 | `fcx_005_momentum_pullback`   | 動量回檔 / RSI(2) 短期均值回歸（3次嘗試均失敗） | 已完成 |
+| FCX-006 | `fcx_006_relative_strength`   | FCX-COPX 相對強度（3次嘗試均失敗） | 已完成 |
+| FCX-007 | `fcx_007_donchian_breakout`   | Donchian 通道突破（3次嘗試均失敗） | 已完成 |
 
 ---
 
@@ -586,10 +597,68 @@ Part A Sharpe 0.29 / Part B 0.32。TP+10% 使 5 筆 Part A 贏利交易（原本
 
 ---
 
+## FCX-007: Donchian Channel Breakout（3次嘗試均失敗）
+
+**目標**：以 Donchian 通道突破（N 日新高）作為趨勢啟動訊號，嘗試與 BB Squeeze（FCX-004）互補的突破策略。
+
+**假說**：FCX 銅礦股在商品週期中有強烈趨勢特性，當價格突破 N 日新高且處於上升趨勢中，代表趨勢啟動。Donchian 突破基於實際價格高點，與 BB 上軌（基於統計偏差）提供不同的突破判定。
+
+### Attempt 1：Donchian(20) + SMA(50)
+
+**進場條件**：Close > 20日最高價 + Close > SMA(50) + 冷卻10天
+**出場**：TP+8% / SL-7% / 20天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 42 (8.4/yr) | 12 (6.0/yr) |
+| 勝率 | 45.2% | 58.3% |
+| 累計報酬 | -26.47% | +17.65% |
+| Sharpe | **-0.06** | **0.23** |
+| MDD | -10.09% | -14.42% |
+
+**失敗原因**：20日 Donchian 門檻太低，FCX 頻繁突破新20日高點，產生大量假突破。Part A 42訊號品質極差（WR 45.2%），A/B 比 3.5:1。
+
+### Attempt 2：Donchian(50) + SMA(50) + 冷卻15天
+
+**進場條件**：Close > 50日最高價 + Close > SMA(50) + 冷卻15天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 24 (4.8/yr) | 7 (3.5/yr) |
+| 勝率 | 54.2% | 57.1% |
+| 累計報酬 | +39.89% | +1.05% |
+| Sharpe | **0.23** | **0.06** |
+| MDD | -10.09% | -10.17% |
+
+**失敗原因**：延長至50日降低訊號數但 Part B 崩潰（Sharpe 0.06），A/B 比 3.4:1 仍不平衡。max consec. loss 5（Part A）。
+
+### Attempt 3：Donchian(30) + BB Squeeze + SMA(50)
+
+**進場條件**：Close > 30日最高價 + 5日內 BB Width < 60日30th百分位 + Close > SMA(50) + 冷卻10天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 24 (4.8/yr) | 4 (2.0/yr) |
+| 勝率 | 50.0% | 75.0% |
+| 累計報酬 | -3.09% | +16.98% |
+| Sharpe | **0.02** | **0.64** |
+| MDD | -10.09% | -10.17% |
+
+**失敗原因**：加入 BB Squeeze 過濾大幅改善 Part B（0.64），但 A/B 訊號比惡化至 6:1。Part A 仍然近乎零（Sharpe 0.02），策略在 IS 期間完全不可靠。
+
+### 綜合結論
+
+1. **Donchian 突破在 FCX 上結構性不穩定**：商品週期造成不同時期的突破模式差異巨大，三種嘗試的 A/B 比均 > 3:1
+2. **BB Squeeze 過濾改善品質但加劇不平衡**：Att3 Part B 0.64 是所有 FCX 突破策略最佳 OOS，但 Part A 0.02 表明過濾器在 IS 期間移除好訊號而非壞訊號
+3. **FCX-004 BB Squeeze Breakout 仍為突破策略最佳**：BB 上軌（統計自適應門檻）優於 Donchian 固定回看高點，因前者隨波動度自動調整
+4. **確認 FCX-001/FCX-004 為全域最優**：7 次實驗、24+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度六大策略類型
+
+---
+
 ## 演進路線圖 (Roadmap)
 
 ```
-FCX-001 (三重極端超賣，寬出場) ← 均值回歸最佳（已確認為全域最優，3次改善嘗試均失敗）
+FCX-001 (三重極端超賣，寬出場) ← 均值回歸最佳（已確認為全域最優）
   ├── FCX-002 (回檔+WR+反轉K線，跨資產驗證模式) ← 已完成，不如 FCX-001
   ├── FCX-003 (3次嘗試：SL收窄/延長持倉/ClosePos過濾) ← 已完成，全部不如 FCX-001
   ├── [低預期] 加入銅價/HG 確認（cross-asset lesson #6 警告額外確認指標通常無效）
@@ -609,4 +678,9 @@ FCX-006 (Relative Strength: FCX vs COPX) ← 全部失敗
   ├── Att1 (RS>=5%, pullback 3-7%) → Part A 0.20 / Part B -0.15，A/B 6:1 不平衡
   ├── Att2 (RS>=8%, pullback 3-8%) → Part B 無訊號
   └── Att3 (RS>=3%, pullback 3-8%) → Part A 0.18 / Part B -0.19
+
+FCX-007 (Donchian Channel Breakout) ← 全部失敗
+  ├── Att1 (Donchian 20, SMA50, cd10) → Part A -0.06 / Part B 0.23，訊號太多太差
+  ├── Att2 (Donchian 50, SMA50, cd15) → Part A 0.23 / Part B 0.06，Part B 崩潰
+  └── Att3 (Donchian 30 + BB Squeeze, SMA50, cd10) → Part A 0.02 / Part B 0.64，A/B 6:1
 ```
