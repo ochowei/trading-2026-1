@@ -128,6 +128,7 @@ on:
           - "NVDA-005: nvda_005_momentum_pullback"
           - "NVDA-006: nvda_006_relative_strength"
           - "NVDA-007: nvda_007_rs_exit_optimized"
+          - "NVDA-008: nvda_008_rs_param_explore"
           - "XBI-001: xbi_001_pullback_wr"
           - "XBI-004: xbi_004_capped_cooldown"
           - "XBI-005: xbi_005_closepos_reversal"
