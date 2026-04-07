@@ -55,6 +55,7 @@ on:
           - "DIA-007: dia_007_trend_pullback"
           - "DIA-008: dia_008_momentum_pullback"
           - "DIA-009: dia_009_pairs_spy"
+          - "DIA-010: dia_010_rsi5_trend_pullback"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
           - "FCX-004: fcx_004_bb_squeeze_breakout"
