@@ -104,6 +104,7 @@ on:
           - "TSLA-007: tsla_007_keltner_breakout"
           - "TSLA-008: tsla_008_rs_momentum_pullback"
           - "TSLA-009: tsla_009_bb_wide_breakout"
+          - "TSLA-010: tsla_010_rsi5_mean_reversion"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
           - "TSM-006: tsm_006_momentum_pullback"
