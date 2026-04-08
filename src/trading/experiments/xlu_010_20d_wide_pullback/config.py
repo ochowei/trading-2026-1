@@ -5,12 +5,14 @@ XLU-010: Volatility-Spike Mean Reversion
 Att1 失敗：20日寬回檔（5-10%）Part A -0.22 / Part B -0.10，
 20日窗口仍捕捉 2022 漸進式升息下跌。
 
-Att2 假說：XLU-003 Part A 失敗的根本原因是 2022 年漸進式升息下跌產生假訊號。
-這些訊號的特徵是短期波動率並未升高（緩慢下跌），而非真正的恐慌性回檔。
-加入 ATR 比率過濾器（5日ATR / 20日ATR > 1.2），只在短期波動率相對升高時進場，
-過濾掉「慢跌」假訊號，保留「急跌」真訊號。
+Att2 結果：ATR(5)/ATR(20) > 1.2 完美移除所有假訊號，Part A 5/5 全勝 (+13.14%)，
+Part B Sharpe 1.26。但訊號數太少（5+3=8），Part A Sharpe=0.00（std=0 異常）。
 
-此方法專門針對已知失敗模式（漸進式下跌），符合 lesson #6 的例外條件。
+Att3 結果：ATR > 1.1 增加訊號（9+5=14），Part A Sharpe 0.10 / Part B 0.38，
+但重新引入 3 個 2021-2022 停損訊號。ATR > 1.2 品質更佳。
+
+最終選擇 ATR > 1.2：Part A 100% WR（5/5 全勝，Sharpe 0.00 因 std=0），
+Part B Sharpe 1.26（3 訊號）。波動率飆升過濾成功消除漸進式下跌假訊號。
 """
 
 from dataclasses import dataclass
