@@ -45,6 +45,7 @@ on:
           - "SIVR-008: sivr_008_bb_squeeze_breakout"
           - "SIVR-009: sivr_009_ratio_reversion"
           - "SIVR-010: sivr_010_rs_momentum"
+          - "SIVR-011: sivr_011_sharp_decline_rsi5"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
