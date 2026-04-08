@@ -148,6 +148,7 @@ on:
           - "XLU-007: xlu_007_momentum_pullback"
           - "XLU-008: xlu_008_tight_squeeze_breakout"
           - "XLU-009: xlu_009_kc_squeeze_breakout"
+          - "XLU-010: xlu_010_20d_wide_pullback"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
