@@ -1,0 +1,228 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-08T08:21:27.374470"
+  },
+  "part_a": {
+    "ticker": "USO",
+    "total_signals": 6,
+    "wins": 4,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 1.3,
+    "std_return_pct": 5.23,
+    "cumulative_return_pct": 7.2,
+    "avg_holding_days": 6.0,
+    "max_drawdown_pct": -7.21,
+    "profit_factor": 1.64,
+    "sharpe_ratio": 0.25,
+    "sortino_ratio": 0.37,
+    "calmar_ratio": 0.18,
+    "max_consecutive_losses": 1,
+    "target_exits": 4,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-09-16",
+        "entry_date": "2019-09-17",
+        "exit_date": "2019-09-18",
+        "entry": 103.54,
+        "exit": 97.23,
+        "return_pct": -6.09,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -7.21
+      },
+      {
+        "date": "2021-01-08",
+        "entry_date": "2021-01-11",
+        "exit_date": "2021-02-02",
+        "entry": 34.91,
+        "exit": 36.66,
+        "return_pct": 5.0,
+        "holding_days": 15,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.01
+      },
+      {
+        "date": "2021-02-03",
+        "entry_date": "2021-02-04",
+        "exit_date": "2021-02-12",
+        "entry": 37.65,
+        "exit": 39.53,
+        "return_pct": 5.0,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.8
+      },
+      {
+        "date": "2022-03-01",
+        "entry_date": "2022-03-02",
+        "exit_date": "2022-03-04",
+        "entry": 74.22,
+        "exit": 77.94,
+        "return_pct": 5.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.3
+      },
+      {
+        "date": "2022-11-04",
+        "entry_date": "2022-11-07",
+        "exit_date": "2022-11-09",
+        "entry": 76.92,
+        "exit": 72.23,
+        "return_pct": -6.09,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.94
+      },
+      {
+        "date": "2023-09-01",
+        "entry_date": "2023-09-05",
+        "exit_date": "2023-09-19",
+        "entry": 78.15,
+        "exit": 82.06,
+        "return_pct": 5.0,
+        "holding_days": 10,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.93
+      }
+    ],
+    "filled_count": 6,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "USO",
+    "total_signals": 4,
+    "wins": 2,
+    "win_rate": 0.5,
+    "avg_return_pct": -0.54,
+    "std_return_pct": 5.54,
+    "cumulative_return_pct": -2.77,
+    "avg_holding_days": 5.0,
+    "max_drawdown_pct": -6.75,
+    "profit_factor": 0.82,
+    "sharpe_ratio": -0.1,
+    "sortino_ratio": -0.13,
+    "calmar_ratio": -0.08,
+    "max_consecutive_losses": 1,
+    "target_exits": 2,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-01-25",
+        "entry_date": "2024-01-26",
+        "exit_date": "2024-02-02",
+        "entry": 72.05,
+        "exit": 67.66,
+        "return_pct": -6.09,
+        "holding_days": 5,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.75
+      },
+      {
+        "date": "2024-03-14",
+        "entry_date": "2024-03-15",
+        "exit_date": "2024-04-01",
+        "entry": 76.05,
+        "exit": 79.85,
+        "return_pct": 5.0,
+        "holding_days": 10,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.12
+      },
+      {
+        "date": "2025-06-11",
+        "entry_date": "2025-06-12",
+        "exit_date": "2025-06-13",
+        "entry": 74.08,
+        "exit": 77.79,
+        "return_pct": 5.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 6.15
+      },
+      {
+        "date": "2025-07-29",
+        "entry_date": "2025-07-30",
+        "exit_date": "2025-08-05",
+        "entry": 80.24,
+        "exit": 75.35,
+        "return_pct": -6.09,
+        "holding_days": 4,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.67
+      }
+    ],
+    "filled_count": 4,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "USO",
+    "total_signals": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": 0.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 0.0,
+    "avg_holding_days": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 0.0,
+    "calmar_ratio": 0.0,
+    "max_consecutive_losses": 0,
+    "target_exits": 0,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [],
+    "filled_count": 0,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 0.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-07"
+    }
+  }
+}
