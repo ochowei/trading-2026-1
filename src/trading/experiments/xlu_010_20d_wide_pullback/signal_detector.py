@@ -1,11 +1,12 @@
 """
-XLU-010 訊號偵測器：20日寬回檔 + Williams %R + 反轉K線
+XLU-010 訊號偵測器：波動率飆升均值回歸
 
 進場條件（全部滿足）：
-1. 20 日回檔 >= 5% 且 <= 10%（寬回檔範圍，過濾淺回檔+極端崩盤）
+1. 10 日回檔 >= 3.5% 且 <= 7%（同 XLU-003）
 2. Williams %R(10) <= -80（超賣確認）
 3. 收盤位置 >= 40%（日內反轉確認）
-4. 冷卻期 7 個交易日
+4. ATR(5) / ATR(20) > 1.2（短期波動率升高，過濾漸進式下跌）
+5. 冷卻期 7 個交易日
 """
 
 import logging
@@ -14,20 +15,20 @@ import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.experiments.xlu_010_20d_wide_pullback.config import (
-    XLU20dWidePullbackConfig,
+    XLUVolSpikeMRConfig,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class XLU20dWidePullbackSignalDetector(BaseSignalDetector):
-    def __init__(self, config: XLU20dWidePullbackConfig):
+class XLUVolSpikeMRDetector(BaseSignalDetector):
+    def __init__(self, config: XLUVolSpikeMRConfig):
         self.config = config
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # 20 日高點回檔
+        # 10 日高點回檔
         n = self.config.pullback_lookback
         df["High_N"] = df["High"].rolling(n).max()
         df["Pullback"] = (df["Close"] - df["High_N"]) / df["High_N"]
@@ -44,6 +45,20 @@ class XLU20dWidePullbackSignalDetector(BaseSignalDetector):
         df["ClosePos"] = (df["Close"] - df["Low"]) / day_range
         df.loc[day_range == 0, "ClosePos"] = 0.5
 
+        # ATR ratio: short-term vs long-term volatility
+        tr = pd.concat(
+            [
+                df["High"] - df["Low"],
+                (df["High"] - df["Close"].shift(1)).abs(),
+                (df["Low"] - df["Close"].shift(1)).abs(),
+            ],
+            axis=1,
+        ).max(axis=1)
+
+        atr_short = tr.rolling(self.config.atr_short_period).mean()
+        atr_long = tr.rolling(self.config.atr_long_period).mean()
+        df["ATR_Ratio"] = atr_short / atr_long
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -53,8 +68,9 @@ class XLU20dWidePullbackSignalDetector(BaseSignalDetector):
         cond_cap = df["Pullback"] >= self.config.pullback_cap
         cond_wr = df["WR"] <= self.config.wr_threshold
         cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
+        cond_vol_spike = df["ATR_Ratio"] > self.config.atr_ratio_threshold
 
-        df["Signal"] = cond_pullback & cond_cap & cond_wr & cond_reversal
+        df["Signal"] = cond_pullback & cond_cap & cond_wr & cond_reversal & cond_vol_spike
 
         # Cooldown
         signal_indices = df.index[df["Signal"]].tolist()
@@ -73,5 +89,5 @@ class XLU20dWidePullbackSignalDetector(BaseSignalDetector):
             df.loc[suppressed, "Signal"] = False
 
         signal_count = df["Signal"].sum()
-        logger.info("XLU-010: Detected %d 20d wide pullback + WR signals", signal_count)
+        logger.info("XLU-010: Detected %d vol-spike MR signals", signal_count)
         return df

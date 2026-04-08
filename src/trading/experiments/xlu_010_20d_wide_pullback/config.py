@@ -1,13 +1,16 @@
 """
-XLU-010: 20-Day Wide Pullback + Williams %R + Reversal Candle
-(XLU 20日寬回檔 + Williams %R + 反轉K線)
+XLU-010: Volatility-Spike Mean Reversion
+(XLU 波動率飆升均值回歸)
 
-COPX-003 證實 20 日回看 + 加寬回檔範圍可大幅改善 Part A Sharpe（0.08→0.39）。
-XLU-003 Att1 的 20 日回看失敗是因為沿用 3.5-7% 窄範圍，
-20 日窗口讓 2022 漸進式升息下跌也累積至 3.5%，產生大量壞訊號。
+Att1 失敗：20日寬回檔（5-10%）Part A -0.22 / Part B -0.10，
+20日窗口仍捕捉 2022 漸進式升息下跌。
 
-本實驗將回檔範圍加寬至 5-10%，使 20 日窗口只在顯著回檔時觸發。
-XLU 日波動 1.08% vs COPX ~2.5%，等比例縮放 COPX 的 10-20% → XLU 的 5-10%。
+Att2 假說：XLU-003 Part A 失敗的根本原因是 2022 年漸進式升息下跌產生假訊號。
+這些訊號的特徵是短期波動率並未升高（緩慢下跌），而非真正的恐慌性回檔。
+加入 ATR 比率過濾器（5日ATR / 20日ATR > 1.2），只在短期波動率相對升高時進場，
+過濾掉「慢跌」假訊號，保留「急跌」真訊號。
+
+此方法專門針對已知失敗模式（漸進式下跌），符合 lesson #6 的例外條件。
 """
 
 from dataclasses import dataclass
@@ -16,13 +19,13 @@ from trading.core.base_config import ExperimentConfig
 
 
 @dataclass
-class XLU20dWidePullbackConfig(ExperimentConfig):
-    """XLU 20日寬回檔 + WR 參數"""
+class XLUVolSpikeMRConfig(ExperimentConfig):
+    """XLU 波動率飆升均值回歸參數"""
 
-    # 回檔參數（核心變更：20日回看 + 5-10% 寬範圍）
-    pullback_lookback: int = 20
-    pullback_threshold: float = -0.05  # 回檔 >= 5%
-    pullback_cap: float = -0.10  # 回檔 <= 10%
+    # 回檔參數（同 XLU-003）
+    pullback_lookback: int = 10
+    pullback_threshold: float = -0.035  # 回檔 >= 3.5%
+    pullback_cap: float = -0.07  # 回檔 <= 7%
 
     # Williams %R 參數
     wr_period: int = 10
@@ -31,15 +34,20 @@ class XLU20dWidePullbackConfig(ExperimentConfig):
     # 收盤位置過濾（反轉K線確認）
     close_position_threshold: float = 0.4
 
+    # 波動率飆升過濾器（核心創新）
+    atr_short_period: int = 5  # 短期 ATR 週期
+    atr_long_period: int = 20  # 長期 ATR 週期
+    atr_ratio_threshold: float = 1.2  # 短期/長期 ATR > 1.2 才進場
+
     # 冷卻期
     cooldown_days: int = 7
 
 
-def create_default_config() -> XLU20dWidePullbackConfig:
-    return XLU20dWidePullbackConfig(
+def create_default_config() -> XLUVolSpikeMRConfig:
+    return XLUVolSpikeMRConfig(
         name="xlu_010_20d_wide_pullback",
         experiment_id="XLU-010",
-        display_name="XLU 20-Day Wide Pullback + Williams %R + Reversal Candle",
+        display_name="XLU Volatility-Spike Mean Reversion",
         tickers=["XLU"],
         data_start="2010-01-01",
         profit_target=0.025,  # +2.5%（XLU 均值回歸甜蜜點）
