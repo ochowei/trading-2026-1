@@ -28,25 +28,26 @@
 ## 2. Trailing Stop 取決於波動度
 
 <!-- freshness:
-  derived_from: [TQQQ-003, TQQQ-005, GLD-003, SIVR-002, SPY-001]
-  validated: 2026-03-29
+  derived_from: [TQQQ-003, TQQQ-005, GLD-003, GLD-012, SIVR-002, SPY-001]
+  validated: 2026-04-09
   data_through: 2025-12-31
   confidence: high
 -->
 
-這是跨資產最重要的教訓之一。Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
+這是跨資產最重要的教訓之一。Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。**但啟動門檻必須接近或超過 TP，否則即使低波動也會壓縮獲利。**
 
 | 日波動度 | 資產範例 | Trailing Stop | 結果 |
 |----------|----------|---------------|------|
-| ≤ 1.5% | GLD | +1.5% 啟動, 1.0% 距離 | WR 82.4% → 88.2%, 累積大幅提升 |
+| ≤ 1.5% | GLD | +1.5% 啟動, 1.0% 距離 | WR 82.4% → 88.2%, 累積大幅提升（GLD-003，成交模型前） |
+| ~1.1% | GLD | +2.0% 啟動, 1.5% 距離, TP +3.0% | 6+ 筆交易被截在 +0.47%~+1.32%，移除追蹤停損後 Sharpe 0.45→**0.48**，累計 +45%→**+50%**（GLD-012 驗證） |
 | ~1.2% | SPY | +2.0% 啟動, 1.5% 距離 | 滾動分析僅 3/12 窗口正累計，平均贏利壓縮至 +0.9%~+2.3% vs 虧損 -4.1% |
 | 2-4% | SIVR | +2.0% 啟動, 1.5% 距離 | WR 提升但累積暴跌 -52%；滾動分析盈虧比最低 0.35 |
 | 4-8%+ | TQQQ (3x) | 任何設定 | WR 85% → 55%, 累積腰斬 |
 
-**原因**：高波動資產的日內價格震盪同時觸及 trailing stop 和 TP，成交模型的悲觀認定會選擇 stop 出場。SPY 雖日波動僅 ~1.2%，但 TP +3.5% 搭配追蹤停損（+2.0% 啟動）時，追蹤停損啟動門檻太低（低於 TP），大量交易在 +2.0% 即被截斷。
+**原因**：高波動資產的日內價格震盪同時觸及 trailing stop 和 TP，成交模型的悲觀認定會選擇 stop 出場。SPY 雖日波動僅 ~1.2%，但 TP +3.5% 搭配追蹤停損（+2.0% 啟動）時，追蹤停損啟動門檻太低（低於 TP），大量交易在 +2.0% 即被截斷。**GLD-012 進一步驗證**：即使 GLD 日波動僅 1.1%，+2.0% 啟動搭配 +3.0% TP 仍截斷獲利——啟動門檻/TP 比率（67%）過低是關鍵，而非日波動本身。
 
 **規則**：
-- 日波動 ≤ 1.5%：可用 trailing stop，但啟動門檻必須接近或超過 TP（SPY-001 反例：+2.0% 啟動 + TP +3.5% 仍壓縮獲利）
+- 日波動 ≤ 1.5%：可用 trailing stop，但**啟動門檻必須 ≥ TP**（啟動/TP 比 < 80% 時反而壓縮獲利，GLD-012、SPY-001 均驗證）
 - 日波動 1.5-3%：需要極謹慎測試，預設不用
 - 日波動 > 3%：禁用 trailing stop，使用固定 TP/SL
 
@@ -194,7 +195,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, GLD-010, GLD-011, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SIVR-010, SIVR-011, SIVR-012, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, FCX-006, FCX-007, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, USO-021, SPY-005, SPY-006, SPY-007, SPY-008, DIA-001, DIA-006, DIA-007, DIA-008, DIA-009, DIA-011, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, SOXL-009, SOXL-010, TSM-004, TSM-005, TSM-006, TSM-007, TSM-008, TSM-009, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, IWM-008, IWM-009, IWM-010, IWM-011, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, XBI-007, XBI-008, XBI-009, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, COPX-007, URA-001, URA-002, URA-003, URA-004, URA-005, URA-006, IBIT-001, IBIT-002, IBIT-003, IBIT-004, NVDA-002, NVDA-003, NVDA-004, NVDA-005, NVDA-007, NVDA-008, TLT-001, TLT-002, TLT-004, TLT-005, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, TSLA-008, TSLA-009, TSLA-010, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006, XLU-007, XLU-008, XLU-009, XLU-010, XLU-011]
+  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, GLD-010, GLD-011, GLD-012, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SIVR-010, SIVR-011, SIVR-012, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, FCX-006, FCX-007, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, USO-021, SPY-005, SPY-006, SPY-007, SPY-008, DIA-001, DIA-006, DIA-007, DIA-008, DIA-009, DIA-011, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, SOXL-009, SOXL-010, TSM-004, TSM-005, TSM-006, TSM-007, TSM-008, TSM-009, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, IWM-008, IWM-009, IWM-010, IWM-011, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, XBI-007, XBI-008, XBI-009, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, COPX-007, URA-001, URA-002, URA-003, URA-004, URA-005, URA-006, IBIT-001, IBIT-002, IBIT-003, IBIT-004, NVDA-002, NVDA-003, NVDA-004, NVDA-005, NVDA-007, NVDA-008, TLT-001, TLT-002, TLT-004, TLT-005, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, TSLA-008, TSLA-009, TSLA-010, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006, XLU-007, XLU-008, XLU-009, XLU-010, XLU-011]
   validated: 2026-04-09
   data_through: 2025-12-31
   confidence: high
@@ -203,7 +204,7 @@
 | 資產 | 最佳實驗 | 策略類型 | 訊號/年 | WR (A/B) | 關鍵成功因素 |
 |------|----------|----------|---------|----------|-------------|
 | TQQQ | TQQQ-010 | 極端恐慌買入 | ~4 | 70%/87.5% | 精確進場 (-15% DD)、固定出場、無 trailing。TQQQ-015 驗證 QQQ BB Squeeze Breakout（Part B Sharpe -0.28/-0.10）和 QQQ Momentum ROC(10)>5%（Part B 0.17，A/B 平衡佳但 min 0.17 < 0.36）均失敗，**已確認為全域最優**（15 次實驗，含均值回歸和趨勢/動量/突破三大策略類型） |
-| GLD | GLD-008 | 20日回調 + Williams %R | ~7.2/6.5 | 77.8%/100% | 20日回看（vs GLD-007 10日）+ TP +3.0%（vs +3.5%），Part A Sharpe 0.45/Part B 2.33（vs GLD-007 的 0.41/2.04），累計 +45.40%/+32.83%。20日回看多捕捉 5 個 Part A 好訊號，TP +3.0% 讓更多交易直接達標。RSI(2) 進場在 GLD 上無效（Att1 Sharpe 0.28/1.59），回檔+WR 是 GLD 最佳進場架構。GLD-009 驗證 BB 擠壓突破無效（Sharpe 0.28/0.27，日波動 1.1% 限制突破幅度）。GLD-010 驗證動量回檔（ROC(20)>5%+5日回檔+SMA50，3 次嘗試，最佳 Sharpe 0.38/0.84，A/B 比 1.15:1 極佳但 min 0.38 < 0.45），追蹤停損在動量策略中有害（截斷趨勢延續）。GLD-011 驗證 Donchian 通道突破（Donchian 20/30/50 + SMA 50/100，3 次嘗試，最佳 min 0.22（Att3: 0.29/0.22），趨勢策略結構性受市場狀態依賴——Att2 Part A 0.08 vs Part B 0.73），**已確認為全域最優**（11 次實驗、42+ 次嘗試，含均值回歸、BB 擠壓突破、動量回檔和 Donchian 突破四大策略類型） |
+| GLD | GLD-012 Att3 | 20日回調 + Williams %R（無追蹤停損） | ~7.2/6.5 | 75.0%/100% | 同 GLD-008 進場（20日回檔≥3% + WR(10)≤-80 + ClosePos≥40%），移除追蹤停損，TP +3.0%/SL -4.0%/20d。Part A Sharpe **0.48**/Part B **4.68**（vs GLD-008 的 0.45/2.33，+6.7%/+101%），累計 +50.15%/+42.30%（+10.5%/+28.8%）。追蹤停損（+2.0% 啟動）在 TP +3.0% 下截斷獲利：6+ 筆交易被截在 +0.47%~+1.32%，移除後大部分達 +3.0% TP。GLD-012 Att1/Att2 驗證 ATR(5)/ATR(20) > 1.1/1.05 波動率自適應無效——GLD 最佳訊號來自低波動溫和拉回（ATR ratio 低），與 IWM/COPX/XLU 相反。**已確認為全域最優**（12 次實驗、45+ 次嘗試，含均值回歸、波動率自適應、BB 擠壓突破、動量回檔和 Donchian 突破五大策略類型） |
 | SIVR | SIVR-005 | 回檔範圍 + Williams %R | ~6.4/5.5 | 62.5%/63.6% | 回檔 7-15% + WR(10)≤-80，回檔上限過濾 COVID 崩盤。Part A Sharpe 0.22（vs SIVR-003 的 0.18，+22%），Part B 完全不變。SIVR-007 驗證 RSI 動能回復/20日回看均失敗，SIVR-008 驗證 BB Squeeze Breakout（3 次嘗試，最佳 Sharpe 0.11/0.10）完全無效，SIVR-009 驗證 GLD/SIVR 配對交易（3 次嘗試，最佳 min(A,B) = 0.18，金銀比結構性偏移無法用 z-score 區分），SIVR-010 驗證 RS 動量（SIVR vs GLD 相對強度，2 次嘗試，最佳 Part A 0.16/Part B -0.07）和趨勢跟蹤（SMA 金叉+回調，Part A -0.07/Part B -0.01）均失敗，SIVR-011 驗證 RSI(5)+2日急跌取代 WR(10)（3 次嘗試，最佳 min(A,B) 0.17，SL 存在結構性 A/B 張力），SIVR-012 驗證 ATR(5)/ATR(20) 波動率自適應過濾（3 次嘗試，Att1 Part A Sharpe 0.41 但 Part B 0.12，ATR 過濾在中高波動資產跨期不穩定），**已確認為全域最優**（14 次實驗、33 次嘗試，含均值回歸、突破、配對交易、RS 動量、趨勢跟蹤、RSI(5)+急跌和波動率自適應七大策略類型） |
 | FCX | FCX-001（均值回歸）/ FCX-004（突破） | 三重極端超賣 / BB Squeeze Breakout | ~3.6/4.6 | 72.2%/60% / 69.6%/66.7% | FCX-001：寬出場 (+10%/-12%)、稀有但精確的訊號，滾動分析 12/12 窗口正累計。FCX-004：BB(20,2) 擠壓 60日30th百分位 + 突破上軌 + SMA(50)，TP+8%/SL-7%/20天。Part A Sharpe 0.51（vs FCX-001 0.43，+18.6%），Part B 0.41（vs 0.74）。兩種策略互補：均值回歸捕捉恐慌抄底，突破捕捉趨勢啟動。FCX-005 驗證動量回檔（3次嘗試）和 RSI(2)（1次嘗試）均失敗，FCX-006 驗證 FCX-COPX 相對強度（3次嘗試，最佳 Part A 0.20/Part B -0.15）亦失敗——商品生產者缺乏持續性超額表現驅動力。FCX-007 驗證 Donchian 通道突破（3次嘗試：Donchian 20/50/30+BB Squeeze，最佳 Part B 0.64 但 Part A 0.02，A/B 6:1），Donchian 固定回看高點不如 BB 上軌的統計自適應門檻，**已確認為全域���優**（7 次實驗、24+ 次嘗試，含均值回歸���突破、動量回檔、RSI(2)、相對強度五大策略類型） |
 | USO | USO-013 | 緊密回檔範圍 + RSI(2) + 2日急跌 | ~7.0/6.0 | 65.7%/83.3% | 回檔 7-12% 緊密過濾 + RSI(2)<15 + 2日跌幅≤-2.5%、TP +3.0% 上限、Part A MDD -7.73%、Part B Sharpe 0.82（USO-017～020 再驗證：Close-based 回檔、K線方向、回檔速度、15日回看、雙時框RSI、累積RSI、7日持倉、RSI(3)、ADX過濾、實現波動率過濾、回復日進場、簡化條件均失敗）。USO-021 驗證 BB Squeeze Breakout（3 次嘗試，最佳 Att3：BB(20,2)+SMA(100)+20th pct，Part A Sharpe 0.47/Part B 0.22，min 0.22 < 0.26，突破策略在趨勢市場 Part A 大幅優於均值回歸但 OOS 盤整市場假突破過多），**已確認為全域最優**（21 次實驗，含均值回歸和突破兩大策略類型）。USO-012 滾動分析：11/12 窗口正累計、**唯一雙漸變通過實驗**（精準度+績效均漸變）。USO-009/010 滾動分析驗證回檔上限的必要性：無上限（USO-009）最差窗口 -13.60%，加 7-12%（USO-010）改善至 -7.50%，加 7-13%（USO-012）改善至 -3.86% |
