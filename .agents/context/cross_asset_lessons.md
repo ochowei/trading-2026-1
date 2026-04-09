@@ -194,7 +194,7 @@
 ## 9. 各資產最佳策略速覽
 
 <!-- freshness:
-  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, GLD-010, GLD-011, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SIVR-010, SIVR-011, SIVR-012, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, FCX-006, FCX-007, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, USO-021, SPY-005, SPY-006, SPY-007, SPY-008, DIA-001, DIA-006, DIA-007, DIA-008, DIA-009, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, SOXL-009, SOXL-010, TSM-004, TSM-005, TSM-006, TSM-007, TSM-008, TSM-009, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, IWM-008, IWM-009, IWM-010, IWM-011, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, XBI-007, XBI-008, XBI-009, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, URA-001, URA-002, URA-003, URA-004, URA-005, URA-006, IBIT-001, IBIT-002, IBIT-003, NVDA-002, NVDA-003, NVDA-004, NVDA-005, NVDA-007, NVDA-008, TLT-001, TLT-002, TLT-004, TLT-005, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, TSLA-008, TSLA-009, TSLA-010, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006, XLU-007, XLU-008, XLU-009, XLU-010, XLU-011]
+  derived_from: [TQQQ-010, TQQQ-015, GLD-007, GLD-008, GLD-009, GLD-010, GLD-011, SIVR-001, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SIVR-010, SIVR-011, SIVR-012, FCX-001, FCX-002, FCX-003, FCX-004, FCX-005, FCX-006, FCX-007, USO-001, USO-002, USO-003, USO-004, USO-012, USO-013, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, USO-021, SPY-005, SPY-006, SPY-007, SPY-008, DIA-001, DIA-006, DIA-007, DIA-008, DIA-009, SOXL-001, SOXL-002, SOXL-003, SOXL-005, SOXL-006, SOXL-007, SOXL-008, SOXL-009, SOXL-010, TSM-004, TSM-005, TSM-006, TSM-007, TSM-008, TSM-009, VOO-003, IWM-001, IWM-002, IWM-003, IWM-004, IWM-005, IWM-006, IWM-007, IWM-008, IWM-009, IWM-010, IWM-011, XBI-001, XBI-002-failed, XBI-003-failed, XBI-005, XBI-006, XBI-007, XBI-008, XBI-009, COPX-001, COPX-002, COPX-003, COPX-004, COPX-005, COPX-006, COPX-007, URA-001, URA-002, URA-003, URA-004, URA-005, URA-006, IBIT-001, IBIT-002, IBIT-003, IBIT-004, NVDA-002, NVDA-003, NVDA-004, NVDA-005, NVDA-007, NVDA-008, TLT-001, TLT-002, TLT-004, TLT-005, TSLA-003, TSLA-004, TSLA-005, TSLA-006, TSLA-007, TSLA-008, TSLA-009, TSLA-010, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006, XLU-007, XLU-008, XLU-009, XLU-010, XLU-011]
   validated: 2026-04-09
   data_through: 2025-12-31
   confidence: high
@@ -217,7 +217,7 @@
 | COPX | COPX-007 | 波動率自適應均值回歸 | ~4.2/5.0 | 76.2%/80.0% | COPX-003 框架（20日回檔 10-20% + WR(10)≤-80）+ ATR(5)/ATR(20) > 1.05，TP+3.5%/SL-4.5%/20天/冷卻12天。Part A Sharpe 0.45/Part B 0.57（min(A,B) 0.45，+28.6% vs COPX-003 的 0.35）。ATR > 1.05 移除慢磨下跌訊號，保留急跌恐慌。ATR > 1.1 min 0.42（Part B 丟失 2 筆好訊號），ATR > 1.15 min 0.42（只影響 Part A）。COPX 日波動 2.25% 超出先前 ATR 有效邊界（≤2.0%），但低門檻（1.05）仍有效——推測有效邊界取決於波動度×門檻互動。COPX-003~006 驗證突破/配對/動量/RSI(2) 均失敗，**COPX-007 為新的全域最優**（7 次實驗、33+ 次嘗試，含均值回歸、波動率自適應、突破、配對交易、動量回檔五大策略類型） |
 | URA | URA-004 | 回檔範圍 + RSI(2) + 2日急跌 | ~4.4/7.5 | 68.2%/66.7% | 回檔 10-20% + RSI(2)<15 + 2日跌幅≤-3%，TP+6.0%/SL-5.5%/20天。Part A Sharpe 0.41/Part B 0.39（A/B gap 0.02，極佳平衡）。vs URA-003：Part A Sharpe +21%（0.34→0.41），min(A,B) +15%（0.34→0.39）。2日跌幅 -3% 是甜蜜點：-2.5% 引入日期偏移（lesson #19）、-4% 搭配 WR(10) 過嚴。20日回看在 URA 嚴格劣化（確認 lesson #54）。URA-005 驗證 BB 擠壓突破（3 次嘗試，Part A Sharpe -0.13~-0.28，Part B -0.37~-0.87）完全無效。URA-006 驗證趨勢跟蹤（SMA金叉+回調，Part A 0.23/Part B 0.03）、動量回調（ROC(20)>10%，Part A -0.21/Part B -0.10）、RS回調（URA vs XLE，Part A -0.28/Part B -0.01）三種順勢策略均失敗——鈾礦 ETF 事件驅動特性使動量訊號不可靠，**已確認為全域最優**（6 次實驗、18+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度五大策略類型） |
 | NVDA | NVDA-004 | BB 擠壓突破（優化） | ~3.4/4.0 | 70.6%/62.5% | BB(20,2) 擠壓（60日 25th 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+8%/SL-7%/20天，冷卻10天。Part A Sharpe 0.50/Part B 0.47（vs NVDA-003 0.40/0.47，Part A +25%），A/B Sharpe 比 1.06:1（近乎完美平衡）。冷卻期 15→10 天捕捉 2 個 Part A 好訊號（Part B 不變）。SL -8% 驗證失敗（虧損更大不救回交易），SMA(20) 驗證失敗（讓通熊市假突破）。NVDA-005 驗證動量回調（ROC+短期回撤+SMA50，3次嘗試，最佳 Part A 0.38/Part B 0.74），Part B 優異但 Part A 受 2021 泡沫期假訊號拖累，min(A,B)=0.36 < 0.47。NVDA-007 驗證 RS 出場優化（TSM-008 方法，3次嘗試：25d/SL-8%/15d，最佳 min 0.46），TP+8%/SL-7%/20d 確認為 RS 策略最佳出場。NVDA-008 驗證 RS 參數探索（10d/40d 回看、SPY 基準，3次嘗試，最佳 min 0.46（Att3: SPY 20d RS≥8%）），20日回看是甜蜜點（10日 Part B 0.17 太噪、40日 Part B 0.03 過擬合），SMH 仍為最佳基準。**已確認為全域最優**（8 次實驗、21+ 次嘗試，含均值回歸、突破、動量回調、相對強度、RS 出場優化、RS 參數探索六大策略類型） |
-| IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2)/SL 優化均失敗。IBIT-003 驗證 BB 擠壓突破（Sharpe -0.29/-1.11）、趨勢動量回檔（-0.07/0.00）、RSI(5) 趨勢回檔（0.00/-0.18）三種非均值回歸策略均失敗，根本瓶頸是 2 年數據不足。**已確認為���域最優**（3 次實驗、9 次嘗試，含均���回歸、突破、趨勢回檔三大策略類型） |
+| IBIT | IBIT-001 | 回檔範圍 + Williams %R | ~5.1/4.0 | 60.0%/75.0% | 回檔 12-22% + WR(10)≤-80 + 冷卻 15 天，TP+5.0%/SL-7.0%/15天。Part A Sharpe 0.15/Part B 0.37（無過擬合）。冷卻 15 天是關鍵（10 天產生 3 連停損），數據僅 2 年（2024-01 起），樣本量有限但 A/B 平衡優秀（1.28:1）。IBIT-002 驗證 RSI(2)/SL 優化均失敗。IBIT-003 驗證 BB 擠壓突破（Sharpe -0.29/-1.11）、趨勢動量回檔（-0.07/0.00）、RSI(5) 趨勢回檔（0.00/-0.18）三種非均值回歸策略均失敗，IBIT-004 驗證 ATR(5)/ATR(20) 波動率自適應（Att1 > 1.05：Part A -3.45，Att2 > 1.0：Part A -0.39，好訊號在低波動回檔被過濾）和 2日急跌 ≤ -5%（Att3：min 0.17 邊際改善但 Part B 訊號日期偏移）。ATR 有效邊界確認為日波動 ≤ 2.25%，根本瓶頸是 2 年數據不足。**已確認為全域最優**（4 次實驗、12 次嘗試，含均值回歸、波動率自適應、突破、趨勢回檔四大策略類型） |
 | TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct 優化） | ~3.4/3.0 | 58.8%/66.7% | BB(20,2) 擠壓（60日 **30th** 百分位，5日內）+ Close > Upper BB + Close > SMA(50)，TP+10%/SL-7%/20天，冷卻10天。Part A Sharpe **0.40**/Part B **0.53**（min 0.40，vs TSLA-005 0.35 +14.3%），A/B 年化訊號比 1.13:1（極佳平衡）。30th 百分位（vs 25th）捕捉更多有效擠壓事件。TSLA-009 Att1 驗證 BB(20,2.5) 寬帶無效（Part A 0.22），Att3 驗證冷卻 15→10 天無影響（訊號天然間隔 >15 天）。TSLA-010 驗證 RSI(5) 均值回歸（SOXL-006 框架移植，3 次嘗試：20日/60日回看、RSI(5)<15/20、DD[-30%,-15%/-18%/-20%]，最佳 Part A 0.11 但 Part B 僅 1 訊號），TSLA 趨勢驅動回撤不適合 mean reversion。TSLA-011 驗證動量回復/回檔後突破（3 次嘗試，最佳 Att3 Part A -0.12/Part B 0.16），非超賣進場 SL 距離不足。**已確認為全域最優**（11 次實驗、37 次嘗試，含均值回歸（含 RSI(5) 變體）、BB 突破、BB 寬帶、趨勢回調、Donchian 突破、Keltner Channel 突破、RS 動量回調、BB Squeeze 金叉、動量回復/回檔後突破十種策略類型） |
 | TLT | TLT-002 | 回檔 + WR + 反轉K線 + 60日跌幅過濾 | ~6.4/8.0 | 46.9%/68.8% | 回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + 60日跌幅≤10%，TP+2.5%/SL-3.5%/20天。Part A Sharpe -0.20/Part B 0.24。**Part A 結構性負**（2022 升息制約）。TLT-004 驗證 BB 擠壓/SMA 交叉，TLT-005 驗證 Donchian 突破/ROC 動量：共 6 次趨勢/動量嘗試全部 Part B 失敗（-0.63~-1.43）。**均值回歸被升息殺、突破被橫盤殺**，TLT 無純技術面解法（12 次實驗、26+ 次嘗試） |
 | XLU | XLU-011 | 波動率自適應均值回歸 | ~1.4/2.0 | 85.7%/75.0% | XLU-003 框架（回檔 3.5-7% + WR(10)≤-80 + ClosePos≥40%）+ ATR(5)/ATR(20) > 1.15，TP+2.5%/SL-4.0%/20天。Part A Sharpe **0.67**/Part B **1.56**（min(A,B) 0.67，+272% vs 前任 XLU-004 的 0.18）。ATR > 1.15 是甜蜜點：比 1.2 多 3 個好訊號（11 vs 8），比 1.1 少 3 個壞訊號。XLU-011 Att2 驗證 ATR > 1.12 引入 Part B 壞訊號（Sharpe 1.56→0.38），Att3 驗證回檔上限 8% 與 7% 等價。**已確認為全域最優**（11 次實驗、43 次嘗試，含均值回歸、突破（BB/KC/寬帶/成交量確認）、趨勢回檔、跨資產配對/過濾、動量回檔、XLU/SPY 配對交易、波動率飆升過濾八種策略類型） |
@@ -227,7 +227,7 @@
 ## 10. 反覆失敗的做法（禁止清單）
 
 <!-- freshness:
-  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, TQQQ-014, TQQQ-015, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SIVR-010, SIVR-011, SIVR-012, SPY-003, SPY-004, SPY-006, DIA-006, DIA-007, DIA-008, DIA-009, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, USO-021, TSM-004, TSM-005, TSM-009, FCX-003, FCX-004, FCX-005, FCX-006, FCX-007, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, COPX-006, NVDA-002, NVDA-004, NVDA-005, NVDA-008, IBIT-002, IWM-004, IWM-005, IWM-006, IWM-007, IWM-009, IWM-010, TLT-002, TLT-004, TLT-005, TSLA-003, TSLA-006, TSLA-007, TSLA-008, TSLA-011, VOO-003, XBI-005, XBI-006, XBI-007, XBI-008, XBI-009, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006, XLU-007, XLU-008, XLU-009]
+  derived_from: [TQQQ-002, TQQQ-003, TQQQ-005, TQQQ-014, TQQQ-015, GLD-005, GLD-009, SIVR-002, SIVR-003, SIVR-005, SIVR-006, SIVR-007, SIVR-008, SIVR-009, SIVR-010, SIVR-011, SIVR-012, SPY-003, SPY-004, SPY-006, DIA-006, DIA-007, DIA-008, DIA-009, USO-002, USO-004, USO-006, USO-007, USO-010, USO-011, USO-012, USO-013, USO-014, USO-015, USO-016, USO-017, USO-018, USO-019, USO-020, USO-021, TSM-004, TSM-005, TSM-009, FCX-003, FCX-004, FCX-005, FCX-006, FCX-007, SOXL-003, SOXL-006, SOXL-007, SOXL-008, SOXL-009, URA-002, URA-004, URA-005, COPX-003, COPX-005, COPX-006, NVDA-002, NVDA-004, NVDA-005, NVDA-008, IBIT-002, IBIT-004, IWM-004, IWM-005, IWM-006, IWM-007, IWM-009, IWM-010, TLT-002, TLT-004, TLT-005, TSLA-003, TSLA-006, TSLA-007, TSLA-008, TSLA-011, VOO-003, XBI-005, XBI-006, XBI-007, XBI-008, XBI-009, XLU-002, XLU-003, XLU-004, XLU-005, XLU-006, XLU-007, XLU-008, XLU-009]
   validated: 2026-04-09
   data_through: 2025-12-31
   confidence: high
@@ -652,3 +652,29 @@ RSI(2) 在指數 ETF（SPY/DIA/IWM/VOO）上表現優異，但對事件驅動的
 **原因**：RSI(2) 偵測 2 天極端超賣（短期均值回歸），對寬基指數有效是因為指數成分多元化使得 2 天急跌通常是短暫恐慌。板塊 ETF（特別是生技、銅礦）的 2 天急跌常由個股事件（FDA 否決、銅價暴跌）驅動，這類事件可能持續數週，短期超賣不等於均值回歸機會。
 
 **規則**：板塊 ETF 和商品 ETF 使用 pullback+WR 的深回檔框架（10-20 日回看），不要套用 RSI(2) 短期超賣框架。RSI(2) 僅適用於寬基市場指數（SPY、DIA、IWM、VOO）。
+
+---
+
+## 18. ATR 波動率自適應過濾有效邊界為日波動 ≤ 2.25%
+
+<!-- freshness:
+  derived_from: [IWM-011, COPX-007, XLU-011, SIVR-012, XBI-009, IBIT-004]
+  validated: 2026-04-09
+  data_through: 2025-12-31
+  confidence: high
+-->
+
+ATR(5)/ATR(20) 波動率飆升過濾在中低波動資產上有效（選擇急跌恐慌訊號、過濾慢磨下跌），但有上限。
+
+| 日波動度 | 資產 | ATR 門檻 | min(A,B) 改善 | 結果 |
+|----------|------|----------|---------------|------|
+| ~1.08% | XLU | > 1.15 | +272%（0.18→0.67）| 極佳：好壞訊號 ATR 比分離清楚 |
+| ~1.5-2.0% | IWM | > 1.1 | +67.7%（0.31→0.52）| 佳：移除慢磨下跌保留急跌 |
+| ~2.25% | COPX | > 1.05 | +28.6%（0.35→0.45）| 有效但需低門檻 |
+| ~2.0% | XBI | > 1.1/1.05 | min 0.16/-0.08 | 失效 |
+| ~2-3% | SIVR | > 1.05 | Part A 0.41 但 Part B 0.12 | 跨期不穩定 |
+| ~3.17% | IBIT | > 1.05/1.0 | Part A -3.45/-0.39 | 完全無效，移除所有贏家 |
+
+**原因**：高波動資產的 ATR(5)/ATR(20) 比率長期波動大，好的均值回歸訊號可能發生在任何 ATR 比率水準。低波動資產（<2%）的急跌恐慌會明確拉高 ATR ratio（短期波動遠超長期），慢磨下跌不會，分離清楚。高波動資產（>2.5%）日常波動已經很大，短期/長期比率的波動更隨機，失去區分力。**IBIT 進一步確認**：Bitcoin 好的均值回歸訊號常發生在「有序回檔」（強趨勢中的 orderly dip，ATR ratio < 1.0），與 IWM/COPX/XLU「急跌恐慌」模式完全相反。
+
+**規則**：ATR 波動率自適應過濾僅適用於日波動 ≤ 2.25% 的資產，門檻隨波動度降低（低波動 1.15-1.2、中波動 1.05-1.1）。日波動 > 2.5% 禁用。
