@@ -48,6 +48,7 @@ on:
           - "SIVR-010: sivr_010_rs_momentum"
           - "SIVR-011: sivr_011_sharp_decline_rsi5"
           - "SIVR-012: sivr_012_vol_adaptive_mr"
+          - "SIVR-013: sivr_013_bb_lower_mr"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
