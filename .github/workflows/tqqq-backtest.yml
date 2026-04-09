@@ -126,6 +126,7 @@ on:
           - "IWM-008: iwm_008_bb_squeeze_optimized"
           - "IWM-009: iwm_009_momentum_rotation"
           - "IWM-010: iwm_010_pullback_rsi2_hybrid"
+          - "IWM-011: iwm_011_vol_adaptive_rsi2"
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "NVDA-003: nvda_003_bb_squeeze_breakout"
