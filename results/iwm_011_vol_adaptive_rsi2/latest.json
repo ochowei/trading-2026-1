@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-04-09T04:46:59.153275"
+    "execution_time": "2026-04-09T04:53:00.303612"
   },
   "part_a": {
     "ticker": "IWM",
-    "total_signals": 15,
-    "wins": 10,
-    "win_rate": 0.6666666666666666,
-    "avg_return_pct": 1.41,
-    "std_return_pct": 3.72,
-    "cumulative_return_pct": 22.19,
-    "avg_holding_days": 5.9,
-    "max_drawdown_pct": -5.54,
-    "profit_factor": 2.13,
-    "sharpe_ratio": 0.38,
-    "sortino_ratio": 0.62,
-    "calmar_ratio": 0.26,
-    "max_consecutive_losses": 2,
-    "target_exits": 10,
-    "stop_loss_exits": 4,
+    "total_signals": 10,
+    "wins": 7,
+    "win_rate": 0.7,
+    "avg_return_pct": 1.79,
+    "std_return_pct": 3.46,
+    "cumulative_return_pct": 18.73,
+    "avg_holding_days": 6.8,
+    "max_drawdown_pct": -4.7,
+    "profit_factor": 2.78,
+    "sharpe_ratio": 0.52,
+    "sortino_ratio": 0.9,
+    "calmar_ratio": 0.38,
+    "max_consecutive_losses": 1,
+    "target_exits": 7,
+    "stop_loss_exits": 2,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
@@ -56,17 +56,6 @@
         "max_drawdown_pct": -1.22
       },
       {
-        "date": "2020-05-13",
-        "entry_date": "2020-05-14",
-        "exit_date": "2020-05-15",
-        "entry": 111.58,
-        "exit": 116.04,
-        "return_pct": 4.0,
-        "holding_days": 1,
-        "exit_type": "target",
-        "max_drawdown_pct": 1.14
-      },
-      {
         "date": "2020-09-21",
         "entry_date": "2020-09-22",
         "exit_date": "2020-10-05",
@@ -100,17 +89,6 @@
         "max_drawdown_pct": -4.67
       },
       {
-        "date": "2022-04-06",
-        "entry_date": "2022-04-07",
-        "exit_date": "2022-04-25",
-        "entry": 190.19,
-        "exit": 181.93,
-        "return_pct": -4.35,
-        "holding_days": 11,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -5.54
-      },
-      {
         "date": "2022-05-10",
         "entry_date": "2022-05-11",
         "exit_date": "2022-05-17",
@@ -122,17 +100,6 @@
         "max_drawdown_pct": -3.65
       },
       {
-        "date": "2022-06-14",
-        "entry_date": "2022-06-15",
-        "exit_date": "2022-06-16",
-        "entry": 163.15,
-        "exit": 156.06,
-        "return_pct": -4.35,
-        "holding_days": 1,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -5.02
-      },
-      {
         "date": "2022-09-23",
         "entry_date": "2022-09-26",
         "exit_date": "2022-10-04",
@@ -142,17 +109,6 @@
         "holding_days": 6,
         "exit_type": "target",
         "max_drawdown_pct": -1.42
-      },
-      {
-        "date": "2022-11-03",
-        "entry_date": "2022-11-04",
-        "exit_date": "2022-11-11",
-        "entry": 171.38,
-        "exit": 178.24,
-        "return_pct": 4.0,
-        "holding_days": 5,
-        "exit_type": "target",
-        "max_drawdown_pct": -2.69
       },
       {
         "date": "2022-12-16",
@@ -175,20 +131,9 @@
         "holding_days": 1,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -4.7
-      },
-      {
-        "date": "2023-07-06",
-        "entry_date": "2023-07-07",
-        "exit_date": "2023-07-12",
-        "entry": 177.22,
-        "exit": 184.31,
-        "return_pct": 4.0,
-        "holding_days": 3,
-        "exit_type": "target",
-        "max_drawdown_pct": 0.54
       }
     ],
-    "filled_count": 15,
+    "filled_count": 10,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -207,21 +152,21 @@
   },
   "part_b": {
     "ticker": "IWM",
-    "total_signals": 6,
-    "wins": 4,
-    "win_rate": 0.6666666666666666,
-    "avg_return_pct": 1.22,
-    "std_return_pct": 3.94,
-    "cumulative_return_pct": 7.03,
-    "avg_holding_days": 3.2,
-    "max_drawdown_pct": -5.01,
-    "profit_factor": 1.84,
-    "sharpe_ratio": 0.31,
-    "sortino_ratio": 0.48,
-    "calmar_ratio": 0.24,
-    "max_consecutive_losses": 2,
-    "target_exits": 4,
-    "stop_loss_exits": 2,
+    "total_signals": 4,
+    "wins": 3,
+    "win_rate": 0.75,
+    "avg_return_pct": 1.91,
+    "std_return_pct": 3.62,
+    "cumulative_return_pct": 7.59,
+    "avg_holding_days": 3.5,
+    "max_drawdown_pct": -4.67,
+    "profit_factor": 2.76,
+    "sharpe_ratio": 0.53,
+    "sortino_ratio": 0.88,
+    "calmar_ratio": 0.41,
+    "max_consecutive_losses": 1,
+    "target_exits": 3,
+    "stop_loss_exits": 1,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
@@ -237,17 +182,6 @@
         "max_drawdown_pct": 1.57
       },
       {
-        "date": "2025-01-10",
-        "entry_date": "2025-01-13",
-        "exit_date": "2025-01-15",
-        "entry": 211.95,
-        "exit": 220.43,
-        "return_pct": 4.0,
-        "holding_days": 2,
-        "exit_type": "target",
-        "max_drawdown_pct": 1.17
-      },
-      {
         "date": "2025-03-04",
         "entry_date": "2025-03-05",
         "exit_date": "2025-03-13",
@@ -259,26 +193,15 @@
         "max_drawdown_pct": -4.67
       },
       {
-        "date": "2025-03-31",
-        "entry_date": "2025-04-01",
-        "exit_date": "2025-04-03",
-        "entry": 197.07,
-        "exit": 188.5,
-        "return_pct": -4.35,
-        "holding_days": 2,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -5.01
-      },
-      {
-        "date": "2025-05-22",
-        "entry_date": "2025-05-23",
-        "exit_date": "2025-05-28",
-        "entry": 197.85,
-        "exit": 205.76,
+        "date": "2025-04-04",
+        "entry_date": "2025-04-07",
+        "exit_date": "2025-04-08",
+        "entry": 172.63,
+        "exit": 179.54,
         "return_pct": 4.0,
-        "holding_days": 2,
+        "holding_days": 1,
         "exit_type": "target",
-        "max_drawdown_pct": 2.09
+        "max_drawdown_pct": -1.23
       },
       {
         "date": "2025-08-01",
@@ -292,7 +215,7 @@
         "max_drawdown_pct": 0.68
       }
     ],
-    "filled_count": 6,
+    "filled_count": 4,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
