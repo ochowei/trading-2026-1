@@ -76,6 +76,7 @@ on:
           - "SOXL-008: soxl_008_wr_oscillator"
           - "SOXL-009: soxl_009_bb_squeeze_breakout"
           - "SOXL-010: soxl_010_sector_rs_momentum"
+          - "SOXL-011: soxl_011_soxx_atr_adaptive"
           - "USO-001: uso_001_pullback_wr"
           - "USO-005: uso_005_symmetric_tight"
           - "USO-007: uso_007_sharp_pullback"
