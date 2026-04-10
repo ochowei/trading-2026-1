@@ -10,7 +10,7 @@ Follow these steps IN ORDER. Stop early if you have enough context.
 
 ### Step 1: Read cross-asset lessons
 
-Read `.agents/context/cross_asset_lessons.md` in full. Pay special attention to:
+Read `.agents/context/cross_asset_lessons.md` (精簡規則版) in full. Pay special attention to:
 - **Section 10** (反覆失敗的做法 / Forbidden approaches) — these are HARD RULES
 - **Section 11** (新資產實驗啟動流程 / New asset launch procedure)
 - **Section 7** (波動率縮放 / Volatility scaling law)
@@ -86,4 +86,4 @@ Produce a summary with ALL of these sections:
 
 - Do NOT create any files. This is research only.
 - Do NOT read full experiment source code unless absolutely needed.
-- Follow the CLAUDE.md reading order: cross_asset_lessons → AI_CONTEXT → parameter table → (only if needed) individual experiment code.
+- Follow the CLAUDE.md reading order: cross_asset_lessons（精簡規則版）→ AI_CONTEXT → parameter table → cross_asset_evidence（特定段落）→ (only if needed) individual experiment code.
