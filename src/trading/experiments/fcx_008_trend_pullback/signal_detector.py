@@ -1,12 +1,12 @@
 """
-FCX-008 Att2 訊號偵測器：波動率自適應極端超賣均值回歸
-FCX-008 Att2 Signal Detector: Volatility-Adaptive Extreme Oversold
+FCX-008 Att3 訊號偵測器：2日急跌 + 極端超賣均值回歸
+FCX-008 Att3 Signal Detector: Sharp Drop + Extreme Oversold
 
 進場條件（全部滿足）：
 1. 收盤價低於 60 日高點 >= 18%（深度回撤，同 FCX-001）
 2. RSI(10) < 28（極端超賣，同 FCX-001）
 3. 收盤價低於 SMA(50) 超過 8%（乖離過大，同 FCX-001）
-4. ATR(5)/ATR(20) > 1.05（波動率飆升，過濾慢磨下跌，來自 COPX-007）
+4. 2日價格跌幅 <= -5%（急跌確認，過濾慢磨下跌）
 5. 冷卻期 15 個交易日
 """
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class FCX008SignalDetector(BaseSignalDetector):
-    """FCX-008 波動率自適應極端超賣訊號偵測器"""
+    """FCX-008 2日急跌 + 極端超賣訊號偵測器"""
 
     def __init__(self, config: FCX008Config):
         self.config = config
@@ -51,19 +51,8 @@ class FCX008SignalDetector(BaseSignalDetector):
         df["SMA"] = df["Close"].rolling(window=self.config.sma_period).mean()
         df["SMA_Deviation"] = (df["Close"] - df["SMA"]) / df["SMA"]
 
-        # 4. ATR ratio: short-term vs long-term volatility
-        tr = pd.concat(
-            [
-                df["High"] - df["Low"],
-                (df["High"] - df["Close"].shift(1)).abs(),
-                (df["Low"] - df["Close"].shift(1)).abs(),
-            ],
-            axis=1,
-        ).max(axis=1)
-
-        atr_short = tr.rolling(self.config.atr_short_period).mean()
-        atr_long = tr.rolling(self.config.atr_long_period).mean()
-        df["ATR_Ratio"] = atr_short / atr_long
+        # 4. 2日價格跌幅
+        df["Two_Day_Drop"] = df["Close"].pct_change(2)
 
         return df
 
@@ -75,10 +64,10 @@ class FCX008SignalDetector(BaseSignalDetector):
         cond_rsi = df["RSI"] < self.config.rsi_threshold
         cond_sma_dev = df["SMA_Deviation"] <= self.config.sma_deviation_threshold
 
-        # 新增：ATR 波動率飆升過濾
-        cond_atr = df["ATR_Ratio"] > self.config.atr_ratio_threshold
+        # 新增：2日急跌過濾
+        cond_drop = df["Two_Day_Drop"] <= self.config.two_day_drop_threshold
 
-        df["Signal"] = cond_drawdown & cond_rsi & cond_sma_dev & cond_atr
+        df["Signal"] = cond_drawdown & cond_rsi & cond_sma_dev & cond_drop
 
         # 冷卻期
         signal_indices = df.index[df["Signal"]].tolist()
@@ -97,5 +86,5 @@ class FCX008SignalDetector(BaseSignalDetector):
             df.loc[suppressed, "Signal"] = False
 
         signal_count = df["Signal"].sum()
-        logger.info("FCX-008: Detected %d vol-adaptive extreme oversold signals", signal_count)
+        logger.info("FCX-008: Detected %d sharp-drop extreme oversold signals", signal_count)
         return df

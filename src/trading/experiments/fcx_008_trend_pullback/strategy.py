@@ -1,8 +1,8 @@
 """
-FCX-008: 波動率自適應極端超賣均值回歸策略
-FCX Volatility-Adaptive Extreme Oversold Mean Reversion Strategy
+FCX-008: 2日急跌 + 極端超賣均值回歸策略
+FCX Sharp Drop + Extreme Oversold Mean Reversion Strategy
 
-Att2: 結合 FCX-001 進場架構 + COPX-007 ATR 波動率過濾。
+Att3: FCX-001 進場架構 + 2日急跌 <= -5% 過濾（USO-013 風格）。
 """
 
 from trading.core.base_config import ExperimentConfig
@@ -18,7 +18,7 @@ from trading.experiments.fcx_008_trend_pullback.signal_detector import (
 
 
 class FCXTrendPullbackStrategy(ExecutionModelStrategy):
-    """FCX-008：波動率自適應極端超賣均值回歸策略（含成交模型）"""
+    """FCX-008：2日急跌 + 極端超賣均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
 
@@ -39,9 +39,6 @@ class FCXTrendPullbackStrategy(ExecutionModelStrategy):
                 f"  SMA 乖離閾值 (SMA dev): Close / SMA({config.sma_period})"
                 f" - 1 <= {config.sma_deviation_threshold:.0%}"
             )
-            print(
-                f"  ATR 過濾 (Vol filter): ATR({config.atr_short_period})"
-                f"/ATR({config.atr_long_period}) > {config.atr_ratio_threshold}"
-            )
+            print(f"  2日急跌 (2-day drop): <= {config.two_day_drop_threshold:.0%}")
             print(f"  冷卻期 (Cooldown): {config.cooldown_days} 交易日")
         super()._print_strategy_params(config)

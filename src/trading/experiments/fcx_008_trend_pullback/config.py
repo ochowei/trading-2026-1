@@ -1,11 +1,12 @@
 """
-FCX-008: 波動率自適應極端超賣均值回歸配置
-FCX Volatility-Adaptive Extreme Oversold Mean Reversion Configuration
+FCX-008: 2日急跌 + 極端超賣均值回歸配置
+FCX Sharp Drop + Extreme Oversold Mean Reversion Configuration
 
 Att1: 趨勢跟蹤 — FAILED (Part A -0.00, Part B -0.63)
-Att2: FCX-001 進場架構 + ATR(5)/ATR(20) > 1.05 波動率過濾
-  假說：COPX-007 的 ATR 過濾在 COPX（日波動 2.25%）上成功（+28.6%），
-  移植至 FCX（日波動 2-4%），預期過濾掉慢磨下跌型假訊號。
+Att2: FCX-001 + ATR > 1.05 — Part B 改善但 Part A 嚴重退化 (min 0.25)
+Att3: FCX-001 + 2日急跌 <= -5%
+  假說：USO-013 的 2日急跌過濾在 USO 上極為成功（Sharpe 0.26/0.82），
+  比 ATR 更直接偵測恐慌拋售。FCX 日波動 2-4%，-5% 門檻約 0.8-1.3σ/日。
 """
 
 from dataclasses import dataclass
@@ -15,7 +16,7 @@ from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class FCX008Config(ExperimentConfig):
-    """FCX-008 波動率自適應極端超賣策略參數"""
+    """FCX-008 2日急���極端超賣策略參數"""
 
     # 進場指標（同 FCX-001）
     drawdown_lookback: int = 60
@@ -26,17 +27,15 @@ class FCX008Config(ExperimentConfig):
     sma_deviation_threshold: float = -0.08  # SMA(50) 乖離 <= -8%
     cooldown_days: int = 15
 
-    # 波動率自適應過濾器（新增，來自 COPX-007）
-    atr_short_period: int = 5
-    atr_long_period: int = 20
-    atr_ratio_threshold: float = 1.05  # ATR(5)/ATR(20) > 1.05
+    # 2日急跌過濾器（新增，來自 USO-013 框架）
+    two_day_drop_threshold: float = -0.05  # 2日跌幅 <= -5%
 
 
 def create_default_config() -> FCX008Config:
     return FCX008Config(
         name="fcx_008_trend_pullback",
         experiment_id="FCX-008",
-        display_name="FCX Volatility-Adaptive Extreme Oversold",
+        display_name="FCX Sharp Drop + Extreme Oversold",
         tickers=["FCX"],
         data_start="2018-01-01",
         profit_target=0.10,  # +10%（同 FCX-001）
