@@ -73,13 +73,17 @@ Read the `<!-- AI_CONTEXT_START ... AI_CONTEXT_END -->` block and update:
 5. Update `last_validated` to today's date
 6. Update `data_through` if the data range has changed
 
-### Step 5: Update cross_asset_lessons.md (if applicable)
+### Step 5: Update cross_asset_lessons.md + cross_asset_evidence.md (if applicable)
 
-Only update `.agents/context/cross_asset_lessons.md` if the experiment results reveal:
+Only update if the experiment results reveal:
 - A **new** cross-asset lesson (novel finding not covered by existing lessons)
 - A **contradiction** to an existing lesson (requires updating the lesson)
 - A **confirmation** of an existing lesson (update `derived_from` and `validated` date)
-- A **cross-asset pattern from 漸變性評估** — e.g., a strategy type consistently passes/fails gradual assessment across multiple assets, or a parameter choice (like trailing stop) consistently causes regime instability. Update the relevant lesson's evidence and `derived_from` list
+- A **cross-asset pattern from 漸變性評估** — e.g., a strategy type consistently passes/fails gradual assessment across multiple assets, or a parameter choice (like trailing stop) consistently causes regime instability
+
+When updating:
+- Update the **rule** in `.agents/context/cross_asset_lessons.md` (精簡規則版)
+- Update the **detailed evidence** in `.agents/context/cross_asset_evidence.md` (表格、原因分析)
 
 If no new lessons, skip this step.
 
