@@ -8,6 +8,11 @@ SIVR Donchian 通道突破策略配置 (SIVR-014)
 - Donchian 使用固定回看期高點（價格層級）
 - BB Squeeze 使用波動率壓縮（統計層級）
 - 回檔要求確保突破來自恢復而非持續上漲
+
+三次嘗試結果（最佳 Att1: min(A,B) Sharpe 0.10，不及 SIVR-005 的 0.22）：
+- Att1: Donchian(20)+SMA(50)+5%回檔，TP+5%/SL-5%/20d → 0.10/0.56
+- Att2: 同上但 TP+3.5%/SL-3.5%/15d+7%回檔 → -0.46/-0.02（緊出場殺死突破策略）
+- Att3: Att1+SMA斜率過濾 → -0.16/0.19（過濾移除好訊號）
 """
 
 from dataclasses import dataclass
@@ -21,9 +26,8 @@ class SIVRDonchianBreakoutConfig(ExperimentConfig):
 
     donchian_period: int = 20
     sma_period: int = 50
-    pullback_threshold: float = 0.05  # 突破前需有 ≥5% 回檔（Att3: 回復 Att1 值）
+    pullback_threshold: float = 0.05  # 突破前需有 ≥5% 回檔
     pullback_lookback: int = 10  # 回檔發生在最近 10 日內
-    sma_slope_lookback: int = 20  # SMA 斜率回看期
     cooldown_days: int = 10
 
 
@@ -34,7 +38,7 @@ def create_default_config() -> SIVRDonchianBreakoutConfig:
         display_name="SIVR Donchian Channel Breakout",
         tickers=["SIVR"],
         data_start="2010-01-01",
-        profit_target=0.05,  # Att3: 回復 Att1 值
-        stop_loss=-0.05,  # Att3: 回復 Att1 值
-        holding_days=20,  # Att3: 回復 Att1 值
+        profit_target=0.05,
+        stop_loss=-0.05,
+        holding_days=20,
     )
