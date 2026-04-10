@@ -64,6 +64,8 @@ on:
           - "EEM-001: eem_001_rsi2_mean_reversion"
           - "EEM-002: eem_002_vol_adaptive_rsi2"
           - "EEM-003: eem_003_vol_adaptive_deep_decline"
+          - "EEM-004: eem_004_pullback_wr"
+          - "EEM-005: eem_005_bb_squeeze_breakout"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
