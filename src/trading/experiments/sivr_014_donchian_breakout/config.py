@@ -21,7 +21,7 @@ class SIVRDonchianBreakoutConfig(ExperimentConfig):
 
     donchian_period: int = 20
     sma_period: int = 50
-    pullback_threshold: float = 0.05  # 突破前需有 ≥5% 回檔
+    pullback_threshold: float = 0.07  # 突破前需有 ≥7% 回檔（Att2: 更深回檔 = 更強突破）
     pullback_lookback: int = 10  # 回檔發生在最近 10 日內
     cooldown_days: int = 10
 
@@ -33,7 +33,7 @@ def create_default_config() -> SIVRDonchianBreakoutConfig:
         display_name="SIVR Donchian Channel Breakout",
         tickers=["SIVR"],
         data_start="2010-01-01",
-        profit_target=0.05,
-        stop_loss=-0.05,
-        holding_days=20,
+        profit_target=0.035,  # Att2: SIVR 最佳出場參數
+        stop_loss=-0.035,  # Att2: ±3.5% 對稱風報比
+        holding_days=15,  # Att2: 15d（同 SIVR-005）
     )
