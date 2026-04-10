@@ -1,0 +1,229 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-10T23:02:21.178613"
+  },
+  "part_a": {
+    "ticker": "EEM",
+    "total_signals": 6,
+    "wins": 1,
+    "win_rate": 0.16666666666666666,
+    "avg_return_pct": -2.08,
+    "std_return_pct": 2.27,
+    "cumulative_return_pct": -12.01,
+    "avg_holding_days": 4.5,
+    "max_drawdown_pct": -3.74,
+    "profit_factor": 0.19,
+    "sharpe_ratio": -0.92,
+    "sortino_ratio": -0.74,
+    "calmar_ratio": -0.56,
+    "max_consecutive_losses": 3,
+    "target_exits": 1,
+    "stop_loss_exits": 5,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-05-09",
+        "entry_date": "2019-05-10",
+        "exit_date": "2019-05-13",
+        "entry": 35.64,
+        "exit": 34.54,
+        "return_pct": -3.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.61
+      },
+      {
+        "date": "2019-07-31",
+        "entry_date": "2019-08-01",
+        "exit_date": "2019-08-02",
+        "entry": 35.86,
+        "exit": 34.74,
+        "return_pct": -3.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.33
+      },
+      {
+        "date": "2020-01-31",
+        "entry_date": "2020-02-03",
+        "exit_date": "2020-02-04",
+        "entry": 37.05,
+        "exit": 38.16,
+        "return_pct": 3.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 3.16
+      },
+      {
+        "date": "2021-02-26",
+        "entry_date": "2021-03-01",
+        "exit_date": "2021-03-04",
+        "entry": 48.83,
+        "exit": 47.32,
+        "return_pct": -3.1,
+        "holding_days": 3,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.47
+      },
+      {
+        "date": "2021-07-08",
+        "entry_date": "2021-07-09",
+        "exit_date": "2021-07-26",
+        "entry": 47.62,
+        "exit": 46.15,
+        "return_pct": -3.1,
+        "holding_days": 11,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.72
+      },
+      {
+        "date": "2023-02-06",
+        "entry_date": "2023-02-07",
+        "exit_date": "2023-02-22",
+        "entry": 37.5,
+        "exit": 36.34,
+        "return_pct": -3.1,
+        "holding_days": 10,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.74
+      }
+    ],
+    "filled_count": 6,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "EEM",
+    "total_signals": 3,
+    "wins": 3,
+    "win_rate": 1.0,
+    "avg_return_pct": 3.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 9.27,
+    "avg_holding_days": 7.0,
+    "max_drawdown_pct": -1.03,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 2.91,
+    "max_consecutive_losses": 0,
+    "target_exits": 3,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-04-16",
+        "entry_date": "2024-04-17",
+        "exit_date": "2024-04-29",
+        "entry": 38.14,
+        "exit": 39.28,
+        "return_pct": 3.0,
+        "holding_days": 8,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.03
+      },
+      {
+        "date": "2024-05-30",
+        "entry_date": "2024-05-31",
+        "exit_date": "2024-06-18",
+        "entry": 39.9,
+        "exit": 41.1,
+        "return_pct": 3.0,
+        "holding_days": 12,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.03
+      },
+      {
+        "date": "2024-08-05",
+        "entry_date": "2024-08-06",
+        "exit_date": "2024-08-07",
+        "entry": 38.72,
+        "exit": 39.88,
+        "return_pct": 3.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.39
+      }
+    ],
+    "filled_count": 3,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "EEM",
+    "total_signals": 1,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": -3.1,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": -3.1,
+    "avg_holding_days": 2.0,
+    "max_drawdown_pct": -3.5,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": -1.0,
+    "calmar_ratio": -0.89,
+    "max_consecutive_losses": 1,
+    "target_exits": 0,
+    "stop_loss_exits": 1,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2026-03-03",
+        "entry_date": "2026-03-04",
+        "exit_date": "2026-03-06",
+        "entry": 58.61,
+        "exit": 56.79,
+        "return_pct": -3.1,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.5
+      }
+    ],
+    "filled_count": 1,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-10"
+    }
+  }
+}
