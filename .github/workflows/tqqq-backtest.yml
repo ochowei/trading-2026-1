@@ -62,6 +62,8 @@ on:
           - "DIA-009: dia_009_pairs_spy"
           - "DIA-010: dia_010_rsi5_trend_pullback"
           - "EEM-001: eem_001_rsi2_mean_reversion"
+          - "EEM-002: eem_002_vol_adaptive_rsi2"
+          - "EEM-003: eem_003_vol_adaptive_deep_decline"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"

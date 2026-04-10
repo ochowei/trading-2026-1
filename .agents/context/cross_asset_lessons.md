@@ -164,6 +164,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | IBIT | IBIT-001 | 回檔範圍+WR | 0.15 | 4 次實驗 ✓ |
 | TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 12 次實驗 ✓ |
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
+| EEM | EEM-003 Att2 | 波動率自適應 RSI(2)+延長冷卻 | 0.06 | 3 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
