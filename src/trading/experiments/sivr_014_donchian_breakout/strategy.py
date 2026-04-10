@@ -36,5 +36,6 @@ class SIVRDonchianBreakoutStrategy(ExecutionModelStrategy):
                 f"  回檔要求: 近 {config.pullback_lookback} 日內"
                 f" ≥ {config.pullback_threshold:.1%} 回檔"
             )
+            print(f"  SMA 斜率: SMA({config.sma_period}) 需 {config.sma_slope_lookback} 日上升")
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)

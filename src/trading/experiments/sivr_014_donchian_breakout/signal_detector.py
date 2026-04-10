@@ -1,11 +1,13 @@
 """
 SIVR Donchian 通道突破訊號偵測器 (SIVR-014)
 
-進場條件（三條件同時成立）：
+進場條件（四條件同時成立）：
 1. Close > 20 日最高 High（Donchian 通道上軌突破）
 2. Close > SMA(50)（趨勢確認）
 3. 最近 10 日內曾有 Close 相對 20 日高點回檔 ≥ 5%
    （確保突破來自回檔後恢復，非持續磨頂）
+4. SMA(50) 上升中（SMA(50) > 20 日前的 SMA(50)）
+   （Att3: 過濾熊市中 SMA 下行時的假突破）
 """
 
 import logging
@@ -45,6 +47,10 @@ class SIVRDonchianBreakoutSignalDetector(BaseSignalDetector):
         threshold = -self.config.pullback_threshold
         df["Had_Pullback"] = df["Pullback_Depth"].rolling(lookback).min() <= threshold
 
+        # SMA 斜率：SMA(50) 是否在上升
+        slope_lb = self.config.sma_slope_lookback
+        df["SMA_Rising"] = df["SMA"] > df["SMA"].shift(slope_lb)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -59,7 +65,10 @@ class SIVRDonchianBreakoutSignalDetector(BaseSignalDetector):
         # 條件三：近期曾有回檔
         cond_pullback = df["Had_Pullback"]
 
-        df["Signal"] = cond_breakout & cond_trend & cond_pullback
+        # 條件四：SMA(50) 上升中（Att3: 過濾熊市假突破）
+        cond_sma_rising = df["SMA_Rising"]
+
+        df["Signal"] = cond_breakout & cond_trend & cond_pullback & cond_sma_rising
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()
