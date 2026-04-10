@@ -164,7 +164,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | IBIT | IBIT-001 | 回檔範圍+WR | 0.15 | 4 次實驗 ✓ |
 | TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 12 次實驗 ✓ |
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
-| EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 5 次實驗 ✓ |
+| EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 6 次實驗 ✓ |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
@@ -225,6 +225,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 34. **Close Position Filter 不可跨資產通用** — GLD/IWM/XBI 有效但 USO/SIVR/FCX 反效果
 35. **板塊指數確認（SMH）對個股（TSM）** — 弱化版過濾器只移除好訊號
 36. **跨資產相對表現過濾在 RSI(2) 框架** — 極端超賣時市場同步下跌，無區分力
+36b. **廣基 ETF RS 動量（EEM vs SPY）** — 宏觀/政治事件（關稅、貿易戰、中國政策）驅動而非結構性因素，三次嘗試 Part B 均為負值（EEM-006 驗證）
 37. **跨資產利率指標（TLT）過濾利率敏感 ETF（XLU）** — 響應速度和方式不同
 38. **回檔回看窗口不可跨資產移植** — 20日在 GLD/COPX 有效，在 SIVR/URA 失敗
 
@@ -384,10 +385,10 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 20. 跨資產相關性配對策略的結構性風險
 <!-- freshness:
-  derived_from: [XLU-005,COPX-006,SIVR-009,TSM-009,FCX-006,DIA-009]
-  validated: 2026-04-07
+  derived_from: [XLU-005,COPX-006,SIVR-009,TSM-009,FCX-006,DIA-009,EEM-006]
+  validated: 2026-04-10
   data_through: 2025-12-31
   confidence: high
 -->
 
-跨資產相關性可能隨宏觀環境改變而失效（regime change）。Part A 正 + Part B 負 Sharpe 是相關性崩潰的典型特徵。個股 vs 板塊 ETF RS 策略僅在個股有持續性結構優勢（如 TSM 先進製程護城河）時有效，商品生產者（FCX）的超額表現由短期事件驅動，無持續性。
+跨資產相關性可能隨宏觀環境改變而失效（regime change）。Part A 正 + Part B 負 Sharpe 是相關性崩潰的典型特徵。個股 vs 板塊 ETF RS 策略僅在個股有持續性結構優勢（如 TSM 先進製程護城河）時有效，商品生產者（FCX）的超額表現由短期事件驅動，無持續性。廣基 ETF RS（如 EEM vs SPY）受宏觀/政治事件（關稅、貿易戰）驅動，三次嘗試 Part B 均為負值。

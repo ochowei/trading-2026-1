@@ -66,6 +66,7 @@ on:
           - "EEM-003: eem_003_vol_adaptive_deep_decline"
           - "EEM-004: eem_004_pullback_wr"
           - "EEM-005: eem_005_bb_squeeze_breakout"
+          - "EEM-006: eem_006_rs_momentum_pullback"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
