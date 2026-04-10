@@ -68,6 +68,7 @@ on:
           - "FCX-005: fcx_005_momentum_pullback"
           - "FCX-006: fcx_006_relative_strength"
           - "FCX-007: fcx_007_donchian_breakout"
+          - "FCX-008: fcx_008_trend_pullback"
           - "SOXL-001: soxl_001_extreme_oversold"
           - "SOXL-002: soxl_002_deep_oversold"
           - "SOXL-003: soxl_003_wide_sl"
