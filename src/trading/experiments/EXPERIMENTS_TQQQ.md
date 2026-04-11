@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-04
+  last_validated: 2026-04-11
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -15,6 +15,10 @@
 - 過嚴的 VIX 過濾（VIX ≥ 25）：TQQQ-004 導致訊號數過少，錯失機會
 - 出場疊加額外過濾器（QQQ RSI < 35 加上短停利）：TQQQ-013 證明訊號數大幅降低，表現落後。**滾動窗口分析（2026-03-29）：** QQQ 數據不可用時退化為 TQQQ-010（數值完全相同），進一步確認 QQQ RSI 過濾不應納入
 - VIX 自適應出場（VIX 區間動態調整 TP/SL）：TQQQ-014 三次嘗試均失敗。原因：(1) 絕大多數 TQQQ 恐慌訊號的 VIX < 30，自適應機制幾乎不啟動；(2) 放寬 TP（+9%）導致原本可達標的交易錯過目標轉為停損；(3) 放寬 SL（-10%）增加虧損但不挽救交易。固定 TP +7%/SL -8% 已是甜蜜點
+- Pullback+WR 均值回歸（回檔 18-30% + WR(10) ≤ -80 + 成交量 1.5x）：TQQQ-016 三次嘗試。最佳 Att3 Part A Sharpe 0.22 仍低於 TQQQ-010 的 0.36。Pullback+WR 捕獲不同回檔事件（2022 年走勢型回檔），但精準度不如 DD-15%+RSI+Volume 的極端恐慌框架
+- QQQ BB Squeeze Breakout → Trade TQQQ：QQQ 突破訊號在 TQQQ 幅度不足，Part B 零達標（TQQQ-015 Att1/Att2）
+- QQQ 動量策略 ROC(10)>5% → Trade TQQQ：A/B 平衡好但 Sharpe ~0.17 遠低於均值回歸（TQQQ-015 Att3）
+- **趨勢/突破/動量策略在 3x 槓桿 ETF 上無效**：高日波動使停損過寬但突破/動量訊號幅度不足（與 SOXL-009 一致）
 
 **已掃描的參數空間：**
 - 出場目標（TP）：+5%, +6%, +7%, +8%, +9%, +12% → +7% 最佳
@@ -22,28 +26,29 @@
 - 持倉天數：7, 8, 10, 12 天 → 10 天最佳
 - 進場 Drawdown：-12%, -13%, -15% → -15% 最佳（需極端恐慌）
 - VIX 自適應出場：3 種 VIX 分層 / 2 層（VIX ≥ 35）/ 2 層（VIX ≥ 30, 不放寬 SL）→ 全部劣化或平手
+- Pullback+WR 進場：10d/20d lookback, 回檔 18-40%, WR -80, ± volume filter → 全部低於 TQQQ-010
+
+**TQQQ-016 實驗摘要（2026-04-11，Pullback+WR 均值回歸，3 次嘗試均低於基準）：**
+- **Att1**（10d pullback 20-35% + WR-80, cd10）：Part A Sharpe -0.17 / Part B 0.66。2022 連續觸發 7+ 停損
+- **Att2**（20d pullback 25-40% + WR-80, cd15）：Part A Sharpe 0.13 / Part B 0.28。太嚴格，Part B 僅 3 訊號
+- **Att3**（10d pullback 18-30% + WR-80 + Volume 1.5x, cd10）：Part A Sharpe 0.22 / Part B 0.00*（4 訊號 100% WR）。最佳嘗試，Volume filter 有效抑制 2022 連續觸發，但仍低於 TQQQ-010
 
 **TQQQ-015 實驗摘要（2026-04-04，趨勢/動量策略，3 次嘗試均失敗）：**
 - **Att1**（QQQ BB Squeeze Breakout, TP+12%/SL-8%/20d）：Part A Sharpe 0.25 / Part B -0.28。TP +12% 太高，Part B 零達標
 - **Att2**（QQQ BB Squeeze Breakout, TP+8%/SL-8%/15d）：Part A Sharpe 0.54 / Part B -0.10。QQQ 突破訊號在 TQQQ 幅度不足（Part B 零達標，最高 +3.68%）
 - **Att3**（QQQ Momentum ROC(10)>5%, TP+10%/SL-10%/15d）：Part A Sharpe 0.19 / Part B 0.17。A/B 平衡極佳（gap 0.02），Part B +21.41%，但 min Sharpe 0.17 遠低於 TQQQ-010 的 0.36
 
-**已證明無效（禁止重複嘗試）：**（更新）
-原有項目加上：
-- QQQ BB Squeeze Breakout → Trade TQQQ：QQQ 突破訊號在 TQQQ 幅度不足，Part B 零達標（TQQQ-015 Att1/Att2）
-- QQQ 動量策略 ROC(10)>5% → Trade TQQQ：A/B 平衡好但 Sharpe ~0.17 遠低於均值回歸（TQQQ-015 Att3）
-- **趨勢/突破/動量策略在 3x 槓桿 ETF 上無效**：高日波動使停損過寬但突破/動量訊號幅度不足（與 SOXL-009 一致）
-
 **尚未嘗試的方向（可探索，但預期改善極低）：**
 - 分批進場/出場（如達到 +5% 賣出一半，剩餘追蹤）
 - 結合大盤均線（例如 SPY SMA200）確認多空趨勢背景（但 cross-asset lesson #5 警告均值回歸+趨勢過濾=災難）
-- **TQQQ-010 已確認為全域最優**（15 次實驗、含均值回歸和趨勢/動量/突破三大策略類型）
+- **TQQQ-010 已確認為全域最優**（16 次實驗、含均值回歸×2種框架 和 趨勢/動量/突破三大策略類型）
 
 **關鍵資產特性：**
 - 高槓桿 (3x)，波動極大，不適合過緊的停損或追蹤停利
 - "極端恐慌抄底" (Drawdown -15%) 是核心獲利來源，不可輕易放寬
 - 隔日開盤進場（成交模型）會顯著影響 In-Sample 報酬（因濾除未來資訊），但更能反映真實表現
 - TQQQ 恐慌訊號大多在 VIX < 30 時觸發，VIX 自適應調整的有效空間極為有限
+- Pullback+WR 框架在其他資產成功（GLD, SIVR, XBI 等），但在 TQQQ 不如極端恐慌框架（DD+RSI+Volume）
 <!-- AI_CONTEXT_END -->
 
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
@@ -449,3 +454,80 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 3. **均值回歸的結構性優勢**：極端恐慌（DD -15%）創造的 7%+ 反彈是唯一能克服高波動 SL 需求的訊號類型
 
 TQQQ-010 確認為全域最優（15 次實驗，含均值回歸和趨勢/動量/突破三大策略類型）。
+
+---
+
+## TQQQ-016: 回檔 + Williams %R 均值回歸 (Pullback + WR Mean Reversion)
+
+**目標**：嘗試跨資產最成功的 Pullback+WR 框架（GLD-006, SIVR-003, COPX-001, XBI-001, URA-001, IBIT-001），測試是否能在 TQQQ 超越 TQQQ-010 的極端恐慌框架。
+
+**進場條件（全部滿足）：**
+1. 收盤價相對 N 日最高價回檔達門檻範圍
+2. Williams %R(10) <= -80（超賣確認）
+3. 成交量 > 1.5x 20 日均量（恐慌賣壓確認，Att3 新增）
+4. 冷卻期 N 個交易日
+
+**出場參數：** TP +7.0% / SL -8.0% / 持倉 10 天（沿用 TQQQ-010 已驗證最佳出場）
+
+**成交模型：** next_open_market 進場，limit_order_day TP，stop_market_gtc SL，悲觀認定，滑價 0.1%
+
+### 迭代記錄
+
+#### Att1: 10d Pullback 20-35% + WR(10) ≤ -80, Cooldown 10d
+
+**參數：** pullback_lookback=10, pullback_threshold=-0.20, pullback_upper=-0.35, wr_period=10, wr_threshold=-80, cooldown_days=10, TP +7%/SL -8%/10d
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 14 (2.8/yr) | 6 (3.0/yr) |
+| WR | 21.4% | 83.3% |
+| Sharpe | **-0.17** | 0.66 |
+| 累計 | -21.6% | +27.3% |
+
+**失敗原因**：2022 年持續下跌中 10 日回檔反覆觸發，產生 7+ 連續停損。Part A Sharpe -0.17 完全不可接受。A/B gap 極大，過度擬合 Part B。
+
+#### Att2: 20d Pullback 25-40% + WR(10) ≤ -80, Cooldown 15d
+
+**改動**：拉長 lookback 至 20 天、提高回檔門檻至 25%、擴大上限至 40%、冷卻期延長至 15 天。
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 10 (2.0/yr) | 3 (1.5/yr) |
+| WR | 50.0% | 66.7% |
+| Sharpe | 0.13 | 0.28 |
+| 累計 | +5.3% | +7.3% |
+
+**分析**：Part A 大幅改善（-0.17→0.13），但條件過嚴導致 Part B 僅 3 訊號，統計信心不足。訊號比 2:1（10:3）偏高但可接受。整體 Sharpe 偏低。
+
+#### Att3: 10d Pullback 18-30% + WR(10) ≤ -80 + Volume 1.5x, Cooldown 10d（最佳嘗試）
+
+**改動**：回到 10 日 lookback，放寬回檔門檻至 18%（降低門檻捕獲更多機會），收窄上限至 30%（過濾極端崩盤），新增成交量 > 1.5x 均量過濾（借鑒 TQQQ-010 的恐慌確認邏輯）。
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 11 (2.2/yr) | 4 (2.0/yr) |
+| WR | 45.5% | 100.0% |
+| Sharpe | **0.22** | 0.00* |
+| 累計 | +5.7% | +28.0% |
+
+*Part B Sharpe 顯示 0.00 因為 Part B 僅 4 筆交易全部達標（WR 100%），變異為零。
+
+**分析**：Volume filter 有效抑制 2022 連續觸發（Part A 停損從 11→5 筆），Part A Sharpe 從 -0.17 提升至 0.22。Part B 4 筆全部達標（100% WR），表現優異。但 Part A Sharpe 0.22 仍低於 TQQQ-010 的 0.36。
+
+### 對比 TQQQ-010 基準
+
+| 策略 | Part A Sharpe | Part B Sharpe | min(A,B) | 備註 |
+|------|--------------|--------------|----------|------|
+| **TQQQ-010 (DD+RSI+Volume)** | **0.36** | **1.02** | **0.36** | 基準 |
+| TQQQ-016 Att1 (PB 20-35%) | -0.17 | 0.66 | -0.17 | 2022 連續停損 |
+| TQQQ-016 Att2 (PB 25-40% 20d) | 0.13 | 0.28 | 0.13 | 訊號過少 |
+| TQQQ-016 Att3 (PB 18-30% +Vol) | 0.22 | 0.00* | 0.00* | 最佳但仍不及 |
+
+### 結論
+
+Pullback+WR 框架雖然在多資產（GLD, SIVR, XBI, COPX, URA, IBIT）表現優異，但在 TQQQ 上無法超越極端恐慌框架（TQQQ-010）。根本原因：
+1. **回檔模式差異**：Pullback+WR 捕獲「高點回檔 18-30%」的走勢型回調，而 TQQQ-010 捕獲「DD -15% + RSI 極低 + 放量」的極端恐慌事件。後者對 TQQQ 的結構性反彈更有預測力
+2. **2022 年長期下跌**：10 日 lookback 在持續下跌中反覆觸發回檔訊號，即使加入 Volume filter 仍有殘餘連續停損
+3. **確認指標選擇**：WR(10) 超賣在持續下跌中容易持續觸發（因為 WR 本質上衡量收盤相對區間位置），不如 RSI(5) < 25 的極端超賣要求嚴格
+
+TQQQ-010 確認為全域最優（16 次實驗，含均值回歸×2 框架 和 趨勢/動量/突破三大策略類型）。
