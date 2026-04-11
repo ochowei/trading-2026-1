@@ -1,0 +1,316 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-11T07:05:14.792542"
+  },
+  "part_a": {
+    "ticker": "TQQQ",
+    "total_signals": 14,
+    "wins": 9,
+    "win_rate": 0.6428571428571429,
+    "avg_return_pct": 1.61,
+    "std_return_pct": 7.23,
+    "cumulative_return_pct": 20.58,
+    "avg_holding_days": 2.0,
+    "max_drawdown_pct": -12.95,
+    "profit_factor": 1.56,
+    "sharpe_ratio": 0.22,
+    "sortino_ratio": 0.33,
+    "calmar_ratio": 0.12,
+    "max_consecutive_losses": 2,
+    "target_exits": 9,
+    "stop_loss_exits": 5,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-05-13",
+        "entry_date": "2019-05-14",
+        "exit_date": "2019-05-16",
+        "entry": 6.64,
+        "exit": 7.11,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.51
+      },
+      {
+        "date": "2019-08-05",
+        "entry_date": "2019-08-06",
+        "exit_date": "2019-08-08",
+        "entry": 6.78,
+        "exit": 7.25,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.36
+      },
+      {
+        "date": "2020-02-24",
+        "entry_date": "2020-02-25",
+        "exit_date": "2020-02-26",
+        "entry": 11.7,
+        "exit": 10.76,
+        "return_pct": -8.09,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -11.1
+      },
+      {
+        "date": "2020-09-10",
+        "entry_date": "2020-09-11",
+        "exit_date": "2020-09-17",
+        "entry": 15.18,
+        "exit": 13.95,
+        "return_pct": -8.09,
+        "holding_days": 4,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -8.71
+      },
+      {
+        "date": "2020-10-30",
+        "entry_date": "2020-11-02",
+        "exit_date": "2020-11-04",
+        "entry": 14.32,
+        "exit": 15.32,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.09
+      },
+      {
+        "date": "2021-02-25",
+        "entry_date": "2021-02-26",
+        "exit_date": "2021-03-01",
+        "entry": 21.61,
+        "exit": 23.12,
+        "return_pct": 7.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.89
+      },
+      {
+        "date": "2021-05-12",
+        "entry_date": "2021-05-13",
+        "exit_date": "2021-05-20",
+        "entry": 21.66,
+        "exit": 23.17,
+        "return_pct": 7.0,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.71
+      },
+      {
+        "date": "2021-12-03",
+        "entry_date": "2021-12-06",
+        "exit_date": "2021-12-07",
+        "entry": 35.99,
+        "exit": 38.51,
+        "return_pct": 7.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 7.3
+      },
+      {
+        "date": "2022-01-21",
+        "entry_date": "2022-01-24",
+        "exit_date": "2022-01-26",
+        "entry": 25.74,
+        "exit": 27.54,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.7
+      },
+      {
+        "date": "2022-03-08",
+        "entry_date": "2022-03-09",
+        "exit_date": "2022-03-14",
+        "entry": 21.7,
+        "exit": 19.95,
+        "return_pct": -8.09,
+        "holding_days": 3,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -12.95
+      },
+      {
+        "date": "2022-04-26",
+        "entry_date": "2022-04-27",
+        "exit_date": "2022-04-28",
+        "entry": 18.25,
+        "exit": 19.52,
+        "return_pct": 7.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.19
+      },
+      {
+        "date": "2022-06-15",
+        "entry_date": "2022-06-16",
+        "exit_date": "2022-06-21",
+        "entry": 10.99,
+        "exit": 11.76,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -5.92
+      },
+      {
+        "date": "2022-09-01",
+        "entry_date": "2022-09-02",
+        "exit_date": "2022-09-06",
+        "entry": 13.69,
+        "exit": 12.58,
+        "return_pct": -8.09,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -11.19
+      },
+      {
+        "date": "2022-09-21",
+        "entry_date": "2022-09-22",
+        "exit_date": "2022-09-23",
+        "entry": 10.92,
+        "exit": 10.04,
+        "return_pct": -8.09,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -10.59
+      }
+    ],
+    "filled_count": 14,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "TQQQ",
+    "total_signals": 4,
+    "wins": 4,
+    "win_rate": 1.0,
+    "avg_return_pct": 7.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 31.08,
+    "avg_holding_days": 2.5,
+    "max_drawdown_pct": -6.53,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 1.07,
+    "max_consecutive_losses": 0,
+    "target_exits": 4,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-04-19",
+        "entry_date": "2024-04-22",
+        "exit_date": "2024-04-24",
+        "entry": 24.71,
+        "exit": 26.44,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.1
+      },
+      {
+        "date": "2024-07-24",
+        "entry_date": "2024-07-25",
+        "exit_date": "2024-08-01",
+        "entry": 32.28,
+        "exit": 34.54,
+        "return_pct": 7.0,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -6.53
+      },
+      {
+        "date": "2024-09-06",
+        "entry_date": "2024-09-09",
+        "exit_date": "2024-09-11",
+        "entry": 28.84,
+        "exit": 30.85,
+        "return_pct": 7.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.46
+      },
+      {
+        "date": "2025-02-27",
+        "entry_date": "2025-02-28",
+        "exit_date": "2025-03-03",
+        "entry": 35.41,
+        "exit": 37.89,
+        "return_pct": 7.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.32
+      }
+    ],
+    "filled_count": 4,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "TQQQ",
+    "total_signals": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": 0.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 0.0,
+    "avg_holding_days": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 0.0,
+    "calmar_ratio": 0.0,
+    "max_consecutive_losses": 0,
+    "target_exits": 0,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [],
+    "filled_count": 0,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 0.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-10"
+    }
+  }
+}
