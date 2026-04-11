@@ -187,6 +187,7 @@ on:
           - "IBIT-002: ibit_002_rsi2_pullback"
           - "IBIT-003: ibit_003_bb_squeeze_breakout"
           - "IBIT-004: ibit_004_vol_adaptive"
+          - "IBIT-005: ibit_005_extended_lookback"
 
 jobs:
   backtest:
