@@ -68,6 +68,7 @@ on:
           - "EEM-005: eem_005_bb_squeeze_breakout"
           - "EEM-006: eem_006_rs_momentum_pullback"
           - "EEM-007: eem_007_trend_momentum_pullback"
+          - "EEM-008: eem_008_optimized_breakout"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"

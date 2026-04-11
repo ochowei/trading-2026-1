@@ -139,7 +139,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-10
+  validated: 2026-04-11
   data_through: 2025-12-31
   confidence: high
 -->
@@ -164,7 +164,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | IBIT | IBIT-001 | 回檔範圍+WR | 0.15 | 4 次實驗 ✓ |
 | TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 12 次實驗 ✓ |
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
-| EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 6 次實驗 ✓ |
+| EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 8 次實驗 ✓ |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
@@ -173,7 +173,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 10. 反覆失敗的做法（禁止清單）
 <!-- freshness:
-  validated: 2026-04-10
+  validated: 2026-04-11
   data_through: 2025-12-31
   confidence: high
 -->
@@ -212,7 +212,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 25. **動量回調在多成分等權重板塊 ETF** — 板塊級 ROC 反映個股事件加總非板塊趨勢
 26. **趨勢回檔策略** — 在低波動防禦型 ETF、高波動個股上均市場狀態依賴過強
 27. **RSI(2) 在日波動 >2% 或利率敏感/事件驅動型資產** — 過於敏感，熊市產生假訊號（SIVR、TSM、FCX、IBIT、XLU、SOXL 均驗證）。有效範圍：日波動 ≤ 1.5% 的寬基指數 ETF（SPY、DIA、IWM、VOO）
-28. **BB 擠壓突破在商品/利率/3x 槓桿 ETF** — 有效性：個股(2-4%) > 高流動 ETF(1.5-2%) > 其餘均失敗。**例外**：EEM（新興市場 ETF）因 EM risk-on/risk-off 資金流特性有效（min 0.18）
+28. **BB 擠壓突破在商品/利率/3x 槓桿 ETF** — 有效性：個股(2-4%) > 高流動 ETF(1.5-2%) > 其餘均失敗。**例外**：EEM（新興市場 ETF）因 EM risk-on/risk-off 資金流特性有效（min 0.18，8 次實驗確認為天花板）
 29. **趨勢/突破/動量策略在 3x 槓桿 ETF** — 3x 放大噪音至日波動 4-8%，突破/動量訊號無法補償高波動 SL
 30. **所有趨勢/突破/動量在利率驅動 ETF（TLT）** — 宏觀政策驅動資產無純技術面解法
 
@@ -240,6 +240,11 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 46. **VOO TP +2.85%**、**SPY TP +3.0%** — 同指數 ETF 的 TP 不同
 47. **URA SL -5.5%** — 甜蜜點
 48. **COPX TP +3.5%** / SL -4.5% — 甜蜜點
+49. **EEM SL > -3.0%（突破策略）** — EM 停損為結構性崩潰非暫時回撤，加寬 SL 只增加虧損（EEM-008 Att1）
+
+### 進場機制禁忌
+50. **價格範圍壓縮替代 BB Squeeze 在分散化 ETF** — 價格範圍壓縮門檻較 BB 帶寬更鬆，產生過多假突破。BB Squeeze 的標準差+百分位方法對 EEM 類 ETF 仍是最佳壓縮偵測（EEM-008 Att2）
+51. **環境實現波動率過濾 BB Squeeze 突破** — 宏觀驅動 ETF（EEM/TLT）的衝擊發生在正常波動率環境，事後波動率才飆升。環境波動率無法預測未來衝擊，反移除好訊號（如 COVID 復甦期突破）多於壞訊號（EEM-008 Att3）
 
 > 每條禁忌的詳細實驗證據見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 10。
 
