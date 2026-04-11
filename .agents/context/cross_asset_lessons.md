@@ -164,7 +164,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | IBIT | IBIT-001 | 回檔範圍+WR | 0.15 | 5 次實驗 ✓ |
 | TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 12 次實驗 ✓ |
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
-| EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 8 次實驗 ✓ |
+| EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
@@ -222,7 +222,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 33. **動量過濾窗口不匹配持倉週期** — 持倉 2-3 天用 2日跌幅最佳
 
 ### 跨資產過濾禁忌
-34. **Close Position Filter 不可跨資產通用** — GLD/IWM/XBI 有效但 USO/SIVR/FCX 反效果
+34. **Close Position Filter 不可跨資產通用** — GLD/IWM/XBI/EEM 有效但 USO/SIVR/FCX 反效果（EEM-011 驗證：移除後 WR 58.3%→52.2%）
 35. **板塊指數確認（SMH）對個股（TSM）** — 弱化版過濾器只移除好訊號
 36. **跨資產相對表現過濾在 RSI(2) 框架** — 極端超賣時市場同步下跌，無區分力
 36b. **廣基 ETF RS 動量（EEM vs SPY）** — 宏觀/政治事件（關稅、貿易戰、中國政策）驅動而非結構性因素，三次嘗試 Part B 均為負值（EEM-006 驗證）
@@ -311,8 +311,8 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 15. ATR 波動率自適應過濾有效邊界
 <!-- freshness:
-  derived_from: [IWM-011,COPX-007,XLU-011,SIVR-012,XBI-009,IBIT-004,FCX-008]
-  validated: 2026-04-10
+  derived_from: [IWM-011,COPX-007,XLU-011,SIVR-012,XBI-009,IBIT-004,FCX-008,EEM-010]
+  validated: 2026-04-11
   data_through: 2025-12-31
   confidence: high
 -->
@@ -320,6 +320,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 ATR(5)/ATR(20) 過濾在中低波動資產選擇急跌恐慌、過濾慢磨下跌。
 
 - ~1.0% XLU：ATR > 1.15 → min +272%（極佳）
+- ~1.17% EEM：ATR > 1.1 配合跌幅 2.0% → Part A -0.13→+0.03（EEM-010 驗證）
 - ~1.5-2.0% IWM：ATR > 1.1 → min +67.7%
 - ~2.25% COPX：ATR > 1.05 → min +28.6%（低門檻仍有效）
 - ≥ 2.0% XBI/SIVR/IBIT：失效
