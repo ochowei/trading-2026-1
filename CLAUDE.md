@@ -15,7 +15,7 @@
 
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **檔案結構變更**：新增、刪除或搬移檔案時，必須更新本文件的「架構速覽」段落。
-- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、以及對應資產的 `EXPERIMENTS_TQQQ.md`、`EXPERIMENTS_GLD.md`、`EXPERIMENTS_SIVR.md`、`EXPERIMENTS_FCX.md`、`EXPERIMENTS_USO.md`、`EXPERIMENTS_SOXL.md`、`EXPERIMENTS_SPY.md`、`EXPERIMENTS_DIA.md`、`EXPERIMENTS_VOO.md`、`EXPERIMENTS_TLT.md`、`EXPERIMENTS_IWM.md`、`EXPERIMENTS_XBI.md`、`EXPERIMENTS_XLU.md`、`EXPERIMENTS_NVDA.md`、`EXPERIMENTS_COPX.md`、`EXPERIMENTS_URA.md`、`EXPERIMENTS_TSLA.md`、`EXPERIMENTS_EEM.md`、`EXPERIMENTS_EWJ.md`、`EXPERIMENTS_EWZ.md`、`EXPERIMENTS_FXI.md`、`EXPERIMENTS_VGK.md` 或 `EXPERIMENTS_IBIT.md`。
+- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、以及對應資產的 `EXPERIMENTS_TQQQ.md`、`EXPERIMENTS_GLD.md`、`EXPERIMENTS_SIVR.md`、`EXPERIMENTS_FCX.md`、`EXPERIMENTS_USO.md`、`EXPERIMENTS_SOXL.md`、`EXPERIMENTS_SPY.md`、`EXPERIMENTS_DIA.md`、`EXPERIMENTS_VOO.md`、`EXPERIMENTS_TLT.md`、`EXPERIMENTS_IWM.md`、`EXPERIMENTS_XBI.md`、`EXPERIMENTS_XLU.md`、`EXPERIMENTS_NVDA.md`、`EXPERIMENTS_COPX.md`、`EXPERIMENTS_URA.md`、`EXPERIMENTS_TSLA.md`、`EXPERIMENTS_EEM.md`、`EXPERIMENTS_EWJ.md`、`EXPERIMENTS_EWZ.md`、`EXPERIMENTS_FXI.md`、`EXPERIMENTS_VGK.md`、`EXPERIMENTS_INDA.md` 或 `EXPERIMENTS_IBIT.md`。
 - **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
 - **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
@@ -131,6 +131,7 @@ src/trading/
 - TSLA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TSLA.md](src/trading/experiments/EXPERIMENTS_TSLA.md)
 - TSM 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TSM.md](src/trading/experiments/EXPERIMENTS_TSM.md)
 - COPX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_COPX.md](src/trading/experiments/EXPERIMENTS_COPX.md)
+- INDA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_INDA.md](src/trading/experiments/EXPERIMENTS_INDA.md)
 - IWM 實驗總覽 → [src/trading/experiments/EXPERIMENTS_IWM.md](src/trading/experiments/EXPERIMENTS_IWM.md)
 - NVDA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_NVDA.md](src/trading/experiments/EXPERIMENTS_NVDA.md)
 - URA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_URA.md](src/trading/experiments/EXPERIMENTS_URA.md)
