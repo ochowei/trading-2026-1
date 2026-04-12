@@ -63,6 +63,7 @@ on:
           - "DIA-010: dia_010_rsi5_trend_pullback"
           - "EEM-001: eem_001_rsi2_mean_reversion"
           - "EWJ-001: ewj_001_pullback_wr_reversal"
+          - "EWT-001: ewt_001_pullback_wr_reversal"
           - "EWZ-001: ewz_001_pullback_wr"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "FCX-002: fcx_002_pullback_wr"
