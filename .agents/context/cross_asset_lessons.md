@@ -139,7 +139,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-11
+  validated: 2026-04-12
   data_through: 2025-12-31
   confidence: high
 -->
@@ -166,6 +166,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
+| VGK | VGK-004 | 回檔+WR+ATR 波動率自適應 | 0.08 | 4 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
 
