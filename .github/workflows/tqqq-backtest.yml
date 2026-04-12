@@ -166,6 +166,7 @@ on:
           - "XLU-009: xlu_009_kc_squeeze_breakout"
           - "XLU-010: xlu_010_20d_wide_pullback"
           - "XLU-011: xlu_011_vol_adaptive_mr"
+          - "CIBR-001: cibr_001_pullback_wr"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
