@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
-  note: FXI-002 added 2026-04-13
+  note: EWT-002 added 2026-04-13
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -167,6 +167,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | EWJ | EWJ-002 Att2 | 波動率自適應回檔+WR+崩盤隔離 | 0.55 | 2 次實驗 |
+| EWT | EWT-002 Att1 | 波動率自適應回檔+WR+ATR | 0.13 | 3 次實驗 |
 | VGK | VGK-002 Att3 | 波動率自適應回檔+WR | 0.42 | 2 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
@@ -368,7 +369,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 18. BB 擠壓突破有效性排序
 <!-- freshness:
-  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003]
+  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003,EWT-003]
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
@@ -377,7 +378,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 個股（日波動 2-4%）> 高流動 ETF（日波動 1.5-2%）> 單一商品 ETF（~1%）> 利率驅動 ETF ≈ 3x 槓桿 ETF > 小眾 ETF
 
 **例外**：EEM（新興市場 ETF, 1.17% vol）BB Squeeze min(A,B) Sharpe 0.18，遠優於其均值回歸最佳 0.06。可能因 EM risk-on/risk-off 資金流特性使波動率壓縮-突破模式有效。
-**反例**：INDA（印度 ETF, 0.97% vol）BB Squeeze Part A 0.53-0.72 / Part B -0.41~-0.48（WR 差距 39-47pp），嚴重市場狀態依賴。EEM 的 EM 突破有效性不可延伸至單一國家 EM ETF。
+**反例**：INDA（印度 ETF, 0.97% vol）BB Squeeze Part A 0.53-0.72 / Part B -0.41~-0.48（WR 差距 39-47pp），嚴重市場狀態依賴。EWT（台灣 ETF, 1.41% vol）BB Squeeze Part A 0.35 / Part B -0.37（WR 差距 31.4pp），地緣政治風險導致突破失敗。EEM 的 EM 突破有效性不可延伸至單一國家 ETF（INDA、EWT 均驗證）。
 
 - 突破買在高點，SL 需比均值回歸更緊但 ~2σ 呼吸空間（NVDA/TSLA SL -7%）
 - SMA(50) 是趨勢確認甜蜜點（SMA(20) 太短、SMA(100) 改變方向非改善品質）

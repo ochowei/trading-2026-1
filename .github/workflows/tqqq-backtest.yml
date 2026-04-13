@@ -75,6 +75,8 @@ on:
           - "EWJ-001: ewj_001_pullback_wr_reversal"
           - "EWJ-002: ewj_002_vol_adaptive_pullback"
           - "EWT-001: ewt_001_pullback_wr_reversal"
+          - "EWT-002: ewt_002_vol_adaptive_pullback"
+          - "EWT-003: ewt_003_bb_squeeze_breakout"
           - "EWZ-001: ewz_001_pullback_wr"
           - "EWZ-002: ewz_002_vol_adaptive_pullback"
           - "EWZ-003: ewz_003_bb_squeeze_breakout"
