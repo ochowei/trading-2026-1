@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
-  note: CIBR-002 added 2026-04-13
+  note: EWT-004 added 2026-04-13
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -167,7 +167,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | EWJ | EWJ-002 Att2 | 波動率自適應回檔+WR+崩盤隔離 | 0.55 | 2 次實驗 |
-| EWT | EWT-002 Att1 | 波動率自適應回檔+WR+ATR | 0.13 | 3 次實驗 |
+| EWT | EWT-004 Att1 | 2日急跌+非對稱出場均值回歸 | 0.15 | 4 次實驗 |
 | VGK | VGK-002 Att3 | 波動率自適應回檔+WR | 0.42 | 2 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
@@ -392,13 +392,15 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 19. 2日急跌過濾
 <!-- freshness:
-  derived_from: [FCX-008,USO-013]
-  validated: 2026-04-10
+  derived_from: [FCX-008,USO-013,EWT-004]
+  validated: 2026-04-13
   data_through: 2025-12-31
   confidence: medium
 -->
 
 2日急跌過濾在基礎訊號頻率 ≥ 5/年的資產上有效（USO、COPX），但在訊號已稀少的資產上（FCX ~3.6/年）會過度移除好訊號。
+
+**例外**：EWT-004 在 3.2 訊號/年仍有效（min(A,B) 0.13→0.15，+15%），但配合非對稱出場才能發揮，且改善幅度小於高頻資產。
 
 ---
 
