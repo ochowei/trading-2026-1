@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-13T23:06:14.735385"
+  },
+  "part_a": {
+    "ticker": "INDA",
+    "total_signals": 18,
+    "wins": 10,
+    "win_rate": 0.5555555555555556,
+    "avg_return_pct": 0.19,
+    "std_return_pct": 3.59,
+    "cumulative_return_pct": 2.19,
+    "avg_holding_days": 9.3,
+    "max_drawdown_pct": -14.89,
+    "profit_factor": 1.11,
+    "sharpe_ratio": 0.05,
+    "sortino_ratio": 0.07,
+    "calmar_ratio": 0.01,
+    "max_consecutive_losses": 3,
+    "target_exits": 9,
+    "stop_loss_exits": 7,
+    "time_expiry_exits": 2,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-05-09",
+        "entry_date": "2019-05-10",
+        "exit_date": "2019-05-20",
+        "entry": 30.83,
+        "exit": 31.9,
+        "return_pct": 3.5,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.81
+      },
+      {
+        "date": "2019-07-08",
+        "entry_date": "2019-07-09",
+        "exit_date": "2019-07-30",
+        "entry": 32.17,
+        "exit": 30.86,
+        "return_pct": -4.1,
+        "holding_days": 15,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -4.91
+      },
+      {
+        "date": "2020-01-06",
+        "entry_date": "2020-01-07",
+        "exit_date": "2020-01-13",
+        "entry": 32.05,
+        "exit": 33.17,
+        "return_pct": 3.5,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.28
+      },
+      {
+        "date": "2020-02-03",
+        "entry_date": "2020-02-04",
+        "exit_date": "2020-02-27",
+        "entry": 32.35,
+        "exit": 31.03,
+        "return_pct": -4.1,
+        "holding_days": 16,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -4.92
+      },
+      {
+        "date": "2020-02-28",
+        "entry_date": "2020-03-02",
+        "exit_date": "2020-03-09",
+        "entry": 29.35,
+        "exit": 28.15,
+        "return_pct": -4.1,
+        "holding_days": 5,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -10.18
+      },
+      {
+        "date": "2020-03-19",
+        "entry_date": "2020-03-20",
+        "exit_date": "2020-03-23",
+        "entry": 22.32,
+        "exit": 21.4,
+        "return_pct": -4.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -14.89
+      },
+      {
+        "date": "2020-10-29",
+        "entry_date": "2020-10-30",
+        "exit_date": "2020-11-04",
+        "entry": 31.43,
+        "exit": 32.53,
+        "return_pct": 3.5,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.22
+      },
+      {
+        "date": "2020-12-21",
+        "entry_date": "2020-12-22",
+        "exit_date": "2020-12-29",
+        "entry": 35.77,
+        "exit": 37.03,
+        "return_pct": 3.5,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.25
+      },
+      {
+        "date": "2021-01-25",
+        "entry_date": "2021-01-26",
+        "exit_date": "2021-02-03",
+        "entry": 37.79,
+        "exit": 39.11,
+        "return_pct": 3.5,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.97
+      },
+      {
+        "date": "2021-02-26",
+        "entry_date": "2021-03-01",
+        "exit_date": "2021-03-04",
+        "entry": 38.83,
+        "exit": 40.19,
+        "return_pct": 3.5,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.19
+      },
+      {
+        "date": "2021-09-20",
+        "entry_date": "2021-09-21",
+        "exit_date": "2021-10-20",
+        "entry": 45.91,
+        "exit": 46.77,
+        "return_pct": 1.87,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -1.56
+      },
+      {
+        "date": "2021-12-06",
+        "entry_date": "2021-12-07",
+        "exit_date": "2022-01-03",
+        "entry": 44.52,
+        "exit": 46.07,
+        "return_pct": 3.5,
+        "holding_days": 18,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.7
+      },
+      {
+        "date": "2022-01-24",
+        "entry_date": "2022-01-25",
+        "exit_date": "2022-02-14",
+        "entry": 44.81,
+        "exit": 42.97,
+        "return_pct": -4.1,
+        "holding_days": 14,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -4.3
+      },
+      {
+        "date": "2022-03-04",
+        "entry_date": "2022-03-07",
+        "exit_date": "2022-03-09",
+        "entry": 40.8,
+        "exit": 42.23,
+        "return_pct": 3.5,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.56
+      },
+      {
+        "date": "2022-05-06",
+        "entry_date": "2022-05-09",
+        "exit_date": "2022-06-08",
+        "entry": 41.29,
+        "exit": 40.75,
+        "return_pct": -1.33,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -3.77
+      },
+      {
+        "date": "2022-06-16",
+        "entry_date": "2022-06-17",
+        "exit_date": "2022-07-06",
+        "entry": 38.38,
+        "exit": 39.72,
+        "return_pct": 3.5,
+        "holding_days": 11,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.08
+      },
+      {
+        "date": "2022-09-16",
+        "entry_date": "2022-09-19",
+        "exit_date": "2022-09-23",
+        "entry": 42.93,
+        "exit": 41.17,
+        "return_pct": -4.1,
+        "holding_days": 4,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -4.35
+      },
+      {
+        "date": "2023-01-27",
+        "entry_date": "2023-01-30",
+        "exit_date": "2023-02-22",
+        "entry": 40.56,
+        "exit": 38.9,
+        "return_pct": -4.1,
+        "holding_days": 16,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -4.03
+      }
+    ],
+    "filled_count": 18,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "INDA",
+    "total_signals": 4,
+    "wins": 3,
+    "win_rate": 0.75,
+    "avg_return_pct": 2.1,
+    "std_return_pct": 2.42,
+    "cumulative_return_pct": 8.54,
+    "avg_holding_days": 12.5,
+    "max_drawdown_pct": -2.72,
+    "profit_factor": 5.0,
+    "sharpe_ratio": 0.87,
+    "sortino_ratio": 2.0,
+    "calmar_ratio": 0.77,
+    "max_consecutive_losses": 1,
+    "target_exits": 3,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-06-04",
+        "entry_date": "2024-06-05",
+        "exit_date": "2024-06-12",
+        "entry": 52.4,
+        "exit": 54.24,
+        "return_pct": 3.5,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.9
+      },
+      {
+        "date": "2024-08-05",
+        "entry_date": "2024-08-06",
+        "exit_date": "2024-08-21",
+        "entry": 54.54,
+        "exit": 56.45,
+        "return_pct": 3.5,
+        "holding_days": 11,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.56
+      },
+      {
+        "date": "2024-11-13",
+        "entry_date": "2024-11-14",
+        "exit_date": "2024-12-05",
+        "entry": 53.15,
+        "exit": 55.01,
+        "return_pct": 3.5,
+        "holding_days": 14,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.2
+      },
+      {
+        "date": "2025-01-13",
+        "entry_date": "2025-01-14",
+        "exit_date": "2025-02-13",
+        "entry": 51.05,
+        "exit": 49.98,
+        "return_pct": -2.1,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -2.72
+      }
+    ],
+    "filled_count": 4,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "INDA",
+    "total_signals": 1,
+    "wins": 1,
+    "win_rate": 1.0,
+    "avg_return_pct": 3.5,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 3.5,
+    "avg_holding_days": 7.0,
+    "max_drawdown_pct": -1.61,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 2.17,
+    "max_consecutive_losses": 0,
+    "target_exits": 1,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2026-01-21",
+        "entry_date": "2026-01-22",
+        "exit_date": "2026-02-02",
+        "entry": 51.77,
+        "exit": 53.58,
+        "return_pct": 3.5,
+        "holding_days": 7,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.61
+      }
+    ],
+    "filled_count": 1,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-13"
+    }
+  }
+}
