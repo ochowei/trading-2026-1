@@ -202,6 +202,7 @@ on:
           - "IBIT-005: ibit_005_extended_lookback"
           - "INDA-001: inda_001_pullback_wr_reversal"
           - "INDA-002: inda_002_vol_adaptive_mr"
+          - "INDA-003: inda_003_bb_squeeze_breakout"
 
 jobs:
   backtest:

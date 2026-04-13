@@ -139,7 +139,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-11
+  validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
 -->
@@ -167,6 +167,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | VGK | VGK-002 Att3 | 波動率自適應回檔+WR | 0.42 | 2 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
+| INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
 | EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 2 次實驗 |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
@@ -229,7 +230,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 36. **跨資產相對表現過濾在 RSI(2) 框架** — 極端超賣時市場同步下跌，無區分力
 36b. **廣基 ETF RS 動量（EEM vs SPY）** — 宏觀/政治事件（關稅、貿易戰、中國政策）驅動而非結構性因素，三次嘗試 Part B 均為負值（EEM-006 驗證）
 37. **跨資產利率指標（TLT）過濾利率敏感 ETF（XLU）** — 響應速度和方式不同
-38. **回檔回看窗口不可跨資產移植** — 20日在 GLD/COPX 有效，在 SIVR/URA/IBIT 失敗（IBIT-005 Att1：10日→20日 Part B 0.37→-0.38）
+38. **回檔回看窗口不可跨資產移植** — 20日在 GLD/COPX 有效，在 SIVR/URA/IBIT/INDA 失敗（IBIT-005 Att1：10日→20日 Part B 0.37→-0.38；INDA-003 Att3：20日回看 A/B 訊號比 2.75:1 嚴重失衡）
 
 ### 資產特定 TP/SL 硬上限（不可突破）
 39. **USO TP +3.0%** / SL -3.25% — contango 限制
@@ -364,8 +365,8 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 18. BB 擠壓突破有效性排序
 <!-- freshness:
-  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005]
-  validated: 2026-04-10
+  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003]
+  validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
 -->
@@ -373,6 +374,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 個股（日波動 2-4%）> 高流動 ETF（日波動 1.5-2%）> 單一商品 ETF（~1%）> 利率驅動 ETF ≈ 3x 槓桿 ETF > 小眾 ETF
 
 **例外**：EEM（新興市場 ETF, 1.17% vol）BB Squeeze min(A,B) Sharpe 0.18，遠優於其均值回歸最佳 0.06。可能因 EM risk-on/risk-off 資金流特性使波動率壓縮-突破模式有效。
+**反例**：INDA（印度 ETF, 0.97% vol）BB Squeeze Part A 0.53-0.72 / Part B -0.41~-0.48（WR 差距 39-47pp），嚴重市場狀態依賴。EEM 的 EM 突破有效性不可延伸至單一國家 EM ETF。
 
 - 突破買在高點，SL 需比均值回歸更緊但 ~2σ 呼吸空間（NVDA/TSLA SL -7%）
 - SMA(50) 是趨勢確認甜蜜點（SMA(20) 太短、SMA(100) 改變方向非改善品質）
