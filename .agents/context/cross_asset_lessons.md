@@ -219,7 +219,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 25. **動量回調在多成分等權重板塊 ETF** — 板塊級 ROC 反映個股事件加總非板塊趨勢
 26. **趨勢回檔策略** — 在低波動防禦型 ETF、高波動個股上均市場狀態依賴過強。**短期動量（5日漲幅>10%）在 IBIT 上 Part A 1.00/Part B -0.55**，2024 牛市 87.5% WR vs 2025 震盪 25% WR（IBIT-005 Att2 驗證）
 27. **RSI(2) 在日波動 >2% 或利率敏感/事件驅動型資產** — 過於敏感，熊市產生假訊號（SIVR、TSM、FCX、IBIT、XLU、SOXL 均驗證）。有效範圍：日波動 ≤ 1.5% 的**美國**寬基指數 ETF（SPY、DIA、IWM、VOO）。**非美國寬基 ETF（VGK）即使日波動近似 SPY（1.12% vs 1.2%），RSI(2) 仍無效**（Part A -0.06），歐洲市場慢磨下跌特性不適合 RSI(2)，回檔+WR 框架更佳（VGK-002 驗證）
-28. **BB 擠壓突破在商品/利率/3x 槓桿 ETF** — 有效性：個股(2-4%) > 高流動 ETF(1.5-2%) > 其餘均失敗。**例外**：EEM（新興市場 ETF）因 EM risk-on/risk-off 資金流特性有效（min 0.18，8 次實驗確認為天花板）
+28. **BB 擠壓突破在商品/利率/3x 槓桿/單一國家 EM ETF** — 有效性：個股(2-4%) > 高流動 ETF(1.5-2%) > 其餘均失敗。**例外**：EEM（新興市場 ETF）因 EM risk-on/risk-off 資金流特性有效（min 0.18，8 次實驗確認為天花板）。**單一國家 EM ETF（INDA/EWT/FXI）均失敗**，FXI 三次迭代 Part A -0.12~-0.30（FXI-003 驗證）
 29. **趨勢/突破/動量策略在 3x 槓桿 ETF** — 3x 放大噪音至日波動 4-8%，突破/動量訊號無法補償高波動 SL
 30. **所有趨勢/突破/動量在利率驅動 ETF（TLT）** — 宏觀政策驅動資產無純技術面解法
 
@@ -369,7 +369,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 18. BB 擠壓突破有效性排序
 <!-- freshness:
-  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003,EWT-003]
+  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003,EWT-003,FXI-003]
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
@@ -378,7 +378,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 個股（日波動 2-4%）> 高流動 ETF（日波動 1.5-2%）> 單一商品 ETF（~1%）> 利率驅動 ETF ≈ 3x 槓桿 ETF > 小眾 ETF
 
 **例外**：EEM（新興市場 ETF, 1.17% vol）BB Squeeze min(A,B) Sharpe 0.18，遠優於其均值回歸最佳 0.06。可能因 EM risk-on/risk-off 資金流特性使波動率壓縮-突破模式有效。
-**反例**：INDA（印度 ETF, 0.97% vol）BB Squeeze Part A 0.53-0.72 / Part B -0.41~-0.48（WR 差距 39-47pp），嚴重市場狀態依賴。EWT（台灣 ETF, 1.41% vol）BB Squeeze Part A 0.35 / Part B -0.37（WR 差距 31.4pp），地緣政治風險導致突破失敗。EEM 的 EM 突破有效性不可延伸至單一國家 ETF（INDA、EWT 均驗證）。
+**反例**：INDA（印度 ETF, 0.97% vol）BB Squeeze Part A 0.53-0.72 / Part B -0.41~-0.48（WR 差距 39-47pp），嚴重市場狀態依賴。EWT（台灣 ETF, 1.41% vol）BB Squeeze Part A 0.35 / Part B -0.37（WR 差距 31.4pp），地緣政治風險導致突破失敗。FXI（中國 ETF, 2.0% vol）BB Squeeze 三次迭代 Part A 均為負值（-0.12~-0.30），2019-2023 中國熊市假突破率過高。EEM 的 EM 突破有效性不可延伸至單一國家 ETF（INDA、EWT、FXI 均驗證）。
 
 - 突破買在高點，SL 需比均值回歸更緊但 ~2σ 呼吸空間（NVDA/TSLA SL -7%）
 - SMA(50) 是趨勢確認甜蜜點（SMA(20) 太短、SMA(100) 改變方向非改善品質）
