@@ -73,6 +73,7 @@ on:
           - "EEM-010: eem_010_strict_decline_atr"
           - "EEM-011: eem_011_no_closepos_atr"
           - "EWJ-001: ewj_001_pullback_wr_reversal"
+          - "EWJ-002: ewj_002_vol_adaptive_pullback"
           - "EWT-001: ewt_001_pullback_wr_reversal"
           - "EWZ-001: ewz_001_pullback_wr"
           - "EWZ-002: ewz_002_vol_adaptive_pullback"
