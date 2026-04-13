@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
-  note: EWJ-002 added 2026-04-13
+  note: FXI-002 added 2026-04-13
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -170,6 +170,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | VGK | VGK-002 Att3 | 波動率自適應回檔+WR | 0.42 | 2 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
+| FXI | FXI-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.33 | 2 次實驗 |
 | EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 2 次實驗 |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
