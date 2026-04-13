@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
-  note: EWT-002 added 2026-04-13
+  note: CIBR-002 added 2026-04-13
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -173,6 +173,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
 | FXI | FXI-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.33 | 2 次實驗 |
 | EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 2 次實驗 |
+| CIBR | CIBR-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.23 | 3 次實驗 |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
 
@@ -369,7 +370,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 18. BB 擠壓突破有效性排序
 <!-- freshness:
-  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003,EWT-003,FXI-003]
+  derived_from: [TSLA-005,NVDA-003,FCX-004,IWM-006,COPX-005,SOXL-009,GLD-009,SIVR-008,TLT-004,IBIT-003,TSM-005,EEM-005,INDA-003,EWT-003,FXI-003,CIBR-003]
   validated: 2026-04-13
   data_through: 2025-12-31
   confidence: high
@@ -385,6 +386,7 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 - 擠壓百分位和冷卻期影響 A/B 平衡，需同時調校
 - 地緣政治敏感個股（TSM）突破後常因政策消息急速反轉
 - 低波動 ETF (EEM 1.17%) TP 需降至 3.0%（3.5% 到期過多），SL 3.0% 對稱即可
+- **板塊 ETF（CIBR 1.53% vol）BB Squeeze 完全無效**：Part A -0.20 / Part B -0.27，WR<40%。板塊 ETF 突破缺乏持續性，突破後快速反轉。均值回歸是正確框架（CIBR-003 驗證）
 
 ---
 
