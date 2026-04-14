@@ -216,6 +216,7 @@ on:
           - "INDA-002: inda_002_vol_adaptive_mr"
           - "INDA-003: inda_003_bb_squeeze_breakout"
           - "INDA-004: inda_004_rsi2_atr_adaptive"
+          - "INDA-005: inda_005_crash_filtered_mr"
 
 jobs:
   backtest:
