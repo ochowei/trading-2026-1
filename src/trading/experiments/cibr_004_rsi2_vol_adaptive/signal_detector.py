@@ -1,12 +1,15 @@
 """
-CIBR-004 訊號偵測器：RSI(2) 波動率自適應均值回歸
+CIBR-004 Att2 訊號偵測器：動量強化均值回歸
+
+在 CIBR-002 的 pullback+WR+ClosePos+ATR 基礎上，新增 2日急跌過濾。
 
 進場條件（全部滿足）：
-1. RSI(2) < 10（極端超賣）
-2. 2日累計跌幅 >= 2.0%（幅度過濾）
+1. 10日高點回檔 >= 4%（深度回檔）
+2. Williams %R(10) <= -80（超賣確認）
 3. 收盤位置 >= 40%（日內反轉確認）
-4. ATR(5)/ATR(20) > 1.15（波動率急升過濾）
-5. 冷卻期 5 個交易日
+4. ATR(5)/ATR(20) > 1.15（波動率急升）
+5. 2日累計跌幅 >= 1.5%（短期動量崩潰確認）
+6. 冷卻期 8 個交易日
 """
 
 import logging
@@ -14,40 +17,32 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.experiments.cibr_004_rsi2_vol_adaptive.config import CIBRRSI2Config
+from trading.experiments.cibr_004_rsi2_vol_adaptive.config import CIBR004Config
 
 logger = logging.getLogger(__name__)
 
 
-class CIBRRSI2SignalDetector(BaseSignalDetector):
-    def __init__(self, config: CIBRRSI2Config):
+class CIBR004SignalDetector(BaseSignalDetector):
+    def __init__(self, config: CIBR004Config):
         self.config = config
-
-    @staticmethod
-    def _compute_rsi(series: pd.Series, period: int) -> pd.Series:
-        """Wilder's RSI"""
-        delta = series.diff()
-        gain = delta.where(delta > 0, 0.0)
-        loss = (-delta).where(delta < 0, 0.0)
-        avg_gain = gain.ewm(alpha=1.0 / period, min_periods=period, adjust=False).mean()
-        avg_loss = loss.ewm(alpha=1.0 / period, min_periods=period, adjust=False).mean()
-        rs = avg_gain / avg_loss
-        return 100.0 - (100.0 / (1.0 + rs))
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # RSI(2)
-        df["RSI"] = self._compute_rsi(df["Close"], self.config.rsi_period)
+        # 回檔幅度：收盤價 vs 近 N 日最高價
+        n = self.config.pullback_lookback
+        df["High_N"] = df["High"].rolling(n).max()
+        df["Pullback"] = (df["Close"] - df["High_N"]) / df["High_N"]
 
-        # 2日累計跌幅
-        n = self.config.decline_lookback
-        df["Decline_2d"] = (df["Close"] - df["Close"].shift(n)) / df["Close"].shift(n)
+        # Williams %R
+        wr_n = self.config.wr_period
+        highest = df["High"].rolling(wr_n).max()
+        lowest = df["Low"].rolling(wr_n).min()
+        df["WR"] = (highest - df["Close"]) / (highest - lowest) * -100
 
-        # 收盤位置 (Close Position): 0=收在最低, 1=收在最高
-        day_range = df["High"] - df["Low"]
-        df["ClosePos"] = (df["Close"] - df["Low"]) / day_range
-        df.loc[day_range == 0, "ClosePos"] = 0.5
+        # Close Position
+        daily_range = df["High"] - df["Low"]
+        df["ClosePos"] = ((df["Close"] - df["Low"]) / daily_range).where(daily_range > 0, 0.5)
 
         # ATR ratio
         tr = pd.concat(
@@ -62,17 +57,22 @@ class CIBRRSI2SignalDetector(BaseSignalDetector):
         df["ATR_slow"] = tr.rolling(self.config.atr_slow).mean()
         df["ATR_ratio"] = df["ATR_fast"] / df["ATR_slow"].where(df["ATR_slow"] > 0, float("nan"))
 
+        # 2日累計跌幅
+        dl = self.config.decline_lookback
+        df["Decline_2d"] = (df["Close"] - df["Close"].shift(dl)) / df["Close"].shift(dl)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        cond_rsi = df["RSI"] < self.config.rsi_threshold
+        cond_pullback = df["Pullback"] <= self.config.pullback_threshold
+        cond_wr = df["WR"] <= self.config.wr_threshold
+        cond_closepos = df["ClosePos"] >= self.config.close_pos_threshold
+        cond_atr = df["ATR_ratio"] > self.config.atr_ratio_threshold
         cond_decline = df["Decline_2d"] <= self.config.decline_threshold
-        cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
-        cond_vol = df["ATR_ratio"] > self.config.atr_ratio_threshold
 
-        df["Signal"] = cond_rsi & cond_decline & cond_reversal & cond_vol
+        df["Signal"] = cond_pullback & cond_wr & cond_closepos & cond_atr & cond_decline
 
         # Cooldown mechanism
         signal_indices = df.index[df["Signal"]].tolist()
@@ -95,5 +95,5 @@ class CIBRRSI2SignalDetector(BaseSignalDetector):
             )
 
         signal_count = df["Signal"].sum()
-        logger.info("CIBR-004: Detected %d RSI(2) vol-adaptive signals", signal_count)
+        logger.info("CIBR-004: Detected %d momentum-enhanced MR signals", signal_count)
         return df
