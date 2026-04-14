@@ -79,6 +79,7 @@ on:
           - "EWT-003: ewt_003_bb_squeeze_breakout"
           - "EWT-004: ewt_004_crash_filter_asymmetric"
           - "EWT-005: ewt_005_rsi2_vol_adaptive"
+          - "EWT-006: ewt_006_optimized_exit_mr"
           - "EWZ-001: ewz_001_pullback_wr"
           - "EWZ-002: ewz_002_vol_adaptive_pullback"
           - "EWZ-003: ewz_003_bb_squeeze_breakout"

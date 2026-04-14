@@ -139,10 +139,10 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-13
+  validated: 2026-04-14
   data_through: 2025-12-31
   confidence: high
-  note: EWT-004 added 2026-04-13
+  note: EWT-006 updated 2026-04-14 (min(A,B) 0.15→0.28)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -167,7 +167,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | EWJ | EWJ-002 Att2 | 波動率自適應回檔+WR+崩盤隔離 | 0.55 | 2 次實驗 |
-| EWT | EWT-004 Att1 | 2日急跌+非對稱出場均值回歸 | 0.15 | 4 次實驗 |
+| EWT | EWT-006 Att2 | 出場優化均值回歸（TP/vol 比校準）| 0.28 | 6 次實驗 ✓ |
 | VGK | VGK-003 Att2 | 回檔+WR+ATR 波動率自適應 | 0.42 | 3 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
