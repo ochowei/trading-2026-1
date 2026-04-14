@@ -220,6 +220,7 @@ on:
           - "INDA-003: inda_003_bb_squeeze_breakout"
           - "INDA-004: inda_004_rsi2_atr_adaptive"
           - "INDA-005: inda_005_crash_filtered_mr"
+          - "INDA-006: inda_006_exit_optimized_mr"
 
 jobs:
   backtest:

@@ -170,7 +170,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | EWT | EWT-006 Att2 | 出場優化均值回歸（TP/vol 比校準）| 0.28 | 6 次實驗 ✓ |
 | VGK | VGK-003 Att2 | 回檔+WR+ATR 波動率自適應 | 0.42 | 3 次實驗 |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
-| INDA | INDA-002 Att1 | 波動率自適應均值回歸 | 0.15 | 3 次實驗 ✓ |
+| INDA | INDA-005 Att3 | 出場優化均值回歸（回檔+WR+ClosePos+ATR）| 0.23 | 6 次實驗 ✓ |
 | FXI | FXI-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.33 | 2 次實驗 |
 | EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 2 次實驗 |
 | CIBR | CIBR-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.23 | 3 次實驗 |
