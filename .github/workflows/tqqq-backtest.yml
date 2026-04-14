@@ -190,6 +190,7 @@ on:
           - "CIBR-002: cibr_002_vol_adaptive_mr"
           - "CIBR-003: cibr_003_bb_squeeze_breakout"
           - "CIBR-004: cibr_004_rsi2_vol_adaptive"
+          - "CIBR-005: cibr_005_20d_lookback_mr"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
