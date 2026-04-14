@@ -207,6 +207,7 @@ on:
           - "VGK-002: vgk_002_vol_adaptive_pullback"
           - "VGK-002-RSI2: vgk_002_vol_adaptive_rsi2"
           - "VGK-003: vgk_003_pullback_wr"
+          - "VGK-004: vgk_004_crash_isolated_mr"
           - "IBIT-001: ibit_001_pullback_wr"
           - "IBIT-002: ibit_002_rsi2_pullback"
           - "IBIT-003: ibit_003_bb_squeeze_breakout"
