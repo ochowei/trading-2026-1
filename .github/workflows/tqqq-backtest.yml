@@ -84,6 +84,7 @@ on:
           - "EWZ-001: ewz_001_pullback_wr"
           - "EWZ-002: ewz_002_vol_adaptive_pullback"
           - "EWZ-003: ewz_003_bb_squeeze_breakout"
+          - "EWZ-004: ewz_004_trend_momentum_pullback"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
