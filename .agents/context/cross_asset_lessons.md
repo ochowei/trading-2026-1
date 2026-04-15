@@ -139,10 +139,10 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-14
+  validated: 2026-04-15
   data_through: 2025-12-31
   confidence: high
-  note: EWT-007 updated 2026-04-14 (min(A,B) 0.28→0.42, RS momentum)
+  note: EWZ-005 updated 2026-04-15 (RS momentum failed, EWZ-002 confirmed global optimum, 5 experiments)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -172,7 +172,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-005 Att3 | 出場優化均值回歸（回檔+WR+ClosePos+ATR）| 0.23 | 6 次實驗 ✓ |
 | FXI | FXI-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.33 | 2 次實驗 |
-| EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 2 次實驗 |
+| EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 5 次實驗 ✓ |
 | CIBR | CIBR-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.23 | 3 次實驗 |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
@@ -217,7 +217,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 ### 策略類型禁忌
 23. **z-score 配對交易** — 所有資產對都存在結構性漂移，5 對 0 成功
 24. **動量回檔在日波動>2% 礦業資產** — SMA 趨勢濾波假陽性率過高
-25. **動量回調在多成分等權重板塊 ETF** — 板塊級 ROC 反映個股事件加總非板塊趨勢。**RS 動量（板塊 vs SPY/QQQ）對市值加權板塊 ETF 同樣無效**：CIBR 三次嘗試（QQQ/SPY 基準、鬆/緊/品質過濾）均負 Sharpe，網路安全無獨立板塊動量週期（CIBR-006 驗證）。RS 動量有效條件：(a) 強週期性板塊如半導體（SOXL-010）或 (b) 地理/資產類別差異大且**週期性**的比較對（EWT vs EEM）。**持續性結構優勢（如 INDA vs EEM：人口紅利/IT）不產生有效 RS 訊號**：INDA-007 三次嘗試（RS 2~3%、ATR 1.10~1.15）Part A -0.49~0.07，極端市場狀態依賴
+25. **動量回調在多成分等權重板塊 ETF** — 板塊級 ROC 反映個股事件加總非板塊趨勢。**RS 動量（板塊 vs SPY/QQQ）對市值加權板塊 ETF 同樣無效**：CIBR 三次嘗試（QQQ/SPY 基準、鬆/緊/品質過濾）均負 Sharpe，網路安全無獨立板塊動量週期（CIBR-006 驗證）。RS 動量有效條件：(a) 強週期性板塊如半導體（SOXL-010）或 (b) 地理/資產類別差異大且**週期性**的比較對（EWT vs EEM）。**持續性結構優勢（如 INDA vs EEM：人口紅利/IT）不產生有效 RS 訊號**：INDA-007 三次嘗試（RS 2~3%、ATR 1.10~1.15）Part A -0.49~0.07，極端市場狀態依賴。**宏觀事件驅動的商品優勢（EWZ vs EEM）同樣無效**：EWZ-005 三次嘗試（RS 10d/15d/20d、2-4%門檻、含/不含 ATR），min(A,B) -0.33~-0.21，A/B 訊號比 6-7:1，巴西商品優勢受大宗商品價格/BRL 匯率/政治事件驅動而非週期性
 26. **趨勢回檔策略** — 在低波動防禦型 ETF、高波動個股上均市場狀態依賴過強。**短期動量（5日漲幅>10%）在 IBIT 上 Part A 1.00/Part B -0.55**，2024 牛市 87.5% WR vs 2025 震盪 25% WR（IBIT-005 Att2 驗證）
 27. **RSI(2) 在日波動 >2% 或利率敏感/事件驅動型資產** — 過於敏感，熊市產生假訊號（SIVR、TSM、FCX、IBIT、XLU、SOXL 均驗證）。有效範圍：日波動 ≤ 1.5% 的**美國寬基指數 ETF**（SPY、DIA、IWM、VOO）。**非寬基 ETF 即使日波動在有效範圍內仍無效**：VGK（歐洲，1.12%，Part A -0.06）、CIBR（美國板塊，1.53%，Part A -0.19）。關鍵差異是**板塊/國家集中度**而非上市國家：集中型 ETF 在持續性熊市（COVID、2021-22 科技拋售）中 RSI(2) 訊號反覆失敗（CIBR-004 Att1 驗證）
 28. **BB 擠壓突破在商品/利率/3x 槓桿/單一國家 EM ETF** — 有效性：個股(2-4%) > 高流動 ETF(1.5-2%) > 其餘均失敗。**例外**：EEM（新興市場 ETF）因 EM risk-on/risk-off 資金流特性有效（min 0.18，8 次實驗確認為天花板）。**單一國家 EM ETF（INDA/EWT/FXI）均失敗**，FXI 三次迭代 Part A -0.12~-0.30（FXI-003 驗證）
