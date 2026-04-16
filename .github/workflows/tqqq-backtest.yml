@@ -200,6 +200,7 @@ on:
           - "CIBR-005: cibr_005_20d_lookback_mr"
           - "CIBR-006: cibr_006_rs_momentum_pullback"
           - "CIBR-007: cibr_007_bb_lower_mr"
+          - "CIBR-008: cibr_008_bb_lower_pullback_cap"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"

@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-16
   data_through: 2025-12-31
   confidence: high
-  note: EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). †EWJ min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (6/6 trades returned identical +3.50%)
+  note: CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). †EWJ min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (6/6 trades returned identical +3.50%)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -173,7 +173,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | INDA | INDA-005 Att3 | 出場優化均值回歸（回檔+WR+ClosePos+ATR）| 0.23 | 6 次實驗 ✓ |
 | FXI | FXI-005 Att3 | 出場優化均值回歸（TP5.5%/SL5%/20d）| 0.38 | 6 次實驗 ✓ |
 | EWZ | EWZ-002 Att3 | 波動率自適應回檔+WR+非對稱出場 | 0.34 | 5 次實驗 ✓ |
-| CIBR | CIBR-002 Att3 | 波動率自適應回檔+WR+ATR+ClosePos | 0.23 | 3 次實驗 |
+| CIBR | CIBR-008 Att2 | BB 下軌+回檔上限-12%+WR+ClosePos+ATR | 0.39 | 8 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
 
@@ -254,7 +254,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 ### 進場機制禁忌
 50. **價格範圍壓縮替代 BB Squeeze 在分散化 ETF** — 價格範圍壓縮門檻較 BB 帶寬更鬆，產生過多假突破。BB Squeeze 的標準差+百分位方法對 EEM 類 ETF 仍是最佳壓縮偵測（EEM-008 Att2）
 51. **環境實現波動率過濾 BB Squeeze 突破** — 宏觀驅動 ETF（EEM/TLT）的衝擊發生在正常波動率環境，事後波動率才飆升。環境波動率無法預測未來衝擊，反移除好訊號（如 COVID 復甦期突破）多於壞訊號（EEM-008 Att3）
-52. **BB 下軌均值回歸在政策驅動 EM ETF** — BB(20,2.0) 太鬆捕捉慢磨下跌（FXI WR41.7%），BB(20,2.5)+多重過濾過嚴（5+1訊號）。BB 帶寬在持續熊市中不斷外擴，下軌失去選擇性。2d decline≤-3% 獨立進場亦僅 min 0.13，不如 PB+WR 框架。**例外**：EWJ-003 驗證 BB 下軌+回檔上限混合進場在日本市場有效（Sharpe 0.60），因日本市場無中國式政策衝擊（FXI-006 驗證）
+52. **BB 下軌均值回歸在政策驅動 EM ETF** — BB(20,2.0) 太鬆捕捉慢磨下跌（FXI WR41.7%），BB(20,2.5)+多重過濾過嚴（5+1訊號）。BB 帶寬在持續熊市中不斷外擴，下軌失去選擇性。2d decline≤-3% 獨立進場亦僅 min 0.13，不如 PB+WR 框架。**例外**：EWJ-003 驗證 BB 下軌+回檔上限混合進場在日本市場有效（Sharpe 0.60），因日本市場無中國式政策衝擊（FXI-006 驗證）。**CIBR-008 Att2 進一步驗證**：在美國板塊 ETF（CIBR 1.53% vol）上 BB(20,2.0) + 回檔上限 -12%（7.8σ）+ WR + ClosePos + ATR 混合進場 min(A,B) 0.39（+44% vs CIBR-007 純 BB 下軌的 0.27）。回檔上限有效隔離崩盤連續段訊號（COVID 2020-03 深度 >12%），BB 下軌仍提供統計自適應進場。混合進場模式適用：低中波動（≤2.0%）資產+三重品質過濾+回檔上限 7-8σ
 
 > 每條禁忌的詳細實驗證據見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 10。
 
