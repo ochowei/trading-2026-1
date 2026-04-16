@@ -12,6 +12,10 @@ SIVR-013 在 2-3% vol 上測試 BB 下軌失敗（熊市反覆觸及），但 CI
 遠低於 SIVR，且搭配 ATR>1.15+ClosePos 品質過濾應可抑制持續性熊市假訊號。
 
 Att1: BB(20,2.0) 下軌 + WR(10)≤-80 + ClosePos≥40% + ATR>1.15
+      → Part A 0.27/Part B 4.38, min 0.27 (+17% vs CIBR-002)
+Att2: BB(20,1.5) 較寬下軌 → 品質稀釋（+訊號含停損），撤回
+Att3: 移除 ClosePos 過濾 → Part A 0.09/Part B 0.02（品質崩壞，15訊號含5停損），
+      確認 ClosePos 在 BB 框架中不可或缺。最終保留 Att1 配置。
 """
 
 from dataclasses import dataclass
