@@ -139,10 +139,10 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-15
+  validated: 2026-04-16
   data_through: 2025-12-31
   confidence: high
-  note: EWZ-005 updated 2026-04-15 (RS momentum failed, EWZ-002 confirmed global optimum, 5 experiments)
+  note: VGK-005 updated 2026-04-16 (deep pullback/2d decline/asymmetric TP all failed, VGK-003 confirmed global optimum, 5 experiments)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -168,7 +168,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
 | EWJ | EWJ-002 Att2 | 波動率自適應回檔+WR+崩盤隔離 | 0.55 | 2 次實驗 |
 | EWT | EWT-007 Att1 | RS 動量回調（EWT vs EEM）| 0.42 | 7 次實驗 ✓ |
-| VGK | VGK-003 Att2 | 回檔+WR+ATR 波動率自適應 | 0.42 | 3 次實驗 |
+| VGK | VGK-003 Att2 | 回檔+WR+ATR 波動率自適應 | 0.42 | 5 次實驗 ✓ |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-005 Att3 | 出場優化均值回歸（回檔+WR+ClosePos+ATR）| 0.23 | 6 次實驗 ✓ |
 | FXI | FXI-005 Att3 | 出場優化均值回歸（TP5.5%/SL5%/20d）| 0.38 | 5 次實驗 ✓ |
@@ -181,7 +181,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 10. 反覆失敗的做法（禁止清單）
 <!-- freshness:
-  validated: 2026-04-15
+  validated: 2026-04-16
   data_through: 2025-12-31
   confidence: high
 -->
@@ -246,6 +246,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 44. **IBIT SL -7%** — 高波動需寬 SL，但 -8% 過寬（停損交易均跌穿 -7% 後繼續至 -8% 以下，加寬只增加虧損，IBIT-005 Att3 驗證）
 45. **XBI SL -5.0%** — 熊市超賣常下探 -4~-5% 後反彈
 46. **VOO TP +2.85%**、**SPY TP +3.0%** — 同指數 ETF 的 TP 不同
+46b. **VGK TP +3.5%** — TP +4.0%（3.57σ）轉達標交易為停損（VGK-005 Att2 驗證）
 47. **URA SL -5.5%** — 甜蜜點
 48. **COPX TP +3.5%** / SL -4.5% — 甜蜜點
 49. **EEM SL > -3.0%（突破策略）** — EM 停損為結構性崩潰非暫時回撤，加寬 SL 只增加虧損（EEM-008 Att1）
@@ -392,8 +393,8 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ## 19. 2日急跌過濾
 <!-- freshness:
-  derived_from: [FCX-008,USO-013,EWT-004]
-  validated: 2026-04-13
+  derived_from: [FCX-008,USO-013,EWT-004,VGK-005]
+  validated: 2026-04-16
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -401,6 +402,8 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 2日急跌過濾在基礎訊號頻率 ≥ 5/年的資產上有效（USO、COPX），但在訊號已稀少的資產上（FCX ~3.6/年）會過度移除好訊號。
 
 **例外**：EWT-004 在 3.2 訊號/年仍有效（min(A,B) 0.13→0.15，+15%），但配合非對稱出場才能發揮，且改善幅度小於高頻資產。
+
+**低波動資產限制**：VGK（1.12% vol）上 2日急跌 ≤ -1.0% 太溫和（~0.45σ/天），pullback+WR 訊號天然包含急跌成分，過濾器因冷卻期交互作用反移除好訊號（Part A 0.42→0.36，-14.3%，VGK-005 Att1 驗證）。
 
 ---
 
