@@ -1,11 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-04-17
   data_through: 2025-12-31
-  note: FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed to beat FXI-005 min 0.38; best Att3 dual-osc 0.37). Confirms Stoch Oscillator adds no value over WR(10) for FXI. A/B signal imbalance (5:1) is structural and cannot be fixed via oscillator changes alone.
+  note: FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed to beat FXI-005 min 0.38; best Att1 0.00, Att2 -0.11, Att3 Part A 0 signals). Confirms short-horizon structure-break + reclaim patterns DO NOT work on policy-driven single-country EM ETFs. Extends lesson #52 to failed-breakdown / Turtle Soup variant. FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed; best Att3 dual-osc 0.37). A/B signal imbalance (5:1) is structural and cannot be fixed via entry-mechanism changes alone.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（8 次實驗）**
+**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（9 次實驗）**
 - Part A Sharpe 0.38（WR65.4%, 26訊號, +54.97%）, Part B Sharpe 1.61（WR80%, 5訊號, +20.59%）
 - min(A,B) Sharpe **0.38**（vs FXI-002 0.33，+15.2% 提升）
 - Part B WR 80%（FXI-002 為 60%），SL -5.0% 拯救 2025-04-04 關鍵交易（SL→TP，+10.6pp）
@@ -43,6 +43,12 @@
   - Att3 WR(10)≤-80 AND %K(14,3)≤20 雙振盪器（最佳嘗試）：Part A 0.37 / Part B 1.49（20/4 訊號），接近但仍 -0.01 短於 FXI-005
   - **根因：Stoch 對 FXI 無加成**。%K>%D 交叉在 MR 策略中作為 entry 過於延遲；Stoch %K(14,3) 等級與 WR(10) 數學接近（僅週期+平滑略異）；雙振盪器 intersection 品質提升不足補訊號流失
   - A/B 訊號比 5:1 為結構性問題（熊市回檔多 vs 反彈期回檔稀少），非振盪器類型可解決
+- **Failed Breakdown Reversal / Turtle Soup**（FXI-009，三次迭代均失敗）：
+  - Att1 breakdown_lookback=10 + bullish bar + WR≤-80 + 20d pullback 3-12% + cd10 + TP+5.5%/SL-5%/20d：Part A 8 訊號 WR 62.5% +6.27% Sharpe 0.18；Part B 1 訊號 WR 0% -5.10% Sharpe 0.00。min 0.00
+  - Att2 breakdown_lookback=5 + 移除 pullback 深度下限 + ClosePos≥40%：Part A 7 訊號 WR 42.9% -4.76% Sharpe -0.11；Part B 1 訊號 WR 0% Sharpe 0.00。min -0.11（WORSE）
+  - Att3 breakdown_lookback=10 + breakdown depth≥1% + ClosePos + bullish：Part A 0 訊號；Part B 1 訊號 WR 0% Sharpe 0.00。min 0.00（Part A 訊號枯竭）
+  - **根因：政策驅動 EM 缺乏可靠的短期反轉結構**。FXI 的破底後「奪回」常被後續多日連環下跌（2021-11、2022-09、2023-02、2025-04 均在 reclaim 後續跌）吞噬。這與 BB 擠壓突破（FXI-003）、BB 下軌 MR（FXI-006）的失敗同根源——中國政策/事件驅動使盤中級別結構失效
+  - 擴展跨資產教訓 #52 至「Turtle Soup / 失效破底反轉」——政策驅動單一國家 EM ETF 所有短週期反轉結構（BB Squeeze、BB 下軌、Stoch 交叉、failed breakdown reclaim）均無效
 - **WR(14) 替代 WR(10)**（FXI-005 Att1）：
   - WR(14) 未提供任何增量（Part B 訊號完全相同），WR(10) 對 FXI 仍為最佳
 - **延長冷卻期 15d**（FXI-005 Att1）：
@@ -68,6 +74,7 @@
 - RSI(2) 框架（日波動 ≥2% 通常無效，RSI(5) 已驗證失敗）
 - ~~RS 動量（FXI vs EEM）~~ → FXI-007 三次迭代均失敗
 - ~~Stochastic Oscillator 均值回歸~~ → FXI-008 三次迭代均失敗（%K>%D 交叉、%K 等級替代 WR、雙振盪器均無加成）
+- ~~Failed Breakdown Reversal / Turtle Soup~~ → FXI-009 三次迭代均失敗（10d/5d breakdown、ClosePos、深度門檻均無法勝過 FXI-005）
 - 動量回調（在高波動 EM ETF 上普遍失敗）
 - SL -4.75%（介於 -4.5% 和 -5.0% 之間，可能是更精確甜蜜點）
 
@@ -82,6 +89,7 @@
 - WR(10) 是 FXI 最佳超賣指標，WR(14) 和 RSI(5) 均無效
 - **RS 動量（FXI vs EEM）無效（FXI-007 驗證）**：中國相對 EM 的超額/劣勢由政策週期驅動（2022 regulatory、2024-2025 stimulus），非結構性。與 INDA/EWZ 失敗模式一致，確認跨資產教訓 #25 延伸至中國 ETF。SMA(200) 趨勢過濾可改善 Part A 但無法解決 A/B 累積差失衡（最佳 Att2 min 0.16，仍遠低於 FXI-005 的 0.38）
 - **Stochastic Oscillator 均值回歸無加成（FXI-008 驗證）**：三次迭代均未勝過 FXI-005（Att1 %K>%D 交叉 min 0.16、Att2 %K 等級替代 WR min 0.34、Att3 WR+Stoch 雙振盪器 min 0.37）。根因：(a) %K>%D 交叉延遲（已回升 1-3 天），TP 空間不足；(b) Stoch %K(14,3) 與 WR(10) ≤ -80 幾乎同義（等價於 raw %K(10) ≤ 20 vs 14 週期 + 3 日 SMA），選擇性僅微差；(c) 雙振盪器 intersection 提升品質但同時移除 Part B 好訊號。A/B 訊號比 5:1 為結構性（熊市回檔多 vs 牛市反彈少），非振盪器類型可修正
+- **Failed Breakdown Reversal / Turtle Soup 無效（FXI-009 驗證）**：三次迭代均未勝過 FXI-005（Att1 10d breakdown + bullish bar min 0.00、Att2 5d breakdown + ClosePos min -0.11、Att3 10d + 1% 深度 Part A 訊號枯竭 min 0.00）。根因：FXI 政策/事件驅動使短期反轉結構全面失效——破底後「奪回」不等於反轉，常被後續多日連環下跌吞噬（Att1 所有 SL 交易 2021-11/2022-09/2023-02/2025-04 均在 reclaim 後 2-10 天停損）。擴展 lesson #52：政策驅動單一國家 EM 在所有短週期反轉結構（BB Squeeze、BB 下軌、Stoch 交叉、failed breakdown reclaim）均無效
 <!-- AI_CONTEXT_END -->
 
 # FXI 實驗總覽 (FXI Experiments Overview)
@@ -105,6 +113,7 @@
 | FXI-006 | `fxi_006_bb_lower_mr`          | BB下軌→急跌均值回歸              | 已完成（失敗，確認 BB MR 無效）|
 | FXI-007 | `fxi_007_rs_momentum`          | RS 動量回調（FXI vs EEM）         | 已完成（失敗，確認 RS 動量在單一國家 EM 無效）|
 | FXI-008 | `fxi_008_stochastic_mr`        | Stochastic Oscillator 均值回歸（3 次迭代均失敗）| 已完成（失敗，確認 Stoch 對 FXI 無加成）|
+| FXI-009 | `fxi_009_failed_breakdown_reversal` | Failed Breakdown Reversal / Turtle Soup（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #52 至 breakdown reclaim 結構）|
 
 ---
 
@@ -605,3 +614,87 @@ FXI-001 (回檔+WR 基礎版)
 - **結論**：Stochastic Oscillator 不適合 FXI 作為均值回歸進場指標；
   FXI-005 的 WR(10)≤-80 + ATR + ClosePos 框架已近最優，改進方向應著重於
   出場邏輯或 regime-aware 的訊號權重調整（超出純技術面範圍）
+
+---
+
+## FXI-009: Failed Breakdown Reversal / Turtle Soup（三次迭代均失敗）
+
+### 目標 (Goal)
+
+嘗試 repo 中**從未使用**的 **Failed Breakdown Reversal (Turtle Soup)**
+策略方向：捕捉 FXI 在短期低點被跌破後隨即反彈的「假突破」結構。假設政策
+驅動的 FXI 常在訊息面恐慌殺跌後 1 天內展現極端反轉（2024-01、2024-09、
+2025-01 的 V 型底部），若能精準捕捉這些結構性反轉，可改善 FXI-005 的 A/B
+訊號不平衡（26:5, 5.2:1）並提升 Part B 訊號密度。
+
+### 策略方向
+
+**失效破底反轉 / Turtle Soup**：
+1. 第 T-1 日：Low 跌破過去 N 日最低點（真實破底）
+2. 第 T 日：Close 重回過去 N 日最低點之上（奪回支撐）
+3. 第 T 日：Close > Open（盤中累積性反轉）
+4. WR(10) 於 T 日仍在超賣區（≤ -80）
+5. 20 日高點回檔 ≥ -12%（隔離 COVID/監管風暴崩盤）
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+| # | 變更 | Part A Sharpe | Part B Sharpe | A/B 訊號 | A WR / B WR | 結論 |
+|---|------|---------------|---------------|----------|-------------|------|
+| 1 | breakdown_lookback=10, 20d PB∈[-12%,-3%], WR≤-80, bullish bar, TP+5.5%/SL-5%/20d/cd10 | 0.18 | 0.00 | 8/1 | 62.5%/0.0% | 基線嘗試；Part B 僅 1 訊號（2025-04-01 關稅前）停損。10 日破底太稀疏，-3% 深度下限過濾掉淺回檔假突破但也排除 stimulus 期反轉 |
+| 2 | breakdown_lookback=5, 移除 PB 深度下限, 加 ClosePos≥40% | -0.11 | 0.00 | 7/1 | 42.9%/0.0% | 5 日破底太常見；Part A WR 崩至 42.9%。ClosePos 未提升品質——FXI 高波動使合格反轉日不一定收在盤高 |
+| 3 | breakdown_lookback=10, breakdown depth≥1%（真實深破）, 保留 ClosePos + bullish | 0.00* | 0.00 | 0/1 | N/A | 1% 深度門檻過嚴，Part A 訊號枯竭。FXI 的 10 日低點通常只被略微跌破即反彈 |
+
+_* Part A 0 訊號，無法計算有意義的 Sharpe_
+
+### 進場條件（三次迭代）
+
+**Att1 基線**：
+| 條件 | 指標 | 閾值 |
+|------|------|------|
+| 1 | 10 日破底 | Low_{T-1} < min(Low over [T-11, T-2]) |
+| 2 | 奪回 | Close_T > 同 10 日最低點 |
+| 3 | 盤中強勢 | Close_T > Open_T |
+| 4 | 超賣 | WR(10) ≤ -80 |
+| 5 | 回檔深度 | 20 日 PB 在 [-12%, -3%] |
+| 6 | 冷卻 | 10 交易日 |
+
+**Att2**：breakdown_lookback=10→5，移除 PB 深度下限，新增 ClosePos≥40%
+**Att3**：breakdown_lookback=5→10，新增 breakdown_depth_pct=0.01（1% 真實破底）
+
+### 出場參數
+
+同 FXI-005：TP +5.5% / SL -5.0% / 20 天 / 無追蹤停損 / cd 10 天。
+
+### 成交模型
+
+同 FXI-005：隔日開盤市價進場、限價賣單 Day、停損市價 GTC、到期隔日開盤、
+滑價 0.1%、悲觀認定。
+
+### 失敗分析 (Failure Analysis)
+
+- **策略方向**：Failed Breakdown Reversal / Turtle Soup（repo 中全新類別）
+- **關鍵參數**：breakdown_lookback（5/10）、breakdown_depth_pct（0/0.01）、
+  pullback_threshold（-3%/無）、close_position_threshold（無/0.4）
+- **結果**：三次迭代最佳 min(A,B) Sharpe 0.00（Att1）< FXI-005 的 0.38
+- **失敗根因**：
+  1. **Part B 僅 1 訊號（兩次迭代相同）**：2024-2025 stimulus rally 中 FXI
+     沒有足夠「真破底 + 奪回」事件，整個 breakdown reclaim 結構極其稀疏
+  2. **Reclaim 不代表反轉**：Att1 的 8 筆 Part A 有 3 筆停損（2021-11、2022-09、
+     2023-02），全部在「奪回」後 4-15 天再度跌穿 -5%，暴露政策驅動 EM 缺乏持續
+     性反轉能量的結構性問題
+  3. **短期 breakdown 過於常見**：Att2 將 lookback 降至 5 日後，Part A 訊號維
+     持但品質崩壞（WR 62.5%→42.9%），證明短期破底頻繁發生在震盪環境且無統計意義
+  4. **深破門檻雙面不討好**：Att3 的 1% 深破要求排除 Part A 所有訊號，FXI 的 10 日
+     破底通常只被略微跌破即反彈，無法同時要求真實深破 + 次日奪回
+  5. **Part B 單一訊號（2025-04-01）的毀滅性停損**：關稅公告前夜觸發 failed
+     breakdown 結構，但隔日關稅消息使 FXI 繼續深跌 7%+，證明「結構性反轉」
+     對政策/事件驅動 EM 毫無預測力
+- **擴展跨資產教訓 #52**：政策驅動單一國家 EM ETF（FXI）在所有短週期反轉結構均失敗：
+  - BB Squeeze 突破（FXI-003）
+  - BB 下軌 MR（FXI-006）
+  - Stochastic %K>%D 交叉（FXI-008）
+  - **Failed breakdown reclaim（FXI-009，新增）**
+- **結論**：Turtle Soup 在政策驅動 EM 上因缺乏穩定反轉結構而失效；FXI 的超額反彈
+  事件由政策/消息驅動，無法用純技術面的 breakdown reclaim 型態捕捉。FXI-005
+  的 PB+WR+ATR+ClosePos 框架仍為全域最優，且訊號頻率結構性不平衡（5:1）無法用
+  進場結構改變解決
