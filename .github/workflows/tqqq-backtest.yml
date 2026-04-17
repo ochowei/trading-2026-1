@@ -102,6 +102,7 @@ on:
           - "FXI-004: fxi_004_rsi5_2d_decline"
           - "FXI-005: fxi_005_wr14_extended_mr"
           - "FXI-006: fxi_006_bb_lower_mr"
+          - "FXI-007: fxi_007_rs_momentum"
           - "SOXL-001: soxl_001_extreme_oversold"
           - "SOXL-002: soxl_002_deep_oversold"
           - "SOXL-003: soxl_003_wide_sl"
