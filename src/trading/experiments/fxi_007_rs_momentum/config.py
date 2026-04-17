@@ -16,10 +16,14 @@ FXI-007: Relative Strength Momentum Pullback (FXI vs EEM)
 本實驗為 FXI 首次嘗試 RS 動量策略。
 
 Att1: EEM ref, RS>=3%, pullback 2-5%, SMA(50), TP+4.0%/SL-4.5%/20d
-  - RS 門檻 3% 承襲 EWT-007 Att1 成功配置
-  - Pullback 2-5% 捕捉淺回調（FXI 2.0% 日波動，≥2% 約 1σ）
-  - TP+4.0%/SL-4.5% 符合 FXI 中等波動出場結構
-  - 冷卻 10 天
+  → Part A -0.22 (13 訊號, WR 46.2%, -12.31%), Part B 0.79 (9 訊號, WR 77.8%, +23.42%)
+  → min(A,B) -0.22 ✗ 2022 中國熊市產生 4 SL 拖累 Part A
+  → 失敗根因：SMA(50) 無法濾除 2022 熊市中的技術性反彈訊號，當 FXI 在
+    SMA(200) 之下時，SMA(50) 常被反彈觸及但仍屬熊市規律
+
+Att2: EEM ref, RS>=3%, pullback 2-5%, SMA(200), TP+4.0%/SL-4.5%/20d
+  - 加強趨勢過濾至 SMA(200)，隔離 2022 中國熊市
+  - 其他參數沿用 Att1
 """
 
 from dataclasses import dataclass
@@ -32,7 +36,7 @@ class FXI007Config(ExperimentConfig):
     """FXI-007 相對強度動量回調策略參數"""
 
     reference_ticker: str = "EEM"
-    sma_trend_period: int = 50
+    sma_trend_period: int = 200
     relative_strength_period: int = 20
     relative_strength_min: float = 0.03  # FXI - EEM 20日報酬差 >= 3%
     pullback_lookback: int = 5
