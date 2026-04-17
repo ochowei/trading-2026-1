@@ -24,6 +24,7 @@ on:
           - "TQQQ-013: tqqq_013_cap_exec_qqq_optimized"
           - "TQQQ-014: tqqq_014_cap_exec_vix_adaptive"
           - "TQQQ-015: tqqq_015_qqq_trend_breakout"
+          - "TQQQ-016: tqqq_016_gap_reversal_mr"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
