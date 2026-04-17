@@ -1,5 +1,5 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-16
+  last_validated: 2026-04-17
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
@@ -29,6 +29,13 @@
 - **2日急跌≤-3% 獨立進場**（FXI-006 Att3）：
   - 放棄 BB 改用 2d decline≤-3%+ATR+ClosePos，min(A,B) Sharpe 僅 0.13
   - 選擇性不足（Part A 16訊號 WR62.5%），不如 PB+WR 框架
+- **RS 動量回調 FXI vs EEM**（FXI-007，三次迭代均失敗）：
+  - Att1 RS≥3%+PB 2-5%+SMA(50)：Part A -0.22 / Part B 0.79（2022 熊市 4 SL）
+  - Att2 RS≥3%+PB 2-5%+SMA(200)：Part A 0.16 / Part B 0.50（強化趨勢過濾但 A/B 累積差 78%）
+  - Att3 RS≥4%+PB 2-5%+SMA(200)：Part A -6.63 / Part B 0.92（RS 4% 過嚴使 Part A 3 連敗）
+  - **根因：中國 vs EEM 相對強度由政策/事件驅動（2022 regulatory crackdown, 2024-2025 stimulus），非結構性**
+  - 確認跨資產教訓 #25：單一國家 EM ETF RS 動量策略全面失敗（INDA/EWZ/FXI 三個資料點）
+  - A/B 訊號品質極度不對稱：Part B（2024-2025 政策刺激期）WR 77-86% / Part A（2019-2023）WR 46-67%
 - **WR(14) 替代 WR(10)**（FXI-005 Att1）：
   - WR(14) 未提供任何增量（Part B 訊號完全相同），WR(10) 對 FXI 仍為最佳
 - **延長冷卻期 15d**（FXI-005 Att1）：
@@ -52,6 +59,7 @@
 **尚未嘗試的方向（預期空間極有限）：**
 - 回檔上限從 -12% 縮窄至 -10%（可能移除部分有效深回檔）
 - RSI(2) 框架（日波動 ≥2% 通常無效，RSI(5) 已驗證失敗）
+- ~~RS 動量（FXI vs EEM）~~ → FXI-007 三次迭代均失敗
 - 動量回調（在高波動 EM ETF 上普遍失敗）
 - SL -4.75%（介於 -4.5% 和 -5.0% 之間，可能是更精確甜蜜點）
 
@@ -64,6 +72,7 @@
 - **出場參數甜蜜點**：SL -5.0% 在 FXI 2.0% vol 下提供最佳呼吸空間（-4.5% 過緊導致假停損，-5.5% 過寬增加虧損），TP +5.5% 捕捉政策驅動的較大反彈
 - BB Squeeze 突破無效：中國市場熊市期（2019-2023）假突破率過高
 - WR(10) 是 FXI 最佳超賣指標，WR(14) 和 RSI(5) 均無效
+- **RS 動量（FXI vs EEM）無效（FXI-007 驗證）**：中國相對 EM 的超額/劣勢由政策週期驅動（2022 regulatory、2024-2025 stimulus），非結構性。與 INDA/EWZ 失敗模式一致，確認跨資產教訓 #25 延伸至中國 ETF。SMA(200) 趨勢過濾可改善 Part A 但無法解決 A/B 累積差失衡（最佳 Att2 min 0.16，仍遠低於 FXI-005 的 0.38）
 <!-- AI_CONTEXT_END -->
 
 # FXI 實驗總覽 (FXI Experiments Overview)
@@ -85,6 +94,7 @@
 | FXI-004 | `fxi_004_rsi5_2d_decline`      | RSI(5)/WR + 2日急跌           | 已完成（失敗，確認 WR+ATR+ClosePos 最佳）|
 | FXI-005 | `fxi_005_wr14_extended_mr`     | 出場優化均值回歸（TP5.5%/SL5%/20d）| 已完成（新最佳★）|
 | FXI-006 | `fxi_006_bb_lower_mr`          | BB下軌→急跌均值回歸              | 已完成（失敗，確認 BB MR 無效）|
+| FXI-007 | `fxi_007_rs_momentum`          | RS 動量回調（FXI vs EEM）         | 已完成（失敗，確認 RS 動量在單一國家 EM 無效）|
 
 ---
 
@@ -466,3 +476,58 @@ FXI-001 (回檔+WR 基礎版)
   │         └── Att3★ TP5.5%/SL-5.0%/20d（min 0.38，SL 甜蜜點）
   └── FXI-004 ✗ (RSI(5)/WR + 2日急跌 — RSI(5) 完全無效，2d decline 選擇性不足)
   └── FXI-006 ✗ (BB 下軌→急跌 MR — BB 下軌無效，2d decline 獨立進場 min 0.13)
+  └── FXI-007 ✗ (RS 動量回調 FXI vs EEM — 三次迭代均失敗，確認單一國家 EM RS 動量禁忌)
+
+---
+
+## FXI-007: Relative Strength Momentum Pullback (FXI vs EEM)
+
+### 目標 (Goal)
+
+在 FXI 首次嘗試 RS 動量策略，參考 EWT-007 成功模板（RS vs EEM，min 0.42）。
+假設：中國相對新興市場的超額表現由政策週期驅動，動量持續性可能優於均值回歸。
+
+### 進場條件 (Entry Conditions)
+
+| 條件 | 指標 | 閾值（最終 Att2）|
+|------|------|------|
+| 1 | FXI - EEM 20日報酬差 | ≥ 3% |
+| 2 | 5日高點回撤 | 2%-5% |
+| 3 | 趨勢確認 | Close > SMA(200) |
+| 4 | 冷卻期 | 10 交易日 |
+
+### 出場參數 (Exit Parameters)
+
+| 參數 | 值 | 說明 |
+|------|------|------|
+| 獲利目標 (TP) | +4.0% | 中等波動 EM 標準 |
+| 停損 (SL) | -4.5% | 需呼吸空間（FXI 2.0% vol）|
+| 最長持倉 | 20 天 | RS 動量標準 |
+| 追蹤停損 | 無 | 日波動 2.0% 禁用 |
+
+### 成交模型 (Execution Model)
+
+同 FXI-005：隔日開盤市價進場、限價賣單 Day、停損市價 GTC、到期隔日開盤、滑價 0.1%、悲觀認定。
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+| # | 變更 | Part A Sharpe | Part B Sharpe | A/B 訊號 | A WR / B WR | 結論 |
+|---|------|---------------|---------------|----------|-------------|------|
+| 1 | RS≥3%, SMA(50) | -0.22 | 0.79 | 13/9 | 46.2%/77.8% | 2022 熊市 4 SL 拖累 Part A |
+| 2 | RS≥3%, SMA(200)（最佳嘗試）| 0.16 | 0.50 | 6/8 | 66.7%/75.0% | 強化趨勢過濾翻正 Part A 但 A/B 累積差 78% |
+| 3 | RS≥4%, SMA(200) | -6.63 | 0.92 | 3/7 | 0%/85.7% | RS 4% 過嚴，Part A 3 連敗 |
+
+### 失敗分析 (Failure Analysis)
+
+- **策略方向**：相對強度動量回調（momentum pullback）— repo 中較少使用的方向
+- **關鍵參數**：RS 門檻（3-4%）、趨勢過濾（SMA(50) vs SMA(200)）、淺回調 2-5%
+- **結果**：三次迭代最佳 min(A,B) Sharpe 0.16 < FXI-005 的 0.38
+- **失敗根因**：
+  1. 中國 vs EEM 相對強度由政策/地緣事件驅動（2022 regulatory crackdown、
+     2024-2025 stimulus），非結構性。動量訊號在政策轉折點急速反轉
+  2. Part A（2019-2023 中國熊市）與 Part B（2024-2025 刺激期）訊號品質極度
+     不對稱：Part B WR 77-86% / Part A WR 46-67%
+  3. 收緊 RS 門檻在稀疏樣本上造成統計脆弱（Att3 Part A 僅 3 筆全敗）
+- **確認跨資產教訓 #25**：單一國家 EM ETF RS 動量策略全面失敗
+  （INDA-007、EWZ-005、FXI-007 共三個資料點）
+- **結論**：FXI 不應進一步探索 RS 動量方向，回歸 FXI-005 均值回歸框架

@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-17
   data_through: 2025-12-31
   confidence: high
-  note: CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). VGK-007 updated 2026-04-16 (BB lower band + pullback cap -7% hybrid, min(A,B) 0.45→0.53, +18%, 7 experiments, resolves VGK-004 A/B imbalance 37.5%→8.2%). EWZ-006 updated 2026-04-16 (BB lower band 1.5σ + pullback cap -10% hybrid, min(A,B) 0.34→0.69, +103%, 6 experiments, first commodity-driven EM single-country ETF to validate hybrid pattern). XBI-010 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on biotech ETF 2.0% vol, three iterations all failed to beat XBI-005 min 0.36, confirmed hybrid pattern effective upper boundary at daily vol ≤1.75%, 10 experiments). INDA-008 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on India ETF 0.97% vol, three iterations all failed to beat INDA-005 min 0.23, confirmed hybrid pattern effective lower boundary at daily vol ≥1.12%, 8 experiments). †EWJ min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (6/6 trades returned identical +3.50%)
+  note: CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). VGK-007 updated 2026-04-16 (BB lower band + pullback cap -7% hybrid, min(A,B) 0.45→0.53, +18%, 7 experiments, resolves VGK-004 A/B imbalance 37.5%→8.2%). EWZ-006 updated 2026-04-16 (BB lower band 1.5σ + pullback cap -10% hybrid, min(A,B) 0.34→0.69, +103%, 6 experiments, first commodity-driven EM single-country ETF to validate hybrid pattern). XBI-010 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on biotech ETF 2.0% vol, three iterations all failed to beat XBI-005 min 0.36, confirmed hybrid pattern effective upper boundary at daily vol ≤1.75%, 10 experiments). INDA-008 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on India ETF 0.97% vol, three iterations all failed to beat INDA-005 min 0.23, confirmed hybrid pattern effective lower boundary at daily vol ≥1.12%, 8 experiments). FXI-007 updated 2026-04-17 (RS momentum FXI vs EEM tested, three iterations min -6.63~0.16 all failed vs FXI-005 min 0.38, confirmed single-country EM RS momentum pattern failure extends to China, 7 experiments). †EWJ min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (6/6 trades returned identical +3.50%)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -171,7 +171,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | VGK | VGK-007 Att1 | BB 下軌+回檔上限+WR+ClosePos+ATR（混合進場）| 0.53 | 7 次實驗 ✓ |
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-005 Att3 | 出場優化均值回歸（回檔+WR+ClosePos+ATR）| 0.23 | 8 次實驗 ✓ |
-| FXI | FXI-005 Att3 | 出場優化均值回歸（TP5.5%/SL5%/20d）| 0.38 | 6 次實驗 ✓ |
+| FXI | FXI-005 Att3 | 出場優化均值回歸（TP5.5%/SL5%/20d）| 0.38 | 7 次實驗 ✓ |
 | EWZ | EWZ-006 Att3 | BB 下軌+回檔上限+WR+ClosePos+ATR（混合進場）| 0.69 | 6 次實驗 ✓ |
 | CIBR | CIBR-008 Att2 | BB 下軌+回檔上限-12%+WR+ClosePos+ATR | 0.39 | 8 次實驗 ✓ |
 
@@ -181,7 +181,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 10. 反覆失敗的做法（禁止清單）
 <!-- freshness:
-  validated: 2026-04-16
+  validated: 2026-04-17
   data_through: 2025-12-31
   confidence: high
 -->
@@ -217,7 +217,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 ### 策略類型禁忌
 23. **z-score 配對交易** — 所有資產對都存在結構性漂移，5 對 0 成功
 24. **動量回檔在日波動>2% 礦業資產** — SMA 趨勢濾波假陽性率過高
-25. **動量回調在多成分等權重板塊 ETF** — 板塊級 ROC 反映個股事件加總非板塊趨勢。**RS 動量（板塊 vs SPY/QQQ）對市值加權板塊 ETF 同樣無效**：CIBR 三次嘗試（QQQ/SPY 基準、鬆/緊/品質過濾）均負 Sharpe，網路安全無獨立板塊動量週期（CIBR-006 驗證）。RS 動量有效條件：(a) 強週期性板塊如半導體（SOXL-010）或 (b) 地理/資產類別差異大且**週期性**的比較對（EWT vs EEM）。**持續性結構優勢（如 INDA vs EEM：人口紅利/IT）不產生有效 RS 訊號**：INDA-007 三次嘗試（RS 2~3%、ATR 1.10~1.15）Part A -0.49~0.07，極端市場狀態依賴。**宏觀事件驅動的商品優勢（EWZ vs EEM）同樣無效**：EWZ-005 三次嘗試（RS 10d/15d/20d、2-4%門檻、含/不含 ATR），min(A,B) -0.33~-0.21，A/B 訊號比 6-7:1，巴西商品優勢受大宗商品價格/BRL 匯率/政治事件驅動而非週期性
+25. **動量回調在多成分等權重板塊 ETF** — 板塊級 ROC 反映個股事件加總非板塊趨勢。**RS 動量（板塊 vs SPY/QQQ）對市值加權板塊 ETF 同樣無效**：CIBR 三次嘗試（QQQ/SPY 基準、鬆/緊/品質過濾）均負 Sharpe，網路安全無獨立板塊動量週期（CIBR-006 驗證）。RS 動量有效條件：(a) 強週期性板塊如半導體（SOXL-010）或 (b) 地理/資產類別差異大且**週期性**的比較對（EWT vs EEM）。**持續性結構優勢（如 INDA vs EEM：人口紅利/IT）不產生有效 RS 訊號**：INDA-007 三次嘗試（RS 2~3%、ATR 1.10~1.15）Part A -0.49~0.07，極端市場狀態依賴。**宏觀事件驅動的商品優勢（EWZ vs EEM）同樣無效**：EWZ-005 三次嘗試（RS 10d/15d/20d、2-4%門檻、含/不含 ATR），min(A,B) -0.33~-0.21，A/B 訊號比 6-7:1，巴西商品優勢受大宗商品價格/BRL 匯率/政治事件驅動而非週期性。**政策驅動的中國優勢（FXI vs EEM）同樣無效**：FXI-007 三次嘗試（RS 3-4%、SMA(50)/SMA(200) 趨勢過濾），min(A,B) -6.63~0.16，A/B 訊號品質極度不對稱（Part A WR 0-67% / Part B WR 77-86%），2022 regulatory crackdown + 2024-2025 stimulus 的政策週期使 RS 訊號在轉折點急速反轉
 26. **趨勢回檔策略** — 在低波動防禦型 ETF、高波動個股上均市場狀態依賴過強。**短期動量（5日漲幅>10%）在 IBIT 上 Part A 1.00/Part B -0.55**，2024 牛市 87.5% WR vs 2025 震盪 25% WR（IBIT-005 Att2 驗證）。**低波動歐洲寬基 ETF（VGK）同樣失敗**：SMA(20)>SMA(50) 趨勢對齊+淺回檔 min 0.02、寬出場 min -0.21、ROC 動量 0 OOS 訊號（VGK-006 三次嘗試驗證）
 27. **RSI(2) 在日波動 >2% 或利率敏感/事件驅動型資產** — 過於敏感，熊市產生假訊號（SIVR、TSM、FCX、IBIT、XLU、SOXL 均驗證）。有效範圍：日波動 ≤ 1.5% 的**美國寬基指數 ETF**（SPY、DIA、IWM、VOO）。**非寬基 ETF 即使日波動在有效範圍內仍無效**：VGK（歐洲，1.12%，Part A -0.06）、CIBR（美國板塊，1.53%，Part A -0.19）。關鍵差異是**板塊/國家集中度**而非上市國家：集中型 ETF 在持續性熊市（COVID、2021-22 科技拋售）中 RSI(2) 訊號反覆失敗（CIBR-004 Att1 驗證）
 28. **BB 擠壓突破在商品/利率/3x 槓桿/單一國家 EM ETF** — 有效性：個股(2-4%) > 高流動 ETF(1.5-2%) > 其餘均失敗。**例外**：EEM（新興市場 ETF）因 EM risk-on/risk-off 資金流特性有效（min 0.18，8 次實驗確認為天花板）。**單一國家 EM ETF（INDA/EWT/FXI）均失敗**，FXI 三次迭代 Part A -0.12~-0.30（FXI-003 驗證）
