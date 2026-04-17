@@ -1,0 +1,195 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-17T12:57:23.699344"
+  },
+  "part_a": {
+    "ticker": "IBIT",
+    "total_signals": 4,
+    "wins": 3,
+    "win_rate": 0.75,
+    "avg_return_pct": 3.71,
+    "std_return_pct": 2.23,
+    "cumulative_return_pct": 15.59,
+    "avg_holding_days": 2.0,
+    "max_drawdown_pct": -1.13,
+    "profit_factor": 100.0,
+    "sharpe_ratio": 1.66,
+    "sortino_ratio": 49.5,
+    "calmar_ratio": 3.29,
+    "max_consecutive_losses": 1,
+    "target_exits": 3,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-03-19",
+        "entry_date": "2024-03-20",
+        "exit_date": "2024-03-21",
+        "entry": 36.23,
+        "exit": 38.05,
+        "return_pct": 5.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.11
+      },
+      {
+        "date": "2024-07-05",
+        "entry_date": "2024-07-08",
+        "exit_date": "2024-07-15",
+        "entry": 32.65,
+        "exit": 34.28,
+        "return_pct": 5.0,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.64
+      },
+      {
+        "date": "2024-08-05",
+        "entry_date": "2024-08-06",
+        "exit_date": "2024-08-08",
+        "entry": 31.48,
+        "exit": 33.05,
+        "return_pct": 5.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.13
+      },
+      {
+        "date": "2024-12-30",
+        "entry_date": "2024-12-31",
+        "exit_date": "2024-12-31",
+        "entry": 54.56,
+        "exit": 54.48,
+        "return_pct": -0.15,
+        "holding_days": 0,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": 0.0
+      }
+    ],
+    "filled_count": 4,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2024-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "IBIT",
+    "total_signals": 3,
+    "wins": 1,
+    "win_rate": 0.3333333333333333,
+    "avg_return_pct": -3.09,
+    "std_return_pct": 5.72,
+    "cumulative_return_pct": -9.46,
+    "avg_holding_days": 4.7,
+    "max_drawdown_pct": -12.76,
+    "profit_factor": 0.35,
+    "sharpe_ratio": -0.54,
+    "sortino_ratio": -0.53,
+    "calmar_ratio": -0.24,
+    "max_consecutive_losses": 2,
+    "target_exits": 1,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2025-02-28",
+        "entry_date": "2025-03-03",
+        "exit_date": "2025-03-04",
+        "entry": 53.05,
+        "exit": 49.26,
+        "return_pct": -7.14,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -12.76
+      },
+      {
+        "date": "2025-10-17",
+        "entry_date": "2025-10-20",
+        "exit_date": "2025-11-04",
+        "entry": 62.97,
+        "exit": 58.48,
+        "return_pct": -7.14,
+        "holding_days": 11,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -10.3
+      },
+      {
+        "date": "2025-11-21",
+        "entry_date": "2025-11-24",
+        "exit_date": "2025-11-26",
+        "entry": 48.8,
+        "exit": 51.24,
+        "return_pct": 5.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.09
+      }
+    ],
+    "filled_count": 3,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "IBIT",
+    "total_signals": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": 0.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 0.0,
+    "avg_holding_days": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 0.0,
+    "calmar_ratio": 0.0,
+    "max_consecutive_losses": 0,
+    "target_exits": 0,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [],
+    "filled_count": 0,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 0.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-16"
+    }
+  }
+}

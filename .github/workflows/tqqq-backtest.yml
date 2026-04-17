@@ -234,6 +234,7 @@ on:
           - "IBIT-003: ibit_003_bb_squeeze_breakout"
           - "IBIT-004: ibit_004_vol_adaptive"
           - "IBIT-005: ibit_005_extended_lookback"
+          - "IBIT-006: ibit_006_gap_reversal_mr"
           - "INDA-001: inda_001_pullback_wr_reversal"
           - "INDA-002: inda_002_vol_adaptive_mr"
           - "INDA-003: inda_003_bb_squeeze_breakout"
