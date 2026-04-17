@@ -1,10 +1,10 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-16
+  last_validated: 2026-04-17
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** EWJ-003 Att3（BB 下軌均值回歸：BB(20,1.5) 下軌觸及 + 10日高點回檔上限 7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15，TP +3.5%/SL -4.0%/20天）
+**當前最佳：** EWJ-003 Att3（BB 下軌均值回歸：BB(20,1.5) 下軌觸及 + 10日高點回檔上限 7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15，TP +3.5%/SL -4.0%/20天）**4 次實驗 12 次嘗試確認全域最優**
 - Part A: Sharpe 0.60, 累計 +21.97%, 13 訊號 (2.6/年), WR 84.6%, MDD -4.50%
 - Part B: 累計 +22.93%, 6 訊號 (3.0/年), WR 100%（6/6 全部達標，Sharpe 因 std=0 顯示 0.00）
 - A/B 年化訊號比 0.87:1（優秀），A/B 累計報酬差距 0.96pp（近乎完美平衡）
@@ -19,6 +19,12 @@
 - 無回檔上限（EWJ-002 Att1）— 極端崩盤（COVID）產生 2 筆連續停損，Part A Sharpe 0.21 vs Att2 的 0.55
 - BB(20,2.0) 無回檔上限（EWJ-003 Att1）— Part A 優秀 0.70 但 Part B 僅 0.49（4 訊號含 1 停損）
 - BB(20,1.5) 無回檔上限（EWJ-003 Att2）— Part B 優秀 1.01（8 訊號 87.5% WR）但 Part A 品質稀釋至 0.26（增加 3 筆 COVID/QT/夏季停損）
+- **RS 動量（EWJ vs EFA/SPY）**（EWJ-004，三次嘗試均失敗）：
+  - Att1: EFA ref, RS>=2%, pullback 1.5-4%, SMA(50) → Part A 0.15/Part B 0.47，min 0.15
+  - Att2: EFA ref, RS>=3%, pullback 2-5%, SMA(200) → Part A 0.12/Part B 0.24，min 0.12（收緊訊號數驟降 10→5）
+  - Att3: SPY ref, RS>=3%, pullback 2-5%, SMA(50) → Part A 0.37/Part B **-0.24**，min -0.24（A/B 嚴重不對稱）
+  - **根因：日本相對強度由事件驅動（BOJ 政策、日圓套息交易、出口週期），非結構性週期因素**
+  - 確認跨資產教訓 #25 擴展至**發達市場單一國家 ETF**：RS 動量僅適用於具有持續週期性結構優勢的資產（半導體 EWT、個股 TSM/NVDA）
 
 **已掃描的參數空間：**
 - EWJ-001：回檔≥3% + WR≤-80 + ClosePos≥40% + 追蹤停損（TP+3.5%/SL-4.0%）→ min 0.16
@@ -28,11 +34,13 @@
 - EWJ-003 Att1：BB(20,2.0) + WR + ClosePos + ATR>1.15 → Part A 0.70/Part B 0.49，min 0.49
 - EWJ-003 Att2：BB(20,1.5) + WR + ClosePos + ATR>1.15 → Part A 0.26/Part B 1.01，min 0.26
 - EWJ-003 Att3：BB(20,1.5) + 回檔上限7% + WR + ClosePos + ATR>1.15 → **Part A 0.60/Part B 100%WR ★**
+- EWJ-004 Att1-3：RS 動量 vs EFA/SPY（2-3% 門檻、SMA(50)/SMA(200)），min(A,B) 最佳 0.15（均失敗）
 
 **尚未嘗試的方向（預期邊際效益極低）：**
 - RSI(2) 短期超賣框架（VGK 驗證非美 ETF 不適合 RSI(2)，cross-asset lesson #27）
 - BB Squeeze 突破（INDA-003 驗證低波動非美 ETF 嚴重市場狀態依賴）
 - BB(20,1.75) 中間值 — Att1/Att2 顯示 BB std 對 Part A/B 影響方向相反，1.5+cap 已是最佳組合
+- ~~RS 動量（EWJ vs EFA/SPY）~~ → EWJ-004 三次嘗試均失敗（Japan 的 RS 非結構性）
 
 **關鍵資產特性：**
 - EWJ 為 iShares MSCI Japan ETF，追蹤日本股市大中型股
@@ -42,6 +50,7 @@
 - 回檔上限 7% 有效隔離 COVID 等極端崩盤
 - BB 下軌自適應門檻在低波動資產（1.15%）上優於固定回檔門檻（CIBR-007 在 1.53% vol 也驗證）
 - 高流動性 ETF，滑價假設 0.1%
+- **RS 動量完全無效（EWJ-004 驗證）**：日本相對強度由事件驅動（BOJ 政策、日圓套息交易、出口週期），非結構性週期因素。三次嘗試（EFA/SPY 基準、RS 2-3%、SMA(50)/SMA(200)）min(A,B) 最佳僅 0.15，Part A 品質不穩定（0.12-0.37），Part B 在 Att3 翻負（-0.24）。確認跨資產教訓 #25 延伸至**發達市場單一國家 ETF**
 <!-- AI_CONTEXT_END -->
 
 # EWJ 實驗總覽 (EWJ Experiments Overview)
@@ -77,6 +86,7 @@
 | EWJ-001 | `ewj_001_pullback_wr_reversal` | 回檔+WR+反轉K線均值回歸（追蹤停損）             | 已完成 |
 | EWJ-002 | `ewj_002_vol_adaptive_pullback` | 波動率自適應回檔+WR均值回歸（ATR過濾+崩盤隔離） | 已完成（前最佳） |
 | EWJ-003 | `ewj_003_bb_lower_mr` | BB 下軌均值回歸（BB+回檔上限+WR+ClosePos+ATR）★ | ✅ 當前最佳 |
+| EWJ-004 | `ewj_004_rs_momentum` | RS 動量回調（EWJ vs EFA/SPY，3 次嘗試均失敗） | 已完成（失敗，確認 lesson #25 擴展至 DM） |
 
 ---
 
@@ -322,6 +332,41 @@
 
 ---
 
+## EWJ-004：Relative Strength Momentum Pullback（失敗，確認 lesson #25 擴展至 DM）
+
+### 目標 (Goal)
+
+EWJ-003 已達 Part A Sharpe 0.60（Part B WR 100% / std=0），Part A 為唯一瓶頸。
+測試 EWT-007 驗證成功的 RS 動量框架是否可套用至**發達市場單一國家 ETF**。
+Cross-asset lesson #25 證實 RS 動量在 EM 單一國家 ETF（INDA/EWZ/FXI）全面失敗，
+但 EWT（台灣）因半導體週期性驅動為例外。EWJ 為 DM 單一國家代表，本實驗
+測試 RS 框架的適用性邊界。
+
+### 進場條件與出場參數 (參考 EWT-007 並依 EWJ 1.15% 低波動縮放)
+
+| Att | 參考基準 | RS 門檻 | 回撤範圍 | SMA 趨勢 | Part A Sharpe | Part B Sharpe | min(A,B) |
+|-----|---------|--------|---------|---------|---------------|---------------|----------|
+| Att1 | EFA | ≥2% | 1.5-4% | SMA(50) | 0.15 (10訊號, WR 60%) | 0.47 (4訊號, WR 75%) | 0.15 ✗ |
+| Att2 | EFA | ≥3% | 2-5% | SMA(200) | 0.12 (5訊號, WR 60%) | 0.24 (3訊號, WR 67%) | 0.12 ✗ |
+| Att3 | SPY | ≥3% | 2-5% | SMA(50) | 0.37 (7訊號, WR 71%) | **-0.24** (6訊號, WR 50%) | -0.24 ✗ |
+
+出場參數統一：TP +3.5% / SL -4.0% / 持倉 20 天 / 冷卻 10 天
+
+### 失敗根因分析
+
+1. **Att1（EFA 基準、寬鬆條件）**：Part A 2 停損 + 2 到期訊號顯示 RS 訊號與均值回歸進場點不同步。Japan 相對 EAFE 的超額表現在 BOJ 政策轉向或日圓套息交易解除時集中爆發，而非持續週期性。
+2. **Att2（收緊 RS + SMA(200)）**：訊號數驟降 10→5，過度過濾但未提升品質。FXI-007 Att2 的 SMA(200) 策略對中國有效（Part A -0.22→0.16），但對日本無類似改善效果，證實不同 EM/DM 市場需不同過濾機制。
+3. **Att3（SPY 基準）**：Part A Sharpe 翻正至 0.37 但 Part B 崩潰至 -0.24，A/B 累計差距 14.16pp（+8.73% vs -5.43%）。5/6 的 Part B 訊號集中在 2025 年日圓急貶衝擊期，RS 訊號在日圓政策事件中完全反向。
+
+### 關鍵發現
+
+- **RS 動量（EWJ vs DM 基準）不適用**：無論 EFA（含 Japan 權重 ~22%）、SPY（美國寬基），Japan 的相對強度均由事件驅動而非結構性週期驅動。
+- **SMA 趨勢過濾對 EWJ 無救援作用**：SMA(50) 和 SMA(200) 均無法隔離 BOJ 政策轉向期的假訊號。
+- **擴展 cross-asset lesson #25**：RS 動量失敗模式不限於 EM 單一國家（INDA/EWZ/FXI），亦涵蓋 DM 單一國家（EWJ）。有效性先決條件：(a) 強週期性板塊驅動（如半導體 EWT/SOXL）或 (b) 個股層級持續性超額表現（如 TSM/NVDA 的先進製程護城河）。**政策/匯率/事件驅動的單一國家 ETF 均無效**。
+- **EWJ-003 混合進場仍為全域最優**：EWJ-004 三次嘗試 min(A,B) 最佳 0.15，遠不及 EWJ-003 的 0.60。BB 下軌 + 回檔上限混合進場確認為 EWJ 最佳策略類型。
+
+---
+
 ## 演進路線圖 (Roadmap)
 
 ```
@@ -334,4 +379,8 @@ EWJ-003 (BB 下軌均值回歸, Part A Sharpe 0.60) ★
   ├── Att1 (BB(20,2.0), 無回檔上限) → Part A 0.70/Part B 0.49 △
   ├── Att2 (BB(20,1.5), 無回檔上限) → Part A 0.26/Part B 1.01 ✗
   └── Att3 (BB(20,1.5) + 回檔上限 7%) → Part A 0.60/Part B 100%WR ★
+EWJ-004 (RS 動量回調, 3 次嘗試均失敗)
+  ├── Att1 (EFA ref, RS≥2%, SMA50) → min 0.15 ✗
+  ├── Att2 (EFA ref, RS≥3%, SMA200) → min 0.12 ✗
+  └── Att3 (SPY ref, RS≥3%, SMA50) → min -0.24 ✗ (確認 lesson #25 擴展至 DM)
 ```
