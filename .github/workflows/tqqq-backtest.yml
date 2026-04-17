@@ -72,6 +72,7 @@ on:
           - "EEM-009: eem_009_atr_sl_rsi2"
           - "EEM-010: eem_010_strict_decline_atr"
           - "EEM-011: eem_011_no_closepos_atr"
+          - "EEM-012: eem_012_bb_lower_pullback_cap"
           - "EWJ-001: ewj_001_pullback_wr_reversal"
           - "EWJ-002: ewj_002_vol_adaptive_pullback"
           - "EWJ-003: ewj_003_bb_lower_mr"
