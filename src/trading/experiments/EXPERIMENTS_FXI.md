@@ -1,10 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-04-17
   data_through: 2025-12-31
+  note: FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed to beat FXI-005 min 0.38; best Att3 dual-osc 0.37). Confirms Stoch Oscillator adds no value over WR(10) for FXI. A/B signal imbalance (5:1) is structural and cannot be fixed via oscillator changes alone.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）
+**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（8 次實驗）**
 - Part A Sharpe 0.38（WR65.4%, 26訊號, +54.97%）, Part B Sharpe 1.61（WR80%, 5訊號, +20.59%）
 - min(A,B) Sharpe **0.38**（vs FXI-002 0.33，+15.2% 提升）
 - Part B WR 80%（FXI-002 為 60%），SL -5.0% 拯救 2025-04-04 關鍵交易（SL→TP，+10.6pp）
@@ -36,6 +37,12 @@
   - **根因：中國 vs EEM 相對強度由政策/事件驅動（2022 regulatory crackdown, 2024-2025 stimulus），非結構性**
   - 確認跨資產教訓 #25：單一國家 EM ETF RS 動量策略全面失敗（INDA/EWZ/FXI 三個資料點）
   - A/B 訊號品質極度不對稱：Part B（2024-2025 政策刺激期）WR 77-86% / Part A（2019-2023）WR 46-67%
+- **Stochastic Oscillator 均值回歸**（FXI-008，三次迭代均失敗）：
+  - Att1 %K(14,3)≤25 AND %K>%D 交叉 + 回檔+ClosePos+ATR：Part A 0.16 / Part B 4.22（15/3 訊號），%K>%D 交叉延遲，Part A 每筆平均報酬降至 0.82%
+  - Att2 %K(14,3)≤20 取代 WR：Part A 0.34 / Part B 1.49（22/4 訊號），Stoch %K 與 WR(10) 幾乎同義，僅微差
+  - Att3 WR(10)≤-80 AND %K(14,3)≤20 雙振盪器（最佳嘗試）：Part A 0.37 / Part B 1.49（20/4 訊號），接近但仍 -0.01 短於 FXI-005
+  - **根因：Stoch 對 FXI 無加成**。%K>%D 交叉在 MR 策略中作為 entry 過於延遲；Stoch %K(14,3) 等級與 WR(10) 數學接近（僅週期+平滑略異）；雙振盪器 intersection 品質提升不足補訊號流失
+  - A/B 訊號比 5:1 為結構性問題（熊市回檔多 vs 反彈期回檔稀少），非振盪器類型可解決
 - **WR(14) 替代 WR(10)**（FXI-005 Att1）：
   - WR(14) 未提供任何增量（Part B 訊號完全相同），WR(10) 對 FXI 仍為最佳
 - **延長冷卻期 15d**（FXI-005 Att1）：
@@ -60,6 +67,7 @@
 - 回檔上限從 -12% 縮窄至 -10%（可能移除部分有效深回檔）
 - RSI(2) 框架（日波動 ≥2% 通常無效，RSI(5) 已驗證失敗）
 - ~~RS 動量（FXI vs EEM）~~ → FXI-007 三次迭代均失敗
+- ~~Stochastic Oscillator 均值回歸~~ → FXI-008 三次迭代均失敗（%K>%D 交叉、%K 等級替代 WR、雙振盪器均無加成）
 - 動量回調（在高波動 EM ETF 上普遍失敗）
 - SL -4.75%（介於 -4.5% 和 -5.0% 之間，可能是更精確甜蜜點）
 
@@ -73,6 +81,7 @@
 - BB Squeeze 突破無效：中國市場熊市期（2019-2023）假突破率過高
 - WR(10) 是 FXI 最佳超賣指標，WR(14) 和 RSI(5) 均無效
 - **RS 動量（FXI vs EEM）無效（FXI-007 驗證）**：中國相對 EM 的超額/劣勢由政策週期驅動（2022 regulatory、2024-2025 stimulus），非結構性。與 INDA/EWZ 失敗模式一致，確認跨資產教訓 #25 延伸至中國 ETF。SMA(200) 趨勢過濾可改善 Part A 但無法解決 A/B 累積差失衡（最佳 Att2 min 0.16，仍遠低於 FXI-005 的 0.38）
+- **Stochastic Oscillator 均值回歸無加成（FXI-008 驗證）**：三次迭代均未勝過 FXI-005（Att1 %K>%D 交叉 min 0.16、Att2 %K 等級替代 WR min 0.34、Att3 WR+Stoch 雙振盪器 min 0.37）。根因：(a) %K>%D 交叉延遲（已回升 1-3 天），TP 空間不足；(b) Stoch %K(14,3) 與 WR(10) ≤ -80 幾乎同義（等價於 raw %K(10) ≤ 20 vs 14 週期 + 3 日 SMA），選擇性僅微差；(c) 雙振盪器 intersection 提升品質但同時移除 Part B 好訊號。A/B 訊號比 5:1 為結構性（熊市回檔多 vs 牛市反彈少），非振盪器類型可修正
 <!-- AI_CONTEXT_END -->
 
 # FXI 實驗總覽 (FXI Experiments Overview)
@@ -95,6 +104,7 @@
 | FXI-005 | `fxi_005_wr14_extended_mr`     | 出場優化均值回歸（TP5.5%/SL5%/20d）| 已完成（新最佳★）|
 | FXI-006 | `fxi_006_bb_lower_mr`          | BB下軌→急跌均值回歸              | 已完成（失敗，確認 BB MR 無效）|
 | FXI-007 | `fxi_007_rs_momentum`          | RS 動量回調（FXI vs EEM）         | 已完成（失敗，確認 RS 動量在單一國家 EM 無效）|
+| FXI-008 | `fxi_008_stochastic_mr`        | Stochastic Oscillator 均值回歸（3 次迭代均失敗）| 已完成（失敗，確認 Stoch 對 FXI 無加成）|
 
 ---
 
@@ -477,6 +487,7 @@ FXI-001 (回檔+WR 基礎版)
   └── FXI-004 ✗ (RSI(5)/WR + 2日急跌 — RSI(5) 完全無效，2d decline 選擇性不足)
   └── FXI-006 ✗ (BB 下軌→急跌 MR — BB 下軌無效，2d decline 獨立進場 min 0.13)
   └── FXI-007 ✗ (RS 動量回調 FXI vs EEM — 三次迭代均失敗，確認單一國家 EM RS 動量禁忌)
+  └── FXI-008 ✗ (Stochastic Oscillator 均值回歸 — 三次迭代均失敗，確認 Stoch 對 FXI 無加成)
 
 ---
 
@@ -531,3 +542,66 @@ FXI-001 (回檔+WR 基礎版)
 - **確認跨資產教訓 #25**：單一國家 EM ETF RS 動量策略全面失敗
   （INDA-007、EWZ-005、FXI-007 共三個資料點）
 - **結論**：FXI 不應進一步探索 RS 動量方向，回歸 FXI-005 均值回歸框架
+
+---
+
+## FXI-008: Stochastic Oscillator %K/%D Mean Reversion（三次迭代均失敗）
+
+### 目標 (Goal)
+
+探索 repo 中尚未使用的 **Stochastic Oscillator** 作為均值回歸超賣指標，
+目標改善 FXI-005 的 Part A/B 訊號不平衡（26:5, 5.2:1，超越教訓 #8 的
+3:1 危險門檻）。假設 Stochastic 的平滑特性 + %K/%D 交叉確認可提升
+訊號品質，過濾中國熊市中 WR 反覆觸及但未真正反轉的假訊號。
+
+### 進場條件（最終 Att3）
+
+| 條件 | 指標 | 閾值 |
+|------|------|------|
+| 1 | 10 日高點回檔 | ≤ -5% |
+| 2 | 回檔上限 | ≥ -12% |
+| 3 | Williams %R(10) | ≤ -80 |
+| 4 | Stochastic %K(14,3) | ≤ 20 |
+| 5 | Close Position | ≥ 40% |
+| 6 | ATR(5)/ATR(20) | > 1.05 |
+| 7 | 冷卻期 | 10 交易日 |
+
+### 出場參數
+
+同 FXI-005：TP +5.5% / SL -5.0% / 20 天 / 無追蹤停損。
+
+### 成交模型
+
+同 FXI-005：隔日開盤市價進場、限價賣單 Day、停損市價 GTC、到期隔日開盤、
+滑價 0.1%、悲觀認定。
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+| # | 變更 | Part A Sharpe | Part B Sharpe | A/B 訊號 | A WR / B WR | 結論 |
+|---|------|---------------|---------------|----------|-------------|------|
+| 1 | %K(14,3)≤25 AND %K>%D 交叉 | 0.16 | 4.22 | 15/3 | 60.0%/100% | %K>%D 交叉太晚，彈升已完成；Part A 品質反降、Part B 訊號過度縮減 |
+| 2 | %K(14,3)≤20 取代 WR（純等級）| 0.34 | 1.49 | 22/4 | 63.6%/75.0% | Stoch %K 與 WR(10) 選擇性接近，略為減少 Part A 訊號但未提升 Sharpe |
+| 3 | WR(10)≤-80 AND %K(14,3)≤20（雙振盪器）| 0.37 | 1.49 | 20/4 | 65.0%/75.0% | 最接近 FXI-005 但仍 -0.01 短；雙振盪器 intersection 輕微提升品質不足補訊號流失 |
+
+### 失敗分析 (Failure Analysis)
+
+- **策略方向**：Stochastic Oscillator 均值回歸（新振盪器類型，repo 中從未使用）
+- **關鍵參數**：%K(14,3) 平滑週期、%K ≤ 20/25 等級、%K>%D 交叉確認
+- **結果**：三次迭代最佳 min(A,B) Sharpe 0.37 < FXI-005 的 0.38
+- **失敗根因**：
+  1. **%K>%D 交叉是延遲指標**：由於 %K 是原始 %K 的 3 日 SMA、%D 是 %K 的 3 日 SMA，
+     交叉發生時 price 已回升 1-3 天，+5.5% TP 空間所剩無幾（Att1 Part A 平均
+     報酬 0.82%，遠低於 FXI-005 的 2.11%）
+  2. **Stoch %K 與 WR(10) 幾乎同義**：WR(10) ≤ -80 等價於 raw %K(10) ≤ 20。
+     Stoch %K(14,3) 僅將週期延長 4 日並加 3 日 SMA 平滑，選擇性僅微差（Att2 移除 4 個
+     Part A 訊號），未提升單筆品質
+  3. **雙振盪器 intersection 邊際效益極小**：Att3 兩個振盪器 agreement 移除
+     6 個 Part A 假訊號（品質提升，avg ret 1.77% vs 0.82%），但同時也移除
+     1 個 Part B 好訊號，min(A,B) 淨 -0.01
+  4. **A/B 訊號不平衡是結構性問題**：5:1 的訊號比源自 2019-2023 熊市回檔頻繁 vs
+     2024-2025 反彈回檔稀少，非振盪器類型可以解決。需要市場狀態識別（regime filter）
+     才能根本改善，但這會違反跨資產教訓 #5（均值回歸加趨勢濾波）
+- **確認跨資產教訓 #6**：已精確訊號上疊加確認指標（雙振盪器）邊際效益遞減
+- **結論**：Stochastic Oscillator 不適合 FXI 作為均值回歸進場指標；
+  FXI-005 的 WR(10)≤-80 + ATR + ClosePos 框架已近最優，改進方向應著重於
+  出場邏輯或 regime-aware 的訊號權重調整（超出純技術面範圍）
