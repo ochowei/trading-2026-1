@@ -95,7 +95,7 @@ def create_default_config() -> IBIT006Config:
         part_b_end="2025-12-31",
         part_c_start="2026-01-01",
         part_c_end="",
-        profit_target=0.05,  # +5.0%（Att1：沿用 IBIT-001）
-        stop_loss=-0.07,  # -7.0%（Att1：沿用 IBIT-001）
+        profit_target=0.045,  # +4.5%（Att2：新最佳）
+        stop_loss=-0.04,  # -4.0%（Att2：新最佳）
         holding_days=15,
     )
