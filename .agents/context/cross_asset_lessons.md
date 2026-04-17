@@ -142,7 +142,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-17
   data_through: 2025-12-31
   confidence: high
-  note: FXI-008 updated 2026-04-17 (Stochastic Oscillator MR tested on FXI, three iterations Att1 %K>%D cross 0.16 / Att2 %K level 0.34 / Att3 WR+Stoch dual osc 0.37 all failed vs FXI-005 min 0.38, confirmed Stoch Oscillator adds no value over WR(10) for policy-driven EM single-country ETF). CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). VGK-007 updated 2026-04-16 (BB lower band + pullback cap -7% hybrid, min(A,B) 0.45→0.53, +18%, 7 experiments, resolves VGK-004 A/B imbalance 37.5%→8.2%). EWZ-006 updated 2026-04-16 (BB lower band 1.5σ + pullback cap -10% hybrid, min(A,B) 0.34→0.69, +103%, 6 experiments, first commodity-driven EM single-country ETF to validate hybrid pattern). XBI-010 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on biotech ETF 2.0% vol, three iterations all failed to beat XBI-005 min 0.36, confirmed hybrid pattern effective upper boundary at daily vol ≤1.75%, 10 experiments). INDA-008 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on India ETF 0.97% vol, three iterations all failed to beat INDA-005 min 0.23, confirmed hybrid pattern effective lower boundary at daily vol ≥1.12%, 8 experiments). FXI-007 updated 2026-04-17 (RS momentum FXI vs EEM tested, three iterations min -6.63~0.16 all failed vs FXI-005 min 0.38, confirmed single-country EM RS momentum pattern failure extends to China, 7 experiments). EWJ-004 updated 2026-04-17 (RS momentum EWJ vs EFA/SPY tested on DM single-country ETF, three iterations min -0.24~0.15 all failed vs EWJ-003 min 0.60, extended single-country RS momentum failure pattern from EM to DM, 4 experiments). EWT-008 updated 2026-04-17 (BB lower band 2.0σ + pullback cap -8% hybrid tested on Taiwan ETF 1.41% vol semiconductor-driven EM single-country, Att1 min(A,B) 0.57† vs EWT-007 RS momentum 0.42, +36% Part A Sharpe, confirmed hybrid pattern effective in [1.12%, 1.75%] vol range extends to EM semiconductor-driven single-country ETFs, 8 experiments). †EWJ/EWT min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (EWJ 6/6, EWT 3/3 trades returned identical +3.50%)
+  note: IBIT-006 added 2026-04-17 (Gap-Down Capitulation MR: Gap<=-1.5% + Close>Open + 10d PB [-12%,-25%] + WR(10)<=-80 + TP+4.5%/SL-4%/15d/cd10, Att2 min(A,B) 0.40 +167% vs IBIT-001 0.15, first structural entry improvement leveraging BTC 24/7 overnight gap + US session buying pattern; Att3 ablation confirmed gap-down filter is prerequisite for tight SL -4%, 6 experiments). FXI-008 updated 2026-04-17 (Stochastic Oscillator MR tested on FXI, three iterations Att1 %K>%D cross 0.16 / Att2 %K level 0.34 / Att3 WR+Stoch dual osc 0.37 all failed vs FXI-005 min 0.38, confirmed Stoch Oscillator adds no value over WR(10) for policy-driven EM single-country ETF). CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). VGK-007 updated 2026-04-16 (BB lower band + pullback cap -7% hybrid, min(A,B) 0.45→0.53, +18%, 7 experiments, resolves VGK-004 A/B imbalance 37.5%→8.2%). EWZ-006 updated 2026-04-16 (BB lower band 1.5σ + pullback cap -10% hybrid, min(A,B) 0.34→0.69, +103%, 6 experiments, first commodity-driven EM single-country ETF to validate hybrid pattern). XBI-010 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on biotech ETF 2.0% vol, three iterations all failed to beat XBI-005 min 0.36, confirmed hybrid pattern effective upper boundary at daily vol ≤1.75%, 10 experiments). INDA-008 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on India ETF 0.97% vol, three iterations all failed to beat INDA-005 min 0.23, confirmed hybrid pattern effective lower boundary at daily vol ≥1.12%, 8 experiments). FXI-007 updated 2026-04-17 (RS momentum FXI vs EEM tested, three iterations min -6.63~0.16 all failed vs FXI-005 min 0.38, confirmed single-country EM RS momentum pattern failure extends to China, 7 experiments). EWJ-004 updated 2026-04-17 (RS momentum EWJ vs EFA/SPY tested on DM single-country ETF, three iterations min -0.24~0.15 all failed vs EWJ-003 min 0.60, extended single-country RS momentum failure pattern from EM to DM, 4 experiments). EWT-008 updated 2026-04-17 (BB lower band 2.0σ + pullback cap -8% hybrid tested on Taiwan ETF 1.41% vol semiconductor-driven EM single-country, Att1 min(A,B) 0.57† vs EWT-007 RS momentum 0.42, +36% Part A Sharpe, confirmed hybrid pattern effective in [1.12%, 1.75%] vol range extends to EM semiconductor-driven single-country ETFs, 8 experiments). †EWJ/EWT min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (EWJ 6/6, EWT 3/3 trades returned identical +3.50%)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
@@ -162,7 +162,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 8 次實驗 ✓ |
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 7 次實驗 ✓ |
 | NVDA | NVDA-004 | BB 擠壓突破（優化）| 0.47 | 8 次實驗 ✓ |
-| IBIT | IBIT-001 | 回檔範圍+WR | 0.15 | 5 次實驗 ✓ |
+| IBIT | IBIT-006 Att2 | Gap-Down 資本化+日內反轉 MR | 0.40 | 6 次實驗 ✓ |
 | TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 12 次實驗 ✓ |
 | TLT | TLT-002 | 回檔+WR+反轉K線+60日跌幅 | -0.20/0.24 | 無純技術面解法（12 次實驗）|
 | EEM | EEM-005 Att2 | BB 擠壓突破（30th pct）| 0.18 | 11 次實驗 ✓ |
@@ -406,6 +406,26 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 **例外**：EWT-004 在 3.2 訊號/年仍有效（min(A,B) 0.13→0.15，+15%），但配合非對稱出場才能發揮，且改善幅度小於高頻資產。
 
 **低波動資產限制**：VGK（1.12% vol）上 2日急跌 ≤ -1.0% 太溫和（~0.45σ/天），pullback+WR 訊號天然包含急跌成分，過濾器因冷卻期交互作用反移除好訊號（Part A 0.42→0.36，-14.3%，VGK-005 Att1 驗證）。
+
+---
+
+## 20a. Gap-Down 資本化 + 日內反轉進場模式（加密相關 ETF）
+<!-- freshness:
+  derived_from: [IBIT-006]
+  validated: 2026-04-17
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+追蹤 24/7 連續交易資產（如加密貨幣）的 ETF 在美股盤外常出現隔夜跳空。「隔夜跳空下跌 ≥ 1.5% + 日內收盤高於開盤（Close > Open）」的組合代表拋壓已被盤中資金消化，為典型 buy-the-dip 訊號。
+
+**規則**（醞釀中）：
+- 基礎 MR 訊號（回檔深度 + WR 超賣）+ gap-down 過濾可改變訊號品質結構
+- Gap-down 過濾為緊 SL（如 IBIT SL -4% vs 寬 -7%）的**必要前提**（IBIT-006 Att3 ablation 驗證：無過濾下緊 SL 毀滅訊號品質）
+- 適用範圍：加密 ETF（IBIT 已驗證），可能延伸至有盤外交易 + 高波動的其他資產（ETHA、BITX 待驗證；TLT、TQQQ 待驗證非美時段事件驅動）
+- **不適用**：盤外交易清淡的傳統 ETF（如 SPY、GLD 的 gap 主要為開盤平衡，非結構性拋壓）
+
+**IBIT-006 Att2 結果**：min(A,B) Sharpe 0.40（+167% vs IBIT-001 0.15），Part A/B 訊號比 1.33:1
 
 ---
 
