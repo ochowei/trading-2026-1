@@ -142,14 +142,14 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-04-17
   data_through: 2025-12-31
   confidence: high
-  note: FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed: Att1 breakdown_lookback=10 min 0.00 / Att2 lookback=5 + ClosePos min -0.11 / Att3 lookback=10 + 1% depth Part A signals dried up. Extends lesson #52 to Turtle Soup structure: policy-driven single-country EM ETFs reject all short-horizon reversal structures (BB Squeeze, BB Lower, Stoch crossover, failed breakdown reclaim). FXI-005 remains global optimum at min(A,B) 0.38. TQQQ-016 added 2026-04-17 (Gap-Down Capitulation MR ported from IBIT-006, 3 iterations all failed: Att1 gap-3% min -0.07 / Att2 gap-2% min -0.07 / Att3 +volume min -0.07, all vs TQQQ-010 0.36). Validates lesson #20a boundary: pattern does NOT extend to leveraged tech ETFs on traditional (non-24/7) underlying. Att3 Part A Sharpe 0.49 (+36% vs TQQQ-010) but Part B unchanged at -0.07 due to 2025-04-07 Trump tariff gap-down continuing to decline. 16 experiments. EEM-012 added 2026-04-17 (BB Lower + Pullback Cap Hybrid MR: BB(20,2.0) + 10d PB cap -7% + WR(10)<=-85 + ClosePos>=40% + ATR(5)/ATR(20)>1.1 + TP+3%/SL-3%/20d/cd10, Att3 min(A,B) 0.34 +89% vs EEM-005 0.18, first validation of hybrid pattern on broad EM ETF category, extends lesson #52 scope beyond single-country EM. Att2 ATR>1.15 reverse-failed: crisis-day ATR spike means tighter ATR preserves losers not winners — WR is the key quality axis for EEM hybrid, 12 experiments). IBIT-006 added 2026-04-17 (Gap-Down Capitulation MR: Gap<=-1.5% + Close>Open + 10d PB [-12%,-25%] + WR(10)<=-80 + TP+4.5%/SL-4%/15d/cd10, Att2 min(A,B) 0.40 +167% vs IBIT-001 0.15, first structural entry improvement leveraging BTC 24/7 overnight gap + US session buying pattern; Att3 ablation confirmed gap-down filter is prerequisite for tight SL -4%, 6 experiments). FXI-008 updated 2026-04-17 (Stochastic Oscillator MR tested on FXI, three iterations Att1 %K>%D cross 0.16 / Att2 %K level 0.34 / Att3 WR+Stoch dual osc 0.37 all failed vs FXI-005 min 0.38, confirmed Stoch Oscillator adds no value over WR(10) for policy-driven EM single-country ETF). CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). VGK-007 updated 2026-04-16 (BB lower band + pullback cap -7% hybrid, min(A,B) 0.45→0.53, +18%, 7 experiments, resolves VGK-004 A/B imbalance 37.5%→8.2%). EWZ-006 updated 2026-04-16 (BB lower band 1.5σ + pullback cap -10% hybrid, min(A,B) 0.34→0.69, +103%, 6 experiments, first commodity-driven EM single-country ETF to validate hybrid pattern). XBI-010 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on biotech ETF 2.0% vol, three iterations all failed to beat XBI-005 min 0.36, confirmed hybrid pattern effective upper boundary at daily vol ≤1.75%, 10 experiments). INDA-008 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on India ETF 0.97% vol, three iterations all failed to beat INDA-005 min 0.23, confirmed hybrid pattern effective lower boundary at daily vol ≥1.12%, 8 experiments). FXI-007 updated 2026-04-17 (RS momentum FXI vs EEM tested, three iterations min -6.63~0.16 all failed vs FXI-005 min 0.38, confirmed single-country EM RS momentum pattern failure extends to China, 7 experiments). EWJ-004 updated 2026-04-17 (RS momentum EWJ vs EFA/SPY tested on DM single-country ETF, three iterations min -0.24~0.15 all failed vs EWJ-003 min 0.60, extended single-country RS momentum failure pattern from EM to DM, 4 experiments). EWT-008 updated 2026-04-17 (BB lower band 2.0σ + pullback cap -8% hybrid tested on Taiwan ETF 1.41% vol semiconductor-driven EM single-country, Att1 min(A,B) 0.57† vs EWT-007 RS momentum 0.42, +36% Part A Sharpe, confirmed hybrid pattern effective in [1.12%, 1.75%] vol range extends to EM semiconductor-driven single-country ETFs, 8 experiments). †EWJ/EWT min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (EWJ 6/6, EWT 3/3 trades returned identical +3.50%)
+  note: SIVR-015 added 2026-04-17 (RSI(14) Bullish Hook Divergence + SIVR-005 entry: pullback 7-15% + WR(10)<=-80 + RSI(14) self-risen from 5d-min by ≥3 points where 5d-min ≤ 35, TP+3.5%/SL-3.5%/15d). Att1 new global best min(A,B) 0.22→0.48 (+118%), Part B Sharpe 0.26→1.41 (+442%). First repo validation of classical bullish divergence pattern. Att2 (lookback 7/delta 2) too loose, Part A regressed 0.28; Att3 (RSI(7)) noisy, both parts negative. RSI(14) is the correct period for SIVR divergence. Pattern may generalize to other mean-reverting assets — cross-asset validation pending. FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed: Att1 breakdown_lookback=10 min 0.00 / Att2 lookback=5 + ClosePos min -0.11 / Att3 lookback=10 + 1% depth Part A signals dried up. Extends lesson #52 to Turtle Soup structure: policy-driven single-country EM ETFs reject all short-horizon reversal structures (BB Squeeze, BB Lower, Stoch crossover, failed breakdown reclaim). FXI-005 remains global optimum at min(A,B) 0.38. TQQQ-016 added 2026-04-17 (Gap-Down Capitulation MR ported from IBIT-006, 3 iterations all failed: Att1 gap-3% min -0.07 / Att2 gap-2% min -0.07 / Att3 +volume min -0.07, all vs TQQQ-010 0.36). Validates lesson #20a boundary: pattern does NOT extend to leveraged tech ETFs on traditional (non-24/7) underlying. Att3 Part A Sharpe 0.49 (+36% vs TQQQ-010) but Part B unchanged at -0.07 due to 2025-04-07 Trump tariff gap-down continuing to decline. 16 experiments. EEM-012 added 2026-04-17 (BB Lower + Pullback Cap Hybrid MR: BB(20,2.0) + 10d PB cap -7% + WR(10)<=-85 + ClosePos>=40% + ATR(5)/ATR(20)>1.1 + TP+3%/SL-3%/20d/cd10, Att3 min(A,B) 0.34 +89% vs EEM-005 0.18, first validation of hybrid pattern on broad EM ETF category, extends lesson #52 scope beyond single-country EM. Att2 ATR>1.15 reverse-failed: crisis-day ATR spike means tighter ATR preserves losers not winners — WR is the key quality axis for EEM hybrid, 12 experiments). IBIT-006 added 2026-04-17 (Gap-Down Capitulation MR: Gap<=-1.5% + Close>Open + 10d PB [-12%,-25%] + WR(10)<=-80 + TP+4.5%/SL-4%/15d/cd10, Att2 min(A,B) 0.40 +167% vs IBIT-001 0.15, first structural entry improvement leveraging BTC 24/7 overnight gap + US session buying pattern; Att3 ablation confirmed gap-down filter is prerequisite for tight SL -4%, 6 experiments). FXI-008 updated 2026-04-17 (Stochastic Oscillator MR tested on FXI, three iterations Att1 %K>%D cross 0.16 / Att2 %K level 0.34 / Att3 WR+Stoch dual osc 0.37 all failed vs FXI-005 min 0.38, confirmed Stoch Oscillator adds no value over WR(10) for policy-driven EM single-country ETF). CIBR-008 updated 2026-04-16 (BB lower band + pullback cap -12% hybrid, min(A,B) 0.27→0.39, +44%, 8 experiments). EWJ-003 updated 2026-04-16 (BB lower band + pullback cap hybrid, Part A Sharpe 0.55→0.60, 3 experiments). VGK-007 updated 2026-04-16 (BB lower band + pullback cap -7% hybrid, min(A,B) 0.45→0.53, +18%, 7 experiments, resolves VGK-004 A/B imbalance 37.5%→8.2%). EWZ-006 updated 2026-04-16 (BB lower band 1.5σ + pullback cap -10% hybrid, min(A,B) 0.34→0.69, +103%, 6 experiments, first commodity-driven EM single-country ETF to validate hybrid pattern). XBI-010 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on biotech ETF 2.0% vol, three iterations all failed to beat XBI-005 min 0.36, confirmed hybrid pattern effective upper boundary at daily vol ≤1.75%, 10 experiments). INDA-008 updated 2026-04-17 (BB lower band + pullback cap hybrid tested on India ETF 0.97% vol, three iterations all failed to beat INDA-005 min 0.23, confirmed hybrid pattern effective lower boundary at daily vol ≥1.12%, 8 experiments). FXI-007 updated 2026-04-17 (RS momentum FXI vs EEM tested, three iterations min -6.63~0.16 all failed vs FXI-005 min 0.38, confirmed single-country EM RS momentum pattern failure extends to China, 7 experiments). EWJ-004 updated 2026-04-17 (RS momentum EWJ vs EFA/SPY tested on DM single-country ETF, three iterations min -0.24~0.15 all failed vs EWJ-003 min 0.60, extended single-country RS momentum failure pattern from EM to DM, 4 experiments). EWT-008 updated 2026-04-17 (BB lower band 2.0σ + pullback cap -8% hybrid tested on Taiwan ETF 1.41% vol semiconductor-driven EM single-country, Att1 min(A,B) 0.57† vs EWT-007 RS momentum 0.42, +36% Part A Sharpe, confirmed hybrid pattern effective in [1.12%, 1.75%] vol range extends to EM semiconductor-driven single-country ETFs, 8 experiments). †EWJ/EWT min(A,B) uses Part A Sharpe as binding constraint — Part B Sharpe formally 0.00 due to zero variance (EWJ 6/6, EWT 3/3 trades returned identical +3.50%)
 -->
 
 | 資產 | 最佳實驗 | 策略類型 | min(A,B) Sharpe | 全域最優確認 |
 |------|----------|----------|-----------------|-------------|
 | TQQQ | TQQQ-010 | 極端恐慌買入 | 0.36 | 16 次實驗 ✓ |
 | GLD | GLD-012 Att3 | 20日回調+WR（無追蹤停損）| 0.48 | 12 次實驗 ✓ |
-| SIVR | SIVR-005 | 回檔範圍+WR | 0.22 | 16 次實驗 ✓ |
+| SIVR | SIVR-015 Att1 | 回檔+WR+RSI bullish hook divergence | 0.48 | 17 次實驗 ✓ |
 | FCX | FCX-001/FCX-004 | 三重極端超賣/BB Squeeze | 0.43/0.41 | 8 次實驗 ✓ |
 | USO | USO-013 | 緊密回檔+RSI(2)+2日急跌 | 0.26 | 21 次實驗 ✓ |
 | SPY | SPY-005 | RSI(2) 寬出場 | 0.53 | 8 次實驗 ✓ |
@@ -430,6 +430,40 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 **IBIT-006 Att2 結果**：min(A,B) Sharpe 0.40（+167% vs IBIT-001 0.15），Part A/B 訊號比 1.33:1
 **TQQQ-016 結果**：Att1/Att2/Att3 三次 min(A,B) 皆 -0.07（vs TQQQ-010 的 0.36），Att3 最佳 Part A Sharpe 0.49 但 Part B -0.07 拖累 min。驗證 pattern 有效性先決條件為「基礎資產盤外真實連續交易」
+
+---
+
+## 20b. RSI Bullish Hook Divergence 對高波動均值回歸有效（SIVR 驗證）
+<!-- freshness:
+  derived_from: [SIVR-015]
+  validated: 2026-04-17
+  data_through: 2025-12-31
+  confidence: medium
+  note: SIVR-015 Att1 first repo validation of classical bullish divergence filter on existing pullback+WR MR framework. Pattern may generalize — awaits cross-asset validation.
+-->
+
+**規則**：在已有 pullback+WR 均值回歸框架的高波動資產上，可疊加 **RSI(14) bullish hook divergence** 作為額外過濾，捕捉「RSI 已從近期 oversold 低點回升」的 capitulation 尾聲訊號，移除「RSI 仍在下探」的持續下跌訊號。
+
+**具體條件（SIVR-015 Att1 驗證）**：
+- RSI(14) 今日 − RSI(14) 過去 5 日最低點 ≥ 3 點（hook delta）
+- 過去 5 日 RSI(14) 最低點 ≤ 35（確保 divergence 發生在 oversold 區間）
+
+**有效條件**：
+- 基礎框架為 pullback+WR 類均值回歸（已驗證有效於該資產）
+- RSI 週期需為 14（RSI(7) 過噪，在 SIVR 上 Sharpe 翻負）
+- hook lookback 5 日最佳（7 日納入過舊 RSI 低點）
+- hook delta 3 點最佳（2 點太鬆納入噪音）
+
+**效果（SIVR-015 Att1 vs SIVR-005）**：
+- Part A Sharpe 0.22 → **0.48**（+118%）
+- Part B Sharpe 0.26 → **1.41**（+442%）
+- WR 62.5%/63.6% → **75.0%/66.7%**
+- 訊號頻率下降至 1.5-1.6/年（SIVR-005 為 5.5-6.4/年）
+- A/B 年化訊號率比 1.07:1（極佳平衡）
+
+**跨資產泛化假設（待驗證）**：可能適用於其他日波動 2-3% 且已驗證 pullback+WR 框架的資產（FCX、COPX、USO、TSLA）。**低波動資產**（GLD、SPY、EWJ、VGK）的 divergence 訊號可能過於稀少；**政策/事件驅動資產**（FXI、TLT）可能因 RSI 特徵受宏觀事件影響而失效。
+
+**與 SIVR-007 Att1「RSI(14) 動能回復」的關鍵差異**：SIVR-007 僅要求 RSI > 5日最低值（單側門檻，無 delta 閾值、無 oversold 前提），SIVR-015 雙重條件更嚴格鎖定 classical divergence 結構。
 
 ---
 

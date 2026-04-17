@@ -1,10 +1,20 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-10
+  last_validated: 2026-04-17
   data_through: 2025-12-31
+  note: SIVR-015 added 2026-04-17 (RSI Bullish Hook Divergence filter + SIVR-005 entry; Att1 RSI(14)/lookback 5d/delta 3/near-low 35 new global best min(A,B) 0.22→0.48 +118%, Part B 0.26→1.41 +442%). First validation of classical bullish divergence pattern in repo — filters out signals where RSI is still declining (prolonged downtrend). Att2 (lookback 7/delta 2) loosened too much, Part A 0.48→0.28; Att3 (RSI(7)/delta 4) noisy, both parts negative Sharpe. RSI(14) is the right period for this pattern on SIVR.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** SIVR-005（回檔 7-15% + WR ≤ -80，回檔上限過濾極端崩盤），已確認為全域最優（16 次實驗、39 次嘗試，含突破策略（BB Squeeze + Donchian）、配對交易、RS 動量、趨勢跟蹤、RSI(5)+急跌、波動率自適應和 BB 下軌均值回歸驗證）
+**當前最佳：** SIVR-015 Att1（RSI Bullish Hook Divergence 過濾 + SIVR-005 進場：回檔 7-15% + WR(10) ≤ -80 + RSI(14) 自 5日低點回升 ≥ 3 點，且 5日低點 ≤ 35）
+- Part A: Sharpe **0.48**, WR 75.0%, 累計 +11.85%, 8 訊號 (1.6/年), MDD -6.06%
+- Part B: Sharpe **1.41**, WR 66.7%, 累計 +7.12%, 3 訊號 (1.5/年), MDD -3.39%
+- **min(A,B) 0.48**（+118% vs SIVR-005 的 0.22）
+- A/B 累計差 4.73pp（<30%），A/B 年化訊號率比 1.07:1（極佳平衡）
+- PF: A 2.60 / B ∞，Sortino: A 0.80 / B ∞
+- **關鍵機制**：RSI(14) 多頭動能轉折（bullish hook）過濾 classical bullish divergence 的「RSI 已從近期低點回升」條件，選擇性移除「RSI 仍下探」的訊號日（持續下跌結構），保留「RSI 轉折但價格仍淺超賣」的 capitulation 尾聲訊號
+- **repo 首次驗證 classical bullish divergence 模式**（SIVR-007 為 20日回看而非 divergence；SIVR-007 Att1 的 RSI 動能回復未使用 hook 閾值與 oversold 準則）
+
+**前任最佳：** SIVR-005（回檔 7-15% + WR ≤ -80，回檔上限過濾極端崩盤，min(A,B) 0.22）
 - Part A: Sharpe 0.22, 累計 +24.06%, 32 訊號 (6.4/年)
 - Part B: Sharpe 0.26, 累計 +9.69%, 11 訊號 (5.5/年)
 - vs SIVR-003: Part A Sharpe +22%, 累計 +23%，Part B 完全相同
@@ -60,8 +70,13 @@
 - BB(20,2.0) + WR(10) + ATR(5)/ATR(20)>1.05（Att3）：Part A Sharpe -0.19（20 訊號，WR 40.0%），Part B Sharpe -0.02（2 訊號）。ATR 在 SIVR 2-3% 日波動下無區分力（普遍偏高），保留壞訊號移除好訊號
 - **結論：BB 下軌入場不可替代固定回檔門檻**（確認 cross_asset_lesson #18 適用 SIVR）。BB 在熊市中持續被觸及產生假訊號，在牛市中幾乎不被觸及導致訊號不足
 
+**已證明無效（RSI Bullish Divergence，SIVR-015 迭代 2/3）：**
+- RSI(14) hook lookback 7 + delta 2（SIVR-015 Att2）：Part A 訊號 8→13（+5），但新增訊號含壞訊號使 Part A Sharpe 0.48→0.28（WR 75.0%→69.2%），Part B 完全不變。放寬 hook 閾值同時放鬆 lookback 導致選擇性下降
+- RSI(7) hook lookback 5 + delta 4（SIVR-015 Att3）：Part A Sharpe -0.15 / Part B -0.16。RSI(7) 週期過短，divergence 訊號噪音過大，16/7 訊號 WR 僅 43-44%，劣於盈虧平衡線。**確認 RSI(14) 為 SIVR divergence 的正確週期**
+
 **尚未嘗試的方向（預期邊際效益極低，不建議繼續探索）：**
 - 多根 K 線確認（連續 2-3 根收高）— 但跨資產教訓 #23 顯示 K 線方向過濾在均值回歸中無效
+- MACD histogram divergence — RSI(14) divergence 已成功，預期 MACD 為近似訊號
 
 **滾動窗口分析摘要（2026-03-29）：**
 - **SIVR-001：** 8/12 窗口正累計（最低 -6.93%，最高 +13.65%），勝率 50-100%，早期全勝但 2021H2~2023H1 低迷（50%），近期恢復 100%，但訊號極少（年均 2-3 筆）
@@ -82,12 +97,13 @@
 - **RSI(5)+2日急跌替代 WR(10) 無效**：三次嘗試最佳 min(A,B) 0.17（Att1，vs SIVR-005 的 0.22）。RSI(5)+急跌捕捉投降性賣壓但不優於 WR(10)，且 SL 存在結構性 A/B 張力。WR(10) ±3.5% 對稱出場確認為 SIVR 全域最優
 - **波動率自適應過濾（ATR(5)/ATR(20)）在 SIVR 上 Part A 有效但 Part B 退化**：三次嘗試最佳 min(A,B) 0.12（Att1：ATR>1.15, SL-3.5%, Part A Sharpe 0.41/Part B 0.12）。ATR 過濾在 Part A（含 COVID、2022 熊市）成功移除慢速回檔假訊號（Sharpe +86%），但 Part B（2024-2025）同時移除 3 個好訊號。ATR>1.10 太寬鬆（引入壞訊號），SL-4.0% 未能挽救停損。日波動 2-3% 的資產 ATR 比率波動本身較大，過濾器跨期穩定性不足
 - **Donchian 通道突破在 SIVR 上不及均值回歸**：SIVR-014 三次嘗試。Att1（Donchian(20)+SMA(50)+5%回檔，TP+5%/SL-5%/20d）Part A Sharpe 0.10/Part B 0.56，min 0.10。Att2（緊出場 ±3.5%/15d+7%回檔）Part A -0.46/Part B -0.02，緊出場殺死突破策略。Att3（SMA斜率過濾）Part A -0.16/Part B 0.19，過濾移除早期恢復好訊號。Part B 0.56 優於 BB Squeeze 的 0.10，但 Part A 0.10 仍遠不及均值回歸 0.22。Donchian 固定回看高點不如 BB 上軌統計自適應門檻（確認跨資產教訓 FCX-007）
+- **RSI(14) Bullish Hook Divergence 過濾在 SIVR 上大幅有效（SIVR-015 Att1 驗證）**：首次在 repo 內驗證 classical bullish divergence 模式。SIVR-005 基礎進場（回檔 7-15% + WR(10) ≤ -80）+ RSI(14) 自過去 5 日最低點回升 ≥ 3 點且低點 ≤ 35（oversold）過濾後，Part A Sharpe 0.22→0.48（+118%）、Part B Sharpe 0.26→1.41（+442%），min(A,B) 0.22→0.48。WR 62.5%/63.6%→75.0%/66.7%。訊號品質大幅提升：過濾掉「RSI 仍下探的被動持續下跌」訊號日，保留「RSI 已轉折的 capitulation 尾聲」訊號。代價是訊號頻率降至 1.5-1.6/年（vs SIVR-005 的 5.5-6.4/年），但每筆訊號品質顯著提升。**RSI(14) 週期是 SIVR divergence 的正確週期**（RSI(7) 太噪、lookback 7+delta 2 太鬆均退化）。與 SIVR-007 Att1 的「RSI(14) 動能回復」關鍵差別：SIVR-007 用 RSI > 5日最低值單側門檻（未設 delta 閾值與 oversold 前提），SIVR-015 雙重條件鎖定更嚴格的 divergence 結構
 <!-- AI_CONTEXT_END -->
 
 # SIVR 實驗總覽 (SIVR Experiment Index)
 
-> **最新實驗 (Latest):** SIVR-014 `sivr_014_donchian_breakout`（Donchian 通道突破，3 次嘗試均未超越 SIVR-005）
-> **當前最佳 (Best):** SIVR-005 `sivr_005_capped_pullback_wr`（回檔上限過濾極端崩盤，Part A Sharpe +22%，已確認全域最優）
+> **最新實驗 (Latest):** SIVR-015 `sivr_015_rsi_divergence_mr`（RSI(14) bullish hook divergence 過濾 + SIVR-005 進場，★ **新全域最優**，min(A,B) 0.22→0.48 +118%）
+> **當前最佳 (Best):** SIVR-015 `sivr_015_rsi_divergence_mr`（classical bullish divergence 首次於 repo 驗證有效，過濾掉 RSI 仍在下跌的訊號）
 
 ## 實驗清單 (Experiments)
 
@@ -107,6 +123,7 @@
 | SIVR-012 | `sivr_012_vol_adaptive_mr` | SIVR 波動率自適應均值回歸 | 回檔 7-15% + WR(10)≤-80 + ATR(5)/ATR(20)>1.15, TP+3.5%/SL-3.5%/15d | ❌ 失敗（3次嘗試） |
 | SIVR-013 | `sivr_013_bb_lower_mr` | SIVR BB 下軌均值回歸 | BB(20,2) 下軌 + WR(10)≤-80 + ATR>1.05, TP+3.5%/SL-3.5%/15d | ❌ 失敗（3次嘗試） |
 | SIVR-014 | `sivr_014_donchian_breakout` | SIVR Donchian 通道突破 | Donchian(20)+SMA(50)+5%回檔, TP+5%/SL-5%/20d | ❌ 失敗（3次嘗試） |
+| SIVR-015 | `sivr_015_rsi_divergence_mr` | SIVR RSI Bullish Divergence + 回檔+WR | SIVR-005 + RSI(14) hook: lookback 5d + delta ≥3 + near-low ≤35, TP+3.5%/SL-3.5%/15d | ✅ **新全域最佳** |
 
 ## 演進路線 (Lineage)
 
@@ -876,3 +893,83 @@ BB Squeeze Breakout 在 SIVR 上完全無效，核心原因：
 3. **SMA 斜率過濾移除好訊號**：Att3 要求 SMA(50) 上升（過濾熊市假突破），但最佳突破訊號常出現在趨勢剛轉向時（SMA 仍下行），過濾器移除了 2020-05（COVID 恢復）等高品質訊號，Part A WR 反而從 55.6% 降至 42.9%。確認跨資產教訓 #6 也適用於突破策略過濾。
 4. **Donchian vs BB Squeeze**：Att1 Part B Sharpe 0.56 顯著優於 SIVR-008 BB Squeeze 的 0.10，表明 Donchian 在趨勢市場更有效。但 Part A（0.10 vs 0.11）相當，兩種突破在盤整市場均失敗。固定回看高點（Donchian）不如統計自適應門檻（BB）穩健，確認 FCX-007 跨資產結論。
 5. **突破策略在 SIVR 上結構性 A/B 不平衡**：所有突破嘗試（SIVR-008 + SIVR-014 共 6 次）Part B 均優於 Part A，反映白銀 2024-2025 的強勢上漲趨勢（$22→$55 漲 150%）。但 2019-2023 的盤整期無法產生持續突破動能。
+
+---
+
+## SIVR-015: RSI Bullish Hook Divergence + Pullback+WR Mean Reversion
+
+### 目標 (Goal)
+
+測試 **classical bullish divergence** 作為 SIVR-005 進場的額外過濾器，驗證此技術分析經典模式在 SIVR 上的有效性。bullish divergence 捕捉「價格仍在超賣區間但動能指標已轉折」的 capitulation 尾聲訊號，邏輯上應選擇性移除「RSI 仍在下探」的持續下跌訊號（預期為 SIVR-005 Part A 中 12 筆停損交易的主要成因）。
+
+**repo 首次測試 classical divergence 模式**——先前 SIVR-007 Att1 的「RSI(14) 動能回復」僅用單側 RSI>5日最低值，無 hook 閾值與 oversold 前提，結構上更接近 RSI 趨勢向上而非 divergence。
+
+### 進場條件 (Entry Conditions，Att1 全域最優)
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| 1 | 回檔幅度 | 10 日高點回檔 ≥ 7% | SIVR-005 繼承，過濾淺回檔 |
+| 2 | 回檔上限 | ≤ 15% | SIVR-005 繼承，過濾極端崩盤 |
+| 3 | Williams %R(10) | ≤ -80 | SIVR-005 繼承，10 日超賣 |
+| 4 | **RSI(14) Bullish Hook Delta** | **RSI 今日 − RSI 過去 5 日最低點 ≥ 3 點** | **新增：動能轉折確認** |
+| 5 | **RSI(14) 近期超賣前提** | **過去 5 日 RSI 最低點 ≤ 35** | **新增：確保 divergence 發生在 oversold 區間** |
+| 6 | 冷卻期 | 10 天 | SIVR-005 繼承 |
+
+### 出場參數 (Exit Parameters) — 同 SIVR-005
+
+| 參數 | 值 |
+|------|------|
+| 獲利目標 (TP) | +3.5%（限價賣單 Day） |
+| 停損 (SL) | -3.5%（停損市價 GTC） |
+| 最大持倉 | 15 天（隔日開盤市價） |
+| 滑價 | 0.15%（SIVR 流動性較 GLD 低） |
+
+### 成交模型 (Execution Model) — 同 SIVR-005
+
+| 項目 | 設定 |
+|------|------|
+| 進場模式 | 隔日開盤市價 (next_open_market) |
+| 止盈委託 | 限價賣單 Day (limit_order_day) |
+| 停損委託 | 停損市價 GTC (stop_market_gtc) |
+| 到期出場 | 隔日開盤市價 (next_open_market) |
+| 悲觀認定 | 是（同根 K 線 stop+target 皆觸發 → 停損優先）|
+
+### 回測結果 (Backtest Results)
+
+| Part | 訊號數 | WR | 平均報酬 | 累計報酬 | Sharpe | Sortino | PF | MDD | Max Consec. Loss |
+|------|--------|-----|---------|---------|--------|---------|-----|------|------|
+| A (2019-2023) | 8 | 75.0% | +1.45% | +11.85% | **0.48** | 0.80 | 2.60 | -6.06% | 1 |
+| B (2024-2025) | 3 | 66.7% | +2.33% | +7.12% | **1.41** | ∞ | ∞ | -3.39% | 0 |
+| C (2026-live) | 0 | — | — | — | — | — | — | — | — |
+
+**min(A,B) Sharpe = 0.48**（+118% vs SIVR-005 的 0.22）
+
+### 三次迭代總結 (Three-Iteration Summary)
+
+| 迭代 | RSI 週期 | Hook Lookback | Hook Delta | Part A Sharpe | Part B Sharpe | Part A 訊號 | Part B 訊號 | Part A WR | 備註 |
+|------|---------|---------------|-----------|---------------|---------------|-------------|-------------|-----------|------|
+| **Att1 ★** | **14** | **5** | **3.0** | **0.48** | **1.41** | **8** | **3** | **75.0%** | **全域最優，首次超越 SIVR-005** |
+| Att2 | 14 | 7 | 2.0 | 0.28 | 1.41 | 13 | 3 | 69.2% | 放鬆加入壞訊號，Part A 退化 |
+| Att3 | 7 | 5 | 4.0 | -0.15 | -0.16 | 16 | 7 | 43.8% | RSI(7) 過噪，兩期 Sharpe 均負 |
+| **SIVR-005** | — | — | — | **0.22** | **0.26** | **32** | **11** | **62.5%** | 前任最佳 |
+
+### 成功分析 (Success Analysis)
+
+1. **Divergence 機制成功**：RSI(14) bullish hook 過濾識別「RSI 已脫離近期低點（turn up）」的時刻，有效區分「capitulation 尾聲」（RSI 轉折）vs「持續下跌途中」（RSI 仍在下探）。SIVR-005 Part A WR 62.5%→75.0%（+12.5pp），12 筆停損中有 8 筆被過濾（Part A 訊號 32→8 - 24）。
+2. **Part B 同步改善**：Part B WR 63.6%→66.7%（+3.1pp），但 Sharpe 大幅改善源於訊號密度下降保留高品質訊號（2024-05, 2024-08 兩筆均 +3.5% 達標）。
+3. **A/B 平衡極佳**：A/B 年化訊號率 1.6/1.5 = 1.07:1（理想範圍），A/B 累計差 4.73pp（<30%）。SIVR 歷史上 Part A/B 一致性是 SIVR-005 的優勢，SIVR-015 繼承並強化。
+4. **訊號頻率 vs 品質的取捨**：訊號頻率降至 1.5/年（SIVR-005 為 5.5-6.4/年），但每筆品質（平均報酬 +1.45~2.33%）提升至 SIVR-005（+0.73~0.90%）的 1.6-2.6 倍。對低訊號頻率但高品質的策略，單一訊號的盈虧對累計報酬影響較大；搭配 1:1 對稱出場 ±3.5% 已是 SIVR 全域最佳配對。
+
+### 失敗分析 (Failure Analysis — Att2, Att3)
+
+1. **Att2 放鬆 hook 門檻引入壞訊號**：lookback 5→7、delta 3→2 將 Part A 訊號從 8 擴至 13，新增 5 筆含 2 筆停損、3 筆贏利，整體 WR 75.0%→69.2%、Sharpe 0.48→0.28 退化 42%。驗證 hook_delta 閾值敏感：3 點為甜蜜點，2 點放入 RSI 微小反彈（可能為日內噪音）。
+2. **Att3 RSI(7) 過噪**：RSI(7) 對日內價格波動極度敏感，5 日內常有多個「局部低點」，divergence hook 失去選擇性。結果 Part A WR 43.8% / Part B 42.9% 均低於盈虧平衡線，Sharpe 均為負值。確認跨資產教訓 #12（超賣指標週期應匹配持倉週期）——SIVR 持倉平均 6.7 天，RSI(14) 才能產生穩定的 divergence 訊號。
+3. **hook_max_min 35 為合理邊界**：過去 5 日 RSI 最低點須曾 ≤ 35 確保 divergence 發生在 oversold 區間。若閾值 ≥ 40（非超賣），divergence 訊號將涵蓋一般回調而非真正的 capitulation。
+
+### 關鍵發現 (Key Findings)
+
+1. **classical bullish divergence 在 SIVR 上大幅有效**：首次在 repo 內驗證此技術分析模式的效益。過去 repo 曾嘗試 RSI(14) 動能回復（SIVR-007 Att1，不完全的 divergence）、RSI(5)+急跌（SIVR-011）、ATR 波動率自適應（SIVR-012）、BB 下軌 MR（SIVR-013），均未明確使用 classical divergence 架構。
+2. **hook 閾值敏感度**：delta 3 點為甜蜜點（2 點太鬆引入噪音、4 點可能太嚴）。lookback 5 日為甜蜜點（7 日納入過舊的 RSI 低點）。
+3. **訊號頻率與 Sharpe 的關係**：低頻率（1.5-1.6/年）+ 高品質（WR 75%）組合在 SIVR 上可行，因 SIVR-015 仍保持 A/B 一致性（annual rate ratio 1.07:1）且 Part B 累計報酬為正。
+4. **可泛化性假設**：RSI(14) bullish hook divergence 預期對其他日波動 2-3% 的均值回歸型資產可能有效（如 FCX、COPX、USO 甚至 TSLA）。跨資產驗證屬下一步工作（留待未來實驗）。
+

@@ -1,0 +1,239 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-17T21:00:39.467489"
+  },
+  "part_a": {
+    "ticker": "SIVR",
+    "total_signals": 8,
+    "wins": 6,
+    "win_rate": 0.75,
+    "avg_return_pct": 1.45,
+    "std_return_pct": 3.02,
+    "cumulative_return_pct": 11.85,
+    "avg_holding_days": 6.8,
+    "max_drawdown_pct": -6.06,
+    "profit_factor": 2.6,
+    "sharpe_ratio": 0.48,
+    "sortino_ratio": 0.8,
+    "calmar_ratio": 0.24,
+    "max_consecutive_losses": 1,
+    "target_exits": 5,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2020-11-30",
+        "entry_date": "2020-12-01",
+        "exit_date": "2020-12-07",
+        "entry": 22.81,
+        "exit": 23.61,
+        "return_pct": 3.5,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.2
+      },
+      {
+        "date": "2021-06-21",
+        "entry_date": "2021-06-22",
+        "exit_date": "2021-07-15",
+        "entry": 24.98,
+        "exit": 25.33,
+        "return_pct": 1.42,
+        "holding_days": 15,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -1.07
+      },
+      {
+        "date": "2021-09-21",
+        "entry_date": "2021-09-22",
+        "exit_date": "2021-09-29",
+        "entry": 21.98,
+        "exit": 21.18,
+        "return_pct": -3.64,
+        "holding_days": 5,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.06
+      },
+      {
+        "date": "2022-05-11",
+        "entry_date": "2022-05-12",
+        "exit_date": "2022-05-19",
+        "entry": 20.38,
+        "exit": 21.09,
+        "return_pct": 3.5,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.75
+      },
+      {
+        "date": "2022-07-13",
+        "entry_date": "2022-07-14",
+        "exit_date": "2022-07-18",
+        "entry": 17.67,
+        "exit": 18.28,
+        "return_pct": 3.5,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.3
+      },
+      {
+        "date": "2023-02-07",
+        "entry_date": "2023-02-08",
+        "exit_date": "2023-02-14",
+        "entry": 21.55,
+        "exit": 20.77,
+        "return_pct": -3.64,
+        "holding_days": 4,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -3.77
+      },
+      {
+        "date": "2023-06-23",
+        "entry_date": "2023-06-26",
+        "exit_date": "2023-07-12",
+        "entry": 21.81,
+        "exit": 22.58,
+        "return_pct": 3.5,
+        "holding_days": 11,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.03
+      },
+      {
+        "date": "2023-08-10",
+        "entry_date": "2023-08-11",
+        "exit_date": "2023-08-23",
+        "entry": 21.78,
+        "exit": 22.55,
+        "return_pct": 3.5,
+        "holding_days": 8,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.57
+      }
+    ],
+    "filled_count": 8,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "SIVR",
+    "total_signals": 3,
+    "wins": 2,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 2.33,
+    "std_return_pct": 1.65,
+    "cumulative_return_pct": 7.12,
+    "avg_holding_days": 7.0,
+    "max_drawdown_pct": -3.39,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 1.41,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 0.69,
+    "max_consecutive_losses": 0,
+    "target_exits": 2,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-05-02",
+        "entry_date": "2024-05-03",
+        "exit_date": "2024-05-06",
+        "entry": 25.4,
+        "exit": 26.29,
+        "return_pct": 3.5,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.37
+      },
+      {
+        "date": "2024-08-07",
+        "entry_date": "2024-08-08",
+        "exit_date": "2024-08-15",
+        "entry": 25.91,
+        "exit": 26.82,
+        "return_pct": 3.5,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.27
+      },
+      {
+        "date": "2024-11-12",
+        "entry_date": "2024-11-13",
+        "exit_date": "2024-12-06",
+        "entry": 29.62,
+        "exit": 29.63,
+        "return_pct": 0.0,
+        "holding_days": 15,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -3.39
+      }
+    ],
+    "filled_count": 3,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "SIVR",
+    "total_signals": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": 0.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 0.0,
+    "avg_holding_days": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 0.0,
+    "calmar_ratio": 0.0,
+    "max_consecutive_losses": 0,
+    "target_exits": 0,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [],
+    "filled_count": 0,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 0.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-17"
+    }
+  }
+}
