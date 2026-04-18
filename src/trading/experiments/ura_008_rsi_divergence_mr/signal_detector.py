@@ -1,10 +1,10 @@
 """
-URA RSI Bullish Divergence + URA-004 訊號偵測器 (URA-008)
+URA RSI Bullish Divergence + Pullback + WR 訊號偵測器 (URA-008)
 
 四條件同時成立時觸發訊號：
 1. 收盤價相對 10 日最高價回檔 ≥ 10%
 2. 收盤價相對 10 日最高價回檔 ≤ 20%（過濾極端崩盤）
-3. RSI(2) < 15（短週期超賣）
+3. Williams %R(10) ≤ -80（超賣）
 4. RSI(14) bullish hook：RSI 自過去 N 日最低點回升 ≥ H 點，且該最低點 ≤ 35
 """
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
-    """URA RSI Bullish Divergence + Pullback + RSI(2) + 2DD 訊號偵測器"""
+    """URA RSI Bullish Divergence + Pullback + WR 訊號偵測器"""
 
     def __init__(self, config: URARSIDivergenceMRConfig):
         self.config = config
@@ -34,21 +34,19 @@ class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
         df["High_N"] = df["High"].rolling(n).max()
         df["Pullback"] = (df["Close"] - df["High_N"]) / df["High_N"]
 
-        delta = df["Close"].diff()
-        gain = delta.clip(lower=0)
-        loss = (-delta).clip(lower=0)
-
-        rsi2_period = self.config.rsi2_period
-        avg_gain_2 = gain.ewm(alpha=1 / rsi2_period, min_periods=rsi2_period, adjust=False).mean()
-        avg_loss_2 = loss.ewm(alpha=1 / rsi2_period, min_periods=rsi2_period, adjust=False).mean()
-        rs_2 = avg_gain_2 / avg_loss_2.replace(0, np.nan)
-        df["RSI2"] = 100 - (100 / (1 + rs_2))
+        wr_n = self.config.wr_period
+        highest = df["High"].rolling(wr_n).max()
+        lowest = df["Low"].rolling(wr_n).min()
+        df["WR"] = (highest - df["Close"]) / (highest - lowest) * -100
 
         rsi_period = self.config.rsi_period
-        avg_gain_n = gain.rolling(rsi_period).mean()
-        avg_loss_n = loss.rolling(rsi_period).mean()
-        rs_n = avg_gain_n / avg_loss_n.replace(0, np.nan)
-        df["RSI"] = 100 - (100 / (1 + rs_n))
+        delta = df["Close"].diff()
+        gain = delta.where(delta > 0, 0.0)
+        loss = (-delta).where(delta < 0, 0.0)
+        avg_gain = gain.rolling(rsi_period).mean()
+        avg_loss = loss.rolling(rsi_period).mean()
+        rs = avg_gain / avg_loss.replace(0, np.nan)
+        df["RSI"] = 100 - (100 / (1 + rs))
 
         hook_n = self.config.rsi_hook_lookback
         df["RSI_Min_N"] = df["RSI"].rolling(hook_n).min()
@@ -61,12 +59,12 @@ class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
 
         cond_pullback_min = df["Pullback"] <= self.config.pullback_threshold
         cond_pullback_cap = df["Pullback"] >= self.config.pullback_upper
-        cond_rsi2 = df["RSI2"] < self.config.rsi2_threshold
+        cond_wr = df["WR"] <= self.config.wr_threshold
         cond_hook_delta = df["RSI_Hook_Delta"] >= self.config.rsi_hook_delta
         cond_hook_oversold = df["RSI_Min_N"] <= self.config.rsi_hook_max_min
 
         df["Signal"] = (
-            cond_pullback_min & cond_pullback_cap & cond_rsi2 & cond_hook_delta & cond_hook_oversold
+            cond_pullback_min & cond_pullback_cap & cond_wr & cond_hook_delta & cond_hook_oversold
         )
 
         signal_indices = df.index[df["Signal"]].tolist()
@@ -86,5 +84,5 @@ class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
             logger.info("URA-008: %d duplicate signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
-        logger.info("URA-008: Detected %d RSI-Divergence Pullback+RSI(2) signals", signal_count)
+        logger.info("URA-008: Detected %d RSI-Divergence Pullback+WR signals", signal_count)
         return df

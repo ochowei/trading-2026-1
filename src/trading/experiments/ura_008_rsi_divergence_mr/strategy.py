@@ -1,5 +1,5 @@
 """
-URA RSI Bullish Divergence + Pullback + RSI(2) Mean Reversion Strategy (URA-008)
+URA RSI Bullish Divergence + Pullback + WR Mean Reversion Strategy (URA-008)
 """
 
 from trading.core.base_config import ExperimentConfig
@@ -15,7 +15,7 @@ from trading.experiments.ura_008_rsi_divergence_mr.signal_detector import (
 
 
 class URARSIDivergenceMRStrategy(ExecutionModelStrategy):
-    """URA-008：RSI(14) bullish hook + 回檔+RSI(2) 均值回歸"""
+    """URA-008：RSI(14) bullish hook + URA-002 回檔+WR 均值回歸"""
 
     slippage_pct: float = 0.0010
 
@@ -31,7 +31,7 @@ class URARSIDivergenceMRStrategy(ExecutionModelStrategy):
                 f"  回檔範圍 (Pullback): {config.pullback_lookback} 日高點回檔"
                 f" {abs(config.pullback_threshold):.0%}-{abs(config.pullback_upper):.0%}"
             )
-            print(f"  RSI({config.rsi2_period}) < {config.rsi2_threshold}")
+            print(f"  Williams %R: WR({config.wr_period}) <= {config.wr_threshold}")
             print(
                 f"  RSI({config.rsi_period}) Bullish Hook: "
                 f"lookback {config.rsi_hook_lookback} 日 / delta ≥ {config.rsi_hook_delta} / "
