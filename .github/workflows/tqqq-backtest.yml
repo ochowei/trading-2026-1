@@ -101,6 +101,7 @@ on:
           - "FCX-006: fcx_006_relative_strength"
           - "FCX-007: fcx_007_donchian_breakout"
           - "FCX-008: fcx_008_trend_pullback"
+          - "FCX-009: fcx_009_rsi_divergence_mr"
           - "FXI-001: fxi_001_pullback_wr"
           - "FXI-002: fxi_002_vol_adaptive_pullback"
           - "FXI-003: fxi_003_bb_squeeze_breakout"

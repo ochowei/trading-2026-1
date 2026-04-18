@@ -1,6 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-10
+  last_validated: 2026-04-18
   data_through: 2025-12-31
+  note: FCX-009 added 2026-04-18 (RSI Bullish Hook Divergence + Pullback+WR MR, cross-asset test from SIVR-015 Att1). Three iterations: Att1 (delta=3) min -0.33, Att2 (delta=5) min -0.06, Att3 (delta=5 + pullback -11%) min 0.30. Part A Sharpe 0.51→0.76→0.85 progression confirmed hook filter improves Part A quality dramatically, but Part B collapses to 2 signals in 2024-2025 post-peak copper weakness, failing to beat FCX-001's min 0.43. Confirms pattern 20b boundary: requires Part B active mean reversion regime (FCX 2024-2025 entered prolonged post-peak decline, lacking reversal follow-through).
 -->
 ## AI Agent 快速索引
 
@@ -68,16 +69,23 @@
 - **Att2**（FCX-001 + ATR(5)/ATR(20)>1.05 波動率過濾）：Part A Sharpe 0.25 / Part B 0.82。ATR 改善 Part B 但大幅退化 Part A（移除好訊號多於壞訊號）
 - **Att3**（FCX-001 + 2日跌幅≤-5% 急跌過濾）：Part A Sharpe 0.31 / Part B **1.26**。A/B 累計完美平衡（+40.57%/+40.28%），但 min(A,B) 0.31 低於 FCX-001 的 0.43
 
+**FCX-009 實驗摘要（2026-04-18，3 次嘗試，全部未超越 FCX-001）：**
+跨資產驗證 pattern 20b（SIVR-015 Att1 的 RSI(14) bullish hook divergence）。進場建立於 FCX-002 pullback+WR 框架（移除 ClosePos，lesson #34），加入 pullback 上限 -18%（~6σ 崩盤隔離）與 RSI(14) hook 過濾。
+- **Att1**（pullback [-9%,-18%] + WR + hook delta=3 / max_min=35，TP+8%/SL-10%/20d）：Part A Sharpe 0.51（WR 72.7%, 11 訊號）/ Part B -0.33（WR 40.0%, 5 訊號）。SIVR-015 Att1 參數直接移植失敗：delta=3 放行 2024-07-29 深跌中的局部反彈假訊號（-10.13% 4日停損）
+- **Att2**（加嚴 hook delta 3→5，其餘不變）：Part A Sharpe **0.76**（WR 77.8%, 9 訊號）/ Part B -0.06（WR 33.3%, 3 訊號）。成功濾除 2024-07 停損並轉為 2024-08 +8% 達標，Part A 跳升 +49%，但 Part B 仍受 2024-11/12 雙筆 20 天到期虧損拖累（FCX 2024 後半缺乏均值回歸動能）
+- **Att3**（加深 pullback -9%→-11%，delta=5）：Part A Sharpe **0.85**（WR 85.7%, 7 訊號）/ Part B 0.30（WR 50.0%, 2 訊號）。深 pullback 門檻濾除 Part B 2024-11 淺層假訊號，兩段均轉正但 min(A,B) 0.30 仍低於 FCX-001 的 0.43。A/B 累計差 39.24pp、訊號差 71.4% 均超出目標（30%/50%），Part B 僅 2 訊號樣本不足
+
 **已證明無效（禁止重複嘗試）：**（更新）
 原有項目加上：
 - FCX-008 趨勢跟蹤：SMA 黃金交叉 + 回檔至 SMA(50) 在高波動週期股完全失敗（Part B WR 25%），趨勢反轉太劇烈
 - FCX-008 ATR 波動率自適應：ATR > 1.05 在 FCX 日波動 2-4% 下跨期不穩定（Part A 0.25 vs 基線 0.43），極端超賣條件本身就需要高波動才能觸發，ATR 對這些訊號的額外過濾力有限
 - FCX-008 2日急跌過濾：改善 Part B（0.74→1.26）但大幅減少 Part A 訊號（18→13），3 個被移除的勝利交易拖累 Part A Sharpe
+- FCX-009 RSI Bullish Hook Divergence：雖 Part A 大幅改善（0.85），但 Part B 2024-2025 銅價 post-peak 回檔期缺乏實質均值回歸動能，3 次迭代 Part B 訊號從 5→3→2 漸趨稀薄。確認 pattern 20b（SIVR-015）跨資產邊界：需 Part B 存在活躍的均值回歸 regime；FCX 2024 後半進入長期下行不適用
 
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - 加入銅價/HG 指標確認（減少 2022 熊市等大環境的誤判，但 cross-asset lesson #6 警告額外確認指標通常無效）
 - 引入追蹤停損（Trailing Stop）捕捉更大型的反彈（但 cross-asset lesson #2 警告日波動 2-4% 禁用 trailing stop）
-- FCX-001/004 已確認為全域最優（8 次實驗、33+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應七大策略類型）
+- FCX-001/004 已確認為全域最優（9 次實驗、36+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應、RSI bullish hook divergence 八大策略類型）
 
 **關鍵資產特性：**
 - 高 Beta、週期性強，與銅價高度相關
@@ -108,6 +116,7 @@
 | FCX-006 | `fcx_006_relative_strength`   | FCX-COPX 相對強度（3次嘗試均失敗） | 已完成 |
 | FCX-007 | `fcx_007_donchian_breakout`   | Donchian 通道突破（3次嘗試均失敗） | 已完成 |
 | FCX-008 | `fcx_008_trend_pullback`      | 趨勢跟蹤→ATR自適應→2日急跌（3次嘗試，Att3 Part B 最佳但 min<FCX-001） | 已完成 |
+| FCX-009 | `fcx_009_rsi_divergence_mr`   | RSI Bullish Hook Divergence + Pullback+WR MR（3次嘗試均未超越 FCX-001） | 已完成 |
 
 ---
 
