@@ -25,7 +25,7 @@ class FCXRSIDivergenceMRConfig(ExperimentConfig):
     """FCX RSI Bullish Hook Divergence + Pullback+WR 均值回歸參數"""
 
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.09  # 回檔 ≥ 9%（FCX-002 基線）
+    pullback_threshold: float = -0.11  # Att3: 深回檔 11%（FCX-002 為 9%，濾除淺層假訊號）
     pullback_cap: float = -0.18  # 回檔 ≤ 18%（約 6σ 崩盤隔離）
 
     wr_period: int = 10
@@ -33,7 +33,7 @@ class FCXRSIDivergenceMRConfig(ExperimentConfig):
 
     rsi_period: int = 14
     rsi_hook_lookback: int = 5
-    rsi_hook_delta: float = 5.0  # Att2: 加嚴 hook delta (SIVR-015 用 3.0, FCX 高波動嘗試更嚴)
+    rsi_hook_delta: float = 5.0  # Att2+: 加嚴 hook delta (SIVR-015 用 3.0, FCX 高波動用 5)
     rsi_hook_max_min: float = 35.0
 
     cooldown_days: int = 10
