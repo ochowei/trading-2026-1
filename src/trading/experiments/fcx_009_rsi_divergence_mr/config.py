@@ -33,7 +33,7 @@ class FCXRSIDivergenceMRConfig(ExperimentConfig):
 
     rsi_period: int = 14
     rsi_hook_lookback: int = 5
-    rsi_hook_delta: float = 3.0  # SIVR-015 Att1 驗證值
+    rsi_hook_delta: float = 5.0  # Att2: 加嚴 hook delta (SIVR-015 用 3.0, FCX 高波動嘗試更嚴)
     rsi_hook_max_min: float = 35.0
 
     cooldown_days: int = 10
