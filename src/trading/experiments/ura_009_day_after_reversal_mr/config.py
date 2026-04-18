@@ -36,8 +36,8 @@ class URADayAfterReversalMRConfig(ExperimentConfig):
     pullback_threshold: float = -0.10  # 昨日回檔 ≥ 10%
     pullback_upper: float = -0.20  # 昨日回檔 ≤ 20%（過濾極端崩盤）
     wr_period: int = 10
-    wr_threshold: float = -85.0  # 昨日 WR(10) ≤ -85（較 URA-004 更極端）
-    two_day_decline: float = -0.04  # 從 T-3 到 T-1 兩日跌幅 ≤ -4%
+    wr_threshold: float = -80.0  # 昨日 WR(10) ≤ -80（同 URA-004 進場，Att3 放寬）
+    two_day_decline: float = -0.03  # 從 T-3 到 T-1 兩日跌幅 ≤ -3%（同 URA-004，Att3 放寬）
     cooldown_days: int = 10
 
     # 反轉強度要求（Att2）：今日收盤收復昨日 High，比 Att1 單純 Close>Open 更嚴格
