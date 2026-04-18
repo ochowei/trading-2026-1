@@ -111,6 +111,7 @@ on:
           - "FXI-007: fxi_007_rs_momentum"
           - "FXI-008: fxi_008_stochastic_mr"
           - "FXI-009: fxi_009_failed_breakdown_reversal"
+          - "FXI-010: fxi_010_gap_reversal_mr"
           - "SOXL-001: soxl_001_extreme_oversold"
           - "SOXL-002: soxl_002_deep_oversold"
           - "SOXL-003: soxl_003_wide_sl"
