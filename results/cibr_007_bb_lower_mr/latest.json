@@ -1,0 +1,295 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-16T10:55:41.005526"
+  },
+  "part_a": {
+    "ticker": "CIBR",
+    "total_signals": 9,
+    "wins": 6,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 0.97,
+    "std_return_pct": 3.58,
+    "cumulative_return_pct": 8.42,
+    "avg_holding_days": 3.2,
+    "max_drawdown_pct": -6.81,
+    "profit_factor": 1.71,
+    "sharpe_ratio": 0.27,
+    "sortino_ratio": 0.41,
+    "calmar_ratio": 0.14,
+    "max_consecutive_losses": 2,
+    "target_exits": 6,
+    "stop_loss_exits": 3,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-08-05",
+        "entry_date": "2019-08-06",
+        "exit_date": "2019-08-08",
+        "entry": 27.14,
+        "exit": 28.09,
+        "return_pct": 3.5,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.87
+      },
+      {
+        "date": "2019-10-02",
+        "entry_date": "2019-10-03",
+        "exit_date": "2019-10-07",
+        "entry": 26.12,
+        "exit": 27.03,
+        "return_pct": 3.5,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.68
+      },
+      {
+        "date": "2020-02-24",
+        "entry_date": "2020-02-25",
+        "exit_date": "2020-02-26",
+        "entry": 29.46,
+        "exit": 28.25,
+        "return_pct": -4.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -4.01
+      },
+      {
+        "date": "2020-03-16",
+        "entry_date": "2020-03-17",
+        "exit_date": "2020-03-18",
+        "entry": 21.34,
+        "exit": 20.46,
+        "return_pct": -4.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -5.0
+      },
+      {
+        "date": "2020-10-30",
+        "entry_date": "2020-11-02",
+        "exit_date": "2020-11-04",
+        "entry": 32.87,
+        "exit": 34.02,
+        "return_pct": 3.5,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.3
+      },
+      {
+        "date": "2021-02-26",
+        "entry_date": "2021-03-01",
+        "exit_date": "2021-03-04",
+        "entry": 41.99,
+        "exit": 40.27,
+        "return_pct": -4.1,
+        "holding_days": 3,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.81
+      },
+      {
+        "date": "2022-05-10",
+        "entry_date": "2022-05-11",
+        "exit_date": "2022-05-13",
+        "entry": 39.94,
+        "exit": 41.34,
+        "return_pct": 3.5,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.77
+      },
+      {
+        "date": "2022-09-01",
+        "entry_date": "2022-09-02",
+        "exit_date": "2022-09-09",
+        "entry": 41.01,
+        "exit": 42.44,
+        "return_pct": 3.5,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.86
+      },
+      {
+        "date": "2023-03-13",
+        "entry_date": "2023-03-14",
+        "exit_date": "2023-03-30",
+        "entry": 39.94,
+        "exit": 41.33,
+        "return_pct": 3.5,
+        "holding_days": 12,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.56
+      }
+    ],
+    "filled_count": 9,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "CIBR",
+    "total_signals": 5,
+    "wins": 5,
+    "win_rate": 1.0,
+    "avg_return_pct": 2.95,
+    "std_return_pct": 0.67,
+    "cumulative_return_pct": 15.66,
+    "avg_holding_days": 11.0,
+    "max_drawdown_pct": -3.87,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 4.38,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 0.76,
+    "max_consecutive_losses": 0,
+    "target_exits": 3,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 2,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-02-21",
+        "entry_date": "2024-02-22",
+        "exit_date": "2024-02-29",
+        "entry": 55.2,
+        "exit": 57.13,
+        "return_pct": 3.5,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.33
+      },
+      {
+        "date": "2024-04-16",
+        "entry_date": "2024-04-17",
+        "exit_date": "2024-05-14",
+        "entry": 53.41,
+        "exit": 54.48,
+        "return_pct": 1.99,
+        "holding_days": 18,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -2.72
+      },
+      {
+        "date": "2024-08-02",
+        "entry_date": "2024-08-05",
+        "exit_date": "2024-08-06",
+        "entry": 50.37,
+        "exit": 52.13,
+        "return_pct": 3.5,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.94
+      },
+      {
+        "date": "2025-08-01",
+        "entry_date": "2025-08-04",
+        "exit_date": "2025-08-29",
+        "entry": 71.85,
+        "exit": 73.49,
+        "return_pct": 2.28,
+        "holding_days": 18,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -2.69
+      },
+      {
+        "date": "2025-11-18",
+        "entry_date": "2025-11-19",
+        "exit_date": "2025-12-09",
+        "entry": 72.89,
+        "exit": 75.44,
+        "return_pct": 3.5,
+        "holding_days": 13,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.87
+      }
+    ],
+    "filled_count": 5,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "CIBR",
+    "total_signals": 2,
+    "wins": 1,
+    "win_rate": 0.5,
+    "avg_return_pct": -0.3,
+    "std_return_pct": 3.8,
+    "cumulative_return_pct": -0.74,
+    "avg_holding_days": 5.5,
+    "max_drawdown_pct": -6.45,
+    "profit_factor": 0.85,
+    "sharpe_ratio": -0.08,
+    "sortino_ratio": -0.1,
+    "calmar_ratio": -0.05,
+    "max_consecutive_losses": 1,
+    "target_exits": 1,
+    "stop_loss_exits": 1,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2026-01-21",
+        "entry_date": "2026-01-22",
+        "exit_date": "2026-02-03",
+        "entry": 70.69,
+        "exit": 67.79,
+        "return_pct": -4.1,
+        "holding_days": 8,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.45
+      },
+      {
+        "date": "2026-02-04",
+        "entry_date": "2026-02-05",
+        "exit_date": "2026-02-10",
+        "entry": 66.35,
+        "exit": 68.67,
+        "return_pct": 3.5,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.48
+      }
+    ],
+    "filled_count": 2,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-15"
+    }
+  }
+}

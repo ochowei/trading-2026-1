@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-14T06:56:09.781800"
+    "execution_time": "2026-04-17T02:49:05.764498"
   },
   "part_a": {
     "ticker": "INDA",
@@ -344,7 +344,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-13"
+      "end": "2026-04-16"
     }
   }
 }
