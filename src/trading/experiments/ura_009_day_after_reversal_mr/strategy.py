@@ -31,6 +31,6 @@ class URADayAfterReversalMRStrategy(ExecutionModelStrategy):
             )
             print(f"  昨日 WR({config.wr_period}) ≤ {config.wr_threshold}")
             print(f"  兩日跌幅 (T-3→T-1): ≤ {config.two_day_decline:.0%}")
-            print("  今日反轉 K 線: Close > 昨日 Close 且 Close > 今日 Open")
+            print("  今日反轉強度: Close > 昨日 High 且 Close > 今日 Open")
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)

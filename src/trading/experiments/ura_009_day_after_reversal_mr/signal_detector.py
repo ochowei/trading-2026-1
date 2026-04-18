@@ -6,7 +6,7 @@ URA Day-After Capitulation Mean Reversion 訊號偵測器 (URA-009)
 2. 昨日（T-1）回檔 ≤ 20%（過濾極端崩盤）
 3. 昨日（T-1）Williams %R(10) ≤ -85（極端超賣）
 4. 兩日跌幅 Close[T-1] / Close[T-3] - 1 ≤ -4%
-5. 今日（T）Close > 昨日（T-1）Close（日後反彈）
+5. 今日（T）Close > 昨日（T-1）High（收盤收復昨日高點，Att2 強化過濾）
 6. 今日（T）Close > 今日（T）Open（陽線 K 線）
 """
 
@@ -52,15 +52,16 @@ class URADayAfterReversalMRSignalDetector(BaseSignalDetector):
         prev_pullback = df["Pullback"].shift(1)
         prev_wr = df["WR"].shift(1)
         prev_two_day_decline = df["TwoDayDecline"].shift(1)
-        prev_close = df["Close"].shift(1)
+        prev_high = df["High"].shift(1)
 
         cond_pullback_min = prev_pullback <= self.config.pullback_threshold
         cond_pullback_cap = prev_pullback >= self.config.pullback_upper
         cond_wr = prev_wr <= self.config.wr_threshold
         cond_decline = prev_two_day_decline <= self.config.two_day_decline
 
-        # 今日反轉 K 線：Close > 昨日 Close 且 Close > 今日 Open
-        cond_close_up = df["Close"] > prev_close
+        # 今日反轉強度：Close > 昨日 High（收盤收復昨日高點）
+        # 同時要求陽線 Close > Open（日內買盤壓過賣壓）
+        cond_reclaim = df["Close"] > prev_high
         cond_bullish_bar = df["Close"] > df["Open"]
 
         df["Signal"] = (
@@ -68,7 +69,7 @@ class URADayAfterReversalMRSignalDetector(BaseSignalDetector):
             & cond_pullback_cap
             & cond_wr
             & cond_decline
-            & cond_close_up
+            & cond_reclaim
             & cond_bullish_bar
         )
 

@@ -40,8 +40,9 @@ class URADayAfterReversalMRConfig(ExperimentConfig):
     two_day_decline: float = -0.04  # 從 T-3 到 T-1 兩日跌幅 ≤ -4%
     cooldown_days: int = 10
 
-    # 確認 K 線要求今日收盤高於昨日收盤 (Close[T] > Close[T-1]) 以及今日收盤高於今日開盤
-    # (Close[T] > Open[T])；這兩個條件以布林值在 detector 中計算
+    # 反轉強度要求（Att2）：今日收盤收復昨日 High，比 Att1 單純 Close>Open 更嚴格
+    # 提供真正的反轉強度過濾，排除「僅微幅反彈」的假訊號
+    require_prev_high_reclaim: bool = True
 
 
 def create_default_config() -> URADayAfterReversalMRConfig:
