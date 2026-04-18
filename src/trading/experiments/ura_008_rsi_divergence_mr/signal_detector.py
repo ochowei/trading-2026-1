@@ -1,12 +1,11 @@
 """
 URA RSI Bullish Divergence + URA-004 訊號偵測器 (URA-008)
 
-五條件同時成立時觸發訊號：
+四條件同時成立時觸發訊號：
 1. 收盤價相對 10 日最高價回檔 ≥ 10%
 2. 收盤價相對 10 日最高價回檔 ≤ 20%（過濾極端崩盤）
 3. RSI(2) < 15（短週期超賣）
-4. 2 日跌幅 ≤ -3%（近期恐慌）
-5. RSI(14) bullish hook：RSI 自過去 N 日最低點回升 ≥ H 點，且該最低點 ≤ 35
+4. RSI(14) bullish hook：RSI 自過去 N 日最低點回升 ≥ H 點，且該最低點 ≤ 35
 """
 
 import logging
@@ -45,8 +44,6 @@ class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
         rs_2 = avg_gain_2 / avg_loss_2.replace(0, np.nan)
         df["RSI2"] = 100 - (100 / (1 + rs_2))
 
-        df["TwoDayDecline"] = df["Close"].pct_change(2)
-
         rsi_period = self.config.rsi_period
         avg_gain_n = gain.rolling(rsi_period).mean()
         avg_loss_n = loss.rolling(rsi_period).mean()
@@ -65,17 +62,11 @@ class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
         cond_pullback_min = df["Pullback"] <= self.config.pullback_threshold
         cond_pullback_cap = df["Pullback"] >= self.config.pullback_upper
         cond_rsi2 = df["RSI2"] < self.config.rsi2_threshold
-        cond_decline = df["TwoDayDecline"] <= self.config.two_day_decline
         cond_hook_delta = df["RSI_Hook_Delta"] >= self.config.rsi_hook_delta
         cond_hook_oversold = df["RSI_Min_N"] <= self.config.rsi_hook_max_min
 
         df["Signal"] = (
-            cond_pullback_min
-            & cond_pullback_cap
-            & cond_rsi2
-            & cond_decline
-            & cond_hook_delta
-            & cond_hook_oversold
+            cond_pullback_min & cond_pullback_cap & cond_rsi2 & cond_hook_delta & cond_hook_oversold
         )
 
         signal_indices = df.index[df["Signal"]].tolist()
@@ -95,5 +86,5 @@ class URARSIDivergenceMRSignalDetector(BaseSignalDetector):
             logger.info("URA-008: %d duplicate signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
-        logger.info("URA-008: Detected %d RSI-Divergence Pullback+RSI(2)+2DD signals", signal_count)
+        logger.info("URA-008: Detected %d RSI-Divergence Pullback+RSI(2) signals", signal_count)
         return df

@@ -34,7 +34,6 @@ class URARSIDivergenceMRConfig(ExperimentConfig):
     pullback_upper: float = -0.20  # 回檔 ≤ 20%
     rsi2_period: int = 2
     rsi2_threshold: float = 15.0  # RSI(2) < 15
-    two_day_decline: float = -0.03  # 2日跌幅 ≤ -3%
 
     # 新增：RSI(14) bullish hook 過濾（移植 SIVR-015 Att1 參數）
     rsi_period: int = 14
@@ -49,7 +48,7 @@ def create_default_config() -> URARSIDivergenceMRConfig:
     return URARSIDivergenceMRConfig(
         name="ura_008_rsi_divergence_mr",
         experiment_id="URA-008",
-        display_name="URA RSI Bullish Divergence + Pullback+RSI(2)+2DD MR",
+        display_name="URA RSI Bullish Divergence + Pullback+RSI(2) MR",
         tickers=["URA"],
         data_start="2010-11-05",
         profit_target=0.060,  # +6.0%
