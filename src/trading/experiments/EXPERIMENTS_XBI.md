@@ -1,10 +1,10 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-18
   data_through: 2025-12-31
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（10 次實驗、32+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場）
+**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（11 次實驗、35+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場、RSI(14) bullish hook divergence）
 **前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
 **滾動窗口分析摘要：** XBI-001 ✗✓（精準度突變 ΔWR 23.8pp，績效漸變，2023 生技低迷為主因）
 
@@ -36,6 +36,9 @@
 - BB(20, 1.5) 下軌 + cap -12% + WR + ClosePos 35%（XBI-010 Att1：Part A Sharpe 0.09/Part B 0.07，BB 1.5σ 在 XBI 2.0% 日波動下過鬆，20 訊號 WR 65% vs 76.2%，平均報酬 0.27% 遠低於 XBI-005 的 1.3%）
 - BB(20, 2.0) 下軌 + cap -12% + WR + ClosePos 35%（XBI-010 Att2：Part A Sharpe -0.03/Part B -0.55，BB 2.0σ 訊號集中極端崩盤事件 7/3 筆，Part B WR 僅 33%）
 - 混合 OR 進場 BB(20, 2.0) OR 回檔 ≥ 8% + cap -12% + WR + ClosePos 35%（XBI-010 Att3：Part A Sharpe 0.20/Part B 0.16，cap -12% 比 XBI-005 的 -20% 過嚴，移除深回檔贏家使 WR 從 76.2%→68.4%）
+- RSI(14) bullish hook divergence + XBI-005 框架（XBI-011 Att1：RSI(14) lookback 5 / delta ≥ 3 / min ≤ 35，Part A 3/3 全 TP（零方差 Sharpe 0.00）/Part B 2/2 全 TP（零方差 Sharpe 0.00），過嚴，訊號年化 0.6/1.0，樣本量過少）
+- RSI(14) bullish hook lookback 5 / delta 3 / min ≤ 40（XBI-011 Att2：Part A Sharpe 0.27（7 訊號 WR 71.4%，2 筆停損）/Part B 2/2 全 TP 零方差，放寬 oversold 門檻引入 Part A 壞訊號）
+- RSI(14) bullish hook lookback 5 / delta 2 / min ≤ 35（XBI-011 Att3：同 Att1，delta 放寬未增訊號因 oversold 為綁定條件）
 
 **已掃描的參數空間：**
 - 進場條件：回檔 6~8% + 上限 15~20% + WR(10) ≤ -80（有/無 2日急跌 ≤ -3%）
@@ -52,8 +55,8 @@
 - 最佳組合：回檔 8-20% + WR ≤ -80 + ClosePos ≥ 35% + SL -5.0% / 15天（WR 76.2%/83.3%）
 
 **尚未嘗試的方向（預期效益極低）：**
-- XBI-005 已確認為全域最優，突破、ROC、動量回調、配對交易、波動率自適應、RSI(2)、BB 下軌混合進場七大策略類型均已驗證無效
-- 所有主要策略類型已窮盡（均值回歸、突破、動量回調、ROC、配對交易、波動率自適應、BB 下軌混合進場）
+- XBI-005 已確認為全域最優，突破、ROC、動量回調、配對交易、波動率自適應、RSI(2)、BB 下軌混合進場、RSI(14) bullish hook divergence 八大策略類型均已驗證無效
+- 所有主要策略類型已窮盡（均值回歸、突破、動量回調、ROC、配對交易、波動率自適應、BB 下軌混合進場、RSI(14) bullish hook divergence）
 
 **已排除的方向：**
 - **動量回調策略（TSM-006 風格）**：XBI-007 三次嘗試全部失敗，最佳 min(A,B) Sharpe 僅 0.02（vs XBI-005 的 0.36）。根本原因：XBI 作為生技板塊 ETF（130+股等權重），個股事件驅動（FDA、臨床數據）使板塊層級動量訊號不可靠，上升趨勢中的回調常因個股利空演變為板塊性回撤
@@ -61,6 +64,7 @@
 - **波動率自適應過濾（IWM-011/XLU-011 方法）**：XBI-009 Att1/Att2 驗證 ATR(5)/ATR(20) > 1.1 和 1.05 均失敗。XBI 2.0% 日波動處於 ATR 過濾有效邊界（IWM 1.5-2.0% 有效、SIVR 2-3% 無效），過濾器無法可靠區分急跌恐慌與慢速下磨
 - **RSI(2) 均值回歸（SPY/DIA/IWM 框架）**：XBI-009 Att3 驗證 RSI(2)<10 + 2日跌幅≥3.0% + ClosePos≥35%，min(A,B) -0.04（vs XBI-005 的 0.36）。RSI(2) 對 XBI 的短期超賣判斷不如 pullback+WR 精確，生技 ETF 需要更深層次的回檔確認
 - **BB 下軌 + 回檔上限混合進場（EWJ-003/VGK-007/CIBR-008/EWZ-006 模式）**：XBI-010 三次嘗試全部失敗，最佳 min(A,B) Sharpe 僅 0.16（vs XBI-005 的 0.36）。根本原因：(1) XBI 2.0% 日波動超出混合模式已驗證有效邊界（EWZ 1.75% 為目前上限）；(2) XBI 無法使用 ATR 過濾（XBI-009 驗證），失去混合模式中關鍵的波動率飆升確認；(3) XBI-005 的固定 pullback 8-20% 已是 XBI 2.0% 日波動下的最優結構。**XBI-010 確認混合進場模式有效邊界為日波動 ≤ 1.75%**
+- **RSI(14) bullish hook divergence（SIVR-015 模式）**：XBI-011 三次嘗試全部無法改善 min(A,B)。Att1/Att3（max_min ≤ 35）過嚴產生僅 3/2 訊號全 TP 零方差樣本（年化 0.6-1.0 訊號），Att2（max_min ≤ 40）放寬後 Part A 引入 2 筆停損使 Sharpe 降至 0.27 < XBI-005 的 0.36。失敗根因：XBI 生技 ETF 的 pullback+WR+ClosePos 訊號日常發生在 RSI(14) 35-45 區間（非 SIVR ≤ 35 深度 oversold 區），hook divergence 過濾器與 XBI 訊號的 RSI 分布不相容。延伸 cross-asset lesson #20b 邊界：pattern 在 2.0% 日波動 + 生技板塊事件驅動特性下失效（SIVR 1.93% 驗證成功，XBI 2.0% 失敗），推斷適用範圍需兼顧波動率（2-3%）與平穩 RSI 分布（而非 FDA/臨床事件驅動的 bimodal）
 
 **關鍵資產特性：**
 - XBI (SPDR S&P Biotech ETF) 日波動約 2.0%，GLD 比率 1.81x
@@ -75,6 +79,7 @@
 - **突破策略在 XBI 上無效**：ETF 分散化削弱突破動能（類似 COPX-005），WR 僅 50-56%，假突破率過高
 - **ROC-based 進場不優於 pullback-from-high**：5日 ROC 在 Part B 僅產生 2 個訊號，市場狀態依賴性過高
 - **ATR 波動率過濾在 XBI 2.0% 日波動邊界失效**：與 SIVR 2-3% 失敗一致，確認 ATR 有效邊界 ≤ 1.5-2.0%
+- **RSI(14) bullish hook divergence 在 XBI 失效**：SIVR-015 模式（lookback 5 / delta 3 / max_min 35）在 XBI 產生 3/2 零方差樣本（Att1/Att3），放寬至 max_min 40（Att2）引入 Part A 壞訊號。XBI pullback+WR+ClosePos 的訊號 RSI(14) 通常僅在 35-45 區間，未達 hook divergence 所需深度 oversold（≤ 35）。延伸 lesson #20b 邊界：hook divergence pattern 有效性需要資產 RSI(14) 訊號日分布集中在 ≤ 35（SIVR），XBI 生技板塊的事件驅動特性使 RSI 分布偏高
 <!-- AI_CONTEXT_END -->
 
 # XBI 實驗總覽 (XBI Experiments Overview)
@@ -98,6 +103,7 @@
 | XBI-008 | `xbi_008_pairs_ibb` | XBI/IBB 配對交易 z-score + 3次嘗試（未勝出） | 已完成 |
 | XBI-009 | `xbi_009_vol_adaptive` | ATR/RSI(2) 波動率自適應 + 3次嘗試（未勝出） | 已完成 |
 | XBI-010 | `xbi_010_bb_lower_pullback_cap` | BB 下軌 + 回檔上限混合進場 + 3次嘗試（未勝出） | 已完成（未改善） |
+| XBI-011 | `xbi_011_rsi_divergence_mr` | RSI(14) Bullish Hook Divergence + XBI-005 + 3次嘗試（未勝出） | 已完成（未改善） |
 
 ---
 
@@ -636,3 +642,102 @@ XBI-005：Part A Sharpe 0.36 / Part B Sharpe 0.64（回檔 8-20% + WR + ClosePos
 2. **BB 2.0σ 過嚴且集中極端事件**：Att2 僅 7/3 Part A/B 訊號，且 Part B WR 僅 33%。BB 2.0σ 訊號大多對應 2020 COVID 和 2022 熊市低點的極端崩盤，這些事件在 15 天內難以反彈至 +3.5% TP
 3. **OR 進場恢復頻率但 cap -12% 過嚴**：Att3 以 19 個 Part A 訊號接近 XBI-005 的 21 個，但 cap -12% 相對 XBI-005 的 -20% 過嚴，移除深回檔贏家（2020 COVID 後的 14-18% 反彈、2022 熊市中期深跌反彈），WR 從 76.2% 降至 68.4%
 4. **混合進場模式有效邊界確認為日波動 ≤ 1.75%**：XBI 2.0% 是首個驗證失敗的邊界案例。根本原因：(a) XBI 無法使用 ATR 過濾失去關鍵的波動率飆升確認組件，(b) XBI-005 的固定 pullback 8-20% 在 2.0% 日波動下已是最優框架，(c) 生技板塊 FDA/臨床事件驅動特性使訊號呈現為絕對深度回檔而非 BB 帶寬所反映的統計異常
+
+---
+
+## XBI-011: RSI(14) Bullish Hook Divergence + Pullback+WR+ClosePos 均值回歸
+
+### 目標 (Goal)
+
+測試 SIVR-015 Att1 驗證的 **RSI(14) bullish hook divergence** 過濾器是否能
+改善 XBI-005 的 Part A Sharpe 0.36 / Part B 0.64（A/B 訊號比 3.5:1，累計差 57%，
+訊號數差 71%）。假設：XBI-005 Part A 的 5 筆停損部分可能發生於 RSI 仍在下探中
+（持續下跌結構），bullish hook 過濾器可選擇性移除這些訊號。
+
+XBI 日波動 2.0% 與 SIVR 1.93% 相近，使用 10 日 pullback 回看（符合 lesson #20b
+要求的 ≤10 日），初步判斷 hook pattern 應能泛化至 XBI。
+
+### 進場條件 (Entry Conditions)
+
+| # | 條件 | 指標 | 閾值 | 說明 |
+|---|------|------|------|------|
+| 1 | 回檔深度 | 10日高點回檔 | ≤ -8% 且 ≥ -20% | 同 XBI-005 |
+| 2 | 超賣確認 | Williams %R(10) | ≤ -80 | 同 XBI-005 |
+| 3 | 反轉跡象 | 收盤位置 (ClosePos) | ≥ 35% | 同 XBI-005 |
+| 4 | RSI hook delta | RSI(14) − 過去 N 日 RSI 最低點 | ≥ H 點 | 新增 |
+| 5 | RSI 前 oversold | 過去 N 日 RSI(14) 最低點 | ≤ L | 新增 |
+| 6 | 冷卻期 | Cooldown | 10 日 | 同 XBI-005 |
+
+### 出場參數 (Exit Parameters)
+
+同 XBI-005：TP +3.5% / SL -5.0% / 最長持倉 15 日 / 隔日開盤市價進場 /
+停損市價 GTC / 滑價 0.10%。
+
+### 三次嘗試結果 (Three Attempt Results)
+
+| 嘗試 | Hook (lookback/delta/max_min) | Part A Sharpe | Part A 訊號 | Part B Sharpe | Part B 訊號 | min(A,B) |
+|------|-------------------------------|--------------|------------|--------------|------------|----------|
+| Att1 | 5 / 3.0 / 35 (SIVR 原始) | 0.00† | 3 | 0.00† | 2 | 0.00† |
+| Att2 | 5 / 3.0 / 40 | 0.27 | 7 | 0.00† | 2 | 0.27 |
+| Att3 | 5 / 2.0 / 35 | 0.00† | 3 | 0.00† | 2 | 0.00† |
+
+†零方差：所有成交均為 +3.50% TP，Sharpe 形式上為 0.00。
+
+**vs XBI-005 基準**：Part A 0.36 / Part B 0.64 / min(A,B) 0.36
+
+### Att1 詳情（5 / 3.0 / 35）
+
+| 期間 | 訊號數 | 每年 | 勝率 | 累計報酬 | Sharpe |
+|------|--------|------|------|----------|--------|
+| Part A (2019-2023) | 3 | 0.6 | 100.0% | +10.87% | 0.00† |
+| Part B (2024-2025) | 2 | 1.0 | 100.0% | +7.12% | 0.00† |
+
+所有 5 筆交易 1-4 天內達 +3.50% TP。Part A 訊號集中於 2021-12、2022-05、2023-10，
+每年僅 0.6 筆，實務上難以作為獨立策略使用。過濾器雖 100% WR，但過於嚴格。
+
+### Att2 詳情（5 / 3.0 / 40）
+
+| 期間 | 訊號數 | 每年 | 勝率 | 累計報酬 | Sharpe |
+|------|--------|------|------|----------|--------|
+| Part A (2019-2023) | 7 | 1.4 | 71.4% | +6.97% | 0.27 |
+| Part B (2024-2025) | 2 | 1.0 | 100.0% | +7.12% | 0.00† |
+
+放寬 max_min 至 40 後 Part A 新增 4 筆訊號，含 2 筆停損（WR 100%→71.4%），
+Sharpe 從零方差降至 0.27（< XBI-005 的 0.36）。Part B 無新增訊號。
+**A/B 累計差 2.1%**（極佳），但 **Part A 訊號品質下降**抵銷平衡改善。
+
+### Att3 詳情（5 / 2.0 / 35）
+
+與 Att1 完全相同（3/2 訊號全 TP），因 max_min=35 為綁定條件——符合 delta≥3
+的訊號天然滿足 delta≥2。確認 **XBI 訊號的 RSI 低點門檻（max_min）為真正過濾器**，
+delta 放寬無邊際效益。
+
+### 失敗分析 (Failure Analysis)
+
+1. **XBI 訊號 RSI(14) 分布偏高**：XBI-005 的 pullback+WR+ClosePos 訊號日，
+   RSI(14) 在 5 日內最低點多在 35-45 區間，未達 SIVR-015 要求的 ≤ 35 深度 oversold。
+   生技 ETF 的 FDA/臨床事件驅動特性使價格快速下跌但 RSI 未達深度 oversold
+   （因為下跌往往為單日或兩日內集中，RSI(14) 尚未完全飽和）
+
+2. **放寬門檻引入 Part A 壞訊號**：max_min 從 35 放寬至 40（Att2）新增 4 個 Part A
+   訊號，其中 2 筆於 2021-2022 生技熊市停損（-5.09%、-5.10%）。新增訊號來自淺層
+   RSI 回升而非真正 capitulation 結束，過濾器失去選擇性
+
+3. **Part B 訊號結構性稀少**：Part B（2024-2025 生技復甦期）原始 XBI-005 僅 6 個訊號，
+   hook 過濾器在任何參數組合下都只剩 2 個。此期間生技 ETF 經歷深跌後緩步回升，
+   少有「RSI 深度 oversold 後急速回升」的 classical bullish divergence 結構
+
+4. **延伸 cross-asset lesson #20b 邊界**：
+   - **有效條件更精細化**：日波動 2-3% + pullback 回看 ≤10 日 + 已驗證 pullback+WR 框架
+     **仍不足以保證泛化**，還需要**訊號日 RSI(14) 分布集中在深度 oversold（≤ 35）**
+   - **XBI 2.0% 失敗 vs SIVR 1.93% 成功**：日波動幾乎相同但 RSI 分布差異顯著，
+     SIVR（貴金屬）為宏觀因子驅動（美元/利率/通膨），下跌較為持續使 RSI 深度 oversold；
+     XBI（生技板塊）為事件驅動，下跌集中且短促，RSI 未達深度 oversold
+   - **建議待測資產修正**：原先待測名單（FCX、USO、TSLA）需進一步區分**宏觀驅動**
+     vs **事件驅動**——事件驅動類資產（TSLA 個股、USO 地緣政治驅動）可能同樣失效
+
+### 結論
+
+XBI-005 確認為 XBI 全域最優。RSI(14) bullish hook divergence 為**第八種**在 XBI
+驗證無效的策略類型（突破、ROC、動量回調、配對交易、ATR 自適應、RSI(2)、BB 下軌混合、
+RSI hook divergence）。
