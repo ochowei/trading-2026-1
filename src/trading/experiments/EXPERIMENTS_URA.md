@@ -4,7 +4,7 @@
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** URA-004（回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3%，TP +6.0% / SL -5.5%，Part A Sharpe 0.41，Part B Sharpe 0.39，A/B gap 0.02）**已確認全域最優**（8 次實驗、24+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器、RSI bullish hook divergence 八大策略類型）
+**當前最佳：** URA-004（回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3%，TP +6.0% / SL -5.5%，Part A Sharpe 0.41，Part B Sharpe 0.39，A/B gap 0.02）**已確認全域最優**（9 次實驗、27+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器、RSI bullish hook divergence、Day-After Capitulation 強反轉 K 線確認九大策略類型）
 **前任最佳：** URA-003（回檔 10-20% + RSI(2) < 15，Part A Sharpe 0.34，Part B Sharpe 0.44，A/B gap 0.10）
 **滾動窗口分析摘要：** URA-001 ✗✓（精準度突變 ΔWR 25.0pp，績效漸變，早期鈾礦暴漲→2022 回檔為主因）
 
@@ -30,6 +30,11 @@
   - Att2（移除 2DD，pullback+RSI(2)+hook）：Part A 0.57 / Part B 0.00，訊號 4/2——RSI(2)<15 過嚴配合 hook 後 Part B 僅 2 訊號皆達標零方差 Sharpe 未定義
   - Att3（改用 WR(10)+hook，SIVR-015 結構直移）：Part A 0.36 / Part B **-0.32**，訊號 6/3——Part B 3 訊號 2 停損 1 達標，WR 33.3%
   - 失敗根因：URA 2024-2025 鈾價高波動期間（11 月雙筆 V 型反彈），hook 過濾器無法辨識「RSI 轉折是暫時回彈還是真實見底」。SIVR 2024-2025 銀價避險需求維持活躍反轉能量，URA 則因核電題材+供應缺口使衝擊後價格常延續更深跌。擴展 lesson #20b 邊界：RSI bullish hook divergence 需資產具備「RSI 轉折=真實反轉」的結構，URA 核能政策驅動使此結構不成立
+- **Day-After Capitulation + 強反轉 K 線確認（URA-009，3 次嘗試均失敗）：**
+  - Att1（WR≤-85 + 2DD≤-4% + Close>Prev Close + Close>Open）：Part A -0.25 / Part B 0.15，訊號 11/9——Part A 4 連敗集中於 2022 鈾礦熊市，純粹「向上 bar」反轉過濾太弱
+  - Att2（加嚴反轉：Close > 昨日 High 收復昨高）：Part A 0.24 / Part B 0.24，訊號 5/5，WR 60%/60%——A/B 完美平衡（累計差 0pp），但年化訊號僅 ~1 筆，樣本過薄
+  - Att3（放寬 T-1 至 WR≤-80, 2DD≤-3% 同 URA-004，保留強反轉）：Part A -0.08 / Part B -0.11，訊號 9/7，WR 44.4%/42.9%——放寬後新增訊號品質崩壞，強反轉無法挽救
+  - 失敗根因：與 URA-008 hook 同屬「V-bounce ≠ genuine reversal」模式——URA 核能政策驅動使任何單日/雙日反轉過濾器（無論振盪器 hook 還是 price-action bar）均無法區分真反轉 vs 暫時回彈。Att2 的強反轉過濾雖能維持高 WR，但訊號稀少至無統計意義。Att3 確認 URA-004 的 WR≤-80 + 2DD≤-3% 配置已是 capitulation-day 進場的最優解
 
 **已掃描的參數空間：**
 - 均值回歸進場：回檔 8~10% + 上限 15~20% + WR(10) ≤ -80 / RSI(2) < 12~15 + 2日跌幅 -2.5%~-4%
@@ -43,6 +48,7 @@
 - **相對強度（URA vs XLE）**：20日報酬差≥8% + SMA(50) + 5日回調 3-8% → Part A -0.28/Part B -0.01（WR 37.5%，6連敗）
 - **波動率自適應**：ATR(5)/ATR(20) > 1.05/1.1 疊加或取代 2日跌幅 → ATR 在 2.34% 日波動下無額外區分力
 - **雙振盪器（WR+RSI）**：WR(10) ≤ -80 + RSI(2) < 15 + 2日跌幅 → 冷卻鏈偏移引入壞訊號
+- **Day-After Capitulation 強反轉 K 線確認**：T-1 capitulation + T 今日反轉 K 線（Close>Prev Close/High + Close>Open），3 次迭代最佳 min(A,B) 0.24
 
 **尚未嘗試的方向（預期改善極低）：**
 - 鈾期貨/鈾價相關 ETF 確認（跨資產驗證，預期邊際效益低）
@@ -61,6 +67,7 @@
 - **趨勢/動量/RS 策略在 URA 上全面失敗**：SMA 金叉、ROC(20) 動量、URA vs XLE 相對強度三種順勢進場方式均產生負或近零 Sharpe，鈾礦 ETF 的事件驅動特性使動量訊號不可靠，回調後常繼續下跌而非恢復上漲
 - **雙振盪器確認在 URA 上失敗**：WR(10) 不過濾 Part B 任何訊號（RSI(2)+2DD 訊號在 Part B 天然通過 WR），但在 Part A 通過冷卻鏈偏移引入新壞訊號
 - **RSI(14) Bullish Hook Divergence 在 URA 上失敗（URA-008 驗證）**：URA 形式上符合 lesson #20b 全部四項條件（日波動 2.34%、10日回檔框架、兩段活躍 MR regime、已驗證 pullback+WR/RSI(2) 框架），但三次迭代均無法超越 URA-004。關鍵失敗點發生在 Part B：hook 過濾器大幅收斂訊號數（SIVR 保留率 44% vs URA 保留率 25%），殘餘 Part B 訊號中停損佔比升至 67%。URA 的核能政策/鈾價供應衝擊使 RSI(14) 轉折不代表真實反轉，常發生「V-bounce 後繼續深跌」模式（如 2025-11-05 訊號後隔日直接跌穿 SL）。擴展 lesson #20b 邊界：SIVR-015 模式需 RSI 轉折 = 真實反轉 的 regime，URA 事件驅動特性使此結構不成立
+- **Day-After Capitulation + 強反轉 K 線確認在 URA 上失敗（URA-009 驗證）**：三次迭代最佳 min(A,B) 0.24（Att2 Close>Prev High），遠低於 URA-004 的 0.39。強反轉過濾（收復昨日高點）能維持 WR 60%，但年化訊號僅 ~1 筆；放寬 T-1 capitulation 閾值後訊號品質立即崩壞（WR 崩至 43%）。與 URA-008 hook 屬於同一失敗模式：政策驅動資產的任何單日/雙日反轉確認（無論振盪器 hook 或 price-action bar）均無法區分真反轉 vs 暫時回彈。Att2 A/B 完美平衡但樣本過薄，Att3 放寬後樣本增但品質丟失——證明 URA-004 的 WR≤-80 + 2DD≤-3% 配置已是 capitulation-day 進場的最優解，day-after 額外一日等待換取的確認訊號價值低於失去的進場速度
 <!-- AI_CONTEXT_END -->
 
 # URA 實驗總覽 (URA Experiments Overview)
@@ -85,6 +92,7 @@
 | URA-006 | `ura_006_trend_pullback`        | 趨勢/動量/RS 回調（3 次嘗試均失敗）        | 已完成（未改善） |
 | URA-007 | `ura_007_vol_adaptive`          | 波動率自適應/雙振盪器（3 次嘗試均失敗）     | 已完成（未改善） |
 | URA-008 | `ura_008_rsi_divergence_mr`     | RSI(14) Bullish Hook Divergence（3 次嘗試均失敗） | 已完成（未改善） |
+| URA-009 | `ura_009_day_after_reversal_mr` | Day-After Capitulation + 強反彈 K 線確認（3 次嘗試均失敗） | 已完成（未改善） |
 
 ---
 
