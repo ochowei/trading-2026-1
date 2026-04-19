@@ -69,9 +69,7 @@ class XBI012SignalDetector(BaseSignalDetector):
         else:
             cond_up = pd.Series(True, index=df.index)
 
-        df["Signal"] = (
-            cond_pullback & cond_upper & cond_roc & cond_closepos & cond_up & cond_wr
-        )
+        df["Signal"] = cond_pullback & cond_upper & cond_roc & cond_closepos & cond_up & cond_wr
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()

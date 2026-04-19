@@ -30,10 +30,7 @@ class XBI012Strategy(ExecutionModelStrategy):
                 f"  Pullback 環境: {config.pullback_lookback} 日高點回檔"
                 f" {abs(config.pullback_threshold):.0%}-{abs(config.pullback_upper):.0%}"
             )
-            print(
-                f"  短期急跌 (ROC): {config.roc_lookback} 日 ROC <= "
-                f"{config.roc_threshold:.0%}"
-            )
+            print(f"  短期急跌 (ROC): {config.roc_lookback} 日 ROC <= {config.roc_threshold:.0%}")
             print(
                 f"  日內反攻: ClosePos >= {config.close_position_threshold:.0%}"
                 f" + Up Day = {config.require_up_day}"

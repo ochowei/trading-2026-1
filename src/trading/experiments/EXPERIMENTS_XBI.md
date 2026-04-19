@@ -1,10 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-18
+  last_validated: 2026-04-19
   data_through: 2025-12-31
+  note: XBI-012 added 2026-04-19 (Capitulation + Acceleration Reversal MR: Pullback(10) + ROC(3) + ClosePos + UpDay + WR). Three iterations all failed vs XBI-005 min 0.36. Att1 (ROC -4%, ClosePos 50%, UpDay) Part A 3/0.16 / Part B 3/0.16 — too restrictive, 0.6 yr signal. Att2 (ROC -3%, ClosePos 40%, UpDay) Part A 7/0.27 / Part B 3/0.16 — Part A improves +69% but Part B stuck because 2024-2025 XBI lacks ROC(3) ≤ -3% events. Att3 (ROC -3%, ClosePos 35%, no UpDay) Part A 21/0.18 / Part B 8/0.07 — signals triple but quality dilutes: UpDay filter confirmed essential. Extends XBI failure pattern list: short-term ROC acceleration + intraday recovery cannot distinguish genuine reversal from technical bounce on event-driven biotech ETF. XBI-005's pullback+WR+ClosePos 35% framework confirmed as structurally optimal for XBI 2.0% daily vol + FDA event-driven MR (12 experiments, 38+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（11 次實驗、35+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場、RSI(14) bullish hook divergence）
+**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（12 次實驗、38+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場、RSI(14) bullish hook divergence、**短期 ROC 急跌 + 日內反攻**）
 **前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
 **滾動窗口分析摘要：** XBI-001 ✗✓（精準度突變 ΔWR 23.8pp，績效漸變，2023 生技低迷為主因）
 
@@ -39,6 +40,9 @@
 - RSI(14) bullish hook divergence + XBI-005 框架（XBI-011 Att1：RSI(14) lookback 5 / delta ≥ 3 / min ≤ 35，Part A 3/3 全 TP（零方差 Sharpe 0.00）/Part B 2/2 全 TP（零方差 Sharpe 0.00），過嚴，訊號年化 0.6/1.0，樣本量過少）
 - RSI(14) bullish hook lookback 5 / delta 3 / min ≤ 40（XBI-011 Att2：Part A Sharpe 0.27（7 訊號 WR 71.4%，2 筆停損）/Part B 2/2 全 TP 零方差，放寬 oversold 門檻引入 Part A 壞訊號）
 - RSI(14) bullish hook lookback 5 / delta 2 / min ≤ 35（XBI-011 Att3：同 Att1，delta 放寬未增訊號因 oversold 為綁定條件）
+- Capitulation + Acceleration Reversal（Pullback ≤ -6% + ROC(3) ≤ -4% + ClosePos ≥ 50% + UpDay + WR ≤ -80）（XBI-012 Att1：Part A Sharpe 0.16 / Part B 0.16，訊號 3/3 過稀疏，ClosePos 50% + ROC(3) -4% 組合過嚴）
+- Capitulation + Acceleration 放寬（ROC(3) ≤ -3% + ClosePos ≥ 40% + UpDay）（XBI-012 Att2：Part A Sharpe 0.27 / Part B 0.16，Part A +69% 但 Part B 訊號未變，2024-2025 XBI 牛市缺少 ROC(3) ≤ -3% 事件）
+- Capitulation + Acceleration 無 UpDay（ROC(3) ≤ -3% + ClosePos ≥ 35% + 無 UpDay）（XBI-012 Att3：Part A Sharpe 0.18 / Part B 0.07，訊號 21/8 倍增但品質崩壞，UpDay 過濾器證實為關鍵品質軸）
 
 **已掃描的參數空間：**
 - 進場條件：回檔 6~8% + 上限 15~20% + WR(10) ≤ -80（有/無 2日急跌 ≤ -3%）
@@ -55,8 +59,8 @@
 - 最佳組合：回檔 8-20% + WR ≤ -80 + ClosePos ≥ 35% + SL -5.0% / 15天（WR 76.2%/83.3%）
 
 **尚未嘗試的方向（預期效益極低）：**
-- XBI-005 已確認為全域最優，突破、ROC、動量回調、配對交易、波動率自適應、RSI(2)、BB 下軌混合進場、RSI(14) bullish hook divergence 八大策略類型均已驗證無效
-- 所有主要策略類型已窮盡（均值回歸、突破、動量回調、ROC、配對交易、波動率自適應、BB 下軌混合進場、RSI(14) bullish hook divergence）
+- XBI-005 已確認為全域最優，突破、ROC、動量回調、配對交易、波動率自適應、RSI(2)、BB 下軌混合進場、RSI(14) bullish hook divergence、**短期 ROC 急跌 + 日內反攻** 九大策略類型均已驗證無效
+- 所有主要策略類型已窮盡（均值回歸、突破、動量回調、ROC、配對交易、波動率自適應、BB 下軌混合進場、RSI(14) bullish hook divergence、短期 ROC 急跌 + 日內反攻）
 
 **已排除的方向：**
 - **動量回調策略（TSM-006 風格）**：XBI-007 三次嘗試全部失敗，最佳 min(A,B) Sharpe 僅 0.02（vs XBI-005 的 0.36）。根本原因：XBI 作為生技板塊 ETF（130+股等權重），個股事件驅動（FDA、臨床數據）使板塊層級動量訊號不可靠，上升趨勢中的回調常因個股利空演變為板塊性回撤
@@ -65,6 +69,7 @@
 - **RSI(2) 均值回歸（SPY/DIA/IWM 框架）**：XBI-009 Att3 驗證 RSI(2)<10 + 2日跌幅≥3.0% + ClosePos≥35%，min(A,B) -0.04（vs XBI-005 的 0.36）。RSI(2) 對 XBI 的短期超賣判斷不如 pullback+WR 精確，生技 ETF 需要更深層次的回檔確認
 - **BB 下軌 + 回檔上限混合進場（EWJ-003/VGK-007/CIBR-008/EWZ-006 模式）**：XBI-010 三次嘗試全部失敗，最佳 min(A,B) Sharpe 僅 0.16（vs XBI-005 的 0.36）。根本原因：(1) XBI 2.0% 日波動超出混合模式已驗證有效邊界（EWZ 1.75% 為目前上限）；(2) XBI 無法使用 ATR 過濾（XBI-009 驗證），失去混合模式中關鍵的波動率飆升確認；(3) XBI-005 的固定 pullback 8-20% 已是 XBI 2.0% 日波動下的最優結構。**XBI-010 確認混合進場模式有效邊界為日波動 ≤ 1.75%**
 - **RSI(14) bullish hook divergence（SIVR-015 模式）**：XBI-011 三次嘗試全部無法改善 min(A,B)。Att1/Att3（max_min ≤ 35）過嚴產生僅 3/2 訊號全 TP 零方差樣本（年化 0.6-1.0 訊號），Att2（max_min ≤ 40）放寬後 Part A 引入 2 筆停損使 Sharpe 降至 0.27 < XBI-005 的 0.36。失敗根因：XBI 生技 ETF 的 pullback+WR+ClosePos 訊號日常發生在 RSI(14) 35-45 區間（非 SIVR ≤ 35 深度 oversold 區），hook divergence 過濾器與 XBI 訊號的 RSI 分布不相容。延伸 cross-asset lesson #20b 邊界：pattern 在 2.0% 日波動 + 生技板塊事件驅動特性下失效（SIVR 1.93% 驗證成功，XBI 2.0% 失敗），推斷適用範圍需兼顧波動率（2-3%）與平穩 RSI 分布（而非 FDA/臨床事件驅動的 bimodal）
+- **短期 ROC 急跌 + 日內反攻（Capitulation + Acceleration）**：XBI-012 三次嘗試全部失敗，最佳 min(A,B) Sharpe 0.16（vs XBI-005 的 0.36）。測試假設：生技 FDA/臨床事件造成的 1-2 日急跌可用 ROC(3) 捕捉，日內反攻用 ClosePos ≥ 50% + UpDay 確認，期望與 XBI-005 的慢磨下跌結構互補。Att1（ROC -4% + ClosePos 50% + UpDay）產生 3/3 過稀疏樣本 Sharpe 0.16；Att2（ROC -3% + ClosePos 40% + UpDay）Part A 7 訊號 Sharpe 0.27（+69%）但 Part B 仍 3/3 無變化——2024-2025 XBI 牛市環境下 ROC(3) ≤ -3% 事件稀少；Att3（ROC -3% + ClosePos 35% + 無 UpDay）訊號暴增至 21/8 但 Sharpe 崩至 0.18/0.07，UpDay 過濾器證實為關鍵品質軸。失敗根因：(1) XBI 2.0% 日波動下 ROC(3) ≤ -3% 門檻僅在熊市活躍（Part A 2020-2023 生技熊市集中），牛市 Part B 樣本不足；(2) ROC(3) 急跌 + ClosePos 日內反攻的組合無法區分「真反轉」vs「急跌後技術性反彈」——Part B 2024-04-03 急跌後 7 日停損、Att3 新增 Part B 2024-12-13/2025-03-31 均屬後者。XBI-005 的 pullback(10) + WR + ClosePos 35% 反轉 K 線已是 XBI 2.0% 日波動 + FDA 事件驅動下的結構最優，短期 ROC 急跌切入點不具獨立訊號價值
 
 **關鍵資產特性：**
 - XBI (SPDR S&P Biotech ETF) 日波動約 2.0%，GLD 比率 1.81x
@@ -80,6 +85,7 @@
 - **ROC-based 進場不優於 pullback-from-high**：5日 ROC 在 Part B 僅產生 2 個訊號，市場狀態依賴性過高
 - **ATR 波動率過濾在 XBI 2.0% 日波動邊界失效**：與 SIVR 2-3% 失敗一致，確認 ATR 有效邊界 ≤ 1.5-2.0%
 - **RSI(14) bullish hook divergence 在 XBI 失效**：SIVR-015 模式（lookback 5 / delta 3 / max_min 35）在 XBI 產生 3/2 零方差樣本（Att1/Att3），放寬至 max_min 40（Att2）引入 Part A 壞訊號。XBI pullback+WR+ClosePos 的訊號 RSI(14) 通常僅在 35-45 區間，未達 hook divergence 所需深度 oversold（≤ 35）。延伸 lesson #20b 邊界：hook divergence pattern 有效性需要資產 RSI(14) 訊號日分布集中在 ≤ 35（SIVR），XBI 生技板塊的事件驅動特性使 RSI 分布偏高
+- **Capitulation + Acceleration（XBI-012）在 XBI 失效**：ROC(3) 短期急跌 + ClosePos 日內反攻 + UpDay 過濾的三次嘗試（ClosePos 50/40/35%）min(A,B) Sharpe 僅 0.16/0.16/0.07。關鍵觀察：(1) Part A 隨放寬條件從 Sharpe 0.16→0.27→0.18 單峰（Att2 最佳），(2) Part B 從 0.16→0.16→0.07 單調下降——UpDay 過濾器為 Part B 品質的關鍵前提，(3) 2024-2025 XBI 牛市 ROC(3) ≤ -3% 事件稀少（3 訊號）無法擴張樣本。整體結構問題：XBI 2.0% 日波動下 ROC(3) 急跌 + 日內反攻無法區分真反轉與急跌後技術性反彈，XBI-005 的 pullback(10)+WR+ClosePos 反轉 K 線框架已是結構最優
 <!-- AI_CONTEXT_END -->
 
 # XBI 實驗總覽 (XBI Experiments Overview)
@@ -104,6 +110,7 @@
 | XBI-009 | `xbi_009_vol_adaptive` | ATR/RSI(2) 波動率自適應 + 3次嘗試（未勝出） | 已完成 |
 | XBI-010 | `xbi_010_bb_lower_pullback_cap` | BB 下軌 + 回檔上限混合進場 + 3次嘗試（未勝出） | 已完成（未改善） |
 | XBI-011 | `xbi_011_rsi_divergence_mr` | RSI(14) Bullish Hook Divergence + XBI-005 + 3次嘗試（未勝出） | 已完成（未改善） |
+| XBI-012 | `xbi_012_capitulation_accel` | Capitulation + Acceleration Reversal（ROC(3) + ClosePos + UpDay + WR） + 3次嘗試（未勝出） | 已完成（未改善） |
 
 ---
 
@@ -741,3 +748,82 @@ delta 放寬無邊際效益。
 XBI-005 確認為 XBI 全域最優。RSI(14) bullish hook divergence 為**第八種**在 XBI
 驗證無效的策略類型（突破、ROC、動量回調、配對交易、ATR 自適應、RSI(2)、BB 下軌混合、
 RSI hook divergence）。
+
+---
+
+## XBI-012: Capitulation + Acceleration Reversal 均值回歸 (3 iterations, all failed)
+
+### 目標 (Goal)
+
+測試 **3 日短期急跌 ROC + 當日強反攻收盤** 作為 XBI-005 pullback+WR+ClosePos 框架的
+結構替代。假設生技 FDA/臨床事件驅動的 1-2 日急跌（而非 10 日慢磨下跌）可用 ROC(3)
+捕捉，日內反攻用 ClosePos + UpDay 確認，期望捕捉與 XBI-005 互補的訊號集。
+
+### 進場條件 (Entry Conditions)
+
+| 條件 | Att1 | Att2 | Att3 |
+|------|------|------|------|
+| 10 日 pullback 下限 | ≤ -6% | 同 | 同 |
+| 10 日 pullback 上限 | ≥ -20% | 同 | 同 |
+| ROC(3) 門檻 | ≤ -4% | ≤ -3% | ≤ -3% |
+| ClosePos 門檻 | ≥ 50% | ≥ 40% | ≥ 35% |
+| UpDay 要求 | 是 | 是 | **否** |
+| WR(10) 門檻 | ≤ -80 | 同 | 同 |
+| 冷卻期 | 10 天 | 同 | 同 |
+
+### 出場參數 (Exit Parameters)
+
+三次嘗試出場參數相同（XBI 硬邊界）：TP +3.5% / SL -5.0% / 15 天持倉。
+
+### 結果比較 (Results Comparison)
+
+| 指標 | XBI-005 | XBI-012 Att1 | XBI-012 Att2 | XBI-012 Att3 |
+|------|---------|--------------|--------------|--------------|
+| Part A Sharpe | **0.36** | 0.16 | **0.27** ⬆ | 0.18 |
+| Part B Sharpe | **0.64** | 0.16 | 0.16 | 0.07 ⬇ |
+| **min(A,B)** | **0.36** | 0.16 | 0.16 | 0.07 |
+| Part A 訊號 | 21 (4.2/yr) | 3 (0.6/yr) | 7 (1.4/yr) | 21 (4.2/yr) |
+| Part B 訊號 | 6 (3.0/yr) | 3 (1.5/yr) | 3 (1.5/yr) | 8 (4.0/yr) |
+| Part A WR | 76.2% | 66.7% | 71.4% | 66.7% |
+| Part B WR | 83.3% | 66.7% | 66.7% | 62.5% |
+
+### 失敗分析
+
+1. **Att1（過嚴）**：ROC(3) ≤ -4% + ClosePos ≥ 50% + UpDay + WR ≤ -80 四重門檻
+   產生 3/3 過稀疏樣本（0.6-1.5 訊號/年），即使 WR 66.7% 仍因樣本過薄使 Sharpe 0.16
+
+2. **Att2（放寬兩門檻）**：ROC -4%→-3%、ClosePos 50%→40%，Part A 訊號 3→7 Sharpe
+   0.16→0.27（+69%）。但 Part B 仍 3 訊號——2024-2025 XBI 牛市結構下 ROC(3) ≤ -3%
+   事件稀少，Part B 為 binding constraint
+
+3. **Att3（移除 UpDay）**：ClosePos 再降至 35% 並移除 UpDay，訊號暴增至 21/8。
+   然而 Part A Sharpe 0.27→0.18、Part B Sharpe 0.16→0.07 雙段退步。新增訊號含 Part A
+   2019-08-05 15 天到期虧損 -4.6%、2021-05-06 停損、Part B 2024-12-13 / 2025-03-31
+   兩筆停損。**UpDay 過濾器為 Part B 品質的關鍵前提**
+
+### 關鍵發現
+
+1. **XBI 2.0% 日波動下 ROC(3) 急跌 + 日內反攻 pattern 無效**：ROC(3) ≤ -3% 的訊號
+   在 Part A 2020-2023 生技熊市集中爆發，在 Part B 2024-2025 牛市稀少，無法形成
+   跨 regime 穩健的均值回歸結構
+
+2. **UpDay 過濾器為品質關鍵**：Att2→Att3 顯示移除 UpDay 使 Part A/B 雙段 Sharpe
+   同步下降，證實「急跌後當日 Close > 前日 Close」是 XBI 訊號品質的必要條件。這與
+   XBI-005 只需 ClosePos ≥ 35% 相比是額外過濾，但在 ROC 切入點上只是恢復 XBI-005
+   的品質水平而無超越
+
+3. **ROC-based 進場 vs Pullback-based 進場**：XBI-012 的 ROC(3) 作為主要進場觸發器
+   與 XBI-006 Att3（5 日 ROC ≤ -8% + WR + ClosePos）一致失敗，確認 **pullback
+   (10 日高點回檔) 為 XBI 唯一有效的主要進場觸發機制**，ROC-based 切入點只反映 XBI
+   已處於 pullback 中的子集
+
+4. **延伸 XBI 失敗策略類型清單**：XBI-012 為**第九種**在 XBI 驗證無效的策略類型
+   （突破、ROC、動量回調、配對交易、ATR 自適應、RSI(2)、BB 下軌混合、RSI hook
+   divergence、短期 ROC 急跌 + 日內反攻）
+
+### 結論
+
+XBI-005 確認為 XBI 全域最優（12 次實驗、38+ 次嘗試）。Capitulation + Acceleration
+Reversal 為第九種驗證無效的策略類型。XBI 2.0% 日波動 + 生技 FDA 事件驅動下，
+pullback+WR+ClosePos 35% 反轉 K 線框架已是結構最優，**任何切換主要進場觸發器
+（ROC、BB、RSI hook）的嘗試皆無法超越**。
