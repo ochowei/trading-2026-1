@@ -1,6 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-06
-  data_through: 2025-12-31
+  last_validated: 2026-04-19
+  data_through: 2026-04-17
+  note: TLT-006 added 2026-04-19 (Day-After Capitulation + Strong Reversal Bar MR ported from URA-009 Att2 framework). Three iterations all failed vs TLT-002 min -0.20: Att1 (pullback -3%/-8% + WR≤-85 + 2DD≤-1.5% + Close>PrevHigh) Part A -0.37 (15 signals WR 40%) / Part B 0.00 (3 signals all +2.5% TP zero-variance), 8 SLs concentrated in 2022 Aug-Sep + 2023 May-Sep hiking cycle; Att2 (tighten WR≤-90 + 2DD≤-2.5% + pullback -4% + range expansion 1.2x) Part A 0.16 (3 signals) / Part B 0 signals; Att3 (middle ground: 2DD≤-2% + range 1.15x + cd10) Part A -0.39 (5 signals WR 40%) / Part B 0 signals. Extends lesson #20b / URA-009 failure mode: Day-After Capitulation pattern fails on policy-driven interest-rate assets because (a) Close>PrevHigh reclaim occurs frequently even during sustained hiking declines but doesn't predict genuine reversal, and (b) tightening the filter causes Part B signal depletion in post-tightening plateau. Confirms TLT's "no pure technical solution" conclusion extends to day-after price-action reversal patterns.
 -->
 ## AI Agent 快速索引
 
@@ -39,6 +40,7 @@
 **尚未嘗試的方向（可探索，但預期改善有限）：**
 - 利率相關指標（如 10Y yield 變化率）作為過濾器（需外部資料源，超出現有框架）
 - 季節性/月份過濾（避開 Fed 會議月份 — 但 2022 幾乎每月都有會議，過濾效果有限）
+- ~~Day-After Capitulation + 強反轉 K 線（URA-009 Att2 框架移植）~~ → TLT-006 三次迭代均失敗（min(A,B) -0.37/-0.39/Part B 枯竭），確認政策驅動資產對單日/雙日 price-action 反轉過濾失效
 
 **關鍵資產特性：**
 - TLT (iShares 20+ Year Treasury Bond ETF) 日波動約 1.00%，低於 GLD (1.11%)，GLD 比率 0.90x
@@ -48,6 +50,7 @@
 - Part A (2019-2023) 涵蓋 2022 極端升息環境，任何均值回歸策略的 Part A 績效必然較差
 - **TLT 的核心限制**：TLT 受宏觀利率政策驅動而非技術面。均值回歸被升息殺死，突破被橫盤殺死。無純技術面策略能同時適應所有利率環境
 - **SL -4.0% 為 Part B 最佳（均值回歸）**：TLT-003 Att3 驗證 SL -4.0%/cd10 使 Part B Sharpe 從 0.24 升至 0.46，但 Part A 維持 -0.20，A/B 失衡加劇
+- **Day-After Capitulation + 強反轉 K 線在 TLT 失效（TLT-006 驗證）**：三次迭代 min(A,B) -0.37/Part B 0 訊號/-0.39 均未勝過 TLT-002 的 -0.20。失敗根因：(a) 2022-2023 升息期間 TLT 在急跌後頻繁出現「Close > Prev High」反彈，但後續繼續下探創新低（8 次 -3.6% 停損集中於 2022 Aug-Sep + 2023 May-Sep）；(b) 收緊 capitulation 閾值（WR≤-90、2DD≤-2.5%、range 擴張 ≥ 1.15-1.2x）立即導致 Part B 枯竭，TLT 2024-2025 高利率高原期缺乏足夠的 capitulation-reversal 事件。與 URA-009 同屬「政策/事件驅動資產的單日/雙日反轉過濾失效」範式，擴展 cross_asset lesson #20b 邊界：Day-After Capitulation 模式在 **利率政策驅動** 資產上與 **核能政策驅動** 資產同樣失效
 <!-- AI_CONTEXT_END -->
 
 # TLT 實驗總覽 (TLT Experiments Overview)
@@ -68,6 +71,7 @@
 | TLT-003 | `tlt_003_wide_asymmetric`       | 回檔 3-7% + WR + 反轉K線 + SL -4.0% + cd10（未超越 TLT-002）| 已完成 |
 | TLT-004 | `tlt_004_bb_squeeze_breakout`   | BB 擠壓突破 / SMA 黃金交叉（趨勢策略，未超越 TLT-002）| 已完成 |
 | TLT-005 | `tlt_005_donchian_momentum`     | Donchian 突破 / ROC 動量（趨勢策略，未超越 TLT-002）| 已完成 |
+| TLT-006 | `tlt_006_day_after_reversal_mr` | Day-After Capitulation + 強反轉 K 線均值回歸（3 次迭代均失敗）| 已完成（未改善）|
 
 ---
 
@@ -490,6 +494,104 @@ TLT-001~003 均為均值回歸策略，受 2022 升息環境結構性制約（Pa
 - 進一步證實 TLT 的短期動量不可持續，與利率政策的低頻驅動特性一致
 
 **結論**：TLT-005 再次驗證趨勢跟蹤/動量策略對 TLT 的結構性限制。結合 TLT-004（BB擠壓/SMA交叉）和 TLT-005（Donchian/ROC），共 6 次嘗試全面確認：**TLT 受宏觀利率政策驅動，純技術面策略無論均值回歸或趨勢跟蹤，都無法同時在 Part A（含升息期）和 Part B（含橫盤期）獲得正 Sharpe**。
+
+---
+
+## TLT-006: Day-After Capitulation + 強反轉 K 線均值回歸 (Day-After Capitulation + Strong Reversal Bar MR)
+
+### 目標 (Goal)
+
+從 URA-009 Att2 框架跨資產移植：驗證「T-1 極端 capitulation + T 強反轉 K 線（Close > T-1 High）」
+是否能改善 TLT-002 Part A 在 2022-2023 升息期間的連續假訊號（TLT-002 Part A 32 訊號 WR 46.9%
+Sharpe -0.20）。**假說**：「收復昨日高點」為技術面 regime 切換訊號，可過濾持續性下跌中的
+短暫 V-bounce。
+
+### 進場條件（三次迭代共同骨架）
+
+| 條件 | 指標 | 備註 |
+|------|------|------|
+| T-1 回檔 | 10 日高點回檔下限 | 各 Att 調整 -3% ~ -4% |
+| T-1 回檔上限 | 10 日高點回檔上限 | 固定 -8% 以隔離 Fed 衝擊日 |
+| T-1 WR(10) | 超賣確認 | 各 Att 調整 -85 ~ -90 |
+| T-1 兩日跌幅 | Close[T-1]/Close[T-3]-1 | 各 Att 調整 -1.5% ~ -2.5% |
+| T Close > T-1 High | 收復昨日高點 | 所有迭代皆必要條件 |
+| T Close > T Open | 陽線 | 所有迭代皆必要條件 |
+| T Range 擴張 | Range[T] / avg(Range[T-5..T-1]) | Att2 1.2x / Att3 1.15x |
+| 冷卻期 | Signal 間最短間隔 | Att1/2 7 天、Att3 10 天 |
+
+### 出場參數（三次迭代相同）
+
+| 參數 | 值 | 說明 |
+|------|------|------|
+| 獲利目標 (TP) | +2.5% | 同 TLT-002 |
+| 停損 (SL) | -3.5% | 同 TLT-002 |
+| 最長持倉 | 20 天 | 同 TLT-002 |
+
+### 成交模型 (Execution Model)
+
+| 項目 | 設定 |
+|------|------|
+| 進場模式 | 隔日開盤市價 (next_open_market) |
+| 止盈委託 | 限價賣單 Day (limit_order_day) |
+| 停損委託 | 停損市價 GTC (stop_market_gtc) |
+| 到期出場 | 隔日開盤市價 (next_open_market) |
+| 滑價 | 0.10% |
+| 悲觀認定 | 是 |
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+#### Att1（2026-04-19）：基準嘗試
+
+- 參數：pullback -3%/-8% + WR≤-85 + 2DD≤-1.5% + Close>PrevHigh + Close>Open，無 range 擴張，cd 7
+- **Part A**：15 訊號 WR 40.0% Sharpe **-0.37** 累計 -15.27%
+- **Part B**：3 訊號 WR 100% Sharpe 0.00（3/3 +2.5% TP，零方差）累計 +7.69%
+- min(A,B) = **-0.37**（**劣於 TLT-002 的 -0.20**）
+- 失敗分析：8 次 -3.6% 停損集中於 2022-08/09（3 筆）與 2023-05/08/09（3 筆），
+  2020-05-12 與 2021-02-26 亦停損。這些日期均處於 TLT 持續性下跌週期中，
+  「收復昨日高點」作為過濾器無法辨識真實反轉 vs 假 V-bounce
+
+#### Att2（2026-04-19）：加嚴嘗試
+
+- 參數：pullback **-4%**/-8% + WR **≤-90** + 2DD **≤-2.5%** + Range 擴張 **1.2x**，cd 7
+- **Part A**：3 訊號 WR 66.7% Sharpe 0.16 累計 +1.28%
+- **Part B**：**0 訊號**
+- min(A,B) 無法評估（Part B 枯竭）
+- 失敗分析：WR≤-90 + 2DD≤-2.5% + Range 1.2x 三重加嚴對 TLT 1.0% vol 過於稀少，
+  Part A 留下 3 筆全部是真 capitulation 但樣本不足，Part B 2024-2025 高利率高原期
+  缺乏符合所有條件的事件
+
+#### Att3（2026-04-19）：折衷嘗試
+
+- 參數：pullback -3%/-8% + WR≤-85 + 2DD **≤-2.0%** + Range 擴張 **1.15x**，cd **10**
+- **Part A**：5 訊號 WR 40% Sharpe **-0.39** 累計 -5.88%
+- **Part B**：**0 訊號**
+- min(A,B) = **-0.39**（**劣於 TLT-002 的 -0.20**）
+- 失敗分析：Range 1.15x 過濾對 TLT 1.0% vol 仍過嚴（日均 range 1.2-1.5%），Att1 的
+  2DD≤-1.5% 放寬換來的訊號全數被 Range 擴張過濾掉；Part A 殘存 5 訊號仍集中於
+  高利率期，WR 無改善
+
+### 失敗範式與跨資產教訓
+
+TLT-006 三次迭代的共同失敗點：
+
+1. **政策驅動資產的 price-action 反轉過濾失效**：TLT 受聯準會政策預期驅動，
+   「Close > Prev High」在持續性 tightening 期間頻繁發生（技術性小反彈）但後續
+   繼續下探。此為與 URA-009（核能政策驅動）相同的「V-bounce ≠ genuine reversal」
+   失敗模式
+2. **低 vol 資產的擴張反轉過濾互斥性**：TLT 1.0% 日 vol 使日均 Range 僅 1.2-1.5%，
+   要求 Range[T] ≥ 1.15-1.2x 平均 range 會強烈過濾 Part B 訊號（TLT 高利率高原期
+   缺乏擴張反轉）
+3. **capitulation 閾值的 dilemma**：放鬆閾值（Att1）Part A 品質低，收緊閾值（Att2/3）
+   Part B 枯竭，無法在 TLT 上找到甜蜜點
+
+**擴展 cross_asset lesson #20b 邊界**：Day-After Capitulation + 強反轉 K 線模式失敗
+範疇由「核能政策驅動」（URA-009）擴展至「利率政策驅動」（TLT-006）——即任何政策/
+事件驅動的資產，price-action 反轉確認（Close>PrevHigh + Close>Open + Range 擴張）
+均無法區分真實 regime 切換與短期技術性反彈。
+
+**TLT-002 min(A,B) -0.20 仍為 TLT 全域最優**，TLT 的「無純技術面解法」結論
+（12+ 次實驗、6 大策略類型：均值回歸、BB 擠壓、SMA 金叉、Donchian、ROC 動量、
+Day-After Capitulation 反轉）再次確認。
 
 ---
 
