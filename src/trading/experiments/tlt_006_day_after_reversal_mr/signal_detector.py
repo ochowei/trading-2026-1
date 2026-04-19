@@ -45,6 +45,11 @@ class TLT006SignalDetector(BaseSignalDetector):
         # 兩日跌幅：Close[T]/Close[T-2] - 1
         df["TwoDayDecline"] = df["Close"].pct_change(2)
 
+        # 當日 Range（High - Low）與過去 N 日 range 平均（不含今日）
+        df["Range"] = df["High"] - df["Low"]
+        lookback = self.config.range_expansion_lookback
+        df["RangeAvg"] = df["Range"].shift(1).rolling(lookback).mean()
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -65,6 +70,14 @@ class TLT006SignalDetector(BaseSignalDetector):
         cond_reclaim = df["Close"] > prev_high
         cond_bullish_bar = df["Close"] > df["Open"]
 
+        # 擴張反轉：Range[T] ≥ 過去平均 range × 倍率（真正的 V 型擴張）
+        if self.config.require_range_expansion:
+            cond_range_expansion = df["Range"] >= (
+                df["RangeAvg"] * self.config.range_expansion_ratio
+            )
+        else:
+            cond_range_expansion = pd.Series(True, index=df.index)
+
         df["Signal"] = (
             cond_pullback_min
             & cond_pullback_cap
@@ -72,6 +85,7 @@ class TLT006SignalDetector(BaseSignalDetector):
             & cond_decline
             & cond_reclaim
             & cond_bullish_bar
+            & cond_range_expansion
         )
 
         # 冷卻機制

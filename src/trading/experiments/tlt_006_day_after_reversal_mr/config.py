@@ -41,18 +41,25 @@ class TLT006Config(ExperimentConfig):
       min(A,B) -0.37（劣於 TLT-002 的 -0.20）。Close>PrevHigh 單項過濾不足以
       排除 2022-2023 持續升息期間的假訊號（8 次 -3.6% 停損集中於 2022 Aug-Sep
       與 2023 May-Sep）
+
+    Att2（加嚴）：加深 capitulation 門檻 → pullback ≥ -4%、WR ≤ -90、2DD ≤ -2.5%
+      並要求反轉擴張 Range[T] ≥ avg(Range[T-5..T-1]) × 1.2。假說：更極端超賣
+      搭配擴張反轉可濾除中度下跌的假反彈，只留下真正崩盤後的 V 型反彈
     """
 
     # T-1 capitulation 評估（針對前一日）
-    pullback_lookback: int = 10  # 10 日回看
-    pullback_threshold: float = -0.03  # 昨日回檔 ≥ 3%（3σ for 1.0% vol）
-    pullback_upper: float = -0.08  # 昨日回檔 ≤ 8%（8σ，過濾 2022 連續暴跌日）
+    pullback_lookback: int = 10
+    pullback_threshold: float = -0.04  # 昨日回檔 ≥ 4%（Att2 加深）
+    pullback_upper: float = -0.08  # 昨日回檔 ≤ 8%
     wr_period: int = 10
-    wr_threshold: float = -85.0  # 昨日 WR(10) ≤ -85（極端超賣）
-    two_day_decline: float = -0.015  # T-3→T-1 兩日跌幅 ≤ -1.5%
+    wr_threshold: float = -90.0  # 昨日 WR(10) ≤ -90（Att2 加嚴）
+    two_day_decline: float = -0.025  # T-3→T-1 兩日跌幅 ≤ -2.5%（Att2 加深）
 
-    # T 反轉強度：收盤收復昨日高點 + 陽線
+    # T 反轉強度：收復昨日高點 + 陽線 + 擴張 K 線
     require_prev_high_reclaim: bool = True  # Close > Prev High
+    require_range_expansion: bool = True  # Range[T] ≥ avg range × 倍率
+    range_expansion_ratio: float = 1.2
+    range_expansion_lookback: int = 5  # 參考過去 N 日平均 range
 
     cooldown_days: int = 7
 
