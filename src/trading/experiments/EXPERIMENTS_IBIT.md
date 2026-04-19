@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-19
   data_through: 2025-12-31
-  note: IBIT-006 added 2026-04-17 (Gap-Down Capitulation MR, 3 iterations; Att2 TP+4.5%/SL-4.0% new best min 0.40 vs IBIT-001 0.15, +167%). Gap-down reversal entry for BTC overnight selling + US session buying pattern confirmed as first post-IBIT-001 improvement. Ablation (Att3) verified gap-down filter is prerequisite for tight SL to work.
+  note: IBIT-007 added 2026-04-19 (Keltner Channel Lower Band MR, 3 iterations all failed vs IBIT-006 Att2 min 0.40: Att1 Keltner 2.0×ATR + 10d PB [-8%,-25%] + Close>Open min -0.31 (Part A 2/2 zero-var WR 100% / Part B 3 signals 33% WR cum -3.97%) — Keltner triggers during continued declines not at capitulation bottoms; Att2 add WR(10) + deepen PB to -10% → identical results (filters non-binding on Keltner signals); Att3 Keltner 2.5×ATR + WR(5) → Part A 0 signals, Part B 1/1 zero-variance — too restrictive. Core failure: Keltner Lower Band can't replicate gap-down capitulation structural asymmetry (BTC overnight selling pressure completion → US-session bargain hunting) that IBIT-006 Att2 leverages. Seventh failed strategy type on IBIT (after RSI(2), BB Squeeze breakout, trend momentum pullback, RSI(5) trend pullback, ATR vol adaptive, 2-day decline, 20d lookback/short momentum, SL-8%). **New cross-asset observation**: Keltner Lower Band MR (GLD-005 success on 1.12% vol) does NOT generalize to high-vol crypto ETF (IBIT 3.17% vol) — the volatility-adaptive oversold threshold triggers during slow-melt declines rather than capitulation moments on 24/7 underlying. IBIT-006 Att2 remains global optimum (7 experiments, 21+ attempts).
 -->
 ## AI Agent 快速索引
 
@@ -12,7 +12,7 @@
 - A/B 訊號比 1.33:1（合格，差距 25%）
 - A/B 累計差 66%（仍 >30%，IBIT 資料限制下難克服）
 
-**前任最佳：** IBIT-001（回檔 12-22% + WR(10) ≤ -80 + 冷卻 15 天，Part A Sharpe 0.15，Part B Sharpe 0.37）（6 次實驗、18 次嘗試，含均值回歸、波動率自適應、突破、趨勢回檔、短期動量、gap-down 反轉六大策略類型）
+**前任最佳：** IBIT-001（回檔 12-22% + WR(10) ≤ -80 + 冷卻 15 天，Part A Sharpe 0.15，Part B Sharpe 0.37）（7 次實驗、21+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢回檔、短期動量、gap-down 反轉、Keltner 下軌七大策略類型）
 **滾動窗口分析摘要：** IBIT-001 數據不足（僅 2 窗口，無法評估漸變性，需待更多歷史數據）
 
 **已證明無效（禁止重複嘗試）：**
@@ -32,6 +32,11 @@
 - SL -8.0%（IBIT-005 Att3：Part A 0.11/Part B 0.30，停損交易均跌穿 -8%，加寬 SL 只增加虧損不挽救交易）
 - Gap-down 反轉 + IBIT-001 寬出場 TP+5%/SL-7%（IBIT-006 Att1：Part A 1.66 / Part B -0.54，TP 5% 錯過 2025-10-17 的 +4.5% 反彈，SL -7% 放大 Part B 熊市虧損）
 - Gap-down 反轉 + SL-4% 但無 gap 過濾（IBIT-006 Att3 ablation：Part A -0.33 / Part B -0.33，證明 gap-down 為緊 SL 之必要前提——無 gap 過濾下的 13 訊號中 9 停損，確認 gap-down 過濾器改變訊號性質而非單純減少）
+- **Keltner Lower Band 均值回歸（IBIT-007，3 次嘗試全部失敗）**：
+  - Att1（Keltner 2.0×ATR + Pullback [-8%,-25%] + Close>Open + cd=10）：Part A n=2 WR 100% 零方差 Sharpe 0.00 / Part B n=3 WR 33% 累計 -3.97% Sharpe -0.31。Keltner 觸發 2025-02-28（同 IBIT-006 Att2 停損日）+ **新增 2025-11-18 停損**（IBIT-006 Gap 過濾器跳過此日，Keltner 無此保護）
+  - Att2（Att1 + WR(10) ≤ -80 + Pullback -10%）：**訊號集與 Att1 完全相同**——Keltner 觸發已隱含 WR/深回檔，額外過濾器非綁定
+  - Att3（Keltner 2.5×ATR + WR(5) ≤ -80）：Part A 0 訊號（過嚴）、Part B 1 訊號零方差。訊號樣本過薄
+  - **核心失敗**：Keltner Lower Band 基於 EMA/ATR 偏離，無法捕捉「盤外拋壓完成 → 美股盤中撿便宜」的結構性不對稱；高波動下 Keltner 門檻無兩全（2.0×ATR 過淺、2.5×ATR 過深）。**Keltner MR 在 GLD-005（1.12% vol）成功無法移植至 IBIT（3.17% vol）**——低波動慢磨下跌觸發後常反彈，高波動加密觸發後常續跌
 
 **已掃描的參數空間：**
 - 進場條件：回檔 12~15% + 上限 22~25% + WR(10) ≤ -80 + 冷卻 10~20 天 + RSI(2) < 12~15 + 2日跌幅 ≤ -5% + ATR(5)/ATR(20) > 1.0~1.05 + Gap<=-1.5% + 日內反轉（Close>Open）
@@ -39,7 +44,7 @@
 - 出場參數：TP +4.5~8% / SL -4~-9% / 持倉 15~20 天
 - SL 完整掃描：-4%（IBIT-006 緊 SL，唯一搭配 gap-down 有效）、-5.5%（過緊）、-6%（過緊）、-7%（IBIT-001 最佳）、-8%（過寬，IBIT-005 Att3）、-9%（過寬）
 - TP 完整掃描：+4.5%（IBIT-006 新最佳，捕捉多日反彈）、+5%（IBIT-001 最佳）、+6%+（使 Part B 多筆達標交易翻轉為到期/停損）
-- 策略類型：均值回歸（IBIT-001/002）、波動率自適應（IBIT-004 Att1/2）、2日急跌過濾（IBIT-004 Att3）、BB 擠壓突破（IBIT-003 Att1）、趨勢動量回檔（Att2）、RSI(5) 趨勢回檔（Att3）、短期動量（IBIT-005 Att2）、**Gap-Down 資本化反轉**（IBIT-006 Att2 新最佳）
+- 策略類型：均值回歸（IBIT-001/002）、波動率自適應（IBIT-004 Att1/2）、2日急跌過濾（IBIT-004 Att3）、BB 擠壓突破（IBIT-003 Att1）、趨勢動量回檔（Att2）、RSI(5) 趨勢回檔（Att3）、短期動量（IBIT-005 Att2）、**Gap-Down 資本化反轉**（IBIT-006 Att2 新最佳）、Keltner 下軌均值回歸（IBIT-007 三次嘗試全部失敗）
 - 當前全域最佳：Gap<=-1.5% + Close>Open + 回檔 12-25% + WR<=-80 + 冷卻 10 天 + TP +4.5% / SL -4%（WR 75%/66.7%, min 0.40）
 - 前任最佳：回檔 12-22% + WR-80 + 冷卻 15 天 + TP +5% / SL -7%（WR 60%/75%, min 0.15）
 - 冷卻 15 天是關鍵：將 Part B 從 -4.63% 翻轉至 +7.50%（阻斷下跌趨勢中的連續進場）
@@ -55,6 +60,7 @@
 **尚未嘗試的方向（預期邊際效益極低，因數據不足）：**
 - ~~冷卻 20 天~~ → IBIT-005 Att1 已驗證（20日回看+20日冷卻，Part B -0.38）
 - ~~Gap-Down 資本化反轉進場~~ → IBIT-006 Att2 驗證為新最佳（min 0.40，+167%）
+- ~~Keltner 下軌均值回歸~~ → IBIT-007 驗證失敗（3 次嘗試，Keltner 無法複製 gap-down 結構）
 - Donchian 突破（已知在 TSLA-006 失敗，且 IBIT 數據不足難以評估）
 
 **關鍵資產特性：**
@@ -93,6 +99,7 @@
 | IBIT-004 | `ibit_004_vol_adaptive`   | 波動率自適應/2日急跌過濾（3 次均失敗） | ❌ 失敗 |
 | IBIT-005 | `ibit_005_extended_lookback` | 20日回看/短期動量/SL-8%（3 次均失敗） | ❌ 失敗 |
 | IBIT-006 | `ibit_006_gap_reversal_mr` | Gap-Down 資本化 + 日內反轉均值回歸（Att2 新最佳 min 0.40） | ✅ 當前最佳 |
+| IBIT-007 | `ibit_007_keltner_lower_mr` | Keltner 通道下軌 + 回檔 + 反轉 K 線均值回歸（3 次嘗試均失敗） | ❌ 失敗 |
 
 ---
 
@@ -375,6 +382,52 @@ IBIT-001 (回檔 12-22% + WR(10) ≤ -80 + 冷卻 15 天, min 0.15) 前任最佳
 2. **Gap-Down 反轉是 IBIT 首個「正向改進」的結構性訊號**：IBIT-002~005 主要為參數微調或策略類型替換（RSI(2)、BB Squeeze、ROC 動量、波動率自適應），均未超越 IBIT-001。IBIT-006 的 gap-down 反轉是首個利用 IBIT 資產特性（加密 24/7 驅動）的結構性進場邏輯
 3. **Ablation 驗證的價值**：Att3 證明策略成功源於 gap-down 過濾而非緊 SL 本身，避免下次實驗錯誤方向（例如「改進 IBIT-001 只需緊 SL」的誤解）
 4. **跨資產啟示**：Gap-Down 反轉進場模式在「有盤外交易 + 高波動」資產上可能通用（加密相關 ETF 如 IBIT/ETHA/BITX、可能適用 TLT/TQQQ 於非美時段有重大事件日）。需跨資產驗證
+
+---
+
+## IBIT-007: Keltner 通道下軌 + 回檔 + 反轉 K 線均值回歸（3 次均失敗）
+
+### 目標 (Goal)
+
+測試波動率自適應進場機制——**Keltner Channel Lower Band（EMA20 − k × ATR10）**——
+是否能取代 IBIT-006 的 gap-down 過濾器並改善 Part A/B 累計差距 66%（目標 < 30%）
+的問題。GLD-005（日波動 1.12%）使用 Keltner 下軌均值回歸成功，但 Keltner 在
+高波動加密 ETF（IBIT 3.17% vol）上是否有效尚未驗證。
+
+### 嘗試紀錄 (Attempt Log)
+
+| # | 變更 | Part A Sharpe | Part B Sharpe | A/B 訊號 | A WR / B WR | 結論 |
+|---|------|-------------|-------------|----------|------------|------|
+| 1 | Keltner 2.0×ATR + PB [-8%,-25%] + C>O + cd=10，TP+4.5%/SL-4%/15d | 0.00 | -0.31 | 2/3 | 100%/33% | Part A 零方差 2/2 勝 +9.20%；Part B 2025-02-28、2025-11-18 皆立即停損；Keltner 觸發偏早，無法複製 gap-down 結構 |
+| 2 | Att1 + WR(10) ≤ -80 + PB -10% | 0.00 | -0.31 | 2/3 | 100%/33% | **與 Att1 完全相同**——WR 與深回檔在 Keltner 訊號上非綁定 |
+| 3 | Keltner 2.5×ATR + WR(5) ≤ -80 + PB -10% | 0.00 | 0.00 | 0/1 | —/100% | Part A 歸零，Part B 僅 2025-11-21 一筆勝利零方差 |
+
+### 關鍵發現
+
+1. **Keltner Lower Band 無法複製 Gap-Down 結構性訊號**：Keltner 基於收盤價相對
+   EMA 的 ATR 偏離，觸發時點落後於 gap-down（需先慢磨下跌至 EMA − 2×ATR）。
+   在 BTC 24/7 市場的「盤外拋壓」情境下，Keltner 訊號常觸發於續跌開端而非
+   capitulation 底部（Part B 2025-11-18 即為典型案例：IBIT-006 Gap 過濾器跳過
+   此日，Keltner 卻觸發並立即停損）。
+
+2. **Keltner 觸發本身包含 WR/回檔資訊（非綁定過濾）**：Att2 加入 WR(10) ≤ -80
+   與深回檔 -10% 完全未改變訊號集，證實 Keltner Lower 觸發已隱含極端超賣。
+   疊加同類過濾器毫無區分力（cross-asset lesson #6 在此資產再度驗證）。
+
+3. **高波動下 Keltner 門檻無兩全**：2.0×ATR 過淺（假訊號多，Part B WR 33%），
+   2.5×ATR 過深（Part A 歸零，統計不可靠）。IBIT 3.17% 日波動使 Keltner 參數
+   空間狹窄，找不到兼顧訊號頻率與品質的甜蜜點。
+
+4. **跨資產啟示**：Keltner Lower Band MR 在 GLD-005（1.12% vol）成功，但**無法
+   線性移植至高波動加密 ETF**。低波動資產的慢磨下跌觸發 Keltner 後常技術性
+   反彈；高波動加密的觸發常伴隨續跌動能。推測 Keltner MR 的有效邊界為日波動
+   ≤ 1.5%（GLD 1.12% 成功，IWM 1.5% 未驗證，XLU 1.08% 另有波動率自適應優解）。
+
+### 結論
+
+三次嘗試均未超越 IBIT-006 Att2 的 min(A,B) 0.40。IBIT-007 為 IBIT 第七次失敗
+策略類型。**IBIT-006 Att2 Gap-Down 資本化 + 日內反轉均值回歸仍為全域最優**
+（7 次實驗、21+ 次嘗試）。
 
 ---
 
