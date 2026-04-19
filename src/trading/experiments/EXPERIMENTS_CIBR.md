@@ -1,11 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-04-19
   data_through: 2025-12-31
-  note: CIBR-009 added 2026-04-19 (Key Reversal Day price-action MR: Pullback + WR + Prev 收黑 + stop-run + reclaim + bullish bar + ClosePos + ATR). Three iterations all failed vs CIBR-008 Att2 min 0.39: Att1 (WR≤-80, no ATR, with stop-run) Part A 8/50% WR Sharpe -0.08 / Part B 3/33.3% WR Sharpe -0.44, 2022 年 3 連 SL + 2025 年 2 連 SL 均為 washout 後續跌的假反轉; Att2 (+ATR>1.15) signals shrink to 2/2, Part A -0.08 / Part B -0.08, 2025-02-28 ATR 1.44 仍 1-day SL; Att3 (remove stop-run, WR≤-85, ATR>1.10) signals crash to 1/1, both SL Sharpe 0.00/0.00. Extends XBI-012 failure pattern to CIBR: short-period price-action reversal confirmation (stop-run + reclaim + bullish bar) fails on event-driven US sector ETFs (XBI biotech / CIBR cybersecurity) — pattern cannot distinguish genuine reversal from dead-cat bounce in continued selling.
+  note: CIBR-010 added 2026-04-19 (NR7 Volatility Contraction + Pullback MR: pullback -4% + WR(10)≤-80 + NR7 + ClosePos≥40%). Three iterations all failed vs CIBR-008 Att2 min 0.39: Att1 (NR7 alone) Part A 7/71.4% Sharpe 0.39 (= CIBR-008) / Part B 3/33.3% Sharpe **-0.44** (2024-03-18 18天到期 -4.13%, 2025-02-28 1日 SL -4.10%, NR7 alone cannot distinguish genuine capitulation from consolidation during slow-melt declines); Att2 (add ATR(5)/ATR(20)>1.15 filter) signals collapse to 1/2 Sharpe 0.00/-0.08 — structural conflict: NR7 requires today's TR to be min of 7 days, ATR(5) includes today, making ATR ratio mechanically depressed; Att3 (remove ATR, add 2-day decline ≤-2.0% as proxy for genuine selloff context) signals collapse to 1/1 both zero-variance Sharpe 0.00 — 2DD and NR7 are near-mutually-exclusive since 2-day drop ≥2% typically means today's range is large. **Failure analysis**: NR7 volatility contraction pattern fails on event-driven US sector ETFs (CIBR cybersecurity) because compression often appears mid-decline as a technical pause rather than seller exhaustion. **New untried pattern in the repo** — adds 6th strategy type to CIBR's failed list, confirming CIBR-008's BB+pullback-cap hybrid remains structurally optimal for 1.53% vol sector ETF. CIBR-009 added 2026-04-19 (Key Reversal Day price-action MR: Pullback + WR + Prev 收黑 + stop-run + reclaim + bullish bar + ClosePos + ATR). Three iterations all failed vs CIBR-008 Att2 min 0.39: Att1 (WR≤-80, no ATR, with stop-run) Part A 8/50% WR Sharpe -0.08 / Part B 3/33.3% WR Sharpe -0.44, 2022 年 3 連 SL + 2025 年 2 連 SL 均為 washout 後續跌的假反轉; Att2 (+ATR>1.15) signals shrink to 2/2, Part A -0.08 / Part B -0.08, 2025-02-28 ATR 1.44 仍 1-day SL; Att3 (remove stop-run, WR≤-85, ATR>1.10) signals crash to 1/1, both SL Sharpe 0.00/0.00. Extends XBI-012 failure pattern to CIBR: short-period price-action reversal confirmation (stop-run + reclaim + bullish bar) fails on event-driven US sector ETFs (XBI biotech / CIBR cybersecurity) — pattern cannot distinguish genuine reversal from dead-cat bounce in continued selling.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** CIBR-008 Att2（BB 下軌 + 回檔上限混合進場：BB(20,2.0) 下軌觸及 + 10日高點回檔 >= -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15）min(A,B) Sharpe **0.39**（+44% vs CIBR-007 的 0.27）。混合進場保留 BB 統計自適應特性同時用絕對回檔深度隔離極端崩盤（-12% = ~7.8σ for 1.53% vol），濾除 COVID 連續崩盤中的 BB 假訊號。**9 次實驗、27 次嘗試**。
+**當前最佳：** CIBR-008 Att2（BB 下軌 + 回檔上限混合進場：BB(20,2.0) 下軌觸及 + 10日高點回檔 >= -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15）min(A,B) Sharpe **0.39**（+44% vs CIBR-007 的 0.27）。混合進場保留 BB 統計自適應特性同時用絕對回檔深度隔離極端崩盤（-12% = ~7.8σ for 1.53% vol），濾除 COVID 連續崩盤中的 BB 假訊號。**10 次實驗、30 次嘗試**。
 
 **次佳：** CIBR-007 Att1（BB 下軌均值回歸：BB(20,2.0) 下軌觸及 + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15，min 0.27）
 
@@ -28,6 +28,11 @@
   - Att2（加入 ATR(5)/ATR(20) > 1.15）：訊號壓縮至 2/2（0.4/年），Part A -0.08 / Part B -0.08，Part B 2025-02-28 ATR 1.44 仍 1-day SL
   - Att3（移除 stop-run + WR≤-85 + ATR>1.10）：訊號崩至 1/1 全 SL，Sharpe 0.00/0.00
   - 失敗根因：(1) stop-run（Low < Prev Low）+ reclaim 組合在熊市續跌中頻繁產生假反轉；(2) ATR 飆升本身不是反轉保證（2025-02-28 ATR 1.44 + 隔日 -4.1%）；(3) CIBR 網路安全板塊事件驅動性質使單日 price-action 反轉結構無選擇性。擴展 XBI-012（Capitulation + Acceleration Reversal）失敗模式至 CIBR 網路安全板塊，確認短週期 price-action 反轉結構在美國事件驅動板塊 ETF 普遍失效
+- **NR7 波動率壓縮 + pullback MR（CIBR-010，3 次迭代全部失敗）**：NR7（Narrowest Range 7，今日 True Range 為近 7 日最小）作為賣壓衰竭訊號在 CIBR 失效
+  - Att1（pullback -4% + WR(10)≤-80 + NR7 + ClosePos≥40%，無 ATR）：Part A 7 訊號 WR 71.4% Sharpe 0.39（與 CIBR-008 同）/ Part B 3 訊號 WR 33.3% Sharpe **-0.44**，min(A,B) -0.44。Part B 2024-03-18 18天到期 -4.13% + 2025-02-28 1日 SL -4.10%，NR7 alone 在慢磨下跌中表現為「技術性暫停」而非「賣壓衰竭」
+  - Att2（加入 ATR(5)/ATR(20) > 1.15）：訊號崩至 1/2，Part A 0.00（1 SL）/ Part B -0.08（2 訊號）。**結構性衝突**：NR7 要求今日 TR 為 7 日最小，ATR(5) 包含今日使 ATR 比率機械性降低，兩條件共存機率過低
+  - Att3（移除 ATR，加入 2 日跌幅 ≤ -2.0% 作為真實賣壓情境代理）：訊號崩至 1/1 全零方差，Sharpe 0.00/0.00。**結構性衝突 2**：2 日跌幅 ≥2% 通常意味著其中一天有大範圍，與 NR7 幾乎互斥
+  - 失敗根因：(1) CIBR 網路安全板塊事件驅動特性使 NR7 訊號常落在延續性下跌的「技術性暫停」期（非賣壓真正衰竭）；(2) NR7 與 CIBR 驗證有效的 ATR/2DD 品質過濾器結構性互斥，無法組合；(3) 2024-2025 Part B 期間 NR7 單獨在 pullback+WR 情境下產生 3 個訊號全部來自事件驅動的連續下跌（Palo Alto 財報、網路安全關稅擾動），非真正 capitulation。**新增失效策略類型（本 repo 未曾嘗試）**：CIBR 失效策略類型達 6 種（突破、RSI(2)、RS 動量、key reversal price-action、NR7 波動率壓縮、2日急跌作為補充）。確認 CIBR-008 的 BB 下軌 + 回檔上限混合進場仍為結構最優
 
 **已掃描的參數空間：**
 - 回檔門檻：4%（Att3 最佳，2.6σ）、5%（Att1 次佳，3.3σ）
@@ -82,6 +87,8 @@
 - ~~20日回看窗口~~ → CIBR-005 驗證失敗（A/B 訊號比 2.0:1 失衡，信號閾值脆弱）
 - ~~WR(14)~~ → CIBR-005 驗證無改善（搭配 20日回看不優於 WR(10)+10日回看）
 - ~~RS 動量回調~~ → CIBR-006 三次嘗試均負 Sharpe（QQQ/SPY 基準、鬆/緊/品質過濾均失敗，網路安全無獨立動量週期）
+- ~~Key Reversal Day price-action~~ → CIBR-009 驗證失敗
+- ~~NR7 波動率壓縮~~ → CIBR-010 三次迭代全部失敗（單獨 Part B -0.44、加 ATR 結構性衝突、加 2DD 亦結構性衝突）
 - 持倉 20天（可能延長到期曝露，預期無改善）
 - 回檔門檻 3%（過鬆，可能增加低品質訊號，vs 4%=2.6σ 已優化）
 - ~~趨勢動量回檔~~ → lesson #25 板塊 ETF 動量無效 + CIBR-006 RS 動量驗證失敗
@@ -102,6 +109,7 @@
 - **回檔上限在 BB 下軌框架有效**（CIBR-008 Att2：-12% = 7.8σ 濾除 COVID 連續崩盤訊號，Part A 0.27→0.39 +44%）。但區間敏感：-8% 過嚴（Att1：-44% Sharpe）、-10% 未濾除剩餘停損（Att3：回退至 0.27）。甜蜜點 -12% 反映 CIBR 歷史上「BB 下軌假訊號」主要來自 10日回檔 >12% 的崩盤連續段
 - **Lesson #52 在 CIBR 上的例外**：BB 下軌 MR 在 1.53% vol CIBR 上（配合 7.8σ 回檔上限）可突破「持續性熊市假訊號」瓶頸。確認 EWJ-003 + CIBR-008 混合進場模式為低波動板塊/區域 ETF 的有效突破方向
 - **Key Reversal Day 在 CIBR 失效（CIBR-009）**：3 次迭代證明單日 price-action 結構（stop-run + reclaim + bullish bar）在 CIBR 網路安全板塊無效。擴展 XBI-012 失敗模式至 CIBR：**美國事件驅動板塊 ETF 拒斥所有短週期 price-action 反轉結構**，需依賴波動率統計指標（BB 下軌+ATR）而非 price-action
+- **NR7 波動率壓縮 + pullback MR 在 CIBR 失效（CIBR-010）**：NR7（今日 True Range 為近 7 日最小）作為「賣壓衰竭」的波動率壓縮訊號，3 次迭代均失敗。**本 repo 首次嘗試 NR7 pattern**，但在 CIBR 網路安全板塊同樣無效。關鍵發現：(1) 單獨 NR7 + pullback+WR+ClosePos（Att1）Part B Sharpe -0.44，訊號常落在延續性下跌的技術性暫停期；(2) NR7 與 CIBR 有效的 ATR(5)/ATR(20)>1.15 過濾器**結構性衝突**——NR7 要求今日 TR 為 7 日最小，ATR(5) 包含今日使 ATR 比率機械性降低；(3) NR7 與 2 日跌幅 ≤-2.0% 過濾器同樣**結構性互斥**——2日跌幅 ≥2% 通常意味著其中一天有大範圍。NR7 適用於「短期 day-trader」的 coiled-spring breakout，不適用於多日 mean reversion 情境。擴展 CIBR 失效策略類型至 6 種（突破、RSI(2)、RS 動量、price-action reversal、NR7 壓縮、2日急跌作為補充過濾）
 <!-- AI_CONTEXT_END -->
 
 # CIBR 實驗總覽 (CIBR Experiments Overview)
@@ -126,6 +134,7 @@
 | CIBR-007 | `cibr_007_bb_lower_mr`         | BB(20,2.0) 下軌均值回歸（min 0.27）                       | 已完成 |
 | CIBR-008 | `cibr_008_bb_lower_pullback_cap`| BB 下軌 + 10日高點回檔上限 -12% 混合進場（★當前最佳，min 0.39）| 已完成 |
 | CIBR-009 | `cibr_009_key_reversal_day_mr`  | Key Reversal Day 均值回歸（price-action washout+reclaim，3 次迭代均失敗）| 已完成 |
+| CIBR-010 | `cibr_010_nr7_pullback_mr`      | NR7 波動率壓縮 + pullback 均值回歸（3 次迭代均失敗）| 已完成（未改善）|
 
 ---
 
