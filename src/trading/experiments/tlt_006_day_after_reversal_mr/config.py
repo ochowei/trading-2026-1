@@ -45,23 +45,45 @@ class TLT006Config(ExperimentConfig):
     Att2（加嚴）：加深 capitulation 門檻 → pullback ≥ -4%、WR ≤ -90、2DD ≤ -2.5%
       並要求反轉擴張 Range[T] ≥ avg(Range[T-5..T-1]) × 1.2。假說：更極端超賣
       搭配擴張反轉可濾除中度下跌的假反彈，只留下真正崩盤後的 V 型反彈
+      結果：Part A 3 訊號 WR 66.7% Sharpe 0.16；**Part B 0 訊號**（過嚴）。確認
+      WR≤-90 + 2DD≤-2.5% + 1.2x range 三重加嚴在 TLT 1.0% vol 下過於稀少
+
+    Att3（折衷）：維持 Att1 的 pullback -3%/-8%、WR ≤ -85，但加深 2DD 至 -2.0%
+      並要求適度擴張 Range[T] ≥ avg(Range) × 1.15，冷卻延長至 10 天。目標：
+      在保留 Part B 訊號的前提下，提升 Part A 的訊號品質
+      結果：Part A 5 訊號 WR 40% Sharpe -0.39；**Part B 0 訊號**。Range 1.15x
+      過濾對 TLT 1.0% vol 仍過嚴（日均 range 約 1.2-1.5%，要求 > 1.38% 擴張）
+      且殘存 Part A 訊號集中於 2022-2023 高利率期間，反彈品質低
+
+    結論（3 次迭代均失敗，擴展 lesson 20b / URA-009 邊界）：
+      Day-After Capitulation + 強反轉 K 線模式在 TLT 上完全失敗，與 URA-009
+      屬於同一失敗範式——「政策/事件驅動資產的單日/雙日反轉確認無法區分真實
+      反轉 vs 暫時回彈」。具體失敗點：
+      - Att1 顯示 2022-2023 升息期間「Close > Prev High」屢次出現但後續持續
+        下跌（8/15 停損集中於該期間）
+      - Att2/Att3 收緊後 Part B 立即枯竭，TLT 2024-2025 高利率高原期缺乏足夠的
+        capitulation → reversal 事件支撐樣本
+      - TLT 反轉強度受聯準會政策預期主導，技術面 price-action 過濾器無法
+        作為有效的 regime 切換指標
+      確認 TLT 的「無純技術面解法」結論（EXPERIMENTS_TLT.md 與 cross_asset
+      lesson #30）擴展至 Day-After Capitulation 結構
     """
 
     # T-1 capitulation 評估（針對前一日）
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.04  # 昨日回檔 ≥ 4%（Att2 加深）
+    pullback_threshold: float = -0.03  # 昨日回檔 ≥ 3%（Att3 回到 Att1）
     pullback_upper: float = -0.08  # 昨日回檔 ≤ 8%
     wr_period: int = 10
-    wr_threshold: float = -90.0  # 昨日 WR(10) ≤ -90（Att2 加嚴）
-    two_day_decline: float = -0.025  # T-3→T-1 兩日跌幅 ≤ -2.5%（Att2 加深）
+    wr_threshold: float = -85.0  # 昨日 WR(10) ≤ -85（Att3 回到 Att1）
+    two_day_decline: float = -0.020  # T-3→T-1 兩日跌幅 ≤ -2.0%（Att3 折衷）
 
     # T 反轉強度：收復昨日高點 + 陽線 + 擴張 K 線
     require_prev_high_reclaim: bool = True  # Close > Prev High
     require_range_expansion: bool = True  # Range[T] ≥ avg range × 倍率
-    range_expansion_ratio: float = 1.2
+    range_expansion_ratio: float = 1.15  # Att3 折衷（Att1 無、Att2 1.2）
     range_expansion_lookback: int = 5  # 參考過去 N 日平均 range
 
-    cooldown_days: int = 7
+    cooldown_days: int = 10  # Att3 延長（Att1/2 7）
 
 
 def create_default_config() -> TLT006Config:
