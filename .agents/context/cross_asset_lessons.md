@@ -151,7 +151,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | GLD | GLD-012 Att3 | 20日回調+WR（無追蹤停損）| 0.48 | 12 次實驗 ✓ |
 | SIVR | SIVR-015 Att1 | 回檔+WR+RSI bullish hook divergence | 0.48 | 17 次實驗 ✓ |
 | FCX | FCX-001/FCX-004 | 三重極端超賣/BB Squeeze | 0.43/0.41 | 9 次實驗 ✓ |
-| USO | USO-013 | 緊密回檔+RSI(2)+2日急跌 | 0.26 | 21 次實驗 ✓ |
+| USO | USO-013 | 緊密回檔+RSI(2)+2日急跌 | 0.26 | 22 次實驗 ✓ |
 | SPY | SPY-005 | RSI(2) 寬出場 | 0.53 | 8 次實驗 ✓ |
 | DIA | DIA-005 | RSI(2) 延長持倉 | 0.47 | 11 次實驗 ✓ |
 | VOO | VOO-003 | RSI(2) 寬獲利目標 | 0.53 | 3 次實驗 ✓ |
@@ -438,9 +438,9 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ---
 
-## 20b. RSI Bullish Hook Divergence 對高波動均值回歸有效（SIVR 驗證，COPX/FCX/URA/XBI 失敗擴展邊界）
+## 20b. RSI Bullish Hook Divergence 對高波動均值回歸有效（SIVR 驗證，COPX/FCX/URA/XBI/USO 失敗擴展邊界）
 <!-- freshness:
-  derived_from: [SIVR-015,COPX-009,FCX-009,URA-008,URA-009,TLT-006,XBI-011]
+  derived_from: [SIVR-015,COPX-009,FCX-009,URA-008,URA-009,TLT-006,XBI-011,USO-022]
   validated: 2026-04-19
   data_through: 2026-04-17
   confidence: medium
@@ -487,7 +487,13 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 - Att3（5 / 2.0 / 35，放寬 delta）：同 Att1，因 max_min=35 為綁定條件
 - **失敗根因**：XBI pullback+WR+ClosePos 訊號日，RSI(14) 5 日最低點多在 35-45 區間（非 SIVR ≤ 35 深度 oversold）。生技板塊 FDA/臨床事件驅動使下跌集中且短促（1-2 日），RSI(14) 尚未飽和至深度 oversold 即已反彈。失敗首次揭示 pattern 有效性除波動率（2-3%）與框架（pullback+WR+回看 ≤10 日）外，還需要**訊號日 RSI 分布結構**——宏觀因子驅動類資產（貴金屬 SIVR）下跌持續使 RSI 深度 oversold，事件驅動板塊（生技 XBI）下跌短促使 RSI 僅淺層 oversold
 
-**跨資產泛化假設（待進一步驗證）**：可能適用於其他**日波動 2-3% + 回檔回看窗口 ≤10 日 + 兩段 Part A/B 皆活躍 MR regime + RSI 轉折=真實反轉結構 + 訊號日 RSI(14) 分布集中於 ≤ 35 深度 oversold**且已驗證 pullback+WR 框架的資產（USO 待測）。**低波動資產**（GLD、SPY、EWJ、VGK）divergence 訊號可能過於稀少；**政策/事件驅動資產**（FXI、TLT、URA）可能因 RSI 特徵受宏觀事件影響而失效；**長回檔窗口資產**（COPX 20 日）已確認失效；**post-peak 持續下跌資產**（FCX 2024-2025 銅價）因 Part B regime 失效而失敗；**核能政策驅動資產**（URA）雖符合前四條件但 hook filter 訊號保留率僅 25%（vs SIVR 44%）且 Part B V-bounce 假訊號過多而失敗（URA-008 驗證）；**事件驅動板塊 ETF**（XBI 生技）因 RSI 僅淺層 oversold 而失效（XBI-011 驗證）；**事件驅動個股**（TSLA）可能同樣失效，需謹慎評估訊號日 RSI 分布再測試。
+**反例（USO-022，10 日回檔+商品 event-driven）**：三次迭代全部失敗，USO-013 min(A,B) 0.26 維持為全域最優：
+- Att1（USO-013 進場 + hook delta≥3/max_min≤35）：Part A 3 訊號全 TP 零方差 Sharpe 0.00 / Part B 0 訊號，USO-013 的 RSI(2)<15 + 2DD≤-2.5% 要求當日 RSI 新低，與 hook delta ≥ 3 要求 RSI 已回升結構性互斥
+- Att2（移除 2DD，pullback + RSI(2) + hook）：Part A 4 訊號仍全 TP 零方差 / Part B 0 訊號，核心矛盾未解
+- Att3（SIVR-015 pattern 直移：pullback 7-12% + WR(10)≤-80 + hook）：Part A Sharpe 0.51（4 訊號 WR 75%）/ Part B Sharpe -0.06（2 訊號，2024-09-10 SL + 2025-10-20 TP）。Att3 揭示 hook 在 Att1/Att2 的進場條件矛盾被 SIVR 架構消解後，Part B 仍因 event-driven SL 失敗
+- **失敗根因**：USO 油價由 OPEC 決策、地緣政治、庫存數據驅動，2024-09-10 供應過剩預期觸發 V-bounce 後續跌停損。USO 形式上符合前四條件（日波動 2.2%、USO-013 已驗證、10 日框架、Part A/B 皆活躍 MR）但**不滿足第五項「RSI 轉折=真實反轉」結構**——商品 event-driven 與 URA/TLT 政策驅動同歸此失敗類別。USO 成為 hook divergence 第 7 個失效資產（URA/FXI/TLT/XBI/COPX/FCX 之後）
+
+**跨資產泛化假設（待進一步驗證）**：可能適用於其他**日波動 2-3% + 回檔回看窗口 ≤10 日 + 兩段 Part A/B 皆活躍 MR regime + RSI 轉折=真實反轉結構 + 訊號日 RSI(14) 分布集中於 ≤ 35 深度 oversold**且已驗證 pullback+WR 框架的資產。**低波動資產**（GLD、SPY、EWJ、VGK）divergence 訊號可能過於稀少；**政策/事件驅動資產**（FXI、TLT、URA）可能因 RSI 特徵受宏觀事件影響而失效；**長回檔窗口資產**（COPX 20 日）已確認失效；**post-peak 持續下跌資產**（FCX 2024-2025 銅價）因 Part B regime 失效而失敗；**核能政策驅動資產**（URA）雖符合前四條件但 hook filter 訊號保留率僅 25%（vs SIVR 44%）且 Part B V-bounce 假訊號過多而失敗（URA-008 驗證）；**事件驅動板塊 ETF**（XBI 生技）因 RSI 僅淺層 oversold 而失效（XBI-011 驗證）；**商品 event-driven ETF**（USO 油價 OPEC/地緣政治）亦失效（USO-022 驗證）；**事件驅動個股**（TSLA）可能同樣失效，需謹慎評估訊號日 RSI 分布再測試。整合觀察：有效資產需滿足 (a) 波動率 2-3%、(b) 持續性下跌使 RSI 飽和至 ≤35、(c) 非事件驅動（macro-factor 驅動優於 event/policy 驅動）。
 
 **與 SIVR-007 Att1「RSI(14) 動能回復」的關鍵差異**：SIVR-007 僅要求 RSI > 5日最低值（單側門檻，無 delta 閾值、無 oversold 前提），SIVR-015 雙重條件更嚴格鎖定 classical divergence 結構。
 

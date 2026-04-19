@@ -130,6 +130,7 @@ on:
           - "USO-012: uso_012_capped_pullback"
           - "USO-013: uso_013_tight_cap"
           - "USO-021: uso_021_bb_squeeze_breakout"
+          - "USO-022: uso_022_rsi_divergence_mr"
           - "SPY-001: spy_001_pullback_wr"
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
