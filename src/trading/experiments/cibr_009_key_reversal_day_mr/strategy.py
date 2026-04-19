@@ -35,5 +35,9 @@ class CIBR009Strategy(ExecutionModelStrategy):
             print(f"  Williams %R: WR({config.wr_period}) <= {config.wr_threshold}")
             print("  Key Reversal 結構: Prev 收黑 + Today 破前低 + Today 收盤高於前收 + Today 收紅")
             print(f"  日內反轉 (ClosePos): >= {config.close_pos_threshold:.0%}")
+            print(
+                f"  ATR 比率: ATR({config.atr_fast})/ATR({config.atr_slow})"
+                f" > {config.atr_ratio_threshold}"
+            )
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)

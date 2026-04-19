@@ -9,6 +9,7 @@ CIBR-009 Key Reversal Day 訊號偵測器
 5. 反轉確認：Today Close > Prev Close（站回前日收盤）
 6. 當日收紅：Today Close > Today Open
 7. 日內反轉：ClosePos ≥ 40%
+8. (Att2) 波動率飆升：ATR(5)/ATR(20) > 1.15（確認真 capitulation）
 """
 
 import logging
@@ -52,6 +53,19 @@ class CIBR009SignalDetector(BaseSignalDetector):
         df["Prev_Open"] = df["Open"].shift(1)
         df["Prev_Low"] = df["Low"].shift(1)
 
+        # ATR ratio（波動率飆升 = 真 capitulation）
+        tr = pd.concat(
+            [
+                df["High"] - df["Low"],
+                (df["High"] - df["Close"].shift(1)).abs(),
+                (df["Low"] - df["Close"].shift(1)).abs(),
+            ],
+            axis=1,
+        ).max(axis=1)
+        df["ATR_fast"] = tr.rolling(self.config.atr_fast).mean()
+        df["ATR_slow"] = tr.rolling(self.config.atr_slow).mean()
+        df["ATR_ratio"] = df["ATR_fast"] / df["ATR_slow"].where(df["ATR_slow"] > 0, float("nan"))
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -68,6 +82,9 @@ class CIBR009SignalDetector(BaseSignalDetector):
         cond_bull_bar = df["Close"] > df["Open"]
         cond_closepos = df["ClosePos"] >= self.config.close_pos_threshold
 
+        # 波動率飆升確認（真 capitulation）
+        cond_atr = df["ATR_ratio"] > self.config.atr_ratio_threshold
+
         df["Signal"] = (
             cond_pullback_min
             & cond_pullback_cap
@@ -77,6 +94,7 @@ class CIBR009SignalDetector(BaseSignalDetector):
             & cond_reclaim
             & cond_bull_bar
             & cond_closepos
+            & cond_atr
         )
 
         # Cooldown

@@ -25,8 +25,11 @@ Pullback 上下限：
 - 上限 ≤ -12%（~7.8σ for 1.53% vol，同 CIBR-008 崩盤隔離邊界）
 
 Att1: 標準參數（WR ≤ -80, pullback -3~-12%, 全部 price-action 過濾）
-Att2: 視 Att1 訊號數調整（放寬/收緊 pullback 或 WR）
-Att3: 視結果調整出場或移除最弱過濾器
+      → Part A -0.08 (8/50% WR) / Part B -0.44 (3/33.3% WR), min -0.44（失敗）
+      失敗分析：stop-run+reclaim 本身不具選擇性，熊市續跌中破底反彈只是技術性反彈。
+      2022 年 3 連 SL、2025 年 2 連 SL 均為「washout 後續跌」。
+Att2: 加入 ATR(5)/ATR(20) > 1.15（波動率飆升確認真 capitulation）
+Att3: 視 Att2 結果決定（調 WR/pullback/ATR 門檻或 TP/SL）
 """
 
 from dataclasses import dataclass
@@ -47,13 +50,18 @@ class CIBR009Config(ExperimentConfig):
     wr_period: int = 10
     wr_threshold: float = -80.0
 
-    # Key Reversal 結構（全部為布林判斷，無額外參數）
+    # Key Reversal 結構（布林條件，硬編碼於 signal_detector）
     close_pos_threshold: float = 0.40  # 日內反轉
-    # 其他結構條件（硬編碼於 signal_detector）：
+    # 其他結構條件：
     # - Prev Close < Prev Open（前日收黑）
     # - Today Low < Prev Low（washout / stop-run）
     # - Today Close > Prev Close（站回前日收盤）
     # - Today Close > Today Open（當日收紅）
+
+    # Att2 新增：ATR 波動率飆升確認
+    atr_fast: int = 5
+    atr_slow: int = 20
+    atr_ratio_threshold: float = 1.15
 
     cooldown_days: int = 8
 
