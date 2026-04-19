@@ -41,12 +41,14 @@ class XBI012Config(ExperimentConfig):
     pullback_upper: float = -0.20  # 回檔上限 20%（過濾極端崩盤）
 
     # 短期急跌：3 日 ROC（Close / Close[-3] - 1） ≤ threshold
+    # Att1 (-4%): 3/3 訊號過稀疏 Sharpe 0.16
+    # Att2 (-3%): 放寬以增加訊號頻率
     roc_lookback: int = 3
-    roc_threshold: float = -0.04  # 3 日急跌 ≥ 4%（約 2σ for 2.0% vol）
+    roc_threshold: float = -0.03  # 3 日急跌 ≥ 3%（約 1.5σ for 2.0% vol）
 
     # 日內反攻：當日收盤強度 + 較前日上漲
-    # （取代 3 日中點條件，後者與 ROC 急跌在數學上互斥）
-    close_position_threshold: float = 0.50  # 收於日內區間上半（Close >= Low + 0.5*Range）
+    # Att1 (0.50): 過嚴；Att2 (0.40): 放寬以同步提升訊號頻率
+    close_position_threshold: float = 0.40
     require_up_day: bool = True  # Close > 前日 Close
 
     # Williams %R 超賣濾波（標準）
