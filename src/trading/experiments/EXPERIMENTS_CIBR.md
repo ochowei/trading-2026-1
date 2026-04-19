@@ -1,10 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-16
+  last_validated: 2026-04-19
   data_through: 2025-12-31
+  note: CIBR-009 added 2026-04-19 (Key Reversal Day price-action MR: Pullback + WR + Prev 收黑 + stop-run + reclaim + bullish bar + ClosePos + ATR). Three iterations all failed vs CIBR-008 Att2 min 0.39: Att1 (WR≤-80, no ATR, with stop-run) Part A 8/50% WR Sharpe -0.08 / Part B 3/33.3% WR Sharpe -0.44, 2022 年 3 連 SL + 2025 年 2 連 SL 均為 washout 後續跌的假反轉; Att2 (+ATR>1.15) signals shrink to 2/2, Part A -0.08 / Part B -0.08, 2025-02-28 ATR 1.44 仍 1-day SL; Att3 (remove stop-run, WR≤-85, ATR>1.10) signals crash to 1/1, both SL Sharpe 0.00/0.00. Extends XBI-012 failure pattern to CIBR: short-period price-action reversal confirmation (stop-run + reclaim + bullish bar) fails on event-driven US sector ETFs (XBI biotech / CIBR cybersecurity) — pattern cannot distinguish genuine reversal from dead-cat bounce in continued selling.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** CIBR-008 Att2（BB 下軌 + 回檔上限混合進場：BB(20,2.0) 下軌觸及 + 10日高點回檔 >= -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15）min(A,B) Sharpe **0.39**（+44% vs CIBR-007 的 0.27）。混合進場保留 BB 統計自適應特性同時用絕對回檔深度隔離極端崩盤（-12% = ~7.8σ for 1.53% vol），濾除 COVID 連續崩盤中的 BB 假訊號。8 次實驗、24 次嘗試。
+**當前最佳：** CIBR-008 Att2（BB 下軌 + 回檔上限混合進場：BB(20,2.0) 下軌觸及 + 10日高點回檔 >= -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15）min(A,B) Sharpe **0.39**（+44% vs CIBR-007 的 0.27）。混合進場保留 BB 統計自適應特性同時用絕對回檔深度隔離極端崩盤（-12% = ~7.8σ for 1.53% vol），濾除 COVID 連續崩盤中的 BB 假訊號。**9 次實驗、27 次嘗試**。
 
 **次佳：** CIBR-007 Att1（BB 下軌均值回歸：BB(20,2.0) 下軌觸及 + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15，min 0.27）
 
@@ -22,6 +23,11 @@
 - **SL -4.5%**（CIBR-004 Att3：所有停損交易均穿越 -4.5%，加寬只增加虧損）
 - **20日回看窗口**（CIBR-005：A/B 訊號比 2.0:1 嚴重失衡。20日窗口在 Part A 產生過多信號，且 6% 回檔門檻附近信號脆弱，冷卻鏈序微調即翻轉結果。持倉 15 vs 18天翻轉 A/B 優劣但均未超越 CIBR-002）
 - **WR(14) 取代 WR(10)**（CIBR-005：搭配 20日回看，未提供超越 WR(10)/10日回看組合的品質提升）
+- **Key Reversal Day price-action（CIBR-009，3 次迭代全部失敗）**：price-action 結構化 washout+reclaim 進場在 CIBR 失效
+  - Att1（WR≤-80、無 ATR、含 stop-run）：Part A 8 訊號 WR 50% Sharpe -0.08 / Part B 3 訊號 WR 33.3% Sharpe -0.44，2022 年 3 連 SL + 2025 年 2 連 SL 均為「washout 後續跌」
+  - Att2（加入 ATR(5)/ATR(20) > 1.15）：訊號壓縮至 2/2（0.4/年），Part A -0.08 / Part B -0.08，Part B 2025-02-28 ATR 1.44 仍 1-day SL
+  - Att3（移除 stop-run + WR≤-85 + ATR>1.10）：訊號崩至 1/1 全 SL，Sharpe 0.00/0.00
+  - 失敗根因：(1) stop-run（Low < Prev Low）+ reclaim 組合在熊市續跌中頻繁產生假反轉；(2) ATR 飆升本身不是反轉保證（2025-02-28 ATR 1.44 + 隔日 -4.1%）；(3) CIBR 網路安全板塊事件驅動性質使單日 price-action 反轉結構無選擇性。擴展 XBI-012（Capitulation + Acceleration Reversal）失敗模式至 CIBR 網路安全板塊，確認短週期 price-action 反轉結構在美國事件驅動板塊 ETF 普遍失效
 
 **已掃描的參數空間：**
 - 回檔門檻：4%（Att3 最佳，2.6σ）、5%（Att1 次佳，3.3σ）
@@ -95,6 +101,7 @@
 - **移除 ClosePos**（CIBR-007 Att3：Part A 0.09/Part B 0.02，15訊號含5停損，品質崩壞。ClosePos 在 BB 框架中不可或缺）
 - **回檔上限在 BB 下軌框架有效**（CIBR-008 Att2：-12% = 7.8σ 濾除 COVID 連續崩盤訊號，Part A 0.27→0.39 +44%）。但區間敏感：-8% 過嚴（Att1：-44% Sharpe）、-10% 未濾除剩餘停損（Att3：回退至 0.27）。甜蜜點 -12% 反映 CIBR 歷史上「BB 下軌假訊號」主要來自 10日回檔 >12% 的崩盤連續段
 - **Lesson #52 在 CIBR 上的例外**：BB 下軌 MR 在 1.53% vol CIBR 上（配合 7.8σ 回檔上限）可突破「持續性熊市假訊號」瓶頸。確認 EWJ-003 + CIBR-008 混合進場模式為低波動板塊/區域 ETF 的有效突破方向
+- **Key Reversal Day 在 CIBR 失效（CIBR-009）**：3 次迭代證明單日 price-action 結構（stop-run + reclaim + bullish bar）在 CIBR 網路安全板塊無效。擴展 XBI-012 失敗模式至 CIBR：**美國事件驅動板塊 ETF 拒斥所有短週期 price-action 反轉結構**，需依賴波動率統計指標（BB 下軌+ATR）而非 price-action
 <!-- AI_CONTEXT_END -->
 
 # CIBR 實驗總覽 (CIBR Experiments Overview)
@@ -118,6 +125,7 @@
 | CIBR-006 | `cibr_006_rs_momentum_pullback`| RS 動量回調 CIBR vs SPY（完全失敗，三次嘗試均負 Sharpe）| 已完成 |
 | CIBR-007 | `cibr_007_bb_lower_mr`         | BB(20,2.0) 下軌均值回歸（min 0.27）                       | 已完成 |
 | CIBR-008 | `cibr_008_bb_lower_pullback_cap`| BB 下軌 + 10日高點回檔上限 -12% 混合進場（★當前最佳，min 0.39）| 已完成 |
+| CIBR-009 | `cibr_009_key_reversal_day_mr`  | Key Reversal Day 均值回歸（price-action washout+reclaim，3 次迭代均失敗）| 已完成 |
 
 ---
 
@@ -616,3 +624,49 @@ Part A Sharpe 0.55→0.60），在 CIBR-007 基礎上疊加回檔上限過濾器
    繞過。適用條件：(a) 低中波動（≤2.0%）資產；(b) 搭配 WR + ClosePos + ATR 三重品質
    過濾；(c) 回檔上限設在 7-8σ（CIBR 12%, EWJ 7%）。不適用於高波動資產（SIVR 2-3%：
    BB 下軌本身失效）或政策驅動 EM ETF（FXI：即使 BB 搭配回檔上限仍失效）。
+
+---
+
+## CIBR-009：Key Reversal Day 均值回歸 (Key Reversal Day MR)
+
+### 設計理念 (Design Rationale)
+
+CIBR-008 Att2 Part A 7 訊號含 2 停損（2020-02-24 COVID、2021-02-26 科技拋售）均為
+「BB 下軌觸及但隔日繼續深跌」。測試能否改用 price-action 結構化的「washout + 日內反轉
+確認」進場訊號，過濾此類 false bottom。
+
+### 進場條件 (Entry Conditions)
+
+| Att | WR 門檻 | Stop-run | ATR 比率 | 其他 |
+|-----|---------|----------|----------|------|
+| Att1 | ≤ -80 | Low < Prev Low | 無 | Prev 收黑 + Close > Prev Close + bullish bar + ClosePos ≥ 40% |
+| Att2 | ≤ -80 | Low < Prev Low | > 1.15 | 同上 |
+| Att3 | ≤ -85 | 無 | > 1.10 | 同上 |
+
+共同條件：10 日高點回檔 ∈ [-12%, -3%]、冷卻 8 天。出場：TP +3.5% / SL -4.0% / 18 天。
+
+### 回測結果 (Backtest Results)
+
+| Att | Part A 訊號 | Part A WR | Part A Sharpe | Part B 訊號 | Part B WR | Part B Sharpe | min(A,B) |
+|-----|-------------|-----------|---------------|-------------|-----------|---------------|----------|
+| Att1 | 8 | 50.0% | -0.08 | 3 | 33.3% | -0.44 | **-0.44** |
+| Att2 | 2 | 50.0% | -0.08 | 2 | 50.0% | -0.08 | -0.08 |
+| Att3 | 1 | 0.0% | 0.00 | 1 | 0.0% | 0.00 | 0.00 (全 SL) |
+| **vs CIBR-008 Att2（基準）** | 7 | 71.4% | 0.39 | 5 | 100.0% | 4.38 | **0.39** |
+
+### 關鍵學習 (Key Learnings)
+
+1. **Stop-run + reclaim 結構在 CIBR 無選擇性**：Att1 8 訊號 50% WR 證明「Low < Prev Low
+   + Close > Prev Close + bullish bar」在熊市續跌中頻繁產生假反轉（dead-cat bounce）。
+   2022 年 3 連 SL + 2025 年 2 連 SL 均屬此類失敗。
+2. **ATR 飆升不等於反轉確認**：Part B 2025-02-28 訊號 ATR 1.44（顯著飆升）但隔日 1-day
+   SL -4.1%，證明波動率擴張本身可能是崩盤的起點而非終點。
+3. **訊號稀缺 vs 品質平衡失敗**：Att2 加嚴 ATR 將訊號壓縮至 2/2（0.4/年），Att3 進一步
+   崩至 1/1 全停損，顯示 CIBR 上「price-action Key Reversal + ATR + WR」組合無甜蜜點。
+4. **擴展 XBI-012 失敗模式至 CIBR**：XBI（生技板塊，FDA/臨床事件驅動）的 Capitulation +
+   Acceleration Reversal 失敗（min 0.16 vs XBI-005 0.36）。CIBR（網路安全板塊，企業
+   並購/資安事件驅動）的 Key Reversal Day 同樣失敗。整合觀察：**美國事件驅動板塊 ETF
+   拒斥所有短週期單日 price-action 反轉結構**，需依賴波動率統計指標（BB 下軌+ATR）+
+   絕對回檔深度過濾（CIBR-008 / EWJ-003 模式）。
+5. **CIBR-008 Att2 全域最優確認**：本次 9 次實驗、27 次嘗試後，BB 下軌 + 回檔上限 -12%
+   混合進場仍為 CIBR min(A,B) 0.39 天花板。
