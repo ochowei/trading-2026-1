@@ -47,9 +47,10 @@ class XBI012Config(ExperimentConfig):
     roc_threshold: float = -0.03  # 3 日急跌 ≥ 3%（約 1.5σ for 2.0% vol）
 
     # 日內反攻：當日收盤強度 + 較前日上漲
-    # Att1 (0.50): 過嚴；Att2 (0.40): 放寬以同步提升訊號頻率
-    close_position_threshold: float = 0.40
-    require_up_day: bool = True  # Close > 前日 Close
+    # Att1 (0.50, UpDay): 過嚴；Att2 (0.40, UpDay): Part B 枯竭
+    # Att3 (0.35, no UpDay): 對齊 XBI-005 ClosePos 門檻並移除 Up Day 強制要求
+    close_position_threshold: float = 0.35
+    require_up_day: bool = False  # Close > 前日 Close
 
     # Williams %R 超賣濾波（標準）
     wr_period: int = 10
