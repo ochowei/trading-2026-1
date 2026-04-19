@@ -77,7 +77,6 @@ class CIBR009SignalDetector(BaseSignalDetector):
 
         # Key Reversal 結構
         cond_prev_bear = df["Prev_Close"] < df["Prev_Open"]
-        cond_stop_run = df["Low"] < df["Prev_Low"]
         cond_reclaim = df["Close"] > df["Prev_Close"]
         cond_bull_bar = df["Close"] > df["Open"]
         cond_closepos = df["ClosePos"] >= self.config.close_pos_threshold
@@ -85,17 +84,22 @@ class CIBR009SignalDetector(BaseSignalDetector):
         # 波動率飆升確認（真 capitulation）
         cond_atr = df["ATR_ratio"] > self.config.atr_ratio_threshold
 
-        df["Signal"] = (
+        signal = (
             cond_pullback_min
             & cond_pullback_cap
             & cond_wr
             & cond_prev_bear
-            & cond_stop_run
             & cond_reclaim
             & cond_bull_bar
             & cond_closepos
             & cond_atr
         )
+
+        # Stop-run 條件（Att1/Att2 啟用、Att3 停用）
+        if self.config.require_stop_run:
+            signal &= df["Low"] < df["Prev_Low"]
+
+        df["Signal"] = signal
 
         # Cooldown
         signal_indices = df.index[df["Signal"]].tolist()

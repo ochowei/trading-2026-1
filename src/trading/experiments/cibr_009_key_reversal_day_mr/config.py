@@ -29,7 +29,12 @@ Att1: 標準參數（WR ≤ -80, pullback -3~-12%, 全部 price-action 過濾）
       失敗分析：stop-run+reclaim 本身不具選擇性，熊市續跌中破底反彈只是技術性反彈。
       2022 年 3 連 SL、2025 年 2 連 SL 均為「washout 後續跌」。
 Att2: 加入 ATR(5)/ATR(20) > 1.15（波動率飆升確認真 capitulation）
-Att3: 視 Att2 結果決定（調 WR/pullback/ATR 門檻或 TP/SL）
+      → Part A -0.08 (2/50% WR) / Part B -0.08 (2/50% WR), min -0.08（失敗但改善）
+      失敗分析：訊號壓縮至 2/2（0.4/年過稀）。2022-01-06 ATR 1.21 仍 SL，2025-02-28
+      ATR 1.44 卻 1-day SL，證明 ATR 飆升本身不是反轉保證。
+Att3: 移除 stop-run（Low < Prev Low）+ 收緊 WR 至 -85 + 放寬 ATR 至 1.10
+      理由：stop-run 條件過於特定，限縮了其他有效的壓縮反轉訊號。放寬 ATR 讓更多
+      訊號通過，同時用更深的 WR 提升品質。
 """
 
 from dataclasses import dataclass
@@ -46,22 +51,23 @@ class CIBR009Config(ExperimentConfig):
     pullback_threshold: float = -0.03  # 下限：回檔至少 -3%
     pullback_cap: float = -0.12  # 上限：回檔不深於 -12%（崩盤隔離）
 
-    # 超賣確認
+    # 超賣確認（Att3 收緊至 -85）
     wr_period: int = 10
-    wr_threshold: float = -80.0
+    wr_threshold: float = -85.0
 
     # Key Reversal 結構（布林條件，硬編碼於 signal_detector）
     close_pos_threshold: float = 0.40  # 日內反轉
-    # 其他結構條件：
+    # 保留結構條件：
     # - Prev Close < Prev Open（前日收黑）
-    # - Today Low < Prev Low（washout / stop-run）
     # - Today Close > Prev Close（站回前日收盤）
     # - Today Close > Today Open（當日收紅）
+    # Att3 移除：Today Low < Prev Low（stop-run）— Att1/Att2 證明此條件不具選擇性
+    require_stop_run: bool = False  # Att1/Att2 為 True，Att3 為 False
 
-    # Att2 新增：ATR 波動率飆升確認
+    # ATR 波動率飆升（Att3 放寬至 1.10）
     atr_fast: int = 5
     atr_slow: int = 20
-    atr_ratio_threshold: float = 1.15
+    atr_ratio_threshold: float = 1.10
 
     cooldown_days: int = 8
 
