@@ -63,12 +63,12 @@ from trading.core.base_config import ExperimentConfig
 class IBIT008Config(ExperimentConfig):
     """IBIT-008 Range Expansion Climax 均值回歸參數"""
 
-    # Range Expansion 主訊號
+    # Range Expansion 主訊號（Att2：放寬 TR 倍率以增加訊號頻率）
     atr_period: int = 20  # ATR 基準期
-    tr_ratio_threshold: float = 2.0  # 今日 TR / ATR(20) ≥ 2.0
+    tr_ratio_threshold: float = 1.5  # Att2：今日 TR / ATR(20) ≥ 1.5（由 2.0 放寬）
 
-    # 日內反轉確認
-    close_pos_threshold: float = 0.50  # ClosePos ≥ 50%（強日內反轉）
+    # 日內反轉確認（Att2：放寬 ClosePos 至 40%）
+    close_pos_threshold: float = 0.40  # Att2：ClosePos ≥ 40%（由 50% 放寬）
 
     # 回檔深度過濾（避免牛市高點 range expansion 的續跌）
     pullback_lookback: int = 10
