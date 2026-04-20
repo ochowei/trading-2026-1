@@ -23,6 +23,10 @@ INDA-009 的設計邏輯：
 - 出場：TP+3.5% / SL-4.0% / 持倉 15 天（同 INDA-005 甜蜜點）
 
 Att1 (baseline): CCI(20) ≤ -100 + CCI 轉折 + Close > Open + cd=10
+  → Part A 21 訊號 WR 61.9% Sharpe 0.09 / Part B 9 訊號 WR 44.4% Sharpe -0.46
+  → min(A,B) -0.46（失敗），A/B 訊號比 2.33:1 過高
+
+Att2: 加嚴 CCI 至 -150 + 加入 ClosePos ≥ 40%（INDA 已驗證有效過濾器）
 """
 
 from dataclasses import dataclass
@@ -34,9 +38,9 @@ from trading.core.base_config import ExperimentConfig
 class INDA009Config(ExperimentConfig):
     """INDA-009 CCI 超賣反轉均值回歸參數"""
 
-    # CCI 參數
+    # CCI 參數（Att2：加嚴至 -150 以過濾慢磨下跌中的假轉折）
     cci_period: int = 20
-    cci_oversold: float = -100.0  # Att1：標準超賣門檻
+    cci_oversold: float = -150.0  # Att2：從 -100 收緊至 -150（深度超賣）
     # CCI 轉折確認：今日 CCI 比 N 日前低點高出至少 delta 點
     cci_turn_lookback: int = 2
     cci_turn_delta: float = 0.0
@@ -44,8 +48,8 @@ class INDA009Config(ExperimentConfig):
     # 反轉 K 線確認
     require_close_gt_open: bool = True
 
-    # ClosePos 過濾（Att1 預設關閉）
-    use_close_pos: bool = False
+    # ClosePos 過濾（Att2：啟用，INDA 已驗證有效）
+    use_close_pos: bool = True
     close_pos_threshold: float = 0.40
 
     # 10 日高點回檔（Att1 預設關閉，pullback_threshold 0 相當於不過濾）
