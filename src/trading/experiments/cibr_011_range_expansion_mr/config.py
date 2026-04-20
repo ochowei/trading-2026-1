@@ -52,23 +52,29 @@ from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class CIBR011Config(ExperimentConfig):
-    """CIBR-011 Range Expansion Climax 均值回歸參數"""
+    """CIBR-011 Range Expansion Climax 均值回歸參數（Att2）"""
 
-    # Range Expansion 主訊號（IBIT-008 結構性參數）
+    # Range Expansion 主訊號（Att2：放寬 TR ≥ 1.7 增加訊號頻率）
     atr_period: int = 20  # ATR 基準期
-    tr_ratio_threshold: float = 2.0  # TR/ATR(20) ≥ 2.0（單日 climax）
+    tr_ratio_threshold: float = 1.7  # Att2：TR/ATR(20) ≥ 1.7（由 2.0 放寬）
 
-    # 日內反轉確認（IBIT-008 已驗證 ClosePos ≥ 50% 強反轉門檻）
+    # 日內反轉確認（Att2：保留 ClosePos ≥ 50%）
     close_pos_threshold: float = 0.50
 
-    # 回檔深度過濾（CIBR 1.53% vol 縮放：-3%/5σ 為 floor，-10%/6.5σ 為 cap）
+    # 回檔深度過濾（Att2：收窄上限至 -8% 以隔離 COVID/Evergrande 級崩盤）
     pullback_lookback: int = 10
     pullback_threshold: float = -0.03  # 10 日回檔 ≤ -3%（≈2σ floor）
-    pullback_upper: float = -0.10  # 10 日回檔 ≥ -10%（≈6.5σ cap，過濾崩盤）
+    pullback_upper: float = -0.08  # Att2：10 日回檔 ≥ -8%（由 -10% 收窄）
 
-    # Williams %R 超賣確認（IBIT-008 已驗證 ≤ -70）
+    # Williams %R 超賣確認（Att2：保留 ≤ -70）
     wr_period: int = 10
     wr_threshold: float = -70.0
+
+    # ATR 波動率自適應過濾（Att2 新增：CIBR-008 已驗證 ATR(5)/ATR(20) > 1.10
+    # 為 capitulation regime 確認，過濾慢磨下跌）
+    atr_fast: int = 5
+    atr_slow: int = 20
+    atr_ratio_threshold: float = 1.10
 
     # 冷卻（CIBR-008 已驗證 8 天為甜蜜點）
     cooldown_days: int = 8

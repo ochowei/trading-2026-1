@@ -41,5 +41,9 @@ class CIBR011Strategy(ExecutionModelStrategy):
                 f" {abs(config.pullback_threshold):.0%}-{abs(config.pullback_upper):.0%}"
             )
             print(f"  Williams %R: WR({config.wr_period}) <= {config.wr_threshold}")
+            print(
+                f"  ATR 過濾: ATR({config.atr_fast})/ATR({config.atr_slow})"
+                f" > {config.atr_ratio_threshold}"
+            )
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)
