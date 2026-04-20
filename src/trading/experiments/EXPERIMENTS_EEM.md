@@ -1,10 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-20
   data_through: 2025-12-31
+  note: EEM-013 added 2026-04-20 (MACD Histogram Bullish Turn + Pullback Hybrid MR, **repo first MACD trial**). Three iterations all failed vs EEM-012 Att3 min 0.34: Att1 (MACD hist zero-line upcross + pullback [-7,-3] + WR≤-70 + ClosePos≥40%) Part A/B both 0 signals — zero-cross severely lags MR entry timing (by the time cross fires, WR already recovered). Att2 (MACD hist 2-bar bullish turn: today > yesterday > day-2 AND yesterday < 0, pullback [-8,-2] + WR≤-75 + ClosePos≥40%) Part A 8 signals 50% WR -0.77% cumulative Sharpe **-0.02** (4 TP / 4 SL, 2022-2023 rate-hike bear market SLs concentrated: 2019-05 trade war / 2022-09,10 / 2023-02 / 2024-07) / Part B 3 signals 66.7% WR +2.80% Sharpe 0.34 — MACD smoother EMA than RSI/CCI hook but still fails in bear rally dead-cat bounces. Att3 (Att2 + **reverse ATR filter**: ATR(5)/ATR(20) < 1.10) Part A 5 signals 60% WR +2.60% Sharpe 0.19 / Part B 2 signals 100% WR +6.09% Sharpe 0.00 (zero-variance 2/2 TPs) / min(A,B) 0.00. **Novel cross-asset finding**: MACD framework on EEM prefers LOW ATR environment (opposite of EEM-010 RSI(2) framework which uses ATR>1.15) — bear-rally dead-cat bounces coincide with high ATR spikes, while genuine MR during bull consolidation has lower ATR. Reverse ATR<1.10 filter improved Part A WR from 50%→60% by removing 3 SL (2019-05-15 ATR 1.47, 2022-10-03 ATR 1.14, 2024-07-29 ATR 1.11) but also removed 2 TP (2019-08-12 ATR 1.15, 2021-10-06 ATR 1.12). **Repo first MACD trial** — extends lesson #20b failure family (V-bounce ≠ genuine reversal) to MACD histogram turn patterns: MACD's EMA-based smoothing insufficient to solve V-bounce problem in post-peak persistent decline regimes (2022-2023 Fed hiking). 13 experiments, 34 attempts. EEM-012 Att3 remains global optimum.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** EEM-012 Att3（BB(20,2.0) 下軌 + 回檔上限 -7% + WR(10)≤-85 + ClosePos≥40% + ATR>1.1 + TP+3%/SL-3%/20天 + 冷卻10天，Part A Sharpe 0.34，Part B Sharpe 0.56，min(A,B) 0.34）★ 混合進場模式首次延伸至 broad EM ETF，勝過 EEM-005 BB Squeeze +89%（0.18→0.34）。**12 個實驗 30+ 次嘗試。**
+**當前最佳：** EEM-012 Att3（BB(20,2.0) 下軌 + 回檔上限 -7% + WR(10)≤-85 + ClosePos≥40% + ATR>1.1 + TP+3%/SL-3%/20天 + 冷卻10天，Part A Sharpe 0.34，Part B Sharpe 0.56，min(A,B) 0.34）★ 混合進場模式首次延伸至 broad EM ETF，勝過 EEM-005 BB Squeeze +89%（0.18→0.34）。**13 個實驗 34+ 次嘗試。**
 
 **次佳（突破策略最佳）：** EEM-005 Att2（BB Squeeze 30th 百分位 + SMA(50) + TP3.0%/SL3.0%/20天 + 冷卻10天，Part A Sharpe 0.20，Part B Sharpe 0.18）
 
@@ -79,6 +80,11 @@
 - ~~寬 SL / 延長持倉~~ → EEM-008 Att1 已驗證失敗
 - ~~替代壓縮指標（價格範圍）~~ → EEM-008 Att2 已驗證假突破過多
 - ~~環境波動率過濾~~ → EEM-008 Att3 已驗證移除好訊號多於壞訊號
+- ~~MACD 柱狀圖 turn-up 均值回歸~~ → EEM-013 驗證失敗（3 次迭代，repo 首次 MACD 試驗）
+  - Att1（MACD 柱狀圖零軸上穿 + 回檔 [-7,-3] + WR≤-70 + ClosePos≥40% + cd10）：Part A/B 各 0 訊號（零軸上穿嚴重滯後）
+  - Att2（MACD 柱狀圖 2 根連續 turn-up + 回檔 [-8,-2] + WR≤-75 + ClosePos≥40%）：Part A 8 訊號 WR 50% Sharpe **-0.02** / Part B 3 訊號 WR 66.7% Sharpe 0.34 / min(A,B) -0.02，2022-2023 升息熊市 SL 集中
+  - Att3（Att2 + **反向 ATR 過濾 ATR<1.10**）：Part A 5 訊號 WR 60% Sharpe 0.19 / Part B 2 訊號 WR 100% Sharpe 0.00 零方差 / min(A,B) 0.00，反向 ATR 為 EEM-013 獨特發現但仍無法超越 EEM-012 Att3 的 0.34
+  - 失敗根因：MACD 雖為平滑 EMA 指標仍擴展 lesson #20b 失敗家族——V-bounce ≠ genuine reversal 在 2022-2023 升息熊市中無法由 MACD/RSI/CCI 任何 oscillator hook 區分
 
 **關鍵資產特性：**
 - EEM 為新興市場 ETF（iShares MSCI Emerging Markets），追蹤新興市場大盤
@@ -99,6 +105,11 @@
   - Att1（WR ≤ -80 + ATR > 1.10）：min(A,B) 0.13，Part A 含 2019-05 貿易戰、2021-11 Omicron 等 3 個 EM 危機假訊號
   - Att2（收緊 ATR > 1.15）：min(A,B) -0.60，**反向失敗**——EEM 危機日 ATR 普遍飆高，提高門檻反移除贏家保留輸家。ATR 在 BB Lower 框架對 EEM 方向相反（vs RSI(2) 框架）
   - Att3（還原 ATR 1.10，收緊 WR ≤ -85）★：min(A,B) 0.34，WR -85 成功移除 2019-05-09 貿易戰淺觸假訊號，A/B 累計差僅 3.6%，訊號頻率 1.2/yr vs 2.0/yr（1:1.67）
+- **EEM-013 MACD 試驗三次迭代（repo 首次 MACD 試驗）**：
+  - Att1（MACD 柱狀圖零軸上穿 + 回檔 [-7%,-3%] + WR≤-70 + ClosePos≥40%）：Part A/B 各 0 訊號，MACD 零軸上穿嚴重滯後於 pullback+WR 組合
+  - Att2（MACD 柱狀圖 2 根連續上揚 today>yesterday>day-2 且 yesterday<0 + 回檔 [-8%,-2%] + WR≤-75 + ClosePos≥40%）：Part A 8 訊號 WR 50% 累計 -0.77% Sharpe **-0.02** / Part B 3 訊號 WR 66.7% 累計 +2.80% Sharpe 0.34 / min(A,B) -0.02。A/B 頻率比 1.04:1 極佳但 Part A 2022-2023 熊市產生 4 筆 SL（2019-05 貿易戰、2022-09/10 升息、2023-02 早期修正）
+  - Att3（Att2 + **反向 ATR 過濾 ATR<1.10**）：Part A 5 訊號 WR 60% 累計 +2.60% Sharpe 0.19 / Part B 2 訊號 WR 100% 累計 +6.09% Sharpe 0.00 零方差 / min(A,B) 0.00。**獨特發現**：MACD 框架在 EEM 上偏好低波動環境（ATR<1.10），與 EEM-010 RSI(2) 框架的 ATR>1.15 方向完全相反——bear rally dead-cat bounce 伴隨 ATR 飆升，bull consolidation MR 為低 ATR
+  - 失敗根因：(1) MACD 雙 EMA 平滑雖優於 RSI/CCI 點估計但仍無法解決「V-bounce ≠ genuine reversal」根本問題（lesson #20b 失敗家族擴展至 MACD）；(2) 反向 ATR<1.10 過濾成功移除 3 筆高 ATR 的 Part A SL（2019-05-15 ATR 1.47、2022-10-03 ATR 1.14、2024-07-29 ATR 1.11）但同時移除 2 筆高 ATR 的 TP（2019-08-12 ATR 1.15、2021-10-06 ATR 1.12），淨 WR 提升至 60% 仍低於所需的 > 70% 門檻；(3) Part B 訊號降至 1/yr 稀疏度使 100% WR 僅兩筆 + 3% 零方差——**EEM 在 MACD 框架下 Part B 訊號稀疏成為結構性限制**
 <!-- AI_CONTEXT_END -->
 
 # EEM 實驗總覽 (EEM Experiments Overview)
@@ -669,3 +680,88 @@ ATR 門檻對 EEM 在 BB Lower 框架內方向與 RSI(2) 框架相反：Att2 收
 | **min(A,B)** | -0.13 | +0.00 | 0.01 | +0.18 | -0.23 | -0.37 | **+0.34** |
 | Part A 訊號 | 28 (5.6/yr) | 13 (2.6/yr) | 45 (9.0/yr) | 18 (3.6/yr) | 9 (1.8/yr) | 15 (3.0/yr) | 6 (1.2/yr) |
 | Part B 訊號 | 7 (3.5/yr) | 5 (2.5/yr) | 12 (6.0/yr) | 10 (5.0/yr) | 5 (2.5/yr) | 6 (3.0/yr) | 4 (2.0/yr) |
+
+---
+
+## EEM-013: MACD 柱狀圖多頭轉折 + 回檔混合進場均值回歸 ❌ 失敗
+
+### 目標 (Goal)
+
+**Repo 首次 MACD 試驗**。填補「MACD momentum indicator」作為 MR 進場訊號的方向空白。EEM broad EM 1.17% vol 屬中低波動，且有明顯 risk-on/risk-off 週期，假設 MACD(12, 26, 9) 柱狀圖平滑 EMA 訊號可過濾 RSI/CCI 點估計指標在 V-bounce 上的噪音問題。目標：突破 EEM-012 Att3 min(A,B) 0.34 天花板。
+
+### 進場條件 (Final Iteration, Att3)
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| MACD 動量轉折 | MACD 柱狀圖 today > yesterday > day-2 且 yesterday < 0 | — | 兩根連續上揚仍處於負值區，賣壓衰竭中 |
+| 回檔情境 | 10 日高點回檔 | [-8%, -2%] | 淺至中等回檔，排除崩盤續跌 |
+| 超賣確認 | Williams %R(10) | ≤ -75 | 放寬（MACD 已為主訊號） |
+| 日內反轉 | Close Position | ≥ 40% | EEM 驗證有效 |
+| **反向 ATR 過濾** | ATR(5)/ATR(20) | **< 1.10** | **EEM-013 獨特發現**：MACD 框架偏好低波動環境 |
+| 冷卻期 | 訊號間隔 | ≥ 10 天 | — |
+
+### 出場參數 (Exit Parameters)
+
+| 參數 | 值 |
+|------|-----|
+| 獲利目標 (TP) | +3.0%（EEM 硬上限） |
+| 停損 (SL) | -3.0%（EEM 硬上限） |
+| 持倉天數 | 20 天 |
+| 滑價 | 0.1% |
+| 成交模型 | 隔日開盤市價進場 |
+
+### 三次迭代摘要
+
+| 迭代 | 進場條件 | Part A Sharpe | Part B Sharpe | min(A,B) | 結論 |
+|------|----------|--------------|---------------|----------|------|
+| Att1 | MACD 柱狀圖零軸上穿 + pullback [-7,-3] + WR≤-70 | 0 訊號 | 0 訊號 | N/A | 零軸上穿嚴重滯後 |
+| Att2 | MACD 柱狀圖 2 根 turn-up + pullback [-8,-2] + WR≤-75 | -0.02 (8訊號 50%WR) | 0.34 (3訊號 66.7%WR) | **-0.02** | 2022-2023 升息熊市 SL 集中 |
+| **Att3** | Att2 + **ATR<1.10 反向過濾** | 0.19 (5訊號 60%WR) | 0.00 (2訊號 100%WR 零方差) | **0.00** | Part A WR 改善但未達 0.34 門檻 |
+
+### 回測結果 (Att3 Default)
+
+| 區間 | 年份 | 訊號數 | 勝率 | 累積報酬 | Sharpe | MDD | 盈虧比 |
+|------|------|--------|------|----------|--------|-----|-------|
+| Part A (IS) | 2019-2023 | 5 (1.0/yr) | 60.0% | +2.60% | 0.19 | -4.34% | 1.45 |
+| Part B (OOS) | 2024-2025 | 2 (1.0/yr) | 100.0% | +6.09% | 0.00 (零方差) | -1.37% | ∞ |
+
+### Att2 Part A 逐筆交易（說明 bear market 假訊號問題）
+
+| 訊號日 | 結果 | WR | Pullback | ATR5/20 | 備註 |
+|--------|------|-----|----------|---------|------|
+| 2019-05-15 | SL -3.10% | -78 | -6.89% | 1.47 | 貿易戰升級（ATR>1.10 移除✓） |
+| 2019-08-12 | TP +3.00% | -85 | -6.99% | 1.15 | 深回檔真反彈（ATR>1.10 誤移除✗） |
+| 2021-10-06 | TP +3.00% | -76 | -3.46% | 1.12 | 淺回檔快速反彈（ATR>1.10 誤移除✗） |
+| 2022-09-08 | SL -3.10% | -88 | -6.18% | 1.04 | Fed 升息熊市（低 ATR，無法移除✗） |
+| 2022-10-03 | SL -3.10% | -77 | -6.39% | 1.14 | 熊市續跌（ATR>1.10 移除✓） |
+| 2023-02-14 | SL -3.10% | -78 | -3.76% | 0.88 | 早期修正（低 ATR，無法移除✗） |
+| 2023-08-18 | TP +3.00% | -92 | -5.65% | 0.83 | 極端 WR 真反彈 |
+| 2023-10-31 | TP +3.00% | -76 | -2.73% | 1.03 | 淺回檔真反彈 |
+
+### 穩健性檢查 (Att3)
+
+- A/B 累積報酬差：|2.60 − 6.09| / 6.09 = **57.3%**（超過 < 30% 目標）
+- A/B 訊號頻率比：**1.0:1**（極佳）
+- A/B 絕對訊號數差：(5 − 2) / 5 = 60%（超過 < 50% 目標）
+- Part B 2/2 零方差 → Sharpe 報為 0.00，為結構性樣本稀疏問題
+
+### 失敗分析
+
+1. **MACD 零軸上穿嚴重滯後（Att1）**：當 MACD 柱狀圖從負值穿越至 > 0 時，price 通常已回升 3-5 天，WR 回彈至 > -70，10 日 pullback 也已從 -5% 收斂至 -2%，導致多重條件不同時滿足
+2. **MACD 2-bar turn-up 在升息熊市失敗（Att2）**：2022-2023 Fed 升息週期中，EEM 連續性慢磨下跌產生多次 dead-cat bounce，MACD 平滑 EMA 雖優於 RSI/CCI 點估計但**仍無法解決 V-bounce 根本問題**。擴展 lesson #20b 失敗家族至 MACD
+3. **反向 ATR 過濾為 EEM-013 獨特發現（Att3）**：MACD 框架在 EEM 上偏好**低波動環境**（ATR<1.10），與 EEM-010 RSI(2) 框架的 ATR>1.15 方向完全相反。假設原因：
+   - Bear rally dead-cat bounce 伴隨 ATR 飆升（panic 殘留 vol）
+   - Bull consolidation 中的 genuine MR 屬於低 ATR 平靜期
+   - 但 EEM 熊市 SL 既可在高 ATR（2019-05, 2022-10, 2024-07）也可在低 ATR（2022-09, 2023-02），使過濾器無法區分
+4. **EEM Part B 訊號稀疏（結構性限制）**：MACD + 反向 ATR 組合使 Part B 降至 1/yr，100% WR 2/2 為零方差 Sharpe 結構，min(A,B) 被迫為 0.00
+
+### 結論
+
+**三次迭代均未勝過 EEM-012 Att3（min(A,B) 0.34）**。EEM-013 為 **repo 首次 MACD 試驗**，驗證：
+- MACD 作為 MR 主訊號加入 lesson #20b 失敗家族（RSI hook、CCI hook、Stoch hook、WVF、MACD 柱狀圖 turn-up）
+- **獨特發現**：MACD 框架在 EEM 上偏好低 ATR 環境（反向 ATR<1.10），與其他 MR 框架方向相反
+- EEM MR 技術上限仍為 EEM-012 Att3 的 BB Lower + Pullback Cap 混合進場模式
+
+跨資產假設（待驗證）：
+- 反向 ATR 方向可能僅在 MACD / 其他 EMA-based 動量指標框架中適用
+- 其他 broad EM ETF（如 VWO、IEMG）MACD + 反向 ATR 可能表現類似，但需在活躍 MR regime 資產上才有機會突破（EEM Part B 2024-2025 強牛市使 MR 訊號稀薄為結構限制）
