@@ -45,7 +45,7 @@ class URA010Config(ExperimentConfig):
 
     # 回檔深度過濾（隔離極端崩盤 + 確保深回撤）
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.08  # 10d 高點回檔 ≥ 8%
+    pullback_threshold: float = -0.10  # Att3：10d 高點回檔 ≥ 10%（沿用 URA-004 標準）
     pullback_upper: float = -0.25  # 回檔上限 25%（過濾結構性崩盤）
 
     # 2 日急跌過濾（Att2 新增 — 沿用 URA-004 已驗證的恐慌過濾器）
