@@ -1,11 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-18
+  last_validated: 2026-04-20
   data_through: 2025-12-31
-  note: FXI-010 added 2026-04-18 (Gap-Down Capitulation + Intraday Reversal MR, ported from IBIT-006 Att2 framework). Three iterations all failed to beat FXI-005 min 0.38: Att1 (gap≤-1.5%, tight exit TP+3.5%/SL-3%) Part A -0.33 / Part B -0.51 (22 signals 31.8% WR, FXI gap-down often continues, not capitulates); Att2 (gap≤-2.5% + close>midpoint + deep pullback + FXI-005 wide exit) Part A 0.04 / Part B 0.00 (too few signals 5/1); Att3 (gap as regime filter: recent 5d contains gap≤-2% + FXI-005 entry) Part A 0.34 / Part B 0.00 (22/2 signals, Part B zero variance, 2024-2025 policy event scarcity). Extends lesson #52 to gap-down capitulation structure: policy-driven EM rejects gap-down capitulation (both as entry trigger and regime filter), unlike IBIT where BTC 24/7 continuous price discovery creates genuine capitulation. FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed to beat FXI-005 min 0.38; best Att1 0.00, Att2 -0.11, Att3 Part A 0 signals). Confirms short-horizon structure-break + reclaim patterns DO NOT work on policy-driven single-country EM ETFs. Extends lesson #52 to failed-breakdown / Turtle Soup variant. FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed; best Att3 dual-osc 0.37). A/B signal imbalance (5:1) is structural and cannot be fixed via entry-mechanism changes alone.
+  note: FXI-011 added 2026-04-20 (Connor's RSI Mean Reversion: composite oscillator RSI(3)+Streak_RSI(2)+PercentRank(1d return,100d), first repo trial of CRSI). Three iterations all failed vs FXI-005 min 0.38: Att1 (CRSI≤10 + PB 4-12% + ClosePos + ATR + cd10) Part A 6 signals 50% WR Sharpe 0.01 / Part B 2/2 100% WR Sharpe 4.14 — CRSI≤10 stacked on PB+ATR over-restrictive, retains only 23% of FXI-005 signal flow with 50% WR; Att2 (CRSI≤20 + PB 4-12% + ClosePos, drop ATR) Part A 16 signals 56.2% WR Sharpe 0.12 / Part B 4/4 100% WR Sharpe 5.36 — CRSI removed 8 wins but only 2 losses (CRSI dis-favors 1-day flush wins that FXI-005 captures via WR); Att3 (FXI-005 framework + CRSI≤25 as additional filter) Part A 18 signals 55.6% WR Sharpe 0.17 / Part B 3/3 100% WR Sharpe 4.74 — wins reduced 17→10 (41% drop) vs signals 26→18 (31% drop), confirming CRSI penalizes single-day flushes (high RSI(3), short streak length). Core failure: FXI's profitable MR signals are sharp 1-2 day flushes with rapid intraday recovery; CRSI's three components all penalize this profile (RSI(3) bounces back fast, streak only -1/-2, %Rank not extreme). Extends lesson #6 boundary: CRSI as additional MR filter on policy-driven EM ETFs penalizes the very signals MR rewards. FXI's 9th failed strategy type (after BB Squeeze, RSI(5), BB Lower MR, RS momentum, Stoch, Failed Breakdown, Gap-Down Capitulation, plus FXI-001 baseline). FXI-005 remains global optimum (11 experiments, 33+ attempts). FXI-010 added 2026-04-18 (Gap-Down Capitulation + Intraday Reversal MR, ported from IBIT-006 Att2 framework). Three iterations all failed to beat FXI-005 min 0.38: Att1 (gap≤-1.5%, tight exit TP+3.5%/SL-3%) Part A -0.33 / Part B -0.51 (22 signals 31.8% WR, FXI gap-down often continues, not capitulates); Att2 (gap≤-2.5% + close>midpoint + deep pullback + FXI-005 wide exit) Part A 0.04 / Part B 0.00 (too few signals 5/1); Att3 (gap as regime filter: recent 5d contains gap≤-2% + FXI-005 entry) Part A 0.34 / Part B 0.00 (22/2 signals, Part B zero variance, 2024-2025 policy event scarcity). Extends lesson #52 to gap-down capitulation structure: policy-driven EM rejects gap-down capitulation (both as entry trigger and regime filter), unlike IBIT where BTC 24/7 continuous price discovery creates genuine capitulation. FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed to beat FXI-005 min 0.38; best Att1 0.00, Att2 -0.11, Att3 Part A 0 signals). Confirms short-horizon structure-break + reclaim patterns DO NOT work on policy-driven single-country EM ETFs. Extends lesson #52 to failed-breakdown / Turtle Soup variant. FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed; best Att3 dual-osc 0.37). A/B signal imbalance (5:1) is structural and cannot be fixed via entry-mechanism changes alone.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（10 次實驗）**
+**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（11 次實驗）**
 - Part A Sharpe 0.38（WR65.4%, 26訊號, +54.97%）, Part B Sharpe 1.61（WR80%, 5訊號, +20.59%）
 - min(A,B) Sharpe **0.38**（vs FXI-002 0.33，+15.2% 提升）
 - Part B WR 80%（FXI-002 為 60%），SL -5.0% 拯救 2025-04-04 關鍵交易（SL→TP，+10.6pp）
@@ -49,6 +49,13 @@
   - Att3 breakdown_lookback=10 + breakdown depth≥1% + ClosePos + bullish：Part A 0 訊號；Part B 1 訊號 WR 0% Sharpe 0.00。min 0.00（Part A 訊號枯竭）
   - **根因：政策驅動 EM 缺乏可靠的短期反轉結構**。FXI 的破底後「奪回」常被後續多日連環下跌（2021-11、2022-09、2023-02、2025-04 均在 reclaim 後續跌）吞噬。這與 BB 擠壓突破（FXI-003）、BB 下軌 MR（FXI-006）的失敗同根源——中國政策/事件驅動使盤中級別結構失效
   - 擴展跨資產教訓 #52 至「Turtle Soup / 失效破底反轉」——政策驅動單一國家 EM ETF 所有短週期反轉結構（BB Squeeze、BB 下軌、Stoch 交叉、failed breakdown reclaim）均無效
+- **Connor's RSI (CRSI) 均值回歸**（FXI-011，三次迭代均失敗）：
+  - Att1（CRSI(3,2,100)≤10 + PB 4-12% + ClosePos≥40% + ATR>1.05 + cd10）：Part A 6 訊號（3W/3L）50% WR Sharpe 0.01 / Part B 2/2 100% WR Sharpe 4.14。**過度過濾**：CRSI≤10（Connors 「extreme oversold」）+ FXI-005 三重過濾僅保留 23% 訊號流量，且 50% WR 低於 FXI-005 的 65.4%
+  - Att2（CRSI≤20 + PB 4-12% + ClosePos，移除 ATR）：Part A 16 訊號 56.2% WR Sharpe 0.12 / Part B 4/4 100% WR Sharpe 5.36。CRSI≤20（標準 Connors 門檻）作為 PRIMARY 振盪器，**WR 卻 *劣於* FXI-005**——CRSI 過濾移除 8 個贏家但只移除 2 個輸家
+  - Att3（FXI-005 完整框架 + CRSI≤25 作為附加過濾）：Part A 18 訊號 55.6% WR Sharpe 0.17 / Part B 3/3 100% WR Sharpe 4.74。**贏家被偏向移除**：訊號 26→18（-31%）、贏家 17→10（-41%），CRSI 反而懲罰高品質訊號
+  - **核心失敗根因**：FXI 的高品質均值回歸訊號為**急跌 1-2 天 + 盤中強反彈**結構，CRSI 三組件均懲罰此類型——(a) RSI(3) 在 1-2 日反彈中已快速回升至中位，(b) Streak 長度僅 -1 或 -2（非長期下跌），(c) %Rank(1d return,100d) 在政策驅動環境的 1 日 -3% 下跌相對「常見」，並非極端。CRSI 真正觸發的條件是**多日連續慢磨下跌**——這正是 FXI-005 的 ATR>1.05 + WR≤-80 已經過濾掉的低品質訊號類型
+  - **擴展 lesson #6 邊界**：CRSI 作為附加過濾器在政策驅動單一國家 EM ETF 上**反向移除好訊號**，違反「特定失敗模式濾波器」原則。FXI 第 9 種失敗策略類型（前 8 種：BB Squeeze、RSI(5)、BB 下軌 MR、RS 動量、Stoch、Failed Breakdown、Gap-Down Capitulation、FXI-001 基準）
+  - **Repo 首次驗證 CRSI**：跨資產假設——CRSI 在低波動寬基 ETF（SPY/DIA/VOO ≤1.0% vol）可能仍有效，因該類資產的反轉通常涉及 3-5 日漸進過程而非 1 日急跌
 - **Gap-Down Capitulation + Intraday Reversal**（FXI-010，三次迭代均失敗）：
   - Att1 gap≤-1.5% + Close>Open + PB [-5%,-15%] + WR≤-80 + TP+3.5%/SL-3%/20d/cd10：Part A 22 訊號 WR 31.8% -20.67% Sharpe -0.33；Part B 4 訊號 WR 25% -5.83% Sharpe -0.51。min -0.51（嚴重失敗）
   - Att2 加嚴 gap≤-2.5% + Close>midpoint + PB [-8%,-20%] + FXI-005 寬出場（TP+5.5%/SL-5%/20d/cd15）：Part A 5 訊號 WR 60% +0.36% Sharpe 0.04；Part B 1 訊號 WR 100% Sharpe 0.00。min 0.00（訊號太稀疏）
@@ -83,6 +90,7 @@
 - ~~Stochastic Oscillator 均值回歸~~ → FXI-008 三次迭代均失敗（%K>%D 交叉、%K 等級替代 WR、雙振盪器均無加成）
 - ~~Failed Breakdown Reversal / Turtle Soup~~ → FXI-009 三次迭代均失敗（10d/5d breakdown、ClosePos、深度門檻均無法勝過 FXI-005）
 - ~~Gap-Down Capitulation + Intraday Reversal~~ → FXI-010 三次迭代均失敗（entry trigger、regime filter 均無法勝過 FXI-005；HK 隔夜 gap 不同於 BTC 24/7 價格發現，常因政策消息持續下行）
+- ~~Connor's RSI (CRSI) 均值回歸~~ → FXI-011 三次迭代均失敗（CRSI 三組件全部懲罰 1-2 日急跌+盤中反彈的高品質訊號）
 - 動量回調（在高波動 EM ETF 上普遍失敗）
 - SL -4.75%（介於 -4.5% 和 -5.0% 之間，可能是更精確甜蜜點）
 
@@ -124,6 +132,7 @@
 | FXI-008 | `fxi_008_stochastic_mr`        | Stochastic Oscillator 均值回歸（3 次迭代均失敗）| 已完成（失敗，確認 Stoch 對 FXI 無加成）|
 | FXI-009 | `fxi_009_failed_breakdown_reversal` | Failed Breakdown Reversal / Turtle Soup（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #52 至 breakdown reclaim 結構）|
 | FXI-010 | `fxi_010_gap_reversal_mr`      | Gap-Down Capitulation + Intraday Reversal MR（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #52 至 gap-down 資本化；雙重驗證 lesson #20a 的 24/7 先決條件）|
+| FXI-011 | `fxi_011_connors_rsi_mr`       | Connor's RSI (CRSI) 均值回歸（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #6 至 CRSI 過濾器在政策驅動 EM 反向移除好訊號）|
 
 ---
 
@@ -788,4 +797,83 @@ FXI 追蹤香港 H 股，HK 市場於美股盤後交易（HKT 9:30-16:00 = ET 21
 - 此前 TQQQ-016 驗證「槓桿科技 ETF」失效
 - FXI-010 進一步驗證「即便擁有盤後 HK 價格發現的單一國家 EM ETF」亦無法套用
 - **精煉先決條件**：Gap-down 資本化反轉模式需「盤外連續價格發現」+「拋壓不受政策/事件持續性影響」兩項必要條件；FXI 滿足前者但不滿足後者
+
+---
+
+## FXI-011: Connor's RSI (CRSI) Mean Reversion（三次迭代均失敗）
+
+**目標**：以 Connor's RSI（CRSI = mean of RSI(3) + Streak_RSI(2) + PercentRank(1d return,100d)）作為複合超賣指標，驗證是否能修正 FXI-005 的 A/B 績效落差（Part A Sharpe 0.38 / Part B 1.61，cum 差 62.5%、訊號數差 80.7%）。
+
+**策略方向**：均值回歸（複合超賣振盪器，repo 首次驗證）
+
+**關鍵假設**：CRSI 三組件分別捕捉動能（RSI(3)）、持續性（Streak_RSI(2)）、相對歷史強度（%Rank(100d)），可比單一 WR/RSI 更精準辨別「真實 capitulation vs 慢磨延續」。Streak 組件特別應有助於分辨 1 日急跌（短 streak）vs 多日慢磨（長 streak）。
+
+### Att1 — CRSI ≤ 10（Connors「extreme oversold」）+ FXI-005 三重過濾
+**進場**：CRSI ≤ 10 + 10d Pullback [-4%, -12%] + ClosePos ≥ 40% + ATR > 1.05 + cd10
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 6 | 2 |
+| 勝率 | 50.0% | 100% |
+| 累計報酬 | -0.33% | +9.04% |
+| Sharpe | **0.01** | 4.14 |
+
+**失敗分析**：CRSI ≤ 10 為「極端」門檻（Connors 標準為 ≤ 5），疊加 PB+ClosePos+ATR 三重過濾後僅保留 23% 訊號流量，Part A 6 筆中 3 停損 + 2 到期 + 1 達標，WR 僅 50%（vs FXI-005 65.4%）。CRSI 過度過濾。
+
+### Att2 — CRSI ≤ 20 取代 WR + 移除 ATR
+**進場**：CRSI ≤ 20 + 10d Pullback [-4%, -12%] + ClosePos ≥ 40% + cd10（移除 ATR、移除 WR(10)）
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 16 | 4 |
+| 勝率 | 56.2% | 100% |
+| 累計報酬 | +7.69% | +21.37% |
+| Sharpe | **0.12** | 5.36 |
+
+**失敗分析**：CRSI ≤ 20（標準 Connors 門檻）作為 PRIMARY 振盪器，Part A WR 56.2% **劣於** FXI-005 的 65.4%。對比 FXI-005 的 Part A 26 訊號 17 贏家：
+- CRSI 過濾保留 16/26 = 62% 訊號
+- 但僅保留 9/17 = 53% 贏家
+- 而保留 7/9 = 78% 輸家
+
+**CRSI 對 FXI 的訊號選擇 *偏向移除贏家*** — 反向效果。
+
+### Att3 — FXI-005 完整框架 + CRSI ≤ 25 作為附加過濾
+**進場**：10d Pullback [-5%, -12%] + WR(10) ≤ -80 + CRSI ≤ 25 + ClosePos ≥ 40% + ATR > 1.05 + cd10
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 18 | 3 |
+| 勝率 | 55.6% | 100% |
+| 累計報酬 | +13.63% | +15.04% |
+| Sharpe | **0.17** | 4.74 |
+
+**失敗分析**：CRSI ≤ 25 為「寬鬆」附加過濾，仍偏向移除贏家：
+- 訊號 26→18（-31%）
+- 贏家 17→10（-41%）
+- 輸家 9→8（-11%）
+**贏家流失率（41%）顯著高於輸家流失率（11%）**——CRSI 確認系統性懲罰高品質訊號。
+
+### 結論與跨資產教訓更新
+
+**失敗根因（三次迭代一致）**：
+1. **FXI 的高品質 MR 訊號為「急跌 1-2 天 + 盤中強反彈」結構**，CRSI 三組件全部懲罰此類型：
+   - **RSI(3)**：1-2 日急跌後盤中反彈使 RSI(3) 已快速回升至中位（30-50），CRSI 第一組件不夠低
+   - **Streak_RSI(2)**：streak 長度僅 -1 或 -2（非長期下跌），Streak_RSI 不夠低
+   - **%Rank(1d return, 100d)**：政策驅動環境的 1 日 -3% 下跌相對「常見」，%Rank 不夠極端
+2. **CRSI 真正觸發的條件是多日連續慢磨下跌**（streak -4 以上、%Rank 極低），但這正是 FXI-005 的 ATR>1.05 + WR≤-80 + ClosePos≥40% 已過濾掉的低品質訊號類型
+3. **Att3 的「直接相加 CRSI 過濾」沒有任何附加價值**——CRSI 與 FXI-005 既有過濾器系統性反向
+4. A/B 訊號比 6:1（Att3 18:3）遠超 50% 目標，與 FXI-010 失敗模式相同
+
+**擴展跨資產教訓 #6 邊界**：
+- Lesson #6 的「特定失敗模式濾波器」例外條件**不適用 CRSI 在政策驅動 EM 上**
+- **CRSI 作為附加過濾器在政策驅動單一國家 EM ETF 上反向移除好訊號**，加入「禁止重複嘗試」清單
+
+**Repo 首次驗證 CRSI**：
+- 跨資產假設：CRSI 在低波動寬基 ETF（SPY/DIA/VOO ≤ 1.0% vol）可能仍有效，因該類資產的反轉通常涉及 3-5 日漸進過程而非 1 日急跌；建議優先測試 DIA-005 RSI(2) 框架的 CRSI 替代版本
+- **不適用範圍**：政策/事件驅動單一國家 ETF（FXI、URA、TLT 同類），高波動加密 ETF（IBIT 同類），高波動個股（TSLA/NVDA 同類，動能特性使 streak 成分過於波動）
+
+**FXI 第 9 種失敗策略類型**（前 8 種：BB Squeeze、RSI(5)、BB 下軌 MR、RS 動量、Stoch、Failed Breakdown、Gap-Down Capitulation、FXI-001 1:1 對稱出場）。FXI-005 確認為全域最優（11 次實驗、33+ 次嘗試）。
 
