@@ -48,9 +48,7 @@ class IBIT008SignalDetector(BaseSignalDetector):
 
         # Close Position：收盤價在當日 High-Low 區間的位置（0-1）
         day_range = df["High"] - df["Low"]
-        df["ClosePos"] = (df["Close"] - df["Low"]) / day_range.where(
-            day_range > 0, float("nan")
-        )
+        df["ClosePos"] = (df["Close"] - df["Low"]) / day_range.where(day_range > 0, float("nan"))
         df["ClosePos"] = df["ClosePos"].fillna(0.5)  # 零範圍日視為中性
 
         # 回檔深度：收盤價 vs 近 N 日最高價

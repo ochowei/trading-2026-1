@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-19
+  last_validated: 2026-04-20
   data_through: 2025-12-31
-  note: IBIT-007 added 2026-04-19 (Keltner Channel Lower Band MR, 3 iterations all failed vs IBIT-006 Att2 min 0.40: Att1 Keltner 2.0×ATR + 10d PB [-8%,-25%] + Close>Open min -0.31 (Part A 2/2 zero-var WR 100% / Part B 3 signals 33% WR cum -3.97%) — Keltner triggers during continued declines not at capitulation bottoms; Att2 add WR(10) + deepen PB to -10% → identical results (filters non-binding on Keltner signals); Att3 Keltner 2.5×ATR + WR(5) → Part A 0 signals, Part B 1/1 zero-variance — too restrictive. Core failure: Keltner Lower Band can't replicate gap-down capitulation structural asymmetry (BTC overnight selling pressure completion → US-session bargain hunting) that IBIT-006 Att2 leverages. Seventh failed strategy type on IBIT (after RSI(2), BB Squeeze breakout, trend momentum pullback, RSI(5) trend pullback, ATR vol adaptive, 2-day decline, 20d lookback/short momentum, SL-8%). **New cross-asset observation**: Keltner Lower Band MR (GLD-005 success on 1.12% vol) does NOT generalize to high-vol crypto ETF (IBIT 3.17% vol) — the volatility-adaptive oversold threshold triggers during slow-melt declines rather than capitulation moments on 24/7 underlying. IBIT-006 Att2 remains global optimum (7 experiments, 21+ attempts).
+  note: IBIT-008 added 2026-04-20 (Range Expansion Climax MR, **repo first single-bar TR expansion as primary signal**). Three iterations all failed vs IBIT-006 Att2 min 0.40: Att1 (TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10d PB [-6%,-20%] + WR(10) ≤ -70, cd 10) Part A n=1 TP +4.50% zero-var / Part B n=1 SL -4.14% / min 0.00 — signal trigger rate only 0.4% (2 signals in 500 trading days); Att2 (relax TR to 1.5 + ClosePos 40%) Part A n=1 (unchanged — pullback/WR binding in 2024 bull regime) / Part B n=4 WR 25% cum -7.95% Sharpe -0.53 / min -0.53 — loosened thresholds capture Part B bear rally dead-cat bounces (3/3 SL in 2025); Att3 (keep TR 2.0/ClosePos 50%, loosen pullback to -4% and WR to -65) Part A n=1 / Part B n=1 identical to Att1 — pullback/WR completely NON-BINDING, confirming TR ≥ 2×ATR + ClosePos ≥ 50% already implies deep pullback and extreme oversold. Core failure modes: (1) signal scarcity on IBIT's 2-year history — single-bar TR expansion + strong intraday reversal is structurally rare on this asset; (2) no true/false reversal discrimination — Att2's relaxed ClosePos 40% cannot distinguish capitulation buyback from temporary pause during bear trends; (3) structural difference from Gap-Down pattern (IBIT-006) — Range Expansion captures only "intraday volatility + reversal" without the overnight-flushout-completion precondition that makes Gap-Down work on 24/7 underlying. **Repo first single-bar Range Expansion as primary MR trigger trial** (TLT-006 used it as auxiliary filter among many conditions, not primary). Extends lesson #20b failure family beyond oscillator-hook (RSI/CCI/Stoch/CRSI/MACD) + day-after reversal (URA-009) + capitulation-depth (WVF) to **single-bar range-expansion climax indicators** — all entry-time confirmation patterns structurally fail on high-vol crypto ETFs in post-peak/bear regimes. Cross-asset hypothesis: Range Expansion MR may work on traditional (non-24/7) US sector ETFs (CIBR/XBI) where overnight gaps are absent and single-bar TR expansion captures the primary capitulation structure — pending validation. IBIT's eighth failed strategy type (after RSI(2), BB Squeeze, trend momentum, RSI(5) trend, ATR vol adaptive, 2-day decline, 20d lookback/short momentum, Keltner Lower). IBIT-006 Att2 remains global optimum (8 experiments, 24+ attempts).
 -->
 ## AI Agent 快速索引
 
@@ -12,7 +12,7 @@
 - A/B 訊號比 1.33:1（合格，差距 25%）
 - A/B 累計差 66%（仍 >30%，IBIT 資料限制下難克服）
 
-**前任最佳：** IBIT-001（回檔 12-22% + WR(10) ≤ -80 + 冷卻 15 天，Part A Sharpe 0.15，Part B Sharpe 0.37）（7 次實驗、21+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢回檔、短期動量、gap-down 反轉、Keltner 下軌七大策略類型）
+**前任最佳：** IBIT-001（回檔 12-22% + WR(10) ≤ -80 + 冷卻 15 天，Part A Sharpe 0.15，Part B Sharpe 0.37）（8 次實驗、24+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢回檔、短期動量、gap-down 反轉、Keltner 下軌、Range Expansion Climax 八大策略類型）
 **滾動窗口分析摘要：** IBIT-001 數據不足（僅 2 窗口，無法評估漸變性，需待更多歷史數據）
 
 **已證明無效（禁止重複嘗試）：**
@@ -37,6 +37,11 @@
   - Att2（Att1 + WR(10) ≤ -80 + Pullback -10%）：**訊號集與 Att1 完全相同**——Keltner 觸發已隱含 WR/深回檔，額外過濾器非綁定
   - Att3（Keltner 2.5×ATR + WR(5) ≤ -80）：Part A 0 訊號（過嚴）、Part B 1 訊號零方差。訊號樣本過薄
   - **核心失敗**：Keltner Lower Band 基於 EMA/ATR 偏離，無法捕捉「盤外拋壓完成 → 美股盤中撿便宜」的結構性不對稱；高波動下 Keltner 門檻無兩全（2.0×ATR 過淺、2.5×ATR 過深）。**Keltner MR 在 GLD-005（1.12% vol）成功無法移植至 IBIT（3.17% vol）**——低波動慢磨下跌觸發後常反彈，高波動加密觸發後常續跌
+- **單日 Range Expansion Climax 均值回歸（IBIT-008，repo 首次單日 TR 爆發作為主訊號，3 次嘗試全部失敗）**：
+  - Att1（TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10d 回檔 [-6%,-20%] + WR(10) ≤ -70，cd=10）：Part A n=1 TP +4.50% 零方差 Sharpe 0.00 / Part B n=1 SL -4.14% Sharpe 0.00 / min 0.00。訊號觸發率僅 0.4%（500 交易日共 2 訊號），樣本不足以評估策略有效性
+  - Att2（放寬 TR→1.5 + ClosePos→40%）：Part A n=1（**不變**）/ Part B n=4 WR 25% cum -7.95% Sharpe -0.53 / min -0.53。pullback/WR 為 Part A 綁定條件（2024 bull regime 少深回檔），放寬 TR/ClosePos 無新增觸發；Part B 2025 bear regime 放寬後新增 3/3 停損為 bear rally dead-cat bounce
+  - Att3（保留嚴格 TR 2.0/ClosePos 50% + 放寬 pullback→-4%/WR→-65）：Part A n=1 / Part B n=1 **與 Att1 完全相同**——證實 TR ≥ 2×ATR + ClosePos ≥ 50% 本身已隱含深回檔與極端超賣，pullback/WR 為**完全非綁定**
+  - **核心失敗**：(1) IBIT 2-year 歷史 + 3.17% vol 下「TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50%」年觸發僅 1 次，訊號結構性稀疏；(2) Range Expansion + ClosePos 無「真/假反轉」區分力（lesson #20b 失敗家族擴展至 range-expansion climax 指標）；(3) 與 Gap-Down 結構性不同——Range Expansion 缺乏「overnight flushout 完成」前置條件，在 BTC 24/7 連續交易的 bear regime 中產生假訊號。**Repo 首次單日 Range Expansion 主訊號試驗**（TLT-006 曾作輔助過濾，非主訊號）。跨資產假設（待驗證）：Range Expansion MR 可能適用傳統（非 24/7）美股板塊 ETF（CIBR/XBI），因無 overnight gap 結構使 range expansion 成為唯一 capitulation 主訊號
 
 **已掃描的參數空間：**
 - 進場條件：回檔 12~15% + 上限 22~25% + WR(10) ≤ -80 + 冷卻 10~20 天 + RSI(2) < 12~15 + 2日跌幅 ≤ -5% + ATR(5)/ATR(20) > 1.0~1.05 + Gap<=-1.5% + 日內反轉（Close>Open）
@@ -44,7 +49,7 @@
 - 出場參數：TP +4.5~8% / SL -4~-9% / 持倉 15~20 天
 - SL 完整掃描：-4%（IBIT-006 緊 SL，唯一搭配 gap-down 有效）、-5.5%（過緊）、-6%（過緊）、-7%（IBIT-001 最佳）、-8%（過寬，IBIT-005 Att3）、-9%（過寬）
 - TP 完整掃描：+4.5%（IBIT-006 新最佳，捕捉多日反彈）、+5%（IBIT-001 最佳）、+6%+（使 Part B 多筆達標交易翻轉為到期/停損）
-- 策略類型：均值回歸（IBIT-001/002）、波動率自適應（IBIT-004 Att1/2）、2日急跌過濾（IBIT-004 Att3）、BB 擠壓突破（IBIT-003 Att1）、趨勢動量回檔（Att2）、RSI(5) 趨勢回檔（Att3）、短期動量（IBIT-005 Att2）、**Gap-Down 資本化反轉**（IBIT-006 Att2 新最佳）、Keltner 下軌均值回歸（IBIT-007 三次嘗試全部失敗）
+- 策略類型：均值回歸（IBIT-001/002）、波動率自適應（IBIT-004 Att1/2）、2日急跌過濾（IBIT-004 Att3）、BB 擠壓突破（IBIT-003 Att1）、趨勢動量回檔（Att2）、RSI(5) 趨勢回檔（Att3）、短期動量（IBIT-005 Att2）、**Gap-Down 資本化反轉**（IBIT-006 Att2 新最佳）、Keltner 下軌均值回歸（IBIT-007 三次嘗試全部失敗）、單日 Range Expansion Climax 均值回歸（IBIT-008 三次嘗試全部失敗）
 - 當前全域最佳：Gap<=-1.5% + Close>Open + 回檔 12-25% + WR<=-80 + 冷卻 10 天 + TP +4.5% / SL -4%（WR 75%/66.7%, min 0.40）
 - 前任最佳：回檔 12-22% + WR-80 + 冷卻 15 天 + TP +5% / SL -7%（WR 60%/75%, min 0.15）
 - 冷卻 15 天是關鍵：將 Part B 從 -4.63% 翻轉至 +7.50%（阻斷下跌趨勢中的連續進場）
@@ -61,6 +66,7 @@
 - ~~冷卻 20 天~~ → IBIT-005 Att1 已驗證（20日回看+20日冷卻，Part B -0.38）
 - ~~Gap-Down 資本化反轉進場~~ → IBIT-006 Att2 驗證為新最佳（min 0.40，+167%）
 - ~~Keltner 下軌均值回歸~~ → IBIT-007 驗證失敗（3 次嘗試，Keltner 無法複製 gap-down 結構）
+- ~~單日 Range Expansion Climax 均值回歸~~ → IBIT-008 驗證失敗（3 次嘗試，訊號結構性稀疏 + 無真/假反轉區分力）
 - Donchian 突破（已知在 TSLA-006 失敗，且 IBIT 數據不足難以評估）
 
 **關鍵資產特性：**
@@ -77,6 +83,7 @@
 - **IBIT 高波動下出場設計的兩種可行範式**：
   - IBIT-001 框架：寬 SL -7%、TP +5%、長持倉 15 天、長冷卻 15 天——靠冷卻期阻斷下跌趨勢連續進場
   - IBIT-006 框架：緊 SL -4%、TP +4.5%、短冷卻 10 天——靠進場品質過濾避免持續下跌訊號
+- **單日 Range Expansion Climax 在 IBIT 結構性不可行（IBIT-008 驗證）**：TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% 年觸發僅 1 次，無法產生統計樣本；放寬 TR/ClosePos 引入 bear rally dead-cat bounces；放寬 pullback/WR 對訊號集非綁定。此失敗與 Keltner Lower（IBIT-007）同屬「單日反轉確認無法在 24/7 連續標的的 bear regime 區分真假反轉」類別
 <!-- AI_CONTEXT_END -->
 
 # IBIT 實驗總覽 (IBIT Experiments Overview)

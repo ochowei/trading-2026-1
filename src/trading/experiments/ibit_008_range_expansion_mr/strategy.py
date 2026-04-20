@@ -33,8 +33,7 @@ class IBIT008Strategy(ExecutionModelStrategy):
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
         if isinstance(config, IBIT008Config):
             print(
-                f"  Range Expansion: TR / ATR({config.atr_period}) >= "
-                f"{config.tr_ratio_threshold}"
+                f"  Range Expansion: TR / ATR({config.atr_period}) >= {config.tr_ratio_threshold}"
             )
             print(f"  Close Position: ClosePos >= {config.close_pos_threshold:.0%}")
             print(
