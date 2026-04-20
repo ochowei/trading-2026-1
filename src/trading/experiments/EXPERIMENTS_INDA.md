@@ -1,16 +1,18 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-20
   data_through: 2025-12-31
+  note: INDA-009 added 2026-04-20 (CCI Oversold Reversal MR, repo first CCI trial). Three iterations all failed vs INDA-005 Att3 min 0.23: Att1 (CCI≤-100 baseline + Close>Open) Part A 21/61.9%/0.09 / Part B 9/44.4%/-0.46 — CCI turn-up fires repeatedly during 2024-2025 INDA post-peak slow-melt decline, 4/9 immediate SLs; Att2 (CCI≤-150 + ClosePos≥40%) Part A 9/55.6%/0.05 / Part B 3/66.7%/-0.03 — tightening reduces signals Part A 21→9, Part B 9→3, but filters out more winners than losers (Part A Sharpe drops 0.09→0.05), 1.5 signals/yr too sparse; Att3 (CCI≤-100 + ClosePos + Pullback≥2.5%) Part A 17/58.8%/0.06 / Part B 9/44.4%/-0.46 — core insight: Part B signals all already carry ≥2.5% pullback (decline regime), making pullback floor filter zero-effect on Part B while removing 4 Part A signals. Repo first CCI trial — extends lesson #20b failure family (V-bounce ≠ genuine reversal): CCI turn-up from oversold shares the oscillator-hook failure mode of RSI Bullish Hook Divergence on post-peak persistent decline regimes (INDA 2024-2025 parallel to URA policy-driven, TLT rate-driven). Cross-asset hypothesis: CCI turn-up effective preconditions may require both Part A/B in active MR regime (not post-peak slow-melt). INDA's 9th failed strategy type (after pullback+WR saturated, RSI(2), BB Squeeze, 20d lookback, vol adaptive+2DD, RS momentum, BB lower+cap hybrid, CCI oscillator hook). INDA-005 Att3 remains global optimum (9 experiments, 28+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** INDA-005 Att3（出場優化均值回歸：10日回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15 + 2日跌幅≤-1.0%，TP +3.5%/SL -4.0%/15天）（8 次實驗、25 次嘗試，**參數空間已完全飽和**）
+**當前最佳：** INDA-005 Att3（出場優化均值回歸：10日回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15 + 2日跌幅≤-1.0%，TP +3.5%/SL -4.0%/15天）（9 次實驗、28+ 次嘗試，**參數空間與策略類型均已飽和**）
 - Part A Sharpe: 0.23 | Part B Sharpe: 0.31 | min(A,B): 0.23
 - Part A: 13 訊號（2.6/年）, WR 69.2%, 累計 +9.68%
 - Part B: 7 訊號（3.5/年）, WR 57.1%, 累計 +6.46%
 - vs INDA-002 Att1: min(A,B) 0.15 → 0.23（+53%），Part B Sharpe 0.15 → 0.31（+107%）
 - 關鍵改善：持倉 20→15天減少到期虧損曝露（Part B 到期 -3.18%/-1.77%→-2.63%/-0.42%）
 - INDA-008（BB 下軌+回檔上限混合進場）三次迭代均失敗，確認混合模式不適用 INDA 0.97% vol
+- **INDA-009（CCI 超賣轉折 MR，repo 首次 CCI 試驗）三次迭代均失敗**（min -0.46/-0.03/-0.46），確認 oscillator hook 結構在 INDA 2024-2025 持續下跌 regime 失效
 
 **已證明無效（禁止重複嘗試）：**
 - 追蹤停損 + ATR 過濾組合（INDA-002 Att2）— 追蹤停損壓縮獲利至 +1.1%，遠低於 TP +3.0%
@@ -29,6 +31,11 @@
 - **深回檔 4-7%（INDA-006 Att3）— Part A 0.22，Part B 僅 4 訊號太薄，A/B 比 2.5:1**
 - **RS 動量 INDA vs EEM（INDA-007 Att1~3）— 極端市場狀態依賴。Part A -0.49~0.07 / Part B 0.00~∞，三次嘗試（RS 2~3%、ATR 1.10~1.15）均失敗**
 - **BB 下軌+回檔上限混合進場（INDA-008 Att1~3）— 三次迭代均未勝過 INDA-005。Att1 BB(20,2.0)+cap-7% min 0.20；Att2 BB(20,1.5)+cap-7% min -0.04（Part A 翻負）；Att3 BB(20,1.8)+cap-6% min -0.25。確認混合進場模式在 INDA 0.97% vol 下失效，BB 自適應機制在極低波動下不比固定 3-7% 回檔門檻優越**
+- **CCI 超賣轉折均值回歸（INDA-009 Att1~3，repo 首次 CCI 試驗，三次迭代均失敗）**
+  - Att1 (CCI(20)≤-100 + 轉折 + Close>Open, cd=10)：Part A 21 訊號 WR 61.9% Sharpe 0.09 / Part B 9 訊號 WR 44.4% Sharpe **-0.46**，min(A,B) -0.46（A/B 訊號比 2.33:1 過高）
+  - Att2 (加嚴 CCI≤-150 + ClosePos≥40%)：Part A 9 訊號 WR 55.6% Sharpe 0.05 / Part B 3 訊號 WR 66.7% Sharpe **-0.03**，min(A,B) -0.03（樣本過薄 1.5/yr、A/B 比 3.0:1）
+  - Att3 (放寬 CCI≤-100 + ClosePos + Pullback≥2.5%)：Part A 17/58.8%/0.06 / Part B 9/44.4%/**-0.46**，min(A,B) -0.46（Pullback 下限對 Part B 零效果——下跌 regime 中訊號本就在深 pullback 中）
+  - 失敗根因：INDA 2024-2025 Part B 處於後峰持續下跌 regime，CCI 長期停留超賣區，每次迷你反彈觸發 turn-up 後續跌停損。CCI 加嚴無法改善（過濾贏家多於輸家），pullback 下限無作用（冗餘條件）。**確認 lesson #20b oscillator hook 失敗家族擴展至 CCI 指標**：與 RSI Bullish Hook Divergence（URA-008/TLT-006）、Day-After Capitulation（URA-009/TLT-006）同屬「V-bounce ≠ genuine reversal」失敗模式
 
 **已掃描的參數空間：**
 - INDA-001 基礎版：回檔 ≥3% + WR ≤-80 + ClosePos ≥40% + 追蹤停損（TP +3.0%/SL -3.5%）→ min 0.03
@@ -49,6 +56,9 @@
 - INDA-008 Att1：BB(20,2.0) + cap-7% + WR+ClosePos+ATR + cd7 → min 0.20（BB 過嚴 7/4 訊號）
 - INDA-008 Att2：BB(20,1.5) + cap-7% → min -0.04（Part A 假訊號翻負）
 - INDA-008 Att3：BB(20,1.8) + cap-6% → min -0.25（中間無法兩全）
+- INDA-009 Att1：CCI(20)≤-100 + 轉折 + Close>Open + cd10 → min -0.46（Part B 9/44.4% 連續停損）
+- INDA-009 Att2：CCI(20)≤-150 + 轉折 + Close>Open + ClosePos≥40% + cd10 → min -0.03（Part A 9/55.6% Sharpe 劣化）
+- INDA-009 Att3：CCI(20)≤-100 + 轉折 + Close>Open + ClosePos + Pullback≥2.5% + cd10 → min -0.46（pullback 下限對 Part B 冗餘）
 
 **尚未嘗試的方向（參數空間已飽和，預期邊際效益極低）：**
 - ~~RSI(2)~~ → INDA-004 Att1 驗證失敗
@@ -61,6 +71,7 @@
 - ~~深回檔 4%~~ → INDA-006 Att3 驗證過嚴
 - ~~RS 動量 INDA vs EEM~~ → INDA-007 驗證失敗（3 次嘗試，極端市場狀態依賴）
 - ~~BB 下軌+回檔上限混合進場~~ → INDA-008 驗證失敗（3 次嘗試，BB 在 0.97% vol 過嚴或過鬆均失敗）
+- ~~CCI 超賣轉折均值回歸~~ → INDA-009 驗證失敗（3 次嘗試，CCI hook 在後峰下跌 regime 無區分力）
 - SL -4.5%（更寬 SL）— 可能允許止損交易恢復，但風險增加止損虧損額
 
 **關鍵資產特性：**
@@ -74,6 +85,7 @@
 - **回檔門檻 3% 為最優**：4% 過嚴（INDA-006 Att3），10日回檔是核心進場訊號
 - BB Squeeze 突破、RSI(2)、20日回看均無效
 - **BB 下軌+回檔上限混合進場在 INDA 失效（INDA-008 驗證）**：INDA 0.97% vol 低於混合模式已驗證下邊界（EWJ 1.15% / VGK 1.12% 為已成功最低 vol）。BB 帶寬在極低波動下對訊號品質極敏感：2.0σ 過嚴（訊號降至 7/4）、1.5σ 過鬆（Part A 品質稀釋）、1.8σ 中間兩端均不如。確認混合進場模式有效邊界：日波動 1.12% ≤ vol ≤ 1.75%（VGK 下限，EWZ 上限）
+- **CCI 超賣轉折均值回歸在 INDA 失效（INDA-009 驗證，repo 首次 CCI 試驗）**：三次迭代（CCI<-100 baseline、CCI<-150 + ClosePos、CCI<-100 + ClosePos + Pullback≥2.5%）min(A,B) 僅 -0.46/-0.03/-0.46，均遠低於 INDA-005 Att3 的 0.23。失敗根因：(a) INDA 2024-2025 Part B 處於後峰持續下跌 regime（peak ~58 → low ~45），CCI(20) 長期停留超賣區域，每次迷你反彈觸發 turn-up 後續跌停損（Part B 9/9 訊號：4 SL + 2 到期虧損 + 1 淺利到期 + 1 TP + 1 擴大虧損到期）；(b) 加嚴 CCI 至 -150（Att2）雖降低假訊號但同時損失 13/21 Part A 好訊號，Sharpe 反從 0.09→0.05；(c) 加入 Pullback≥2.5% 下限（Att3）對 Part B 零效果，下跌 regime 中所有訊號已天然伴隨深 pullback。**確認 lesson #20b oscillator hook 失敗家族擴展至 CCI 指標**：CCI turn-up 與 RSI Bullish Hook Divergence（URA-008 核能政策、TLT-006 利率政策）、Day-After Capitulation（URA-009/TLT-006）同屬「V-bounce ≠ genuine reversal」失敗模式，有效先決條件推斷：Part A/B 兩段皆需活躍 MR regime，INDA 2024-2025 post-peak slow-melt 自動違反
 - 受印度經濟增長、盧比匯率、外資流向等因素影響
 - 高流動性 ETF，滑價假設 0.1%
 <!-- AI_CONTEXT_END -->
@@ -99,6 +111,7 @@
 | INDA-006  | `inda_006_exit_optimized_mr`   | 進場/出場參數優化（12天持倉/移除ClosePos/深回檔，3次嘗試） | 已完成（未超越）|
 | INDA-007  | `inda_007_rs_momentum`         | RS 動量回調（INDA vs EEM 相對強度，3次嘗試）                | 已完成（失敗）|
 | INDA-008  | `inda_008_bb_lower_pullback_cap` | BB 下軌+回檔上限混合進場（3 次嘗試）                       | 已完成（失敗）|
+| INDA-009  | `inda_009_cci_oversold_mr`     | CCI 超賣轉折均值回歸（repo 首次 CCI 試驗，3 次嘗試）          | 已完成（失敗）|
 
 ---
 
@@ -759,3 +772,85 @@ INDA 日波動 0.97%，為目前混合進場模式驗證成功資產中波動最
 - 上邊界：EWZ 1.75% 成功，XBI 2.0% 失敗（XBI-010 驗證）
 
 **確認 INDA-005 Att3 為 INDA 全域最優**（8 次實驗、25 次嘗試）
+
+---
+
+## INDA-009：CCI 超賣轉折均值回歸（repo 首次 CCI 試驗）
+
+### 目標 (Goal)
+
+INDA-005 Att3 pullback+WR 框架已飽和（INDA-006~008 三次迭代類型均失敗），測試
+repo 中尚未使用的 Commodity Channel Index (CCI) 指標作為均值回歸進場主訊號。
+
+**CCI 與現有指標的結構差異：**
+- CCI 使用 Mean Absolute Deviation (MAD) 量化 Typical Price 偏離 SMA
+- BB 使用 std（std 比 MAD 對極端值敏感 ~1.25x，CCI 理論上更穩健）
+- RSI 使用 gains/losses 比率（有界 0-100，飽和後無區分力）
+- CCI 無界可達 ±300+，-100/-200 為傳統「超賣/極端超賣」分界
+
+### 進場條件
+
+| # | 條件 | 指標 | Att1 | Att2 | Att3 |
+|---|------|------|------|------|------|
+| 1 | 深度超賣 | CCI(20) | ≤ -100 | **≤ -150** | ≤ -100 |
+| 2 | 轉折確認 | 今日 CCI - 過去 2 日最低 | ≥ 0 | ≥ 0 | ≥ 0 |
+| 3 | 反轉 K 線 | Close > Open | ✓ | ✓ | ✓ |
+| 4 | 日內反轉強度 | ClosePos | — | **≥ 40%** | ≥ 40% |
+| 5 | 回檔下限 | 10日高點回檔 | — | — | **≤ -2.5%** |
+| 6 | 冷卻期 | — | 10 天 | 10 天 | 10 天 |
+
+### 出場參數（三次迭代一致）
+
+| 參數 | 值 |
+|------|-----|
+| 獲利目標 (TP) | +3.5% |
+| 停損 (SL) | -4.0% |
+| 最長持倉 | 15 天 |
+| 追蹤停損 | 無 |
+
+（沿用 INDA-005 Att3 驗證有效的出場甜蜜點）
+
+### 成交模型 (Execution Model)
+
+同 INDA-005 標準：隔日開盤市價進場、限價賣單止盈、停損市價 GTC、到期隔日開盤市價、
+滑價 0.1%、悲觀認定。
+
+### 回測結果 (Backtest Results)
+
+| 指標 | Att1 | Att2 | Att3 | INDA-005 Att3 (基線) |
+|------|------|------|------|---------------------|
+| Part A 訊號 | 21 | 9 | 17 | 13 |
+| Part A WR | 61.9% | 55.6% | 58.8% | 69.2% |
+| Part A 累計 | +5.78% | +1.16% | +2.60% | +9.68% |
+| Part A Sharpe | **0.09** | 0.05 | 0.06 | 0.23 |
+| Part B 訊號 | 9 | 3 | 9 | 7 |
+| Part B WR | 44.4% | 66.7% | 44.4% | 57.1% |
+| Part B 累計 | -11.47% | -0.41% | -11.47% | +6.46% |
+| Part B Sharpe | **-0.46** | **-0.03** | **-0.46** | 0.31 |
+| min(A,B) | -0.46 | -0.03 | -0.46 | **0.23** |
+| A/B 訊號比 | 2.33:1 | 3.0:1 | 1.89:1 | 1.86:1 |
+
+### 失敗分析
+
+**Att1 (CCI<-100 baseline):** Part B 2024-2025 INDA 後峰持續下跌 regime（peak ~58 → ~45），CCI 長期停留超賣區，每次迷你反彈觸發 turn-up 後續跌停損。4/9 Part B 訊號直接停損，2 筆到期虧損。
+
+**Att2 (CCI<-150 加嚴):** 加嚴使訊號大幅減少（Part A 21→9, Part B 9→3），但 Part A Sharpe 反從 0.09 降至 0.05——過濾掉的好訊號多於壞訊號。Part B 樣本過薄 1.5/yr 且累計仍為負。A/B 訊號比惡化至 3.0:1。
+
+**Att3 (CCI<-100 + Pullback 下限):** 核心洞察——Part B 所有 CCI<-100 轉折訊號天然伴隨 ≥2.5% 回檔（因 Part B 處於持續下跌期），故 pullback 下限過濾僅移除 Part A 4 筆訊號，對 Part B 9 筆完全無作用。結果與 Att1 Part B 完全相同。
+
+### 結論
+
+**CCI 超賣轉折均值回歸不適用 INDA**
+
+根本原因：
+1. **Regime 條件不足**：INDA 2024-2025 Part B 為後峰 slow-melt 下跌 regime，缺乏 mean reversion 動能，任何 oscillator turn-up 訊號均無法區分「真 capitulation 尾聲」與「連續下跌中的暫時反彈」
+2. **CCI 門檻兩端均失敗**：寬門檻（-100）引入大量 Part B 假訊號；嚴門檻（-150）削減 Part A 好訊號反而 Sharpe 劣化
+3. **過濾器冗餘**：ClosePos/Close>Open/Pullback 下限無法改善核心問題——在連續下跌中 CCI turn-up 的結構性假訊號
+
+**跨資產貢獻（repo 首次 CCI 試驗）：**
+- 失敗模式與 lesson #20b（RSI Bullish Hook Divergence 在政策驅動資產失敗）平行
+- URA-008（核能政策）、TLT-006（利率政策）、INDA-009（low-vol slow-melt regime）共同揭示：**任何 oscillator hook 訊號（RSI/CCI/Stoch turn-up）在「V-bounce ≠ genuine reversal」結構下均失效**
+- 推斷 CCI mean reversion 有效先決條件（類比 lesson #20b）：需兩段 Part A/B 皆活躍 MR regime，且非 post-peak secular decline
+
+**確認 INDA-005 Att3 維持為 INDA 全域最優**（9 次實驗、28+ 次嘗試）
+
