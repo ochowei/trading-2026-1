@@ -7,7 +7,8 @@ URA-010 訊號偵測器：Williams Vix Fix 資本化 + 回檔深度均值回歸
    - 表示當前 Low 相對近 N 日最高 Close 的折價達近期極值
 2. 10 日高點回檔 ≥ 8%（深回撤確認，過濾淺技術超賣）
 3. 回檔上限 ≤ 25%（隔離結構性崩盤）
-4. 冷卻期 10 個交易日
+4. 2 日跌幅 ≤ -3%（Att2 新增；確認近期急速恐慌而非緩慢漂移）
+5. 冷卻期 10 個交易日
 """
 
 import logging
@@ -47,6 +48,9 @@ class URA010SignalDetector(BaseSignalDetector):
         df["High_N"] = df["High"].rolling(pn).max()
         df["Pullback"] = (df["Close"] - df["High_N"]) / df["High_N"]
 
+        # 2 日跌幅
+        df["TwoDayDecline"] = df["Close"].pct_change(2)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -61,7 +65,10 @@ class URA010SignalDetector(BaseSignalDetector):
         # 條件三：回檔上限（隔離結構性崩盤）
         cond_upper = df["Pullback"] >= self.config.pullback_upper
 
-        df["Signal"] = cond_wvf & cond_pullback & cond_upper
+        # 條件四：2 日急跌（Att2 新增）
+        cond_decline = df["TwoDayDecline"] <= self.config.two_day_decline
+
+        df["Signal"] = cond_wvf & cond_pullback & cond_upper & cond_decline
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()

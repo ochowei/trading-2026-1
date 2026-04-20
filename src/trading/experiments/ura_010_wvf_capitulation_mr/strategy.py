@@ -40,5 +40,6 @@ class URA010WVFCapitulationStrategy(ExecutionModelStrategy):
                 f"  回檔範圍 (Pullback): {config.pullback_lookback} 日高點回檔"
                 f" {abs(config.pullback_threshold):.0%}-{abs(config.pullback_upper):.0%}"
             )
+            print(f"  2日跌幅 (2-Day Decline): ≤ {config.two_day_decline:.0%}")
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)

@@ -48,6 +48,9 @@ class URA010Config(ExperimentConfig):
     pullback_threshold: float = -0.08  # 10d 高點回檔 ≥ 8%
     pullback_upper: float = -0.25  # 回檔上限 25%（過濾結構性崩盤）
 
+    # 2 日急跌過濾（Att2 新增 — 沿用 URA-004 已驗證的恐慌過濾器）
+    two_day_decline: float = -0.03  # 2 日跌幅 ≤ -3%
+
     # 冷卻
     cooldown_days: int = 10
 
