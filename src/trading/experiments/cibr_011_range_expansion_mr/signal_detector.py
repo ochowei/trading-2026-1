@@ -2,13 +2,13 @@
 CIBR-011 訊號偵測器：單日 Range Expansion Climax + 日內反轉均值回歸
 (CIBR-011 Signal Detector: Single-bar Range Expansion Climax + Intraday Reversal MR)
 
-進場條件（六項同時成立 — Att2）：
-1. 今日 True Range / ATR(20) ≥ 1.7（Att2：放寬 climax 門檻以增加訊號）
+進場條件（六項同時成立 — Att3 反向 ATR）：
+1. 今日 True Range / ATR(20) ≥ 1.7（Att2 放寬保留）
 2. Close Position ≥ 50%（收盤價高於當日中點，強日內反轉）
 3. 10 日高點回檔 ≤ -3%（淺回檔以上）
-4. 10 日回檔 ≥ -8%（Att2：收窄崩盤上限以過濾 COVID 級事件）
+4. 10 日回檔 ≥ -10%（Att3 恢復原始上限）
 5. Williams %R(10) ≤ -70（超賣確認）
-6. ATR(5)/ATR(20) > 1.10（Att2 新增：capitulation regime 確認）
+6. ATR(5)/ATR(20) ≤ 1.10（Att3 反向：平靜 ATR + 單日爆發 = 真 capitulation）
 7. 冷卻期 8 個交易日
 
 True Range 定義（標準 Wilder 定義）：
@@ -70,9 +70,7 @@ class CIBR011SignalDetector(BaseSignalDetector):
         # ATR 波動率比率（Att2 新增：capitulation regime 過濾）
         df["ATR_fast"] = df["TR"].rolling(self.config.atr_fast).mean()
         df["ATR_slow"] = df["TR"].rolling(self.config.atr_slow).mean()
-        df["ATR_ratio"] = df["ATR_fast"] / df["ATR_slow"].where(
-            df["ATR_slow"] > 0, float("nan")
-        )
+        df["ATR_ratio"] = df["ATR_fast"] / df["ATR_slow"].where(df["ATR_slow"] > 0, float("nan"))
 
         return df
 
@@ -84,11 +82,10 @@ class CIBR011SignalDetector(BaseSignalDetector):
         cond_pullback = df["Pullback"] <= self.config.pullback_threshold
         cond_upper = df["Pullback"] >= self.config.pullback_upper
         cond_wr = df["WR"] <= self.config.wr_threshold
-        cond_atr = df["ATR_ratio"] > self.config.atr_ratio_threshold
+        # Att3 反向 ATR 過濾：平靜 ATR regime + 單日爆發為真 capitulation
+        cond_atr = df["ATR_ratio"] <= self.config.atr_ratio_max
 
-        df["Signal"] = (
-            cond_tr & cond_close_pos & cond_pullback & cond_upper & cond_wr & cond_atr
-        )
+        df["Signal"] = cond_tr & cond_close_pos & cond_pullback & cond_upper & cond_wr & cond_atr
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()
