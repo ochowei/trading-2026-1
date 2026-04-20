@@ -39,17 +39,75 @@ IBIT-008：單日 Range Expansion Climax 均值回歸配置
 
 迭代歷程（Iteration Log）：
 
-Att1（Baseline）—— 將於回測後填入
+Att1（Baseline）—— 嚴格 climax 定義
+    進場：TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10日回檔 [-6%, -20%] + WR(10) ≤ -70
+    出場：TP +4.5% / SL -4.0% / 15 天 / cd 10
+    結果：Part A n=1 WR 100% TP +4.50% 零方差 Sharpe 0.00；
+          Part B n=1 WR 0% SL -4.14% Sharpe 0.00；Part C n=0
+    min(A,B) 0.00，訊號觸發率僅 0.4%（500 交易日共 2 訊號）
+    失敗分析：TR ≥ 2.0×ATR(20) + ClosePos ≥ 50% 雙硬性過濾極嚴，
+        樣本不足以評估策略有效性。
 
-Att2（待決策）—— 將於 Att1 結果後決定調整方向
+Att2（放寬 TR 倍率與 ClosePos）—— 增加訊號頻率
+    進場：TR/ATR(20) ≥ 1.5 + ClosePos ≥ 40% + 其餘同 Att1
+    結果：Part A n=1（**不變！**）Sharpe 0.00；
+          Part B n=4 WR 25% cum -7.95% Sharpe **-0.53**；Part C n=1 SL
+    min(A,B) **-0.53**（顯著惡化）
+    失敗分析：(1) Part A 2024 bull regime 下 pullback/WR 為綁定條件，
+        TR/ClosePos 放寬無新增觸發；(2) Part B 2025 bear regime 下放寬
+        新增 3 訊號全停損——寬 range expansion + 40% ClosePos 在慢磨下跌
+        中捕捉「bear rally 假反彈」而非 true capitulation。Regime-dependent
+        雙極失敗：Part A 觸發不足、Part B 品質下降。
 
-Att3（待決策）—— 將於 Att2 結果後決定調整方向
+Att3（嚴格 climax + 放寬 pullback/WR）—— 保留核心主訊號、擴大 regime 候選
+    進場：TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10日回檔 [-4%, -20%] + WR(10) ≤ -65
+    結果：Part A n=1（**與 Att1 完全相同**）Sharpe 0.00；
+          Part B n=1（**與 Att1 完全相同**）Sharpe 0.00；Part C n=0
+    min(A,B) 0.00
+    失敗分析：放寬 pullback 至 -4% 與 WR 至 -65 對訊號集**完全非綁定**——
+        證實 TR/ATR ≥ 2.0 + ClosePos ≥ 50% 本身已隱含深回檔與極端超賣，
+        pullback/WR 為後置（redundant）過濾器。IBIT 在 2024-2025 全部 500
+        交易日僅 2 日滿足「單日 TR 爆發 + 強日內反轉」——這兩日分散於
+        Part A 與 Part B 的不同 regime，產生零方差或對立結果。
+
+總結（結論）：三次迭代均未超越 IBIT-006 Att2 的 min(A,B) 0.40。
+    **IBIT 第八次失敗的策略類型**（繼 MR pullback+WR、RSI(2)、BB 擠壓突破、
+    波動率自適應、2日急跌過濾、短期動量、Keltner Lower 之後）。
+
+    **Repo 首次單日 Range Expansion 主訊號試驗** 的核心失敗根因：
+
+    1. **訊號稀缺性**：TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% 要求「今日波幅為
+       近 20 日均值的 2 倍且收盤過中點」，在 IBIT（3.17% 日波動）上每年
+       觸發 ≤ 1-2 次。放寬 TR 至 1.5 擴大 Part B 觸發但全為假反彈停損
+       （Att2 證實）；保留 TR 2.0 但放寬其他過濾條件為**非綁定**（Att3 證實）。
+       Range Expansion Climax 模式無法在 IBIT 的兩年半數據下產生統計意義
+       樣本。
+
+    2. **Range Expansion 本身無「真/假反轉」區分力**：ClosePos ≥ 50% 在單日
+       爆發中無法區分「capitulation 買家接回」與「賣壓暫歇後繼續」。Att2
+       在 Part B 的 3 筆 SL 訊號（2025 年）皆為 bear rally dead-cat bounce
+       後的續跌，與 cross-asset lesson #20b 失敗家族一致——**單日 price-action
+       反轉確認在 post-peak/bear regime 結構性無效**。
+
+    3. **與 Gap-Down 結構性差異**：IBIT-006 Att2 Gap-Down 捕捉「盤外連續
+       交易 → 美股盤中撿便宜」的特殊結構性不對稱；Range Expansion 僅捕捉
+       「盤中劇烈波動 + 日內反轉」，缺乏 gap 的「overnight flushout 完成」
+       前置條件。Range Expansion 在傳統（非 24/7 連續標的）市場可能更
+       有效，因為隔夜 gap 不構成主要 capitulation 結構。
+
+    **跨資產啟示（待進一步驗證）**：
+    - Range Expansion Climax（TR/ATR 單日爆發）作為 MR 主訊號在高波動
+      24/7 連續標的（加密 ETF）上訊號過稀疏。
+    - 可能適用資產（假設）：傳統美股板塊 ETF（CIBR、XBI）於事件日
+      單日爆發後，因無 overnight gap 結構，range expansion 可能為
+      capitulation 主要訊號。待驗證。
+    - 對於 IBIT，**IBIT-006 Att2 Gap-Down Capitulation + Intraday Reversal
+      仍為全域最優**（8 次實驗、24+ 次嘗試）。
 
 資產特性：IBIT 日波動 3.17%，GLD 比率 2.64x。
-    Att1 參數：
-    進場：TR / ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10日回檔 [-6%, -20%]
-         + WR(10) ≤ -70
-    出場：TP +4.5% / SL -4.0% / 最長持倉 15 天（IBIT-006 Att2 甜蜜點）
+    最終參數（Att3）：
+    進場：TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10 日回檔 [-4%, -20%] + WR(10) ≤ -65
+    出場：TP +4.5% / SL -4.0% / 最長持倉 15 天
     冷卻：10 天
     無追蹤停損（日波動 3.17% 禁用區域，cross-asset lesson #2）
 """
@@ -63,21 +121,21 @@ from trading.core.base_config import ExperimentConfig
 class IBIT008Config(ExperimentConfig):
     """IBIT-008 Range Expansion Climax 均值回歸參數"""
 
-    # Range Expansion 主訊號（Att2：放寬 TR 倍率以增加訊號頻率）
+    # Range Expansion 主訊號（Att3：回到嚴格 climax 定義）
     atr_period: int = 20  # ATR 基準期
-    tr_ratio_threshold: float = 1.5  # Att2：今日 TR / ATR(20) ≥ 1.5（由 2.0 放寬）
+    tr_ratio_threshold: float = 2.0  # Att3：TR/ATR(20) ≥ 2.0（恢復嚴格 climax）
 
-    # 日內反轉確認（Att2：放寬 ClosePos 至 40%）
-    close_pos_threshold: float = 0.40  # Att2：ClosePos ≥ 40%（由 50% 放寬）
+    # 日內反轉確認（Att3：ClosePos 50% 強日內反轉）
+    close_pos_threshold: float = 0.50  # Att3：ClosePos ≥ 50%（恢復嚴格）
 
-    # 回檔深度過濾（避免牛市高點 range expansion 的續跌）
+    # 回檔深度過濾（Att3：放寬 pullback 至 -4% 以增加 Part A 候選）
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.06  # 10 日回檔 ≤ -6%
+    pullback_threshold: float = -0.04  # Att3：10 日回檔 ≤ -4%（由 -6% 放寬）
     pullback_upper: float = -0.20  # 回檔上限 -20%（過濾崩盤極端）
 
-    # Williams %R 超賣確認
+    # Williams %R 超賣確認（Att3：放寬 WR 至 -65）
     wr_period: int = 10
-    wr_threshold: float = -70.0  # WR(10) ≤ -70
+    wr_threshold: float = -65.0  # Att3：WR(10) ≤ -65（由 -70 放寬）
 
     # 冷卻
     cooldown_days: int = 10
