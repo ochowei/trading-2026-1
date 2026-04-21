@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-18
+  last_validated: 2026-04-21
   data_through: 2025-12-31
-  note: FCX-009 added 2026-04-18 (RSI Bullish Hook Divergence + Pullback+WR MR, cross-asset test from SIVR-015 Att1). Three iterations: Att1 (delta=3) min -0.33, Att2 (delta=5) min -0.06, Att3 (delta=5 + pullback -11%) min 0.30. Part A Sharpe 0.51→0.76→0.85 progression confirmed hook filter improves Part A quality dramatically, but Part B collapses to 2 signals in 2024-2025 post-peak copper weakness, failing to beat FCX-001's min 0.43. Confirms pattern 20b boundary: requires Part B active mean reversion regime (FCX 2024-2025 entered prolonged post-peak decline, lacking reversal follow-through).
+  note: FCX-010 added 2026-04-21 (Gap-Down Capitulation + Intraday Reversal MR, **repo first single-stock Gap-Down trial**, cross-asset test from IBIT-006 Att2). Three iterations all failed vs FCX-001 min 0.43: Att1 (Gap<=-2.0% + Close>Open + 10d PB [-6%,-18%] + WR<=-80 + TP+5%/SL-4%/15d) Part A n=9 WR 55.6% cum +7.77% Sharpe 0.21 / Part B n=2 WR 100% zero-variance Sharpe 0.00 — 4 Part A SLs concentrated in 2019 trade war + 2023 SVB first-wave shocks (gap-down continues not capitulates); Att2 (+ ClosePos>=50% strong intraday reversal filter) Part A n=8 WR 62.5% cum +12.42% Sharpe 0.36 / Part B unchanged n=2 zero-variance — removes 1 weak-reversal SL (2023-02-24) but 3 policy-shock SLs remain; Att3 (tighten Gap<=-2.5% + pullback floor -8%) Part A n=5 WR 80% cum +16.52% Sharpe **0.87** (repo-first single-stock gap-down high Part A Sharpe) / Part B n=1 zero-variance Sharpe 0.00, A/B signal annualized ratio 2.0:1 and A/B cum gap 69.7% violate balance goals. **Repo first Gap-Down Capitulation trial on single stock** — extends lesson #20a failure family: Gap-Down pattern requires NOT JUST 24/7 overnight price discovery but ALSO selling-pressure exhaustion uncorrelated with daytime policy/commodity continuity. FCX (copper-linked high-vol stock) has LME/SHFE/COMEX near-24h futures coverage but copper price shocks (trade policy, USD, global demand) persist into US session, paralleling FXI-010's Chinese policy continuity failure. Failure family extended: TQQQ-016 (leveraged index ETF, QQQ non-24/7) + FXI-010 (policy-driven EM ETF) + FCX-010 (commodity-linked single stock) — all fail; only IBIT (pure BTC 24/7 ETF) validates. Cross-asset hypothesis (pending validation): Gap-Down MR may apply ONLY to pure-crypto ETFs (BTC/ETH spot), not to any US equity with macroeconomic/commodity exposure. FCX's 8th failed strategy type (after pullback+WR+ClosePos variants, momentum pullback, RS, Donchian, trend pullback, RSI divergence). FCX-001 remains global optimum (10 experiments, 30+ attempts).
 -->
 ## AI Agent 快速索引
 
@@ -75,17 +75,24 @@
 - **Att2**（加嚴 hook delta 3→5，其餘不變）：Part A Sharpe **0.76**（WR 77.8%, 9 訊號）/ Part B -0.06（WR 33.3%, 3 訊號）。成功濾除 2024-07 停損並轉為 2024-08 +8% 達標，Part A 跳升 +49%，但 Part B 仍受 2024-11/12 雙筆 20 天到期虧損拖累（FCX 2024 後半缺乏均值回歸動能）
 - **Att3**（加深 pullback -9%→-11%，delta=5）：Part A Sharpe **0.85**（WR 85.7%, 7 訊號）/ Part B 0.30（WR 50.0%, 2 訊號）。深 pullback 門檻濾除 Part B 2024-11 淺層假訊號，兩段均轉正但 min(A,B) 0.30 仍低於 FCX-001 的 0.43。A/B 累計差 39.24pp、訊號差 71.4% 均超出目標（30%/50%），Part B 僅 2 訊號樣本不足
 
+**FCX-010 實驗摘要（2026-04-21，3 次嘗試，全部未超越 FCX-001，**repo 首次 single-stock Gap-Down 試驗**）：**
+跨資產驗證 pattern 20a（IBIT-006 Att2 的 Gap-Down Capitulation + Intraday Reversal MR）。假設：FCX 作為銅礦股，其隔夜缺口反映銅期貨（LME/SHFE/COMEX）近 24 小時連續定價，結構類似 IBIT 的 BTC 24/7 隔夜拋壓 → 美股撿便宜模式。
+- **Att1**（Baseline: Gap<=-2.0% + Close>Open + 10d PB [-6%,-18%] + WR<=-80，TP+5%/SL-4%/15d/cd10）：Part A n=9 WR 55.6% cum +7.77% Sharpe **0.21** / Part B n=2 WR 100% zero-variance Sharpe 0.00，min(A,B) 0.00。4 筆 Part A SL 全為 1-3 日快速停損，集中於 2019-05-07（貿易戰升溫第一天）、2019-08-06（人民幣匯率衝擊）、2023-02-24、2023-03-14（SVB 銀行危機），均為「新事件衝擊第一波」或「次波衝擊」訊號，gap-down 後續跌而非反轉
+- **Att2**（+ ClosePos>=50% 強日內反轉過濾）：Part A n=8 WR 62.5% cum +12.42% Sharpe **0.36**（+71% vs Att1）/ Part B n=2 WR 100% zero-variance Sharpe 0.00（訊號集不變），min(A,B) 0.00。ClosePos 過濾器移除 1 筆 Part A SL（2023-02-24 的弱反轉）但 3 筆政策衝擊 SL（2019 兩筆 + 2023-03-14 SVB）保留，Part B 2024-2025 bull regime gap-down + 強反轉稀少
+- **Att3**（加嚴 Gap<=-2.5% + pullback floor -8%）：Part A n=5 WR 80% cum +16.52% Sharpe **0.87**（+142% vs Att2，repo 首見 single-stock gap-down 之 Part A 高 Sharpe）/ Part B n=1 WR 100% zero-variance Sharpe 0.00，min(A,B) 0.00。加嚴成功提升 Part A 品質但 Part B 崩至 1 訊號，A/B 訊號年化比 2.0:1、累計差 69.7% 均嚴重違反平衡目標
+
 **已證明無效（禁止重複嘗試）：**（更新）
 原有項目加上：
 - FCX-008 趨勢跟蹤：SMA 黃金交叉 + 回檔至 SMA(50) 在高波動週期股完全失敗（Part B WR 25%），趨勢反轉太劇烈
 - FCX-008 ATR 波動率自適應：ATR > 1.05 在 FCX 日波動 2-4% 下跨期不穩定（Part A 0.25 vs 基線 0.43），極端超賣條件本身就需要高波動才能觸發，ATR 對這些訊號的額外過濾力有限
 - FCX-008 2日急跌過濾：改善 Part B（0.74→1.26）但大幅減少 Part A 訊號（18→13），3 個被移除的勝利交易拖累 Part A Sharpe
 - FCX-009 RSI Bullish Hook Divergence：雖 Part A 大幅改善（0.85），但 Part B 2024-2025 銅價 post-peak 回檔期缺乏實質均值回歸動能，3 次迭代 Part B 訊號從 5→3→2 漸趨稀薄。確認 pattern 20b（SIVR-015）跨資產邊界：需 Part B 存在活躍的均值回歸 regime；FCX 2024 後半進入長期下行不適用
+- **FCX-010 Gap-Down Capitulation + Intraday Reversal MR（repo 首次 single-stock Gap-Down 試驗，3 次迭代全部失敗）**：跨資產移植 IBIT-006 Att2 模式。Att1（Gap<=-2.0% baseline）Part A Sharpe 0.21 / Part B zero-var 0.00 / min 0.00，4 筆 SL 集中政策衝擊日；Att2（+ ClosePos>=50%）Part A 0.36 / Part B 同 / min 0.00，移除弱反轉但保留政策衝擊 SL；Att3（Gap<=-2.5% + PB -8%）Part A Sharpe **0.87** / Part B n=1 零方差 / min 0.00，Part A 大幅改善但 Part B 崩潰。**核心失敗根因**：(1) 銅價衝擊（貿易政策、美元、全球需求預期）往往貫穿美股盤中持續發酵，與 FXI 中國政策持續性平行，gap-down 後常續跌而非反轉；(2) FCX 2024-2025 post-peak 銅週期缺乏 capitulation 事件，Part B 訊號結構性稀少；(3) 加嚴過濾器在 Part A 有效但在 Part B 導致樣本崩潰。**延伸 pattern 20a 失敗清單**：TQQQ-016（槓桿指數 ETF）+ FXI-010（政策驅動 EM ETF）+ FCX-010（商品連動個股）均失敗，目前僅 IBIT（純 BTC 24/7 ETF）驗證成功——結構性前提嚴格，不可跨類別泛化。跨資產假設（待驗證）：Gap-Down MR 可能僅適用「underlying 連續交易 + selling pressure 自然耗盡」的純加密類資產，不適用任何與宏觀政策/商品供需週期連動的美股
 
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - 加入銅價/HG 指標確認（減少 2022 熊市等大環境的誤判，但 cross-asset lesson #6 警告額外確認指標通常無效）
 - 引入追蹤停損（Trailing Stop）捕捉更大型的反彈（但 cross-asset lesson #2 警告日波動 2-4% 禁用 trailing stop）
-- FCX-001/004 已確認為全域最優（9 次實驗、36+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應、RSI bullish hook divergence 八大策略類型）
+- FCX-001/004 已確認為全域最優（10 次實驗、39+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應、RSI bullish hook divergence、**Gap-Down Capitulation** 九大策略類型）
 
 **關鍵資產特性：**
 - 高 Beta、週期性強，與銅價高度相關
@@ -117,6 +124,7 @@
 | FCX-007 | `fcx_007_donchian_breakout`   | Donchian 通道突破（3次嘗試均失敗） | 已完成 |
 | FCX-008 | `fcx_008_trend_pullback`      | 趨勢跟蹤→ATR自適應→2日急跌（3次嘗試，Att3 Part B 最佳但 min<FCX-001） | 已完成 |
 | FCX-009 | `fcx_009_rsi_divergence_mr`   | RSI Bullish Hook Divergence + Pullback+WR MR（3次嘗試均未超越 FCX-001） | 已完成 |
+| FCX-010 | `fcx_010_gap_reversal_mr`     | Gap-Down Capitulation + 日內反轉 MR（3次嘗試均未超越 FCX-001，repo 首次 single-stock Gap-Down 試驗） | 已完成 |
 
 ---
 
@@ -787,4 +795,14 @@ FCX-008 (趨勢跟蹤→ATR自適應→2日急跌) ← Att3 Part B 最佳但 min
   ├── Att1 (趨勢跟蹤：SMA黃金交叉+回測SMA50) → Part A -0.00 / Part B -0.63，趨勢反轉
   ├── Att2 (FCX-001 + ATR>1.05) → Part A 0.25 / Part B 0.82，ATR 移除好訊號
   └── Att3 (FCX-001 + 2日跌幅≤-5%) → Part A 0.31 / Part B 1.26，最佳 A/B 平衡
+
+FCX-009 (RSI(14) Bullish Hook Divergence + Pullback+WR) ← 全部失敗，跨資產 pattern 20b 驗證
+  ├── Att1 (pullback [-9%,-18%] + hook delta=3 / max_min=35) → Part A 0.51 / Part B -0.33
+  ├── Att2 (加嚴 delta=5) → Part A 0.76 / Part B -0.06，但 Part B 2024-11/12 雙筆到期
+  └── Att3 (加深 pullback -11%, delta=5) → Part A 0.85 / Part B 0.30 / min 0.30，A/B 累計差 39.24pp
+
+FCX-010 (Gap-Down Capitulation + 日內反轉) ← 全部失敗，**repo 首次 single-stock Gap-Down 試驗**
+  ├── Att1 (Gap<=-2.0% + Close>Open + PB [-6%,-18%] + WR) → Part A 0.21 / Part B n=2 零方差 / min 0.00
+  ├── Att2 (+ ClosePos>=50%) → Part A 0.36 / Part B 不變零方差 / min 0.00
+  └── Att3 (Gap<=-2.5% + PB -8%) → Part A **0.87** / Part B n=1 零方差 / min 0.00（A/B 訊號比 2.0:1 崩潰）
 ```
