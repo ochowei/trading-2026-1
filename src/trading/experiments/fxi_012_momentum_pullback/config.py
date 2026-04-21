@@ -24,12 +24,6 @@ FXI-012: Momentum Breakout Pullback Continuation (MBPC)
     Strategy direction: Momentum pullback continuation with Donchian breakout
     freshness filter, targeting FXI's stimulus-driven V-shape rallies
 
-    核心假設（Core Hypothesis）：
-    - FXI 政策刺激常觸發連續 20 日新高突破（2024 年 Q3 刺激、2025 年 Q1/Q3
-      刺激波均有此特徵）
-    - 突破後的淺層回檔（2-5%）到 SMA(20) 附近為高品質連續進場點
-    - 與 MR 框架互補：MR 抓 deep pullback，Momentum 抓 shallow pullback in trend
-
 成交模型（Execution Model）：
     - 進場：隔日開盤市價（next_open_market）
     - 止盈：限價賣單 Day（limit_order_day）
@@ -38,25 +32,49 @@ FXI-012: Momentum Breakout Pullback Continuation (MBPC)
     - 滑價：0.15%（FXI 為流動性較低的單一國家 EM ETF）
     - 悲觀認定：是
 
+迭代歷程（Iteration Log）：
+
 Att1（Baseline）—— Donchian 新高 + 淺回檔連續進場
     進場：
         1. 近 5 日內曾創 20 日新高（Donchian breakout freshness）
-        2. Close > SMA(50)（確認趨勢向上）
-        3. 當前 5 日高點回檔 2-5%（淺回檔，未失去動量）
-        4. RSI(14) ∈ [40, 60]（中性 — 非超買也非深度超賣）
-        5. 冷卻期 10 天
+        2. Close > SMA(50)
+        3. 5 日高點回檔 2-5%（淺回檔）
+        4. RSI(14) ∈ [40, 60]（中性）
+        5. 冷卻 10 天
     出場：TP +4.0% / SL -3.5% / 15 天
+    結果：
+        Part A: 26 訊號, WR 42.3%, 累計 -9.96%, Sharpe -0.09
+        Part B: 12 訊號, WR 58.3%, 累計 +9.42%, Sharpe 0.24
+        min(A,B): -0.09（遠低於 FXI-005 的 0.38）
+    失敗分析：
+        - Part A 2019-2023 中國熊市期產生大量假 Donchian 突破
+        - SMA(50) 單一趨勢過濾太寬鬆——熊市反彈中常被觸及
+        - Part B WR 58.3% 顯示策略在真正上升趨勢中有部分效用
 
-核心參數（Att1）：
-    pullback_lookback: 5 日（淺回檔框架，不同於 FXI-005 的 10 日深回檔）
+Att2（基於 Att1）—— 收緊趨勢 regime 過濾
+    調整：
+        - 新增 SMA(20) > SMA(50)（短中均線黃金排列，確認短期動能）
+        - RSI 範圍收緊 [45, 58]（排除過度回檔和超買邊界）
+        - 其他條件保持
+    預期效果：
+        - Part A 熊市反彈訊號將被 SMA(20)>SMA(50) 濾除
+        - Part B 真正上升趨勢保留
+        - 訊號總數減少但品質提升
+
+Att3（待定）：基於 Att2 結果微調
+
+核心參數（Att2 當前）：
+    pullback_lookback: 5 日
     pullback_min: -0.02（2% 淺回檔下限）
-    pullback_max: -0.05（5% 淺回檔上限，避免抓到真正破位訊號）
-    donchian_period: 20 日（標準 Donchian）
-    breakout_recency_days: 5（近 5 日內曾新高，動量仍活躍）
-    sma_trend_period: 50 日（中期趨勢過濾）
+    pullback_max: -0.05（5% 淺回檔上限）
+    donchian_period: 20 日
+    breakout_recency_days: 5
+    sma_short_period: 20（Att2 新增：短均線）
+    sma_trend_period: 50
+    require_sma20_above_sma50: True（Att2 新增：黃金排列）
     rsi_period: 14
-    rsi_min: 40（排除深度超賣——非 MR 進場）
-    rsi_max: 60（排除超買——避免追高）
+    rsi_min: 45（Att2 收緊）
+    rsi_max: 58（Att2 收緊）
     cooldown_days: 10
 """
 
@@ -67,7 +85,7 @@ from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class FXI012Config(ExperimentConfig):
-    """FXI-012 Momentum Breakout Pullback Continuation 參數（Att1 Baseline）"""
+    """FXI-012 Momentum Breakout Pullback Continuation 參數（Att2）"""
 
     # Donchian breakout freshness
     donchian_period: int = 20
@@ -78,13 +96,15 @@ class FXI012Config(ExperimentConfig):
     pullback_min: float = -0.02  # -2% 淺回檔下限
     pullback_max: float = -0.05  # -5% 淺回檔上限
 
-    # Trend filter
+    # Trend filter (Att2: 雙均線黃金排列)
+    sma_short_period: int = 20
     sma_trend_period: int = 50
+    require_sma20_above_sma50: bool = True
 
-    # RSI neutrality filter
+    # RSI neutrality filter (Att2: 收緊 [45, 58])
     rsi_period: int = 14
-    rsi_min: float = 40.0
-    rsi_max: float = 60.0
+    rsi_min: float = 45.0
+    rsi_max: float = 58.0
 
     # Cooldown
     cooldown_days: int = 10
@@ -99,5 +119,5 @@ def create_default_config() -> FXI012Config:
         data_start="2010-01-01",
         profit_target=0.04,  # +4.0%（動量連續中等目標）
         stop_loss=-0.035,  # -3.5%（淺回檔上方停損）
-        holding_days=15,  # 15 天（動量不延續應快速出場）
+        holding_days=15,  # 15 天
     )

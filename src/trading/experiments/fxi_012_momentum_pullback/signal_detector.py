@@ -1,12 +1,13 @@
 """
 FXI-012 Signal Detector: Momentum Breakout Pullback Continuation
 
-進場條件（五項同時成立 — Att1 Baseline）：
+進場條件（六項同時成立 — Att2）：
 1. 近 5 日內曾創 20 日 Donchian 新高（breakout freshness）
 2. Close > SMA(50)（確認中期趨勢向上）
-3. 當前 Close 相對於 5 日高點回檔 -2% 至 -5%（淺層回檔）
-4. RSI(14) ∈ [40, 60]（中性 — 非超買非深度超賣）
-5. 冷卻期 10 個交易日
+3. SMA(20) > SMA(50)（黃金排列，排除熊市反彈假突破）
+4. 當前 Close 相對於 5 日高點回檔 -2% 至 -5%（淺層回檔）
+5. RSI(14) ∈ [45, 58]（收緊：非深度超賣非超買邊界）
+6. 冷卻期 10 個交易日
 """
 
 import logging
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class FXI012SignalDetector(BaseSignalDetector):
-    """FXI-012：Donchian 新高 + 淺回檔 + SMA 趨勢 + RSI 中性 訊號偵測器"""
+    """FXI-012：Donchian 新高 + 淺回檔 + 雙均線黃金排列 + RSI 中性 訊號偵測器"""
 
     def __init__(self, config: FXI012Config):
         self.config = config
@@ -54,6 +55,9 @@ class FXI012SignalDetector(BaseSignalDetector):
         # SMA(50) 趨勢過濾
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
 
+        # SMA(20) 短均線（Att2：黃金排列過濾）
+        df["SMA_Short"] = df["Close"].rolling(self.config.sma_short_period).mean()
+
         # 5 日高點回檔（當前 Close 相對於 5 日高點）
         n = self.config.pullback_lookback
         df["High_N"] = df["High"].rolling(n).max()
@@ -69,6 +73,11 @@ class FXI012SignalDetector(BaseSignalDetector):
 
         cond_recent_new_high = df["RecentNewHigh"]
         cond_trend = df["Close"] > df["SMA_Trend"]
+        cond_golden = (
+            df["SMA_Short"] > df["SMA_Trend"]
+            if self.config.require_sma20_above_sma50
+            else pd.Series(True, index=df.index)
+        )
         cond_pullback_low = df["Pullback"] <= self.config.pullback_min
         cond_pullback_high = df["Pullback"] >= self.config.pullback_max
         cond_rsi_min = df["RSI"] >= self.config.rsi_min
@@ -77,6 +86,7 @@ class FXI012SignalDetector(BaseSignalDetector):
         df["Signal"] = (
             cond_recent_new_high
             & cond_trend
+            & cond_golden
             & cond_pullback_low
             & cond_pullback_high
             & cond_rsi_min

@@ -2,12 +2,13 @@
 FXI-012: Momentum Breakout Pullback Continuation Strategy
 (FXI 動量突破回檔連續進場策略)
 
-進場條件（五項 — Att1 Baseline）：
+進場條件（六項 — Att2）：
     1. 近 5 日內曾創 20 日 Donchian 新高
     2. Close > SMA(50)
-    3. 5 日高點回檔 -2% ~ -5%
-    4. RSI(14) ∈ [40, 60]
-    5. 冷卻 10 天
+    3. SMA(20) > SMA(50)（黃金排列）
+    4. 5 日高點回檔 -2% ~ -5%
+    5. RSI(14) ∈ [45, 58]
+    6. 冷卻 10 天
 
 出場：
     TP +4.0% / SL -3.5% / 15 天 / 成交模型
@@ -43,6 +44,10 @@ class FXI012Strategy(ExecutionModelStrategy):
                 f"(近 {config.breakout_recency_days} 日內)"
             )
             print(f"  趨勢過濾: Close > SMA({config.sma_trend_period})")
+            if config.require_sma20_above_sma50:
+                print(
+                    f"  黃金排列: SMA({config.sma_short_period}) > SMA({config.sma_trend_period})"
+                )
             print(
                 f"  淺回檔 (Pullback): {config.pullback_lookback} 日高點回檔 "
                 f"{abs(config.pullback_min):.0%}-{abs(config.pullback_max):.0%}"
