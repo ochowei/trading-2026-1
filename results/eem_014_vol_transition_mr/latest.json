@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-04-21T16:43:28.198965"
+    "execution_time": "2026-04-21T16:57:59.793055"
   },
   "part_a": {
     "ticker": "EEM",
-    "total_signals": 6,
+    "total_signals": 5,
     "wins": 4,
-    "win_rate": 0.6666666666666666,
-    "avg_return_pct": 0.97,
-    "std_return_pct": 2.88,
-    "cumulative_return_pct": 5.68,
-    "avg_holding_days": 9.0,
+    "win_rate": 0.8,
+    "avg_return_pct": 1.78,
+    "std_return_pct": 2.44,
+    "cumulative_return_pct": 9.06,
+    "avg_holding_days": 8.2,
     "max_drawdown_pct": -3.72,
-    "profit_factor": 1.94,
-    "sharpe_ratio": 0.34,
-    "sortino_ratio": 0.54,
-    "calmar_ratio": 0.26,
+    "profit_factor": 3.87,
+    "sharpe_ratio": 0.73,
+    "sortino_ratio": 1.28,
+    "calmar_ratio": 0.48,
     "max_consecutive_losses": 1,
     "target_exits": 4,
-    "stop_loss_exits": 2,
+    "stop_loss_exits": 1,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
@@ -76,20 +76,9 @@
         "holding_days": 18,
         "exit_type": "target",
         "max_drawdown_pct": -2.58
-      },
-      {
-        "date": "2021-11-30",
-        "entry_date": "2021-12-01",
-        "exit_date": "2021-12-20",
-        "entry": 44.38,
-        "exit": 43.01,
-        "return_pct": -3.1,
-        "holding_days": 13,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -3.69
       }
     ],
-    "filled_count": 6,
+    "filled_count": 5,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
