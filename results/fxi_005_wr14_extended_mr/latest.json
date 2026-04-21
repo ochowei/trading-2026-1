@@ -1,15 +1,15 @@
 {
   "metadata": {
-    "execution_time": "2026-04-16T03:24:59.629280"
+    "execution_time": "2026-04-21T00:46:06.817549"
   },
   "part_a": {
     "ticker": "FXI",
     "total_signals": 26,
     "wins": 17,
     "win_rate": 0.6538461538461539,
-    "avg_return_pct": 1.81,
+    "avg_return_pct": 1.82,
     "std_return_pct": 4.8,
-    "cumulative_return_pct": 54.97,
+    "cumulative_return_pct": 55.0,
     "avg_holding_days": 10.1,
     "max_drawdown_pct": -11.79,
     "profit_factor": 2.14,
@@ -72,7 +72,7 @@
         "exit_date": "2020-01-27",
         "entry": 37.39,
         "exit": 35.48,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 1,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -7.12
@@ -105,7 +105,7 @@
         "exit_date": "2020-09-25",
         "entry": 37.62,
         "exit": 35.7,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 12,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.94
@@ -160,7 +160,7 @@
         "exit_date": "2021-11-26",
         "entry": 36.33,
         "exit": 34.48,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 15,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.08
@@ -259,7 +259,7 @@
         "exit_date": "2023-02-17",
         "entry": 28.71,
         "exit": 27.25,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 8,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.08
@@ -476,7 +476,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-15"
+      "end": "2026-04-20"
     }
   }
 }
