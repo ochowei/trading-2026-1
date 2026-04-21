@@ -270,6 +270,7 @@ on:
           - "INDA-007: inda_007_rs_momentum"
           - "INDA-008: inda_008_bb_lower_pullback_cap"
           - "INDA-009: inda_009_cci_oversold_mr"
+          - "INDA-010: inda_010_vol_transition_mr"
 
 jobs:
   backtest:
