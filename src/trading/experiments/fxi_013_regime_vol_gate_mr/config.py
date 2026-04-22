@@ -69,7 +69,7 @@ class FXI013Config(ExperimentConfig):
     # FXI ~2.0% vol 為 TLT ~1.0% vol 的 2 倍，故預期需要較 TLT 寬鬆的門檻
     bb_period: int = 20
     bb_std: float = 2.0
-    max_bb_width_ratio: float = 0.08  # Att1 起點 8%（TLT-007 Att2 為 5%，FXI 為 TLT 2 倍 vol）
+    max_bb_width_ratio: float = 0.12  # Att2 放寬至 12%（Att1 8% 過嚴，僅 6/31 訊號通過）
 
     # 冷卻期（同 FXI-005）
     cooldown_days: int = 10
