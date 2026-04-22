@@ -1,11 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-19
+  last_validated: 2026-04-22
   data_through: 2025-12-31
-  note: XBI-012 added 2026-04-19 (Capitulation + Acceleration Reversal MR: Pullback(10) + ROC(3) + ClosePos + UpDay + WR). Three iterations all failed vs XBI-005 min 0.36. Att1 (ROC -4%, ClosePos 50%, UpDay) Part A 3/0.16 / Part B 3/0.16 — too restrictive, 0.6 yr signal. Att2 (ROC -3%, ClosePos 40%, UpDay) Part A 7/0.27 / Part B 3/0.16 — Part A improves +69% but Part B stuck because 2024-2025 XBI lacks ROC(3) ≤ -3% events. Att3 (ROC -3%, ClosePos 35%, no UpDay) Part A 21/0.18 / Part B 8/0.07 — signals triple but quality dilutes: UpDay filter confirmed essential. Extends XBI failure pattern list: short-term ROC acceleration + intraday recovery cannot distinguish genuine reversal from technical bounce on event-driven biotech ETF. XBI-005's pullback+WR+ClosePos 35% framework confirmed as structurally optimal for XBI 2.0% daily vol + FDA event-driven MR (12 experiments, 38+ attempts).
+  note: XBI-013 added 2026-04-22 (Gap-Down Capitulation + Intraday Reversal MR, **repo 第 5 次 Gap-Down 試驗，首次 US 板塊 ETF 測試**，cross-asset port from IBIT-006 Att2). Three iterations all failed vs XBI-005 min 0.36: Att1 (Gap ≤ -1.0% primary + Close>Open + 10d PB [-5%,-15%] + WR ≤ -80, TP +3.0%/SL -3.0%/15d) Part A 8/50% WR Sharpe **-0.02** cum -0.77%（4TP/4SL，全部 1-3 日出場）/ Part B 1/0% WR Sharpe 0.00 cum -3.10% / min **-0.02** — 生技 gap-down 為 FDA/臨床 negative news 續跌結構，非 IBIT 隔夜拋壓耗盡；Att2 (Gap as supplementary filter on XBI-005 base + ClosePos ≥ 35%) Part A 3/66.7% WR Sharpe 1.39 cum +7.08% / Part B 1/0% WR Sharpe 0.00 cum -5.10% / min **0.00** — Gap 濾波將 XBI-005 原 35/8 訊號濾至 3/1，樣本過薄且 Part B 唯一訊號 2024-01-17 仍 1 日 SL；Att3 (deep Gap ≤ -2.0% + wider pullback [-5%,-18%]) Part A 1/100% WR 零方差 Sharpe 0.00 / Part B 1/0% WR Sharpe 0.00 / min **0.00** — 深 gap 過嚴僅 1 訊號每 Part，Part B 2024-07-29 訊號仍 SL。**Repo 第 5 次 Gap-Down Capitulation MR 試驗** — 首次 US 板塊 ETF 測試。Gap-Down 失敗家族正式擴展為 4 大類（IBIT 為唯一成功）：(1) TQQQ-016（non-24/7 槓桿股指 ETF）(2) FXI-010（政策驅動 EM 單一國家 ETF）(3) FCX-010（商品關聯個股）(4) **XBI-013（US 板塊 ETF with 事件驅動 gap）**。整合失敗規則：Gap-Down MR 需要 (a) 24/7 連續交易 underlying AND (b) 拋壓耗盡與當日 session 不相關聯；XBI 生技板塊兩者皆不符——事件常盤後宣告產生跨 session 持續拋壓，平行 FXI 政策延續 / FCX 商品衝擊延續 / TQQQ 槓桿結構失敗。IBIT 為唯一合格 Gap-Down underlying。XBI 第 10 個失敗策略類型（後於突破、ROC 單獨、動量回調、配對、ATR 自適應、RSI(2)、BB-lower 混合、RSI hook divergence、capitulation-accel、Gap-Down）。XBI-005 仍為全域最優（13 次實驗、41+ 次嘗試）. XBI-012 added 2026-04-19 (Capitulation + Acceleration Reversal MR: Pullback(10) + ROC(3) + ClosePos + UpDay + WR). Three iterations all failed vs XBI-005 min 0.36. Att1 (ROC -4%, ClosePos 50%, UpDay) Part A 3/0.16 / Part B 3/0.16 — too restrictive, 0.6 yr signal. Att2 (ROC -3%, ClosePos 40%, UpDay) Part A 7/0.27 / Part B 3/0.16 — Part A improves +69% but Part B stuck because 2024-2025 XBI lacks ROC(3) ≤ -3% events. Att3 (ROC -3%, ClosePos 35%, no UpDay) Part A 21/0.18 / Part B 8/0.07 — signals triple but quality dilutes: UpDay filter confirmed essential. Extends XBI failure pattern list: short-term ROC acceleration + intraday recovery cannot distinguish genuine reversal from technical bounce on event-driven biotech ETF. XBI-005's pullback+WR+ClosePos 35% framework confirmed as structurally optimal for XBI 2.0% daily vol + FDA event-driven MR (13 experiments, 41+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（12 次實驗、38+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場、RSI(14) bullish hook divergence、**短期 ROC 急跌 + 日內反攻**）
+**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（13 次實驗、41+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場、RSI(14) bullish hook divergence、短期 ROC 急跌 + 日內反攻、**Gap-Down Capitulation**）
 **前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
 **滾動窗口分析摘要：** XBI-001 ✗✓（精準度突變 ΔWR 23.8pp，績效漸變，2023 生技低迷為主因）
 
@@ -43,6 +43,9 @@
 - Capitulation + Acceleration Reversal（Pullback ≤ -6% + ROC(3) ≤ -4% + ClosePos ≥ 50% + UpDay + WR ≤ -80）（XBI-012 Att1：Part A Sharpe 0.16 / Part B 0.16，訊號 3/3 過稀疏，ClosePos 50% + ROC(3) -4% 組合過嚴）
 - Capitulation + Acceleration 放寬（ROC(3) ≤ -3% + ClosePos ≥ 40% + UpDay）（XBI-012 Att2：Part A Sharpe 0.27 / Part B 0.16，Part A +69% 但 Part B 訊號未變，2024-2025 XBI 牛市缺少 ROC(3) ≤ -3% 事件）
 - Capitulation + Acceleration 無 UpDay（ROC(3) ≤ -3% + ClosePos ≥ 35% + 無 UpDay）（XBI-012 Att3：Part A Sharpe 0.18 / Part B 0.07，訊號 21/8 倍增但品質崩壞，UpDay 過濾器證實為關鍵品質軸）
+- **Gap-Down Capitulation MR 作為主進場（XBI-013 Att1，repo 第 5 次 Gap-Down 試驗，首次 US 板塊 ETF 測試）**（Gap ≤ -1.0% + Close>Open + 10d Pullback [-5%,-15%] + WR(10) ≤ -80, TP +3.0%/SL -3.0%/15d）：Part A 8 訊號 50% WR Sharpe **-0.02** cum -0.77%（4TP/4SL，全部 1-3 日出場）/ Part B 1 訊號 0% WR Sharpe 0.00 cum -3.10%（1 日 SL）/ min(A,B) **-0.02**，失敗根因：生技 gap-down 為 FDA/臨床 negative news 續跌結構，非 IBIT 隔夜拋壓耗盡
+- **Gap-Down 作為 XBI-005 框架上的補充品質過濾（XBI-013 Att2）**（XBI-005 base + Gap ≤ -1.0% + Close>Open）：Part A 3 訊號 66.7% WR Sharpe 1.39 cum +7.08% / Part B 1 訊號 0% WR Sharpe 0.00 cum -5.10% / min **0.00**，失敗根因：Gap 將 XBI-005 原 35/8 濾至 3/1（-90%），Part B 唯一訊號 2024-01-17 仍 1 日 SL，Gap 對 XBI 訊號品質無貢獻
+- **深 Gap-Down Capitulation MR（XBI-013 Att3）**（Gap ≤ -2.0% + Close>Open + 10d Pullback [-5%,-18%] + WR(10) ≤ -80, TP +3.5%/SL -4.0%/15d）：Part A 1 訊號 100% WR 零方差 Sharpe 0.00 cum +3.50% / Part B 1 訊號 0% WR Sharpe 0.00 cum -4.10% / min **0.00**，失敗根因：深 gap 過嚴僅 1 訊號每 Part，Part B 2024-07-29 訊號仍 SL，XBI event-driven 結構對任何 gap 門檻都不適用
 
 **已掃描的參數空間：**
 - 進場條件：回檔 6~8% + 上限 15~20% + WR(10) ≤ -80（有/無 2日急跌 ≤ -3%）
@@ -111,6 +114,7 @@
 | XBI-010 | `xbi_010_bb_lower_pullback_cap` | BB 下軌 + 回檔上限混合進場 + 3次嘗試（未勝出） | 已完成（未改善） |
 | XBI-011 | `xbi_011_rsi_divergence_mr` | RSI(14) Bullish Hook Divergence + XBI-005 + 3次嘗試（未勝出） | 已完成（未改善） |
 | XBI-012 | `xbi_012_capitulation_accel` | Capitulation + Acceleration Reversal（ROC(3) + ClosePos + UpDay + WR） + 3次嘗試（未勝出） | 已完成（未改善） |
+| XBI-013 | `xbi_013_gap_reversal_mr` | Gap-Down Capitulation + Intraday Reversal MR（IBIT-006 移植） + 3次嘗試（未勝出） | 已完成（失敗，repo 首次 US 板塊 ETF Gap-Down 試驗） |
 
 ---
 

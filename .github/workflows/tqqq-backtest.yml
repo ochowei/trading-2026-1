@@ -203,6 +203,7 @@ on:
           - "XBI-010: xbi_010_bb_lower_pullback_cap"
           - "XBI-011: xbi_011_rsi_divergence_mr"
           - "XBI-012: xbi_012_capitulation_accel"
+          - "XBI-013: xbi_013_gap_reversal_mr"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "XLU-002: xlu_002_capped_pullback_wr"
           - "XLU-003: xlu_003_tight_pullback_wr"

@@ -53,9 +53,7 @@ class XBI013Strategy(ExecutionModelStrategy):
             if config.require_up_bar:
                 print("  日內反轉: Close > Open")
             if config.use_close_position:
-                print(
-                    f"  收盤位置 (Close Position): >= {config.close_position_threshold:.0%}"
-                )
+                print(f"  收盤位置 (Close Position): >= {config.close_position_threshold:.0%}")
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
             print("  追蹤停損 (Trailing Stop): 無 (Disabled)")
         super()._print_strategy_params(config)

@@ -77,9 +77,7 @@ class XBI013SignalDetector(BaseSignalDetector):
         else:
             cond_closepos = pd.Series(True, index=df.index)
 
-        df["Signal"] = (
-            cond_pullback & cond_upper & cond_wr & cond_gap & cond_up_bar & cond_closepos
-        )
+        df["Signal"] = cond_pullback & cond_upper & cond_wr & cond_gap & cond_up_bar & cond_closepos
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()
