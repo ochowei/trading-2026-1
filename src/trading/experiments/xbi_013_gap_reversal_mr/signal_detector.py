@@ -2,12 +2,17 @@
 XBI-013 訊號偵測器：Gap-Down Capitulation + Intraday Reversal MR
 (XBI-013 Signal Detector: Gap-Down Capitulation + Intraday Reversal MR)
 
-進場條件（五項同時成立）：
-1. 隔夜開盤跳空 (Open - PrevClose) / PrevClose <= -1.0%（生技事件投降拋壓）
-2. 日內收盤高於開盤 Close > Open（日內資金撿便宜反轉）
-3. 10 日高點回檔 in [-5%, -15%]（回檔範圍過濾）
-4. Williams %R(10) <= -80（超賣確認）
-5. 冷卻期 10 個交易日
+Att2 當前結論（gap 改為補充過濾）：
+- XBI-005 主框架（pullback 8-20% + WR + ClosePos ≥ 35%）+ Gap ≤ -1.0%（補充品質）
+  + Close > Open（日內反轉）
+
+進場條件（六項同時成立）：
+1. 10 日高點回檔 in [-8%, -20%]（XBI-005 基線）
+2. Williams %R(10) <= -80（XBI-005 基線）
+3. 收盤位置 >= 35%（XBI-005 基線：日內反轉強度）
+4. 隔夜開盤跳空 (Open - PrevClose) / PrevClose <= -1.0%（Att2 新增補充過濾）
+5. Close > Open（日內陽 K，雙重確認反轉）
+6. 冷卻期 10 個交易日
 """
 
 import logging
@@ -46,18 +51,36 @@ class XBI013SignalDetector(BaseSignalDetector):
         df["WR"] = (highest - df["Close"]) / hl_range.where(hl_range > 0, float("nan")) * -100
         df["WR"] = df["WR"].fillna(-50.0)
 
+        # 收盤位置
+        day_range = df["High"] - df["Low"]
+        df["ClosePos"] = ((df["Close"] - df["Low"]) / day_range).where(day_range > 0, 0.5)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        cond_gap = df["Gap"] <= self.config.gap_threshold
-        cond_reversal = df["Close"] > df["Open"]
+        # XBI-005 基線三項
         cond_pullback = df["Pullback"] <= self.config.pullback_threshold
         cond_upper = df["Pullback"] >= self.config.pullback_upper
         cond_wr = df["WR"] <= self.config.wr_threshold
+        cond_closepos = df["ClosePos"] >= self.config.close_position_threshold
 
-        df["Signal"] = cond_gap & cond_reversal & cond_pullback & cond_upper & cond_wr
+        # Att2 新增補充過濾
+        cond_gap = df["Gap"] <= self.config.gap_threshold
+        if self.config.require_up_bar:
+            cond_up_bar = df["Close"] > df["Open"]
+        else:
+            cond_up_bar = pd.Series(True, index=df.index)
+
+        df["Signal"] = (
+            cond_pullback
+            & cond_upper
+            & cond_wr
+            & cond_closepos
+            & cond_gap
+            & cond_up_bar
+        )
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()
@@ -77,5 +100,5 @@ class XBI013SignalDetector(BaseSignalDetector):
             logger.info("XBI-013: %d signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
-        logger.info("XBI-013: Detected %d gap-down reversal signals", signal_count)
+        logger.info("XBI-013: Detected %d gap-down + XBI-005 filtered signals", signal_count)
         return df

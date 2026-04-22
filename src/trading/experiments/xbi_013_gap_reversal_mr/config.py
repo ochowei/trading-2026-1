@@ -48,22 +48,28 @@ from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class XBI013Config(ExperimentConfig):
-    """XBI-013 Gap-Down Capitulation + Intraday Reversal MR 參數"""
+    """XBI-013 Gap-Down Capitulation + Intraday Reversal MR 參數
 
-    # 進場 — 隔夜跳空（IBIT-006 風格，XBI 縮放）
-    gap_threshold: float = -0.010  # 隔夜 Open/PrevClose <= -1.0%
+    Att2（當前）：將 gap 濾波器改為 XBI-005 框架上的「補充品質過濾」，非主訊號。
+    """
 
-    # 進場 — 日內反轉（Close > Open）
-    # 無額外參數，使用 Close > Open 條件
-
-    # 進場 — 回檔範圍（10 日）
+    # 進場 — 回檔範圍（XBI-005 基線）
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.05  # 回檔 >= 5%（縮放自 IBIT -12%）
-    pullback_upper: float = -0.15  # 回檔上限 15%（縮放自 IBIT -25%）
+    pullback_threshold: float = -0.08  # 回檔 >= 8%（XBI-005 base）
+    pullback_upper: float = -0.20  # 回檔上限 20%（XBI-005 base）
 
-    # 進場 — Williams %R 超賣確認
+    # 進場 — Williams %R 超賣確認（XBI-005 基線）
     wr_period: int = 10
     wr_threshold: float = -80.0
+
+    # 進場 — 收盤位置過濾（XBI-005 基線）
+    close_position_threshold: float = 0.35
+
+    # 進場 — 隔夜跳空（Att2 新增補充過濾，非主訊號）
+    gap_threshold: float = -0.010  # Gap <= -1.0%（較寬以保留更多訊號）
+
+    # 進場 — 日內反轉（Close > Open，配合 ClosePos 雙重確認）
+    require_up_bar: bool = True
 
     # 冷卻期
     cooldown_days: int = 10
@@ -76,7 +82,7 @@ def create_default_config() -> XBI013Config:
         display_name="XBI Gap-Down Capitulation + Intraday Reversal MR",
         tickers=["XBI"],
         data_start="2010-01-01",
-        profit_target=0.030,  # +3.0%（縮放自 IBIT +4.5%）
-        stop_loss=-0.030,  # -3.0%（縮放自 IBIT -4.0%）
+        profit_target=0.035,  # +3.5%（XBI-005 基線）
+        stop_loss=-0.050,  # -5.0%（XBI-005 基線）
         holding_days=15,
     )
