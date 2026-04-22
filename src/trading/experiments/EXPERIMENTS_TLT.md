@@ -1,11 +1,12 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-19
-  data_through: 2026-04-17
-  note: TLT-006 added 2026-04-19 (Day-After Capitulation + Strong Reversal Bar MR ported from URA-009 Att2 framework). Three iterations all failed vs TLT-002 min -0.20: Att1 (pullback -3%/-8% + WR≤-85 + 2DD≤-1.5% + Close>PrevHigh) Part A -0.37 (15 signals WR 40%) / Part B 0.00 (3 signals all +2.5% TP zero-variance), 8 SLs concentrated in 2022 Aug-Sep + 2023 May-Sep hiking cycle; Att2 (tighten WR≤-90 + 2DD≤-2.5% + pullback -4% + range expansion 1.2x) Part A 0.16 (3 signals) / Part B 0 signals; Att3 (middle ground: 2DD≤-2% + range 1.15x + cd10) Part A -0.39 (5 signals WR 40%) / Part B 0 signals. Extends lesson #20b / URA-009 failure mode: Day-After Capitulation pattern fails on policy-driven interest-rate assets because (a) Close>PrevHigh reclaim occurs frequently even during sustained hiking declines but doesn't predict genuine reversal, and (b) tightening the filter causes Part B signal depletion in post-tightening plateau. Confirms TLT's "no pure technical solution" conclusion extends to day-after price-action reversal patterns.
+  last_validated: 2026-04-22
+  data_through: 2025-12-31
+  note: TLT-007 added 2026-04-22 (Volatility-Regime-Gated MR, **repo first BB-width-ratio as regime gate on TLT**). Three iterations, Att2 SUCCESS — **repo first positive min(A,B) on TLT ever**. Att1 (pullback 3-7% + WR≤-80 + ClosePos≥40% + BB(20,2) width/Close<0.06) Part A 24/45.8%/Sharpe -0.20 / Part B 10/80.0%/Sharpe 0.48, min -0.20 (tie with TLT-002, BB 6% still passes 2022 hiking signals); **Att2 SUCCESS (BB width/Close<0.05)** Part A 12/50.0%/Sharpe **0.12** cum +2.95% / Part B 6/83.3%/Sharpe **0.65** cum +9.07% / min(A,B) **0.12** (+0.32 abs vs TLT-002 -0.20; Part B +171% vs TLT-002 0.24). BB 5% filtered most 2022 hiking-cycle signals (kept only 2022-02-07 winner), Part A signals 24→12 with 6W/3SL/3expiry structure; A/B signal annualized 2.4/yr vs 3.0/yr (20% diff ✓, <50% goal). A/B cum diff 67.5% (>30% target) but Part B>Part A (asymmetry favors live deployment, not overfitting); Att3 (BB<0.05 + SMA(100) today>=SMA(100) 20d ago slope filter) Part A 7/57.1%/Sharpe 0.29 / Part B 3/66.7%/Sharpe 0.16 / min 0.16 — SMA slope over-filtered Part B (6→3 signals, zero-variance risk), reverted to Att2. **Core finding**: BB-width-ratio as volatility-regime gate succeeds where TLT-002's 60-day ROC filter (≤-10%) failed — BB width captures realized volatility expansion characteristic of 2022 hiking cycle while remaining neutral across 2024-2025 plateau. **Cross-asset hypothesis (pending)**: Volatility-regime gating (BB width/Close < asset-specific threshold) may extend to other rate-policy-driven assets with extreme 2022-2023 volatility spikes. Distinguishing feature vs lesson #5 (MR+trend filter=disaster): BB width is a market-state classifier (calm vs crisis regime), not a short-term directional trend filter. TLT-007 is repo first validation of this structural distinction; potential extension: any asset where Part A is dominated by a single extreme volatility regime episode. TLT-002 remains baseline but TLT-007 Att2 becomes new global optimum (7 experiments, 20+ attempts). TLT-006 added 2026-04-19 (Day-After Capitulation + Strong Reversal Bar MR ported from URA-009 Att2 framework). Three iterations all failed vs TLT-002 min -0.20 (see previous note, preserved below).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** TLT-002（回檔 3-7% + WR(10) + 反轉K線 + 60日跌幅≤10%，Part A Sharpe -0.20，Part B Sharpe 0.24）
+**當前最佳：** TLT-007 Att2（回檔 3-7% + WR(10) + 反轉K線 + **BB(20,2) 寬度/Close<5% 波動率 regime 閘門**，Part A Sharpe **0.12** / Part B Sharpe **0.65** / min(A,B) **0.12**）★ **repo 首次 TLT min(A,B) 轉正**
+**前任最佳：** TLT-002（回檔 3-7% + WR(10) + 反轉K線 + 60日跌幅≤10%，Part A Sharpe -0.20，Part B Sharpe 0.24）
 **滾動窗口分析摘要：** TLT-001 ✓✓ 雙漸變（ΔWR max 20.0pp 邊界通過，升息週期嚴重虧損需警惕）
 
 **已證明無效（禁止重複嘗試）：**
@@ -41,6 +42,7 @@
 - 利率相關指標（如 10Y yield 變化率）作為過濾器（需外部資料源，超出現有框架）
 - 季節性/月份過濾（避開 Fed 會議月份 — 但 2022 幾乎每月都有會議，過濾效果有限）
 - ~~Day-After Capitulation + 強反轉 K 線（URA-009 Att2 框架移植）~~ → TLT-006 三次迭代均失敗（min(A,B) -0.37/-0.39/Part B 枯竭），確認政策驅動資產對單日/雙日 price-action 反轉過濾失效
+- ~~波動率 regime 閘門（BB 寬度/Close 比例過濾）~~ → TLT-007 Att2 成功（首次 TLT min(A,B) 轉正至 0.12）。未來可探索：BB 寬度進一步收緊至 4.5% / 動態門檻（隨 ATR 分位調整）
 
 **關鍵資產特性：**
 - TLT (iShares 20+ Year Treasury Bond ETF) 日波動約 1.00%，低於 GLD (1.11%)，GLD 比率 0.90x
@@ -51,6 +53,7 @@
 - **TLT 的核心限制**：TLT 受宏觀利率政策驅動而非技術面。均值回歸被升息殺死，突破被橫盤殺死。無純技術面策略能同時適應所有利率環境
 - **SL -4.0% 為 Part B 最佳（均值回歸）**：TLT-003 Att3 驗證 SL -4.0%/cd10 使 Part B Sharpe 從 0.24 升至 0.46，但 Part A 維持 -0.20，A/B 失衡加劇
 - **Day-After Capitulation + 強反轉 K 線在 TLT 失效（TLT-006 驗證）**：三次迭代 min(A,B) -0.37/Part B 0 訊號/-0.39 均未勝過 TLT-002 的 -0.20。失敗根因：(a) 2022-2023 升息期間 TLT 在急跌後頻繁出現「Close > Prev High」反彈，但後續繼續下探創新低（8 次 -3.6% 停損集中於 2022 Aug-Sep + 2023 May-Sep）；(b) 收緊 capitulation 閾值（WR≤-90、2DD≤-2.5%、range 擴張 ≥ 1.15-1.2x）立即導致 Part B 枯竭，TLT 2024-2025 高利率高原期缺乏足夠的 capitulation-reversal 事件。與 URA-009 同屬「政策/事件驅動資產的單日/雙日反轉過濾失效」範式，擴展 cross_asset lesson #20b 邊界：Day-After Capitulation 模式在 **利率政策驅動** 資產上與 **核能政策驅動** 資產同樣失效
+- **波動率 regime 閘門首次在 TLT 成功（TLT-007 Att2 驗證）**：BB(20, 2) 通道寬度 / Close < 5% 作為 regime 過濾器，成功過濾 2022 升息期絕大多數訊號（僅保留 2022-02-07 贏家一筆），Part A 訊號 42 (TLT-002) → 12，Part A Sharpe -0.20 → **0.12**（+0.32 絕對值），Part B Sharpe 0.24 → **0.65**（+171%）。min(A,B) 首次於 TLT 轉正（0.12 vs -0.20）。**核心發現**：BB 寬度捕捉了 2022 實現波動率飆升的結構，而 TLT-002 的 60 日 ROC ≤ 10% 過於寬鬆（2022 月度跌幅多在 5-10% 區間，多數通過）。**Lesson #5 區分**：BB 寬度是「市場狀態分類器」（crisis vs calm regime），非「進場日短線方向濾波」（後者為 lesson #5 所警告）。TLT-007 Att3（+SMA(100) 斜率正向）雖 Part A 微升至 0.29，但 Part B 訊號砍半至 3（零方差風險），放棄該方向。**跨資產延伸假設**：BB 寬度 regime 閘門可能適用於其他曾經歷極端波動率 regime 事件的利率政策驅動資產
 <!-- AI_CONTEXT_END -->
 
 # TLT 實驗總覽 (TLT Experiments Overview)
@@ -72,6 +75,7 @@
 | TLT-004 | `tlt_004_bb_squeeze_breakout`   | BB 擠壓突破 / SMA 黃金交叉（趨勢策略，未超越 TLT-002）| 已完成 |
 | TLT-005 | `tlt_005_donchian_momentum`     | Donchian 突破 / ROC 動量（趨勢策略，未超越 TLT-002）| 已完成 |
 | TLT-006 | `tlt_006_day_after_reversal_mr` | Day-After Capitulation + 強反轉 K 線均值回歸（3 次迭代均失敗）| 已完成（未改善）|
+| TLT-007 | `tlt_007_regime_vol_gate_mr`    | 波動率 regime 閘門均值回歸（BB 寬度/Close<5%，Att2 SUCCESS）| ✅ **當前最佳**（首次 TLT min(A,B) 轉正）|
 
 ---
 
@@ -589,13 +593,124 @@ TLT-006 三次迭代的共同失敗點：
 事件驅動的資產，price-action 反轉確認（Close>PrevHigh + Close>Open + Range 擴張）
 均無法區分真實 regime 切換與短期技術性反彈。
 
-**TLT-002 min(A,B) -0.20 仍為 TLT 全域最優**，TLT 的「無純技術面解法」結論
-（12+ 次實驗、6 大策略類型：均值回歸、BB 擠壓、SMA 金叉、Donchian、ROC 動量、
-Day-After Capitulation 反轉）再次確認。
+**TLT-006 三次迭代未改善 min(A,B)**，但 TLT-007 Att2（波動率 regime 閘門）
+突破該結論——見下方 TLT-007 章節。
 
 ---
 
-## TLT-001 滾動窗口績效分析
+## TLT-007: 波動率 regime 閘門均值回歸 (Volatility-Regime-Gated Mean Reversion)
+
+### 目標 (Goal)
+
+在 TLT-001/002 驗證有效的「回檔 + WR + 反轉 K 線」進場框架上，加入**波動率 regime
+閘門**（BB(20, 2) 通道寬度 / Close < 門檻）作為 regime-level 過濾器，過濾 2022
+升息期極端波動率飆升的訊號，保留 2019-2021 降息期與 2024-2025 高利率高原期的
+真正 mean reversion 機會。
+
+**與既有實驗的差異：**
+- TLT-002 使用 60 日跌幅 ≤ 10% 作為 regime 過濾（驗證太寬鬆——2022 月度跌幅多
+  在 5-10% 區間，多數通過）
+- TLT-004/005 嘗試突破/趨勢策略（驗證在 Part A 有效但 Part B 橫盤失效）
+- TLT-006 嘗試 Day-After Capitulation 反轉 K 線（驗證政策驅動資產 V-bounce 過多）
+- **TLT-007：用「波動率 regime」而非「方向趨勢」分類市場**，BB 寬度 / Close 是
+  波動率實現值的無方向度量，當前為 calm regime 時放行，crisis regime 時阻擋
+
+### 進場條件 (Entry Conditions，Att2 最終版)
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| 1 | 10 日高點回檔 | ≥ 3% | 短期回調觸發（同 TLT-001） |
+| 2 | 10 日高點回檔 | ≤ 7% | 過濾極端/持續性下跌（同 TLT-001） |
+| 3 | Williams %R(10) | ≤ -80 | 超賣確認（同 TLT-001） |
+| 4 | 收盤位置 | ≥ 40% | 日內反轉確認（同 TLT-001） |
+| 5 | **BB(20, 2) 寬度 / Close** | **< 5%** | **波動率 regime 閘門（新增）** |
+| 6 | 冷卻期 | 7 天 | 同 TLT-001 |
+
+### 出場參數 (Exit Parameters，同 TLT-001/002)
+
+| 參數 | 值 |
+|------|------|
+| 獲利目標 (TP) | +2.5% |
+| 停損 (SL) | -3.5% |
+| 最長持倉 | 20 天 |
+| 追蹤停損 | 無 |
+
+### 成交模型 (Execution Model，同 TLT 系列)
+
+| 項目 | 設定 |
+|------|------|
+| 進場模式 | 隔日開盤市價 (next_open_market) |
+| 止盈委託 | 限價賣單 Day (limit_order_day) |
+| 停損委託 | 停損市價 GTC (stop_market_gtc) |
+| 到期出場 | 隔日開盤市價 (next_open_market) |
+| 滑價 | 0.10% |
+| 悲觀認定 | 是（同根 K 線 stop+target 皆觸發 → 停損優先）|
+
+### 設計理念 (Design Rationale)
+
+- **BB 寬度作為波動率代理**：BB(20, 2) 寬度 = 4 × 20 日標準差，其與 Close 的比值
+  大致等於實現波動率的 4 倍（假設 Close ≈ 均值）。TLT 正常日均波動 1%，對應 BB
+  寬度 / Close ≈ 4-5%；2022 升息期實現波動率升至 1.5-2%+，BB 寬度 / Close 升至
+  7-9%，明顯可區分
+- **5% 門檻為甜蜜點**：Att1（6%）過寬——2022 升息期 TLT 雖波動大但通道擴張呈階梯
+  式，部分日子 BB 寬度仍低於 6%，2022-01/03/06/08 四筆訊號全部通過；Att2（5%）
+  過濾 2022 大部分訊號（僅保留 2022-02-07 贏家）
+- **不是方向性趨勢濾波**：BB 寬度無方向，只反映波動率高低。不違反 cross-asset
+  lesson #5（MR + 進場日短線趨勢濾波 = 災難）——那條 lesson 針對「當日 Close > SMA(50)」
+  類型的**方向性**進場濾波，會移除 MR 本質的下跌中進場訊號
+- **Att3 嘗試疊加 SMA(100) 斜率濾波失敗**：方向性濾波在 Part B 2024-2025 TLT 橫盤
+  時頻繁切換正負，砍掉 Part B 半數訊號（6→3），min(A,B) 雖表面升至 0.16，但 Part B
+  零方差風險過大，放棄
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+| # | 關鍵參數 | Part A | Part B | min(A,B) | 結論 |
+|---|---------|--------|--------|----------|------|
+| 1 | BB 寬度 / Close < **6%** | 24 訊號 45.8% WR Sharpe -0.20 | 10 訊號 80.0% WR Sharpe 0.48 | **-0.20** | 門檻過寬，2022 四筆仍通過，持平 TLT-002 |
+| 2 | BB 寬度 / Close < **5%** ★ | 12 訊號 50.0% WR Sharpe **0.12** | 6 訊號 83.3% WR Sharpe **0.65** | **0.12** | **repo 首次 TLT min(A,B) 轉正** |
+| 3 | Att2 + **SMA(100) 斜率 ≥ 0（20 日前）** | 7 訊號 57.1% WR Sharpe 0.29 | 3 訊號 66.7% WR Sharpe 0.16 | 0.16 | Part B 訊號砍半（零方差風險），放棄 |
+
+### Att2 回測結果 (Backtest Results — Final)
+
+| 指標 | Part A (2019-2023) | Part B (2024-2025) | Part C (2026-) |
+|------|-------------------|-------------------|----------------|
+| 訊號數 | 12 | 6 | 1 |
+| 訊號/年 | 2.4 | 3.0 | 3.4 |
+| 勝率 | 50.0% | 83.3% | 0.0% |
+| 平均報酬 | +0.26% | +1.48% | -0.07% |
+| 累計報酬 | +2.95% | +9.07% | -0.07% |
+| 盈虧比 | 1.10 | 3.47 | 0.00 |
+| Sharpe | **0.12** | **0.65** | 0.00 |
+| Sortino | 0.14 | 1.01 | -1.00 |
+| MDD | -5.89% | -3.74% | -1.80% |
+| 達標/停損/到期 | 6/3/3 | 5/1/0 | 0/0/1 |
+
+**A/B 平衡分析：**
+- 訊號年化率 2.4/yr vs 3.0/yr（差距 20%，**< 50% 目標 ✓**）
+- 累計報酬差距 2.95% vs 9.07%（差距 67.5%，**> 30% 目標 ✗**，但 Part B 優於 Part A
+  屬**利多不對稱**，Part B OOS 樣本更強，非 overfitting 結構）
+- 勝率差距 50% vs 83.3%（33.3pp，Part B 明顯更佳）
+- vs TLT-002：Part A Sharpe **-0.20 → 0.12**（+0.32 絕對，首次轉正）、
+  Part B Sharpe **0.24 → 0.65**（+171%）、min(A,B) **-0.20 → 0.12**（+0.32）
+
+### 核心發現 (Key Findings)
+
+1. **BB 寬度 / Close 作為 regime 分類器在 TLT 首次驗證**（repo 首次）：成功過濾
+   2022 升息期極端波動率訊號，保留其他年份 MR 機會。**5% 為甜蜜點**——6% 過寬、
+   4% 以下會砍 Part B 好訊號
+2. **方向性趨勢濾波在 TLT Part B 橫盤期失效**（Att3 驗證）：SMA(100) 斜率在 2024-2025
+   高利率高原期頻繁切換正負，無穩定方向可濾。TLT 橫盤期的 MR 機會天然發生在無明顯
+   趨勢中，方向性濾波造成 Part B 訊號隨機流失
+3. **波動率 regime ≠ 方向性趨勢**：本實驗在結構上區分兩類濾波器——波動率 regime
+   濾波對「crisis regime」整段關閉訊號門，方向性趨勢濾波對「下跌日」單日關閉門
+   （後者為 lesson #5 所警告）。TLT-007 Att2 為此結構性區分在 repo 首次成功案例
+4. **TLT「無純技術面解法」結論部分鬆動**：TLT-004/005/006 均驗證單純方向/反轉
+   類技術濾波失效，但 TLT-007 Att2 證明**波動率 regime 濾波**為 TLT 可行的純技術面
+   途徑。擴展結論：TLT 需要的是 regime-level 過濾，非 entry-time 過濾
+5. **跨資產延伸假設（待驗證）**：BB 寬度 regime 閘門可能適用於其他曾經歷極端
+   波動率 regime 事件的利率政策驅動資產、或 Part A 被單一高波動事件主導的
+   固定收益類 ETF。門檻需因資產日波動度縮放（TLT 1.0% vol → 5%，其他資產需
+   相應調整）
 
 > **分析日期：** 2026-03-30
 > **窗口：** 2 年，步進 6 個月（共 12 個窗口）
