@@ -1,11 +1,12 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-09
+  last_validated: 2026-04-22
   data_through: 2025-12-31
-  last_experiment_attempt: GLD-012 (3 attempts, 1 success — GLD-012 Att3 為新最佳)
+  last_experiment_attempt: GLD-013 (3 attempts, 0 success — Post-Capitulation Vol-Transition MR 不適用商品 ETF)
+  note: GLD-013 added 2026-04-22. VGK-008 Att2 (+390% on European broad ETF) and similar successes on EEM/INDA/CIBR prompted cross-category extension to commodity ETF. All 3 iterations failed (Att1 1 signal / Att2 Part A 0.20 / Att3 Part A -0.69). Extends Post-Capitulation Vol-Transition MR boundary: pattern requires equity-style capitulation dynamics, fails on macro-driven commodity declines (rates/USD/inflation repricing does not cluster SLs at shallow 2DD). GLD-012 Att3 remains global optimum.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** GLD-012 Att3（同 GLD-008 進場，移除追蹤停損，純 TP/SL/到期出場）
+**當前最佳：** GLD-012 Att3（同 GLD-008 進場，移除追蹤停損，純 TP/SL/到期出場）**已確認為 min(A,B) 全域最優（13 次實驗）**
 - Part A: +50.15%（36訊號, 75.0% WR, Sharpe 0.48, Sortino 0.78）, Part B: +42.30%（13訊號, 100% WR, Sharpe 4.68, Sortino 999.99）
 - vs GLD-008: Part A Sharpe +6.7%（0.45→0.48），Part B Sharpe +101%（2.33→4.68），cumul. +10.5%/+28.8%
 - A/B 累計差距 15.6%（vs GLD-008 的 28%），A/B 訊號比 2.77:1（不變）
@@ -31,6 +32,13 @@
 - BB Squeeze Breakout：BB(20,2) 擠壓 25th pct + Close > Upper BB + SMA(50)（GLD-009，3 次嘗試）
 - 動量回檔：ROC(20) > 3%/5% + 5日回檔 ≥1.5% + SMA(50)（GLD-010，3 次嘗試）
 - Donchian 突破：Donchian(20/30/50) + SMA(50/100) ± ATR(14) 過濾（GLD-011，3 次嘗試）
+- **Post-Capitulation Vol-Transition MR**（GLD-013，3 次嘗試均失敗）：
+  BB(20,2) 下軌 + 10日回檔上限 + WR + ClosePos + ATR>1.05~1.15 + 2DD floor -1.0~-2.0%
+  - Att1（cap-5% + ATR>1.15 + 2DD<=-1.5%）：組合過嚴，全期僅 1 訊號
+  - Att2（cap-7% + ATR>1.05 + 2DD<=-1.0%）：Part A 8 訊號 Sharpe 0.20 / Part B 2 訊號零方差，含 2 筆 SL（2021-02 實質利率上升、2022-09 升息加速）
+  - Att3（2DD<=-2.0% 對齊 VGK/INDA）：Part A 2 訊號含 1 SL -4.10%，Sharpe **-0.69**，2021-02-04 SL 訊號 2DD 深度通過門檻仍失敗
+  - **失敗根因**：商品 ETF（GLD）的下跌由 macro（實質利率、USD、通膨預期）驅動而非 equity capitulation 動力學。VGK-008 的成功依賴「SL 集中於 2DD 淺帶 -0.89~-1.68%」，GLD 的 SL 分布跨所有 2DD 深度，2DD floor 無區分力
+  - **擴展跨資產教訓**：Post-Capitulation Vol-Transition MR 適用**股票類 ETF（broad / country / sector）**，不適用**商品 ETF**
 
 **GLD-008 嘗試記錄（3 次嘗試，Att3 成功超越 GLD-007）：**
 - Att1: RSI(2)<10 + 2日跌幅≥1.5% + ClosePos≥40%，TP +3.5%/SL -4.0%/20d + 追蹤停損 → Part A Sharpe 0.28 / Part B 1.59（RSI(2) 在 GLD 不如回檔+WR）
@@ -105,6 +113,7 @@
 | GLD-010 | `gld_010_momentum_pullback` | 動量回檔 | ROC(20) > 5% + 5日回檔 ≥1.5% + SMA(50), TP +3.5%, SL -4.0%, 25d | ❌ 未超越 |
 | GLD-011 | `gld_011_donchian_breakout` | Donchian 突破 | Donchian(50) + SMA(100), TP +4.0%, SL -3.5%, 25d | ❌ 未超越 |
 | GLD-012 | `gld_012_atr_adaptive` | 無追蹤停損均值回歸 | 同 GLD-008 進場，移除追蹤停損，TP +3.0%, SL -4.0%, 20d | ✅ 新最佳 |
+| GLD-013 | `gld_013_vol_transition_mr` | Post-Capitulation Vol-Transition MR（3次嘗試均失敗）| BB(20,2) 下軌 + 10日回檔上限 + WR + ClosePos + ATR + 2DD floor，跨類別延伸 VGK-008 | ❌ 未超越 |
 
 ## 演進路線 (Lineage)
 
