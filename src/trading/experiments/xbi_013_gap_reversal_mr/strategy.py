@@ -49,12 +49,13 @@ class XBI013Strategy(ExecutionModelStrategy):
                 f" {abs(config.pullback_threshold):.0%}-{abs(config.pullback_upper):.0%}"
             )
             print(f"  Williams %R: WR({config.wr_period}) <= {config.wr_threshold}")
-            print(
-                f"  收盤位置 (Close Position): >= {config.close_position_threshold:.0%}"
-            )
-            print(f"  隔夜跳空 (Gap): Gap <= {config.gap_threshold:.1%}（補充過濾）")
+            print(f"  隔夜跳空 (Gap): Gap <= {config.gap_threshold:.1%}（深 gap 測試）")
             if config.require_up_bar:
                 print("  日內反轉: Close > Open")
+            if config.use_close_position:
+                print(
+                    f"  收盤位置 (Close Position): >= {config.close_position_threshold:.0%}"
+                )
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
             print("  追蹤停損 (Trailing Stop): 無 (Disabled)")
         super()._print_strategy_params(config)

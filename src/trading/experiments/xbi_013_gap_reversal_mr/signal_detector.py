@@ -2,17 +2,20 @@
 XBI-013 訊號偵測器：Gap-Down Capitulation + Intraday Reversal MR
 (XBI-013 Signal Detector: Gap-Down Capitulation + Intraday Reversal MR)
 
-Att2 當前結論（gap 改為補充過濾）：
-- XBI-005 主框架（pullback 8-20% + WR + ClosePos ≥ 35%）+ Gap ≤ -1.0%（補充品質）
-  + Close > Open（日內反轉）
+Att3 當前（深 Gap 測試）：
+- 10 日高點回檔 in [-5%, -18%]
+- Williams %R(10) <= -80
+- Gap <= -2.0%（Att3 加深門檻）
+- Close > Open（日內反轉確認）
+- 冷卻期 10 天
+- ClosePos 過濾停用以允許更寬訊號集
 
-進場條件（六項同時成立）：
-1. 10 日高點回檔 in [-8%, -20%]（XBI-005 基線）
-2. Williams %R(10) <= -80（XBI-005 基線）
-3. 收盤位置 >= 35%（XBI-005 基線：日內反轉強度）
-4. 隔夜開盤跳空 (Open - PrevClose) / PrevClose <= -1.0%（Att2 新增補充過濾）
-5. Close > Open（日內陽 K，雙重確認反轉）
-6. 冷卻期 10 個交易日
+進場條件（五項同時成立）：
+1. 10 日高點回檔 in [-5%, -18%]
+2. Williams %R(10) <= -80
+3. Gap <= -2.0%
+4. Close > Open
+5. 冷卻期 10 個交易日
 """
 
 import logging
@@ -60,26 +63,22 @@ class XBI013SignalDetector(BaseSignalDetector):
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # XBI-005 基線三項
         cond_pullback = df["Pullback"] <= self.config.pullback_threshold
         cond_upper = df["Pullback"] >= self.config.pullback_upper
         cond_wr = df["WR"] <= self.config.wr_threshold
-        cond_closepos = df["ClosePos"] >= self.config.close_position_threshold
-
-        # Att2 新增補充過濾
         cond_gap = df["Gap"] <= self.config.gap_threshold
         if self.config.require_up_bar:
             cond_up_bar = df["Close"] > df["Open"]
         else:
             cond_up_bar = pd.Series(True, index=df.index)
 
+        if self.config.use_close_position:
+            cond_closepos = df["ClosePos"] >= self.config.close_position_threshold
+        else:
+            cond_closepos = pd.Series(True, index=df.index)
+
         df["Signal"] = (
-            cond_pullback
-            & cond_upper
-            & cond_wr
-            & cond_closepos
-            & cond_gap
-            & cond_up_bar
+            cond_pullback & cond_upper & cond_wr & cond_gap & cond_up_bar & cond_closepos
         )
 
         # 冷卻機制
@@ -100,5 +99,5 @@ class XBI013SignalDetector(BaseSignalDetector):
             logger.info("XBI-013: %d signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
-        logger.info("XBI-013: Detected %d gap-down + XBI-005 filtered signals", signal_count)
+        logger.info("XBI-013: Detected %d gap-down reversal signals", signal_count)
         return df

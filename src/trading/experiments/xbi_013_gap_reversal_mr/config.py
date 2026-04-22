@@ -25,20 +25,43 @@ XBI-013：Gap-Down Capitulation + Intraday Reversal 均值回歸配置
 策略方向：均值回歸（事件驅動投降拋壓 + 日內反轉確認）
     Strategy direction: Mean reversion with event-driven gap-down + intraday reversal
 
-參數縮放（IBIT-006 → XBI）：
-    IBIT 3.17% vol → XBI 2.0% vol，縮放比率 0.63x：
-    - Gap threshold: IBIT -1.5% → XBI -1.0%
-    - Pullback: IBIT [-12%, -25%] → XBI [-5%, -15%]
-    - TP: IBIT +4.5% → XBI +3.0%
-    - SL: IBIT -4.0% → XBI -2.5% (rounded to -3.0% for biotech event volatility)
-    - 持倉 15 天、冷卻 10 天保持不變
+========================================================================
+三次迭代結果（2026-04-22，成交模型 0.1% slippage，隔日開盤市價進場）：
+========================================================================
 
-迭代歷程（Iteration Log）：見 signal_detector.py 與 strategy.py 註解
+Att1（失敗）—— Primary Gap-Down 觸發，IBIT-006 縮放參數
+    進場：Gap ≤ -1.0% + Close > Open + 10d Pullback [-5%, -15%] + WR(10) ≤ -80 + cd 10
+    出場：TP +3.0% / SL -3.0% / 15 天
+    結果：Part A 8 訊號 50% WR Sharpe **-0.02** cum -0.77%（4TP/4SL，全部 1-3 日出場）
+         Part B 1 訊號 0% WR Sharpe 0.00 cum -3.10%（1 日停損）
+         min(A,B) **-0.02**（-106% vs XBI-005 的 0.36）
+    失敗分析：生技 gap-down 多為 FDA/臨床 negative news 觸發，負面消息續跌特性
+             明顯，非 IBIT BTC 24/7 隔夜拋壓耗盡結構。4/8 Part A 訊號與 1/1 Part B
+             訊號均在 1-3 日內觸 -3% SL，無反彈模式。Gap-Down MR 失敗家族擴展：
+             XBI 生技板塊 ETF 加入 FXI（政策）/ FCX（商品）/ TQQQ（槓桿）行列。
 
-設計要點：
-    XBI 生技板塊日波動 ~2.0%，事件驅動 FDA/臨床公告。Gap-down + 日內反轉
-    結構假設可能符合 IBIT-006 成功的三個前提（資訊完全公告、無跨 session 延續
-    性拋壓機制、短期反彈生物學基礎）。
+Att2（失敗）—— Gap 改為 XBI-005 框架上的補充品質過濾
+    進場：XBI-005 base（pullback 8-20% + WR ≤ -80 + ClosePos ≥ 35%）+ Gap ≤ -1.0%
+         + Close > Open + cd 10
+    出場：TP +3.5% / SL -5.0% / 15 天（XBI-005 基線）
+    結果：Part A 3 訊號 66.7% WR Sharpe 1.39 cum +7.08%
+         Part B 1 訊號 0% WR Sharpe 0.00 cum -5.10%
+         min(A,B) **0.00**（-100% vs XBI-005 的 0.36）
+    失敗分析：Gap 過濾把 XBI-005 原 35/8 訊號濾至 3/1（-90%），樣本過薄。
+             Part A 倖存訊號雖然 Sharpe 1.39，但 Part B 單訊號 2024-01-17 仍 1日 SL，
+             顯示 gap-down 對 XBI 訊號品質無貢獻，結構性問題與 filter role（主/補
+             充）無關。
+
+Att3（失敗）—— 深 Gap 測試：生技需更深 gap 才能觸 capitulation？
+    進場：Gap ≤ -2.0%（較 Att1 深 2x）+ Close > Open + 10d Pullback [-5%, -18%]
+         + WR(10) ≤ -80 + cd 10
+    出場：TP +3.5% / SL -4.0% / 15 天
+    結果：見 signal_detector.py 與 strategy.py 中的最終更新註解
+
+========================================================================
+結論：Gap-Down MR 在 XBI 生技板塊 ETF 上三次迭代均未勝過 XBI-005 的 min 0.36
+     確認 Gap-Down 失敗家族擴展至 US 事件驅動板塊 ETF 類別
+========================================================================
 """
 
 from dataclasses import dataclass
@@ -48,28 +71,26 @@ from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class XBI013Config(ExperimentConfig):
-    """XBI-013 Gap-Down Capitulation + Intraday Reversal MR 參數
+    """XBI-013 Gap-Down Capitulation + Intraday Reversal MR 參數（Att3 最終）"""
 
-    Att2（當前）：將 gap 濾波器改為 XBI-005 框架上的「補充品質過濾」，非主訊號。
-    """
-
-    # 進場 — 回檔範圍（XBI-005 基線）
+    # 進場 — 回檔範圍（Att3：拓寬至 [-5%, -18%] 捕捉更多潛在訊號）
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.08  # 回檔 >= 8%（XBI-005 base）
-    pullback_upper: float = -0.20  # 回檔上限 20%（XBI-005 base）
+    pullback_threshold: float = -0.05  # 回檔 >= 5%
+    pullback_upper: float = -0.18  # 回檔上限 18%
 
-    # 進場 — Williams %R 超賣確認（XBI-005 基線）
+    # 進場 — Williams %R 超賣確認
     wr_period: int = 10
     wr_threshold: float = -80.0
 
-    # 進場 — 收盤位置過濾（XBI-005 基線）
-    close_position_threshold: float = 0.35
+    # 進場 — 隔夜跳空（Att3：加深至 -2.0% 測試「真正 capitulation」假設）
+    gap_threshold: float = -0.020  # Gap <= -2.0%
 
-    # 進場 — 隔夜跳空（Att2 新增補充過濾，非主訊號）
-    gap_threshold: float = -0.010  # Gap <= -1.0%（較寬以保留更多訊號）
-
-    # 進場 — 日內反轉（Close > Open，配合 ClosePos 雙重確認）
+    # 進場 — 日內反轉（Close > Open）
     require_up_bar: bool = True
+
+    # 進場 — 收盤位置過濾（Att3 停用以允許更寬訊號）
+    use_close_position: bool = False
+    close_position_threshold: float = 0.35
 
     # 冷卻期
     cooldown_days: int = 10
@@ -82,7 +103,7 @@ def create_default_config() -> XBI013Config:
         display_name="XBI Gap-Down Capitulation + Intraday Reversal MR",
         tickers=["XBI"],
         data_start="2010-01-01",
-        profit_target=0.035,  # +3.5%（XBI-005 基線）
-        stop_loss=-0.050,  # -5.0%（XBI-005 基線）
+        profit_target=0.035,
+        stop_loss=-0.040,
         holding_days=15,
     )
