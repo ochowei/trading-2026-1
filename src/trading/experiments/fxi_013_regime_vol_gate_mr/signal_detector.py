@@ -72,6 +72,11 @@ class FXI013SignalDetector(BaseSignalDetector):
         df["BB_Lower"] = sma - bb_k * std
         df["BB_Width_Ratio"] = (df["BB_Upper"] - df["BB_Lower"]) / df["Close"]
 
+        # 動態 regime 百分位（Att3 新增）：BB 寬度在 252 日回看期的分位排名
+        # rank(pct=True) 回傳 0~1 值，0 為最低、1 為最高
+        pct_lookback = self.config.bb_width_percentile_lookback
+        df["BB_Width_Pct"] = df["BB_Width_Ratio"].rolling(pct_lookback).rank(pct=True)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -84,8 +89,21 @@ class FXI013SignalDetector(BaseSignalDetector):
         cond_atr = df["ATR_Ratio"] > self.config.atr_ratio_threshold
         cond_regime = df["BB_Width_Ratio"] < self.config.max_bb_width_ratio
 
+        if self.config.use_bb_width_percentile:
+            cond_regime_pct = (
+                df["BB_Width_Pct"] < self.config.bb_width_percentile_threshold
+            ).fillna(False)
+        else:
+            cond_regime_pct = pd.Series(True, index=df.index)
+
         df["Signal"] = (
-            cond_pullback & cond_cap & cond_wr & cond_reversal & cond_atr & cond_regime
+            cond_pullback
+            & cond_cap
+            & cond_wr
+            & cond_reversal
+            & cond_atr
+            & cond_regime
+            & cond_regime_pct
         )
 
         # 冷卻機制

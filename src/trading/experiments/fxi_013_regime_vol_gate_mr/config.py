@@ -69,7 +69,15 @@ class FXI013Config(ExperimentConfig):
     # FXI ~2.0% vol 為 TLT ~1.0% vol 的 2 倍，故預期需要較 TLT 寬鬆的門檻
     bb_period: int = 20
     bb_std: float = 2.0
-    max_bb_width_ratio: float = 0.12  # Att2 放寬至 12%（Att1 8% 過嚴，僅 6/31 訊號通過）
+    max_bb_width_ratio: float = 0.10  # Att3 採中間值 10% 搭配動態 regime 百分位過濾
+
+    # 動態 regime 百分位閘門（Att3 新增）：BB 寬度必須位於 252 日回看期的
+    # 前 bb_width_pct_threshold 分位以下（即在相對安靜的 regime 中）。
+    # 這讓門檻隨 regime 自動調整——crisis 期 median 升高時即使固定 10% 門檻也
+    # 過關的訊號仍可能被過濾（因相對於 252 日仍屬高波動 regime）
+    use_bb_width_percentile: bool = True
+    bb_width_percentile_lookback: int = 252  # 1 交易年
+    bb_width_percentile_threshold: float = 0.5  # 需在過去 252 日 BB 寬度的前 50% 分位內
 
     # 冷卻期（同 FXI-005）
     cooldown_days: int = 10
