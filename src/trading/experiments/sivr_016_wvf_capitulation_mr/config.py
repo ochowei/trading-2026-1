@@ -54,9 +54,9 @@ class SIVR016Config(ExperimentConfig):
     wvf_bb_lookback: int = 20  # WVF 序列的 BB 計算窗口
     wvf_bb_stddev: float = 2.0  # BB 標準差倍數（突破上軌即 capitulation）
 
-    # 回檔深度過濾（SIVR baseline: 7%-20%；Att2 可收緊至 10%）
+    # 回檔深度過濾（Att2：收緊至 -10% 深回檔，URA-010 Att3 方向）
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.07  # 10d 高點回檔 ≥ 7%（SIVR-005 baseline）
+    pullback_threshold: float = -0.10  # 10d 高點回檔 ≥ 10%（Att2 加深）
     pullback_upper: float = -0.20  # 回檔上限 20%（過濾結構性崩盤）
 
     # RSI(14) bullish hook（Att3 選用；Att1/Att2 設 enabled=False）
