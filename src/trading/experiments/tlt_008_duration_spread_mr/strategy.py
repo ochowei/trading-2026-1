@@ -15,7 +15,7 @@ from trading.experiments.tlt_008_duration_spread_mr.signal_detector import (
 class TLT008DurationSpreadMRStrategy(ExecutionModelStrategy):
     """TLT-008：TLT 相對 IEF 存續期間價差均值回歸"""
 
-    slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+    slippage_pct: float = 0.001
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()
@@ -25,25 +25,31 @@ class TLT008DurationSpreadMRStrategy(ExecutionModelStrategy):
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
         if isinstance(config, TLT008Config):
-            if config.use_spread_zscore:
+            if config.require_mr_framework:
                 print(
-                    f"  配對訊號 (Pair signal): TLT/{config.reference_ticker} "
-                    f"{config.spread_zscore_window}d z-score <= "
-                    f"{config.spread_zscore_threshold:.1f}"
+                    f"  回檔範圍 (Pullback range): {config.pullback_lookback} 日高點回檔"
+                    f" {abs(config.pullback_threshold):.0%} ~ {abs(config.pullback_upper):.0%}"
                 )
-            else:
-                print(
-                    f"  配對訊號 (Pair signal): TLT-{config.reference_ticker} "
-                    f"{config.relative_lookback}d return spread <= "
-                    f"{config.relative_underperf_threshold:.1%}"
-                )
+                print(f"  Williams %R: WR({config.wr_period}) <= {config.wr_threshold}")
             print(
                 f"  收盤位置 (Close Position): >= {config.close_position_threshold:.0%} of day range"
             )
-            print(f"  當日轉正 (Daily up): {'是 Yes' if config.require_daily_up else '否 No'}")
             print(
                 f"  波動率閘門 (Vol Regime Gate): BB({config.bb_period}, {config.bb_std}) width"
                 f" / Close < {config.max_bb_width_ratio:.1%}"
             )
+            if config.use_spread_zscore:
+                print(
+                    f"  配對過濾 (Pair filter): TLT/{config.reference_ticker} "
+                    f"{config.spread_zscore_window}d z-score <= {config.spread_zscore_threshold:.1f}"
+                )
+            else:
+                print(
+                    f"  配對過濾 (Pair filter): TLT-{config.reference_ticker} "
+                    f"{config.relative_lookback}d return spread <= {config.relative_underperf_threshold:.1%}"
+                )
+            if not config.require_mr_framework:
+                print("  (Att1 純 pair 模式；不檢查 pullback/WR)")
+                print(f"  當日轉正 (Daily up): {'是 Yes' if config.require_daily_up else '否 No'}")
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)
