@@ -1,5 +1,5 @@
 """
-TQQQ-017：恐慌抄底 + 日內反轉確認 (Capitulation + Intraday Recovery Confirmation)
+TQQQ-017：恐慌抄底 + 盤中/加速確認 (Capitulation + Intraday/Acceleration Confirmation)
 
 動機（Motivation）：
     TQQQ-010（當前最佳）在 Part A 出現 6 筆停損（20 訊號中，WR 70%，
@@ -8,18 +8,29 @@ TQQQ-017：恐慌抄底 + 日內反轉確認 (Capitulation + Intraday Recovery C
     2022-09-01、2022-09-21。觀察這些日子的共同特徵與勝利日的差異，設計
     篩選器以過濾「持續性下跌中的偽訊號」但保留「急速恐慌後的真反轉」。
 
-策略方向：均值回歸（加入日內反轉確認）
+策略方向：均值回歸（加入日內/加速過濾）
 
-Att1 — ClosePos >= 0.30（日內反轉確認）
+迭代歷程（Iteration Log）：
+
+Att1 — ClosePos >= 0.30（日內反轉確認）【失敗】
     進場：20d DD <= -15% + RSI(5)<25 + Volume>1.5x SMA20 + ClosePos>=0.30
-    預期：ClosePos = (Close-Low)/(High-Low) >= 0.30 要求訊號日盤中收在當日振幅
-         上段，確認已出現盤中反彈，排除「盤中持續性賣壓」的偽訊號。
+    結果：Part A n=11, WR 72.7%, Sharpe 0.43 (+19% vs TQQQ-010)
+         Part B n=5, WR 60%, Sharpe 0.13 (-87% vs TQQQ-010)
+    min(A,B) = 0.13（失敗，遠低於 TQQQ-010 的 0.36）
+    失敗分析：
+      - Part A 小幅改善因篩除部分 Part A 停損（2020-03-12、2021-09-28、
+        2022-03-08、2022-09-21 四筆中篩除三筆）
+      - 但 Part B 崩壞——ClosePos>=0.30 篩掉 TQQQ-010 原 7 個 Part B 勝者中 5 個
+        （2024-04-19、2024-07-24、2024-09-06、2025-02-27、2025-04-04 均
+        ClosePos<0.30），同時冷卻期偏移引入新壞訊號（2025-03-04 SL、2025-04-07 SL）
+      - 核心問題：TQQQ 3x 槓桿 + 5-6% 日波動使恐慌日多收於當日低點附近
+        （多數 TQQQ-010 勝者的 ClosePos < 30%），日內反轉發生於隔日而非當日
+      - 再度驗證 cross_asset_lesson #6（ClosePos 邊界 ≤ 2% vol）在 TQQQ 5-6% vol 失效
 
-與 cross_asset_lesson #6（ClosePos 邊界約為日波動 ≤ 2.0%）的關係：
-    Lesson #6 基於 ClosePos 作為「日常訊號」過濾器的跨資產測試。本實驗情境不同：
-    TQQQ-010 訊號已要求三重極端條件（DD ≤ -15% + RSI(5)<25 + Volume > 1.5x SMA20），
-    ClosePos 僅作為**恐慌日日內反轉確認**而非獨立訊號。此 context 下 ClosePos 在
-    高波動資產是否有效為 open question，本實驗直接驗證。
+Att2 — 2 日加速跌幅 <= -10%（加速過濾，避開慢磨下跌）
+    進場：20d DD <= -15% + RSI(5)<25 + Volume>1.5x SMA20 + Return2D<=-0.10
+    預期：篩除「慢磨跌至 -15% DD」的訊號（如 2022-03-08 Ukraine 供應衝擊）、
+         保留「急速 2 日崩盤至 -15% DD」的真恐慌（COVID 系列、yen carry、關稅）
 
 目標（Targets）：
     - min(A,B) Sharpe > 0.36（TQQQ-010 基線）
@@ -35,9 +46,9 @@ from trading.experiments.tqqq_001_capitulation.config import TQQQConfig
 
 @dataclass
 class TQQQ017Config(TQQQConfig):
-    """TQQQ-017：恐慌抄底 + 日內反轉確認配置
+    """TQQQ-017：恐慌抄底 + 加速/確認過濾配置
 
-    繼承 TQQQ-001 的三重進場條件，加入 close_position_threshold。
+    繼承 TQQQ-001 的三重進場條件，依迭代選擇加入不同過濾器。
     出場參數沿用 TQQQ-008/010 的優化值（TP +7% / SL -8% / 10 天持倉）。
     """
 
@@ -47,12 +58,15 @@ class TQQQ017Config(TQQQConfig):
     #   volume_multiplier: 1.5, volume_sma_period: 20
     #   cooldown_days: 3
 
-    # Att1：日內反轉確認
-    close_position_threshold: float = 0.30  # ClosePos = (Close-Low)/(High-Low) >= 0.30
+    # Att1（ClosePos 日內反轉，已驗證失敗）
+    # close_position_threshold 保留為可選參數，<=0 表示停用該過濾器
+    close_position_threshold: float = 0.0  # 0.0 = 停用
 
-    # 後續迭代備用過濾器（Att1 停用）
-    two_day_return_threshold: float = -0.10
-    enable_two_day_filter: bool = False
+    # Att2：2 日加速跌幅過濾
+    two_day_return_threshold: float = -0.10  # 2 日報酬 <= -10% 才視為急速恐慌
+    enable_two_day_filter: bool = True
+
+    # 後續迭代備用過濾器（Att2 停用）
     prev_rsi_threshold: float = 0.0
 
     # 優化出場（同 TQQQ-008/010）
@@ -68,7 +82,7 @@ def create_default_config() -> TQQQ017Config:
     return TQQQ017Config(
         name="tqqq_017_cap_reversal_confirm",
         experiment_id="TQQQ-017",
-        display_name="TQQQ Capitulation + Intraday Recovery Confirmation",
+        display_name="TQQQ Capitulation + Acceleration Confirmation",
         tickers=["TQQQ"],
         data_start="2019-01-01",
         part_a_start="2019-01-01",
