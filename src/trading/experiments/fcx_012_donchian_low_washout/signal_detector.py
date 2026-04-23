@@ -61,6 +61,9 @@ class FCX012SignalDetector(BaseSignalDetector):
         df["High_DD"] = df["High"].rolling(dd_n).max()
         df["Drawdown"] = (df["Close"] - df["High_DD"]) / df["High_DD"]
 
+        # 2 日收盤報酬（close-to-close over 2 trading days）
+        df["TwoDayReturn"] = df["Close"] / df["Close"].shift(2) - 1
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -82,9 +85,19 @@ class FCX012SignalDetector(BaseSignalDetector):
             cond_higher_low = df["Low"] > df["Low"].shift(1)
         else:
             cond_higher_low = pd.Series(True, index=df.index)
+        if self.config.use_twoday_cap:
+            cond_twoday = df["TwoDayReturn"] >= self.config.twoday_return_cap
+        else:
+            cond_twoday = pd.Series(True, index=df.index)
 
         df["Signal"] = (
-            cond_near_low & cond_washout & cond_closepos & cond_atr & cond_dd & cond_higher_low
+            cond_near_low
+            & cond_washout
+            & cond_closepos
+            & cond_atr
+            & cond_dd
+            & cond_higher_low
+            & cond_twoday
         )
 
         # Cooldown

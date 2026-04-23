@@ -108,6 +108,7 @@ on:
           - "FCX-009: fcx_009_rsi_divergence_mr"
           - "FCX-010: fcx_010_gap_reversal_mr"
           - "FCX-011: fcx_011_vol_transition_mr"
+          - "FCX-012: fcx_012_donchian_low_washout"
           - "FXI-001: fxi_001_pullback_wr"
           - "FXI-002: fxi_002_vol_adaptive_pullback"
           - "FXI-003: fxi_003_bb_squeeze_breakout"
