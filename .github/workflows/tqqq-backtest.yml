@@ -54,6 +54,7 @@ on:
           - "SIVR-013: sivr_013_bb_lower_mr"
           - "SIVR-014: sivr_014_donchian_breakout"
           - "SIVR-015: sivr_015_rsi_divergence_mr"
+          - "SIVR-016: sivr_016_wvf_capitulation_mr"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
