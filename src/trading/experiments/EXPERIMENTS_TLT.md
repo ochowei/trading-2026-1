@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-04-23
   data_through: 2025-12-31
-  note: TLT-008 added 2026-04-23 (Duration-Spread Pairs Trading MR vs IEF, **repo first pairs-trading attempt on rate-driven asset**). Three iterations all failed vs TLT-007 Att2 min 0.12: Att1 (pure pair: TLT-IEF 10d spread <= -2% + ClosePos + Daily Up + BB<5%) Part A 4/0% WR/Sharpe **-5.92** cum -12.49% / Part B 1/100%/zero-var Sharpe 0.00 / min **-5.92** — pair signal captures "TLT bear-market onset" not reversal; Att2 (hybrid TLT-007 full framework + TLT-IEF 10d spread <= -1.5%) Part A 6/0% WR/Sharpe **-1.71** (2 SL/4 expiry) cum -12.86% / Part B **0 signals** (vs TLT-007 Att2's 6 winners filtered out!) / min **-1.71** — pair filter **systematically removes winners, keeps losers**; inverse direction test (TLT 5d outperform IEF >= +0.3%) **0 signals all parts** — structural contradiction (TLT always underperforms IEF during own pullback due to duration mechanics); Att3 final (TLT/IEF 100d z-score <= -1.5σ + TLT-007 framework) Part A 6/33.3% WR/Sharpe **-0.31** (2W/1SL/3 expiry) cum -4.64% / Part B 2/100%/zero-var Sharpe 0.00 / min **-0.31** — z-score recovers 2022-02-08 winner but can't salvage 2020-12/2021-01 continuous loss regime signals. **Core finding (extends lesson #20)**: TLT vs IEF same-asset-class duration pair structurally fails — TLT/IEF relationship during TLT pullbacks is **mechanically determined by duration sensitivity ratio** (TLT ~2.4x IEF rate sensitivity), not classical "independent entities' deviation-reversion" pairs MR structure. "TLT loses IEF" filter systematically retains rate-shock onset signals (winners filtered); "TLT beats IEF" filter contradicts MR entry structure; z-score statistical standardization cannot overcome this structural limit. **TLT-008 becomes first confirmed failure of same-asset-class mechanical pair MR on rate-driven asset**, distinguishing from sectoral/event-driven pairs under lesson #20. TLT-007 Att2 remains global optimum (8 experiments, 23+ attempts). TLT-007 added 2026-04-22 (Volatility-Regime-Gated MR, **repo first BB-width-ratio as regime gate on TLT**). Three iterations, Att2 SUCCESS — **repo first positive min(A,B) on TLT ever**. Att1 (pullback 3-7% + WR≤-80 + ClosePos≥40% + BB(20,2) width/Close<0.06) Part A 24/45.8%/Sharpe -0.20 / Part B 10/80.0%/Sharpe 0.48, min -0.20 (tie with TLT-002, BB 6% still passes 2022 hiking signals); **Att2 SUCCESS (BB width/Close<0.05)** Part A 12/50.0%/Sharpe **0.12** cum +2.95% / Part B 6/83.3%/Sharpe **0.65** cum +9.07% / min(A,B) **0.12** (+0.32 abs vs TLT-002 -0.20; Part B +171% vs TLT-002 0.24). BB 5% filtered most 2022 hiking-cycle signals (kept only 2022-02-07 winner), Part A signals 24→12 with 6W/3SL/3expiry structure; A/B signal annualized 2.4/yr vs 3.0/yr (20% diff ✓, <50% goal). A/B cum diff 67.5% (>30% target) but Part B>Part A (asymmetry favors live deployment, not overfitting); Att3 (BB<0.05 + SMA(100) today>=SMA(100) 20d ago slope filter) Part A 7/57.1%/Sharpe 0.29 / Part B 3/66.7%/Sharpe 0.16 / min 0.16 — SMA slope over-filtered Part B (6→3 signals, zero-variance risk), reverted to Att2. **Core finding**: BB-width-ratio as volatility-regime gate succeeds where TLT-002's 60-day ROC filter (≤-10%) failed — BB width captures realized volatility expansion characteristic of 2022 hiking cycle while remaining neutral across 2024-2025 plateau. **Cross-asset hypothesis (pending)**: Volatility-regime gating (BB width/Close < asset-specific threshold) may extend to other rate-policy-driven assets with extreme 2022-2023 volatility spikes. Distinguishing feature vs lesson #5 (MR+trend filter=disaster): BB width is a market-state classifier (calm vs crisis regime), not a short-term directional trend filter. TLT-007 is repo first validation of this structural distinction; potential extension: any asset where Part A is dominated by a single extreme volatility regime episode. TLT-002 remains baseline but TLT-007 Att2 becomes new global optimum (7 experiments, 20+ attempts). TLT-006 added 2026-04-19 (Day-After Capitulation + Strong Reversal Bar MR ported from URA-009 Att2 framework). Three iterations all failed vs TLT-002 min -0.20 (see previous note, preserved below).
+  note: TLT-009 added 2026-04-23 (Yield-Velocity-Gated MR using external ^TNX 10Y Treasury yield, **repo first use of external Treasury yield data as regime filter**). Three iterations all failed vs TLT-007 Att2 min 0.12: Att1 (pure yield gate: ^TNX 10d change <= +15bps, BB gate disabled) Part A 24/45.8% WR/Sharpe **-0.16** cum -10.74% (11W/8SL/5Exp) / Part B 8/87.5% WR/Sharpe 0.86 cum +14.59% / min **-0.16** — 2022 升息呈階梯式，median +12bps，+15bps 門檻讓多段短期平緩窗口訊號通過（2022-03-10/05-05/08-05/08-17/10-11 共 5 筆），但 Part B 8 訊號 vs TLT-007 Att2 6 訊號多 2 筆 87.5% WR 顯示 yield gate 在 Part B 有訊號放寬價值；Att2 (hybrid BB 寬度<5% AND ^TNX 10d<=+15bps) Part A 9/33.3% WR/Sharpe **-0.15** cum -3.33% / Part B 4/100% WR/Sharpe 0.00 zero-var / min **-0.15** — 雙閘門邊界重疊，BB 5% 在 Att1→Att2 砍掉的 15 筆中 7W/7SL，系統性移除 regime transition 期贏家（2020-05-06、2021-10-08、2022-05-05、2023-04-18、2023-08-17、2023-10-20）；Att3 (yield 方向閘門：^TNX 5d change <= 0，BB gate 停用) Part A 4/50% WR/Sharpe **-0.22** cum -2.70% (2W/2SL) / Part B 1/100% WR/Sharpe 0.00 / min **-0.22** — yield 方向與 TLT pullback 進場時機微觀反向（TLT MR 觸發當下 ^TNX 近日通常仍略升），方向閘門過濾率 >90%。**Core finding (結構性失敗)**：外部 ^TNX yield velocity 作為 TLT MR regime gate 無論 magnitude-based (Att1/2) 還是 direction-based (Att3) 皆失敗。(a) 日線 yield velocity 與 TLT 日內 MR trigger 時序錯位：Fed rate shock 在 yield 先反映 (leading)，但 TLT MR 觸發多發生於 rate-shock 後 TLT 日內反轉，此時 ^TNX 近 N 日仍呈正值；(b) BB 寬度 gate（backward-looking 已成形 realized vol）與 MR setup 邏輯（pullback 已發生、WR 已超賣）一致，反而 forward-looking yield driver 與 MR trigger 不同步；(c) TLT-008（IEF pair）+ TLT-009（^TNX driver）共同驗證：外部利率相關指標作為 TLT MR 過濾器結構性受限，TLT-007 的「資產自身 BB 寬度 regime gate」仍為最佳方向。**Cross-asset 擴展**：其他利率政策驅動資產（XLU 部分、REITs、高殖利率股）可能承襲相同結論——自身 BB 寬度 > 外部 yield 指標。未來若要突破 TLT min 0.12，方向應為 TLT-007 Att2 的**更精細 BB 寬度 regime 分層**（如 BB 寬度 60 日分位數 regime 而非固定閾值），而非加入外部 yield 指標。TLT-007 Att2 仍為 TLT 全域最佳（9 實驗、26+ 嘗試）。TLT-008 added 2026-04-23 (Duration-Spread Pairs Trading MR vs IEF, **repo first pairs-trading attempt on rate-driven asset**). Three iterations all failed vs TLT-007 Att2 min 0.12: Att1 (pure pair: TLT-IEF 10d spread <= -2% + ClosePos + Daily Up + BB<5%) Part A 4/0% WR/Sharpe **-5.92** cum -12.49% / Part B 1/100%/zero-var Sharpe 0.00 / min **-5.92** — pair signal captures "TLT bear-market onset" not reversal; Att2 (hybrid TLT-007 full framework + TLT-IEF 10d spread <= -1.5%) Part A 6/0% WR/Sharpe **-1.71** (2 SL/4 expiry) cum -12.86% / Part B **0 signals** (vs TLT-007 Att2's 6 winners filtered out!) / min **-1.71** — pair filter **systematically removes winners, keeps losers**; inverse direction test (TLT 5d outperform IEF >= +0.3%) **0 signals all parts** — structural contradiction (TLT always underperforms IEF during own pullback due to duration mechanics); Att3 final (TLT/IEF 100d z-score <= -1.5σ + TLT-007 framework) Part A 6/33.3% WR/Sharpe **-0.31** (2W/1SL/3 expiry) cum -4.64% / Part B 2/100%/zero-var Sharpe 0.00 / min **-0.31** — z-score recovers 2022-02-08 winner but can't salvage 2020-12/2021-01 continuous loss regime signals. **Core finding (extends lesson #20)**: TLT vs IEF same-asset-class duration pair structurally fails — TLT/IEF relationship during TLT pullbacks is **mechanically determined by duration sensitivity ratio** (TLT ~2.4x IEF rate sensitivity), not classical "independent entities' deviation-reversion" pairs MR structure. "TLT loses IEF" filter systematically retains rate-shock onset signals (winners filtered); "TLT beats IEF" filter contradicts MR entry structure; z-score statistical standardization cannot overcome this structural limit. **TLT-008 becomes first confirmed failure of same-asset-class mechanical pair MR on rate-driven asset**, distinguishing from sectoral/event-driven pairs under lesson #20. TLT-007 Att2 remains global optimum (8 experiments, 23+ attempts). TLT-007 added 2026-04-22 (Volatility-Regime-Gated MR, **repo first BB-width-ratio as regime gate on TLT**). Three iterations, Att2 SUCCESS — **repo first positive min(A,B) on TLT ever**. Att1 (pullback 3-7% + WR≤-80 + ClosePos≥40% + BB(20,2) width/Close<0.06) Part A 24/45.8%/Sharpe -0.20 / Part B 10/80.0%/Sharpe 0.48, min -0.20 (tie with TLT-002, BB 6% still passes 2022 hiking signals); **Att2 SUCCESS (BB width/Close<0.05)** Part A 12/50.0%/Sharpe **0.12** cum +2.95% / Part B 6/83.3%/Sharpe **0.65** cum +9.07% / min(A,B) **0.12** (+0.32 abs vs TLT-002 -0.20; Part B +171% vs TLT-002 0.24). BB 5% filtered most 2022 hiking-cycle signals (kept only 2022-02-07 winner), Part A signals 24→12 with 6W/3SL/3expiry structure; A/B signal annualized 2.4/yr vs 3.0/yr (20% diff ✓, <50% goal). A/B cum diff 67.5% (>30% target) but Part B>Part A (asymmetry favors live deployment, not overfitting); Att3 (BB<0.05 + SMA(100) today>=SMA(100) 20d ago slope filter) Part A 7/57.1%/Sharpe 0.29 / Part B 3/66.7%/Sharpe 0.16 / min 0.16 — SMA slope over-filtered Part B (6→3 signals, zero-variance risk), reverted to Att2. **Core finding**: BB-width-ratio as volatility-regime gate succeeds where TLT-002's 60-day ROC filter (≤-10%) failed — BB width captures realized volatility expansion characteristic of 2022 hiking cycle while remaining neutral across 2024-2025 plateau. **Cross-asset hypothesis (pending)**: Volatility-regime gating (BB width/Close < asset-specific threshold) may extend to other rate-policy-driven assets with extreme 2022-2023 volatility spikes. Distinguishing feature vs lesson #5 (MR+trend filter=disaster): BB width is a market-state classifier (calm vs crisis regime), not a short-term directional trend filter. TLT-007 is repo first validation of this structural distinction; potential extension: any asset where Part A is dominated by a single extreme volatility regime episode. TLT-002 remains baseline but TLT-007 Att2 becomes new global optimum (7 experiments, 20+ attempts). TLT-006 added 2026-04-19 (Day-After Capitulation + Strong Reversal Bar MR ported from URA-009 Att2 framework). Three iterations all failed vs TLT-002 min -0.20 (see previous note, preserved below).
 -->
 ## AI Agent 快速索引
 
@@ -42,8 +42,9 @@
 - 利率相關指標（如 10Y yield 變化率）作為過濾器（需外部資料源，超出現有框架）
 - 季節性/月份過濾（避開 Fed 會議月份 — 但 2022 幾乎每月都有會議，過濾效果有限）
 - ~~Day-After Capitulation + 強反轉 K 線（URA-009 Att2 框架移植）~~ → TLT-006 三次迭代均失敗（min(A,B) -0.37/-0.39/Part B 枯竭），確認政策驅動資產對單日/雙日 price-action 反轉過濾失效
-- ~~波動率 regime 閘門（BB 寬度/Close 比例過濾）~~ → TLT-007 Att2 成功（首次 TLT min(A,B) 轉正至 0.12）。未來可探索：BB 寬度進一步收緊至 4.5% / 動態門檻（隨 ATR 分位調整）
+- ~~波動率 regime 閘門（BB 寬度/Close 比例過濾）~~ → TLT-007 Att2 成功（首次 TLT min(A,B) 轉正至 0.12）。未來可探索：BB 寬度進一步收緊至 4.5% / **動態門檻（BB 寬度 60 日分位數 regime 而非固定閾值）**
 - ~~配對交易（TLT vs IEF duration spread MR）~~ → TLT-008 三次迭代全失敗（min(A,B) -5.92/-1.71/-0.31），確認同資產類別但不同 duration 的機械性 pair 結構性不適用 MR 進場過濾
+- ~~外部 ^TNX yield velocity gate（repo 首次外部 Treasury yield 數據過濾）~~ → TLT-009 三次迭代全失敗（min(A,B) -0.16/-0.15/-0.22）：magnitude-based (Att1/2) 與 direction-based (Att3) yield gate 皆結構性失敗。**核心原因**：日線 yield velocity 與 TLT 日內 MR trigger 時序錯位——Fed rate shock 在 yield 先反映但 TLT MR 觸發多發生於 rate-shock 後日內反轉，此時 ^TNX 近 N 日仍呈正值；BB 寬度 gate（backward-looking 已成形 vol）與 MR setup 邏輯（pullback 已發生、WR 已超賣）一致，反而 forward-looking yield driver 與 MR trigger 不同步。與 TLT-008 共同證明：**外部利率相關指標作為 TLT MR 過濾器結構性受限**
 
 **關鍵資產特性：**
 - TLT (iShares 20+ Year Treasury Bond ETF) 日波動約 1.00%，低於 GLD (1.11%)，GLD 比率 0.90x
@@ -79,6 +80,7 @@
 | TLT-006 | `tlt_006_day_after_reversal_mr` | Day-After Capitulation + 強反轉 K 線均值回歸（3 次迭代均失敗）| 已完成（未改善）|
 | TLT-007 | `tlt_007_regime_vol_gate_mr`    | 波動率 regime 閘門均值回歸（BB 寬度/Close<5%，Att2 SUCCESS）| ✅ **當前最佳**（首次 TLT min(A,B) 轉正）|
 | TLT-008 | `tlt_008_duration_spread_mr`    | 配對交易 MR（TLT vs IEF duration spread，3 次迭代全失敗） | 已完成（未改善）|
+| TLT-009 | `tlt_009_yield_velocity_mr`     | ^TNX yield velocity gate MR（repo 首次外部 Treasury yield 過濾，3 次迭代全失敗）| 已完成（未改善）|
 
 ---
 
@@ -803,3 +805,65 @@ TLT-006 三次迭代的共同失敗點：
    - 「TLT 贏 IEF」過濾（中間測試）與 MR 進場結構互斥（訊號全 0）
    - z-score 統計標準化（Att3）無法克服此結構性限制
 4. **Lesson #20 擴展**：跨資產相關性配對策略的結構性風險不僅限於「跨資產類別」，**同資產類別但存在機械性 beta/duration 關係的 pair** 亦失效
+
+---
+
+## TLT-009: Yield-Velocity-Gated Mean Reversion（^TNX 外部殖利率 regime gate，repo 首次）
+
+### 目標 (Goal)
+
+探索使用**外部 Treasury yield 數據（^TNX = CBOE 10-Year Treasury Note Yield Index）**作為 TLT MR 的 regime 過濾器——repo 首次試驗。核心假設：TLT 價格 ≈ −duration × Δyield，^TNX 短期變化是 TLT 價格的 **forward-looking driver**，10 日 ^TNX 變化可作為 Fed rate-shock 偵測器，取代或補強 TLT-007 Att2 的 **backward-looking BB 寬度 gate**。
+
+### 設計背景 (Design Rationale)
+
+- TLT-007 Att2 的 BB 寬度 gate 為**實現波動率（realized vol）**，滯後於 Fed rate shock 1-3 天
+- ^TNX 變化在時序上**領先**（leading）TLT 價格反應
+- 2022 升息期 ^TNX 10 日變化 median +12bps、90th percentile +35bps；2024-2025 高原期 median 0bps、90th percentile +20bps——門檻 +15bps 理論上可移除 ~50% 2022 訊號、保留 ~80% 2024-2025 訊號
+
+### 三次迭代紀錄 (Iteration Log)
+
+| # | 方向 | 關鍵參數 | Part A | Part B | min(A,B) | 結果 |
+|---|------|----------|--------|--------|----------|------|
+| Att1 | 純 yield magnitude gate | ^TNX 10d <= +15bps, BB gate 停用 | 24/45.8% WR/Sharpe -0.16/cum -10.74% (11W/8SL/5Exp) | 8/87.5% WR/Sharpe 0.86/cum +14.59% (7W/1SL) | **-0.16** | 2022 階梯式升息讓短期平緩窗口訊號通過（5 筆 2022 訊號），Part A 仍負 |
+| Att2 | hybrid BB+yield gate | BB 寬度<5% AND ^TNX 10d<=+15bps | 9/33.3% WR/Sharpe -0.15/cum -3.33% (3W/2SL/4Exp) | 4/100% WR/Sharpe 0.00 zero-var/cum +10.38% | **-0.15** | 雙閘門系統性移除 regime transition 贏家（6 筆 Part A 贏家被 BB 砍掉）|
+| Att3 | yield direction gate | ^TNX 5d <= 0（不再上升），BB gate 停用 | 4/50% WR/Sharpe -0.22/cum -2.70% (2W/2SL) | 1/100% WR/Sharpe 0.00 zero-var/cum +2.50% | **-0.22** | 方向閘門過濾率 >90%，yield 方向與 TLT pullback 微觀反向 |
+
+### 詳細結果 (Detailed Results)
+
+#### Att1 Part A 2022 訊號（5 筆通過 +15bps 閾值）
+- 2022-03-10 SL −3.60%（Fed 3 月首次升息前一週）
+- 2022-05-05 W +2.50%（5 月升息後短暫反彈）
+- 2022-08-05 SL −3.60%
+- 2022-08-17 SL −3.60%
+- 2022-10-11 SL −3.60%
+
+→ +15bps 閾值讓「多段 rate-shock 之間的短暫平緩窗口」訊號通過，但此時 TLT 價格反映累積 rate-shock，未必同步回升。
+
+#### Att2 hybrid 移除的 Part A 贏家（BB 寬度 > 5% 的 regime transition 期）
+- 2020-05-06 W（COVID 後 Fed QE 緩和初期）
+- 2021-10-08 W（reflation trade）
+- 2022-05-05 W（5 月 Fed 緊縮前短暫喘息）
+- 2023-04-18 W（post-SVB 利率回落）
+- 2023-08-17 W
+- 2023-10-20 W
+
+→ BB 寬度 gate 與 yield gate 邊界在 regime transition 期重疊，hybrid 不疊加過濾力，反而放大「過濾 turning-point 贏家」的副作用。
+
+#### Att3 Part A 4 筆訊號（yield 5d 方向閘門通過率 <10%）
+- 2019-10-22 SL / 2020-05-26 SL / 2021-10-04 Exp +2.15% / 2023-03-28 W +2.50%
+
+→ TLT MR 進場結構（pullback 3-7% + WR 超賣）多發生於 rate-shock 仍持續但 TLT 短期超賣時刻，此時 ^TNX 5d 仍為正值，方向閘門系統性排除此類進場機會。
+
+### 結論與跨資產延伸 (Conclusions)
+
+三次迭代全部失敗，TLT-007 Att2 min(A,B) 0.12 仍為 TLT 全域最佳（9 實驗、26+ 嘗試）。TLT-009 的**結構性失敗**（與 TLT-008 共同）擴展 TLT knowledge base：
+
+1. **外部殖利率指標於 TLT MR 過濾器結構性受限**：
+   - magnitude-based gate (Att1/Att2)：計數過濾 ≠ 品質過濾，階梯式升息的 intermediate pauses 仍產生虧損訊號
+   - direction-based gate (Att3)：yield 方向與 TLT pullback 進場時機在微觀層級反向
+   - hybrid 雙閘門 (Att2)：BB 寬度 gate 與 yield gate 邊界重疊於 regime transition 期，雙閘門反而放大副作用
+2. **日線 yield velocity 與 TLT 日內 MR trigger 時序錯位**：Fed rate shock 在 yield 先反映（leading），但 TLT MR 觸發（pullback+WR+ClosePos）多發生於 rate-shock 後的日內反轉，此時 ^TNX 近 N 日（N≤10）仍呈正值
+3. **BB 寬度 gate 之所以有效的機理**：BB 寬度捕捉的是「已發生的實現波動率」，與 MR setup 的邏輯（pullback 已發生、WR 已超賣）一致——兩者皆為 backward-looking 的「狀態已成形」指標。反觀 forward-looking 的 yield velocity，與 MR trigger 時機不同步
+4. **TLT-008（IEF pair）+ TLT-009（^TNX driver）共同結論**：外部利率相關指標（無論 pair 形式或 driver velocity 形式）作為 TLT MR 過濾器結構性不適用。TLT-007 的「資產自身 BB 寬度 regime gate」仍為最佳方向
+5. **突破 TLT min 0.12 的方向建議**：若要進一步改善，應為 TLT-007 Att2 的**更精細 BB 寬度 regime 分層**（如 BB 寬度 60 日分位數 regime 而非固定 5% 閾值、或動態隨 ATR 分位調整），而非加入外部 yield 指標
+6. **Cross-asset 擴展假設**：其他利率政策驅動資產（XLU 部分、REITs、高殖利率股）可能承襲相同結論——自身 BB 寬度 > 外部 yield 指標。Fixed-income 類 ETF 的 MR 過濾器應優先考慮自身波動率狀態分類，而非外部 driver

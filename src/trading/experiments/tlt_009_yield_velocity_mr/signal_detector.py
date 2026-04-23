@@ -111,12 +111,7 @@ class TLT009SignalDetector(BaseSignalDetector):
             cond_bb = pd.Series(True, index=df.index)
 
         df["Signal"] = (
-            cond_pullback_min
-            & cond_pullback_max
-            & cond_wr
-            & cond_reversal
-            & cond_yield
-            & cond_bb
+            cond_pullback_min & cond_pullback_max & cond_wr & cond_reversal & cond_yield & cond_bb
         )
 
         # 冷卻機制

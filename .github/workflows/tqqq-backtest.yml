@@ -164,6 +164,7 @@ on:
           - "TLT-006: tlt_006_day_after_reversal_mr"
           - "TLT-007: tlt_007_regime_vol_gate_mr"
           - "TLT-008: tlt_008_duration_spread_mr"
+          - "TLT-009: tlt_009_yield_velocity_mr"
           - "TSLA-001: tsla_001_extreme_oversold"
           - "TSLA-002: tsla_002_wider_exit"
           - "TSLA-003: tsla_003_tight_retracement"
