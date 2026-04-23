@@ -68,8 +68,16 @@ commodity panic 結構（2016 信貸、2020 COVID、2022 銅價暴跌）。
     decline 陷阱——Donchian Low 觸及但後續續跌。Part B 三筆到期報酬微幅
     （2024-01/11/12），顯示 washout 訊號在 side-way 環境缺乏觸發動能。
 
-**Att2：（根據 Att1 結果調整）**
-  （待定）
+**Att2：疊加 require_higher_low_today=True（Day-After Capitulation，失敗）**
+  - 其餘同 Att1；新增條件：今日 Low > 昨日 Low
+    （搭配 washout_lookback=2 → 昨日 Low = 新低、今日不再探底）
+  Part A: 1 訊號（2021-06-16 Expiry -12.36% Sharpe 0.00 零方差）
+  Part B: 2 訊號（2024-01-18 Expiry +0.30% / 2025-09-26 TP +9% Sharpe 1.07）
+  min(A,B) **-0.60**（Part A 單筆虧損 Sharpe 無法計算，以單筆報酬近似）
+  失敗分析：Day-After 條件過度過濾——「washout-day + 今日不再探底」在 FCX
+    高波動個股上極稀疏，Part A/B 共 3 訊號無統計意義。**驗證 lesson #20b
+    Day-After Capitulation 失敗家族於 FCX 3% vol 單一商品個股**（繼 URA
+    2.34%/TLT 1% 利率驅動後）。
 
 **Att3：（根據 Att2 結果調整）**
   （待定）
@@ -94,6 +102,11 @@ class FCX012Config(ExperimentConfig):
     require_washout_day: bool = True
     # 「昨日 Low = 20 日低點」視窗（過去 N 個交易日內出現新低）
     washout_lookback_days: int = 2
+
+    # Att2: 要求今日 Low 高於昨日 Low（Day-After 反轉結構）。
+    # 設為 True 時搭配 washout_lookback_days=2 表示「昨日 Low = 新低，
+    # 今日 Low 不再探底」——Key Reversal Day 模式。
+    require_higher_low_today: bool = True
 
     # 日內反轉
     close_pos_threshold: float = 0.40

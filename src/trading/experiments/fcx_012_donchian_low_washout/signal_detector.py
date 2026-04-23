@@ -78,7 +78,14 @@ class FCX012SignalDetector(BaseSignalDetector):
             df["Drawdown"] >= self.config.drawdown_lower
         )
 
-        df["Signal"] = cond_near_low & cond_washout & cond_closepos & cond_atr & cond_dd
+        if self.config.require_higher_low_today:
+            cond_higher_low = df["Low"] > df["Low"].shift(1)
+        else:
+            cond_higher_low = pd.Series(True, index=df.index)
+
+        df["Signal"] = (
+            cond_near_low & cond_washout & cond_closepos & cond_atr & cond_dd & cond_higher_low
+        )
 
         # Cooldown
         signal_indices = df.index[df["Signal"]].tolist()
