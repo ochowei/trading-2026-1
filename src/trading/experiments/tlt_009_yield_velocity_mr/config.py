@@ -79,8 +79,9 @@ class TLT009Config(ExperimentConfig):
     # === BB 寬度 gate（TLT-007 Att2 架構，Att2 重新啟用 hybrid）===
     bb_period: int = 20
     bb_std: float = 2.0
-    # Att1 設 None（停用 BB gate 以純測 yield gate 效果）
-    max_bb_width_ratio: float | None = None
+    # Att1: None（停用 BB gate 以純測 yield gate 效果）
+    # Att2: 0.05（啟用 hybrid：BB 寬度 < 5% AND ^TNX 10d ≤ +15bps）
+    max_bb_width_ratio: float | None = 0.05
 
     # 冷卻期
     cooldown_days: int = 7
