@@ -243,6 +243,7 @@ on:
           - "COPX-007: copx_007_vol_adaptive"
           - "COPX-008: copx_008_rs_momentum"
           - "COPX-009: copx_009_rsi_divergence_mr"
+          - "COPX-010: copx_010_vol_transition_mr"
           - "URA-001: ura_001_pullback_wr"
           - "URA-002: ura_002_asymmetric_narrow"
           - "URA-003: ura_003_pullback_rsi2"
