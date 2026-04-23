@@ -566,10 +566,18 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 
 ## 20. 跨資產相關性配對策略的結構性風險
 <!-- freshness:
-  derived_from: [XLU-005,COPX-006,SIVR-009,TSM-009,FCX-006,DIA-009,EEM-006]
-  validated: 2026-04-10
+  derived_from: [XLU-005,COPX-006,SIVR-009,TSM-009,FCX-006,DIA-009,EEM-006,TLT-008]
+  validated: 2026-04-23
   data_through: 2025-12-31
   confidence: high
 -->
 
 跨資產相關性可能隨宏觀環境改變而失效（regime change）。Part A 正 + Part B 負 Sharpe 是相關性崩潰的典型特徵。個股 vs 板塊 ETF RS 策略僅在個股有持續性結構優勢（如 TSM 先進製程護城河）時有效，商品生產者（FCX）的超額表現由短期事件驅動，無持續性。廣基 ETF RS（如 EEM vs SPY）受宏觀/政治事件（關稅、貿易戰）驅動，三次嘗試 Part B 均為負值。
+
+**TLT-008 擴展（2026-04-23）：同資產類別但不同 duration 的機械性 pair 亦結構性失敗**。TLT vs IEF duration spread MR 三次迭代全失敗（min(A,B) -5.92/-1.71/-0.31 vs TLT-007 Att2 的 0.12）：
+- Att1 純 pair（10d spread ≤ -2% + ClosePos + BB<5%）：Part A 4/0% WR，訊號全部集中於 2020-05 至 2021-02 TLT 熊市啟動初期
+- Att2 hybrid（TLT-007 Att2 框架 + 10d spread ≤ -1.5%）：Part A 6/0% WR，**Part B 6→0 訊號（贏家全被過濾）**
+- 反向方向測試（5d spread ≥ +0.3%）：所有 part 0 訊號（TLT 在自己 pullback 期間機械性必弱於 IEF）
+- Att3 z-score（100d ≤ -1.5σ）：Part A 6/33.3%/-0.31，z-score 統計標準化無法救
+
+**根因**：TLT 與 IEF 的相對表現由 duration 敏感度比例機械決定（TLT 對利率敏感度約 IEF 的 2.4 倍），並非「獨立個體偏離後回歸」的經典 pairs MR 結構。**規則擴展**：跨資產相關性配對策略的結構性風險不僅適用於「跨資產類別」，**同資產類別但存在機械性 beta/duration 關係的 pair**（如 TLT vs IEF、SPY vs SPLG 等）亦失效。經典 pairs MR 先決條件為「兩個獨立個體其短期偏離後向結構性均衡回歸」，機械性衍生物（如 duration 放大版 ETF、槓桿 ETF、ETF vs 其成分股平均）不滿足此前提。

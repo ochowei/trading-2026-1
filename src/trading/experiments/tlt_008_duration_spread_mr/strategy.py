@@ -38,15 +38,16 @@ class TLT008DurationSpreadMRStrategy(ExecutionModelStrategy):
                 f"  波動率閘門 (Vol Regime Gate): BB({config.bb_period}, {config.bb_std}) width"
                 f" / Close < {config.max_bb_width_ratio:.1%}"
             )
+            op = ">=" if config.relative_direction_bullish else "<="
             if config.use_spread_zscore:
                 print(
                     f"  配對過濾 (Pair filter): TLT/{config.reference_ticker} "
-                    f"{config.spread_zscore_window}d z-score <= {config.spread_zscore_threshold:.1f}"
+                    f"{config.spread_zscore_window}d z-score {op} {config.spread_zscore_threshold:.2f}"
                 )
             else:
                 print(
                     f"  配對過濾 (Pair filter): TLT-{config.reference_ticker} "
-                    f"{config.relative_lookback}d return spread <= {config.relative_underperf_threshold:.1%}"
+                    f"{config.relative_lookback}d return spread {op} {config.relative_underperf_threshold:.2%}"
                 )
             if not config.require_mr_framework:
                 print("  (Att1 純 pair 模式；不檢查 pullback/WR)")

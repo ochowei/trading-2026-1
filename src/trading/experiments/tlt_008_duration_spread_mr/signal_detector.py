@@ -122,6 +122,18 @@ class TLT008SignalDetector(BaseSignalDetector):
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
+        # 配對過濾（方向由 relative_direction_bullish 控制；Att1/Att2 為 False = 弱勢方向）
+        if self.config.use_spread_zscore:
+            if self.config.relative_direction_bullish:
+                cond_pair = df["Spread_Z"] >= self.config.spread_zscore_threshold
+            else:
+                cond_pair = df["Spread_Z"] <= self.config.spread_zscore_threshold
+        else:
+            if self.config.relative_direction_bullish:
+                cond_pair = df["Relative_Spread"] >= self.config.relative_underperf_threshold
+            else:
+                cond_pair = df["Relative_Spread"] <= self.config.relative_underperf_threshold
+
         if self.config.require_mr_framework:
             # Att2+: 完整 MR 框架 + pair 過濾
             cond_pb_min = df["Pullback"] <= self.config.pullback_threshold
@@ -130,21 +142,11 @@ class TLT008SignalDetector(BaseSignalDetector):
             cond_close = df["ClosePos"] >= self.config.close_position_threshold
             cond_regime = df["BB_Width_Ratio"] < self.config.max_bb_width_ratio
 
-            if self.config.use_spread_zscore:
-                cond_pair = df["Spread_Z"] <= self.config.spread_zscore_threshold
-            else:
-                cond_pair = df["Relative_Spread"] <= self.config.relative_underperf_threshold
-
             df["Signal"] = (
                 cond_pb_min & cond_pb_max & cond_wr & cond_close & cond_regime & cond_pair
             )
         else:
             # Att1 純 pair 模式
-            if self.config.use_spread_zscore:
-                cond_pair = df["Spread_Z"] <= self.config.spread_zscore_threshold
-            else:
-                cond_pair = df["Relative_Spread"] <= self.config.relative_underperf_threshold
-
             cond_close = df["ClosePos"] >= self.config.close_position_threshold
             cond_daily_up = (
                 df["Daily_Up"] if self.config.require_daily_up else pd.Series(True, index=df.index)

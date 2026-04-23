@@ -56,8 +56,28 @@ class TLT008Config(ExperimentConfig):
         預期：過濾掉 TLT-007 Att2 中「一般 MR 訊號」，保留「殖利率曲線陡峭化事件」
         這類結構性機會（2022-10 Fed hawkish surprise、2023-08 bond auction shock 等）。
 
-      Att3（若 Att2 結果 > TLT-007 但 A/B 訊號過稀，改用 spread ratio z-score 或放寬 threshold）：
-        計畫動態調整。
+      Att3（z-score 統計標準化 pair 過濾）：
+        反向方向中間測試（5d spread >= +0.3% + MR 主訊號）**所有 part 皆 0 訊號**——
+        TLT 在 10d pullback 3-7% 期間相對 IEF 必然弱勢（duration 機械關係），短期
+        反向 spread 與 MR 進場結構互斥。最終 Att3 配置：TLT/IEF 價格比率對其 100 日
+        均值的 z-score <= -1.5σ（統計顯著的歷史性偏離）+ TLT-007 Att2 完整 MR 框架。
+        結果：Part A 6/33.3% WR/Sharpe **-0.31** (2 TP/1 SL/3 expiry)、cum -4.64%；
+        Part B 2/100%/零方差 Sharpe 0.00、cum +5.06%；min(A,B) **-0.31**。
+        仍低於 TLT-007 Att2 的 0.12。z-score 過濾雖救回 2022-02-08 贏家，但仍無法
+        補救 2020-12、2021-01 連續性虧損期訊號。
+
+    實驗結論（三次迭代皆失敗）：TLT vs IEF duration spread pairs trading 於 TLT 上
+    **結構性失敗**，擴展 cross_asset lesson #20 邊界：
+    - 原規則：「跨資產類別相關性配對」在 regime change 時失效
+    - TLT-008 發現：**同資產類別（同為美國公債）但不同 duration 的機械性 pair** 仍失敗
+    - 根因：TLT 與 IEF 在 TLT pullback 期間的相對表現由「duration 敏感度比例」機械
+      決定（TLT ≈ 18yr duration vs IEF ≈ 7.5yr duration，TLT 對利率敏感度 ~2.4x），
+      而非「獨立個體間偏離後回歸」的經典 pairs MR 結構
+    - 任何「TLT 輸 IEF」過濾都系統性保留「rate shock 起點」訊號（贏家被濾掉）；
+      任何「TLT 贏 IEF」過濾在 MR 進場結構下無解（矛盾條件）；z-score 統計標準化
+      無法克服此結構性限制
+
+    最終配置：保留 Att3（z-score），作為最後一次驗證參考；實驗標記為**未超越 TLT-007 Att2**。
     """
 
     # 參考標的（配對對手：中期公債 ETF）
@@ -86,16 +106,20 @@ class TLT008Config(ExperimentConfig):
     require_mr_framework: bool = True
 
     # Relative strength 過濾參數
-    relative_lookback: int = 10  # 10 日 TLT-IEF 報酬差
-    relative_underperf_threshold: float = -0.015  # TLT 輸 IEF >= 1.5pp（Att2 放寬）
+    # Att1/Att2 (弱勢方向) + 反向測試 (強勢方向) 皆失敗
+    # Att3：改用 TLT/IEF 價格比率 z-score（100d 視窗統計標準化），捕捉「歷史性
+    # 極端偏離」而非短期絕對差距，作為最後一次嘗試的 pair 變體
+    relative_lookback: int = 10
+    relative_underperf_threshold: float = -0.015
+    relative_direction_bullish: bool = False  # 恢復弱勢方向（與 z-score 一致）
 
     # 當日轉正確認（僅 Att1 純 pair 使用；Att2+ 已由 ClosePos + 主 MR 框架覆蓋）
     require_daily_up: bool = False
 
-    # Att3 備用：spread ratio z-score MR（預設不啟用）
-    use_spread_zscore: bool = False
+    # Att3 啟用：spread ratio z-score MR（100 日視窗，-1.5σ 門檻）
+    use_spread_zscore: bool = True
     spread_zscore_window: int = 100
-    spread_zscore_threshold: float = -2.0
+    spread_zscore_threshold: float = -1.5
 
     # 冷卻期
     cooldown_days: int = 7
