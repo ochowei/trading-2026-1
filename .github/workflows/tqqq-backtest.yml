@@ -165,6 +165,7 @@ on:
           - "TLT-007: tlt_007_regime_vol_gate_mr"
           - "TLT-008: tlt_008_duration_spread_mr"
           - "TLT-009: tlt_009_yield_velocity_mr"
+          - "TLT-010: tlt_010_capitulation_regime_mr"
           - "TSLA-001: tsla_001_extreme_oversold"
           - "TSLA-002: tsla_002_wider_exit"
           - "TSLA-003: tsla_003_tight_retracement"
