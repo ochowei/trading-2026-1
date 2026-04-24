@@ -57,6 +57,20 @@ class TLT010SignalDetector(BaseSignalDetector):
         two_n = self.config.two_day_decline_lookback
         df["TwoDayReturn"] = df["Close"] / df["Close"].shift(two_n) - 1.0
 
+        # ATR 波動率擴張（Att3 新增）
+        prev_close = df["Close"].shift(1)
+        tr = pd.concat(
+            [
+                df["High"] - df["Low"],
+                (df["High"] - prev_close).abs(),
+                (df["Low"] - prev_close).abs(),
+            ],
+            axis=1,
+        ).max(axis=1)
+        df["ATR_Fast"] = tr.rolling(self.config.atr_fast_period).mean()
+        df["ATR_Slow"] = tr.rolling(self.config.atr_slow_period).mean()
+        df["ATR_Ratio"] = df["ATR_Fast"] / df["ATR_Slow"]
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -67,10 +81,18 @@ class TLT010SignalDetector(BaseSignalDetector):
         cond_wr = df["WR"] <= self.config.wr_threshold
         cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
         cond_regime = df["BB_Width_Ratio"] < self.config.max_bb_width_ratio
-        if self.config.two_day_decline_as_cap:
-            cond_capitulation = df["TwoDayReturn"] >= self.config.two_day_decline_threshold
+        if self.config.use_two_day_decline_filter:
+            if self.config.two_day_decline_as_cap:
+                cond_capitulation = df["TwoDayReturn"] >= self.config.two_day_decline_threshold
+            else:
+                cond_capitulation = df["TwoDayReturn"] <= self.config.two_day_decline_threshold
         else:
-            cond_capitulation = df["TwoDayReturn"] <= self.config.two_day_decline_threshold
+            cond_capitulation = pd.Series(True, index=df.index)
+
+        if self.config.use_atr_expansion:
+            cond_atr = df["ATR_Ratio"].fillna(0) >= self.config.atr_expansion_ratio_min
+        else:
+            cond_atr = pd.Series(True, index=df.index)
 
         df["Signal"] = (
             cond_pullback_min
@@ -79,6 +101,7 @@ class TLT010SignalDetector(BaseSignalDetector):
             & cond_reversal
             & cond_regime
             & cond_capitulation
+            & cond_atr
         )
 
         # 冷卻機制
