@@ -37,12 +37,19 @@ from trading.core.base_config import ExperimentConfig
 
 @dataclass
 class TLT011Config(ExperimentConfig):
-    """TLT-011 Dynamic BB-Width Percentile Regime MR 參數 (Att1 baseline)
+    """TLT-011 Dynamic BB-Width Percentile Regime MR 參數
 
     Att1（bb_width_pctile_lookback=252、max_bb_width_pctile_rank=0.50、
          enable_absolute_backup=False）：
-      策略方向：252 日 rolling percentile rank <= 50%（中位數）作為 regime 閘門
-      關鍵參數：lookback=252d、pctile<=50%、純動態無絕對閾值
+      結果：Part A 24/50.0% WR/Sharpe -0.11 cum -7.76%
+            Part B 11/81.8% WR/Sharpe 0.55 cum +14.72%
+            min(A,B) -0.11（失敗）
+      失敗：50th pctile 過寬，2022 升息期 trailing 252d 窗口自我稀釋，中位數被拉高
+
+    Att2（bb_width_pctile_lookback=504、max_bb_width_pctile_rank=0.40、
+         enable_absolute_backup=False）：
+      策略方向：擴大 lookback 至 504 日（2 年）以跨越 2022 regime，收緊 pctile 至 40th
+      關鍵參數：lookback=504d、pctile<=40%、純動態無絕對閾值
     """
 
     # 回檔範圍進場（同 TLT-007 Att2）
@@ -60,8 +67,8 @@ class TLT011Config(ExperimentConfig):
     # 動態 BB 寬度分位數 regime 閘門（新增，取代固定 5% 閾值）
     bb_period: int = 20
     bb_std: float = 2.0
-    bb_width_pctile_lookback: int = 252  # Att1：252 交易日 ≈ 1 年
-    max_bb_width_pctile_rank: float = 0.50  # Att1：BB 寬度 <= 過去 252 日 50th pctile
+    bb_width_pctile_lookback: int = 504  # Att2：504 交易日 ≈ 2 年
+    max_bb_width_pctile_rank: float = 0.40  # Att2：BB 寬度 <= 過去 504 日 40th pctile
 
     # 雙閘門（絕對 + 相對）— Att1 不啟用，純動態 percentile
     enable_absolute_backup: bool = False
@@ -77,7 +84,7 @@ def create_default_config() -> TLT011Config:
         experiment_id="TLT-011",
         display_name="TLT Dynamic BB-Width Percentile Regime MR",
         tickers=["TLT"],
-        data_start="2017-01-01",  # 需要 252 日 percentile 暖機 + BB(20) 暖機
+        data_start="2016-01-01",  # 需要 504 日 percentile 暖機 + BB(20) 暖機
         profit_target=0.025,  # +2.5%（同 TLT-007）
         stop_loss=-0.035,  # -3.5%（同 TLT-007）
         holding_days=20,
