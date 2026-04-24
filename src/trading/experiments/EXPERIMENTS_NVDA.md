@@ -1,11 +1,13 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取
-  last_validated: 2026-04-07
+  last_validated: 2026-04-24
   data_through: 2025-12-31
+  note: NVDA-009 added 2026-04-24 (Momentum Breakout Pullback Continuation, **repo 第 2 次 MBPC 結構試驗，繼 FXI-012 後首次高波動個股測試**，三次迭代全部失敗). Att1 baseline（Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 淺回檔 -3% ~ -8% + RSI(14) ∈ [40,65] + 多頭 K 棒 + cd10 + TP+8%/SL-7%/20d）Part A 34 訊號 WR 67.6% Sharpe **0.41** cum +142.32% / Part B 8 訊號 WR 75.0% Sharpe **0.96** cum +47.30% / min **0.41**（低於 NVDA-004 / NVDA-006 的 0.47）——A/B 年化訊號比 1.7:1（41% gap）、A/B 年化 cum 差 16.9%，**A/B 平衡目標達成但 Sharpe 目標未達**；Att2（+ SMA(200) regime 閘門 + RSI_max 65→60）Part A 21/66.7%/**0.38** / Part B 6/83.3%/**2.22** / min 0.38——**非選擇性過濾**（訊號 -38%/WR -0.9pp，移除贏家 9/5 比於整體 23/11 比方向錯誤），SMA(200) 過濾 2022-07-25 TP 贏家、RSI<60 過濾 AI 主升段健康續漲；Att3a（2DD cap >= -6%，CIBR-012 方向）與 Att1 完全相同（-6% 無綁定，NVDA 突破+淺回檔 2d 報酬典型 -3~-5%）；Att3b（2DD cap >= -4%）Part A 31/64.5%/**0.33** / Part B 8/62.5%/**0.49** / min **0.33**（三次最差）——-4% cap 與 5d 淺回檔範圍部分重疊且 cooldown-shift 引入新 SL。**核心發現**：Part B（2024-2025 AI 牛市）單邊 Sharpe 0.96 遠勝 NVDA-004 Part B 的 0.47，證明 MBPC 結構在純趨勢期極有效；但 Part A 2021-2023 混合 regime（late-bull + 2022 bear + 2023 summer chop）11 筆 SL 壓制 Sharpe 至 0.41。**repo 第 2 次 MBPC 失敗**（繼 FXI-012 後），失敗機制差異：FXI 為政策驅動假突破（Part A WR 42.3%），NVDA 為 bubble/correction late-cycle 突破（Part A WR 67.6% 已不錯但 Sharpe 受限於標準差）。**擴展 cross_asset_lesson #25**：Momentum Breakout Pullback Continuation 結構需**單一純上升 regime** 資產才穩定，**多 regime 資產**（FXI 政策驅動 / NVDA bubble+correction mixed）結構性劣化於 regime-specific 優化的 MR / 突破策略。NVDA-004 / NVDA-006 維持全域最優（9 次實驗、28+ 次嘗試）。
 -->
 ## AI Agent 快速索引
 
 **當前最佳：** NVDA-004（BB Squeeze Optimized，冷卻 10天，TP+8%/SL-7%/20天）— Part A Sharpe 0.50/Part B Sharpe 0.47，大幅超越 NVDA-003（0.40/0.47）
 **互補策略：** NVDA-006（Relative Strength Momentum Pullback，NVDA-SMH RS≥5% + 5日回撤3-8% + SMA50）— Part A Sharpe 0.47/Part B Sharpe 0.64，min(A,B) 0.47 持平 NVDA-004，但 Part B OOS +36%，A/B 年化訊號比 1.17:1（極佳平衡）
+**單邊 Part B 最佳（已驗證）：** NVDA-009 Att1（Momentum Breakout Pullback Continuation，Donchian 20d + 5d 淺回檔 -3~-8% + SMA(50) + RSI[40,65] + 多頭 K 棒 + cd10）— Part A Sharpe 0.41/Part B Sharpe **0.96**（+104% vs NVDA-004 Part B），但 Part A 0.41 < NVDA-004 的 0.50 使 min(A,B) 僅 0.41，**不可作為全域最優**，**但可作為純趨勢期補充策略**
 **前任最佳：** NVDA-003（BB Squeeze Breakout，冷卻 15天）— Part A Sharpe 0.40/Part B Sharpe 0.47
 **滾動窗口分析摘要：** NVDA-001 ✗✓（精準度突變 ΔWR 25.0pp，績效漸變，訊號極稀少統計可信度低）
 
@@ -66,10 +68,31 @@
 - Att3（SPY 20日 RS≥8% + 5日回撤 3-8%）：Part A 0.46/Part B 0.57，min 0.46（最接近但未超越 0.47）
 - 結論：20日 RS 回看是甜蜜點（10日太噪、40日過擬合），SMH 仍是最佳基準（SPY 因缺少半導體板塊動態略差）
 
+**NVDA-009 Momentum Breakout Pullback Continuation（3 次嘗試，全部失敗，repo 第 2 次 MBPC 結構）：**
+- **Att1（Baseline）**：Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 淺回檔 -3~-8% + RSI(14) [40,65] + 多頭 K 棒 + cd10，TP+8%/SL-7%/20d
+  - Part A: 34 訊號 WR 67.6% Sharpe **0.41** cum +142.32%（11 筆 SL 集中 2020 COVID/2021 late-bull/2022 bear/2023 summer chop）
+  - Part B: 8 訊號 WR 75.0% Sharpe **0.96** cum +47.30%（純趨勢期優異）
+  - min(A,B) **0.41**（低於 NVDA-004 / NVDA-006 的 0.47）
+  - A/B 平衡良好：年化訊號比 1.7:1（41% gap）、年化 cum 差 16.9%（<30%）✓
+- **Att2（+ SMA(200) regime 閘門 + RSI_max 65→60，試圖過濾 late-cycle）**：
+  - Part A: 21/66.7%/**0.38** cum +66.17%（-7% vs Att1）
+  - Part B: 6/83.3%/**2.22** cum +46.87%（+131% vs Att1，單邊優異）
+  - min(A,B) **0.38**（劣化）
+  - 失敗：非選擇性過濾（訊號 -38% 但 WR 僅 -0.9pp），贏家/SL 移除比 9/5 低於整體 23/11，SMA(200) 過濾 2022-07-25 TP 贏家，RSI<60 過濾 AI 主升段健康續漲
+- **Att3a（2DD cap >= -6%，CIBR-012 方向）**：與 Att1 完全相同（-6% 無綁定，NVDA 突破+淺回檔 2d 報酬典型 -3~-5%）
+- **Att3b（2DD cap >= -4%）**：
+  - Part A: 31/64.5%/**0.33** cum +92.36%（-20% vs Att1）
+  - Part B: 8/62.5%/**0.49** cum +26.65%（-49% vs Att1）
+  - min(A,B) **0.33**（三次最差）
+  - 失敗：-4% cap 與 5d 淺回檔範圍部分重疊，cooldown-shift 引入新 SL（2024-11-29 -7.14%）
+- **結論**：Part B Sharpe 0.96（+104% vs NVDA-004 Part B 0.47）證明 MBPC 結構在純趨勢期極有效，但 Part A 0.41 受多 regime 限制。**repo 第 2 次 MBPC 失敗**（繼 FXI-012 後），擴展 lesson：MBPC 需**單一純上升 regime**資產才穩定，**多 regime 資產**（FXI 政策驅動 / NVDA bubble+correction mixed）結構性劣化
+- **NVDA-009 Att1 可作為 2024-2025 AI 純趨勢期補充訊號**，不取代 NVDA-004 / NVDA-006
+
 **已證明無效（禁止重複嘗試）：**（更新）
 原有項目加上：
 - NVDA-007 RS 出場優化：延長持倉（25d）、放寬停損（-8%）、縮短持倉（15d）三種方向均失敗，TP+8%/SL-7%/20d 已確認為 RS 策略全域最優出場參數
 - NVDA-008 RS 參數探索：10日回看（噪音過多 Part B 0.17）、40日回看（A/B 過擬合 Part B 0.03）、SPY 基準（min 0.46 未超越）三種方向均失敗，20日 RS + SMH 基準已確認為全域最優 RS 參數
+- NVDA-009 Momentum Breakout Pullback Continuation：三次迭代全部失敗（Att1 min 0.41 < 0.47），確認 MBPC 結構在多 regime 高波動個股結構性劣化。Att2 SMA(200) + RSI<60 非選擇性過濾、Att3 2DD cap -6% 無綁定 / -4% 雙向劣化
 
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - BB(20,2.5) 更嚴格的擠壓條件

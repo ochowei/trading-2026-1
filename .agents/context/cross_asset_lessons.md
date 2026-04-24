@@ -591,3 +591,38 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 - Att3 z-score（100d ≤ -1.5σ）：Part A 6/33.3%/-0.31，z-score 統計標準化無法救
 
 **根因**：TLT 與 IEF 的相對表現由 duration 敏感度比例機械決定（TLT 對利率敏感度約 IEF 的 2.4 倍），並非「獨立個體偏離後回歸」的經典 pairs MR 結構。**規則擴展**：跨資產相關性配對策略的結構性風險不僅適用於「跨資產類別」，**同資產類別但存在機械性 beta/duration 關係的 pair**（如 TLT vs IEF、SPY vs SPLG 等）亦失效。經典 pairs MR 先決條件為「兩個獨立個體其短期偏離後向結構性均衡回歸」，機械性衍生物（如 duration 放大版 ETF、槓桿 ETF、ETF vs 其成分股平均）不滿足此前提。
+
+---
+
+## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產
+<!-- freshness:
+  derived_from: [FXI-012,NVDA-009]
+  validated: 2026-04-24
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺回檔 + SMA 趨勢 + RSI 中性 + 多頭 K 棒）為經典趨勢跟蹤 / 動量延續結構（類似 Mark Minervini VCP 理念）。repo 已累積 2 個資料點，**兩次皆失敗**：
+
+**FXI-012（2026-04-21，repo 首次 MBPC 試驗）**：
+- Att1 Baseline / Att2 + 黃金排列 / Att3 + SMA(50) slope positive：三次迭代 min(A,B) -0.09 / -0.11 / -0.21 全部劣於 FXI-005 的 0.38
+- 失敗機制：**政策驅動 EM 假突破**——2019-2023 中國熊市期 Donchian 新高多為熊市反彈假突破（Part A WR 42.3%），且 SMA slope 已轉正時往往已錯過最佳進場點（Att3 雙向惡化）
+- FXI 為政策/事件驅動（貿易戰、監管、疫情、刺激政策），regime 轉換期突破頻繁失效
+
+**NVDA-009（2026-04-24，repo 第 2 次 MBPC 試驗，首次高波動個股測試）**：
+- Att1 Baseline（Donchian 20d 近 10 日內新高 + 5d 淺回檔 -3~-8% + SMA(50) + RSI[40,65]）：Part A 34/67.6%/**0.41** cum +142.32% / Part B 8/75%/**0.96** cum +47.30% / min **0.41**（低於 NVDA-004/NVDA-006 的 0.47）
+- Att2（+ SMA(200) regime gate + RSI_max 60）：**非選擇性過濾**，訊號 -38% 但 WR 僅 -0.9pp，移除贏家多於 SL → Part A 退化至 0.38
+- Att3a（2DD cap >= -6% CIBR-012 方向）：完全無綁定（NVDA 突破+淺回檔 2d 報酬典型 -3%~-5%）
+- Att3b（2DD cap >= -4%）：cap 與淺回檔範圍部分重疊且 cooldown-shift 引入新 SL，Part A 0.33 / Part B 0.49
+- **失敗機制差異於 FXI**：NVDA Part A WR 67.6% 已不差，失敗來自 2021 late-bull + 2022 bear + 2023 summer chop 三段**混合 regime**產生 11 筆 SL 拉低 Sharpe 標準差
+
+**整合規則（MBPC 有效性邊界）**：
+- **有效先決條件**：資產處於**單一純上升 regime**（如 NVDA 2024-2025 AI 主升段 Part B Sharpe 0.96 即為證據）
+- **結構性失敗條件**：
+    - **政策/事件驅動 regime**（FXI 中國政策、URA 核能政策、TLT 利率政策）
+    - **多 regime 混合**（NVDA bubble 2021 + bear 2022 + chop 2023 + bull 2024-25）
+    - **low-vol 慢磨 regime**（推測，待驗證）
+
+**規則**：MBPC 結構不是通用的 Sharpe ratio 改善工具；在多 regime 或事件驅動資產上，regime-specific 優化的 MR（pullback+WR）或突破（BB Squeeze）通常結構性優於 MBPC。**MBPC 的 Part B 優異表現（NVDA-009 Part B 0.96）顯示此結構在純趨勢期仍有價值**，可作為**補充訊號生成器**而非主策略。
+
+**跨資產假設（待驗證）**：MBPC 可能在**單一結構性上升趨勢資產**（如 SPY 2023-2025、VOO、DIA）中有效；在**週期性 / 事件驅動 / 多 regime 資產**（FXI、URA、TLT、INDA、EEM、NVDA、FCX）中結構性劣化。
