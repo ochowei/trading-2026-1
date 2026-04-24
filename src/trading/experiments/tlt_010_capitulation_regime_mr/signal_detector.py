@@ -67,7 +67,10 @@ class TLT010SignalDetector(BaseSignalDetector):
         cond_wr = df["WR"] <= self.config.wr_threshold
         cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
         cond_regime = df["BB_Width_Ratio"] < self.config.max_bb_width_ratio
-        cond_capitulation = df["TwoDayReturn"] <= self.config.two_day_decline_threshold
+        if self.config.two_day_decline_as_cap:
+            cond_capitulation = df["TwoDayReturn"] >= self.config.two_day_decline_threshold
+        else:
+            cond_capitulation = df["TwoDayReturn"] <= self.config.two_day_decline_threshold
 
         df["Signal"] = (
             cond_pullback_min
