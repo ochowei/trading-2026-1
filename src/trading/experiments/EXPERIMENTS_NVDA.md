@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取
-  last_validated: 2026-04-24
+  last_validated: 2026-04-25
   data_through: 2025-12-31
-  note: NVDA-009 added 2026-04-24 (Momentum Breakout Pullback Continuation, **repo 第 2 次 MBPC 結構試驗，繼 FXI-012 後首次高波動個股測試**，三次迭代全部失敗). Att1 baseline（Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 淺回檔 -3% ~ -8% + RSI(14) ∈ [40,65] + 多頭 K 棒 + cd10 + TP+8%/SL-7%/20d）Part A 34 訊號 WR 67.6% Sharpe **0.41** cum +142.32% / Part B 8 訊號 WR 75.0% Sharpe **0.96** cum +47.30% / min **0.41**（低於 NVDA-004 / NVDA-006 的 0.47）——A/B 年化訊號比 1.7:1（41% gap）、A/B 年化 cum 差 16.9%，**A/B 平衡目標達成但 Sharpe 目標未達**；Att2（+ SMA(200) regime 閘門 + RSI_max 65→60）Part A 21/66.7%/**0.38** / Part B 6/83.3%/**2.22** / min 0.38——**非選擇性過濾**（訊號 -38%/WR -0.9pp，移除贏家 9/5 比於整體 23/11 比方向錯誤），SMA(200) 過濾 2022-07-25 TP 贏家、RSI<60 過濾 AI 主升段健康續漲；Att3a（2DD cap >= -6%，CIBR-012 方向）與 Att1 完全相同（-6% 無綁定，NVDA 突破+淺回檔 2d 報酬典型 -3~-5%）；Att3b（2DD cap >= -4%）Part A 31/64.5%/**0.33** / Part B 8/62.5%/**0.49** / min **0.33**（三次最差）——-4% cap 與 5d 淺回檔範圍部分重疊且 cooldown-shift 引入新 SL。**核心發現**：Part B（2024-2025 AI 牛市）單邊 Sharpe 0.96 遠勝 NVDA-004 Part B 的 0.47，證明 MBPC 結構在純趨勢期極有效；但 Part A 2021-2023 混合 regime（late-bull + 2022 bear + 2023 summer chop）11 筆 SL 壓制 Sharpe 至 0.41。**repo 第 2 次 MBPC 失敗**（繼 FXI-012 後），失敗機制差異：FXI 為政策驅動假突破（Part A WR 42.3%），NVDA 為 bubble/correction late-cycle 突破（Part A WR 67.6% 已不錯但 Sharpe 受限於標準差）。**擴展 cross_asset_lesson #25**：Momentum Breakout Pullback Continuation 結構需**單一純上升 regime** 資產才穩定，**多 regime 資產**（FXI 政策驅動 / NVDA bubble+correction mixed）結構性劣化於 regime-specific 優化的 MR / 突破策略。NVDA-004 / NVDA-006 維持全域最優（9 次實驗、28+ 次嘗試）。
+  note: NVDA-010 added 2026-04-25 (ADX-Filtered RSI(2) Mean Reversion, **repo 首次 ADX/DMI 作為主規範閘門試驗**，三次迭代全部失敗 vs NVDA-004/006 min(A,B) 0.47). Att1（ADX>=25 + +DI>-DI + RSI(2)<=15 + Pullback[-3%,-10%] + cd10 + TP+6%/SL-6%/15d）Part A 3/66.7%/Sharpe **0.26** cum +3.88% / Part B 1/0%/Sharpe **0.00** zero-var SL / min **0.00** —— 多重綁定過嚴僅 0.6 訊號/yr 統計不足；強趨勢中 RSI(2)<=15 罕見發生（持續下挫使 +DI<<-DI 必然違反方向過濾），交集結構性狹窄。Att2（放寬 ADX>=20 + RSI(2)<=20 + Pullback[-2%,-12%] + cd8）Part A 8/62.5%/Sharpe **0.22** cum +9.00% / Part B **1**/0%/Sharpe **0.00** / min **0.00** —— Part A 新增 5 中等品質訊號稀釋集中贏家（Sharpe 0.26→0.22）；Part B 仍卡在 1 訊號：NVDA 2024-2025 深度修正（2024-08 -17%、2025-04 tariff -25%）違反 (a) -12% pullback 上限、(b) Close>SMA(50) 規範閘門（深跌跌破 50 日 MA）、或 (c) +DI>-DI（DMI 快速崩盤期間翻轉 bear），結構不匹配 Part B 的 deep-capitulation 機會。Att3（移除 +DI>-DI + RSI(3)<=25 + Pullback to -15%）Part A 8/**37.5%/Sharpe -0.27** cum -13.24%（4 連續 SL！）/ Part B 2/**0%**/Sharpe **0.00** zero-var / min **-0.27**（三次最差）—— cooldown chain shift（lesson #19）：移除 +DI>-DI 釋放原本被壓制的 2020-02-24（pre-COVID drop）、2021-02-23（Feb 修正）、2021-12-06（post-COVID 反彈）、2022-12-20（bear 反彈）4 筆全 SL，+DI>-DI 提供真實品質過濾；Part B 2024-04-02 + 2025-08-20 皆 SL 為 continuation-decline 假反彈（lesson #20b 平行結構）。**核心結論**：(1) ADX>=25 強趨勢與 RSI(2)<=15 deep oversold 罕見共存（RSI 需持續下挫使 DMI 翻轉），Att1 訊號結構性稀疏；(2) ADX>=20 weak-trend 過於包容（納入震盪 2023 summer 使 MR 訊號隨機化）；(3) +DI>-DI 提供真實選擇性但與 Close>SMA(50) 大部分時間冗餘，移除觸發 cooldown-chain-shift；(4) 多重綁定 ADX+RSI+SMA+Pullback+Close>Open+Cooldown 高約束相關性，放寬一條件不會比例增長訊號。**Repo 首次 ADX/DMI 主過濾器試驗失敗**——擴展 lesson #6（確認指標邊際效益遞減）至 ADX/DMI 類別；擴展 lesson #20b 邊界：trend-strength oscillators（ADX）加入 RSI/CCI/Stoch/MACD hook divergence 作為多 regime 高波動個股的無效進場主過濾器。**NVDA 結構性 Sharpe 上限約 0.5**——2019-2023 多 regime 變異使單一參數集難以同時優化 Part A/B；NVDA-004（BB Squeeze）/ NVDA-006（RS）維持全域最優 0.47（10 次實驗、31+ 次嘗試）。NVDA-009 added 2026-04-24 (Momentum Breakout Pullback Continuation, **repo 第 2 次 MBPC 結構試驗，繼 FXI-012 後首次高波動個股測試**，三次迭代全部失敗). Att1 baseline（Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 淺回檔 -3% ~ -8% + RSI(14) ∈ [40,65] + 多頭 K 棒 + cd10 + TP+8%/SL-7%/20d）Part A 34 訊號 WR 67.6% Sharpe **0.41** cum +142.32% / Part B 8 訊號 WR 75.0% Sharpe **0.96** cum +47.30% / min **0.41**（低於 NVDA-004 / NVDA-006 的 0.47）——A/B 年化訊號比 1.7:1（41% gap）、A/B 年化 cum 差 16.9%，**A/B 平衡目標達成但 Sharpe 目標未達**；Att2（+ SMA(200) regime 閘門 + RSI_max 65→60）Part A 21/66.7%/**0.38** / Part B 6/83.3%/**2.22** / min 0.38——**非選擇性過濾**（訊號 -38%/WR -0.9pp，移除贏家 9/5 比於整體 23/11 比方向錯誤），SMA(200) 過濾 2022-07-25 TP 贏家、RSI<60 過濾 AI 主升段健康續漲；Att3a（2DD cap >= -6%，CIBR-012 方向）與 Att1 完全相同（-6% 無綁定，NVDA 突破+淺回檔 2d 報酬典型 -3~-5%）；Att3b（2DD cap >= -4%）Part A 31/64.5%/**0.33** / Part B 8/62.5%/**0.49** / min **0.33**（三次最差）——-4% cap 與 5d 淺回檔範圍部分重疊且 cooldown-shift 引入新 SL。**核心發現**：Part B（2024-2025 AI 牛市）單邊 Sharpe 0.96 遠勝 NVDA-004 Part B 的 0.47，證明 MBPC 結構在純趨勢期極有效；但 Part A 2021-2023 混合 regime（late-bull + 2022 bear + 2023 summer chop）11 筆 SL 壓制 Sharpe 至 0.41。**repo 第 2 次 MBPC 失敗**（繼 FXI-012 後），失敗機制差異：FXI 為政策驅動假突破（Part A WR 42.3%），NVDA 為 bubble/correction late-cycle 突破（Part A WR 67.6% 已不錯但 Sharpe 受限於標準差）。**擴展 cross_asset_lesson #25**：Momentum Breakout Pullback Continuation 結構需**單一純上升 regime** 資產才穩定，**多 regime 資產**（FXI 政策驅動 / NVDA bubble+correction mixed）結構性劣化於 regime-specific 優化的 MR / 突破策略。NVDA-004 / NVDA-006 維持全域最優（9 次實驗、28+ 次嘗試）。
 -->
 ## AI Agent 快速索引
 
@@ -93,6 +93,11 @@
 - NVDA-007 RS 出場優化：延長持倉（25d）、放寬停損（-8%）、縮短持倉（15d）三種方向均失敗，TP+8%/SL-7%/20d 已確認為 RS 策略全域最優出場參數
 - NVDA-008 RS 參數探索：10日回看（噪音過多 Part B 0.17）、40日回看（A/B 過擬合 Part B 0.03）、SPY 基準（min 0.46 未超越）三種方向均失敗，20日 RS + SMH 基準已確認為全域最優 RS 參數
 - NVDA-009 Momentum Breakout Pullback Continuation：三次迭代全部失敗（Att1 min 0.41 < 0.47），確認 MBPC 結構在多 regime 高波動個股結構性劣化。Att2 SMA(200) + RSI<60 非選擇性過濾、Att3 2DD cap -6% 無綁定 / -4% 雙向劣化
+- **NVDA-010 ADX-Filtered RSI(2) MR（repo 首次 ADX/DMI 主規範閘門試驗，3 次迭代全部失敗）**：
+  - Att1（ADX>=25 + +DI>-DI + RSI(2)<=15 + PB[-3%,-10%] + cd10）：Part A 3/66.7%/0.26 / Part B 1/0%/0.00 / min **0.00** —— 0.6 訊號/yr 過稀
+  - Att2（ADX>=20 + RSI(2)<=20 + PB[-2%,-12%] + cd8）：Part A 8/62.5%/0.22 / Part B 1/0%/0.00 / min **0.00** —— Part B 卡 1 訊號（深修正違反 pullback / SMA / DMI）
+  - Att3（移除 +DI>-DI + RSI(3)<=25 + PB to -15%）：Part A 8/37.5%/-0.27 / Part B 2/0%/0.00 / min **-0.27** —— cooldown chain shift 引入 4 連續 SL
+  - 失敗根因：(1) ADX>=25 與 RSI(2)<=15 罕見共存（RSI 需持續下挫使 DMI 翻轉）；(2) +DI>-DI 提供真實選擇性但 naively 移除觸發 cooldown-shift；(3) 高約束相關性使放寬無比例增長訊號。**擴展 lesson #6 + #20b 至 ADX/DMI 類別**
 
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - BB(20,2.5) 更嚴格的擠壓條件
@@ -106,7 +111,7 @@
 - 訊號頻率：RS 7.0/6.0/年（最佳 A/B 平衡），突破 3.4/年，均值回歸 1.2/年
 - **RS 出場優化無效**：TSM-008 的延長持倉方法在 NVDA 無效，因交易平均 7 天解決（vs TSM 更長）
 - **RS 參數探索無效**：不同回看窗口和不同基準均未超越 20日 SMH RS≥5%
-- NVDA-004/006 已確認為全域最優（8 次實驗、21+ 次嘗試，含均值回歸、突破、動量回調、相對強度、RS 出場優化、RS 參數探索六大方向）
+- NVDA-004/006 已確認為全域最優（10 次實驗、31+ 次嘗試，含均值回歸、突破、動量回調、相對強度、RS 出場優化、RS 參數探索、Momentum Breakout Pullback Continuation、ADX/DMI Filtered RSI(2) MR 八大方向）
 <!-- AI_CONTEXT_END -->
 
 # NVDA 實驗總覽 (NVDA Experiments Overview)
@@ -131,6 +136,8 @@
 | NVDA-006 | `nvda_006_relative_strength` | 相對強度：NVDA-SMH RS≥5% + 5日回撤3-8% + SMA(50)，TP+8%/SL-7%/20天 | 已完成（互補策略，min(A,B) 持平，OOS +36%） |
 | NVDA-007 | `nvda_007_rs_exit_optimized` | RS 出場優化：同 NVDA-006 進場，3種出場嘗試（25d/SL-8%/15d） | 已完成（3次嘗試均未超越 NVDA-006） |
 | NVDA-008 | `nvda_008_rs_param_explore` | RS 參數探索：10日/40日回看、SPY基準（3次嘗試均未超越） | 已完成（3次嘗試均未超越 NVDA-004/006） |
+| NVDA-009 | `nvda_009_momentum_pullback` | Momentum Breakout Pullback Continuation：Donchian 20d + 5d 淺回檔 -3~-8% + SMA(50) + RSI[40,65]，TP+8%/SL-7%/20d | 已完成（3次嘗試全部失敗，min(A,B) 0.41 < 0.47） |
+| NVDA-010 | `nvda_010_adx_rsi2_mr` | ADX-Filtered RSI(2) MR：ADX(14)>=25 + +DI>-DI + RSI(2)<=15 + Pullback[-3%,-10%] + SMA(50)，TP+6%/SL-6%/15d | 已完成（3次嘗試全部失敗，min(A,B) 0.00/0.00/-0.27） |
 
 ## NVDA-001: RSI(2) 極端超賣均值回歸
 
@@ -756,3 +763,63 @@ TSM-008 的出場優化方法不適用 NVDA。關鍵差異：
 3. **RS ≥5%（SMH）是甜蜜點**。SPY 需提高至 8% 才能維持訊號品質，但高門檻減少有效訊號。
 
 **NVDA-004/006 已確認為全域最優**（8 次實驗、21+ 次嘗試，涵蓋均值回歸、突破、動量回調、相對強度、RS 出場優化、RS 參數探索六大策略方向）。
+
+---
+
+## NVDA-010: ADX-Filtered RSI(2) Mean Reversion（3 次嘗試全部失敗）
+
+**Repo 首次將 ADX/DMI 作為主規範閘門試驗**（Average Directional Index +
+Directional Movement Index）。先前所有實驗皆以 SMA / BB / ATR ratio /
+pullback 作為 regime 過濾，ADX 為新方向。
+
+### 動機 (Motivation)
+
+NVDA-004 / NVDA-006 min(A,B) 皆停在 0.47，瓶頸都在 Part A 2019-2023
+多 regime 期。NVDA-009 MBPC Part B 0.96 證明結構性訊號在純趨勢期極佳。
+本實驗假設：**強趨勢期間（ADX>=25）的淺回檔短期超賣（RSI(2)<=15）為
+高勝率 MR 進場；無趨勢/盤整期間（ADX<25）RSI(2) MR 失效**。
+
+### 三次迭代結果
+
+| 嘗試 | 進場條件 | Part A (n/WR/Sharpe) | Part B (n/WR/Sharpe) | min(A,B) |
+|------|----------|----------------------|----------------------|----------|
+| Att1 | ADX>=25 + +DI>-DI + RSI(2)<=15 + PB[-3%,-10%] + cd10 | 3/66.7%/**0.26** | 1/0%/**0.00** | **0.00** |
+| Att2 | 放寬 ADX>=20 + RSI(2)<=20 + PB[-2%,-12%] + cd8 | 8/62.5%/0.22 | 1/0%/0.00 | **0.00** |
+| Att3 | 移除 +DI>-DI + RSI(3)<=25 + PB to -15% | 8/**37.5%**/**-0.27** | 2/0%/0.00 | **-0.27** |
+
+出場參數：TP +6% / SL -6% / 15 天 / 滑價 0.15%（含成交模型）
+
+### 失敗分析
+
+**Att1 過嚴（0.6 訊號/yr）**：
+- ADX>=25 強趨勢與 RSI(2)<=15 deep oversold 罕見共存
+- RSI(2)<=15 需持續下挫，但持續下挫使 +DI<<-DI 必然違反方向過濾
+- 多重綁定 ADX ∧ RSI ∧ DMI ∧ Pullback ∧ Close>Open 交集結構性狹窄
+
+**Att2 仍卡 Part B（1 訊號）**：
+- Part A Sharpe 退化（0.26→0.22）—— 5 中等品質訊號稀釋集中贏家
+- NVDA 2024-2025 深度修正（2024-08 -17%、2025-04 tariff -25%）違反:
+  - (a) -12% pullback 上限
+  - (b) Close > SMA(50) 規範閘門（深跌跌破 50 日 MA）
+  - (c) +DI > -DI（DMI 快速崩盤期間翻轉至 bear）
+- 結構不匹配：Part B 的 MR 機會在於深層 capitulation 事件
+
+**Att3 cooldown chain shift**：
+- 移除 +DI>-DI 釋放原本被壓制的 4 個訊號（2020-02-24 / 2021-02-23 /
+  2021-12-06 / 2022-12-20）—— 全部 SL
+- +DI>-DI 原本提供真實品質過濾，naively 移除使框架退化
+- Part A WR 62.5%（Att2）→ 37.5%（Att3）
+
+### 跨資產貢獻
+
+**Repo 首次 ADX/DMI 主過濾器試驗失敗**：
+1. 擴展 lesson #6（確認指標邊際效益遞減）至 ADX/DMI 類別
+2. 擴展 lesson #20b 邊界：trend-strength oscillators（ADX）加入
+   RSI/CCI/Stoch/MACD hook divergence 作為多 regime 高波動個股的無效
+   進場主過濾器
+3. NVDA 結構性 Sharpe 上限約 0.5，2019-2023 多 regime 變異使單一參數集
+   難以同時優化 Part A/B
+
+NVDA-004（BB Squeeze）/ NVDA-006（RS）維持全域最優（10 次實驗、31+ 次
+嘗試）。NVDA 第 9 個失敗策略類型（後於 RSI(2) MR、capped DD、BB Squeeze、
+BB Optimized、momentum pullback、RS pullback、RS exit opt、MBPC）。
