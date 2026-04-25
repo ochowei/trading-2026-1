@@ -77,7 +77,7 @@ class VOO004Config(ExperimentConfig):
     # Trend filter
     sma_trend_period: int = 50
     sma_long_period: int = 200  # Att2 試驗用：長均線 regime 過濾
-    require_above_sma_long: bool = False  # Att1: 不啟用
+    require_above_sma_long: bool = True  # Att2: 啟用
 
     # RSI neutrality filter
     rsi_period: int = 14
