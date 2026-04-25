@@ -65,19 +65,19 @@ from trading.core.base_config import ExperimentConfig
 class VOO004Config(ExperimentConfig):
     """VOO-004 Momentum Breakout Pullback Continuation 參數"""
 
-    # Donchian breakout freshness
+    # Donchian breakout freshness (Att3: 10 → 5 收緊新鮮度)
     donchian_period: int = 20
-    breakout_recency_days: int = 10  # 近 10 日曾創 20 日新高
+    breakout_recency_days: int = 5  # 近 5 日曾創 20 日新高（Att3 收緊）
 
-    # Shallow pullback range (VOO ~1.0% vol, -3% ≈ 3σ)
+    # Shallow pullback range (Att3: 收緊至 -2% ~ -3% 排除邊緣 pullback)
     pullback_lookback: int = 5
-    pullback_min: float = -0.015  # -1.5% 淺回檔下限（避免過淺進場）
-    pullback_max: float = -0.04  # -4% 淺回檔上限（隔離崩盤前下跌）
+    pullback_min: float = -0.02  # -2% 淺回檔下限（Att3 收緊自 -1.5%）
+    pullback_max: float = -0.03  # -3% 淺回檔上限（Att3 收緊自 -4%）
 
     # Trend filter
     sma_trend_period: int = 50
-    sma_long_period: int = 200  # Att2 試驗用：長均線 regime 過濾
-    require_above_sma_long: bool = True  # Att2: 啟用
+    sma_long_period: int = 200
+    require_above_sma_long: bool = False  # Att3: 還原（Att2 非選擇性失敗）
 
     # RSI neutrality filter
     rsi_period: int = 14
