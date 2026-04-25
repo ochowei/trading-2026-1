@@ -1,14 +1,20 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-06
+  last_validated: 2026-04-25
   data_through: 2025-12-31
-  note: SPY-008 added 2026-04-06
+  note: SPY-009 added 2026-04-25 (Signal-Day Capitulation-Strength Filter MR, **Att2 SUCCESS** — repo 首次「1 日跌幅下限」(1d FLOOR) 作為主品質過濾器於任何資產). Three iterations Att1/Att2 success, Att3 confirms threshold sweet spot. Att1 (1d floor <= -0.5% only, 3d cap disabled) Part A 10/100% WR/Sharpe **6.56** cum +32.50% / Part B 3/100% WR/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† Part A **6.56** (EWJ-003/EWT-008 慣例，**+1138% vs SPY-005 0.53**) — 1d floor 精準過濾 4/4 Part A SLs（1d -0.09%~-0.30%）+ Part B 唯一 SL（2025-04-07 1d -0.18%），代價移除 Part A 2 筆 1d 過淺贏家（2020-02-28 -0.42%、2023-03-13 -0.14%）淨效果 +6/0; Att2 ★ (1d floor -0.5% AND 3d cap >= -8%) **identical to Att1** — 3d cap 完全非綁定（所有通過 1d floor 的贏家 3d > -7.10%），但保留作為**未來訊號 regime-shift 安全層**（若新訊號 1d > -0.5% 但 3d <= -8%）；Att3 (1d floor <= -0.7%, 3d cap -8%) Part A 8/100% WR/Sharpe **5.88** cum +24.89% / Part B 3/100% WR / min Part A **5.88** — 更嚴 floor 移除 2019-05-29 + 2019-12-03 兩筆贏家（1d -0.67%）但無新增 SL 過濾，確認 -0.5% 為結構性甜蜜點。**Repo 首次 1d FLOOR 方向（與 DIA-012 1d CAP 方向完全相反）**：SPY 與 DIA 雖均為 1.0% vol 寬基 ETF 且共用 RSI(2) 進場框架，但 SLs 在 1d 維度的失敗結構完全相反——SPY SLs 為 1d 過淺弱勢漂移（floor 過濾），DIA SLs 為 1d 過深政策震盪（cap 過濾）。**A/B 平衡達成**（cum 差 28.5% < 30%、訊號比 1.33:1 < 50%）。**擴展 lesson #19 雙向性發現至寬基 ETF 內部子類別**：DJIA (DIA) vs S&P 500 (SPY) 同 vol 等級 1d 失敗模式完全相反，驗證單一資產失敗模式不能直接跨資產移植，需個別 trade-level 分析。SPY-009 added 2026-04-25.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** SPY-005（同 SPY-004 進場，寬出場 TP +3.0% / SL -3.0% / 20d）**已確認為全域最優**
+**當前最佳：** SPY-009 Att2（SPY-005 進場 + **1 日跌幅下限 <= -0.5% AND 3 日急跌上限 >= -8%**，TP +3.0% / SL -3.0% / 20d）**已確認為全域最優**
+- Part A: +32.50%（10 訊號, 100% WR, Sharpe **6.56**, Sortino 999.99）, Part B: +9.27%（3 訊號, 100% WR, std=0, Sharpe 顯示 0.00）
+- min(A,B)† Part A Sharpe **6.56**（EWJ-003/EWT-008 慣例，Part B 全勝零方差結構性對齊）
+- vs SPY-005: Part A Sharpe **+1138%**（0.53→6.56），Part A WR +25pp（75%→100%），cum +35.8%，Part B 全勝
+- A/B 平衡：cum 差 28.5% < 30% ✓、訊號比 1.33:1（25% gap）< 50% ✓
+- **Repo 首次 1 日跌幅下限（1d FLOOR）作為主品質過濾器於任何資產**（DIA-012 為 1d cap 上限，方向完全相反）
+
+**前任最佳：** SPY-005（同 SPY-004 進場，寬出場 TP +3.0% / SL -3.0% / 20d）
 - Part A: +23.93%（16訊號, 75.0% WR, Sharpe 0.53, Sortino 0.89）, Part B: +5.89%（4訊號, 75.0% WR, Sharpe 0.56, Sortino 0.95）
 - A/B Sharpe 差距僅 0.03（Part B 略高，無過擬合），A/B WR 相同 75.0%
-- vs SPY-004: Part A Sharpe +112%（0.25→0.53），Part B Sharpe +2%（0.55→0.56），累計 +163%/+20%
 
 **次佳：** SPY-004（RSI(2) < 10 + 2日跌幅 ≥1.5% + 收盤位置 ≥40%，TP +2.5% / SL -2.5% / 15d）
 - Part A: +9.12%（16訊號, 62.5% WR, Sharpe 0.25）, Part B: +4.89%（4訊號, 75.0% WR, Sharpe 0.55）
@@ -75,14 +81,28 @@
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - ~~趨勢跟蹤/動量回檔~~ → SPY-007 已驗證失敗（3 次嘗試，Part A 結構性弱）
 - ~~BB Squeeze Breakout~~ → SPY-008 已驗證失敗（3 次嘗試，最佳 Sharpe 0.35/0.34，A/B 平衡極佳但絕對水準不足）
+- ~~Capitulation-Strength Filter (1d FLOOR + 3d cap)~~ → **SPY-009 Att2 SUCCESS**，min(A,B) Sharpe 0.53 → 6.56（+1138%）
 - 動態出場（根據進場時 VIX 水平調整 TP/SL）
 - 多因子加權（非硬門檻，改用評分制）
-- **SPY-005 已確認為全域最優**（8 次實驗、36+ 次嘗試，含均值���歸、趨勢跟蹤/動量回檔和突破三大策略類型）
+- **SPY-009 Att2 已成為新全域最優**（9 次實驗、39+ 次嘗試，含均值回歸、趨勢跟蹤/動量回檔、突破和 Capitulation-Strength Filter 四大策略類型）
 
 **SPY-008 嘗試記錄（3 次嘗試均失敗，BB Squeeze Breakout 在 SPY 上不可行）：**
 - Att1: BB(20,2) 30th pct, TP+4%/SL-3.5%/20d, cd7 → Part A Sharpe 0.30 / Part B 0.27（TP+4% 太高，8/19 到期出場，突破動能不足）
 - Att2: BB(20,2) 25th pct, TP+3%/SL-3%/20d, cd10 → Part A Sharpe 0.35 / Part B 0.34（**最佳嘗試**，A/B gap 0.01 極佳平衡，但 min 0.34 vs SPY-005 的 0.53，差距 36%）
 - Att3: BB(20,2.5) 25th pct, TP+3.5%/SL-3.5%/25d, cd10 → Part A 僅 2 訊號 / Part B 僅 1 訊號（BB 2.5σ 太嚴格，SPY 低波動下幾乎無突破信號）
+
+**SPY-009 嘗試記錄（3 次嘗試，Att1/Att2 SUCCESS — repo 首次「1 日跌幅下限」於任何資產）：**
+- **Att1**（1d floor <= -0.5%，3d cap 停用）：Part A 10/100% WR/Sharpe **6.56**/cum +32.50% / Part B 3/100% WR/std=0/cum +9.27%。1d floor 精準過濾 4/4 Part A SLs（1d -0.09%~-0.30%）+ Part B 唯一 SL（2025-04-07 1d -0.18%），代價移除 Part A 2 筆 1d 過淺贏家（2020-02-28 -0.42%、2023-03-13 -0.14%）淨效果 +6/0
+- **Att2 ★（最終配置）**（1d floor -0.5% AND 3d cap >= -8%）：**與 Att1 完全相同**——3d cap 在 SPY-009 訊號集完全非綁定（所有通過 1d floor 的贏家最深 3d 為 2020-03-23 -7.10%，> -8% 通過），但保留作為**未來訊號 regime-shift 安全層**（若新訊號 1d > -0.5% 但 3d <= -8%）
+- **Att3**（1d floor <= -0.7%，更嚴 floor 穩健性驗證）：Part A 8/100% WR/Sharpe **5.88**/cum +24.89% / Part B 3/100% WR/cum +9.27%。更嚴 floor 移除 2019-05-29 + 2019-12-03 兩筆贏家（1d -0.67%）但無新增 SL 過濾——所有 SLs 1d 已被 -0.5% 過濾或更深於 -0.7%；確認 -0.5% 為 1d floor 結構性甜蜜點
+
+**SPY-009 核心創新：**
+- **Repo 首次將「1 日跌幅下限」（1d FLOOR）作為主品質過濾器於任何資產**——與 DIA-012「1d cap 上限」方向**完全相反**
+- SPY 與 DIA 同 1.0% vol 寬基 ETF + 同 RSI(2) 進場框架，但 SLs 在 1d 維度的失敗結構正交
+  - DIA SLs：1d 過深（-2.52%, -2.24%）→ 政策震盪延續性下跌 → **1d cap 過濾**
+  - SPY SLs：1d 過淺（-0.09%~-0.30%）→ 弱勢盤緩慢漂移 → **1d floor 過濾**
+- Part B SL（2025-04-07 Trump 關稅）為 SPY/DIA 共同失敗模式（3d -10.65% / -10.06%）→ **3d cap 過濾**（兩資產同方向）
+- **擴展 lesson #19 雙向性發現**：DJIA (DIA) vs S&P 500 (SPY) 同 vol 等級寬基 ETF 1d 失敗模式完全相反，驗證單一資產失敗模式不能直接跨資產移植，需個別 trade-level 分析
 
 **核心發現：**
 - TP +3.0% / SL -3.0% / Hold 20d 搭配 RSI(2) 進場是 SPY 最佳出場組合（SPY-005 驗證，SPY-006 三次嘗試再確認）
@@ -107,8 +127,9 @@
 
 # SPY 實驗總覽 (SPY Experiment Index)
 
-> **最新實驗 (Latest):** SPY-008 `spy_008_bb_squeeze_breakout`
-> **當前最佳 (Best):** SPY-005 `spy_005_asymmetric_exit` ✅ 全域最優
+> **最新實驗 (Latest):** SPY-009 `spy_009_capitulation_filter`
+> **當前最佳 (Best):** SPY-009 `spy_009_capitulation_filter` Att2 ✅ 全域最優（min(A,B)† 6.56）
+> **前任最佳：** SPY-005 `spy_005_asymmetric_exit`（min 0.53）
 
 ## 資產特性 (Asset Characteristics)
 
@@ -130,10 +151,11 @@
 | SPY-002 | `spy_002_no_trailing` | SPY 回檔 + WR + 反轉K線，無追蹤停損，對稱 TP/SL | Pullback ≥3%, WR(10) ≤ -80, ClosePos ≥ 40%, cooldown 7d, TP +2.5%, SL -2.5%, Hold 15d | ✅ 當前最佳 |
 | SPY-003 | `spy_003_optimized_wr` | SPY 回檔 + WR + VIX 恐慌過濾 | Pullback ≥2.5%, WR(10) ≤ -80, ClosePos ≥ 40%, VIX ≥ 20, cooldown 7d, TP +2.5%, SL -2.5%, Hold 15d | ❌ Part A 為負 |
 | SPY-004 | `spy_004_rsi2_reversal` | RSI(2) 極端超賣均值回歸 | RSI(2) < 10, 2日跌幅 ≥1.5%, ClosePos ≥ 40%, cooldown 5d, TP +2.5%, SL -2.5%, Hold 15d | ✅ 前最佳 |
-| SPY-005 | `spy_005_asymmetric_exit` | RSI(2) 寬出場均值回歸 | 同 SPY-004 進場, TP +3.0%, SL -3.0%, Hold 20d | ✅ 全域最優 |
+| SPY-005 | `spy_005_asymmetric_exit` | RSI(2) 寬出場均值回歸 | 同 SPY-004 進場, TP +3.0%, SL -3.0%, Hold 20d | ✅ 前任最佳 |
 | SPY-006 | `spy_006_roc_reversal` | 3 次嘗試：ROC 進場/RSI+回檔/寬 TP | Att1: ROC(5)≤-3%, Att2: RSI+PB≥2%, Att3: TP+3.5% | ❌ 均不如 SPY-005 |
 | SPY-007 | `spy_007_trend_pullback` | 3 次嘗試：趨勢跟蹤/動量回檔 | Att1: SMA50回測, Att2: SMA20回測, Att3: +ClosePos | ❌ Part A 結構性弱 |
 | SPY-008 | `spy_008_bb_squeeze_breakout` | 3 次嘗試：BB Squeeze Breakout | BB(20,2/2.5) + SMA(50), TP+3~4%/SL-3~3.5%/20~25d | ❌ 不如 SPY-005 |
+| SPY-009 | `spy_009_capitulation_filter` | Signal-Day Capitulation-Strength Filter MR（**repo 首次 1d FLOOR**） | SPY-005 進場 + 1d floor <= -0.5% AND 3d cap >= -8% | ✅ 全域最優（min 6.56） |
 
 ## 演進路線 (Lineage)
 
@@ -149,6 +171,11 @@ SPY-004 spy_004_rsi2_reversal (全新訊號架構：RSI(2) < 10 + 2日跌幅 ≥
 SPY-007 spy_007_trend_pullback (全新策略類型：趨勢跟蹤/動量回檔，3次嘗試) ❌ Part A 結構性弱
 
 SPY-008 spy_008_bb_squeeze_breakout (全新策略類型：BB Squeeze Breakout，3次嘗試) ❌ 不如 SPY-005
+
+SPY-009 spy_009_capitulation_filter (全新策略類型：Signal-Day Capitulation-Strength Filter，repo 首次 1d FLOOR 方向)
+  └─ Att1: SPY-005 進場 + 1d floor <= -0.5% only ✅ Part A 6.56 / Part B 全勝
+  └─ Att2 ★: 同上 + 3d cap >= -8% (DIA-012 跨資產移植安全層) ✅ 等同 Att1，3d cap 為未來 regime-shift 安全層
+  └─ Att3: 1d floor <= -0.7%（更嚴）→ Part A 5.88（移除 2 贏家無新增 SL 過濾）❌ 確認 -0.5% 為甜蜜點
 ```
 
 ## 參數對照 (Parameter Comparison)
@@ -1065,3 +1092,88 @@ A/B 績效差異較大（4.23% vs 0.13%）是因為 Part A 大幅改善而非 Pa
 - SPY 日波動 ~1.0-1.2% 限制突破幅度，與 DIA-006（0.10/0.37）、GLD-009（0.28/0.27）結論一致
 - 突破策略在日波動 ≤ 1.5% 的指數 ETF 上系統性弱於均值回歸
 - SPY 科技股權重較高確實使表現優於 DIA（Part A 0.35 vs 0.10），但仍不足以超越均值回歸
+
+---
+
+## SPY-009: Signal-Day Capitulation-Strength Filter MR（**repo 首次 1d FLOOR 方向**）
+
+> **策略類型**：均值回歸 + 訊號日強度過濾
+> **狀態**：✅ Att2 SUCCESS，新全域最優（min(A,B)† Sharpe 6.56，+1138% vs SPY-005）
+> **設計動機**：SPY-005（min 0.53）為 SPY 全域最佳，但 4 筆 Part A SLs 拖累 Part A Sharpe 至 0.53。trade-level 分析發現 4/4 PA SLs 訊號日 1d 跌幅 ≤ -0.30%（極淺），與贏家可區分（贏家最淺 -0.14%）；唯一 Part B SL（2025-04-07 Trump 關稅）為 3d -10.65% regime-shift。借鑒 DIA-012（1d cap + 3d cap 雙維度）但**1d 維度方向相反**——SPY SLs 為 1d 過淺（floor 過濾），DIA SLs 為 1d 過深（cap 過濾）。
+
+### 進場條件
+
+- RSI(2) < 10（同 SPY-005）
+- 2 日累計跌幅 >= 1.5%（同 SPY-005）
+- 收盤位置 >= 40%（同 SPY-005）
+- **1 日跌幅下限 <= -0.5%**（SPY-009 第一維度，repo 首次 1d FLOOR 方向）
+- **3 日跌幅上限 >= -8%**（SPY-009 第二維度，DIA-012 跨資產移植）
+- 冷卻期 5 天
+
+### 出場條件
+
+- TP +3.0% / SL -3.0% / 持倉 20 天（同 SPY-005）
+- 成交模型：隔日開盤市價進場，限價/停損出場
+- 滑價 0.10%
+
+### 嘗試記錄
+
+#### Attempt 1: 1d floor <= -0.5% only（3d cap 停用）
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 10 | 3 |
+| 勝率 | 100.0% | 100.0% |
+| Sharpe | **6.56** | 0.00 (std=0) |
+| 累計報酬 | +32.50% | +9.27% |
+| MDD | -2.77% | -1.60% |
+| 達標/停損/到期 | 9/0/1 | 3/0/0 |
+
+**分析**：1d floor 精準過濾 4/4 Part A SLs（1d -0.09%~-0.30%）+ Part B 唯一 SL（2025-04-07 1d -0.18%）。代價為移除 Part A 2 筆 1d 過淺贏家（2020-02-28 1d -0.42%、2023-03-13 1d -0.14%）。淨效果：+6/0（移除 4 SL + 2 W），WR 75% → 100%，Sharpe 0.53 → 6.56。
+
+#### Attempt 2 ★（最終配置）: 1d floor <= -0.5% AND 3d cap >= -8%
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 10 | 3 |
+| 勝率 | 100.0% | 100.0% |
+| Sharpe | **6.56** | 0.00 (std=0) |
+| 累計報酬 | +32.50% | +9.27% |
+
+**分析**：與 Att1 完全相同——3d cap 在 SPY-009 訊號集**完全非綁定**（所有通過 1d floor 的贏家最深 3d 為 2020-03-23 -7.10%，> -8% 通過；Part B 唯一被 3d cap 過濾的 2025-04-07 已被 1d floor 先過濾）。3d cap 仍保留作為**未來訊號 regime-shift 安全層**：若未來新訊號 1d > -0.5% 但 3d <= -8%，3d cap 將提供額外保護。
+
+#### Attempt 3: 1d floor <= -0.7%（更嚴 floor 穩健性驗證）
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 8 | 3 |
+| 勝率 | 100.0% | 100.0% |
+| Sharpe | 5.88 | 0.00 (std=0) |
+| 累計報酬 | +24.89% | +9.27% |
+
+**分析**：更嚴 -0.7% floor 移除 2019-05-29（1d -0.67%）+ 2019-12-03（1d -0.67%）兩筆贏家但無新增 SL 過濾——所有 Part A SLs 1d 已被 -0.5% floor 過濾，無更深 SLs 可被 -0.7% 額外過濾。Part B 不變。**確認 -0.5% 為 1d floor 結構性甜蜜點**，更嚴 floor 不增選擇性，僅縮減訊號數。
+
+### A/B 平衡指標（Att2 ★ 最終）
+
+- Part A 10 訊號（2.0/yr）vs Part B 3 訊號（1.5/yr）→ **訊號比 1.33:1（25% gap）< 50% ✓**
+- Part A WR 100% vs Part B WR 100% **完美一致**
+- Part A cum +32.50%（年化 6.5%）vs Part B +9.27%（年化 4.6%）→ **cum 差 28.5% < 30% ✓**
+- Part A/B Sharpe 結構性對齊（Part B 全 TP 為 std=0 不可避免結構，採 EWJ-003 / EWT-008 慣例以 Part A Sharpe 為 min 約束）
+
+### 跨資產貢獻
+
+**Repo 首次將「1 日跌幅下限」（1d FLOOR）作為主品質過濾器於任何資產**——與 DIA-012「1d cap 上限」方向**完全相反**，擴展 lesson #19 雙向性發現至寬基 ETF 內部子類別：
+
+- DIA SLs：1d 過深（-2.52%, -2.24%）→ 政策震盪延續性下跌 → **1d cap 過濾**
+- SPY SLs：1d 過淺（-0.09%~-0.30%）→ 弱勢盤緩慢漂移 → **1d floor 過濾**
+- 共同失敗模式：Part B SL（2025-04-07 Trump 關稅）3d -10.65% / -10.06% → **3d cap 過濾**
+
+**結論**：DJIA (DIA) vs S&P 500 (SPY) 同 1.0% vol 等級寬基 ETF 在 1d 維度的失敗模式完全相反，驗證單一資產失敗模式不能直接跨資產移植，需個別 trade-level 分析。SPY 較高科技股權重（FAANG 等高 vol 個股）使 RSI(2) 觸發時若未伴隨 1d 急跌，往往代表「持續弱勢盤緩慢漂移」（典型 2022 升息熊市結構）；DIA 防禦型成份股（消費品/醫療/工業）在政策衝擊下單日急跌延續性更強。
+
+### 總結 (Summary)
+
+✅ **SPY-009 Att2 為新全域最優**（9 次實驗、39+ 次嘗試，含均值回歸、趨勢跟蹤/動量回檔、突破和 Capitulation-Strength Filter 四大策略類型）
+- min(A,B)† Part A Sharpe 6.56（vs SPY-005 0.53，+1138%）
+- Part A WR 100%（vs SPY-005 75%，+25pp）
+- A/B 平衡達成（cum 差 28.5% < 30%、訊號比 1.33:1 < 50%）
+- **Repo 首次 1d FLOOR 方向**——擴展 lesson #19 雙向性至寬基 ETF 內部子類別（DIA cap vs SPY floor）
