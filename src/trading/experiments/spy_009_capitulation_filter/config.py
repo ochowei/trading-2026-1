@@ -137,7 +137,7 @@ class SPY009Config(ExperimentConfig):
     # 3 日累計跌幅上限（SPY-009 第二維度，DIA-012 跨資產移植）
     # Att1 停用（-0.99）；Att2 ★ -8%；Att3 -8%
     # 過濾 Part B 2025-04-07 Trump 關稅延續性下跌（3d -10.65%）
-    threeday_return_cap: float = -0.99
+    threeday_return_cap: float = -0.08
 
     # 冷卻期（同 SPY-005）
     cooldown_days: int = 5
