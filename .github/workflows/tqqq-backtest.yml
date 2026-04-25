@@ -182,6 +182,7 @@ on:
           - "TSLA-010: tsla_010_rsi5_mean_reversion"
           - "TSLA-011: tsla_011_momentum_recovery"
           - "TSLA-012: tsla_012_volume_breakout"
+          - "TSLA-013: tsla_013_pre_breakout_calm"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
           - "TSM-006: tsm_006_momentum_pullback"
