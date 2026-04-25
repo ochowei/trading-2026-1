@@ -1,7 +1,8 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-09
+  last_validated: 2026-04-25
   data_through: 2025-12-31
-  last_experiment_attempt: IWM-011 (3 attempts, 1 success — 超越 IWM-005)
+  last_experiment_attempt: IWM-012 (3 attempts, 0 success — BB-lower hybrid mode 失敗)
+  note: IWM-012 added 2026-04-25 (BB Lower + Pullback Cap Hybrid Mode, **repo 首次將 BB-lower hybrid mode 應用至小型股寬基 ETF**, three iterations all failed vs IWM-011 min 0.52). Att1 (BB(20, 2.0) + 10d cap -10% + WR≤-80 + ClosePos≥0.40 + ATR>1.10) Part A 7/57.1%/Sharpe **0.23** cum +5.55% / Part B 3/66.7%/Sharpe 0.31 cum +3.46% / min **0.23** — BB(20, 2.0) 訊號集與 IWM-011 RSI(2) 框架互補但不重疊：捕捉 7 訊號 vs IWM-011 的 10，缺少 5 個 IWM-011 winners (2019-10-02/2020-02-28 COVID/2020-09-21/2022-05-10/2022-09-23 — 淺超賣急跌反轉訊號未達 BB 下軌深度)，新增 2 winners (2020-09-11/2020-10-30) 但 SL 全部保留；Att2 (BB(20, 1.5) + cap -10% + ATR>1.10) Part A 12/58.3%/Sharpe **0.20** cum +8.63% / Part B 6/66.7%/Sharpe 0.24 cum +5.01% / min **0.20**（更差）— BB 1.5σ 過鬆引入 3 SLs (2020-01-27 pre-COVID/2022-05-06 Fed pivot fear/Part B 2025-03-11)，EWZ 1.75% vol 用 1.5σ 等同 IWM 2.0σ 的距離，IWM 1.5-2% vol 用 1.5σ 過鬆；Att3 (BB(20, 2.0) + cap -10% + ClosePos≥0.50 + ATR>1.15) Part A 2/50%/Sharpe 0.49 cum +2.56% / Part B 3/66.7%/Sharpe 0.31 cum +3.46% / min **0.31**（樣本過稀疏，Part A 0.4/yr）— 收緊雙重品質過濾將 Part A 訊號從 7 縮至 2 失去統計顯著性。**Repo 首次將 BB-lower hybrid mode 應用至小型股寬基 ETF**。**核心失敗根因（結構性）**：(1) IWM RSI(2)<10 + 2DD≤-2.5% 框架捕捉「淺超賣急跌反轉」，多數訊號未達 BB(20, 2.0) 下軌深度；BB-lower 框架捕捉「絕對深度回檔」，兩者訊號集互補但不重疊；(2) IWM 為 Russell 2000 小型股寬基，個股事件驅動加總使板塊級 BB 下軌觸及包含過多事件雜訊，有別於 VGK/EWJ 發達市場、EWZ/EWT 單一國家 EM、CIBR 美國板塊等市場結構；(3) ATR>1.10 在 IWM-011 中過濾「慢磨下跌假訊號」有效，但在 BB-lower 訊號集上保留所有原 SL 無選擇性提升。**擴展 cross_asset_lesson #52 / lesson #16 邊界**：BB-lower hybrid mode 適用「結構性集中或真正寬基」ETF (VGK/EWJ/EEM/EWZ/EWT/CIBR)，**不適用個股事件驅動加總的小型股寬基 ETF（IWM 為首例驗證資料點）**。確認 [1.12%, 1.75%] vol 為**必要非充分條件**，asset 結構亦為關鍵變項。IWM 第 7 種失敗策略類型 (前 6 種：Pullback+WR、BB Squeeze 突破、趨勢回調 SMA、IWM/SPY 相對強度配對、回檔範圍結構過濾、深 RSI(2) 進場)。IWM-011 Att2 維持全域最優（12 次實驗、40+ 次嘗試）。
 -->
 ## AI Agent 快速索引
 
@@ -75,13 +76,24 @@
 - **Att3**（ATR(5)/ATR(20) > 1.15）：Part A Sharpe 0.34 / Part B 0.53。與 ATR > 1.2 的 Part A 完全相同（8 訊號），確認 1.1 與 1.15 之間有 2 個關鍵好訊號
 - **結論**：ATR > 1.1 是甜蜜點。XLU-011 的波動率自適應方法在 IWM（日波動 1.5-2%）上同樣有效，成功區分「急跌恐慌」與「慢磨下跌」
 
+**IWM-012 實驗摘要（2026-04-25，3 次嘗試，0 次超越 IWM-011，**repo 首次小型股寬基 ETF BB-lower hybrid mode 試驗**）：**
+跨資產驗證 EWJ-003 / VGK-007 / EWZ-006 / EWT-008 / CIBR-008 / EEM-012 的 BB-lower hybrid 成功模式於 IWM。IWM 1.5-2% vol 位於混合模式已驗證有效邊界 [1.12%, 1.75%] 中段，CIBR 1.53% vol 已驗證有效。
+- **Att1**（BB(20, 2.0) + 10d cap -10% + WR(10)≤-80 + ClosePos≥0.40 + ATR>1.10 + cd 8 + TP+4%/SL-4.25%/20d）：Part A 7 訊號 WR 57.1% Sharpe **0.23** cum +5.55% / Part B 3 訊號 WR 66.7% Sharpe 0.31 cum +3.46%，min(A,B) **0.23**（-56% vs IWM-011 的 0.52）。BB(20, 2.0) 在 IWM 1.5-2% vol 上需要 ~3-4% 偏離均值才觸發，比 IWM-011 RSI(2)+2DD≤-2.5% 框架嚴格。捕捉 7 訊號（vs IWM-011 的 10），缺少 5 個 IWM-011 winners（2019-10-02 / 2020-02-28 COVID / 2020-09-21 / 2022-05-10 / 2022-09-23 — 淺超賣急跌反轉訊號未達 BB(20, 2.0) 下軌深度），新增 2 winners（2020-09-11 / 2020-10-30）。SL 全部保留（淨效應為移除過多贏家）
+- **Att2**（BB 放寬至 1.5σ，參考 EWZ-006 1.75% vol 配置）：Part A 12 訊號 WR 58.3% Sharpe **0.20** cum +8.63% / Part B 6 訊號 WR 66.7% Sharpe 0.24 cum +5.01%，min(A,B) **0.20**（更差）。BB 1.5σ 過鬆引入 3 SLs（2020-01-27 pre-COVID -4.35%、2022-05-06 Fed pivot fear -4.35%、Part B 2025-03-11 -4.35%），WR 從 Att1 的 57.1%/66.7% 下降至 58.3%/66.7%。EWZ 用 1.5σ 成功因 EWZ 1.75% vol 較高，1.5σ 等同 IWM 2.0σ 的距離；IWM 1.5-2% vol 用 1.5σ 過鬆
+- **Att3**（回到 BB(20, 2.0) + 收緊 ClosePos≥0.50 + ATR>1.15）：Part A 2 訊號 WR 50% Sharpe 0.49 cum +2.56%（樣本過少）/ Part B 3 訊號 WR 66.7% Sharpe 0.31 cum +3.46%，min(A,B) **0.31**（樣本稀疏 Part A 0.4/yr，統計信心不足）。收緊雙重品質過濾將 Part A 從 7 縮至 2，失去統計顯著性
+- **核心失敗根因（結構性）**：(1) IWM RSI(2)<10 + 2DD≤-2.5% 框架捕捉「淺超賣急跌反轉」，多數訊號未達 BB(20, 2.0) 下軌深度；BB-lower 框架捕捉「絕對深度回檔」，兩者訊號集互補但不重疊。(2) IWM 為 Russell 2000 小型股寬基，個股事件驅動加總使板塊級 BB 下軌觸及包含過多事件雜訊（如 2020-01 pre-COVID、2022-05 Fed pivot），有別於 VGK/EWJ 發達市場、EWZ/EWT 單一國家 EM、CIBR 美國板塊等市場結構。(3) ATR>1.10 在 IWM-011 中過濾「慢磨下跌假訊號」並提升至 0.52；本實驗中 ATR>1.10 在 BB-lower 訊號集上保留所有原 SL 無選擇性提升
+- **擴展 cross-asset lesson #52 / lesson #16 邊界**：BB-lower hybrid mode 適用「結構性集中或真正寬基」ETF（VGK 非美寬基、EWJ 日本寬基、EEM EM 寬基、EWZ/EWT 單一國家 EM、CIBR 美國板塊）；**不適用個股事件驅動加總的小型股寬基 ETF（IWM 為首例驗證資料點）**。確認 [1.12%, 1.75%] vol 為**必要非充分條件**，asset 結構亦為關鍵變項
+- **IWM 第 7 種失敗策略類型**（前 6 種：Pullback+WR、BB Squeeze 突破、趨勢回調 SMA、IWM/SPY 相對強度配對、回檔範圍結構過濾、深 RSI(2) 進場）
+
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - ATR 閾值微調（1.05-1.09 / 1.11-1.14）：預期邊際改善，1.1 已是 0.31 與 0.34 的分水嶺
 - BB Squeeze Breakout 已測試（IWM-006/008），6 次嘗試均未超越均值回歸
 - 趨勢跟蹤/動量策略已測試（IWM-007），3 次嘗試均失敗
 - 配對/相對報酬策略已測試（IWM-009），3 次嘗試均失敗
 - 回檔範圍結構性過濾已測試（IWM-010），3 次嘗試均未超越 IWM-005
-- **IWM-011 已確認為新的全域最優**（11 次實驗、37+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、相對強度/配對交易、混合回檔範圍過濾六大策略類型及出場優化）
+- ~~BB-lower + 回檔上限混合進場~~ → IWM-012 三次迭代全部失敗（repo 首次小型股寬基 ETF 試驗，擴展 BB-lower hybrid mode 失敗邊界）
+- 信號日 capitulation strength filter（SPY-009 / DIA-012 1d floor / cap 模式）：尚未試驗，但 IWM-011 已 70%/75% WR 改善空間有限
+- **IWM-011 維持全域最優**（12 次實驗、40+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、相對強度/配對交易、混合回檔範圍過濾、**BB-lower 混合進場**七大策略類型及出場優化）
 
 **關鍵資產特性：**
 - IWM (iShares Russell 2000 ETF) 日波動約 1.5-2%，高於 SPY (1.2%)，SPY 比率 ~1.3x
@@ -118,6 +130,7 @@
 | IWM-009 | `iwm_009_momentum_rotation`   | Small-Cap Rotation / IWM-SPY 配對（3 次嘗試均失敗）| ❌ 失敗 |
 | IWM-010 | `iwm_010_pullback_rsi2_hybrid`| 回檔範圍 + RSI(2) 混合（3 次嘗試，Att2 改善 Part A 但未超越 IWM-005）| ❌ 未超越 |
 | IWM-011 | `iwm_011_vol_adaptive_rsi2`   | 波動率自適應 RSI(2)（ATR>1.1 過濾，超越 IWM-005 +67.7%）| ✅ 當前最佳 |
+| IWM-012 | `iwm_012_bb_lower_pullback_cap` | BB 下軌 + 回檔上限混合進場（**repo 首次小型股寬基 ETF 試驗**，3 次迭代全部失敗） | ❌ 失敗 |
 
 ---
 
@@ -865,3 +878,80 @@ IWM/SPY 相對報酬作為交易訊號在兩個方向上均不可靠。相對落
 ### 結論
 
 ATR(5)/ATR(20) > 1.1 波動率過濾成功打破 IWM RSI(2) 均值回歸的績效天花板。min(A,B) Sharpe 從 0.31 提升到 0.52（+67.7%），A/B 平衡近乎完美。**IWM-011 確認為新的全域最優**（11 次實驗、37+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、相對強度/配對交易、混合回檔範圍過濾六大策略類型及出場優化）。
+
+---
+
+## IWM-012: BB 下軌 + 回檔上限混合進場（Repo 首次小型股寬基 ETF 試驗）
+
+### 目標 (Goal)
+
+跨資產驗證 EWJ-003 / VGK-007 / EWZ-006 / EWT-008 / CIBR-008 / EEM-012 已成功的
+「BB(20,2) 下軌 + 10日高點回檔上限 + WR(10) + ClosePos + ATR」混合進場模式於 IWM。
+
+### 跨資產假設 (Cross-asset Hypothesis)
+
+混合進場模式已驗證有效 vol 邊界 [1.12%, 1.75%]：VGK 1.12% (min 0.53)、EEM 1.17%
+(min 0.34)、EWT 1.41% (min 0.57†)、CIBR 1.53% (min 0.39)、EWZ 1.75% (min 0.69)。
+IWM 1.5-2% vol 位於此邊界中段，CIBR 1.53% 已驗證有效。本實驗測試是否擴展至
+小型股寬基 ETF。
+
+### 進場條件 (Entry Conditions, Att3 最終)
+
+| # | 條件 | 指標 | 閾值 | 說明 |
+|---|------|------|------|------|
+| 1 | BB 下軌觸及 | Close <= BB(20, 2.0) lower | — | 統計自適應深度進場 |
+| 2 | 崩盤隔離 | 10日高點回檔 | >= -10% | 回檔不深於 10%（~5-7σ for 1.5-2% vol） |
+| 3 | 超賣確認 | Williams %R(10) | <= -80 | 標準 oversold |
+| 4 | 反轉跡象 | ClosePos | >= 50% | Att3 收緊（IWM-011 為 0.40） |
+| 5 | 波動率飆升 | ATR(5)/ATR(20) | > 1.15 | Att3 收緊（IWM-011 為 1.10） |
+| 6 | 冷卻期 | Cooldown | 8 天 | 避免重複進場 |
+
+### 出場參數 (Exit Parameters)
+
+| 參數 | 值 |
+|------|-----|
+| 獲利目標 (TP) | +4.0%（同 IWM-011） |
+| 停損 (SL) | -4.25%（同 IWM-011 甜蜜點） |
+| 最長持倉 | 20 天 |
+| 追蹤停損 | 無 |
+
+### 三次迭代結果 (Three Iterations)
+
+| 嘗試 | BB | Cap | ClosePos | ATR | Part A Sharpe | Part B Sharpe | min(A,B) | 結論 |
+|------|------|------|----------|------|---------------|---------------|----------|------|
+| Att1 | (20,2.0) | -10% | ≥0.40 | >1.10 | 0.23 (7訊號) | 0.31 (3訊號) | **0.23** | 失敗，BB 過嚴錯失 IWM-011 winners |
+| Att2 | (20,1.5) | -10% | ≥0.40 | >1.10 | 0.20 (12訊號) | 0.24 (6訊號) | **0.20** | 失敗，BB 過鬆引入 SLs |
+| Att3 | (20,2.0) | -10% | ≥0.50 | >1.15 | 0.49 (2訊號) | 0.31 (3訊號) | **0.31** | 失敗，樣本稀疏 0.4/yr |
+
+### 失敗根因分析 (Failure Root Cause)
+
+1. **訊號集差異**：IWM RSI(2)+2DD 框架捕捉「淺超賣急跌反轉」，多數訊號未達
+   BB(20, 2.0) 下軌深度（~3-4% 偏離均值）；BB-lower 框架捕捉「絕對深度回檔」，
+   兩者訊號集**互補但不重疊**
+2. **小型股動態**：IWM 為 Russell 2000 小型股寬基，個股事件驅動加總使板塊級
+   BB 下軌觸及包含過多事件雜訊（如 2020-01 pre-COVID、2022-05 Fed pivot），
+   有別於 VGK/EWJ 發達市場、EWZ/EWT 單一國家 EM、CIBR 美國板塊等市場結構
+3. **ATR>1.10 在 IWM 與其他資產的角色不同**：IWM-011 中 ATR>1.10 過濾「慢磨
+   下跌假訊號」並提升至 0.52；本實驗中 ATR>1.10 在 BB-lower 訊號集上保留所有
+   原 SL（無選擇性提升）
+
+### 跨資產貢獻 (Cross-Asset Contribution)
+
+擴展 cross-asset lesson #52 / lesson #16 邊界：
+- BB-lower hybrid mode 已驗證有效：non-US developed broad（VGK/EWJ）、EM broad
+  （EEM）、commodity-driven single-country EM（EWZ）、semiconductor-driven
+  single-country EM（EWT）、US sector（CIBR）
+- BB-lower hybrid mode 已驗證失效（vol 邊界外）：US biotech sector（XBI 2.0%）、
+  India ETF（INDA 0.97%）
+- BB-lower hybrid mode 已驗證失效（vol 邊界內但結構不適）：**US small-cap broad
+  ETF（IWM 1.5-2% 在邊界內但失敗）** — 確認 [1.12%, 1.75%] vol 為**必要非充分
+  條件**，asset 結構（個股事件驅動加總 vs 真正寬基或集中度高的 ETF）亦為關鍵
+  變項
+
+**新邊界規則**：BB-lower hybrid 適用「結構性集中或真正寬基」ETF，不適用個股
+事件驅動加總的小型股寬基（IWM 為首例驗證資料點）。
+
+### 結論
+
+IWM-012 三次迭代全部失敗，**IWM-011 維持全域最優**（min(A,B) 0.52）。本實驗為
+cross-asset 失敗驗證，記錄為 IWM 第 7 種失敗策略類型。
