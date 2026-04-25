@@ -1,36 +1,27 @@
 """
-IWM BB 下軌 + 回檔上限混合進場配置 (IWM-012) — Att1 baseline
+IWM BB 下軌 + 回檔上限混合進場配置 (IWM-012) — Att2
 
 動機：IWM-011 Att2（min(A,B) Sharpe 0.52）為 IWM 全域最佳，使用 RSI(2)+2DD+
 ClosePos+ATR 框架。本實驗測試 BB-lower hybrid mode（cross-asset port from
 EWJ-003 / VGK-007 / EWZ-006 / EWT-008 / CIBR-008 / EEM-012 successful pattern）
 是否在 IWM 1.5-2% vol（位於混合模式已驗證有效邊界 [1.12%, 1.75%] 中段）上有效。
 
-**Repo 首次將 BB-lower hybrid mode 應用至小型股寬基 ETF**（前驗證集中於非美
-寬基（VGK/EWJ）、EM 寬基（EEM）、單一國家 EM（EWZ/EWT）、美國板塊（CIBR））。
-
-跨資產假設（待驗證）：
-- BB-lower hybrid 在 IWM 1.5-2% vol 上應有效，因日波動正落在 EWJ/CIBR/EWT/EWZ
-  證實有效的 [1.12%, 1.75%] 區間中段（CIBR 1.53% vol 已成功驗證 min 0.39）
-- IWM 已驗證 ATR>1.10 過濾有效（IWM-011 Att2），是混合模式所需的核心品質
-  過濾器之一
-
-10日高點回檔上限門檻（IWM 1.5-2% vol）：
-- -8% = ~5σ（可能過嚴，移除中度回檔贏家）
-- -10% = ~6σ（預期甜蜜點，隔離 COVID/2022-bear/SVB-class 連續崩盤）
-- -12% = ~7σ（對 1.5% vol 偏鬆，無法過濾 2022-bear 期假訊號）
-
-跨資產校準參考：
-- VGK 1.12% vol 用 -7%（6σ）
-- CIBR 1.53% vol 用 -12%（7.8σ）
-- EWZ 1.75% vol 用 -10%（5.7σ，使用 BB(20, 1.5σ)）
-- EWT 1.41% vol 用 -8%（5.7σ）
-- IWM 1.5-2% vol 推估 -10%（5-7σ）為合理起點
+**Repo 首次將 BB-lower hybrid mode 應用至小型股寬基 ETF**。
 
 ========================================================================
-Att1（基線）：BB(20, 2.0) + 10d cap -10% + WR(10)≤-80 + ClosePos≥0.40
-              + ATR(5)/ATR(20) > 1.10 + cd 8 + TP+4%/SL-4.25%/20d
+迭代記錄（2026-04-25，成交模型 0.1% slippage，隔日開盤市價進場）：
 ========================================================================
+
+Att1（失敗）：BB(20, 2.0) + 10d cap -10% + WR≤-80 + ClosePos≥0.40 + ATR>1.10
+  Part A 7/57.1%/Sharpe **0.23** cum +5.55%
+  Part B 3/66.7%/Sharpe 0.31 cum +3.46%
+  min(A,B) **0.23**（-56% vs IWM-011 的 0.52）
+  失敗：BB(20, 2.0) 訊號集與 IWM-011 RSI(2) 框架互補但不重疊；缺失 5 個
+  IWM-011 winners（淺超賣急跌反轉訊號未達 BB 下軌深度），新增 2 winners
+  但 SL 全部保留，淨效應為移除過多贏家。
+
+Att2（當前）：放寬 BB 至 1.5σ（參考 EWZ-006 1.75% vol 配置）
+  目的：測試是否較鬆 BB 帶寬可捕捉更多 IWM-011 winners 同時保持 SL 過濾
 """
 
 from dataclasses import dataclass
@@ -42,9 +33,11 @@ from trading.core.base_config import ExperimentConfig
 class IWM012Config(ExperimentConfig):
     """IWM-012 BB 下軌 + 回檔上限混合進場參數"""
 
-    # BB 參數（同 CIBR-008/EWJ-003/VGK-007/EWT-008，1.75% 以下使用 2.0σ）
+    # BB 參數（Att2 改用 1.5σ，參考 EWZ-006 1.75% vol 的成功配置）
+    # Att1 BB(20, 2.0) + cap -10% → min 0.23 FAIL（捕捉訊號不足）
+    # Att2 BB(20, 1.5) + cap -10% → 放寬 BB 至 1.5σ 增加訊號流量
     bb_period: int = 20
-    bb_std: float = 2.0
+    bb_std: float = 1.5
 
     # 崩盤隔離（10日高點回檔上限）
     pullback_lookback: int = 10
