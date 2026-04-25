@@ -39,5 +39,9 @@ class TSLAPreBreakoutCalmStrategy(ExecutionModelStrategy):
                 f"  突破前平靜度 (Pre-Breakout Calm): T-1 報酬 ∈ "
                 f"[{config.prev_day_return_min:.1%}, {config.prev_day_return_max:.1%}]"
             )
+            print(
+                f"  SMA 延伸度上限 (SMA Extension Cap): "
+                f"Close / SMA({config.sma_trend_period}) ≤ {config.sma_extension_max:.2f}"
+            )
             print(f"  冷卻期 (Cooldown): {config.cooldown_days} 交易日")
         super()._print_strategy_params(config)

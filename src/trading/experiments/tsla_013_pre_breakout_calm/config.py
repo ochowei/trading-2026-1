@@ -8,10 +8,9 @@ Base: TSLA-009 Att2（當前最佳，min(A,B)=0.40）
 
 新方向：突破前平靜度過濾（Pre-Breakout Calm）
     Att1 基線：T-1 日報酬 ∈ [-3%, +4%]
-        - 上限排除過熱延續性突破（2021 bubble 晚期特徵）
-        - 下限排除熊市 V 型反彈突破（2022 bear 特徵）
-    Att2：移除下限（設為 -20% 實質非綁定），驗證下限是否在 BB Squeeze 框架下
-        結構性互斥（BB Squeeze 要求近期低波動，T-1 < -3% 應從不出現）
+    Att2：上限唯一（下限非綁定）
+    Att3：放棄 T-1 報酬過濾，改用 SMA(50) 延伸度上限 Close/SMA(50) ≤ 1.15
+        位置型過濾器，直接針對「price 已遠離 SMA 的過熱延續性突破」特徵
 """
 
 from dataclasses import dataclass
@@ -34,9 +33,14 @@ class TSLAPreBreakoutCalmConfig(ExperimentConfig):
 
     # === 突破前平靜度過濾（Pre-Breakout Calm Filter）===
     # 僅檢查訊號日前一日（T-1）的單日報酬
-    # Att2: 僅保留上限（排除過熱延續性），下限放寬至 -20% 實質非綁定
-    prev_day_return_max: float = 0.04  # T-1 日報酬上限（排除過熱延續性突破）
-    prev_day_return_min: float = -0.20  # 實質無下限（驗證下限結構性非綁定）
+    # Att3: 放寬 T-1 上限至 +10% 實質停用，改用 SMA 延伸度過濾器
+    prev_day_return_max: float = 0.10  # 實質無上限
+    prev_day_return_min: float = -0.20  # 實質無下限
+
+    # === SMA 延伸度上限（Att3 新增）===
+    # 排除「已遠離 SMA(50) 的晚期延伸突破」（2021 bubble late-cycle 特徵）
+    # Close / SMA(50) 若超過此倍率則跳過訊號
+    sma_extension_max: float = 1.15
 
 
 def create_default_config() -> TSLAPreBreakoutCalmConfig:

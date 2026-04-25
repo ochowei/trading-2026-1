@@ -176,7 +176,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
 | NVDA | NVDA-004 | BB 擠壓突破（優化）| 0.47 | 8 次實驗 ✓ |
 | IBIT | IBIT-006 Att2 | Gap-Down 資本化+日內反轉 MR | 0.40 | 8 次實驗 ✓ |
-| TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 12 次實驗 ✓ |
+| TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 13 次實驗 ✓ |
 | TLT | TLT-007 Att2 | 回檔+WR+反轉K線+**BB 寬度 regime 閘門**（<5%）| 0.12/0.65 | 12 次實驗 ✓（TLT-010 2DD/ATR 補充濾波三次失敗；TLT-011 percentile-based dynamic regime 三次失敗；TLT-012 trajectory-based regime 三次失敗，固定絕對閾值 + 單日 snapshot 為結構性最優）|
 | EEM | EEM-014 Att2 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor ≤-0.5%**（混合進場+2DD floor 精煉）| 0.56 | 14 次實驗 ✓ |
 | EWJ | EWJ-003 Att3 | BB 下軌+回檔上限+WR+ATR（混合進場）| 0.60† | 4 次實驗 ✓ |
@@ -217,6 +217,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 13. **收窄回撤範圍（微調1-3%）** — 改變訊號日期而非增減訊號，效果不可控
 
 ### 指標相關禁忌
+13b. **T-1 單日報酬過濾器在突破策略上（TSLA-013 驗證）** — 突破策略中 T-1/T-2 單日報酬過濾器因 cooldown-chain-shift 結構性失敗：訊號數不變但 Part A 績效退化（TSLA-013 Att1/2：Part A Sharpe 0.40→0.29、cum +64%→+36%）。BB Squeeze 要求近期低波動使 T-1 下限非綁定（Att2 下限 -20% 與 Att1 下限 -3% 結果完全相同），所有過濾效果來自上限。僅適用 MR 策略（已成功案例：USO-013/EEM-014/INDA-010/CIBR-012/DIA-012）
 14. **VIX 閾值過濾均值回歸進場** — VIX 在熊市持續偏高，過濾掉牛市好訊號
 15. **SMA 偏離作為額外過濾器** — 嚴重損害品質
 16. **RSI(14) 動能回復** — 本質是確認指標變形，移除好訊號多於壞
@@ -409,10 +410,10 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ---
 
-## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24**）
+## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25**）
 <!-- freshness:
-  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012]
-  validated: 2026-04-24
+  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013]
+  validated: 2026-04-25
   data_through: 2025-12-31
   confidence: high
 -->
@@ -467,6 +468,14 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 4. 若 SL 與 TP 的 2DD 分布重疊 → 2DD 方向不適用，改用其他過濾器
 
 **Meta-lesson**：當一個過濾器「方向」驗證無效（如 CIBR-004 的 2DD floor、EEM-014 Att1 的 2DD cap、VGK-008 Att1 的淺 2DD floor），其**反方向或深度加深**可能作為 timing/regime 過濾器有效。此觀察為新過濾器設計途徑，超越「oscillator hook / range expansion / capitulation depth」家族（lesson #20b 失敗家族）。**Att1 失敗轉 Att2 成功為「反向驗證」教科書案例**：遇到跨資產移植失敗時，先檢查資產結構（殘餘 SL 特徵與分布寬度）而非放棄方向。
+
+**新邊界（TSLA-013 驗證 2026-04-25）**：**T-1/T-2 單日或雙日報酬過濾器在突破（breakout）策略上結構性失敗**，與 MR 策略上的成功形成鮮明對比：
+- **MR 策略成功案例**：USO-013（2DD floor）、EEM-014（2DD floor）、INDA-010（2DD floor）、CIBR-012（2DD cap）、DIA-012（1d+3d cap dual-dimension）
+- **突破策略失敗案例**：TSLA-013 Att1/Att2（T-1 ≤ +4% upper cap + BB Squeeze Breakout）——Part A 訊號數保持 17 但 Sharpe 0.40→0.29、cum +64%→+36%
+- **失敗機制**：cooldown-chain-shift（見 lesson #19）在訊號密度高、cooldown 期長的 Part A 上放大——過濾器移除某個早期訊號後，原先被 cooldown 抑制的後續訊號（常品質較差）進入訊號集
+- **結構差異**：MR 進場隱含「已超賣/回檔」狀態，T-1/T-2 過濾器可在該隱含框架內選擇性過濾；突破進場則與 T-1 單日報酬下限結構性互斥（TSLA BB Squeeze 突破日 T-1 從不會 < -3%，因 BB Squeeze 要求近 5 日低波動）
+- **Att2 驗證（下限 -3% 完全非綁定）**：移除下限後結果與 Att1 完全相同，確認所有過濾效果來自上限，所有副作用來自 cooldown chain shift
+- **新規則**：T-1/T-2 單日/雙日報酬過濾器僅適用於 MR 策略；突破策略需改用 regime-level 過濾器（多週期波動率狀態、BB 寬度歷史百分位、趨勢持續性）而非 point-in-time 過濾器。擴展失敗邊界至 3.72% 高波動個股突破類別
 
 ---
 

@@ -7,7 +7,8 @@ TSLA-013 Signal Detector: BB Squeeze Breakout + Pre-Breakout Calm Filter
 2. 收盤價 > Upper BB(20, 2.0)（突破上軌）
 3. 收盤價 > SMA(50)（趨勢向上）
 4. 訊號日前一日（T-1）報酬 ∈ [prev_day_return_min, prev_day_return_max]
-5. 冷卻期 10 個交易日
+5. Close / SMA(50) ≤ sma_extension_max（Att3 新增：排除已遠離 SMA 的延伸突破）
+6. 冷卻期 10 個交易日
 """
 
 import logging
@@ -54,6 +55,7 @@ class TSLAPreBreakoutCalmDetector(BaseSignalDetector):
 
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
         df["Prev_Day_Return"] = df["Close"].pct_change().shift(1)
+        df["SMA_Extension"] = df["Close"] / df["SMA_Trend"]
 
         return df
 
@@ -68,8 +70,11 @@ class TSLAPreBreakoutCalmDetector(BaseSignalDetector):
         cond_prev_day_calm = (prev_ret >= self.config.prev_day_return_min) & (
             prev_ret <= self.config.prev_day_return_max
         )
+        cond_sma_not_extended = df["SMA_Extension"] <= self.config.sma_extension_max
 
-        df["Signal"] = cond_squeeze & cond_breakout & cond_trend & cond_prev_day_calm
+        df["Signal"] = (
+            cond_squeeze & cond_breakout & cond_trend & cond_prev_day_calm & cond_sma_not_extended
+        )
 
         signal_indices = df.index[df["Signal"]].tolist()
         suppressed: list[pd.Timestamp] = []
