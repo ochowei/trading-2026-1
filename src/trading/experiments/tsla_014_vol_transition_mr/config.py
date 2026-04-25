@@ -20,11 +20,21 @@ TSLA Post-Capitulation Vol-Transition 均值回歸配置 (TSLA-014)
 - 冷卻：INDA 7d → TSLA 10d
 
 ========================================================================
-Att1（baseline，2026-04-25）：
+Att1（baseline，2026-04-25）：FAILED min(A,B) -0.01
 ========================================================================
 參數：10 日 pullback [-25%, -10%] + WR(10) ≤ -80 + ClosePos ≥ 0.35
       + ATR(5)/ATR(20) > 1.15 + 2DD floor ≤ -5%
       + TP +7% / SL -7% / 15 天 / 冷卻 10 天
+結果：Part A 4 訊號 50% WR Sharpe -0.01 / Part B 1 訊號 0% WR / min -0.01
+失敗：訊號過稀（8 年 4/1），多重綁定 + 深 2DD 過嚴
+
+========================================================================
+Att2（放寬 pullback 與 2DD，2026-04-25）：
+========================================================================
+參數調整：pullback_threshold -10% → -8%，drop_2d_floor -5% → -3%
+其餘同 Att1
+
+預期：增加訊號至 ~2/yr 範圍同時保持品質
 
 成交模型：0.15% slippage（高波動單一股票）、隔日開盤市價進場
 """
@@ -39,8 +49,10 @@ class TSLA014Config(ExperimentConfig):
     """TSLA-014 Post-Capitulation Vol-Transition MR 參數"""
 
     # 進場 — 10 日高點回檔（深度 capitulation）
+    # Att1 -10%：訊號過稀（4/1）
+    # Att2：放寬至 -8% 增加訊號
     pullback_lookback: int = 10
-    pullback_threshold: float = -0.10  # 回檔 ≥ 10%（高 vol 深 capitulation 起點）
+    pullback_threshold: float = -0.08
     pullback_cap: float = -0.25  # 回檔 ≤ 25%（隔離極端崩盤如 2022 -65%）
 
     # 進場 — Williams %R 超賣
@@ -56,7 +68,9 @@ class TSLA014Config(ExperimentConfig):
     atr_ratio_threshold: float = 1.15
 
     # 進場 — 2 日急跌下限
-    drop_2d_floor: float = -0.05
+    # Att1 (-5%)：訊號過稀，過嚴
+    # Att2：放寬至 -3%（TSLA pullback 期間 2DD median ~-3% to -4%）
+    drop_2d_floor: float = -0.03
 
     # 冷卻天數
     cooldown_days: int = 10
