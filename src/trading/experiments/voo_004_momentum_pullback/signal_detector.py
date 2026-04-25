@@ -65,9 +65,7 @@ class VOO004SignalDetector(BaseSignalDetector):
 
         # Breakout freshness: any new-high in the last `breakout_recency_days`
         recency = self.config.breakout_recency_days
-        df["RecentNewHigh"] = (
-            df["IsNewHigh"].rolling(recency, min_periods=1).max().fillna(0) >= 1.0
-        )
+        df["RecentNewHigh"] = df["IsNewHigh"].rolling(recency, min_periods=1).max().fillna(0) >= 1.0
 
         # SMA trend filter
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()

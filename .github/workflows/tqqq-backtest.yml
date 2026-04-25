@@ -156,6 +156,7 @@ on:
           - "VOO-001: voo_001_rsi2_reversal"
           - "VOO-002: voo_002_asymmetric_exit"
           - "VOO-003: voo_003_wider_tp"
+          - "VOO-004: voo_004_momentum_pullback"
           - "TSM-001: tsm_001_extreme_oversold"
           - "TSM-002: tsm_002_pullback_wr_reversal"
           - "TSM-003: tsm_003_rsi2_reversal"

@@ -40,8 +40,7 @@ class VOO004MomentumPullbackStrategy(ExecutionModelStrategy):
                 f"（相對近 {config.pullback_lookback} 日高點）"
             )
             print(
-                f"  RSI({config.rsi_period}) 中性區: "
-                f"[{config.rsi_min:.0f}, {config.rsi_max:.0f}]"
+                f"  RSI({config.rsi_period}) 中性區: [{config.rsi_min:.0f}, {config.rsi_max:.0f}]"
             )
             print(f"  多頭 K 棒: Close > Open = {config.bullish_close_required}")
             if config.require_atr_ratio:
