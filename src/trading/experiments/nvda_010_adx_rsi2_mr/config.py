@@ -56,26 +56,26 @@ class NVDA010Config(ExperimentConfig):
 
     # ADX / DMI 趨勢強度閘門（repo 首次使用）
     adx_period: int = 14
-    adx_threshold: float = 20.0  # Att2: 25 → 20（Att1 過嚴僅 3/1 訊號）
-    require_bullish_dmi: bool = True  # +DI > -DI
+    adx_threshold: float = 20.0  # Att3: 維持 20
+    require_bullish_dmi: bool = False  # Att3: 移除 +DI>-DI（讓 SMA(50) 處理方向）
 
-    # 短期超賣觸發 (RSI(2))
-    rsi_period: int = 2
-    rsi_threshold: float = 20.0  # Att2: 15 → 20（強趨勢中 RSI<15 過稀）
+    # 短期超賣觸發
+    rsi_period: int = 3  # Att3: RSI(2) → RSI(3)（更平滑、Part B 訊號密度提升）
+    rsi_threshold: float = 25.0  # Att3: RSI(3) <= 25（與 RSI(2)<=20 等效嚴度但分布更穩）
 
     # 中期趨勢過濾
     sma_trend_period: int = 50
 
     # 淺回檔範圍 (NVDA ~3.26% vol)
     pullback_lookback: int = 5
-    pullback_min: float = -0.02  # Att2: 3% → 2%（放寬上限）
-    pullback_max: float = -0.12  # Att2: 10% → 12%（放寬下限）
+    pullback_min: float = -0.02  # 上限：至少回檔 2%
+    pullback_max: float = -0.15  # Att3: -12% → -15%（捕捉 Part B 較深 AI 修正）
 
     # 多頭 K 棒確認
     bullish_close_required: bool = True
 
     # 冷卻期
-    cooldown_days: int = 8  # Att2: 10 → 8（增加訊號密度）
+    cooldown_days: int = 8
 
 
 def create_default_config() -> NVDA010Config:
