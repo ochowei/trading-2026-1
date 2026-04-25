@@ -411,9 +411,9 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ---
 
-## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25**）
+## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25**）
 <!-- freshness:
-  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009]
+  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014]
   validated: 2026-04-25
   data_through: 2025-12-31
   confidence: high
@@ -471,6 +471,15 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 4. 若 SL 與 TP 的 2DD 分布重疊 → 2DD 方向不適用，改用其他過濾器
 
 **Meta-lesson**：當一個過濾器「方向」驗證無效（如 CIBR-004 的 2DD floor、EEM-014 Att1 的 2DD cap、VGK-008 Att1 的淺 2DD floor），其**反方向或深度加深**可能作為 timing/regime 過濾器有效。此觀察為新過濾器設計途徑，超越「oscillator hook / range expansion / capitulation depth」家族（lesson #20b 失敗家族）。**Att1 失敗轉 Att2 成功為「反向驗證」教科書案例**：遇到跨資產移植失敗時，先檢查資產結構（殘餘 SL 特徵與分布寬度）而非放棄方向。
+
+**新邊界（TSLA-014 驗證 2026-04-25，repo 第 1 次高 vol 單一股票 Post-Cap MR 試驗）**：**Post-Capitulation Vol-Transition MR 框架（10 日 pullback + 2DD floor + ATR ratio + WR）在高 vol 單一股票上結構性失敗**，確立框架的 vol 邊界。三次迭代全部失敗 vs TSLA-009 Att2 min 0.40：Att1（pullback -10%、2DD -5%）4/1 訊號 min -0.01（過稀）；Att2（pullback -8%、2DD -3%）7/4 訊號 min -0.59（bear regime SLs，Part B 7/12 為 SL）；Att3（pullback -12%、2DD -4%、ClosePos 0.50、WR -85）3/0 訊號 min 0.00（Part B 完全過濾）。**框架成功歷史 vs 邊界**：
+- INDA 0.97% vol（broad EM single country）：✅ min 0.30
+- VGK 1.12% vol（broad DM single country）：✅ min 2.60
+- EEM 1.17% vol（broad EM）：✅ min 0.56
+- USO 2.20% vol（事件驅動商品 ETF）：✅ min 0.26
+- **TSLA 3.72% vol（事件驅動單一股票）：❌ 三次迭代全部失敗**
+
+**新邊界**：Post-Cap MR 框架在 ~2.2% 日波動 / 事件驅動商品 ETF 為上限，**超越此邊界（高波動單一股票）結構性失效**。失敗機制：高 vol 單一股票的「深 capitulation」與「持續下跌中段」不可分——TSLA 2019/2022/2024 多次出現連續多日 -5%+ 下跌（trade war/Fed hawk/delivery miss/Musk events），任何 2DD 深度過濾器都會在這些「中段」訊號中觸發後續 SL；強反轉確認（ClosePos≥0.50）僅能捕捉牛市階段真實反轉但 Part B mixed regime 即零訊號。與 lesson #20b oscillator hook 失敗家族並列，但邊界判準不同：**oscillator hook 失敗依「政策驅動 + 後峰下跌 regime」分類；Post-Cap MR 失敗依「日波動 > 2.2% + 單一股票多 regime」分類**。
 
 **新邊界（TSLA-013 驗證 2026-04-25）**：**T-1/T-2 單日或雙日報酬過濾器在突破（breakout）策略上結構性失敗**，與 MR 策略上的成功形成鮮明對比：
 - **MR 策略成功案例**：USO-013（2DD floor）、EEM-014（2DD floor）、INDA-010（2DD floor）、CIBR-012（2DD cap）、DIA-012（1d+3d cap dual-dimension）
