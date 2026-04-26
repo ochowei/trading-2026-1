@@ -37,7 +37,11 @@ class TSLA015RegimeBreakoutStrategy(ExecutionModelStrategy):
                 f"{config.bb_squeeze_recent_days}日內"
             )
             print(f"  趨勢確認 (Trend): Close > SMA({config.sma_trend_period})")
-            print(f"  趨勢 regime: SMA({config.sma_regime_short}) > SMA({config.sma_regime_long})")
+            print(
+                f"  趨勢 regime: SMA({config.sma_regime_short})"
+                f" ≥ {config.sma_regime_ratio_min}"
+                f" × SMA({config.sma_regime_long})"
+            )
             print(
                 f"  波動 regime: ATR({config.atr_regime_short})"
                 f" ≤ {config.vol_regime_max_ratio}"
