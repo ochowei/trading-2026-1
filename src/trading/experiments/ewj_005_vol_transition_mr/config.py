@@ -70,7 +70,7 @@ class EWJ005Config(ExperimentConfig):
     # mode: "2dd_floor" | "1d_floor"
     capitulation_mode: str = "1d_floor"
     # 對應閾值（負數，要求 N 日報酬 <= 此值才通過）
-    capitulation_threshold: float = -0.005
+    capitulation_threshold: float = -0.007
 
     cooldown_days: int = 7
 
