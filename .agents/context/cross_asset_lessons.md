@@ -172,7 +172,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | VOO | VOO-004 Att3 | **Donchian 突破 + 5d 內 + 窄帶淺回檔（MBPC）** | 1.12† | 4 次實驗 ✓（**repo 首次 MBPC 成功**） |
 | SOXL | SOXL-010 Att3 | 板塊 RS 動量回調 | 0.70 | 11 次實驗 ✓ |
 | TSM | TSM-008 | RS 出場優化 | 0.79 | 9 次實驗 ✓ |
-| IWM | IWM-011 | 波動率自適應 RSI(2) | 0.52 | 12 次實驗 ✓ |
+| IWM | IWM-013 Att3 | Capitulation-Depth Filter MR (RSI<8 oscillator depth) | 0.59† | 13 次實驗 ✓ |
 | XBI | XBI-005 | 回檔範圍+WR+反轉K線 | 0.36 | 12 次實驗 ✓ |
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 10 次實驗 ✓ |
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
@@ -413,13 +413,15 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ---
 
-## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25**）
+## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25，IWM-013 oscillator depth 替代 raw return depth 2026-04-26**）
 <!-- freshness:
-  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014]
-  validated: 2026-04-25
+  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014,IWM-013]
+  validated: 2026-04-26
   data_through: 2025-12-31
   confidence: high
 -->
+
+**IWM-013 擴展（2026-04-26，repo 首次以 oscillator depth 替代 raw return depth 維度）**：對於小型股寬基 ETF（IWM Russell 2000，1.5-2% vol），1d/3d raw return 維度的 capitulation-depth filter 結構性失敗（Att1 1d cap + 3d cap min -0.04 / Att2 3d FLOOR min 0.43，均劣化於 IWM-011 的 0.52）；改用 **RSI(2) < 8（oscillator depth tightening，從 IWM-011 < 10 加嚴 1.25x）** 後 Att3 min(A,B)† **0.59**（+13.5%）成功。**結構性根因**：IWM 為 2000+ 個股寬基 ETF，板塊級 raw return 帶有過多個股事件雜訊，losers vs winners 在 1d/3d 維度高度重疊（loser 2021-11-26 1d=-3.77% 與 winner 2020-09-21 1d=-3.50% 不可分；loser 2025-03-04 3d=-2.81% 與 winner 2025-08-01 3d=-3.49% 接近）；但 RSI(2) 為 EWMA-based 反映多日壓力累積，losers 集中 RSI 8-10、winners RSI ≤ 7.9，有清晰分隔。**新 cross-asset 規則（lesson #19 v3）**：(a) 對於發達/單一國家寬基 ETF（DIA/SPY/EWJ/VGK/EEM/INDA），raw return depth (1d/3d/2DD floor or cap) 仍為主要 capitulation strength 度量工具；(b) 對於小型股寬基 ETF（IWM，個股事件驅動加總），改用 **oscillator depth (RSI threshold tightening)** 為更精準的 capitulation strength 度量；(c) 跨資產移植時優先檢查 SL/TP 在 raw return 維度的可分離性，若重疊則改用 oscillator 維度。**Cooldown shift 良性案例**：IWM-013 Att3 移除 2019-08-02 LOSS 後 cooldown shift 至 2019-08-05 expiry +0.44%（淨改善 +1.82pp），未引發 SL 連鎖（不同於 NVDA-010 Att3 / TLT-010 失敗模式），顯示**「淺 oscillator depth 過濾器」較「raw return cap」更不易觸發負面 cooldown chain shift**。
 
 **SPY-009 擴展（2026-04-25，repo 首次 1d FLOOR 方向）**：低波動寬基 ETF（SPY ~1.0% vol）的 SL 1d 維度失敗結構與 DIA **方向完全相反**——SPY SLs 為 1d 過淺（-0.09%~-0.30%）的弱勢盤緩慢漂移，需 **1 日跌幅下限 (1d FLOOR) <= -0.5%** 過濾（要求訊號日具備足夠 capitulation 強度）；DIA SLs 為 1d 過深（-2.5%, -2.2%）的政策震盪延續，需 **1d cap >= -2.0%** 過濾。**雙資產共同失敗模式**：Part B 2025-04-07 Trump 關稅 3d -10.65% / -10.06% regime-shift → 共用 **3d cap >= -8%** 過濾。SPY-009 Att2 min(A,B) Part A Sharpe **6.56**（vs SPY-005 0.53，+1138%）。**新 cross-asset 規則（精煉 lesson #19）**：低波動寬基 ETF（~1.0% vol）SLs 在 1d 維度的失敗結構**並非單一方向**——需個別 trade-level SL 分布分析判斷：(a) DIA 防禦型成份股（消費品/醫療/工業）→ 1d cap 方向（過深政策震盪）；(b) SPY 較高科技股權重（FAANG 高 vol 成份股）→ 1d FLOOR 方向（過淺弱勢漂移）。**單一資產失敗模式不能直接跨資產移植**，即使在「同 vol 等級 + 同進場框架」的相近資產類別之間，仍需 trade-level 確認。
 

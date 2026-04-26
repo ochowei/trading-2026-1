@@ -205,6 +205,7 @@ on:
           - "IWM-010: iwm_010_pullback_rsi2_hybrid"
           - "IWM-011: iwm_011_vol_adaptive_rsi2"
           - "IWM-012: iwm_012_bb_lower_pullback_cap"
+          - "IWM-013: iwm_013_capitulation_filter"
           - "NVDA-001: nvda_001_extreme_oversold"
           - "NVDA-002: nvda_002_capped_drawdown"
           - "NVDA-003: nvda_003_bb_squeeze_breakout"
