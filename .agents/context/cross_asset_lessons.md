@@ -676,15 +676,15 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 
 ---
 
-## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認）
+## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26**）
 <!-- freshness:
-  derived_from: [TSLA-013,TSLA-015]
+  derived_from: [TSLA-013,TSLA-015,NVDA-012]
   validated: 2026-04-26
   data_through: 2025-12-31
   confidence: medium
 -->
 
-TSLA-013 提出跨資產假設：「breakout strategies on high-vol stocks may require regime-level filters (vol state, multi-week trend regime) rather than T-1/T-2 single-day filters」。TSLA-015 三次迭代驗證並精煉此假設：
+TSLA-013 提出跨資產假設：「breakout strategies on high-vol stocks may require regime-level filters (vol state, multi-week trend regime) rather than T-1/T-2 single-day filters」。TSLA-015 三次迭代驗證並精煉此假設，**NVDA-012（2026-04-26）為第二次跨資產驗證並精煉 k 值資產相依性**：
 
 **規則**：在已有 BB Squeeze breakout 框架的高波動單一個股上（>3% 日波動），可疊加 **buffered multi-week SMA trend regime** 過濾器：
 
@@ -692,9 +692,11 @@ TSLA-013 提出跨資產假設：「breakout strategies on high-vol stocks may r
 SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
 ```
 
-**緩衝閾值 k 為關鍵**：
+**緩衝閾值 k 為關鍵且資產相依**（NVDA-012 跨資產驗證精煉）：
 - k = 1.00（嚴格 SMA20 > SMA60）：因 cooldown chain shift 失敗（TSLA-015 Att1：min 0.37）。borderline transition 訊號（如 SMA20/SMA60 = 0.994）被過濾，cooldown 被解除使下一日 borderline 訊號獲准進場成 SL
-- **k = 0.99（1% 緩衝）為甜蜜點**（TSLA-015 Att2/Att3：min 0.53）。精準分隔 transition winners（比率 0.99-1.00）與 bear regime SLs（比率 < 0.99）
+- **TSLA k = 0.99（1% 緩衝）為甜蜜點**（TSLA-015 Att2/Att3：min 0.53，3.72% 日波動）。精準分隔 transition winners（比率 0.99-1.00）與 bear regime SLs（比率 < 0.99）
+- **NVDA k = 0.97（3% 緩衝）為甜蜜點**（NVDA-012 Att2：min 0.51，2.5-3% 日波動）。NVDA-012 三次迭代精準鎖定：Att1 k=0.99 失敗（min 0.41，誤殺 2025-05-13 transition winner）→ Att2 k=0.97 成功 → Att3 k=0.98 又失敗（min 0.41）。**NVDA AI growth stock 的 transition signals SMA20/SMA60 比率落於 0.97-0.99 區間**，需更寬緩衝；TSLA 高波動使 SMA 變動更劇烈，1% 即足
+- **k 值跨資產不可直接移植**：lesson #22 規則需依資產 transition signal 的 SMA20/SMA60 比率分布調整。建議首次測試 k=0.99，若 transition winners 被誤殺則放寬至 0.97-0.95 範圍
 
 **效果（TSLA-015 Att3 vs TSLA-009 Att2，BB Squeeze breakout）**：
 - Part A WR 58.8% → **72.7%**（+14pp）
@@ -709,11 +711,11 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
 - 所有 19 個訊號日的 ATR(20)/ATR(60) ≤ 1.383 < 1.40，閾值從未觸發
 - **根因**：BB Squeeze 進場條件本身已隱含「近期低 vol」要求（BB Width ≤ 60d 30th percentile），疊加 ATR vol filter 訊號日天然滿足，無區分力
 
-**有效條件（待跨資產驗證）**：
-1. 高波動單一個股（>3% 日波動，TSLA 3.72% 已驗證）
-2. 已驗證 BB Squeeze breakout 框架（如 TSLA-009 Att2、NVDA-004、SOXL-010）
+**有效條件（NVDA-012 跨資產確認後更新）**：
+1. **中-高波動單一個股（≥2.5% 日波動）**：TSLA 3.72%、NVDA ~3% 雙資產驗證；vol 上限暫未測得
+2. 已驗證 BB Squeeze breakout 框架（TSLA-009 Att2、NVDA-004 雙資產驗證；SOXL-010 等待測試）
 3. 多 regime 變異性（多空交替使 SMA regime 有真實選擇力）
-4. 1% 緩衝（k=0.99）為精準分隔 transition borderline 訊號的甜蜜點
+4. **k 緩衝為資產相依**（NVDA-012 精煉）：高波動（>3.5%）試 k=0.99；中波動（2.5-3.5%）試 k=0.97；通用搜尋網格 [0.99, 0.97, 0.95]
 
 **反例對比（lesson #21 MBPC 框架）**：
 - VOO-004 / NVDA-009 在 MBPC 框架下，SMA(200) regime gate 為**非選擇性過濾**
@@ -725,9 +727,14 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
 - ❌ 「vol state regime」hypothesis 在 BB Squeeze 框架被消融證實冗餘
 - ✅ 對比 single-day 過濾器（T-1 cap、SMA extension cap）系統性失敗，regime-level 過濾為突破策略高波動個股的正確方向
 
-**跨資產假設（待續驗證）**：buffered multi-week SMA regime 可能在以下資產有效：
-- NVDA（NVDA-004 BB Squeeze breakout，2.5-3% 日波動）
-- SOXL（SOXL-010 板塊 RS 動量回調，可能延伸至 BB Squeeze 框架）
-- 其他 >2% 日波動個股的突破策略
+**跨資產假設（NVDA-012 確認後更新）**：buffered multi-week SMA regime 已確認雙資產有效：
+- ✅ TSLA（TSLA-015 Att2，3.72% vol，k=0.99）：min 0.40→0.53（+33%）
+- ✅ NVDA（NVDA-012 Att2，~3% vol，k=0.97）：min 0.47→0.51（+9%）—— **首次突破 NVDA 結構性 Sharpe 上限 0.47**
+- 待測試：SOXL（SOXL-010 板塊 RS 動量回調，可能延伸至 BB Squeeze 框架）、其他 ≥2.5% 日波動個股的突破策略
 
-**規則簡化**：高波動單一個股 BB Squeeze breakout 策略中，使用 **SMA(20) ≥ 0.99 × SMA(60)** 為主要 multi-week regime 過濾器，**毋需額外 ATR vol regime**（squeeze 已隱含低 vol 條件）。
+**規則簡化**：中-高波動單一個股 BB Squeeze breakout 策略中，使用 **buffered SMA(20) ≥ k × SMA(60)** 為主要 multi-week regime 過濾器（k 依資產調整：TSLA k=0.99、NVDA k=0.97），**毋需額外 ATR vol regime**（squeeze 已隱含低 vol 條件）。
+
+**NVDA vs TSLA 過濾結構差異**：
+- TSLA-015：Part A 17→11 訊號（過濾 6 SLs）/ Part B 6→6 訊號（無過濾），高 vol 使 bear regime 與 bull regime SMA20/SMA60 差距大，1% 緩衝即可清晰分隔
+- NVDA-012：Part A 17→16 訊號（僅過濾 1 個 2022-07-20 bear SL）/ Part B 8→7 訊號（過濾 1 marginal expiry，保留 1 transition winner，需 3% 緩衝），中 vol AI growth 期 SMA 變動較緩，transition zone 落於 0.97-0.99 區間
+- **共同模式**：規則皆過濾「明確 bear regime」的 SLs（ratio << k），保留 transition + bull regime 的 winners

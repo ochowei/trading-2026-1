@@ -218,6 +218,7 @@ on:
           - "NVDA-009: nvda_009_momentum_pullback"
           - "NVDA-010: nvda_010_adx_rsi2_mr"
           - "NVDA-011: nvda_011_capitulation_filter"
+          - "NVDA-012: nvda_012_regime_breakout"
           - "XBI-001: xbi_001_pullback_wr"
           - "XBI-004: xbi_004_capped_cooldown"
           - "XBI-005: xbi_005_closepos_reversal"
