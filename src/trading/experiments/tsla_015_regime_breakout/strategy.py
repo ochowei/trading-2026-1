@@ -42,10 +42,13 @@ class TSLA015RegimeBreakoutStrategy(ExecutionModelStrategy):
                 f" ≥ {config.sma_regime_ratio_min}"
                 f" × SMA({config.sma_regime_long})"
             )
-            print(
-                f"  波動 regime: ATR({config.atr_regime_short})"
-                f" ≤ {config.vol_regime_max_ratio}"
-                f" × ATR({config.atr_regime_long})"
-            )
+            if config.use_vol_regime:
+                print(
+                    f"  波動 regime: ATR({config.atr_regime_short})"
+                    f" ≤ {config.vol_regime_max_ratio}"
+                    f" × ATR({config.atr_regime_long})"
+                )
+            else:
+                print("  波動 regime: 已停用 (Att3 ablation)")
             print(f"  冷卻期 (Cooldown): {config.cooldown_days} 交易日")
         super()._print_strategy_params(config)

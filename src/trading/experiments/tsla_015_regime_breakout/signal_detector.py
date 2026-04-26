@@ -82,9 +82,12 @@ class TSLA015RegimeBreakoutDetector(BaseSignalDetector):
         cond_regime_trend = df["SMA_Regime_Short"] >= (
             df["SMA_Regime_Long"] * self.config.sma_regime_ratio_min
         )
-        cond_regime_vol = df["ATR_Regime_Short"] <= (
-            df["ATR_Regime_Long"] * self.config.vol_regime_max_ratio
-        )
+        if self.config.use_vol_regime:
+            cond_regime_vol = df["ATR_Regime_Short"] <= (
+                df["ATR_Regime_Long"] * self.config.vol_regime_max_ratio
+            )
+        else:
+            cond_regime_vol = pd.Series(True, index=df.index)
 
         df["Signal"] = (
             cond_squeeze & cond_breakout & cond_trend & cond_regime_trend & cond_regime_vol

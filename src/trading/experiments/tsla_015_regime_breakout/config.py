@@ -41,11 +41,22 @@ Att1（baseline，2026-04-26）：FAILED min(A,B) 0.37
       cooldown chain shift（lesson #19）使 2025-05-13 進場成 SL。
 
 ================================================================================
-Att2（buffered SMA regime，2026-04-26）
+Att2（buffered SMA regime，2026-04-26）：SUCCESS min(A,B) 0.53
 ================================================================================
 參數調整：sma_regime_ratio_min 1.00 → 0.99（允許 1% 緩衝）
-直覺：2024-09-19 SL（SMA 比率 0.986）與 2025-05-12 winner（SMA 比率 0.994）
-      在 1% 緩衝下可區分，過濾前者保留後者
+結果：Part A 11/72.7%/Sharpe 0.84 cum +82.29%（+110% vs 0.40 baseline）/
+      Part B 6/66.7%/Sharpe 0.53 cum +26.25%（與 baseline 完全相同）/
+      min 0.53（+33% vs 0.40 baseline）。A/B 年化 cum 差 3.3% < 30% ✓
+      訊號比 1.36:1 < 1.5:1 ✓
+
+================================================================================
+Att3（穩健性測試：移除 vol regime，2026-04-26）
+================================================================================
+參數調整：use_vol_regime False → True 改為 False（移除 ATR vol regime filter）
+直覺：Att1/Att2 中 vol regime（ATR(20) ≤ 1.40 × ATR(60)）對 Part B 全部訊號
+      非綁定（全部訊號 ATR ratio ≤ 1.383 < 1.40），僅在 Part A 起作用。
+      若移除後 Part A 退化，證明 vol regime 為實質貢獻者；若維持，
+      證明 SMA buffered regime 為主要貢獻者，vol regime 冗餘
 """
 
 from dataclasses import dataclass
@@ -80,9 +91,11 @@ class TSLA015Config(ExperimentConfig):
     # 短週期 ATR：20 日
     # 長週期 ATR：60 日
     # 條件：ATR(short) ≤ ATR(long) * vol_regime_max_ratio
+    # use_vol_regime=False 完全移除 ATR vol filter（Att3 ablation 測試）
     atr_regime_short: int = 20
     atr_regime_long: int = 60
     vol_regime_max_ratio: float = 1.40
+    use_vol_regime: bool = False
 
 
 def create_default_config() -> TSLA015Config:
