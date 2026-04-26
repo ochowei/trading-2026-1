@@ -1,17 +1,24 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-26
   data_through: 2025-12-31
+  note: EWJ-005 added 2026-04-26 (Post-Capitulation Vol-Transition MR：EWJ-003 Att3 框架 + 「1日報酬下限」過濾，**Att2 SUCCESS — repo 第 2 次「1d floor」方向成功驗證，繼 SPY-009 後首次非美 ETF 驗證**). Three iterations: Att1 (2DD floor <= -2.0%，VGK-008 Att2 直接移植) Part A 7/85.7%/Sharpe 0.61 cum +11.06% / Part B 3/100%/std=0 Sharpe 0.00 cum +10.87% / min(A,B)† 0.61 (+1.7% vs baseline 0.60，邊際) — EWJ Part A 兩筆 SL 的 2DD 為 -1.63%（filtered）/ -2.36%（kept），且 winners 2DD 廣泛分布 +0.17%~-2.43%，2DD floor 同時切除 6 筆 shallow-2DD winners 換 1 筆 SL，淨效果有限（不同於 VGK 1.12% vol 上 SLs 集中於 -1.47%~-1.68% 窄帶可被 -2.0% 完全繞過）；Att2 ★ (1d floor <= -0.5%，SPY-009 方向跨資產移植) Part A 9 訊號 WR **88.9%** Sharpe **0.70** cum +14.72% / Part B 4 訊號 WR 100% std=0 Sharpe 0.00 cum +14.75% / min(A,B)† **0.70**（+16.7% vs baseline，A/B 累計差 0.03pp 近乎完美平衡）—— 1d 維度成功過濾 2023-08-03 SL（1d -0.49% 恰於 -0.5% 邊界外），副作用為過濾 3 筆 1d 過淺贏家（2021-08-20 +0.08% / 2021-10-05 +0.56% / 2022-01-28 +0.38%），淨增 Part A WR 84.6%→88.9%；Att3 (1d floor <= -0.7%，加嚴測試) Part A 6/83.3%/0.46 cum +7.11% / Part B 3/100%/std=0 cum +10.87% / min 0.46 (-23% vs Att2) —— -0.7% 移除 3 筆淺 1d winners (2019-05-08 -0.61%/+2.23%、2019-08-02 -0.52%/+1.22%、2020-10-30 -0.58%/+3.50%) 確認 -0.5% 為甜蜜點。**核心發現**：EWJ Part A SLs 在 1d 維度具區分力（-0.49% vs winners 多在 -0.5%~-2.0%），與 SPY-009 同類失敗結構（淺 1d drift + BB 下軌假觸碰）；2DD floor 雖在 VGK/EEM/INDA 成功，但 EWJ winners 2DD 廣泛分布使 2DD 維度區分力弱於 1d 維度。**跨資產貢獻**：repo 第 2 次「1d floor」方向成功驗證（繼 SPY-009 後），首次非美 ETF 驗證；擴展 lesson #19 雙向性發現至 EWJ 1.15% vol 已開發亞洲寬基 ETF。EWJ-005 Att2 為新全域最優（5 次實驗、15 次嘗試）。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** EWJ-003 Att3（BB 下軌均值回歸：BB(20,1.5) 下軌觸及 + 10日高點回檔上限 7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15，TP +3.5%/SL -4.0%/20天）**4 次實驗 12 次嘗試確認全域最優**
+**當前最佳：** EWJ-005 Att2（Post-Capitulation Vol-Transition MR：EWJ-003 Att3 框架 + **1 日報酬下限 <= -0.5%**，TP +3.5%/SL -4.0%/20天/cd7）**5 次實驗 15 次嘗試確認全域最優**
+- Part A: Sharpe **0.70**, 累計 +14.72%, 9 訊號 (1.8/年), WR **88.9%**, MDD -4.10%
+- Part B: 累計 +14.75%, 4 訊號 (2.0/年), WR 100%（4/4 全部達標，Sharpe 因 std=0 顯示 0.00）
+- min(A,B)† **0.70**（Part A 為約束，沿用 EWJ-003/DIA-012/SPY-009 慣例）, +16.7% vs EWJ-003 Att3 的 0.60
+- A/B 累計報酬差 **0.03pp（近乎完美平衡）**，A/B 年化訊號比 0.9:1（優秀）
+- 關鍵改善：1d floor <= -0.5% 過濾 EWJ-003 Att3 的 2023-08-03 SL（1d -0.49% 恰於邊界外）+ 3 筆 1d 過淺 winners，淨增 WR 84.6%→88.9% 且 Sharpe 0.60→0.70
+- **跨資產貢獻**：repo 第 2 次「1d floor」方向成功驗證（繼 SPY-009 後），首次非美 ETF 驗證
+
+**前任最佳：** EWJ-003 Att3（BB 下軌均值回歸：BB(20,1.5) 下軌觸及 + 10日高點回檔上限 7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15，TP +3.5%/SL -4.0%/20天）
 - Part A: Sharpe 0.60, 累計 +21.97%, 13 訊號 (2.6/年), WR 84.6%, MDD -4.50%
 - Part B: 累計 +22.93%, 6 訊號 (3.0/年), WR 100%（6/6 全部達標，Sharpe 因 std=0 顯示 0.00）
 - A/B 年化訊號比 0.87:1（優秀），A/B 累計報酬差距 0.96pp（近乎完美平衡）
-- vs EWJ-002: Part A Sharpe 0.55→**0.60**（+9%），Part A 累計 +18.08%→+21.97%（+22%）
-- BB 下軌自適應門檻 + 固定回檔上限 = 混合進場，低波動期捕捉更多有效訊號同時隔離極端崩盤
 
-**前任最佳：** EWJ-002 Att2（波動率自適應回檔+WR：10日回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + ATR>1.15，min(A,B) Sharpe 0.55）
+**前任最佳（vol-adaptive）：** EWJ-002 Att2（波動率自適應回檔+WR：10日回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + ATR>1.15，min(A,B) Sharpe 0.55）
 
 **已證明無效（禁止重複嘗試）：**
 - 追蹤停損啟動 +2.0%/距離 1.5%（EWJ-001）— 啟動/TP 比 57% 遠低於 80% 門檻，壓縮獲利空間
@@ -35,12 +42,19 @@
 - EWJ-003 Att2：BB(20,1.5) + WR + ClosePos + ATR>1.15 → Part A 0.26/Part B 1.01，min 0.26
 - EWJ-003 Att3：BB(20,1.5) + 回檔上限7% + WR + ClosePos + ATR>1.15 → **Part A 0.60/Part B 100%WR ★**
 - EWJ-004 Att1-3：RS 動量 vs EFA/SPY（2-3% 門檻、SMA(50)/SMA(200)），min(A,B) 最佳 0.15（均失敗）
+- EWJ-005 Att1：EWJ-003 Att3 框架 + 2DD floor <= -2.0%（VGK-008 Att2 移植）→ Part A 0.61/Part B std=0, min 0.61（+1.7%，邊際）
+- EWJ-005 Att2：EWJ-003 Att3 框架 + **1d floor <= -0.5%**（SPY-009 方向）→ Part A 0.70/Part B std=0, min **0.70**（+16.7%）★
+- EWJ-005 Att3：EWJ-003 Att3 框架 + 1d floor <= -0.7%（加嚴）→ Part A 0.46/Part B std=0, min 0.46（-23% vs Att2，移除 3 筆淺 1d winners）
 
 **尚未嘗試的方向（預期邊際效益極低）：**
 - RSI(2) 短期超賣框架（VGK 驗證非美 ETF 不適合 RSI(2)，cross-asset lesson #27）
 - BB Squeeze 突破（INDA-003 驗證低波動非美 ETF 嚴重市場狀態依賴）
 - BB(20,1.75) 中間值 — Att1/Att2 顯示 BB std 對 Part A/B 影響方向相反，1.5+cap 已是最佳組合
+- 1d cap（DIA-012 方向）：EWJ Part A SLs 1d 為 -1.19% 與 -0.49%，cap 方向會誤刪 -2.03% / -1.81% 等深 1d winners，預期失敗
+- 1d floor + 3d cap 雙維度（DIA-012 Att2 風格）：3d cap 在 EWJ 上不必要，EWJ-005 Att2 已達 0.03pp 完美平衡
 - ~~RS 動量（EWJ vs EFA/SPY）~~ → EWJ-004 三次嘗試均失敗（Japan 的 RS 非結構性）
+- ~~2DD floor（lesson #19 family）~~ → EWJ-005 Att1 驗證 2DD 維度區分力弱於 1d
+- **★ 1d floor 方向精煉（Capitulation-Strength Filter）→ EWJ-005 Att2 成功**（1d floor <= -0.5% 過濾 2023-08-03 SL 與 3 筆淺 1d winners，min 0.60→0.70 +16.7%）
 
 **關鍵資產特性：**
 - EWJ 為 iShares MSCI Japan ETF，追蹤日本股市大中型股
@@ -51,6 +65,7 @@
 - BB 下軌自適應門檻在低波動資產（1.15%）上優於固定回檔門檻（CIBR-007 在 1.53% vol 也驗證）
 - 高流動性 ETF，滑價假設 0.1%
 - **RS 動量完全無效（EWJ-004 驗證）**：日本相對強度由事件驅動（BOJ 政策、日圓套息交易、出口週期），非結構性週期因素。三次嘗試（EFA/SPY 基準、RS 2-3%、SMA(50)/SMA(200)）min(A,B) 最佳僅 0.15，Part A 品質不穩定（0.12-0.37），Part B 在 Att3 翻負（-0.24）。確認跨資產教訓 #25 延伸至**發達市場單一國家 ETF**
+- **1d floor capitulation filter 在 EWJ 有效（EWJ-005 Att2 驗證）**：日波動 1.15% 下 1d 報酬 -0.5% 為甜蜜點，過濾「淺 1d drift + BB 下軌假觸碰」訊號（如 2023-08-03 SL 1d -0.49% 恰於邊界外）。比 2DD floor（VGK-008/EEM-014/INDA-010 方向）在 EWJ 更有效，因 EWJ winners 2DD 廣泛分布（+0.17%~-2.43%）但 1d 分布更集中。EWJ 為 repo 第 2 例「1d floor」成功（首例 SPY-009），並擴展至非美 ETF
 <!-- AI_CONTEXT_END -->
 
 # EWJ 實驗總覽 (EWJ Experiments Overview)
@@ -64,20 +79,21 @@
 
 ## 參數對照表 (Parameter Comparison)
 
-| 參數 | EWJ-001 | EWJ-002 Att2 | EWJ-003 Att3★ |
-|------|---------|---------------|---------------|
-| 進場框架 | 固定回檔≥3% | 固定回檔 3-7% | BB(20,1.5) 下軌 + 回檔上限 7% |
-| WR(10) | ≤ -80 | ≤ -80 | ≤ -80 |
-| ClosePos | ≥ 40% | ≥ 40% | ≥ 40% |
-| ATR 過濾 | 無 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 |
-| TP | +3.5% | +3.5% | +3.5% |
-| SL | -4.0% | -4.0% | -4.0% |
-| 持倉 | 20 天 | 20 天 | 20 天 |
-| 追蹤停損 | 啟動+2.0%/距離1.5% | 無 | 無 |
-| Part A Sharpe | 0.16 | 0.55 | **0.60** |
-| Part B Sharpe | 0.24 | 2.06 | 0.00 (std=0) |
-| Part B WR | 71.4% | 83.3% | **100.0%** |
-| **min(A,B)** | 0.16 | 0.55 | **0.60★** (Part A 為約束) |
+| 參數 | EWJ-001 | EWJ-002 Att2 | EWJ-003 Att3 | EWJ-005 Att2★ |
+|------|---------|---------------|---------------|---------------|
+| 進場框架 | 固定回檔≥3% | 固定回檔 3-7% | BB(20,1.5) 下軌 + 回檔上限 7% | BB(20,1.5) 下軌 + 回檔上限 7% |
+| WR(10) | ≤ -80 | ≤ -80 | ≤ -80 | ≤ -80 |
+| ClosePos | ≥ 40% | ≥ 40% | ≥ 40% | ≥ 40% |
+| ATR 過濾 | 無 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 |
+| Capitulation 過濾 | 無 | 無 | 無 | **1d floor <= -0.5%** |
+| TP | +3.5% | +3.5% | +3.5% | +3.5% |
+| SL | -4.0% | -4.0% | -4.0% | -4.0% |
+| 持倉 | 20 天 | 20 天 | 20 天 | 20 天 |
+| 追蹤停損 | 啟動+2.0%/距離1.5% | 無 | 無 | 無 |
+| Part A Sharpe | 0.16 | 0.55 | 0.60 | **0.70** |
+| Part B Sharpe | 0.24 | 2.06 | 0.00 (std=0) | 0.00 (std=0) |
+| Part B WR | 71.4% | 83.3% | 100.0% | **100.0%** |
+| **min(A,B)** | 0.16 | 0.55 | 0.60 | **0.70★** (Part A 為約束) |
 
 ## 實驗列表 (Experiment List)
 
@@ -85,8 +101,9 @@
 |---------|---------------------------------|---------------------------------------------|-----------|
 | EWJ-001 | `ewj_001_pullback_wr_reversal` | 回檔+WR+反轉K線均值回歸（追蹤停損）             | 已完成 |
 | EWJ-002 | `ewj_002_vol_adaptive_pullback` | 波動率自適應回檔+WR均值回歸（ATR過濾+崩盤隔離） | 已完成（前最佳） |
-| EWJ-003 | `ewj_003_bb_lower_mr` | BB 下軌均值回歸（BB+回檔上限+WR+ClosePos+ATR）★ | ✅ 當前最佳 |
+| EWJ-003 | `ewj_003_bb_lower_mr` | BB 下軌均值回歸（BB+回檔上限+WR+ClosePos+ATR） | 已完成（前最佳） |
 | EWJ-004 | `ewj_004_rs_momentum` | RS 動量回調（EWJ vs EFA/SPY，3 次嘗試均失敗） | 已完成（失敗，確認 lesson #25 擴展至 DM） |
+| EWJ-005 | `ewj_005_vol_transition_mr` | Post-Capitulation Vol-Transition MR（EWJ-003 + 1d floor）★ | ✅ 當前最佳 |
 
 ---
 
@@ -239,7 +256,7 @@
 
 ---
 
-## EWJ-003：BB 下軌均值回歸 ★ 當前最佳
+## EWJ-003：BB 下軌均值回歸（前任最佳）
 
 ### 目標 (Goal)
 
@@ -367,6 +384,89 @@ Cross-asset lesson #25 證實 RS 動量在 EM 單一國家 ETF（INDA/EWZ/FXI）
 
 ---
 
+## EWJ-005：Post-Capitulation Vol-Transition MR ★ 當前最佳
+
+### 目標 (Goal)
+
+EWJ-003 Att3 達 Part A Sharpe 0.60（Part B 100% WR / std=0），Part A 為唯一瓶頸：
+2022-09-01（BoJ pivot 不安）與 2023-08-03（殖利率飆升）兩筆 SL（每筆 -4.10%）
+拖累 Sharpe。本實驗測試「Capitulation strength filter」（lesson #19 family）能否
+過濾這兩筆 SL 同時保留高品質 winners。
+
+跨資產脈絡：「2DD floor」於 USO-013 / EEM-014 / INDA-010 / VGK-008 全部成功，
+「1d floor」於 SPY-009 成功（首例）。EWJ 1.15% vol 落在 lesson #19 已驗證 vol
+區間內，先試 2DD floor 再試 1d floor。
+
+### 迭代歷程 (Iteration History)
+
+| Attempt | Filter | 閾值 | Part A Sharpe | Part B Sharpe | min(A,B) | 結果 |
+|---------|--------|------|---------------|---------------|----------|------|
+| Att1 | 2DD floor | <= -2.0% | 0.61 (7訊號 85.7% WR) | 0.00 std=0 (3訊號 100% WR) | 0.61 | △ 邊際 (+1.7%) |
+| **Att2★** | **1d floor** | **<= -0.5%** | **0.70 (9訊號 88.9% WR)** | **0.00 std=0 (4訊號 100% WR)** | **0.70†** | **★ 最終選擇** |
+| Att3 | 1d floor | <= -0.7% | 0.46 (6訊號 83.3% WR) | 0.00 std=0 (3訊號 100% WR) | 0.46 | ✗ 過嚴 |
+
+### 進場條件 (Entry Conditions) — Att2★
+
+| # | 條件 | 指標 | 閾值 | 說明 |
+|---|------|------|------|------|
+| 1 | BB 下軌觸及 | Close vs BB(20,1.5) lower | Close ≤ BB lower | 統計自適應超賣門檻（同 EWJ-003 Att3） |
+| 2 | 回檔上限 | 10日高點回檔 | ≥ -7% | 隔離極端崩盤（同 EWJ-003 Att3） |
+| 3 | 超賣確認 | Williams %R(10) | ≤ -80 | 10 日超賣區域 |
+| 4 | 反轉跡象 | 收盤位置 (ClosePos) | ≥ 40% | 日內反轉確認 |
+| 5 | 波動率飆升 | ATR(5)/ATR(20) | > 1.15 | 急跌恐慌過濾 |
+| 6 | **Capitulation strength** | **1日報酬** | **≤ -0.5%** | **新增：要求訊號日為實質下跌（過濾 BB 下軌假觸碰）** |
+| 7 | 冷卻期 | Cooldown | 7 天 | 防止同一波段重複進場 |
+
+### 出場參數 (Exit Parameters) — Att2★
+
+| 參數 | 值 | 說明 |
+|------|-----|------|
+| 獲利目標 (TP) | +3.5% | 同 EWJ-003 Att3 |
+| 停損 (SL) | -4.0% | 同 EWJ-003 Att3 |
+| 最大持倉天數 | 20 天 | 到期出場 |
+
+### 成交模型 (Execution Model)
+
+| 項目 | 設定 |
+|------|------|
+| 進場方式 | 隔日開盤市價單 |
+| 獲利出場 | 日內限價單 Day |
+| 停損出場 | 停損市價單 GTC |
+| 到期出場 | 隔日開盤市價單 |
+| 滑價假設 | 0.1%（ETF） |
+| 悲觀認定 | 同日觸及 TP 和 SL 時認定停損 |
+
+### 設計理念 (Design Rationale)
+
+- **lesson #19 family 跨資產移植**：USO/EEM/INDA/VGK 用 2DD floor 成功，SPY 用 1d floor 成功。EWJ 1.15% vol 與 VGK 1.12% 接近，先試 2DD floor。
+- **Att1 失敗根因（2DD floor）**：EWJ Part A 兩筆 SL 的 2DD 為 -1.63% 與 -2.36%，winners 2DD 廣泛分布 +0.17%~-2.43%，2DD 維度區分力弱。-2.0% 過濾掉 6 筆 shallow-2DD winners 換取 1 筆 SL，淨改善僅 0.60→0.61。
+- **Att2 成功根因（1d floor）**：EWJ Part A SLs 在 1d 維度為 -1.19%（2022-09-01）與 -0.49%（2023-08-03），1d -0.5% 邊界精準過濾後者。winners 1d 多在 -0.5%~-2.0%，邊界外的「淺 1d 訊號」實為「BB 下軌假觸碰但無實質下跌」，過濾後 Part A WR 84.6%→88.9%、Sharpe 0.60→0.70。
+- **Att3 過嚴**：-0.7% 移除 3 筆淺 1d winners (2019-05-08/2019-08-02/2020-10-30 1d 為 -0.61%/-0.52%/-0.58%) 而未額外過濾任何 SL，淨損 Part A 訊號 9→6，Sharpe 0.70→0.46。
+- **保留 EWJ-003 Att3 全部進場/出場參數**：僅新增單一品質過濾器，遵循 lesson #4「進場參數敏感度 >> 出場參數」；不調整出場以隔離 capitulation filter 效果。
+
+### 回測結果 (Backtest Results) — Att2★
+
+| 期間 | 訊號數 | 每年 | 勝率 | 累計報酬 | Sharpe | MDD | 狀態 |
+|------|--------|------|------|----------|--------|-----|------|
+| Part A (2019-2023) | 9 | 1.8 | 88.9% | +14.72% | **0.70** | -4.10% | 已完成 |
+| Part B (2024-2025) | 4 | 2.0 | 100.0% | +14.75% | 0.00† | -2.09% | 已完成 |
+| Part C (2026-) | 0 | 0.0 | - | +0.00% | 0.00 | 0.00% | 進行中 |
+
+†Part B Sharpe 0.00 因 4 筆交易均回報 +3.50%（std=0），並非表現不佳而是零變異數的數學結果。
+
+**A/B 訊號年化比:** 0.9:1（優秀）
+**A/B 累計報酬差:** |14.72% - 14.75%| = **0.03pp**（近乎完美平衡）
+**Part A Sharpe 0.70**（約束條件）> EWJ-003 Att3 的 0.60（+16.7%）
+
+### 關鍵發現
+
+1. **1d floor 在 EWJ 比 2DD floor 更有效**：EWJ 兩筆 Part A SLs 的 2DD 廣泛（-1.63% 與 -2.36%），但其中一筆的 1d -0.49% 恰位於 -0.5% 邊界外被過濾；2DD 維度上 winners 與 losers 重疊大，而 1d 維度有更清晰的閾值。
+2. **EWJ 「淺 1d drift + BB 下軌假觸碰」失敗結構同 SPY**：EWJ-005 Att2 為 repo 第 2 例「1d floor」成功（首例 SPY-009），擴展 lesson #19 至非美 ETF。
+3. **單一品質過濾器即可達 +16.7% Sharpe 改善**：遵循 lesson #4 不動出場，僅新增 1d floor 條件即達標，驗證進場過濾器精煉勝過出場參數調整。
+4. **A/B 完美平衡**：累計差 0.03pp 為 EWJ 系列最佳，訊號比 0.9:1 優秀；驗證 1d floor 在 Part A/B 均勻過濾低品質訊號。
+
+---
+
 ## 演進路線圖 (Roadmap)
 
 ```
@@ -375,12 +475,16 @@ EWJ-001 (回檔+WR+反轉K線+追蹤停損, Sharpe 0.16)
         ├── Att1 (ATR>1.15, 無回檔上限) → min 0.21 △
         ├── Att2 (ATR>1.15, 回檔上限 7%) → min 0.55
         └── Att3 (ATR>1.12, 回檔上限 7%) → min 0.41 ✗
-EWJ-003 (BB 下軌均值回歸, Part A Sharpe 0.60) ★
+EWJ-003 (BB 下軌均值回歸, Part A Sharpe 0.60)
   ├── Att1 (BB(20,2.0), 無回檔上限) → Part A 0.70/Part B 0.49 △
   ├── Att2 (BB(20,1.5), 無回檔上限) → Part A 0.26/Part B 1.01 ✗
-  └── Att3 (BB(20,1.5) + 回檔上限 7%) → Part A 0.60/Part B 100%WR ★
+  └── Att3 (BB(20,1.5) + 回檔上限 7%) → Part A 0.60/Part B 100%WR
 EWJ-004 (RS 動量回調, 3 次嘗試均失敗)
   ├── Att1 (EFA ref, RS≥2%, SMA50) → min 0.15 ✗
   ├── Att2 (EFA ref, RS≥3%, SMA200) → min 0.12 ✗
   └── Att3 (SPY ref, RS≥3%, SMA50) → min -0.24 ✗ (確認 lesson #25 擴展至 DM)
+EWJ-005 (Post-Capitulation Vol-Transition MR, Part A Sharpe 0.70) ★
+  ├── Att1 (2DD floor <= -2.0%, VGK-008 移植) → Part A 0.61/Part B std=0 △ 邊際
+  ├── Att2 (1d floor <= -0.5%, SPY-009 方向) → Part A 0.70/Part B 100%WR ★
+  └── Att3 (1d floor <= -0.7%, 加嚴) → Part A 0.46/Part B std=0 ✗ 過嚴
 ```
