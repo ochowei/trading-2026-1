@@ -178,7 +178,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
 | NVDA | NVDA-004 | BB 擠壓突破（優化）| 0.47 | 11 次實驗 ✓（NVDA-009 MBPC 三次失敗 / NVDA-010 ADX-Filtered RSI(2) MR 三次失敗，repo 首次 ADX/DMI 主過濾器試驗 / NVDA-011 Capitulation-Depth Filter MR 三次失敗，repo 首次 >3% vol 高波動單股測試 lesson #19 family）|
 | IBIT | IBIT-006 Att2 | Gap-Down 資本化+日內反轉 MR | 0.40 | 8 次實驗 ✓ |
-| TSLA | TSLA-009 Att2 | BB 擠壓突破（30th pct）| 0.40 | 13 次實驗 ✓ |
+| TSLA | TSLA-015 Att3 | BB 擠壓突破 + **buffered multi-week SMA regime**（SMA(20)≥0.99×SMA(60)） | 0.53 | 15 次實驗 ✓ |
 | TLT | TLT-007 Att2 | 回檔+WR+反轉K線+**BB 寬度 regime 閘門**（<5%）| 0.12/0.65 | 12 次實驗 ✓（TLT-010 2DD/ATR 補充濾波三次失敗；TLT-011 percentile-based dynamic regime 三次失敗；TLT-012 trajectory-based regime 三次失敗，固定絕對閾值 + 單日 snapshot 為結構性最優）|
 | EEM | EEM-014 Att2 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor ≤-0.5%**（混合進場+2DD floor 精煉）| 0.56 | 14 次實驗 ✓ |
 | EWJ | EWJ-003 Att3 | BB 下軌+回檔上限+WR+ATR（混合進場）| 0.60† | 4 次實驗 ✓ |
@@ -673,3 +673,61 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 - **規則**：MBPC 框架下優先收緊 breakout 新鮮度與 pullback 範圍，而非加入長均線 regime 閘門
 
 **跨資產假設（待續驗證）**：MBPC 可能在 SPY、DIA（同 broad-uptrend ETF 類別）中有效，VOO-004 已建立先例。在**週期性 / 事件驅動 / 多 regime 資產**（FXI、URA、TLT、INDA、EEM、NVDA、FCX）中已被驗證結構性劣化。
+
+---
+
+## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認）
+<!-- freshness:
+  derived_from: [TSLA-013,TSLA-015]
+  validated: 2026-04-26
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+TSLA-013 提出跨資產假設：「breakout strategies on high-vol stocks may require regime-level filters (vol state, multi-week trend regime) rather than T-1/T-2 single-day filters」。TSLA-015 三次迭代驗證並精煉此假設：
+
+**規則**：在已有 BB Squeeze breakout 框架的高波動單一個股上（>3% 日波動），可疊加 **buffered multi-week SMA trend regime** 過濾器：
+
+```
+SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
+```
+
+**緩衝閾值 k 為關鍵**：
+- k = 1.00（嚴格 SMA20 > SMA60）：因 cooldown chain shift 失敗（TSLA-015 Att1：min 0.37）。borderline transition 訊號（如 SMA20/SMA60 = 0.994）被過濾，cooldown 被解除使下一日 borderline 訊號獲准進場成 SL
+- **k = 0.99（1% 緩衝）為甜蜜點**（TSLA-015 Att2/Att3：min 0.53）。精準分隔 transition winners（比率 0.99-1.00）與 bear regime SLs（比率 < 0.99）
+
+**效果（TSLA-015 Att3 vs TSLA-009 Att2，BB Squeeze breakout）**：
+- Part A WR 58.8% → **72.7%**（+14pp）
+- Part A Sharpe 0.40 → **0.84**（+110%）
+- Part B 完全保留 baseline 6/6 訊號（無 cooldown shift）
+- min(A,B) 0.40 → **0.53**（+33%）
+- A/B 年化 cum 差 3.3%（< 30% ✓）/ 年化訊號比 1.36:1（< 1.5:1 ✓）
+
+**ATR vol regime 對 BB Squeeze 框架冗餘（TSLA-015 Att3 消融確認）**：
+- TSLA-015 Att2 同時包含 buffered SMA + ATR(20) ≤ 1.40 × ATR(60) vol regime
+- Att3 移除 vol regime（`use_vol_regime = False`），結果**完全相同 Att2**
+- 所有 19 個訊號日的 ATR(20)/ATR(60) ≤ 1.383 < 1.40，閾值從未觸發
+- **根因**：BB Squeeze 進場條件本身已隱含「近期低 vol」要求（BB Width ≤ 60d 30th percentile），疊加 ATR vol filter 訊號日天然滿足，無區分力
+
+**有效條件（待跨資產驗證）**：
+1. 高波動單一個股（>3% 日波動，TSLA 3.72% 已驗證）
+2. 已驗證 BB Squeeze breakout 框架（如 TSLA-009 Att2、NVDA-004、SOXL-010）
+3. 多 regime 變異性（多空交替使 SMA regime 有真實選擇力）
+4. 1% 緩衝（k=0.99）為精準分隔 transition borderline 訊號的甜蜜點
+
+**反例對比（lesson #21 MBPC 框架）**：
+- VOO-004 / NVDA-009 在 MBPC 框架下，SMA(200) regime gate 為**非選擇性過濾**
+- 差異：MBPC 已含 SMA(50) 趨勢條件（隱含中期趨勢），疊加 SMA(200) 重複；BB Squeeze 框架僅含 SMA(50) 短期趨勢，疊加 multi-week SMA(20)/SMA(60) regime 提供新維度資訊（短期 vs 中期趨勢的相對比較，非絕對位置）
+- **整合規則**：multi-week SMA regime 在 BB Squeeze 上有效（buffered 形式），在 MBPC 上冗餘
+
+**直接驗證 TSLA-013 假設**：
+- ✅ 「multi-week trend regime」hypothesis 確認（buffered 形式有效）
+- ❌ 「vol state regime」hypothesis 在 BB Squeeze 框架被消融證實冗餘
+- ✅ 對比 single-day 過濾器（T-1 cap、SMA extension cap）系統性失敗，regime-level 過濾為突破策略高波動個股的正確方向
+
+**跨資產假設（待續驗證）**：buffered multi-week SMA regime 可能在以下資產有效：
+- NVDA（NVDA-004 BB Squeeze breakout，2.5-3% 日波動）
+- SOXL（SOXL-010 板塊 RS 動量回調，可能延伸至 BB Squeeze 框架）
+- 其他 >2% 日波動個股的突破策略
+
+**規則簡化**：高波動單一個股 BB Squeeze breakout 策略中，使用 **SMA(20) ≥ 0.99 × SMA(60)** 為主要 multi-week regime 過濾器，**毋需額外 ATR vol regime**（squeeze 已隱含低 vol 條件）。
