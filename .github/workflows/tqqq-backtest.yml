@@ -84,6 +84,7 @@ on:
           - "EWJ-002: ewj_002_vol_adaptive_pullback"
           - "EWJ-003: ewj_003_bb_lower_mr"
           - "EWJ-004: ewj_004_rs_momentum"
+          - "EWJ-005: ewj_005_vol_transition_mr"
           - "EWT-001: ewt_001_pullback_wr_reversal"
           - "EWT-002: ewt_002_vol_adaptive_pullback"
           - "EWT-003: ewt_003_bb_squeeze_breakout"
