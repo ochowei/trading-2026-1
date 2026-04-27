@@ -93,6 +93,7 @@ on:
           - "EWT-006: ewt_006_optimized_exit_mr"
           - "EWT-007: ewt_007_rs_momentum"
           - "EWT-008: ewt_008_bb_lower_pullback_cap"
+          - "EWT-009: ewt_009_vol_transition_mr"
           - "EWZ-001: ewz_001_pullback_wr"
           - "EWZ-002: ewz_002_vol_adaptive_pullback"
           - "EWZ-003: ewz_003_bb_squeeze_breakout"
