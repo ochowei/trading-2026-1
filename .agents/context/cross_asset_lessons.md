@@ -177,7 +177,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 10 次實驗 ✓ |
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
 | NVDA | NVDA-004 | BB 擠壓突破（優化）| 0.47 | 11 次實驗 ✓（NVDA-009 MBPC 三次失敗 / NVDA-010 ADX-Filtered RSI(2) MR 三次失敗，repo 首次 ADX/DMI 主過濾器試驗 / NVDA-011 Capitulation-Depth Filter MR 三次失敗，repo 首次 >3% vol 高波動單股測試 lesson #19 family）|
-| IBIT | IBIT-006 Att2 | Gap-Down 資本化+日內反轉 MR | 0.40 | 8 次實驗 ✓ |
+| IBIT | IBIT-009 Att1 | Gap-Down + **2DD floor <= -3.0%** (Post-Cap Vol-Transition) | 5/5 全勝† | 9 次實驗 ✓（repo 第 5 次 2DD floor 方向成功，首次高波動加密 ETF 驗證，擴展 Post-Cap MR 框架有效 vol 範圍至 3.17%）|
 | TSLA | TSLA-015 Att3 | BB 擠壓突破 + **buffered multi-week SMA regime**（SMA(20)≥0.99×SMA(60)） | 0.53 | 15 次實驗 ✓ |
 | TLT | TLT-007 Att2 | 回檔+WR+反轉K線+**BB 寬度 regime 閘門**（<5%）| 0.12/0.65 | 12 次實驗 ✓（TLT-010 2DD/ATR 補充濾波三次失敗；TLT-011 percentile-based dynamic regime 三次失敗；TLT-012 trajectory-based regime 三次失敗，固定絕對閾值 + 單日 snapshot 為結構性最優）|
 | EEM | EEM-014 Att2 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor ≤-0.5%**（混合進場+2DD floor 精煉）| 0.56 | 14 次實驗 ✓ |

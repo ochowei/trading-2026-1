@@ -292,6 +292,7 @@ on:
           - "IBIT-006: ibit_006_gap_reversal_mr"
           - "IBIT-007: ibit_007_keltner_lower_mr"
           - "IBIT-008: ibit_008_range_expansion_mr"
+          - "IBIT-009: ibit_009_post_cap_vol_transition_mr"
           - "INDA-001: inda_001_pullback_wr_reversal"
           - "INDA-002: inda_002_vol_adaptive_mr"
           - "INDA-003: inda_003_bb_squeeze_breakout"
