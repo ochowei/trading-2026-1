@@ -15,18 +15,19 @@ EWT-009: Post-Capitulation Vol-Transition Mean Reversion
 - SPY-009（1.0% vol）：1d floor 方向成功
 - EWJ-005 Att2（1.15% vol）：1d floor <= -0.5% → min(A,B) 0.60→0.70（+16.7%）
 
-EWT 1.41% vol 落在 lesson #19 已驗證 vol 區間內。半導體驅動單一國家 EM ETF 結構接近
-EWJ（DM 已開發但同樣亞洲 export-led），先測試 VGK-008 Att2 / EWJ-005 Att1 已驗證的
-2DD floor <= -2.0%。
+EWT 1.41% vol 落在 lesson #19 已驗證 vol 區間內。
 
-Att1（2DD floor <= -2.0%，VGK-008 Att2 / EEM-014 / INDA-010 / EWJ-005 Att1 直接移植）：
-- Part A 7/85.7%/Sharpe 0.91 cum +17.89%
-- Part B 3/100%/std=0 cum +10.87%
-- min(A,B)† 0.91（+59.6% vs EWT-008 baseline 0.57）
-- **失敗分析**：-2.0% 過嚴：2019-05-09（2d -1.69%）+ 2023-03-15（2d -1.87%）winners
-  兩筆被同時過濾，且因 2019-05-09 移除引入 2019-05-13 cooldown shift 新 SL
-  （lesson #19）。Sharpe 大幅改善但 Part A 訊號從 9 縮至 7，A/B 訊號比惡化至
-  7:3 = 2.33:1。需測試更精準閾值或改用 1d 維度。
+迭代結果：
+- Att1（2DD floor <= -2.0%，VGK-008 Att2 / EEM-014 / INDA-010 / EWJ-005 Att1 直接移植）：
+  Part A 7/85.7%/Sharpe 0.91 cum +17.89% / Part B 3/100%/std=0 cum +10.87% /
+  min(A,B)† 0.91（+59.6% vs baseline 0.57）。-2.0% 過嚴：過濾 2 winners 並引入
+  2019-05-13 cooldown shift 新 SL。
+- Att2（1d floor <= -1.0%，SPY-009 / EWJ-005 Att2 1d 維度跨資產移植）：
+  Part A 8/87.5%/Sharpe 1.01 cum +22.01% / Part B **2**/100%/std=0 cum +7.12% /
+  min(A,B)† 1.01（+77% vs baseline）。1d 維度精準過濾 2022-01-25 SL（1d -0.95%）
+  但**同時誤殺 Part B 2025-11-18 winner**（1d -0.78% 落於 -1.0% 邊界外），Part B
+  從 3 縮至 2，cum +10.87%→+7.12%。Sharpe 升至 1.01 但 Part B 訊號流失為主要副作
+  用，跨資產 1d 維度需檢查 Part B winners 1d 分布。
 """
 
 from dataclasses import dataclass
@@ -56,8 +57,8 @@ class EWT009Config(ExperimentConfig):
 
     # Capitulation strength filter
     # mode: "2dd_floor" | "1d_floor"
-    capitulation_mode: str = "2dd_floor"
-    capitulation_threshold: float = -0.02
+    capitulation_mode: str = "1d_floor"
+    capitulation_threshold: float = -0.01
 
     cooldown_days: int = 10
 
