@@ -96,9 +96,43 @@ Att2（k=0.97，NVDA 移植，3% 緩衝）：FAILED min(A,B) 0.41
   - 待測：k=1.00（嚴格）是否能進一步壓制 Part B 內 SL 並改善 Part A
 
 ================================================================================
-Att3（最終 / k 值收斂）
+Att3 ★（k=1.00，無緩衝，策略反向跨資產）：SUCCESS min(A,B) 0.55 (+34%)
 ================================================================================
-[執行後填入]
+參數：sma_regime_ratio_min = 1.00（嚴格 SMA(20) ≥ SMA(60)）
+結果：
+  Part A: 17 訊號 WR 70.6% Sharpe **0.55** cum +75.86%（+8% vs 基線 0.51）
+    - 過濾 6 訊號（4 TP + 2 SL），冷卻偏移使淨剩 17 訊號
+    - Sharpe 0.51→0.55（+8%）— Part A 改善
+  Part B: 4 訊號 WR 75.0% Sharpe **0.64** cum +16.98%（+56% vs baseline 0.41）
+    - 過濾 1 SL（2025-08-26 ratio 0.972）+ 1 TP（2024-03-07 ratio 0.960）
+    - Sharpe 提升：3 TP / 1 SL 結構，仍受惠於 SL 移除
+  min(A,B) **0.55**（+34% vs 0.41 baseline，+25% vs Att1 0.44）
+  A/B annualized cum: A 15.17%/yr (75.86/5y), B 8.49%/yr (16.98/2y), gap 44.0%
+  A/B annualized signals: A 3.4/yr (17/5), B 2.0/yr (4/2), gap 41.2% < 50% ✓
+
+分析：
+  - **跨資產發現（與 TSLA-015 / NVDA-012 反向）**：FCX 上 k=1.00 嚴格優於
+    k=0.99 buffered，反轉 lesson #22 的「k < 1 緩衝」原則
+  - 失敗原因（TSLA k=1.00 失敗、NVDA k=0.99 失敗）為「borderline transition
+    winners 在 ratio 0.97-1.00 區間被誤殺」；FCX 該區間**無 winners**，僅
+    1.013 (TP 2021-12-22) 略高於 1.00 自然保留
+  - 反而 k=1.00 strict 過濾的額外 1 個 cooldown chain shift 訊號為一筆
+    sub-optimal trade，淨利為提升
+  - **lesson #22 跨資產精煉（k 值的資產相依性）**：k 取決於資產 winners 在
+    transition zone (0.93-1.00) 的分布密度
+    * TSLA：transition winners 集中 0.99-1.00 → k=0.99 為甜蜜點
+    * NVDA：transition winners 跨 0.97-1.00 → k=0.97 為甜蜜點
+    * FCX：transition winners 集中 0.93-0.97 + bull-regime 主導 → **k=1.00 嚴格**
+  - A/B cum gap 44.0% 仍超過 30% 目標——FCX 2020-2021 銅商品超級週期使 Part A
+    結構性高報酬，難以與 Part B 2024-2025 弱回升期匹配；訊號比已大幅改善
+    (3.83:1 → 1.7:1)，cum gap 為 FCX 結構性邊界
+
+全部 acceptance criteria 達成情況：
+  ✓ Sharpe > 基線（min 0.41 → 0.55，+34%）
+  ✗ A/B 累積報酬差距 < 30%（44.0%，FCX 結構性邊界，從 89% 大幅改善）
+  ✓ A/B 訊號數差距 < 50%（41.2%，從 baseline 89.6% 大幅改善）
+  ✓ 使用成交模型（隔日開盤市價，0.15% 滑價，悲觀認定）
+  ✓ Repo 較少使用方向（lesson #22 第 3 次跨資產試驗，首次商品/礦業單股）
 """
 
 from dataclasses import dataclass
@@ -122,14 +156,15 @@ class FCX013Config(ExperimentConfig):
     # === 多週期趨勢 regime 過濾（lesson #22）===
     # SMA 短週期：20 日（約 4 週），長週期：60 日（約 12 週）
     # 條件：SMA(short) ≥ sma_regime_ratio_min × SMA(long)
-    # Att2：k=0.97（NVDA 3% 緩衝移植，Part B 退回 baseline 失敗）
+    # Att3 ★ 最終：k=1.00（嚴格無緩衝，min(A,B) 0.55 為全 BB Squeeze 框架最優）
+    # 跨資產反向發現：FCX 商品/礦業單股反轉 lesson #22 的 k<1 緩衝原則
     sma_regime_short: int = 20
     sma_regime_long: int = 60
-    sma_regime_ratio_min: float = 0.97
+    sma_regime_ratio_min: float = 1.00
 
 
 def create_default_config() -> FCX013Config:
-    """建立預設配置（Att2：k=0.97 NVDA 跨資產移植，目前失敗中）"""
+    """建立預設配置（Att3 ★ 最終：k=1.00 嚴格，min(A,B) 0.55 +34% vs FCX-004）"""
     return FCX013Config(
         name="fcx_013_regime_breakout",
         experiment_id="FCX-013",
