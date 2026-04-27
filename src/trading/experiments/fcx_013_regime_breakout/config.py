@@ -78,9 +78,22 @@ Att1（k=0.99，TSLA 移植，1% 緩衝）：PARTIAL SUCCESS min(A,B) 0.44 (+7%)
     (b) k=1.00 嚴格測試是否進一步提升 Part A
 
 ================================================================================
-Att2（k=0.97，NVDA 移植，3% 緩衝）：[執行後填入]
+Att2（k=0.97，NVDA 移植，3% 緩衝）：FAILED min(A,B) 0.41
 ================================================================================
-[執行後填入]
+參數：sma_regime_ratio_min = 0.97
+結果：
+  Part A: 19 訊號 WR 68.4% Sharpe 0.48 cum +76.36%
+  Part B: 6 訊號 WR 66.7% Sharpe 0.41 cum +17.31%（**完全相同 baseline**）
+  min(A,B) **0.41**（持平 baseline）
+分析：
+  - k=0.97 過寬，Part B 2025-08-26 SL（ratio 0.972 > 0.97）保留，Part B 結果
+    與 baseline 完全相同
+  - 證實 NVDA 跨資產 k 值不可直接移植——FCX 的 transition zone 結構不同
+  - NVDA k=0.97 為其 transition winners 保留設計（ratio 0.97-0.99 區間有 winners）；
+    FCX 該區間僅有 SLs（2025-08-26 ratio 0.972），需更嚴 k 才能過濾
+  - 退化方向：當 k 從 0.99 放鬆至 0.97 時，重新放行 1 SL（2025-08-26 ratio
+    0.972）使 Part B 退回 baseline 6 訊號結構，Part B Sharpe 從 0.82 崩回 0.41
+  - 待測：k=1.00（嚴格）是否能進一步壓制 Part B 內 SL 並改善 Part A
 
 ================================================================================
 Att3（最終 / k 值收斂）
@@ -109,14 +122,14 @@ class FCX013Config(ExperimentConfig):
     # === 多週期趨勢 regime 過濾（lesson #22）===
     # SMA 短週期：20 日（約 4 週），長週期：60 日（約 12 週）
     # 條件：SMA(short) ≥ sma_regime_ratio_min × SMA(long)
-    # Att1 baseline：k=0.99（TSLA 1% 緩衝跨資產移植）
+    # Att2：k=0.97（NVDA 3% 緩衝移植，Part B 退回 baseline 失敗）
     sma_regime_short: int = 20
     sma_regime_long: int = 60
-    sma_regime_ratio_min: float = 0.99
+    sma_regime_ratio_min: float = 0.97
 
 
 def create_default_config() -> FCX013Config:
-    """建立預設配置（Att1 baseline：k=0.99 TSLA 跨資產移植）"""
+    """建立預設配置（Att2：k=0.97 NVDA 跨資產移植，目前失敗中）"""
     return FCX013Config(
         name="fcx_013_regime_breakout",
         experiment_id="FCX-013",
