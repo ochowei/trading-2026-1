@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-04-28T08:51:04.590289"
+    "execution_time": "2026-04-28T08:59:15.469631"
   },
   "part_a": {
     "ticker": "TQQQ",
-    "total_signals": 11,
+    "total_signals": 10,
     "wins": 9,
-    "win_rate": 0.8181818181818182,
-    "avg_return_pct": 4.26,
-    "std_return_pct": 5.82,
-    "cumulative_return_pct": 55.3,
-    "avg_holding_days": 2.0,
-    "max_drawdown_pct": -11.1,
-    "profit_factor": 3.89,
-    "sharpe_ratio": 0.73,
-    "sortino_ratio": 1.23,
-    "calmar_ratio": 0.38,
+    "win_rate": 0.9,
+    "avg_return_pct": 5.49,
+    "std_return_pct": 4.53,
+    "cumulative_return_pct": 68.97,
+    "avg_holding_days": 2.1,
+    "max_drawdown_pct": -9.07,
+    "profit_factor": 7.79,
+    "sharpe_ratio": 1.21,
+    "sortino_ratio": 2.15,
+    "calmar_ratio": 0.61,
     "max_consecutive_losses": 1,
     "target_exits": 9,
-    "stop_loss_exits": 2,
+    "stop_loss_exits": 1,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
@@ -54,17 +54,6 @@
         "holding_days": 1,
         "exit_type": "target",
         "max_drawdown_pct": 4.4
-      },
-      {
-        "date": "2020-02-24",
-        "entry_date": "2020-02-25",
-        "exit_date": "2020-02-26",
-        "entry": 11.7,
-        "exit": 10.76,
-        "return_pct": -8.09,
-        "holding_days": 1,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -11.1
       },
       {
         "date": "2021-02-25",
@@ -144,7 +133,7 @@
         "max_drawdown_pct": 2.34
       }
     ],
-    "filled_count": 11,
+    "filled_count": 10,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

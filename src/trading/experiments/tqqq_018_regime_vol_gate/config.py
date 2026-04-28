@@ -54,7 +54,14 @@ class TQQQ018Config(TQQQConfig):
     # 波動率 regime 閘門（新增）：BB(bb_period, bb_std) 寬度 / Close < max_bb_width_ratio
     bb_period: int = 20
     bb_std: float = 2.0
-    max_bb_width_ratio: float = 0.48  # Att2：收緊以過濾 2022-09-21 SL（BB 0.493）
+    max_bb_width_ratio: float = 0.48  # Att2/Att3：過濾 2022-09-21 SL（BB 0.493）
+
+    # 「進場前已在回撤」過濾器（Att3 新增）
+    # T-N 日的 Drawdown 必須 <= prior_drawdown_lookback_threshold（已下跌至少 X% from 20d high）
+    # 設計目的：過濾「first-day-of-decline」pattern（如 2020-02-24 SL，DD_5d_ago 僅 -0.49%）
+    # 該模式在 5d 之前還在 20d 高點附近，當日急跌觸發 RSI(5)<25，但延續性高（剛開始的下跌通常未結束）
+    prior_drawdown_lookback: int = 5
+    prior_drawdown_threshold: float = -0.01  # T-5 日 DD 必須 <= -1%（已從 20d 高點下跌 ≥1%）
 
     # 成交模型參數（同 TQQQ-010）
     slippage_pct: float = 0.001  # 0.1%

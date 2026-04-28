@@ -45,6 +45,10 @@ class TQQQ018RegimeVolGateStrategy(ExecutionModelStrategy):
             f"  波動率閘門 (Vol Regime Gate):    BB({config.bb_period}, {config.bb_std}) width"
             f" / Close < {config.max_bb_width_ratio:.2f}"
         )
+        print(
+            f"  進場前回撤 (Prior DD Filter):    DD(T-{config.prior_drawdown_lookback}) "
+            f"<= {config.prior_drawdown_threshold:.0%}"
+        )
         print(f"  獲利目標 (Profit target):        +{config.profit_target:.0%}")
         print(f"  停損 (Stop-loss):                {config.stop_loss:.0%}")
         print(f"  最長持倉 (Max holding):          {config.holding_days} 天")

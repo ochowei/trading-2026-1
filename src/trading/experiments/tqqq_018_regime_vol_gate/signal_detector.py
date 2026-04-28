@@ -36,6 +36,8 @@ class TQQQ018SignalDetector(BaseSignalDetector):
         df["BB_Lower"] = sma - cfg.bb_std * std
         df["BB_Width_Ratio"] = (df["BB_Upper"] - df["BB_Lower"]) / df["Close"]
 
+        df["Drawdown_Prior"] = df["Drawdown"].shift(cfg.prior_drawdown_lookback)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -46,8 +48,11 @@ class TQQQ018SignalDetector(BaseSignalDetector):
         cond_rsi = df["RSI5"] < cfg.rsi_threshold
         cond_volume = df["Volume"] > cfg.volume_multiplier * df["Volume_SMA20"]
         cond_regime = df["BB_Width_Ratio"] < cfg.max_bb_width_ratio
+        cond_prior_dd = df["Drawdown_Prior"].fillna(0.0) <= cfg.prior_drawdown_threshold
 
-        df["Signal"] = cond_drawdown & cond_rsi & cond_volume & cond_regime
+        df["Signal"] = (
+            cond_drawdown & cond_rsi & cond_volume & cond_regime & cond_prior_dd
+        )
 
         # 冷卻機制（同 TQQQ-001）
         signal_indices = df.index[df["Signal"]].tolist()
