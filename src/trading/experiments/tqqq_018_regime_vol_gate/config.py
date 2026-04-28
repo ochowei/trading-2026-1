@@ -54,7 +54,7 @@ class TQQQ018Config(TQQQConfig):
     # 波動率 regime 閘門（新增）：BB(bb_period, bb_std) 寬度 / Close < max_bb_width_ratio
     bb_period: int = 20
     bb_std: float = 2.0
-    max_bb_width_ratio: float = 0.50  # Att1 起點，將依結果迭代
+    max_bb_width_ratio: float = 0.48  # Att2：收緊以過濾 2022-09-21 SL（BB 0.493）
 
     # 成交模型參數（同 TQQQ-010）
     slippage_pct: float = 0.001  # 0.1%
