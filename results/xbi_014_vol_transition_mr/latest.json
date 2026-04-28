@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "execution_time": "2026-04-28T01:05:05.069968"
+    "execution_time": "2026-04-28T01:07:16.194429"
   },
   "part_a": {
     "ticker": "XBI",
-    "total_signals": 16,
-    "wins": 11,
-    "win_rate": 0.6875,
-    "avg_return_pct": 0.61,
-    "std_return_pct": 3.92,
-    "cumulative_return_pct": 8.9,
-    "avg_holding_days": 3.5,
-    "max_drawdown_pct": -7.17,
-    "profit_factor": 1.38,
-    "sharpe_ratio": 0.16,
-    "sortino_ratio": 0.22,
-    "calmar_ratio": 0.09,
-    "max_consecutive_losses": 2,
-    "target_exits": 10,
+    "total_signals": 20,
+    "wins": 15,
+    "win_rate": 0.75,
+    "avg_return_pct": 1.19,
+    "std_return_pct": 3.7,
+    "cumulative_return_pct": 24.96,
+    "avg_holding_days": 3.7,
+    "max_drawdown_pct": -9.08,
+    "profit_factor": 1.93,
+    "sharpe_ratio": 0.32,
+    "sortino_ratio": 0.47,
+    "calmar_ratio": 0.13,
+    "max_consecutive_losses": 1,
+    "target_exits": 14,
     "stop_loss_exits": 5,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
@@ -32,6 +32,17 @@
         "holding_days": 1,
         "exit_type": "target",
         "max_drawdown_pct": 0.1
+      },
+      {
+        "date": "2019-09-30",
+        "entry_date": "2019-10-01",
+        "exit_date": "2019-10-17",
+        "entry": 75.92,
+        "exit": 78.57,
+        "return_pct": 3.5,
+        "holding_days": 12,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.62
       },
       {
         "date": "2020-01-31",
@@ -56,15 +67,26 @@
         "max_drawdown_pct": 6.7
       },
       {
-        "date": "2021-02-26",
-        "entry_date": "2021-03-01",
-        "exit_date": "2021-03-03",
-        "entry": 149.48,
-        "exit": 141.86,
+        "date": "2021-02-19",
+        "entry_date": "2021-02-22",
+        "exit_date": "2021-02-23",
+        "entry": 158.14,
+        "exit": 150.08,
         "return_pct": -5.09,
-        "holding_days": 2,
+        "holding_days": 1,
         "exit_type": "stop_loss",
-        "max_drawdown_pct": -6.97
+        "max_drawdown_pct": -9.08
+      },
+      {
+        "date": "2021-03-30",
+        "entry_date": "2021-03-31",
+        "exit_date": "2021-04-01",
+        "entry": 130.98,
+        "exit": 135.56,
+        "return_pct": 3.5,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 3.25
       },
       {
         "date": "2021-05-06",
@@ -72,7 +94,7 @@
         "exit_date": "2021-05-11",
         "entry": 126.58,
         "exit": 120.13,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 2,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -7.09
@@ -105,7 +127,7 @@
         "exit_date": "2022-01-13",
         "entry": 104.72,
         "exit": 99.39,
-        "return_pct": -5.1,
+        "return_pct": -5.09,
         "holding_days": 4,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -7.17
@@ -127,7 +149,7 @@
         "exit_date": "2022-04-22",
         "entry": 84.58,
         "exit": 80.27,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 2,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -6.32
@@ -153,6 +175,17 @@
         "holding_days": 2,
         "exit_type": "target",
         "max_drawdown_pct": -3.03
+      },
+      {
+        "date": "2022-08-30",
+        "entry_date": "2022-08-31",
+        "exit_date": "2022-09-08",
+        "entry": 83.69,
+        "exit": 86.61,
+        "return_pct": 3.5,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.62
       },
       {
         "date": "2022-09-22",
@@ -197,9 +230,20 @@
         "holding_days": 7,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -5.85
+      },
+      {
+        "date": "2023-10-30",
+        "entry_date": "2023-10-31",
+        "exit_date": "2023-11-01",
+        "entry": 64.17,
+        "exit": 66.42,
+        "return_pct": 3.5,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.47
       }
     ],
-    "filled_count": 16,
+    "filled_count": 20,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -218,34 +262,45 @@
   },
   "part_b": {
     "ticker": "XBI",
-    "total_signals": 5,
-    "wins": 4,
-    "win_rate": 0.8,
-    "avg_return_pct": 1.78,
-    "std_return_pct": 3.44,
-    "cumulative_return_pct": 8.9,
-    "avg_holding_days": 2.2,
+    "total_signals": 6,
+    "wins": 5,
+    "win_rate": 0.8333333333333334,
+    "avg_return_pct": 2.07,
+    "std_return_pct": 3.21,
+    "cumulative_return_pct": 12.71,
+    "avg_holding_days": 3.5,
     "max_drawdown_pct": -9.5,
-    "profit_factor": 2.75,
-    "sharpe_ratio": 0.52,
-    "sortino_ratio": 0.78,
-    "calmar_ratio": 0.19,
+    "profit_factor": 3.43,
+    "sharpe_ratio": 0.64,
+    "sortino_ratio": 0.99,
+    "calmar_ratio": 0.22,
     "max_consecutive_losses": 1,
-    "target_exits": 4,
+    "target_exits": 5,
     "stop_loss_exits": 1,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
       {
-        "date": "2024-04-25",
-        "entry_date": "2024-04-26",
-        "exit_date": "2024-04-29",
-        "entry": 82.24,
-        "exit": 85.12,
+        "date": "2024-03-14",
+        "entry_date": "2024-03-15",
+        "exit_date": "2024-03-21",
+        "entry": 93.61,
+        "exit": 96.89,
         "return_pct": 3.5,
-        "holding_days": 1,
+        "holding_days": 4,
         "exit_type": "target",
-        "max_drawdown_pct": 2.04
+        "max_drawdown_pct": -2.07
+      },
+      {
+        "date": "2024-04-19",
+        "entry_date": "2024-04-22",
+        "exit_date": "2024-05-01",
+        "entry": 83.15,
+        "exit": 86.06,
+        "return_pct": 3.5,
+        "holding_days": 7,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.92
       },
       {
         "date": "2024-11-18",
@@ -292,7 +347,7 @@
         "max_drawdown_pct": -1.09
       }
     ],
-    "filled_count": 5,
+    "filled_count": 6,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

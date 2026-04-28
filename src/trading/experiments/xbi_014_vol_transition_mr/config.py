@@ -71,8 +71,9 @@ class XBI014Config(ExperimentConfig):
     # 進場 — 2 日急跌下限（XBI-014 核心創新）
     # 2 日報酬 <= drop_2d_floor 才進場，過濾「shallow 2DD = slow-melt drift」
     # 進場品質：要求近 2 日已有明顯急跌，符合 post-capitulation 結構
-    # Att1: -2.0% 失敗（min 0.16），Att2 加深至 -2.5% 偏向真 capitulation 深度
-    drop_2d_floor: float = -0.025  # Att2: -2.5%（向 USO 2.20% vol 門檻靠攏）
+    # Att1: -2.0% 失敗（min 0.16）；Att2: -2.5% 失敗（min 0.16，Part A WR 單調下降）
+    # Att3: 最輕度 floor -1.0% 作為最終 ablation，建立完整 threshold sweep 失敗曲線
+    drop_2d_floor: float = -0.010  # Att3: -1.0%（最輕度 ablation）
 
     # 冷卻期（同 XBI-005）
     cooldown_days: int = 10
