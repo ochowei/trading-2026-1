@@ -100,6 +100,7 @@ on:
           - "EWZ-004: ewz_004_trend_momentum_pullback"
           - "EWZ-005: ewz_005_rs_momentum"
           - "EWZ-006: ewz_006_bb_lower_pullback_cap"
+          - "EWZ-007: ewz_007_vol_transition_mr"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "DIA-012: dia_012_oneday_capitulation_filter"
           - "FCX-002: fcx_002_pullback_wr"

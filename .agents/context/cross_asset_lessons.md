@@ -153,7 +153,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-04-27
+  validated: 2026-04-28
   data_through: 2025-12-31
   confidence: high
   note_2026_04_27: EWT-009 Att3 added (Post-Capitulation Vol-Transition MR, **repo 第 6 次「2DD floor」方向成功**，繼 USO-013 / EEM-014 / INDA-010 / VGK-008 / EWJ-005 後**首次半導體驅動 EM 單一國家 ETF 驗證**). Three iterations: Att1 (2DD floor <= -2.0%, VGK-008 直接移植) min 0.91 (+59.6% vs EWT-008 0.57，但 -2.0% 過嚴過濾 2 winners 並引入 cooldown shift 新 SL); Att2 (1d floor <= -1.0%, SPY-009/EWJ-005 1d 維度移植) min 1.01 但 **誤殺 Part B 2025-11-18 winner**（1d -0.78%）使 Part B 從 3 縮至 2; Att3 ★ (2DD floor <= -1.5%，精準目標 2022-01-25 SL 之 2d -0.46%) Part A 9/88.9%/Sharpe **1.11** cum +26.28% / Part B 3/100%/std=0 cum +10.87% / min(A,B)† **1.11**（+94.7% vs baseline 0.57）。**意外收益（cooldown chain shift 正向，lesson #19 例外）**：移除 2022-01-25 SL 後，原本被 cooldown 抑制的 2022-01-28 訊號活化並達標 +3.50%，Part A 訊號數保持 9 不變，WR 從 77.8%→88.9%（8 TPs + 1 SL）。Part B 全部 3 筆 winners 保留（2d -3.70%/-4.23%/-3.84% 皆深於 -1.5%）。**核心發現**：(1) EWT 2DD 維度有效（不同於 EWJ-005 Att1 的 2DD -2.0% 過嚴），因 EWT 有 1 筆淺 2DD SL（2022-01-25 2d -0.46%）剛好被 -1.5% 過濾，且所有 winners 2d 皆深於 -1.5%（最淺 -1.87% = 2023-03-15 TP）；(2) Att2 1d -1.0% 雖在 EWJ 上成功（EWJ-005 Att2 1d -0.5%）但 EWT 上 Part B 含 1 筆 1d -0.78% 淺 1d winner 而失敗，跨資產 1d 維度需檢查 Part B winners 1d 分布；(3) **lesson #19 雙向發現再擴展**：2DD floor 對 EWT 1.41% vol 半導體驅動 EM 單一國家 ETF 有效，**閾值精準度（-1.5% vs -2.0%）為關鍵變量**——2DD floor 並非「越深越好」，需逐資產檢視 winners/losers 的 2d 分布找最大切點。**新跨資產規則（lesson #19 family 精煉）**：2DD floor 閾值需匹配資產 winners 最淺 2d 與 losers 2d 的中位點 — EWT losers 含 -0.46% 淺 2d, winners 最淺 -1.87%, 甜蜜點 -1.5%；VGK losers 最淺 -1.47%~-1.68%, winners 最深 -2.0% 內, 甜蜜點 -2.0%；EWJ winners 廣泛分布 +0.17%~-2.43%, 2DD 無精準切點, 1d 維度 -0.5% 為甜蜜點。跨資產 2DD 閾值不可直接移植，需先做 trade-level 2d 分布分析。EWT-009 Att3 為新全域最優（9 次實驗、30+ 次嘗試）。
@@ -188,7 +188,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
 | INDA | INDA-010 Att3 | 回檔+WR+ClosePos+ATR+**2DD floor <=-2.0%**（EEM 方向加深）| 0.30 | 10 次實驗 ✓ |
 | FXI | FXI-005 Att3 | 出場優化均值回歸（TP5.5%/SL5%/20d）| 0.38 | 13 次實驗 ✓ |
-| EWZ | EWZ-006 Att3 | BB 下軌+回檔上限+WR+ClosePos+ATR（混合進場）| 0.69 | 6 次實驗 ✓ |
+| EWZ | EWZ-007 Att3 | BB 下軌+回檔上限+WR+ClosePos+ATR+**1d cap >= -5.0%（surgical Petrobras filter）** | 0.95 | 7 次實驗 ✓ |
 | CIBR | CIBR-012 Att3 | BB 下軌+回檔上限-12%+WR+ClosePos+ATR+**2DD cap ≥-4.0%** | 0.49 | 12 次實驗 ✓ |
 
 > 各實驗詳細參數、探索歷程和確認邏輯見 [cross_asset_evidence.md](cross_asset_evidence.md) Section 9。
@@ -414,13 +414,15 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ---
 
-## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25，IWM-013 oscillator depth 替代 raw return depth 2026-04-26，EWT-009 2DD floor 閾值精準度規則 2026-04-27**）
+## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25，IWM-013 oscillator depth 替代 raw return depth 2026-04-26，EWT-009 2DD floor 閾值精準度規則 2026-04-27，EWZ-007 outlier-event surgical filter 規則 2026-04-28**）
 <!-- freshness:
-  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014,IWM-013,EWT-009]
-  validated: 2026-04-27
+  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014,IWM-013,EWT-009,EWZ-007]
+  validated: 2026-04-28
   data_through: 2025-12-31
   confidence: high
 -->
+
+**EWZ-007 擴展（2026-04-28，repo 首次驗證 1d cap 作為 outlier-event surgical filter，首次商品/政治雙驅動 EM 單國 ETF 驗證）**：對於商品/政治雙驅動 EM 單國 ETF（EWZ Brazil 1.75% vol），其 trade-level 2d 分布呈 **Part A vs Part B 結構性反轉**——Part A losers 集中於深 2d crashes（Petrobras 2021-02-22 2d -5.93%、COVID 2020-01-31 2d -2.67%、2019-03-25 2d -4.79%），Part A winners 跨深+淺 2d；**Part B winners 部分為深 2d V-bounce recoveries**（2024-11-29 TP 2d -7.06%、2024-06-10 EXP+ 2d -3.90%）。**2DD floor / 2DD cap 雙向皆失敗**：Att1 2DD floor <= -2.0%（VGK/INDA 標準直接移植）min **0.31** —— 移除 3 baseline winners + 0 losers + cooldown shift 新 SL；Att2 2DD cap >= -3.0%（CIBR/USO cap 方向）min **0.53** —— Part A 大改善（+68%）但 Part B 崩壞（-71%），cap 同時移除 2 個深 2d Part B winners + cooldown shift 新 SL。Att3 ★ **1d cap >= -5.0%** 為 surgical filter min **0.95**（+38% vs baseline 0.69）—— 僅過濾 2021-02-22 Petrobras 1d -6.19%（~2.86σ 級單日 outlier 暴跌）這 1 筆 SL，**零 winners 損傷、零 cooldown shift**（下一訊號 4+ 月後遠超 cooldown 10 日），Part B 全部 6 訊號保留。**新 cross-asset 規則（lesson #19 v4）**：(a) **2DD floor / 2DD cap 雙向皆失敗** 表示資產 winners/losers 在 2d 維度結構性重疊或 Part A vs Part B 結構性反轉時，需切換至 **1d 維度 outlier-event surgical filter**（>= -5.0%，~3σ 級閾值）；(b) outlier-event surgical filter 適用條件：資產含 **1 筆以上 ~3σ 級單日暴跌**為 outlier loser，且其他 winners/losers 在 1d 維度分佈集中於 [-3%, 0%] 區間（被 ~3σ 閾值排除在外）；(c) 跨資產移植 lesson #19 family 不僅需調整閾值（VGK -2.0% vs EWT -1.5% vs EWJ 1d -0.5%），亦需同時調整**維度（2d vs 1d）、方向（floor vs cap）、目標範圍（regime-level threshold vs outlier-event surgical）**。EWZ-007 為 lesson #19 family 第 8 個成功資產（繼 USO-013、EEM-014、INDA-010、VGK-008、EWJ-005、IBIT-009、EWT-009 後），首次商品/政治雙驅動 EM 單國 ETF 驗證，亦首次「1d cap 作為 outlier-event surgical filter」repo 內驗證。
 
 **IWM-013 擴展（2026-04-26，repo 首次以 oscillator depth 替代 raw return depth 維度）**：對於小型股寬基 ETF（IWM Russell 2000，1.5-2% vol），1d/3d raw return 維度的 capitulation-depth filter 結構性失敗（Att1 1d cap + 3d cap min -0.04 / Att2 3d FLOOR min 0.43，均劣化於 IWM-011 的 0.52）；改用 **RSI(2) < 8（oscillator depth tightening，從 IWM-011 < 10 加嚴 1.25x）** 後 Att3 min(A,B)† **0.59**（+13.5%）成功。**結構性根因**：IWM 為 2000+ 個股寬基 ETF，板塊級 raw return 帶有過多個股事件雜訊，losers vs winners 在 1d/3d 維度高度重疊（loser 2021-11-26 1d=-3.77% 與 winner 2020-09-21 1d=-3.50% 不可分；loser 2025-03-04 3d=-2.81% 與 winner 2025-08-01 3d=-3.49% 接近）；但 RSI(2) 為 EWMA-based 反映多日壓力累積，losers 集中 RSI 8-10、winners RSI ≤ 7.9，有清晰分隔。**新 cross-asset 規則（lesson #19 v3）**：(a) 對於發達/單一國家寬基 ETF（DIA/SPY/EWJ/VGK/EEM/INDA），raw return depth (1d/3d/2DD floor or cap) 仍為主要 capitulation strength 度量工具；(b) 對於小型股寬基 ETF（IWM，個股事件驅動加總），改用 **oscillator depth (RSI threshold tightening)** 為更精準的 capitulation strength 度量；(c) 跨資產移植時優先檢查 SL/TP 在 raw return 維度的可分離性，若重疊則改用 oscillator 維度。**Cooldown shift 良性案例**：IWM-013 Att3 移除 2019-08-02 LOSS 後 cooldown shift 至 2019-08-05 expiry +0.44%（淨改善 +1.82pp），未引發 SL 連鎖（不同於 NVDA-010 Att3 / TLT-010 失敗模式），顯示**「淺 oscillator depth 過濾器」較「raw return cap」更不易觸發負面 cooldown chain shift**。
 
