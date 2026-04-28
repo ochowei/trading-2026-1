@@ -182,17 +182,19 @@ class NVDA013Config(ExperimentConfig):
     # === 多週期趨勢 regime 過濾（lesson #22）===
     # SMA(20) ≥ sma_regime_ratio_min × SMA(60)
     # Att1: k=0.97（NVDA-012 移植）→ FAILED min 0.38（cooldown chain shift）
-    # Att2: k=1.00 strict（FCX-013 方向）— 嘗試更積極過濾 late-cycle / bear
+    # Att2: k=1.00 strict（FCX-013 方向）→ FAILED min 0.41（純 SMA regime 不足）
+    # Att3 ★: k=1.00 strict + ATR vol regime → SUCCESS min 0.55（雙重 gate）
     sma_regime_short: int = 20
     sma_regime_long: int = 60
     sma_regime_ratio_min: float = 1.00
 
-    # === 多週期波動 regime 過濾（預設停用）===
-    # TSLA-015 Att3 證實 BB Squeeze 框架冗餘，MBPC 框架可在後續 Att 啟用測試
+    # === 多週期波動 regime 過濾 ===
+    # Att3 ★ SUCCESS：MBPC 框架不含波動收縮前提，vol regime 提供獨立選擇力
+    # （與 TSLA-015 Att3 ablation BB Squeeze 框架冗餘相反，框架相依性發現）
     atr_regime_short: int = 20
     atr_regime_long: int = 60
     vol_regime_max_ratio: float = 1.40
-    use_vol_regime: bool = False
+    use_vol_regime: bool = True
 
 
 def create_default_config() -> NVDA013Config:
