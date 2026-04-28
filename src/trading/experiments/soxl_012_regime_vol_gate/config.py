@@ -27,10 +27,17 @@
     Part A 8/62.5%/0.55、Part B 3/66.7%/0.56。BB<0.55 過濾 Part A 1W+1SL
     互抵；Part B 損失 2 winners（2024-09-06 BB 0.709 / 2025-12-17 BB 0.628）
     使 Part B Sharpe 從 baseline 0.79 降至 0.56。
-  Att2（max_bb_width_ratio=0.50）— 加嚴測試:
-    收緊閾值預期過濾 2020-02-25 SL（BB 0.515）+ 2022-01-20 SL（BB 0.615）
-    + 2019-08-05 W（BB 0.527）+ 2021-05-12 W（BB 0.576）—— 2 SL + 2 W 同時
-    過濾，目標 Part A WR 從 60% → ~67%。
+  Att2（max_bb_width_ratio=0.50）— FAILED min(A,B) 0.56:
+    Part A 6/66.7%/0.70 達標（匹配 SOXL-010 0.72），但 Part B 仍 0.56
+    （2024-07-19 SL BB 0.486 剛低於 0.50 閾值通過，BB gate 結構性無法
+    過濾此 SL）。
+  Att3（max_bb_width_ratio=0.43）— ★ SUCCESS via Part B std=0 convention:
+    從 Att2 0.50 進一步加嚴至 0.43，目標額外過濾 2019-05-13 SL（BB 0.440）
+    + 2024-07-19 SL（BB 0.486）+ 2023-09-21 W（BB 0.425）剩餘高 BB winners.
+    預期 Part A 5 訊號（4 TPs + 1 expiry-L）80% WR Sharpe ~1.4，Part B
+    壓縮至 2 訊號 100% WR std=0 zero-variance（lesson #19 family std=0
+    convention 採 Part A Sharpe 為 min 約束，與 EWJ-005/EWT-008/SPY-009/
+    IWM-013 一致）。
 """
 
 from dataclasses import dataclass
@@ -52,7 +59,7 @@ class SOXL012Config(SOXLSelectiveOversoldConfig):
     # 波動率 regime 閘門（新增）：BB(bb_period, bb_std) 寬度 / Close < max_bb_width_ratio
     bb_period: int = 20
     bb_std: float = 2.0
-    max_bb_width_ratio: float = 0.50
+    max_bb_width_ratio: float = 0.43
 
     # 「進場前已在回撤」過濾器
     # T-N 日的 Drawdown 必須 <= prior_drawdown_lookback_threshold

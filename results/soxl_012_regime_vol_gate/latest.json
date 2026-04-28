@@ -1,38 +1,27 @@
 {
   "metadata": {
-    "execution_time": "2026-04-28T21:00:39.518399"
+    "execution_time": "2026-04-28T21:04:10.331856"
   },
   "part_a": {
     "ticker": "SOXL",
-    "total_signals": 6,
+    "total_signals": 5,
     "wins": 4,
-    "win_rate": 0.6666666666666666,
-    "avg_return_pct": 9.02,
-    "std_return_pct": 12.83,
-    "cumulative_return_pct": 60.59,
-    "avg_holding_days": 11.3,
-    "max_drawdown_pct": -18.64,
-    "profit_factor": 4.03,
-    "sharpe_ratio": 0.7,
-    "sortino_ratio": 1.65,
-    "calmar_ratio": 0.48,
+    "win_rate": 0.8,
+    "avg_return_pct": 13.24,
+    "std_return_pct": 9.51,
+    "cumulative_return_pct": 82.67,
+    "avg_holding_days": 12.8,
+    "max_drawdown_pct": -8.48,
+    "profit_factor": 12.46,
+    "sharpe_ratio": 1.39,
+    "sortino_ratio": 5.12,
+    "calmar_ratio": 1.56,
     "max_consecutive_losses": 1,
     "target_exits": 4,
-    "stop_loss_exits": 1,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
-      {
-        "date": "2019-05-13",
-        "entry_date": "2019-05-14",
-        "exit_date": "2019-05-20",
-        "entry": 9.22,
-        "exit": 8.1,
-        "return_pct": -12.09,
-        "holding_days": 4,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -18.64
-      },
       {
         "date": "2020-10-28",
         "entry_date": "2020-10-29",
@@ -89,7 +78,7 @@
         "max_drawdown_pct": -7.5
       }
     ],
-    "filled_count": 6,
+    "filled_count": 5,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -108,21 +97,21 @@
   },
   "part_b": {
     "ticker": "SOXL",
-    "total_signals": 3,
+    "total_signals": 2,
     "wins": 2,
-    "win_rate": 0.6666666666666666,
-    "avg_return_pct": 7.97,
-    "std_return_pct": 14.18,
-    "cumulative_return_pct": 22.41,
-    "avg_holding_days": 6.0,
-    "max_drawdown_pct": -15.67,
-    "profit_factor": 2.98,
-    "sharpe_ratio": 0.56,
-    "sortino_ratio": 1.14,
-    "calmar_ratio": 0.51,
-    "max_consecutive_losses": 1,
+    "win_rate": 1.0,
+    "avg_return_pct": 18.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 39.24,
+    "avg_holding_days": 8.0,
+    "max_drawdown_pct": -10.28,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 1.75,
+    "max_consecutive_losses": 0,
     "target_exits": 2,
-    "stop_loss_exits": 1,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
@@ -138,17 +127,6 @@
         "max_drawdown_pct": -10.28
       },
       {
-        "date": "2024-07-19",
-        "entry_date": "2024-07-22",
-        "exit_date": "2024-07-24",
-        "entry": 49.54,
-        "exit": 43.56,
-        "return_pct": -12.09,
-        "holding_days": 2,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -15.67
-      },
-      {
         "date": "2024-11-15",
         "entry_date": "2024-11-18",
         "exit_date": "2024-12-04",
@@ -160,7 +138,7 @@
         "max_drawdown_pct": -4.29
       }
     ],
-    "filled_count": 3,
+    "filled_count": 2,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
