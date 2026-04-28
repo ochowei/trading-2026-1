@@ -26,6 +26,7 @@ on:
           - "TQQQ-015: tqqq_015_qqq_trend_breakout"
           - "TQQQ-016: tqqq_016_gap_reversal_mr"
           - "TQQQ-017: tqqq_017_cap_reversal_confirm"
+          - "TQQQ-018: tqqq_018_regime_vol_gate"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"

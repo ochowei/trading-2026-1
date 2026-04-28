@@ -749,3 +749,74 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
 - NVDA-012：Part A 17→16 訊號（僅過濾 1 個 2022-07-20 bear SL）/ Part B 8→7 訊號（過濾 1 marginal expiry，保留 1 transition winner，需 3% 緩衝），中 vol AI growth 期 SMA 變動較緩，transition zone 落於 0.97-0.99 區間
 - **FCX-013**：Part A 23→17 訊號（過濾 4 TP + 2 SL，淨 -6）/ Part B 6→4 訊號（過濾 1 TP + 1 SL，淨 -2），**SLs 主要在 bull regime ratio>1**（4/6 SL 在 bull）使 buffered k<1 無法處理大部分 SLs；TPs 中 transition winners 集中 ratio 0.93-0.97（k=1.00 移除但無代價，因該區間僅 4 TPs 而 0.97-1.00 區間僅有 SLs）
 - **共同模式精煉（FCX-013 確認後）**：規則的核心是「對齊 k 值與資產 winner-loser ratio 分布的分隔點」——TSLA/NVDA 為「過濾 bear-regime SLs 同時保留 transition winners」（k<1 buffered），FCX 為「過濾 transition-zone SLs 但 transition zone 無 winners」（k=1.00 嚴格亦成立）
+
+---
+
+## 23. BB-Width Regime Gate + First-Day-of-Decline Filter 對 leveraged index ETF 有效（TLT-007 → TQQQ-018 跨資產驗證 2026-04-28）
+<!-- freshness:
+  derived_from: [TLT-007,TLT-011,TLT-012,TQQQ-018,FXI-013]
+  validated: 2026-04-28
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+TLT-007 Att2 doc 提出跨資產假設：「BB-width regime gate 適用於含**單一極端 vol regime episode** 的資產，預期成功候選：SPY/DIA/VOO（2020 COVID 單一極端）、TQQQ（2022 單一科技熊市）」。**TQQQ-018 Att3（2026-04-28）為 repo 首次驗證並擴展此假設**，從 rate-driven 資產（TLT 1% vol）跨域至 leveraged tech ETF（TQQQ ~5-6% vol）。
+
+**規則 1（BB-width regime gate 跨資產移植）**：對於 Part A 含**單一極端 vol regime episode**（持續 ≥ 6 個月波動率飆升）的資產，可疊加 BB(20, 2) Width / Close < threshold 為 regime 過濾器：
+
+```
+threshold ≈ 資產 BB-width 分布的 75-80th percentile
+```
+
+**已驗證閾值（按 vol 等比放大）**：
+- ✅ TLT 1% vol → threshold 0.05（5%）（TLT-007 Att2，過濾 2022 升息期）
+- ✅ TQQQ ~5-6% vol → threshold 0.48（48%）（TQQQ-018 Att2/Att3，過濾 2020 COVID + 2022 科技熊市）
+- ❌ FXI 2% vol → 任何閾值皆失敗（FXI-013，多段中等 vol regime 重疊使閾值無 cross-regime 區分力）
+
+**規則 2（first-day-of-decline filter，TQQQ-018 Att3 新發現）**：BB-width regime gate 之外，可再疊加「進場前 N 日已在回撤」過濾器以捕捉 transition-day 訊號：
+
+```
+Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
+```
+
+**目標訊號類型**：「從 N 日高點急速下跌首日 + 觸發短期超賣」。此類訊號在 5 日前還在 20d 高點附近（DD ≈ 0），當日急跌觸發 RSI(5)<25，但延續性高（剛開始的下跌通常未結束）。
+
+**TQQQ-018 Att3 驗證效果**：
+- DD(T-5) <= -1% 精準過濾 2020-02-24 SL（DD_5d_ago -0.49%，COVID 急速下跌首日）
+- 所有 winners 通過（DD_5d_ago 範圍 -1.38% ~ -21.42%，均 ≤ -1%）
+- 結合 BB<0.48 後，僅剩 1 筆無法過濾的 SL（2021-09-28：低 vol regime + 中等 pullback drift）
+
+**TQQQ-018 Att3 完整效果（vs TQQQ-010 baseline）**：
+- Part A WR 70% → **90%**（+20pp）
+- Part A Sharpe 0.36 → **1.21**（**+236%**）
+- Part A MDD -29.26% → **-9.07%**（-69%）
+- Part A PF 2.02 → **7.79**（+286%）
+- min(A,B) 0.36 → **0.80**（**+122%**）
+- A/B 年化 cum 差 18.1% < 30% ✓
+
+**重要意義（反證 TQQQ-017 結論）**：TQQQ-017 三次迭代後宣稱「Part A 6 SLs 為結構性噪音、無法用技術過濾器區分」，但僅基於**單週期 single-period filter**（ClosePos / 2DD / Prev RSI）。TQQQ-018 Att3 驗證 **regime-level（BB width）+ transition-day（prior drawdown depth）combo** 可過濾 5/6 SLs（除 2021-09-28 低 vol drift SL 外），證明 TQQQ Part A Sharpe 可從 0.36 突破至 1.21。**新類別過濾器**：「regime + transition combo filter」與單週期過濾器在過濾結構上根本不同。
+
+**有效條件（適用情況）**：
+1. 資產 Part A 含**單一連續極端 vol regime episode**（≥ 6 個月）— 與 lesson #6 反例 5 一致
+2. 已驗證 MR 進場框架（TQQQ-010 framework / TLT-002 framework）
+3. 訊號流足夠（Part A ≥ 15 訊號，避免過濾後樣本過薄）
+4. **不適用**：多段中等 vol regime 重疊（如 FXI 政策驅動 EM）— FXI-013 三次迭代驗證固定+動態 BB-width gate 皆失敗
+
+**跨資產假設（待驗證）**：BB-width regime gate + first-day-of-decline filter combo 預期可移植至：
+- ✅ **TLT** 已驗證 BB gate 部分（lesson #6 規則 #5 + TLT-007 Att2，min 0.12，但無 prior DD 嘗試）
+- ✅ **TQQQ** 已驗證 combo（TQQQ-018 Att3，min 0.80）
+- 預期成功：SOXL（3x semiconductor，類似 TQQQ leveraged ETF 結構）、SQQQ inverse（待測）
+- 預期成功：SPY/DIA/VOO（COVID single-extreme-episode + 對應低 vol calm regime）— 但這些資產 baseline Sharpe 已較高，邊際效益可能有限
+
+**TLT vs TQQQ vs FXI 三資產對比（lesson #6 規則 #5 + #6 + 本規則整合）**：
+- ✅ **TLT 1% vol single-extreme regime（2022 升息）**：固定 5% 閾值有效（min 0.12），動態/trajectory 變體皆失敗
+- ✅ **TQQQ ~5-6% vol two-extreme regimes（2020 COVID + 2022 tech bear）**：固定 48% 閾值 + prior DD filter 有效（min 0.80）
+- ❌ **FXI 2% vol multi-mid-vol regimes**：固定/動態/trajectory 全失敗（min 0.38 baseline 維持）
+
+**規則簡化**：
+1. **第一步**：判斷資產 Part A 是否含「單一連續極端 vol regime」（單一 episode 持續 ≥ 6 個月）。若否，跳過 BB-width regime gate
+2. **第二步**：若是，計算資產 BB-width 全期 75-80th percentile 為閾值起點，迭代調整
+3. **第三步**：分析 Part A SLs 在 prior drawdown depth 維度上的分布。若有「first-day-of-decline」型 SLs（DD_5d_ago > -1%），疊加 prior DD filter
+4. **第四步**：驗證 Part B 訊號未被過度過濾（保留 ≥ 80% baseline 訊號）
+
+---

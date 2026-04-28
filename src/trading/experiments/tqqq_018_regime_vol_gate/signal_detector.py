@@ -50,9 +50,7 @@ class TQQQ018SignalDetector(BaseSignalDetector):
         cond_regime = df["BB_Width_Ratio"] < cfg.max_bb_width_ratio
         cond_prior_dd = df["Drawdown_Prior"].fillna(0.0) <= cfg.prior_drawdown_threshold
 
-        df["Signal"] = (
-            cond_drawdown & cond_rsi & cond_volume & cond_regime & cond_prior_dd
-        )
+        df["Signal"] = cond_drawdown & cond_rsi & cond_volume & cond_regime & cond_prior_dd
 
         # 冷卻機制（同 TQQQ-001）
         signal_indices = df.index[df["Signal"]].tolist()
