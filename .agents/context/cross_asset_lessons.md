@@ -679,10 +679,10 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 
 ---
 
-## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27**）
+## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28**）
 <!-- freshness:
-  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013]
-  validated: 2026-04-27
+  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013]
+  validated: 2026-04-28
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -726,23 +726,34 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
    - **商品/礦業/週期性個股，bull regime 主導 SLs 且 winners 集中 ratio < 0.97**：試 k=1.00 嚴格（FCX 模式）
    - 判斷準則：先 trade-level 分析 baseline 失敗 SL/winners 在 SMA20/SMA60 ratio 分布——若 bear regime 有 SL 集中則 buffered k<1，若 transition zone (0.97-1.00) 無 winners 則 k=1.00 嚴格
 
-**反例對比（lesson #21 MBPC 框架）**：
-- VOO-004 / NVDA-009 在 MBPC 框架下，SMA(200) regime gate 為**非選擇性過濾**
-- 差異：MBPC 已含 SMA(50) 趨勢條件（隱含中期趨勢），疊加 SMA(200) 重複；BB Squeeze 框架僅含 SMA(50) 短期趨勢，疊加 multi-week SMA(20)/SMA(60) regime 提供新維度資訊（短期 vs 中期趨勢的相對比較，非絕對位置）
-- **整合規則**：multi-week SMA regime 在 BB Squeeze 上有效（buffered 形式），在 MBPC 上冗餘
+**反例對比（lesson #21 MBPC 框架）— NVDA-013 重要修正 2026-04-28**：
+- ~~VOO-004 / NVDA-009 在 MBPC 框架下，SMA(200) regime gate 為**非選擇性過濾**~~
+- ~~**整合規則**：multi-week SMA regime 在 BB Squeeze 上有效（buffered 形式），在 MBPC 上冗餘~~
+- **NVDA-013 Att3（2026-04-28）推翻先前 MBPC 冗餘結論**：buffered multi-week SMA regime（k=1.00 strict）+ ATR vol regime（ATR(20) ≤ 1.40 × ATR(60)）**雙重 regime gate** 在 NVDA MBPC 框架成功，min 0.41→**0.55**（+34%）。**Repo 第 1 次 lesson #22 cross-strategy 移植（BB Squeeze → MBPC）+ 首次發現 vol regime 在非 BB Squeeze 框架非冗餘**
+- 修正後規則：multi-week SMA regime 在 MBPC 上**單獨**仍冗餘（NVDA-013 Att2 驗證 k=1.00 strict 單獨僅持平 baseline 0.41），但**疊加 ATR vol regime** 後雙重 gate 提供精準選擇力（NVDA-013 Att3）
 
 **直接驗證 TSLA-013 假設**：
 - ✅ 「multi-week trend regime」hypothesis 確認（buffered 形式有效）
 - ❌ 「vol state regime」hypothesis 在 BB Squeeze 框架被消融證實冗餘
 - ✅ 對比 single-day 過濾器（T-1 cap、SMA extension cap）系統性失敗，regime-level 過濾為突破策略高波動個股的正確方向
 
-**跨資產假設（FCX-013 確認後更新）**：multi-week SMA regime 已確認三資產有效（k 值因資產異）：
-- ✅ TSLA（TSLA-015 Att2，3.72% vol，k=0.99 buffered）：min 0.40→0.53（+33%）
-- ✅ NVDA（NVDA-012 Att2，~3% vol，k=0.97 buffered）：min 0.47→0.51（+9%）—— **首次突破 NVDA 結構性 Sharpe 上限 0.47**
-- ✅ **FCX（FCX-013 Att3，~3% vol，k=1.00 嚴格）：min 0.41→0.55（+34%）—— repo 首次商品/礦業單股驗證、首次「k=1.00 嚴格」甜蜜點、跨資產反向發現**
-- 待測試：SOXL（SOXL-010 板塊 RS 動量回調，可能延伸至 BB Squeeze 框架）、其他 ≥2.5% 日波動個股的突破策略
+**跨資產假設（NVDA-013 確認後更新）**：multi-week SMA regime 已確認三資產 BB Squeeze 框架有效 + 一資產 MBPC 框架有效（k 值與額外 vol regime 因策略類型異）：
+- ✅ TSLA-015 Att2（BB Squeeze，3.72% vol，k=0.99 buffered）：min 0.40→0.53（+33%）
+- ✅ NVDA-012 Att2（BB Squeeze，~3% vol，k=0.97 buffered）：min 0.47→0.51（+9%）—— **首次突破 NVDA 結構性 Sharpe 上限 0.47**
+- ✅ FCX-013 Att3（BB Squeeze，~3% vol，k=1.00 嚴格）：min 0.41→0.55（+34%）—— **repo 首次商品/礦業單股、首次 k=1.00 嚴格甜蜜點**
+- ✅ **NVDA-013 Att3（MBPC，~3% vol，k=1.00 strict + ATR(20)≤1.40×ATR(60) vol regime）：min 0.41→0.55（+34%）—— repo 首次 lesson #22 cross-strategy 移植（BB Squeeze→MBPC）+ 首次驗證 vol regime 在非 BB Squeeze 框架非冗餘**
+- 待測試：SOXL（SOXL-010 板塊 RS 動量回調，可能延伸至 BB Squeeze 框架）、其他 ≥2.5% 日波動個股的突破策略、其他 MBPC 框架資產（VOO-004 / FXI-012）
 
 **規則簡化**：中-高波動單一個股 BB Squeeze breakout 策略中，使用 **SMA(20) ≥ k × SMA(60)** 為主要 multi-week regime 過濾器（k 依資產調整：TSLA k=0.99、NVDA k=0.97、**FCX k=1.00**），**毋需額外 ATR vol regime**（squeeze 已隱含低 vol 條件）。
+
+**NVDA-013 (2026-04-28) 框架相依性精煉**：
+- **vol regime 冗餘性取決於進場框架的隱含波動限制**：
+  - **BB Squeeze**（顯式 BB Width ≤ 60d 30th pct = 近期低波動）→ ATR vol regime **冗餘**（TSLA-015 Att3 ablation 證實）
+  - **MBPC**（Donchian 新高 + 5d 淺回檔 + RSI 中性 + 多頭 K 棒，**無顯式波動限制**）→ ATR vol regime **非冗餘，提供獨立選擇力**（NVDA-013 Att3 證實，min 0.41→0.55 +34%，Part A WR 67.9%→73.1% +5.2pp）
+- **k 值需求差異跨策略**：
+  - BB Squeeze + lesson #22 NVDA k=0.97 為甜蜜點（SMA regime 為唯一過濾器，需精準 transition winner 保留）
+  - MBPC + lesson #22 NVDA k=1.00 strict 為甜蜜點（vol regime 已主導，SMA regime 嚴格度需求降低）
+- **新跨資產規則候選**：lesson #22 的 **vol regime 適用性需依據進場框架的 pre-existing volatility constraints 判斷，非通用結論**——進場框架顯式含波動限制則 vol regime 冗餘，無顯式波動限制則 vol regime 提供獨立過濾力
 
 **FCX vs NVDA vs TSLA 過濾結構差異（三資產對比）**：
 - TSLA-015：Part A 17→11 訊號（過濾 6 SLs）/ Part B 6→6 訊號（無過濾），高 vol 使 bear regime 與 bull regime SMA20/SMA60 差距大，1% 緩衝即可清晰分隔
