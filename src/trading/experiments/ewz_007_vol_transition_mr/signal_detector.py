@@ -90,6 +90,10 @@ class EWZ007SignalDetector(BaseSignalDetector):
             cond_cap_strength = df["Ret_2d"] <= self.config.capitulation_threshold
         elif self.config.capitulation_mode == "1d_floor":
             cond_cap_strength = df["Ret_1d"] <= self.config.capitulation_threshold
+        elif self.config.capitulation_mode == "2dd_cap":
+            cond_cap_strength = df["Ret_2d"] >= self.config.capitulation_threshold
+        elif self.config.capitulation_mode == "1d_cap":
+            cond_cap_strength = df["Ret_1d"] >= self.config.capitulation_threshold
         else:
             raise ValueError(f"Unsupported capitulation_mode: {self.config.capitulation_mode}")
 

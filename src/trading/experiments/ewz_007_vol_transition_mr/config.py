@@ -89,9 +89,9 @@ class EWZ007Config(ExperimentConfig):
     atr_ratio_threshold: float = 1.10
 
     # Capitulation strength filter
-    # mode: "2dd_floor" | "1d_floor"
-    capitulation_mode: str = "2dd_floor"
-    capitulation_threshold: float = -0.020  # Att3 ★ 甜蜜點
+    # mode: "2dd_floor" | "1d_floor" | "2dd_cap" | "1d_cap"
+    capitulation_mode: str = "2dd_cap"
+    capitulation_threshold: float = -0.030  # Att2: 2dd cap >= -3.0%
 
     cooldown_days: int = 10
 
