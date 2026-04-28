@@ -679,9 +679,9 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 
 ---
 
-## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28**）
+## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28，COPX-011 商品/礦業 ETF 首次驗證 + repo 首次 regime BOX 雙向過濾發現 2026-04-28**）
 <!-- freshness:
-  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013]
+  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013,COPX-011]
   validated: 2026-04-28
   data_through: 2025-12-31
   confidence: medium
@@ -760,6 +760,11 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
 - NVDA-012：Part A 17→16 訊號（僅過濾 1 個 2022-07-20 bear SL）/ Part B 8→7 訊號（過濾 1 marginal expiry，保留 1 transition winner，需 3% 緩衝），中 vol AI growth 期 SMA 變動較緩，transition zone 落於 0.97-0.99 區間
 - **FCX-013**：Part A 23→17 訊號（過濾 4 TP + 2 SL，淨 -6）/ Part B 6→4 訊號（過濾 1 TP + 1 SL，淨 -2），**SLs 主要在 bull regime ratio>1**（4/6 SL 在 bull）使 buffered k<1 無法處理大部分 SLs；TPs 中 transition winners 集中 ratio 0.93-0.97（k=1.00 移除但無代價，因該區間僅 4 TPs 而 0.97-1.00 區間僅有 SLs）
 - **共同模式精煉（FCX-013 確認後）**：規則的核心是「對齊 k 值與資產 winner-loser ratio 分布的分隔點」——TSLA/NVDA 為「過濾 bear-regime SLs 同時保留 transition winners」（k<1 buffered），FCX 為「過濾 transition-zone SLs 但 transition zone 無 winners」（k=1.00 嚴格亦成立）
+- **COPX-011（2026-04-28）**：Part A baseline 18→10 訊號（k_min=1.00 過濾 4 弱 regime + k_max=1.09 過濾 4 過熱牛末）/ Part B 5→2 訊號（過濾 2024-05-14 SL ratio 1.094 過熱 ✓、2025-02-07 SL transition、2024-03-06 TP transition cost）。**Repo 首次 regime BOX（k_min + k_max 雙向）發現**：FCX 個股 SL 集中於 ratio<1.00 透過 k_min=1.00 解決即可；**COPX 商品/礦業 ETF 的 SL 反而集中於 ratio>1.09 過熱牛末**，需 k_max=1.09 上限濾除。**機制推測**：ETF 平均化效應使 SMA20/SMA60 ratio 變化更平滑，過熱訊號（牛市末段 momentum exhaustion）在 ETF 上更明顯；個股波動使 ratio 噪音更大，過熱信號被自然消除。**lesson #22 v2 精煉**：
+  - 個股形式（FCX-013、TSLA、NVDA）：單純下限 k_min 即可
+  - **ETF 形式（COPX-011）：需 BOX 結構 [k_min, k_max] 雙向過濾**
+  - COPX-011 規則：BB Squeeze breakout 框架疊加 1.00 ≤ SMA(20)/SMA(60) ≤ 1.09，min(A,B) 0.45→**0.64**（+42%）
+- **跨類驗證假設（待測）**：lesson #22 BOX 結構應於其他商品/礦業 ETF（XBI、CIBR 嗎？）上驗證；尤其 SLs 是否同樣集中於過熱 ratio 區間。對於股票寬基/槓桿 ETF（IWM、TQQQ 等），ETF 平均化效應假設仍待驗證
 
 ---
 
