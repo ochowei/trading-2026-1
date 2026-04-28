@@ -1,11 +1,12 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-10
+  last_validated: 2026-04-27
   data_through: 2025-12-31
+  note: FCX-013 added 2026-04-27 (Multi-Week Regime-Aware BB Squeeze Breakout, **repo 第 3 次 lesson #22 試驗、首次商品/礦業單股驗證 buffered multi-week SMA trend regime**, cross-asset extension from TSLA-015 / NVDA-012). Three iterations, **Att3 SUCCESS**: Att1 (k=0.99 TSLA cross-asset port, 1% buffer) Part A 18/66.7%/Sharpe **0.44** cum +63.30% / Part B 5/80%/Sharpe **0.82** cum +26.34% / min(A,B) **0.44** (+7% vs FCX-004 0.41) — Part B 大幅改善 (0.41→0.82) 為主要貢獻，Part A 略退化 (0.51→0.44) 因 4 TP 過濾損失大於 2 SL 過濾受益. Att2 (k=0.97 NVDA cross-asset port, 3% buffer) Part A 19/68.4%/0.48 / Part B 6/66.7%/0.41 完全相同 baseline / min **0.41** — k=0.97 過寬，Part B 2025-08-26 SL (ratio 0.972 > 0.97) 保留，**證實 NVDA k 值不可直接移植 FCX**：NVDA 該區間有 transition winners 而 FCX 該區間僅有 SLs. **Att3 ★ SUCCESS (k=1.00 嚴格無緩衝)** Part A 17/70.6%/Sharpe **0.55** cum +75.86% / Part B 4/75%/Sharpe **0.64** cum +16.98% / min(A,B) **0.55** (+34% vs 0.41 baseline，+25% vs Att1 0.44). **跨資產發現（與 TSLA/NVDA 反向）**：FCX 上 k=1.00 嚴格優於 k<1 buffered，反轉 lesson #22 「k<1 緩衝」原則。失敗根因（TSLA k=1.00 / NVDA k=0.99 失敗）為 borderline transition winners 在 ratio 0.97-1.00 區間被誤殺；**FCX 該區間無 winners**（僅 1.013 略高於 1.00 自然保留），故 k=1.00 無代價。**lesson #22 跨資產精煉**：k 取決於資產 winners 在 transition zone (0.93-1.00) 分布——TSLA winners 集中 0.99-1.00 (k=0.99) / NVDA 跨 0.97-1.00 (k=0.97) / **FCX 集中 0.93-0.97 + bull-regime 主導 (k=1.00 嚴格)**. A/B 平衡 acceptance：訊號比 1.7:1 (gap 41.2% < 50%) ✓，cum gap 44.0% (FCX 商品超級週期結構性邊界) ✗，**從 baseline 89% / 3.83:1 大幅改善**. FCX-013 Att3 為 BB Squeeze 框架新最佳，與 FCX-001 MR 框架並列雙最優。13 experiments 39+ attempts. FCX-012 added 2026-04-23 (Donchian Lower Washout + Intraday Reversal MR, **repo first "Donchian Lower touch + intraday reversal" combo as MR primary entry**). Three iterations all failed vs FCX-004 min 0.41: Att1 (baseline: Close within 2.5% of Donchian_Low(20) + today or yesterday Low = 20d low + ClosePos>=40% + ATR(5)/ATR(20)>=1.10 + 60d DD in [-30%,-10%] + TP+9%/SL-11%/20d/cd15) Part A 8/50%/**-0.06** cum -8.16% / Part B 6/50%/**0.02** cum -0.93% / min **-0.06** — two Part A -11% SLs (2019-08-05 trade war, 2023-04-25 drift) are continuation-decline traps; Part B dominated by small expiries (2024-01/11/12) showing washout signal lacks trigger momentum in sideway regimes; Att2 (+ require today Low > yesterday Low = Day-After Capitulation) Part A 1/0%/Sharpe 0.00 zero-var cum -12.36% / Part B 2/100% Sharpe 1.07 cum +9.33% / min **-0.60** (single-trade approximation) — over-filters to 3 total signals, statistical insignificance; **validates lesson #20b Day-After Capitulation failure family extending to FCX 3% vol single commodity stock** (after URA 2.34% policy-driven / TLT 1% rate-driven, third data point); Att3 (revert Att2, add 2DD cap >= -7%, CIBR-012 direction) Part A 7/42.9% Sharpe **-0.20** cum -15.74% (**WORSE than Att1**) / Part B 6/50% Sharpe 0.02 unchanged / min **-0.20** — 2DD cap removed 1 TP winner (not SL) dropping WR 50→42.9%; Part B all signals' 2DD > -7% (structurally unbinding). **Core failure**: FCX winners' 2DD distribution spans -3%~-8% overlapping with losers (same pattern as FCX-011 Att2 found), no unidirectional selectivity opposite to CIBR 1.53% vol success. **Repo first Donchian Lower Washout + intraday reversal trial** — extends lesson #52 failed-breakdown-reversal family to "Donchian Lower binary price trigger" category: single-day Donchian Low touch + intraday reversal insufficient to distinguish "tail-of-washout" from "mid-acceleration" in multi-stage declining assets (parallels FXI-009 Failed Breakdown Reversal 3 iteration failure). FCX's 12th failed strategy type. FCX-001 remains global optimum; FCX-004 remains execution-model optimum (min 0.41). FCX-011 added 2026-04-22 (Post-Capitulation Vol-Transition MR, **repo first BB-lower + pullback-cap hybrid mode trial on high-vol single stock (FCX ~3% vol)** — cross-asset extension from VGK-008 / INDA-010 / EEM-014 / CIBR-012). Three iterations all failed vs FCX-004 min 0.41: Att1 (baseline hybrid: BB(20,2) + PB cap -15% + WR<=-80 + ClosePos>=40% + ATR>1.15 + TP+6%/SL-7%/20d/cd10) Part A 3 signals WR 66.7% cum +4.34% Sharpe **0.26** / Part B 5 signals WR 40.0% cum -7.86% Sharpe **-0.23** / min -0.23 — Part B 2024-07-19 + 2024-12-13 both 1-3d fast SLs indicate signal-day filter cannot distinguish accelerating-crashes from genuine capitulation; Att2 (+ 2DD cap >= -5%, CIBR-012 direction) Part A 2/50% Sharpe -0.09 / Part B 2/50% Sharpe -0.09 / min -0.09 — cap removes 2021-06-16 TP winner (deep 2DD) alongside 2024-07-19 SL; deep 2DD covers both winners and losers in FCX, no unidirectional selectivity; Att3 (+ 2DD floor <= -5%, VGK/INDA/EEM direction) Part A 1/100% zero-var / Part B 4/50% Sharpe ~0 / min 0.00 — floor filters 2/3 Part A signals (density 0.2/yr), keeps both winners and expiry losses in Part B. **Core failure**: FCX winners' 2DD distribution spans -3%~-8%, overlapping with losers (distinct from CIBR SLs concentrated deep 2DD or VGK SLs concentrated shallow 2DD). **Repo first BB-lower hybrid mode on high-vol single stock** — **extends XBI-010's 1.75% vol upper boundary to include single-stock category** (previously established only on ETFs). Integrated rule: BB-lower + pullback-cap hybrid mode applies only to low-mid vol broad/sector/single-country ETFs (1.12%~1.75%); fails on XBI (2.0% ETF), FXI (policy EM), GLD/TLT (commodity/rate), and now **FCX (~3% single stock)**. FCX's 9th failed strategy type (after pullback+WR, momentum pullback, RS, Donchian, trend pullback, RSI divergence, Gap-Down, BB-lower-hybrid). FCX-001 remains global optimum (11 experiments, 33+ attempts); FCX-004 remains execution-model optimum (min 0.41). FCX-010 added 2026-04-21 (Gap-Down Capitulation + Intraday Reversal MR, **repo first single-stock Gap-Down trial**, cross-asset test from IBIT-006 Att2). Three iterations all failed vs FCX-001 min 0.43: Att1 (Gap<=-2.0% + Close>Open + 10d PB [-6%,-18%] + WR<=-80 + TP+5%/SL-4%/15d) Part A n=9 WR 55.6% cum +7.77% Sharpe 0.21 / Part B n=2 WR 100% zero-variance Sharpe 0.00 — 4 Part A SLs concentrated in 2019 trade war + 2023 SVB first-wave shocks (gap-down continues not capitulates); Att2 (+ ClosePos>=50% strong intraday reversal filter) Part A n=8 WR 62.5% cum +12.42% Sharpe 0.36 / Part B unchanged n=2 zero-variance — removes 1 weak-reversal SL (2023-02-24) but 3 policy-shock SLs remain; Att3 (tighten Gap<=-2.5% + pullback floor -8%) Part A n=5 WR 80% cum +16.52% Sharpe **0.87** (repo-first single-stock gap-down high Part A Sharpe) / Part B n=1 zero-variance Sharpe 0.00, A/B signal annualized ratio 2.0:1 and A/B cum gap 69.7% violate balance goals. **Repo first Gap-Down Capitulation trial on single stock** — extends lesson #20a failure family: Gap-Down pattern requires NOT JUST 24/7 overnight price discovery but ALSO selling-pressure exhaustion uncorrelated with daytime policy/commodity continuity. FCX (copper-linked high-vol stock) has LME/SHFE/COMEX near-24h futures coverage but copper price shocks (trade policy, USD, global demand) persist into US session, paralleling FXI-010's Chinese policy continuity failure. Failure family extended: TQQQ-016 (leveraged index ETF, QQQ non-24/7) + FXI-010 (policy-driven EM ETF) + FCX-010 (commodity-linked single stock) — all fail; only IBIT (pure BTC 24/7 ETF) validates. Cross-asset hypothesis (pending validation): Gap-Down MR may apply ONLY to pure-crypto ETFs (BTC/ETH spot), not to any US equity with macroeconomic/commodity exposure.
 -->
 ## AI Agent 快速索引
 
 **當前最佳（均值回歸）：** FCX-001（三重條件極端超賣均值回歸：60日回撤≤-18% + RSI<28 + SMA50乖離≤-8%）
-**當前最佳（突破策略）：** FCX-004（BB Squeeze Breakout：BB(20,2) 60日30th百分位擠壓 + 突破上軌 + SMA50趨勢確認）
+**當前最佳（突破策略）：** ★ **FCX-013 Att3**（Multi-Week Regime-Aware BB Squeeze Breakout：FCX-004 框架 + **SMA(20) ≥ 1.00 × SMA(60)** 嚴格 multi-week trend regime gate，TP+8%/SL-7%/20d/cd10）— Part A Sharpe **0.55**, Part B Sharpe **0.64**, min(A,B) **0.55**（+34% vs FCX-004 0.41）。**Repo 第 3 次 lesson #22 試驗、首次商品/礦業單股驗證**，跨資產反向發現：FCX k=1.00 嚴格優於 TSLA k=0.99 / NVDA k=0.97 buffered。**前任最佳（突破）：** FCX-004（同進場無 regime gate，min 0.41）
 
 **滾動窗口分析摘要（2026-03-29）：**
 - **FCX-001：** 12/12 窗口正累計（最低 +13.05%，最高 +41.52%），勝率 50-83%，近期虧損收窄（-12%→-3%）但差點成功比例升高，策略穩健但反彈速度趨緩
@@ -68,16 +69,52 @@
 - **Att2**（FCX-001 + ATR(5)/ATR(20)>1.05 波動率過濾）：Part A Sharpe 0.25 / Part B 0.82。ATR 改善 Part B 但大幅退化 Part A（移除好訊號多於壞訊號）
 - **Att3**（FCX-001 + 2日跌幅≤-5% 急跌過濾）：Part A Sharpe 0.31 / Part B **1.26**。A/B 累計完美平衡（+40.57%/+40.28%），但 min(A,B) 0.31 低於 FCX-001 的 0.43
 
+**FCX-009 實驗摘要（2026-04-18，3 次嘗試，全部未超越 FCX-001）：**
+跨資產驗證 pattern 20b（SIVR-015 Att1 的 RSI(14) bullish hook divergence）。進場建立於 FCX-002 pullback+WR 框架（移除 ClosePos，lesson #34），加入 pullback 上限 -18%（~6σ 崩盤隔離）與 RSI(14) hook 過濾。
+- **Att1**（pullback [-9%,-18%] + WR + hook delta=3 / max_min=35，TP+8%/SL-10%/20d）：Part A Sharpe 0.51（WR 72.7%, 11 訊號）/ Part B -0.33（WR 40.0%, 5 訊號）。SIVR-015 Att1 參數直接移植失敗：delta=3 放行 2024-07-29 深跌中的局部反彈假訊號（-10.13% 4日停損）
+- **Att2**（加嚴 hook delta 3→5，其餘不變）：Part A Sharpe **0.76**（WR 77.8%, 9 訊號）/ Part B -0.06（WR 33.3%, 3 訊號）。成功濾除 2024-07 停損並轉為 2024-08 +8% 達標，Part A 跳升 +49%，但 Part B 仍受 2024-11/12 雙筆 20 天到期虧損拖累（FCX 2024 後半缺乏均值回歸動能）
+- **Att3**（加深 pullback -9%→-11%，delta=5）：Part A Sharpe **0.85**（WR 85.7%, 7 訊號）/ Part B 0.30（WR 50.0%, 2 訊號）。深 pullback 門檻濾除 Part B 2024-11 淺層假訊號，兩段均轉正但 min(A,B) 0.30 仍低於 FCX-001 的 0.43。A/B 累計差 39.24pp、訊號差 71.4% 均超出目標（30%/50%），Part B 僅 2 訊號樣本不足
+
+**FCX-010 實驗摘要（2026-04-21，3 次嘗試，全部未超越 FCX-001，**repo 首次 single-stock Gap-Down 試驗**）：**
+跨資產驗證 pattern 20a（IBIT-006 Att2 的 Gap-Down Capitulation + Intraday Reversal MR）。假設：FCX 作為銅礦股，其隔夜缺口反映銅期貨（LME/SHFE/COMEX）近 24 小時連續定價，結構類似 IBIT 的 BTC 24/7 隔夜拋壓 → 美股撿便宜模式。
+- **Att1**（Baseline: Gap<=-2.0% + Close>Open + 10d PB [-6%,-18%] + WR<=-80，TP+5%/SL-4%/15d/cd10）：Part A n=9 WR 55.6% cum +7.77% Sharpe **0.21** / Part B n=2 WR 100% zero-variance Sharpe 0.00，min(A,B) 0.00。4 筆 Part A SL 全為 1-3 日快速停損，集中於 2019-05-07（貿易戰升溫第一天）、2019-08-06（人民幣匯率衝擊）、2023-02-24、2023-03-14（SVB 銀行危機），均為「新事件衝擊第一波」或「次波衝擊」訊號，gap-down 後續跌而非反轉
+- **Att2**（+ ClosePos>=50% 強日內反轉過濾）：Part A n=8 WR 62.5% cum +12.42% Sharpe **0.36**（+71% vs Att1）/ Part B n=2 WR 100% zero-variance Sharpe 0.00（訊號集不變），min(A,B) 0.00。ClosePos 過濾器移除 1 筆 Part A SL（2023-02-24 的弱反轉）但 3 筆政策衝擊 SL（2019 兩筆 + 2023-03-14 SVB）保留，Part B 2024-2025 bull regime gap-down + 強反轉稀少
+- **Att3**（加嚴 Gap<=-2.5% + pullback floor -8%）：Part A n=5 WR 80% cum +16.52% Sharpe **0.87**（+142% vs Att2，repo 首見 single-stock gap-down 之 Part A 高 Sharpe）/ Part B n=1 WR 100% zero-variance Sharpe 0.00，min(A,B) 0.00。加嚴成功提升 Part A 品質但 Part B 崩至 1 訊號，A/B 訊號年化比 2.0:1、累計差 69.7% 均嚴重違反平衡目標
+
 **已證明無效（禁止重複嘗試）：**（更新）
 原有項目加上：
 - FCX-008 趨勢跟蹤：SMA 黃金交叉 + 回檔至 SMA(50) 在高波動週期股完全失敗（Part B WR 25%），趨勢反轉太劇烈
 - FCX-008 ATR 波動率自適應：ATR > 1.05 在 FCX 日波動 2-4% 下跨期不穩定（Part A 0.25 vs 基線 0.43），極端超賣條件本身就需要高波動才能觸發，ATR 對這些訊號的額外過濾力有限
 - FCX-008 2日急跌過濾：改善 Part B（0.74→1.26）但大幅減少 Part A 訊號（18→13），3 個被移除的勝利交易拖累 Part A Sharpe
+- FCX-009 RSI Bullish Hook Divergence：雖 Part A 大幅改善（0.85），但 Part B 2024-2025 銅價 post-peak 回檔期缺乏實質均值回歸動能，3 次迭代 Part B 訊號從 5→3→2 漸趨稀薄。確認 pattern 20b（SIVR-015）跨資產邊界：需 Part B 存在活躍的均值回歸 regime；FCX 2024 後半進入長期下行不適用
+- **FCX-010 Gap-Down Capitulation + Intraday Reversal MR（repo 首次 single-stock Gap-Down 試驗，3 次迭代全部失敗）**：跨資產移植 IBIT-006 Att2 模式。Att1（Gap<=-2.0% baseline）Part A Sharpe 0.21 / Part B zero-var 0.00 / min 0.00，4 筆 SL 集中政策衝擊日；Att2（+ ClosePos>=50%）Part A 0.36 / Part B 同 / min 0.00，移除弱反轉但保留政策衝擊 SL；Att3（Gap<=-2.5% + PB -8%）Part A Sharpe **0.87** / Part B n=1 零方差 / min 0.00，Part A 大幅改善但 Part B 崩潰。**核心失敗根因**：(1) 銅價衝擊（貿易政策、美元、全球需求預期）往往貫穿美股盤中持續發酵，與 FXI 中國政策持續性平行，gap-down 後常續跌而非反轉；(2) FCX 2024-2025 post-peak 銅週期缺乏 capitulation 事件，Part B 訊號結構性稀少；(3) 加嚴過濾器在 Part A 有效但在 Part B 導致樣本崩潰。**延伸 pattern 20a 失敗清單**：TQQQ-016（槓桿指數 ETF）+ FXI-010（政策驅動 EM ETF）+ FCX-010（商品連動個股）均失敗，目前僅 IBIT（純 BTC 24/7 ETF）驗證成功——結構性前提嚴格，不可跨類別泛化。跨資產假設（待驗證）：Gap-Down MR 可能僅適用「underlying 連續交易 + selling pressure 自然耗盡」的純加密類資產，不適用任何與宏觀政策/商品供需週期連動的美股
+
+**FCX-011 實驗摘要（2026-04-22，3 次嘗試，全部未超越 FCX-004，**repo 首次 BB-lower hybrid mode 於高波動單一個股試驗**）：**
+跨資產驗證 VGK-008 / INDA-010 / EEM-014 / CIBR-012 所建立的「BB 下軌 + 回檔上限 + WR + ClosePos + ATR」混合進場模式。XBI-010 已驗證該模式上限為日波動 1.75%（XBI 2.0% 失敗）；本實驗測試 **單一個股類別**（FCX ~3% vol）是否突破此上限。
+- **Att1**（基線混合進場：BB(20,2) + PB cap -15% + WR<=-80 + ClosePos>=40% + ATR>1.15，TP+6%/SL-7%/20d/cd10）：Part A 3 訊號 WR 66.7% cum +4.34% Sharpe **0.26** / Part B 5 訊號 WR 40.0% cum -7.86% Sharpe **-0.23** / min(A,B) **-0.23**。Part B 2 筆 SL (2024-07-19 9-day, 2024-12-13 3-day) 均快速觸發，signal-day ATR/ClosePos 過濾無法分辨加速崩盤與真 capitulation
+- **Att2**（+ 2DD cap >= -5%，CIBR-012 方向排除加速崩盤）：Part A 2/50% Sharpe **-0.09** / Part B 2/50% Sharpe **-0.09** / min **-0.09**。cap 過濾器同時移除 2021-06-16 深 2DD 贏家（+6% TP）與 2024-07-19 SL——FCX 贏家 2DD 分布橫跨淺深，cap 方向無選擇力
+- **Att3**（+ 2DD floor <= -5%，VGK/INDA/EEM 方向排除淺漂移）：Part A 1 訊號 WR 100% 零方差 Sharpe **0.00** / Part B 4 訊號 WR 50% Sharpe ~0 / min **0.00**。floor 濾掉 Part A 2/3 訊號（密度崩至 0.2/yr），訊號過稀疏；Part B 2024-11-12 淺 2DD 到期虧損仍保留
+
+**FCX-012 實驗摘要（2026-04-23，3 次嘗試，全部未超越 FCX-004，**repo 首次「Donchian Lower Washout + 日內反轉」組合作為 MR 主進場試驗**）：**
+測試「Donchian 20 日低點觸及」作為 binary、非參數化的 washout 觸發器，
+搭配日內反轉（ClosePos >= 40%）、波動率放大（ATR(5)/ATR(20) >= 1.10）
+與 60 日回撤範圍約束 [-30%, -10%]，探索是否能打破 FCX-001 的 Part A/B
+累計報酬 72% gap。
+- **Att1**（基線：Close 距 20 日低點 <= 2.5% + 今日或昨日 Low = 20d 新低 + ClosePos >= 40% + ATR >= 1.10 + 60d DD ∈ [-30%,-10%]，TP+9%/SL-11%/20d/cd15）：Part A 8 訊號 WR 50% cum -8.16% Sharpe **-0.06** / Part B 6 訊號 WR 50% cum -0.93% Sharpe **0.02** / min **-0.06**。兩筆 Part A -11% SL（2019-08-05 貿易戰、2023-04-25 drift）為 continuation-decline 陷阱；Part B 三筆小幅到期（2024-01/11/12）顯示 washout 訊號在 sideway 環境缺乏動能
+- **Att2**（+ require today Low > yesterday Low = Day-After Capitulation）：Part A 1 訊號 Sharpe 0.00 零方差 cum -12.36% / Part B 2 訊號 Sharpe 1.07 cum +9.33% / min **-0.60**（以 Part A 單筆 -12.36% 報酬近似）。過度過濾——「washout-day + 今日不再探底」在 FCX 高波動個股上極稀疏，共 3 訊號無統計意義。**驗證 lesson #20b Day-After Capitulation 失敗家族於 FCX 3% vol 單一商品個股**（繼 URA 2.34% / TLT 1% 後第三個資料點）
+- **Att3**（回退 Att2，改加 2DD cap >= -7%，CIBR-012 方向）：Part A 7 訊號 WR 42.9% cum -15.74% Sharpe **-0.20**（**比 Att1 更差**）/ Part B 6 訊號不變（2DD 全 > -7%，cap 結構性非綁定）Sharpe 0.02 / min **-0.20**。2DD cap 僅移除 1 筆 TP（未移除 SL），WR 從 50% 降至 42.9%——FCX winners 2DD 分布橫跨 -3%~-8%，與 losers 重疊，無單向選擇力
+
+**已證明無效（禁止重複嘗試）：**（更新）
+原有項目加上：
+- **FCX-011 BB 下軌 + 回檔上限混合進場模式（repo 首次高波動單一個股試驗，3 次迭代全部失敗）**：跨資產移植 VGK-008/INDA-010/EEM-014/CIBR-012 成功模式。Att1 基線 min -0.23，Part B 兩筆快速 SL 顯示混合模式對 FCX 高波動缺乏辨識力；Att2 2DD cap 方向崩至 min -0.09（贏家過濾過嚴）；Att3 2DD floor 方向 min 0.00（訊號過稀疏）。**核心失敗根因**：(1) BB 下軌在 FCX 高波動下觸及頻率高但選擇性低，統計自適應門檻無法捕捉 FCX 單一個股的事件驅動結構；(2) FCX 贏家訊號的 2DD 分布橫跨 -3%~-8%，與輸家重疊，雙向（cap/floor）皆無選擇力——與 CIBR SLs 集中深 2DD、VGK SLs 集中淺 2DD 之結構皆不同；(3) FCX ~3% vol 遠超 XBI-010 已驗證的 1.75% vol 上限。**延伸跨資產規則**：BB-lower hybrid mode 上限**從「1.75% vol ETF」擴展為「1.75% vol（涵蓋 ETF 與單一個股兩類別）」**，高波動單一個股類別正式納入失敗清單（繼 XBI 2.0% ETF、FXI 政策驅動 EM、GLD/TLT 商品/利率 ETF 後）
+- **FCX-012 Donchian Lower Washout + 日內反轉 MR（repo 首次 Donchian Lower touch + 日內反轉作為 MR 主進場試驗，3 次迭代全部失敗）**：Att1 基線 min -0.06，兩筆 -11% SL 為 continuation-decline；Att2 Day-After Capitulation 過度過濾至 3 總訊號 min -0.60；Att3 2DD cap -7% 意外移除贏家多於輸家使 min 崩至 -0.20。**核心失敗根因**：(1) Donchian Lower 觸及為「反轉候選」非「反轉確認」——FCX ~3% vol commodity panic 常以多日連續 Donchian 新低為特徵（2019-08 trade war、2021-06 銅價頂部後、2022 升息、2024-07 銅價暴跌均有 3-5 連續新低日），單日觸及 + 日內反轉不足以區分「尾段 washout」vs「中段 acceleration」，與 FXI-009 Failed Breakdown Reversal 三次迭代失敗（lesson #52）同源；(2) Day-After Capitulation 對 FCX 同樣失效（延伸 lesson #20b 至 FCX 3% vol 個股，第三個資料點）；(3) 2DD cap 在 FCX 無選擇力（呼應 FCX-011 Att2 相同發現）。**擴展 lesson #52 至「Donchian Lower binary price trigger」類別**：binary 價格觸發器在「多段下跌」結構資產上結構性缺乏區分力——政策驅動 EM ETF（FXI）與高波動單一商品個股（FCX）共享同一失敗機制
 
 **尚未嘗試的方向（可探索，但預期邊際效益極低）：**
 - 加入銅價/HG 指標確認（減少 2022 熊市等大環境的誤判，但 cross-asset lesson #6 警告額外確認指標通常無效）
 - 引入追蹤停損（Trailing Stop）捕捉更大型的反彈（但 cross-asset lesson #2 警告日波動 2-4% 禁用 trailing stop）
-- FCX-001/004 已確認為全域最優（8 次實驗、33+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應七大策略類型）
+- ~~BB 下軌 + 回檔上限混合進場模式~~ → FCX-011 三次迭代全部失敗（repo 首次高波動單一個股試驗，確認 XBI-010 1.75% vol 上限延伸至單一個股類別）
+- ~~Donchian Lower Washout + 日內反轉 MR~~ → FCX-012 三次迭代全部失敗（repo 首次此組合作為 MR 主進場，擴展 lesson #52 至 binary 價格觸發器類別）
+- FCX-001/004 已確認為全域最優（12 次實驗、45+ 次嘗試，含均值回歸、突破（BB Squeeze + Donchian）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應、RSI bullish hook divergence、Gap-Down Capitulation、BB-lower hybrid mode、**Donchian Lower Washout** 十一大策略類型）
 
 **關鍵資產特性：**
 - 高 Beta、週期性強，與銅價高度相關
@@ -108,6 +145,11 @@
 | FCX-006 | `fcx_006_relative_strength`   | FCX-COPX 相對強度（3次嘗試均失敗） | 已完成 |
 | FCX-007 | `fcx_007_donchian_breakout`   | Donchian 通道突破（3次嘗試均失敗） | 已完成 |
 | FCX-008 | `fcx_008_trend_pullback`      | 趨勢跟蹤→ATR自適應→2日急跌（3次嘗試，Att3 Part B 最佳但 min<FCX-001） | 已完成 |
+| FCX-009 | `fcx_009_rsi_divergence_mr`   | RSI Bullish Hook Divergence + Pullback+WR MR（3次嘗試均未超越 FCX-001） | 已完成 |
+| FCX-010 | `fcx_010_gap_reversal_mr`     | Gap-Down Capitulation + 日內反轉 MR（3次嘗試均未超越 FCX-001，repo 首次 single-stock Gap-Down 試驗） | 已完成 |
+| FCX-011 | `fcx_011_vol_transition_mr`   | Post-Capitulation Vol-Transition MR / BB-lower hybrid（3次嘗試均未超越 FCX-004，repo 首次 BB-lower hybrid 於高波動單一個股試驗） | 已完成 |
+| FCX-012 | `fcx_012_donchian_low_washout` | Donchian Lower Washout + 日內反轉 MR（3次嘗試均未超越 FCX-004，repo 首次此組合作為 MR 主進場） | 已完成 |
+| FCX-013 | `fcx_013_regime_breakout`     | Multi-Week Regime-Aware BB Squeeze Breakout（FCX-004 + buffered SMA(20)≥k×SMA(60)，**Att3 SUCCESS k=1.00 嚴格 min(A,B) 0.55 +34%**，repo 第 3 次 lesson #22 試驗、首次商品/礦業單股、跨資產反向發現） | ✅ 突破策略當前最佳 |
 
 ---
 
@@ -778,4 +820,149 @@ FCX-008 (趨勢跟蹤→ATR自適應→2日急跌) ← Att3 Part B 最佳但 min
   ├── Att1 (趨勢跟蹤：SMA黃金交叉+回測SMA50) → Part A -0.00 / Part B -0.63，趨勢反轉
   ├── Att2 (FCX-001 + ATR>1.05) → Part A 0.25 / Part B 0.82，ATR 移除好訊號
   └── Att3 (FCX-001 + 2日跌幅≤-5%) → Part A 0.31 / Part B 1.26，最佳 A/B 平衡
+
+FCX-009 (RSI(14) Bullish Hook Divergence + Pullback+WR) ← 全部失敗，跨資產 pattern 20b 驗證
+  ├── Att1 (pullback [-9%,-18%] + hook delta=3 / max_min=35) → Part A 0.51 / Part B -0.33
+  ├── Att2 (加嚴 delta=5) → Part A 0.76 / Part B -0.06，但 Part B 2024-11/12 雙筆到期
+  └── Att3 (加深 pullback -11%, delta=5) → Part A 0.85 / Part B 0.30 / min 0.30，A/B 累計差 39.24pp
+
+FCX-010 (Gap-Down Capitulation + 日內反轉) ← 全部失敗，**repo 首次 single-stock Gap-Down 試驗**
+  ├── Att1 (Gap<=-2.0% + Close>Open + PB [-6%,-18%] + WR) → Part A 0.21 / Part B n=2 零方差 / min 0.00
+  ├── Att2 (+ ClosePos>=50%) → Part A 0.36 / Part B 不變零方差 / min 0.00
+  └── Att3 (Gap<=-2.5% + PB -8%) → Part A **0.87** / Part B n=1 零方差 / min 0.00（A/B 訊號比 2.0:1 崩潰）
+
+FCX-011 (Post-Capitulation Vol-Transition MR / BB-lower hybrid) ← 全部失敗，**repo 首次 BB-lower hybrid 於高波動單一個股試驗**
+  ├── Att1 (基線：BB(20,2) + PB cap -15% + WR + ClosePos + ATR, TP+6%/SL-7%/20d/cd10) → Part A 0.26 / Part B -0.23 / min -0.23
+  ├── Att2 (+ 2DD cap >= -5%, CIBR-012 方向) → Part A -0.09 / Part B -0.09 / min -0.09（贏家過濾過嚴）
+  └── Att3 (+ 2DD floor <= -5%, VGK/INDA/EEM 方向) → Part A 零方差 / Part B ~0 / min 0.00（訊號過稀疏）
+     延伸 XBI-010 已建立之 BB-lower hybrid 1.75% vol 上限至**單一個股類別**
+
+FCX-012 (Donchian Lower Washout + 日內反轉 MR) ← 全部失敗，**repo 首次此組合作為 MR 主進場**
+  ├── Att1 (基線：Close 距 20d Low <= 2.5% + 今/昨 Low = 新低 + ClosePos + ATR + 60d DD [-30%,-10%], TP+9%/SL-11%/20d/cd15) → Part A 8/50%/-0.06 / Part B 6/50%/0.02 / min -0.06
+  ├── Att2 (+ require today Low > yesterday Low = Day-After Capitulation) → Part A 1/零方差 / Part B 2/Sharpe 1.07 / min -0.60（過度過濾，3 訊號無統計意義）
+  └── Att3 (回退 Att2，+ 2DD cap >= -7%, CIBR-012 方向) → Part A 7/42.9%/-0.20（**比 Att1 更差**）/ Part B 6/50%/0.02 不變 / min -0.20（cap 移除 1 TP 非 SL）
+     擴展 cross-asset lesson #52 至「Donchian Lower binary 價格觸發器」類別，失敗家族與 FXI-009 Failed Breakdown Reversal 同源
 ```
+
+## FCX-011: Post-Capitulation Vol-Transition MR（3 次嘗試均失敗）
+
+**實驗目的：** 跨資產驗證 BB 下軌 + 回檔上限混合進場模式（VGK-008/INDA-010/EEM-014/CIBR-012 成功）是否延伸至**高波動單一個股**類別。
+
+**假設：** FCX（銅礦龍頭 ~3% vol）具股權資本化動態（2016/2020/2022 急跌反彈），若成立則 BB 下軌統計自適應門檻 + 絕對回檔上限應能辨識「慢漂移 vs 真恐慌」，類似已驗證的 ETF 案例。
+
+**結果：** 三次迭代全部未超越 FCX-004 min 0.41。混合模式在 FCX 上崩壞至 min -0.23 ~ 0.00，確認 **XBI-010 已建立的 1.75% vol 上限延伸至單一個股類別**。
+
+**迭代明細：**
+
+| 迭代 | 2DD 過濾 | Part A (訊號 WR Sharpe) | Part B (訊號 WR Sharpe) | min(A,B) |
+|------|----------|------------------------|-------------------------|----------|
+| Att1 | 停用（基線）| 3 訊號 / 66.7% / **0.26** | 5 訊號 / 40.0% / **-0.23** | **-0.23** |
+| Att2 | cap >= -5%  | 2 訊號 / 50.0% / -0.09 | 2 訊號 / 50.0% / -0.09 | -0.09 |
+| Att3 | floor <= -5% | 1 訊號 / 100% / 零方差 | 4 訊號 / 50.0% / ~0 | 0.00 |
+
+**核心失敗根因：**
+
+1. **BB 下軌選擇性低**：FCX 高波動使 BB 帶寬大，下軌觸及頻率高但品質未保證；Part B 2024-07-19 + 2024-12-13 均為 1-3 日快速 SL，signal-day 過濾器（ATR>1.15, ClosePos>=40%）無法分辨加速崩盤與真 capitulation。
+2. **2DD 方向無選擇力**：FCX 贏家訊號的 2DD 分布橫跨 -3% ~ -8%，與輸家重疊——與 CIBR SLs 集中深 2DD（cap 有效）、VGK SLs 集中淺 2DD（floor 有效）之結構皆不同。Att2 cap 過濾器錯殺 2021-06-16 深 2DD 贏家（+6% TP）；Att3 floor 過濾器濾掉 2/3 Part A 訊號密度崩至 0.2/yr。
+3. **單一個股事件結構**：FCX 事件驅動（銅價衝擊、公司信用、中國需求）使統計自適應 BB 下軌無法捕捉獨特事件結構；ETF 的分散化使 BB 成為有效 regime classifier，單一個股則事件突兀使 BB 失去選擇性。
+
+**跨資產貢獻：**
+
+- **Repo 第 1 次 BB-lower hybrid mode 於高波動單一個股試驗**——三次迭代全部失敗
+- **擴展 cross-asset lesson #52**：BB-lower hybrid mode 有效邊界**從「1.75% vol ETF」延伸為「1.75% vol（涵蓋 ETF 與單一個股兩類別）」**
+- **新失敗清單項**：高波動單一個股（FCX ~3%）正式加入不適用該模式的資產類別，繼 XBI 2.0% ETF、FXI 政策驅動 EM ETF、GLD/TLT 商品/利率 ETF 後
+- **開放假設**：混合模式是否適用於**中低波動單一個股**（如日波動 1.5-2% 之防禦性股票）——尚未驗證，但 FCX-011 失敗並未排除此可能
+
+**FCX-004（BB Squeeze Breakout）仍為 FCX 執行模型最優（min 0.41）；FCX-001（grandfathered 極端超賣 MR）仍為全域最佳（min 0.43）。**
+
+## FCX-012: Donchian Lower Washout + 日內反轉 MR（3 次嘗試均失敗）
+
+**實驗目的：** 探索 **repo 首次「Donchian 20 日低點觸及 + 日內反轉」組合**作為 MR 主進場訊號，測試 binary、非參數化的 washout 觸發器能否在 FCX（高波動、commodity-driven 單一個股）上打破 FCX-001 的 Part A/B 累計報酬 72% gap。
+
+**假設：** FCX 作為銅礦個股，commodity panic 常以「連續下跌 + 某日觸及新低 + 盤中買盤湧入」模式結束。Donchian Low 觸及比統計 BB 下軌更 binary——BB 在高波動期帶寬持續擴大使下軌頻繁觸及但不代表真實底部，而 Donchian 新低是 unambiguous washout 事件。此設計針對 FCX 之 event-driven commodity panic 結構（2016 信貸、2020 COVID、2022 銅價暴跌）。
+
+**結果：** 三次迭代全部未超越 FCX-004 min 0.41，Part A Sharpe 最佳僅 -0.06（Att1 基線）、最差 -0.20（Att3）。確認 **Donchian Lower binary 價格觸發器在 FCX 上結構性失效**。
+
+**迭代明細：**
+
+| 迭代 | 關鍵新增條件 | Part A (訊號 WR Sharpe) | Part B (訊號 WR Sharpe) | min(A,B) |
+|------|--------------|------------------------|-------------------------|----------|
+| Att1 | 基線（Donchian Low 觸及 + 日內反轉 + ATR + DD 範圍）| 8 / 50% / **-0.06** | 6 / 50% / **0.02** | **-0.06** |
+| Att2 | + today Low > yesterday Low（Day-After）| 1 / 0% / 零方差 | 2 / 100% / 1.07 | **-0.60** |
+| Att3 | 回退 Att2，+ 2DD cap >= -7%（CIBR-012 方向）| 7 / 42.9% / **-0.20** | 6 / 50% / 0.02 | **-0.20** |
+
+**核心失敗根因：**
+
+1. **Donchian Lower 觸及為「反轉候選」而非「反轉確認」**：在 FCX ~3% vol 上，commodity panic 常以多日連續 Donchian 新低為特徵（2019-08 trade war、2021-06 銅價頂部後、2022 夏秋升息、2024-07 銅價暴跌均有 3-5 連續新低日）。單日觸及 + 日內反轉不足以區分「尾段 washout」vs「中段 acceleration」。Att1 的 2 筆 -11% SL（2019-08-05、2023-04-25）正是 continuation-decline 陷阱。
+2. **Day-After Capitulation 對 FCX 同樣失效**（擴展 lesson #20b 至 FCX 3% vol 個股，第三個資料點繼 URA 2.34% policy-driven、TLT 1% rate-driven 後）：強反轉結構過嚴使訊號崩至 3 筆，無統計意義。驗證「V-bounce ≠ genuine reversal」失敗家族在多階段下跌資產上的普遍性。
+3. **2DD cap 對 FCX 無選擇力**：CIBR-012 成功的 2DD cap -4% 方向（淺 2DD = 減速、深 2DD = 加速）在 FCX 上不成立——FCX winners 的 2DD 分布橫跨 -3%~-8%，與 losers 重疊。Att3 的 2DD cap -7% 實際移除 1 筆 TP 而未移除任何 SL，WR 從 50% 降至 42.9%。呼應 FCX-011 Att2（2DD cap -5% min 0.00）的同一發現。
+
+**跨資產貢獻：**
+
+- **Repo 第 1 次「Donchian Lower Washout + 日內反轉」組合作為 MR 主進場試驗**——三次迭代全部失敗
+- **擴展 cross-asset lesson #52 至「Donchian Lower binary 價格觸發器」類別**：binary 價格觸發器在「多段下跌」結構資產上結構性缺乏區分力。FXI-009 Failed Breakdown Reversal（政策驅動 EM ETF）+ FCX-012 Donchian Lower Washout（高波動 commodity 個股）共享同一失敗機制——單一時點的價格反轉確認無法辨識 washout 的階段
+- **Day-After Capitulation 失敗家族第三個資料點**：URA（policy-driven 2.34%）+ TLT（rate-driven 1%）+ FCX（commodity-driven 3%）均失敗，涵蓋三種不同驅動因素與波動率範圍
+- **FCX 第 12 種失敗策略類型**：均值回歸、突破（BB Squeeze + Donchian Upper）、動量回檔、RSI(2)、相對強度、趨勢跟蹤、波動率自適應、RSI bullish hook divergence、Gap-Down Capitulation、BB-lower hybrid mode、**Donchian Lower Washout**
+
+**FCX-004（BB Squeeze Breakout）仍為 FCX 執行模型最優（min 0.41）；FCX-001（grandfathered 極端超賣 MR）仍為全域最佳（min 0.43）。**
+
+---
+
+## FCX-013: Multi-Week Regime-Aware BB Squeeze Breakout（3 次嘗試，Att3 SUCCESS k=1.00 嚴格）★ 突破策略當前最佳
+
+**實驗目的：** 探索 **repo 第 3 次 lesson #22 試驗、首次商品/礦業單股驗證**，將 TSLA-015 / NVDA-012 已驗證的「buffered multi-week SMA trend regime gate」跨資產移植至 FCX-004 BB Squeeze Breakout 之上，目標解決 FCX-004 嚴重 A/B 失衡（cum gap 89%、訊號比 3.83:1）。
+
+**假設：** FCX 為銅礦龍頭股（~3% vol），位於 lesson #22 已驗證的 vol 範圍內（TSLA 3.72% / NVDA 2.5-3%）。Buffered SMA(20) ≥ k × SMA(60) regime gate 可過濾 bear regime 假突破，保留 transition winners。重點測試 k 值跨資產移植性。
+
+**結果：** 三次迭代，**Att3 SUCCESS** min(A,B) **0.55**（+34% vs FCX-004 0.41）。**重大跨資產發現**：FCX 反轉 lesson #22 的「k<1 緩衝」原則——k=1.00 嚴格優於 k=0.99/0.97 buffered。
+
+**迭代明細：**
+
+| 迭代 | k 值 | Part A (訊號 WR Sharpe cum) | Part B (訊號 WR Sharpe cum) | min(A,B) | 結論 |
+|------|------|----------------------------|------------------------------|----------|------|
+| Att1 | 0.99（TSLA 移植）| 18 / 66.7% / **0.44** / +63.30% | 5 / 80% / **0.82** / +26.34% | **0.44** | 部分成功（+7%）|
+| Att2 | 0.97（NVDA 移植）| 19 / 68.4% / 0.48 / +76.36% | 6 / 66.7% / 0.41 / +17.31%（同 baseline）| **0.41** | 失敗（k 過寬）|
+| Att3 ★ | 1.00（嚴格無緩衝）| 17 / 70.6% / **0.55** / +75.86% | 4 / 75% / **0.64** / +16.98% | **0.55** | **SUCCESS（+34%）**|
+
+**進場條件（Att3 ★ 最終）：**
+
+1. 過去 5 日內 BB Width 曾低於 60 日 30th 百分位（近期波動收縮）
+2. 收盤價 > Upper BB(20, 2.0)（突破上軌）
+3. 收盤價 > SMA(50)（短期趨勢向上）
+4. **SMA(20) ≥ 1.00 × SMA(60)（嚴格 multi-week trend regime gate）**
+5. 冷卻期 10 個交易日
+
+**出場參數：** TP +8% / SL -7% / 持倉 20 天（同 FCX-004 Att2，已驗證為 FCX 突破甜蜜點）
+
+**成交模型：** 隔日開盤市價進場，限價 TP，stop-market GTC SL，0.15% 滑價（高 vol 個股），悲觀認定（同根 K 線 stop+target 皆觸發 → 停損優先）
+
+**核心跨資產發現（lesson #22 跨資產精煉）：**
+
+trade-level signal-day SMA20/SMA60 ratio 分析揭示三資產的 transition zone 分布結構性差異：
+
+| 資產 | 日波動 | Transition winners 集中區間 | 甜蜜點 k | 失敗模式 |
+|------|--------|------------------------------|----------|----------|
+| TSLA | 3.72% | ratio 0.99-1.00 | **0.99** | k=1.00 誤殺 winners + cooldown chain shift |
+| NVDA | 2.5-3% | ratio 0.97-1.00 | **0.97** | k=0.99 誤殺 0.97-0.99 區間 winners |
+| **FCX** | **~3%** | **ratio 0.93-0.97** + bull-regime 主導 | **1.00 嚴格** | k=0.99 仍過寬，0.97-1.00 區間僅有 SLs |
+
+**關鍵差異**：FCX winners 集中於 ratio 0.93-0.97 + bull-regime（>1.0），**0.97-1.00 區間結構性無 winners**（僅 1 筆 ratio 1.013 略高於 1.00 自然保留）。因此 k=1.00 嚴格僅濾除該區間的 SLs（Part B 2025-08-26 ratio 0.972）而無 winner 代價。反觀 TSLA/NVDA 該區間有大量 winners，需 buffered k<1。
+
+**Att1 vs Att3 對比：**
+- Att1 k=0.99：Part B 大幅改善（0.41→0.82）但 Part A 退化（0.51→0.44）
+- Att3 k=1.00：Part A 改善（0.51→0.55）+ Part B 改善（0.41→0.64），雙向改善
+
+**A/B 平衡指標（Att3 ★ 最終）：**
+- Part A 17 訊號（3.4/yr）vs Part B 4 訊號（2.0/yr），訊號比 1.7:1（gap 41.2% < 50% ✓，從 baseline 89.6% 大幅改善）
+- Part A WR 70.6% vs Part B 75%（接近一致）
+- Part A annualized cum 15.17%/yr vs Part B 8.49%/yr（gap 44.0%，從 baseline 59.3% 改善但仍超 30% 目標）
+- A/B cum gap 為 FCX 結構性邊界——2020-2021 銅商品超級週期使 Part A 結構性高報酬
+
+**跨資產貢獻：**
+
+- **Repo 第 3 次 lesson #22 buffered multi-week SMA trend regime gate 試驗**（前 2 次：TSLA-015 高 beta 個股、NVDA-012 AI 牛市個股），**首次商品/礦業單股驗證**
+- **跨資產反向發現**：FCX 上 k=1.00 嚴格優於 k<1 buffered，反轉 lesson #22 的「k<1 緩衝」原則
+- **lesson #22 精煉新規則**：k 值取決於資產 winners 在 transition zone (0.93-1.00) 的分布密度——TSLA/NVDA winners 密集於 0.97-1.00 需 buffered k<1，FCX winners 集中 0.93-0.97 + bull-regime 主導使 k=1.00 嚴格成為甜蜜點
+- **FCX 第 13 種策略類型 + 第 1 次 BB Squeeze 框架升級**：FCX-013 Att3 為 FCX BB Squeeze 框架的新最佳，與 FCX-001 MR 框架並列雙最優結構
+
+**結論：FCX-013 Att3（k=1.00 嚴格）為 FCX 突破策略全域最佳，min(A,B) 0.55 vs FCX-004 的 0.41（+34%），同時大幅改善 A/B 平衡（訊號比 3.83:1 → 1.7:1）。**

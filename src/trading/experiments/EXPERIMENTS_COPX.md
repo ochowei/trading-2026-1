@@ -1,14 +1,15 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-18
+  last_validated: 2026-04-23
   gradient_validated: 2026-03-30
   data_through: 2025-12-31
+  note: COPX-010 added 2026-04-23 (Post-Capitulation Vol-Transition MR, **repo first 2DD/1DD entry-time filter trial on commodity ETF**, cross-asset port from CIBR-012 Att3). Three iterations all failed vs COPX-007 min 0.45. **Trade-level analysis (n=21 Part A trades) reveals COPX winners and losers cannot be reliably distinguished by 2DD or 1DD direction**: losers Pullback -10~-13%/2dRet +0.2~-7.5%/1dRet -2.1~-5.3% overlap with winners' broader ranges. Att1 (2DD cap >= -5.5% CIBR direction) Part A WR 76.2%->61.1% Sharpe 0.08 — cap removed deep-2DD winners (COPX winners 2dRet typically deeper than losers, OPPOSITE to CIBR pattern). Att2 (2DD floor <= -3% EEM/INDA direction) Part A unchanged (most signals naturally have deep 2DD) but Part B WR 80%->66.7% Sharpe 0.21 — filtered 5 shallow-2DD winners (2024-01-22, 2024-08-07, 2024-12-17, 2025-03-03, 2025-11-20). Att3 (weak-capitulation filter: skip if 1DD>-3% AND ClosePos>0.30, best of 3) precisely targeted 2 weak-capitulation losers (2019-05-06 1DD-2.12%/CP0.97, 2025-03-31 1DD-2.35%/CP0.81); Part A 0.38 / **Part B 0.57 unchanged** (filter+cooldown shift exchange 1W+1L for 1W+1L) / min **0.38**. **A/B balance achieved (cum diff 28.6%<30%, signal ratio 1.9:1<50%) but Part A Sharpe degraded by cooldown chain shift (lesson #19) introducing 2019-05-13 new SL (4-month trade war continuation)**. **Cross-asset finding**: REJECT CIBR-012 cross-asset hypothesis on COPX 2.25% vol commodity ETF — CIBR 1.53% vol losers cluster deep 2DD (cap effective), COPX winners span deep+shallow 2DD (cap/floor both fail). Extends lesson #20b failure family to "single-day momentum filter" category on commodity ETFs — paralleling TQQQ-017 (ClosePos/2DD/Prev RSI failure on leveraged index). COPX-007 confirmed structural Sharpe ceiling for 2.25% vol commodity ETFs; any entry-time confirmation filter creates A/B regime asymmetry or gets neutralized by cooldown shift. COPX's 9th failed strategy type (after pullback+WR baseline, BB Squeeze, pairs trading, RSI(2), RS momentum, Donchian breakout, RSI hook divergence). COPX-007 remains global optimum (10 experiments, 45+ attempts).
 -->
 ## AI Agent 快速索引
 
 **當前最佳：** COPX-007（COPX-003 框架 + ATR(5)/ATR(20) > 1.05 波動率自適應過濾，Part A Sharpe 0.45，Part B Sharpe 0.57，min(A,B) 0.45，+28.6% vs COPX-003）
 **前任最佳：** COPX-003（20日回檔 10-20% + WR(10) ≤ -80 + SL -4.5%，Part A Sharpe 0.39，Part B Sharpe 0.35）
 **滾動窗口分析摘要：** COPX-001 ✓✓ 雙漸變（ΔWR max 9.2pp，10/12 正報酬窗口）
-**最新實驗：** COPX-009（RSI(14) bullish hook divergence 跨資產泛化測試，三次迭代全部失敗）
+**最新實驗：** COPX-010（Post-Capitulation Vol-Transition MR 跨資產泛化測試，三次迭代全部失敗）
 
 **已證明無效（禁止重複嘗試）：**
 - 回檔 ≥ 8% 搭配 WR-80（Part A WR 59.5% = 盈虧平衡線，Sharpe 0.00，累計 -2.99%）
@@ -32,6 +33,11 @@
 - RSI(14) bullish hook divergence + ATR + COPX-007 框架（COPX-009 Att1：lookback 5 / delta 3 / max_min 35，Part A Sharpe -0.50/Part B 0.00，min -0.50。hook 過濾反移除 Part A 好訊號，WR 76.2%→33.3%）
 - RSI(14) bullish hook divergence + ATR + lookback 延長（COPX-009 Att2：lookback 10 / delta 3 / max_min 35，Part A 0.00/Part B 0.00 WR 100%，min 0.00。延長 lookback 略改善但仍失敗）
 - RSI(14) bullish hook divergence 純 pullback+WR（COPX-009 Att3：無 ATR + lookback 10 / delta 3 / max_min 35，Part A Sharpe 0.15/Part B 0.57，min 0.15。移除 ATR 恢復部分訊號但 Part A WR 僅 64.3%，遠低於 COPX-007 的 76.2%）
+- **Post-Capitulation Vol-Transition MR（COPX-010，CIBR-012 跨資產泛化測試，3 次嘗試全部失敗）**：
+  - Att1（2DD cap >= -5.5%，CIBR-012 方向）：Part A 18 訊號 WR 61.1% Sharpe **0.08** cum +4.69% / Part B 10 訊號 WR 70% Sharpe 0.28 cum +10.33%，min(A,B) 0.08。**確認 COPX winners 2dRet 整體偏深於 losers**（與 CIBR 結構相反），cap 方向系統性移除贏家
+  - Att2（2DD floor <= -3.0%，EEM/INDA 方向）：Part A 21 訊號 Sharpe 0.45（一筆 cooldown 偏移仍 SL）/ Part B 6 訊號 WR 66.7% Sharpe **0.21** cum +4.35%，min(A,B) 0.21。COPX 2024-2025 牛市淺 2DD 反彈訊號為 Part B 主要贏家，floor 方向系統性殺死它們
+  - Att3（弱 capitulation 雙條件過濾：跳過 1DD>-3% AND CP>0.30，best of 3）：Part A 19 訊號 WR 73.7% Sharpe **0.38** cum +27.64% / Part B 10 訊號 WR 80% Sharpe **0.57**（**完全持平**）cum +19.74%，min(A,B) **0.38**。**A/B 平衡達標**（cum 差 28.6%<30%、訊號比 1.9:1<50%）但 Part A 退化由 cooldown shift 引入 2019-05-13 新 SL 抵消
+  - **核心失敗**：(1) COPX winners/losers 的 2DD/1DD 分佈大幅重疊，無單一維度具區分力；(2) cooldown chain shift（lesson #19）即便精準過濾 2 個 weak-capitulation losers 仍引入新 SL；(3) **拒絕 CIBR-012 跨資產假設於 COPX**：CIBR 1.53% vol losers 集中深 2DD（cap 有效），COPX 2.25% vol winners 跨深淺 2DD 廣泛分佈（cap/floor 雙向均失效）。延伸 lesson #20b 失敗家族至「single-day momentum filter」類別於商品 ETF，平行於 TQQQ-017 槓桿指數失敗。**COPX-007 確認為 2.25% vol 商品 ETF 結構性 Sharpe 上限**
 
 **已掃描的參數空間：**
 - 均值回歸進場：回檔 8~10% + 上限 16~20% + WR(10) ≤ -80~-85 + RSI(2) < 10~15 + 2日跌幅 3~4% + ClosePos ≥ 40% + 60日回撤 15% + RSI(10) < 30 + SMA(50) 乖離 -6%
@@ -66,7 +72,8 @@
 - **RS 動量在銅礦 ETF 完全無效**：COPX-SPY 相對強度（10d/20d 回看、4%/5% 門檻）不具預測力，與 FCX-006（商品生產者缺乏持續性超額表現）和 SIVR-010（RS 動量失敗）一致
 - **Donchian 突破可行但劣於均值回歸**：COPX-008 Att3 Part A/B Sharpe 0.17/0.16（A/B gap 0.01 極佳平衡），但 min 0.16 vs COPX-007 的 0.45（-64%）。WR 64% 搭配不對稱 TP/SL（+3.5%/-4.5%）= 低期望值
 - **RSI(14) bullish hook divergence 不適用 COPX 20日回檔框架（COPX-009 驗證）**：SIVR-015 成功於 10日回檔 7-15% + WR(10) + divergence（min 0.48），COPX-009 三次迭代（lookback 5/10，有/無 ATR）全部失敗，最佳 min 0.15。**根因**：COPX 20日回檔框架下延續性下跌持續 15-30 日，RSI(14) 在此窗口內常多次 hook up-down，5-10 日 hook lookback 捕捉的是局部雜訊。Att1 證實 hook 過濾反移除 Part A 好訊號（21→6 訊號，WR 76.2%→33.3%）。**擴展跨資產教訓 §20b 邊界**：bullish hook divergence 有效性需同時符合（a）中高波動 2-3%、（b）pullback+WR 框架、（c）**回檔回看窗口 ≤10 日** 三個條件
-- COPX 均值回歸、波動率自適應、突破（BB Squeeze + Donchian）、配對交易、動量回檔、RSI(2)、RS 動量、**RSI bullish hook divergence** 均已驗證，**COPX-007 已確認為全域最優**（9 次實驗、42+ 次嘗試，含均值回歸、波動率自適應、突破、配對交易、動量回檔、RS 動量、bullish divergence 八大策略類型）
+- COPX 均值回歸、波動率自適應、突破（BB Squeeze + Donchian）、配對交易、動量回檔、RSI(2)、RS 動量、**RSI bullish hook divergence**、**Post-Capitulation Vol-Transition MR（2DD cap / 2DD floor / weak-capitulation 雙條件）** 均已驗證，**COPX-007 已確認為全域最優**（10 次實驗、45+ 次嘗試，含均值回歸、波動率自適應、突破、配對交易、動量回檔、RS 動量、bullish divergence、vol-transition entry 九大策略類型）
+- **COPX-010 驗證 single-day/2-day momentum filter 在商品 ETF 失效**：trade-level 分析（Part A n=21）顯示 winners/losers 在 2DD/1DD/ClosePos 三維度分佈大幅重疊，無單一維度具 cross-regime 區分力。即便精準過濾兩個「最弱 capitulation」losers（高 ClosePos + 淺 1DD），cooldown chain shift（lesson #19）會引入新 SL 抵消增益。**COPX-007 為 2.25% vol 商品 ETF 結構性 Sharpe 上限**
 <!-- AI_CONTEXT_END -->
 
 # COPX 實驗總覽 (COPX Experiments Overview)
@@ -92,6 +99,7 @@
 | COPX-007 | `copx_007_vol_adaptive` | 波動率自適應均值回歸（ATR 過濾）| ✅ 當前最佳 |
 | COPX-008 | `copx_008_rs_momentum` | RS 動量回調 / Donchian 突破（3 次嘗試均劣於 COPX-007）| ❌ 失敗 |
 | COPX-009 | `copx_009_rsi_divergence_mr` | RSI(14) bullish hook divergence（SIVR-015 跨資產泛化測試，3 次嘗試均失敗）| ❌ 失敗 |
+| COPX-010 | `copx_010_vol_transition_mr` | Post-Capitulation Vol-Transition MR（CIBR-012 跨資產泛化測試，3 次嘗試均失敗）| ❌ 失敗 |
 
 ---
 

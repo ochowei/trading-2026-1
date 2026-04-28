@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-01T05:21:39.909800"
+    "execution_time": "2026-04-24T12:51:47.811949"
   },
   "part_a": {
     "ticker": "USO",
@@ -629,7 +629,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-31"
+      "end": "2026-04-23"
     }
   }
 }

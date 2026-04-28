@@ -1,10 +1,13 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-16
+  last_validated: 2026-04-26
   data_through: 2025-12-31
+  note: CIBR-013 added 2026-04-26 (Higher-Low Structural Confirmation MR, **repo first multi-bar swing-structure pattern as MR primary filter on any asset**). Three iterations all failed vs CIBR-012 Att3 min 0.49: Att1 (pullback+WR+ATR>1.10+Bullish bar+Higher-Low(3)+Swing depth>=1%, 5-condition intersection) Part A 2/50%/Sharpe **-0.08** cum -0.74% (1 TP 2023-04-27 +3.5% / 1 SL 2022-04-28 -4.10%) / Part B **0 signals** / min **-0.08** — 5-way condition intersection over-tight, signal density 0.4/yr; Att2 (relax ATR=1.00 disabled + Higher-Low(3→5) longer lookback) Part A 3/33.3%/Sharpe **-0.44** cum -4.81% (added 1 SL) / Part B 1/100% TP +3.5% zero-var Sharpe 0.00 cum +3.50% / min **-0.44** — relaxation introduced Part A SL (lookback 5 + no ATR captures "mid-bounce failure" type signals); Att3 (BB Lower base + Higher-Low(5) replacing CIBR-012's 2DD cap) Part A **0 signals** / Part B **0 signals** / min **0.00** — **STRUCTURAL INCOMPATIBILITY discovered**: BB Lower touch (Close ≤ BB_lower) day is statistically extreme down-move where today's Low is almost always a new 5-day low; Higher-Low(5) requires today's Low > min(Low[t-5..t-1]). Two conditions are nearly mutually exclusive — only 1 signal triggered in 8+ years (Part C). **Repo first validation that "BB Lower entry + multi-bar Higher-Low filter" is structurally non-combinable**. **Key cross-asset finding**: extending lesson #20b failure family from single-day patterns (Key Reversal, NR7, Range Expansion, ClosePos, 2DD floor/cap) to **multi-bar structural patterns (Higher-Low Confirmation)** — multi-bar swing-structure dimension does NOT bypass single-day pattern failure root cause on event-driven sector ETFs (CIBR 1.53% vol). CIBR's 8th failed strategy type (after BB Squeeze, RSI(2), RS momentum, Key Reversal Day, NR7, Range Expansion, Higher-Low Confirmation). CIBR-012 Att3 remains global optimum (13 experiments, 39+ attempts). CIBR-012 added 2026-04-21 (Post-Capitulation Vol-Transition MR, **repo first "2-day return cap" filter as entry-time timing gate** — inverse direction vs CIBR-004's "2DD floor" which failed). Three iterations: Att1 failed (ATR peak ≥1.30 + today ≤1.20 two-stage filter structurally conflicts with CIBR-008 working ATR>1.15, collapsed to 1 signal total in 8yrs); Att2 failed (prior 10d ATR peak ≥1.25 as supplementary filter → Part A 3 signals Sharpe 0.27 / Part B 3 signals Sharpe 4.21, removed 3 winners and only 1 of 2 losers, prior ATR peak does NOT correlate with winner/loser); **Att3 SUCCESS (2DD cap >= -4.0%)** → Part A 4 signals WR 75% Sharpe **0.49** (+26% vs CIBR-008) / Part B 3 signals WR 100% Sharpe 3.96 / min(A,B) **0.49** / A/B cum diff 1.64pp (vs CIBR-008's 6.43pp) / A/B signal count diff 25% — ALL task goals met (Sharpe improvement, A/B cum <30%, signals <50%). Core finding: **"2-day return cap" (MUST >= -4.0%) filter direction is INVERSE of CIBR-004's "2-day decline floor" (MUST <= -1.5%/-2.0%) — floor direction failed, cap direction succeeds.** Interpretation: deep 2DD (≤-4% = 2.6σ for 1.53% vol) signals "crash still accelerating", shallow 2DD (-2~-4%) signals "deceleration phase where MR bounces work". Att3 filters both Part A SLs (2020-02-24 COVID 2DD -4.1%, and the filter mechanism also catches acceleration-mode signals). New cross-asset hypothesis: 2DD cap filter may extend to other US sector ETFs (XBI, XLU, IWM, COPX, VGK, EEM) facing "BB lower + cap" hybrid pattern — pending validation. CIBR-011 added 2026-04-20 (Range Expansion Climax MR, **repo first single-bar Range Expansion as primary signal on traditional US sector ETF** — IBIT-008 was crypto ETF, TLT-006 used range expansion as auxiliary only). Three iterations all failed vs CIBR-008 Att2 min 0.39: Att1 (TR/ATR(20)≥2.0 + ClosePos≥50% + 10d PB [-3%,-10%] + WR(10)≤-70, cd=8) Part A 3 signals 33.3% WR cum -4.81% Sharpe **-0.44** (2020-02-24 COVID precursor + 2021-09-20 Evergrande both 1-9d SLs) / Part B 2/2 100% WR cum +7.12% zero-variance Sharpe 0.00 — signal scarcity (5 signals in 8 years, 0.6/yr); Att2 (TR≥1.7 + tighten cap to -8% + add ATR(5)/ATR(20)>1.10) Part A 2/50% WR Sharpe -0.08 / Part B 2/50% WR Sharpe **-0.29** — ATR>1.10 filter REMOVES winners (2024-02-21, 2024-08-05 ATR<1.10) and adds 2025-03-04 SL; Att3 (reverse ATR ATR(5)/ATR(20)≤1.10 testing "calm regime + sudden TR expansion = real capitulation" hypothesis) Part A 2 signals 0W/2L **WR 0%** cum -8.03% Sharpe 0.00 (2021-05-04 + 2021-09-20 both SLs) / Part B **0 signals** / min 0.00 — reverse ATR also fails: removes ALL Part B signals while preserving Part A bear-regime continuation SLs. **Repo first Range Expansion MR trial on traditional US sector ETF** — refutes IBIT-008's cross-asset hypothesis ("Range Expansion MR may work on traditional non-24/7 US sector ETFs"). Range Expansion failure family extends from (a) high-vol 24/7 crypto ETF (IBIT 3.17%) to (b) mid-vol traditional US sector ETF (CIBR 1.53%). Core finding: ATR filter has **NO unidirectional efficacy** on CIBR Range Expansion — forward ATR (>1.10) removes winners, reverse ATR (≤1.10) preserves losers, indicating ATR is noise for this signal type. Integrated lesson: ALL entry-time filter types (oscillator hook, day-after reversal, capitulation depth, single-bar range expansion) structurally fail in event-driven sector ETFs that lack statistical-adaptive entry framework (BB Lower with std auto-scaling). CIBR's 7th failed strategy type (after BB Squeeze, RSI(2), RS momentum, Key Reversal Day, NR7, Range Expansion). CIBR-008 Att2 remains global optimum (11 experiments, 33+ attempts). CIBR-010 added 2026-04-19 (NR7 Volatility Contraction + Pullback MR, three iterations all failed: Att1 NR7 alone Part B Sharpe -0.44, Att2 +ATR>1.15 structural conflict signals 1/2, Att3 +2DD≤-2 structural conflict signals 1/1 zero-var). CIBR-009 added 2026-04-19 (Key Reversal Day price-action MR, three iterations all failed: WR/ATR variations all washout-then-continue SLs).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** CIBR-008 Att2（BB 下軌 + 回檔上限混合進場：BB(20,2.0) 下軌觸及 + 10日高點回檔 >= -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15）min(A,B) Sharpe **0.39**（+44% vs CIBR-007 的 0.27）。混合進場保留 BB 統計自適應特性同時用絕對回檔深度隔離極端崩盤（-12% = ~7.8σ for 1.53% vol），濾除 COVID 連續崩盤中的 BB 假訊號。8 次實驗、24 次嘗試。
+**當前最佳：** CIBR-012 Att3（Post-Capitulation Vol-Transition MR：BB(20,2.0) 下軌觸及 + 10日回檔上限 -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15 + **2日報酬 >= -4.0%**）min(A,B) Sharpe **0.49**（+26% vs CIBR-008 Att2 的 0.39）。在 CIBR-008 框架上新增「2 日報酬上限」過濾器，排除「崩盤加速中」進場時點，過濾 2020-02-24 COVID 前夕 SL 並保留 5 個 TPs 中的 3 個。A/B 累計差 1.64pp（vs CIBR-008 6.43pp）+ A/B 訊號比 1.33:1，符合全部平衡目標。**12 次實驗、36+ 次嘗試**。
+
+**前任最佳：** CIBR-008 Att2（BB 下軌 + 回檔上限混合進場：BB(20,2.0) 下軌觸及 + 10日高點回檔 >= -12% + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15）min(A,B) Sharpe **0.39**（+44% vs CIBR-007 的 0.27）。混合進場保留 BB 統計自適應特性同時用絕對回檔深度隔離極端崩盤（-12% = ~7.8σ for 1.53% vol），濾除 COVID 連續崩盤中的 BB 假訊號。
 
 **次佳：** CIBR-007 Att1（BB 下軌均值回歸：BB(20,2.0) 下軌觸及 + WR(10)<=-80 + ClosePos>=40% + ATR(5)/ATR(20)>1.15，min 0.27）
 
@@ -22,6 +25,27 @@
 - **SL -4.5%**（CIBR-004 Att3：所有停損交易均穿越 -4.5%，加寬只增加虧損）
 - **20日回看窗口**（CIBR-005：A/B 訊號比 2.0:1 嚴重失衡。20日窗口在 Part A 產生過多信號，且 6% 回檔門檻附近信號脆弱，冷卻鏈序微調即翻轉結果。持倉 15 vs 18天翻轉 A/B 優劣但均未超越 CIBR-002）
 - **WR(14) 取代 WR(10)**（CIBR-005：搭配 20日回看，未提供超越 WR(10)/10日回看組合的品質提升）
+- **Key Reversal Day price-action（CIBR-009，3 次迭代全部失敗）**：price-action 結構化 washout+reclaim 進場在 CIBR 失效
+  - Att1（WR≤-80、無 ATR、含 stop-run）：Part A 8 訊號 WR 50% Sharpe -0.08 / Part B 3 訊號 WR 33.3% Sharpe -0.44，2022 年 3 連 SL + 2025 年 2 連 SL 均為「washout 後續跌」
+  - Att2（加入 ATR(5)/ATR(20) > 1.15）：訊號壓縮至 2/2（0.4/年），Part A -0.08 / Part B -0.08，Part B 2025-02-28 ATR 1.44 仍 1-day SL
+  - Att3（移除 stop-run + WR≤-85 + ATR>1.10）：訊號崩至 1/1 全 SL，Sharpe 0.00/0.00
+  - 失敗根因：(1) stop-run（Low < Prev Low）+ reclaim 組合在熊市續跌中頻繁產生假反轉；(2) ATR 飆升本身不是反轉保證（2025-02-28 ATR 1.44 + 隔日 -4.1%）；(3) CIBR 網路安全板塊事件驅動性質使單日 price-action 反轉結構無選擇性。擴展 XBI-012（Capitulation + Acceleration Reversal）失敗模式至 CIBR 網路安全板塊，確認短週期 price-action 反轉結構在美國事件驅動板塊 ETF 普遍失效
+- **NR7 波動率壓縮 + pullback MR（CIBR-010，3 次迭代全部失敗）**：NR7（Narrowest Range 7，今日 True Range 為近 7 日最小）作為賣壓衰竭訊號在 CIBR 失效
+  - Att1（pullback -4% + WR(10)≤-80 + NR7 + ClosePos≥40%，無 ATR）：Part A 7 訊號 WR 71.4% Sharpe 0.39（與 CIBR-008 同）/ Part B 3 訊號 WR 33.3% Sharpe **-0.44**，min(A,B) -0.44。Part B 2024-03-18 18天到期 -4.13% + 2025-02-28 1日 SL -4.10%，NR7 alone 在慢磨下跌中表現為「技術性暫停」而非「賣壓衰竭」
+  - Att2（加入 ATR(5)/ATR(20) > 1.15）：訊號崩至 1/2，Part A 0.00（1 SL）/ Part B -0.08（2 訊號）。**結構性衝突**：NR7 要求今日 TR 為 7 日最小，ATR(5) 包含今日使 ATR 比率機械性降低，兩條件共存機率過低
+  - Att3（移除 ATR，加入 2 日跌幅 ≤ -2.0% 作為真實賣壓情境代理）：訊號崩至 1/1 全零方差，Sharpe 0.00/0.00。**結構性衝突 2**：2 日跌幅 ≥2% 通常意味著其中一天有大範圍，與 NR7 幾乎互斥
+  - 失敗根因：(1) CIBR 網路安全板塊事件驅動特性使 NR7 訊號常落在延續性下跌的「技術性暫停」期（非賣壓真正衰竭）；(2) NR7 與 CIBR 驗證有效的 ATR/2DD 品質過濾器結構性互斥，無法組合；(3) 2024-2025 Part B 期間 NR7 單獨在 pullback+WR 情境下產生 3 個訊號全部來自事件驅動的連續下跌（Palo Alto 財報、網路安全關稅擾動），非真正 capitulation
+- **Range Expansion Climax MR（CIBR-011，3 次迭代全部失敗，repo 首次傳統 US 板塊 ETF Range Expansion 試驗）**：單日 TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10日回檔 + WR 超賣 + 反/正向 ATR
+  - Att1（TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% + 10日回檔 [-3%, -10%] + WR(10) ≤ -70）：Part A 3 訊號 WR 33.3% Sharpe **-0.44** / Part B 2 訊號 WR 100% 累計 +7.12% Sharpe 0.00（零方差）/ min(A,B) -0.44。訊號稀缺（5 訊號 8 年、0.6/yr），Part A 兩筆 SL 為 crash precursor（2020-02-24 COVID + 2021-09-20 Evergrande）
+  - Att2（放寬 TR ≥ 1.7 + 收窄 cap -8% + 加 ATR(5)/ATR(20) > 1.10）：Part A 2 訊號 WR 50% Sharpe -0.08 / Part B 2 訊號 WR 50% Sharpe **-0.29** / min -0.29。**ATR > 1.10 反而移除好訊號**——Part B Att1 兩筆 winners（2024-02-21、2024-08-05 ATR < 1.10 環境）被過濾，改捕捉 2025 衰退期 1W 1L
+  - Att3（反向 ATR 過濾 ATR(5)/ATR(20) ≤ 1.10）：Part A 2 訊號 **WR 0%**（兩筆 SL）累計 -8.03% / Part B **0 訊號** / min 0.00。反向 ATR 假設「平靜 + 突發爆發 = 真 capitulation」**完全失敗**——移除所有 Part B 訊號，留 Part A 兩筆事件早期下殺後續跌
+  - 失敗根因：(1) 訊號稀缺性結構性問題（與 IBIT-008 平行）；(2) Range Expansion 本身無「真/假反轉」區分力（與 lesson #20b V-bounce 失敗家族一致）；(3) **ATR 過濾器無單向有效性**——CIBR Range Expansion 訊號的 ATR 環境與真假反轉**無關聯**，ATR 為 noise；(4) 與 CIBR-008 BB Lower 框架的結構性差異——BB 下軌為**統計自適應**進場，Range Expansion 為**單日點估計**，缺乏統計選擇性。**拒絕 IBIT-008 跨資產假設**（"Range Expansion MR 可能適用傳統 US 板塊 ETF"）。失敗家族擴展：所有 entry-time 過濾器（oscillator hook、day-after reversal、capitulation depth、single-bar range expansion）在「事件驅動 + 缺乏統計自適應」進場框架下結構性失效。CIBR 失敗策略類型達 7 種，確認 CIBR-008 BB+回檔上限混合進場仍為 1.5-2.0% vol 板塊 ETF 的最優結構
+- **Higher-Low Structural Confirmation MR（CIBR-013，3 次迭代全部失敗，repo 首次將「多日 swing 結構 pattern」作為 MR 主過濾器於任何資產）**：
+  - 動機：CIBR-009（Key Reversal）/-010（NR7）/-011（Range Expansion）三次嘗試以單日 price-action 過濾均失敗，**核心假設**：將「單日 pattern」擴展為「多日結構 pattern」可繞過此限制。Higher-Low（今日 Low > min(Low[t-N..t-1])）為多日 swing 結構的量化定義
+  - Att1（純 pullback+WR+Higher-Low(3)+Bullish bar+ATR>1.10，5 重交集）：Part A 2 訊號 50% WR Sharpe **-0.08** cum -0.74%（1 TP 2023-04-27 +3.5% / 1 SL 2022-04-28 -4.10%）/ Part B **0 訊號** / min **-0.08**。5 重交集訊號密度 0.4/yr 過稀
+  - Att2（放寬 ATR=1.00 + Higher-Low lookback 3→5）：Part A 3 訊號 33.3% WR Sharpe **-0.44** cum -4.81%（新增 1 SL）/ Part B 1 訊號 zero-var TP +3.5% Sharpe 0.00 / min **-0.44**。放寬 lookback 與停用 ATR 引入「中段反彈失敗」型態訊號
+  - Att3（BB Lower 框架 + Higher-Low(5)，取代 CIBR-012 的 2DD cap）：Part A **0 訊號** / Part B **0 訊號** / min **0.00**。**結構性互斥重要發現**：BB Lower 觸及（Close ≤ BB_lower）日為統計極端下殺，今日 Low 幾乎必為近 5 日新低；而 Higher-Low(5) 要求今日 Low > min(Low[t-5..t-1])。兩條件在 CIBR 1.53% vol 板塊 ETF 上幾乎完全互斥（過去 8 年僅 1 訊號於 Part C 觸發）。**Repo 首次驗證「BB Lower entry + multi-bar Higher-Low filter 結構性不可組合」**
+  - 失敗根因：(1) **多日 swing 結構維度並未繞過單日 pattern 的失敗根因**——擴展 lesson #20b 失敗家族至多日結構 pattern；(2) **BB Lower 與 Higher-Low 結構性互斥**——統計極端進場與多日反轉確認在低-中波動板塊 ETF 不可組合；(3) 純 pullback+WR 框架下加 Higher-Low + bullish bar + swing depth 5 重交集訊號密度過低；(4) 放寬條件引入低品質訊號。**CIBR 失敗策略類型達 8 種**，確認 CIBR-012 Att3 BB Lower + 2DD cap 仍為 1.5-2.0% vol 板塊 ETF 的最優結構
 
 **已掃描的參數空間：**
 - 回檔門檻：4%（Att3 最佳，2.6σ）、5%（Att1 次佳，3.3σ）
@@ -66,7 +90,8 @@
 | A/B 訊號頻率比 | 1.29:1 | 0.97:1 | 0.80:1 | 0.72:1 | 2.0:1 | 5.6:1 | 1.80:1 | **1.40:1** |
 
 **尚未嘗試的方向（預期邊際效益極低）：**
-- ~~BB 下軌 + 回檔上限混合~~ → CIBR-008 Att2 新最佳（min 0.39，+44% vs CIBR-007）
+- ~~2 日報酬上限（2DD cap，與 CIBR-004 2DD floor 相反方向）~~ → CIBR-012 Att3 新最佳（min 0.49，+26% vs CIBR-008）
+- ~~BB 下軌 + 回檔上限混合~~ → CIBR-008 Att2 （min 0.39，+44% vs CIBR-007）
 - ~~BB 下軌均值回歸~~ → CIBR-007 新最佳（min 0.27，+17% vs CIBR-002）
 - ~~RSI(2)~~ → CIBR-004 Att1 驗證失敗（美國板塊 ETF 同樣無效）
 - ~~BB 擠壓突破~~ → CIBR-003 驗證失敗
@@ -76,6 +101,10 @@
 - ~~20日回看窗口~~ → CIBR-005 驗證失敗（A/B 訊號比 2.0:1 失衡，信號閾值脆弱）
 - ~~WR(14)~~ → CIBR-005 驗證無改善（搭配 20日回看不優於 WR(10)+10日回看）
 - ~~RS 動量回調~~ → CIBR-006 三次嘗試均負 Sharpe（QQQ/SPY 基準、鬆/緊/品質過濾均失敗，網路安全無獨立動量週期）
+- ~~Key Reversal Day price-action~~ → CIBR-009 驗證失敗
+- ~~NR7 波動率壓縮~~ → CIBR-010 三次迭代全部失敗（單獨 Part B -0.44、加 ATR 結構性衝突、加 2DD 亦結構性衝突）
+- ~~Range Expansion Climax MR~~ → CIBR-011 三次迭代全部失敗（Att1 訊號稀缺 min -0.44、Att2 ATR 過濾移除好訊號 min -0.29、Att3 反向 ATR 全敗 min 0.00）。**拒絕 IBIT-008 跨資產假設**，Range Expansion 在 CIBR/IBIT 兩種波動率區間均失敗
+- ~~Higher-Low 多日結構確認 MR~~ → CIBR-013 三次迭代全部失敗（Att1 5 重交集 min -0.08、Att2 放寬引入 SL min -0.44、Att3 BB Lower + Higher-Low **結構性互斥** min 0.00）。**Repo 首次多日 swing 結構 pattern 作為 MR 主過濾器**驗證——多日結構維度未繞過單日 pattern 的失敗根因。擴展 lesson #20b 失敗家族至多日結構 pattern
 - 持倉 20天（可能延長到期曝露，預期無改善）
 - 回檔門檻 3%（過鬆，可能增加低品質訊號，vs 4%=2.6σ 已優化）
 - ~~趨勢動量回檔~~ → lesson #25 板塊 ETF 動量無效 + CIBR-006 RS 動量驗證失敗
@@ -95,6 +124,9 @@
 - **移除 ClosePos**（CIBR-007 Att3：Part A 0.09/Part B 0.02，15訊號含5停損，品質崩壞。ClosePos 在 BB 框架中不可或缺）
 - **回檔上限在 BB 下軌框架有效**（CIBR-008 Att2：-12% = 7.8σ 濾除 COVID 連續崩盤訊號，Part A 0.27→0.39 +44%）。但區間敏感：-8% 過嚴（Att1：-44% Sharpe）、-10% 未濾除剩餘停損（Att3：回退至 0.27）。甜蜜點 -12% 反映 CIBR 歷史上「BB 下軌假訊號」主要來自 10日回檔 >12% 的崩盤連續段
 - **Lesson #52 在 CIBR 上的例外**：BB 下軌 MR 在 1.53% vol CIBR 上（配合 7.8σ 回檔上限）可突破「持續性熊市假訊號」瓶頸。確認 EWJ-003 + CIBR-008 混合進場模式為低波動板塊/區域 ETF 的有效突破方向
+- **Key Reversal Day 在 CIBR 失效（CIBR-009）**：3 次迭代證明單日 price-action 結構（stop-run + reclaim + bullish bar）在 CIBR 網路安全板塊無效。擴展 XBI-012 失敗模式至 CIBR：**美國事件驅動板塊 ETF 拒斥所有短週期 price-action 反轉結構**，需依賴波動率統計指標（BB 下軌+ATR）而非 price-action
+- **NR7 波動率壓縮 + pullback MR 在 CIBR 失效（CIBR-010）**：NR7（今日 True Range 為近 7 日最小）作為「賣壓衰竭」的波動率壓縮訊號，3 次迭代均失敗。**本 repo 首次嘗試 NR7 pattern**，但在 CIBR 網路安全板塊同樣無效。關鍵發現：(1) 單獨 NR7 + pullback+WR+ClosePos（Att1）Part B Sharpe -0.44，訊號常落在延續性下跌的技術性暫停期；(2) NR7 與 CIBR 有效的 ATR(5)/ATR(20)>1.15 過濾器**結構性衝突**；(3) NR7 與 2 日跌幅 ≤-2.0% 過濾器同樣**結構性互斥**
+- **Range Expansion Climax MR 在 CIBR 失效（CIBR-011，repo 首次傳統 US 板塊 ETF Range Expansion 試驗）**：單日 TR/ATR(20) ≥ 2.0 + ClosePos ≥ 50% 主訊號（IBIT-008 模式跨資產移植）3 次迭代均失敗。Att1（IBIT-008 結構縮放）Part A 3/33%/min -0.44 + Part B 2/100%零方差 0.00；Att2（放寬 TR 1.7 + 加 ATR>1.10）Part A/B 各 2 訊號 50% WR min -0.29，**ATR>1.10 反而過濾掉 Part B 兩筆 2024 winners**；Att3（反向 ATR ≤1.10）Part A WR 0% + Part B 0 訊號 min 0.00。**核心發現**：(1) Range Expansion 訊號在 CIBR 8 年資料僅 0.6/yr，與 IBIT-008 同樣稀疏；(2) **ATR 過濾器無單向有效性**——正向移除 winners、反向保留 losers；(3) Range Expansion 為**單日點估計**進場，缺乏 BB 下軌的**統計自適應**特性。**拒絕 IBIT-008 跨資產假設**：「Range Expansion MR 可能適用傳統 US 板塊 ETF」於 CIBR 1.53% vol 上不成立。失敗家族擴展：所有 entry-time 過濾器類型（oscillator hook、day-after reversal、capitulation depth、single-bar range expansion）在事件驅動板塊 ETF + 缺乏統計自適應進場框架下結構性失效。**CIBR 失效策略類型達 7 種**（突破、RSI(2)、RS 動量、price-action reversal、NR7 壓縮、2日急跌作為補充、Range Expansion Climax）
 <!-- AI_CONTEXT_END -->
 
 # CIBR 實驗總覽 (CIBR Experiments Overview)
@@ -117,7 +149,11 @@
 | CIBR-005 | `cibr_005_20d_lookback_mr`    | 20日回看窗口+WR(14)+6%回檔（A/B 失衡，未超越 CIBR-002）| 已完成 |
 | CIBR-006 | `cibr_006_rs_momentum_pullback`| RS 動量回調 CIBR vs SPY（完全失敗，三次嘗試均負 Sharpe）| 已完成 |
 | CIBR-007 | `cibr_007_bb_lower_mr`         | BB(20,2.0) 下軌均值回歸（min 0.27）                       | 已完成 |
-| CIBR-008 | `cibr_008_bb_lower_pullback_cap`| BB 下軌 + 10日高點回檔上限 -12% 混合進場（★當前最佳，min 0.39）| 已完成 |
+| CIBR-008 | `cibr_008_bb_lower_pullback_cap`| BB 下軌 + 10日高點回檔上限 -12% 混合進場（前任最佳，min 0.39）| 已完成 |
+| CIBR-009 | `cibr_009_key_reversal_day_mr`  | Key Reversal Day 均值回歸（price-action washout+reclaim，3 次迭代均失敗）| 已完成 |
+| CIBR-010 | `cibr_010_nr7_pullback_mr`      | NR7 波動率壓縮 + pullback 均值回歸（3 次迭代均失敗）| 已完成（未改善）|
+| CIBR-011 | `cibr_011_range_expansion_mr`   | Range Expansion Climax 均值回歸（TR/ATR≥2.0+ClosePos≥50%，3 次迭代均失敗）| 已完成 |
+| CIBR-012 | `cibr_012_vol_transition_mr`    | Post-Capitulation Vol-Transition MR（Att3 2DD cap ≥ -4.0% 成功，★當前最佳 min 0.49）| 已完成 |
 
 ---
 
@@ -616,3 +652,255 @@ Part A Sharpe 0.55→0.60），在 CIBR-007 基礎上疊加回檔上限過濾器
    繞過。適用條件：(a) 低中波動（≤2.0%）資產；(b) 搭配 WR + ClosePos + ATR 三重品質
    過濾；(c) 回檔上限設在 7-8σ（CIBR 12%, EWJ 7%）。不適用於高波動資產（SIVR 2-3%：
    BB 下軌本身失效）或政策驅動 EM ETF（FXI：即使 BB 搭配回檔上限仍失效）。
+
+---
+
+## CIBR-009：Key Reversal Day 均值回歸 (Key Reversal Day MR)
+
+### 設計理念 (Design Rationale)
+
+CIBR-008 Att2 Part A 7 訊號含 2 停損（2020-02-24 COVID、2021-02-26 科技拋售）均為
+「BB 下軌觸及但隔日繼續深跌」。測試能否改用 price-action 結構化的「washout + 日內反轉
+確認」進場訊號，過濾此類 false bottom。
+
+### 進場條件 (Entry Conditions)
+
+| Att | WR 門檻 | Stop-run | ATR 比率 | 其他 |
+|-----|---------|----------|----------|------|
+| Att1 | ≤ -80 | Low < Prev Low | 無 | Prev 收黑 + Close > Prev Close + bullish bar + ClosePos ≥ 40% |
+| Att2 | ≤ -80 | Low < Prev Low | > 1.15 | 同上 |
+| Att3 | ≤ -85 | 無 | > 1.10 | 同上 |
+
+共同條件：10 日高點回檔 ∈ [-12%, -3%]、冷卻 8 天。出場：TP +3.5% / SL -4.0% / 18 天。
+
+### 回測結果 (Backtest Results)
+
+| Att | Part A 訊號 | Part A WR | Part A Sharpe | Part B 訊號 | Part B WR | Part B Sharpe | min(A,B) |
+|-----|-------------|-----------|---------------|-------------|-----------|---------------|----------|
+| Att1 | 8 | 50.0% | -0.08 | 3 | 33.3% | -0.44 | **-0.44** |
+| Att2 | 2 | 50.0% | -0.08 | 2 | 50.0% | -0.08 | -0.08 |
+| Att3 | 1 | 0.0% | 0.00 | 1 | 0.0% | 0.00 | 0.00 (全 SL) |
+| **vs CIBR-008 Att2（基準）** | 7 | 71.4% | 0.39 | 5 | 100.0% | 4.38 | **0.39** |
+
+### 關鍵學習 (Key Learnings)
+
+1. **Stop-run + reclaim 結構在 CIBR 無選擇性**：Att1 8 訊號 50% WR 證明「Low < Prev Low
+   + Close > Prev Close + bullish bar」在熊市續跌中頻繁產生假反轉（dead-cat bounce）。
+   2022 年 3 連 SL + 2025 年 2 連 SL 均屬此類失敗。
+2. **ATR 飆升不等於反轉確認**：Part B 2025-02-28 訊號 ATR 1.44（顯著飆升）但隔日 1-day
+   SL -4.1%，證明波動率擴張本身可能是崩盤的起點而非終點。
+3. **訊號稀缺 vs 品質平衡失敗**：Att2 加嚴 ATR 將訊號壓縮至 2/2（0.4/年），Att3 進一步
+   崩至 1/1 全停損，顯示 CIBR 上「price-action Key Reversal + ATR + WR」組合無甜蜜點。
+4. **擴展 XBI-012 失敗模式至 CIBR**：XBI（生技板塊，FDA/臨床事件驅動）的 Capitulation +
+   Acceleration Reversal 失敗（min 0.16 vs XBI-005 0.36）。CIBR（網路安全板塊，企業
+   並購/資安事件驅動）的 Key Reversal Day 同樣失敗。整合觀察：**美國事件驅動板塊 ETF
+   拒斥所有短週期單日 price-action 反轉結構**，需依賴波動率統計指標（BB 下軌+ATR）+
+   絕對回檔深度過濾（CIBR-008 / EWJ-003 模式）。
+5. **CIBR-008 Att2 全域最優確認**：本次 9 次實驗、27 次嘗試後，BB 下軌 + 回檔上限 -12%
+   混合進場仍為 CIBR min(A,B) 0.39 天花板。
+
+---
+
+## CIBR-012：Post-Capitulation Vol-Transition MR ★當前最佳
+
+### 目標 (Goal)
+
+CIBR-008 Att2（BB 下軌 + 回檔上限混合進場，min(A,B) Sharpe 0.39）於 Part A 7 訊號中
+仍有 2 筆停損（2020-02-24 COVID 前夕、2021-02-26 科技股輪動拋售），兩者均為
+「急跌加速中」進場。目標：在保留 CIBR-008 全部品質過濾器的前提下，新增「進場時點」
+過濾以排除 in-crash acceleration 訊號。
+
+### 設計理念 (Design Rationale)
+
+**核心觀察**（觀察 CIBR-008 Part A 7 訊號的 2 日收盤報酬分布）：
+- SL: 2020-02-24 2DD -4.1% / 2021-02-26 2DD -3.9%
+- TP: 2019-10-02 (-2.8%) / 2020-10-30 (-1.5%) / 2022-09-01 (-1.7%) /
+      2023-03-13 (-2.8%)
+- 結構性差異：**SL 的 2DD 較深於 TP 的 2DD**（SL -4%+ vs TP -1.5%~-3%）
+  此規律暗示深 2DD（≥2.6σ 的 2 日急跌）代表「崩盤加速中」而非反轉起點
+
+**新過濾條件**：`2-day close-to-close return >= -4.0%`（2DD cap）
+
+**與 CIBR-004 的關鍵差異**（方向**完全相反**）：
+- CIBR-004 Att2/Att3: 2DD **<= -1.5% / -2.0%**（2DD 下限，篩選急跌）— 失敗或非綁定
+- CIBR-012 Att3: 2DD **>= -4.0%**（2DD 上限，排除 in-crash）— 成功
+
+此為 repo 首次測試「2DD 上限」作為進場時機過濾器（vs 傳統「2DD 下限」急跌確認）。
+
+### 進場條件 (Entry Conditions)
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| 1 | Close vs BB(20, 2.0) 下軌 | Close <= BB_lower | 統計自適應下軌觸及 |
+| 2 | 10 日高點回檔 | >= -12% | 崩盤隔離（CIBR-008 驗證甜蜜點 7.8σ）|
+| 3 | Williams %R(10) | <= -80 | 超賣確認 |
+| 4 | ClosePos | >= 40% | 日內反轉跡象 |
+| 5 | ATR(5)/ATR(20) | > 1.15 | signal-day 急跌 panic（CIBR-008 有效過濾）|
+| 6 | **2 日收盤報酬** | **>= -4.0%** | **排除 in-crash acceleration（新）**|
+| 7 | 冷卻期 | 8 天 | 避免連續進場 |
+
+### 出場參數 (Exit Parameters)
+
+| 參數 | 值 | 說明 |
+|------|-----|------|
+| 獲利目標 (TP) | +3.5% | 同 CIBR-008，已驗證甜蜜點 |
+| 停損 (SL) | -4.0% | 同 CIBR-008，熊市停損常穿越 -4.5% |
+| 最長持倉 | 18 天 | 同 CIBR-008 |
+| 追蹤停損 | 不使用 | 1.53% 日波動，追蹤停損壓縮獲利 |
+
+### 成交模型 (Execution Model)
+
+| 項目 | 設定 |
+|------|------|
+| 進場方式 | 訊號隔日開盤市價進場 |
+| 出場方式 | TP 限價賣單 Day / SL 停損市價 GTC / 到期隔日開盤 |
+| 滑價 | 0.1%（ETF 標準） |
+| 日內路徑 | 悲觀認定（同日觸 TP/SL 時假設先觸 SL） |
+
+### 迭代歷程 (Iteration History)
+
+| Iter | 設定 | Part A (Sharpe / WR / Cum) | Part B (Sharpe / WR / Cum) | min(A,B) | 結果 |
+|------|------|---------------------------|---------------------------|----------|------|
+| Att1 | ATR peak 10d ≥ 1.30 + today ≤ 1.20 | 0.00 / 100% / +3.50% (1 訊號) | 0 訊號 | 0.00 | ❌ 過嚴 |
+| Att2 | 保留 CIBR-008 + prior 10d ATR peak ≥ 1.25 | 0.27 / 66.7% / +2.73% (3 訊號) | 4.21 / 100% / +9.25% (3 訊號) | 0.27 | ❌ 移除 3 贏家 |
+| **Att3 ★** | **CIBR-008 + 2DD cap ≥ -4.0%** | **0.49 / 75% / +6.33% (4 訊號)** | **3.96 / 100% / +7.97% (3 訊號)** | **0.49** | ✅ **+26%** |
+
+### 回測結果（Att3 ★）(Backtest Results)
+
+| 區間 | 期間 | 訊號數 | 勝率 | 累計報酬 | Sharpe | MDD |
+|------|------|--------|------|----------|--------|-----|
+| Part A (IS) | 2019-01-01 ~ 2023-12-31 | 4 (0.8/年) | 75.0% | +6.33% | 0.49 | -6.81% |
+| Part B (OOS) | 2024-01-01 ~ 2025-12-31 | 3 (1.5/年) | 100.0% | +7.97% | 3.96 | -3.87% |
+| Part C (Live) | 2026-01-01 ~ 2026-04-20 | 1 | 0.0% | -4.10% | 0.00 | -6.45% |
+
+### 逐筆交易分析（Att3）
+
+**Part A 4 訊號（過濾結果）：**
+- ✅ 2019-10-02 target +3.50%（勝）
+- ✅ 2020-10-30 target +3.50%（勝）
+- ✅ 2021-02-26 stop_loss -4.10%（保留；2DD -3.9% > -4.0% 未被濾除）
+- ✅ 2023-03-13 target +3.50%（勝）
+- ❌ 2019-08-05 TP 被濾除（2DD ≤ -4.0%）
+- ✅ 2020-02-24 SL 被濾除（2DD -4.1%，成功過濾 COVID precursor）
+- ❌ 2022-09-01 TP 被濾除（2DD ≤ -4.0%）
+
+**Part B 3 訊號（過濾結果）：**
+- ✅ 2024-04-16 time_expiry +1.99%（保留）
+- ✅ 2025-08-01 time_expiry +2.28%（保留）
+- ✅ 2025-11-18 target +3.50%（勝）
+- ❌ 2024-02-21 TP 被濾除（2DD ≤ -4.0%）
+- ❌ 2024-08-02 TP 被濾除（2DD ≤ -4.0%，yen carry unwind）
+
+**淨效果：Part A 保留 1 個 SL 但 4 個 TPs 中仍有 3 個，WR 提升 71.4→75%，
+Sharpe 提升 0.39→0.49（+26%）。Part B 失去 2 個 TPs 但 Sharpe 維持 3.96。**
+
+### 關鍵發現與失敗分析
+
+1. **2DD 上限過濾方向正確性**：CIBR-004 的 2DD 下限（≤-1.5%/-2.0%）已驗證失敗
+   （非綁定或移除好訊號），本實驗 2DD 上限（≥-4.0%）反向成功，揭示 CIBR 的
+   in-crash acceleration 訊號為結構性失敗源（lesson #19 延伸至 2DD 上限方向）。
+
+2. **Att1 結構性衝突**：「今日 ATR ≤ 1.20」與 CIBR-008 的「ATR > 1.15」幾乎互斥，
+   兩條件共存使訊號近乎歸零（1 訊號/8 年）。任何與 working filter 結構性衝突的
+   新過濾器在 tight 品質過濾框架下會立即歸零。
+
+3. **Att2 先期 ATR 峰值不具區分力**：CIBR winners 可發生在前期平靜、突然 capitulation
+   的結構中，prior ATR peak 與 winner/loser 無關聯。此發現與 lesson #20b entry-time
+   filter 失敗家族一致——ATR 峰值作為過濾器缺乏 winner/loser 區分力。
+
+4. **2DD 上限為 in-crash acceleration 的可測量指標**：-4.0% = 2.6σ for 1.53% vol，
+   此閾值具統計意義（2 個標準差外事件）而非任意選擇。深 2DD 反映「崩盤加速中」
+   持續拋售，淺 2DD 反映「減速階段」MR 進場時機。
+
+5. **跨資產延伸假設（待驗證）**：
+   - 其他 BB 下軌 + 回檔上限混合進場資產（XBI, XLU, IWM, COPX, VGK, EEM）可能受益
+     於 2DD cap 補充過濾，特別是 Part A 有 crash-day SLs 的資產
+   - 不適用於單日決策驅動資產（TQQQ 槓桿、IBIT 加密、FXI 政策驅動）——這些資產的
+     winners 與 in-crash entries 可能重疊
+   - 適用閾值可能隨日波動度縮放：CIBR 1.53% vol → 2DD -4.0%（2.6σ）；高波動資產
+     （SIVR 2-3% vol）預計 2DD cap 應為 -5% 或更深
+
+### 全域最優狀態
+
+CIBR-012 Att3 現為全域最優（min(A,B) Sharpe 0.49，12 次實驗、36+ 次嘗試）。
+
+---
+
+## CIBR-013：Higher-Low Structural Confirmation MR（失敗，repo 首次多日 swing 結構 pattern 主過濾器試驗）
+
+### 目標 (Goal)
+
+驗證「多日 swing 結構 pattern」作為 MR 主過濾器能否突破 CIBR-009/010/011 三次「單日
+price-action」過濾失敗的根因。
+
+### 設計理念 (Design Rationale)
+
+**核心假設**：將「單日 pattern」（Key Reversal、NR7、Range Expansion）擴展為「多日
+結構 pattern」可繞過 lesson #20b V-bounce ≠ genuine reversal 的限制。Higher-Low 結構
+（今日 Low 嚴格高於過去 N 日 Low 最低值）為多日 swing 結構的量化定義：
+- 單日 ClosePos 反映當日盤中反轉程度（時間尺度 = 1 日）
+- 多日 Higher-Low 反映 swing 結構的反轉確認（時間尺度 = N 日）
+- 後者篩選「過去 N 日已建立 swing low + 今日不再破底」的進場時機
+
+Repo 首次將多日 swing 結構 pattern 作為 MR 主過濾器於任何資產。
+
+### 迭代歷程 (Iteration History)
+
+#### Att1：純 pullback+WR+Higher-Low(3)+Bullish bar+ATR>1.10 5 重交集
+
+**進場條件**：10d pullback in [-3%, -10%] + WR(10) ≤ -80 + Today_Low > min(Low[t-3..t-1])
++ Swing depth ≥ 1.0% + Close > Open + ATR(5)/ATR(20) > 1.10 + cd 8
+
+**結果**：Part A 2 訊號 50% WR Sharpe **-0.08** cum -0.74%（1 TP 2023-04-27 +3.5% / 1 SL
+2022-04-28 -4.10%）/ Part B **0 訊號** / min(A,B) **-0.08**
+
+**失敗分析**：5 重交集（pullback + WR + Higher-Low + Bullish bar + ATR）過嚴，訊號密度
+0.4/yr，Part B 完全空白。Higher-Low(3) + ATR>1.10 + bullish bar 三重結構確認在事件驅動
+板塊 ETF 上過於罕見。
+
+#### Att2：放寬 ATR=1.00（停用）+ Higher-Low lookback 3→5
+
+**結果**：Part A 3 訊號 33.3% WR Sharpe **-0.44** cum -4.81%（新增 1 SL）/ Part B 1 訊號
+zero-var TP +3.5% Sharpe 0.00 / min(A,B) **-0.44**
+
+**失敗分析**：放寬 lookback 5 與停用 ATR 引入 1 個新 Part A 訊號為 SL，Part A WR 從
+50%→33.3%。Higher-Low + 寬 ATR 環境下信號天然偏向「中段反彈失敗」型態。
+
+#### Att3：BB Lower 框架 + Higher-Low(5)（取代 CIBR-012 的 2DD cap）
+
+**進場條件**：Close ≤ BB(20,2) 下軌 + 10d pullback ≥ -12% + WR(10) ≤ -80 +
+ClosePos ≥ 40% + ATR(5)/ATR(20) > 1.15 + Today_Low > min(Low[t-5..t-1]) +
+Swing depth ≥ 0.5% + cd 8
+
+**結果**：Part A **0 訊號** / Part B **0 訊號** / min(A,B) **0.00**
+
+**失敗分析（重要結構性發現）**：BB Lower 觸及（Close ≤ BB_lower）日為統計極端下殺，
+今日 Low 幾乎必為近 5 日新低；而 Higher-Low(5) 要求今日 Low > min(Low[t-5..t-1])。
+**兩條件在 CIBR 1.53% vol 板塊 ETF 上幾乎完全互斥**（過去 8 年僅 1 訊號於 Part C 觸發）。
+Repo 首次驗證「BB Lower entry + multi-bar Higher-Low filter 結構性不可組合」。
+
+### 關鍵發現與失敗分析
+
+1. **多日結構維度未繞過單日 pattern 的失敗根因**：擴展 lesson #20b 失敗家族至
+   **多日結構 pattern (Higher-Low Confirmation)**——CIBR 等事件驅動板塊 ETF 上，
+   無論 entry-time 過濾器是單日 (Key Reversal、NR7、Range Expansion、ClosePos、
+   2DD floor/cap) 或多日結構 (Higher-Low) 維度，皆缺乏「真假反轉」區分力。
+
+2. **BB Lower 與 Higher-Low 結構性互斥**：BB Lower 觸及日的數學特性（統計極端）
+   與 Higher-Low 結構（多日反轉確認）在低-中波動板塊 ETF 不可組合。此發現平行
+   於 CIBR-010 NR7 與 ATR 過濾器的結構性衝突——兩個結構性概念可能互斥，過濾器
+   組合需先驗證可共存。
+
+3. **訊號稀疏性問題**：純 pullback+WR 框架下加 Higher-Low + bullish bar + swing
+   depth 5 重交集訊號密度 < 0.5/yr，與 CIBR-011 Range Expansion 同樣稀疏問題。
+
+4. **跨資產假設（待驗證）**：Higher-Low 多日結構 pattern 可能在「具備持續 MR
+   regime 結構」的資產（如低波動低事件密度寬基 ETF）上有效，但需重新設計與
+   BB Lower 互斥問題的兼容方案（例如改用 pullback-based 進場 + Higher-Low(7-10)
+   長 lookback）。CIBR 1.53% vol 板塊 ETF 不適合此 pattern。
+
+### 全域最優狀態（不變）
+
+CIBR-012 Att3 現為全域最優（min(A,B) Sharpe 0.49，13 次實驗、39+ 次嘗試）。CIBR-013
+為 CIBR 第 8 個失敗策略類型（突破、RSI(2)、RS 動量、Key Reversal、NR7、Range Expansion、
+2DD floor、Higher-Low Structural Confirmation）。

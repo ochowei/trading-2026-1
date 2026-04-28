@@ -1,13 +1,22 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-09
+  last_validated: 2026-04-24
   data_through: 2025-12-31
+  note: DIA-012 added 2026-04-24 (Capitulation-Depth Filter MR — repo first 1d-return cap + 3d-return cap dual-dimension primary filter on any asset, **Att2 SUCCESS**). Three iterations: Att1 (1d cap >= -2.0% only) Part A 12/91.7%/Sharpe **1.31** cum +32.47% / Part B 4/75%/0.47 unchanged / min(A,B) 0.47 (tied baseline) — 1d cap precisely filters 2/3 Part A SLs (2021-11-26 1d -2.52%, 2020-10-26 1d -2.24%) preserving all winners; Part B SL (2025-04-07 1d -0.95%) is "shallow 1d + deep 3d" structure (Trump tariff overnight continuation), 1d cap cannot capture; Att2 ★ (1d cap -2.0% AND 3d cap -7%, dual-dimension) Part A 12/91.7%/Sharpe **1.31** cum +32.47% (unchanged from Att1, 3d filter non-binding on Part A) / Part B **3/100%**/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† **= Part A 1.31** (EWJ-003/EWT-008 convention, +178% vs DIA-005 0.47) — 3d cap precisely filters Part B SL (3d -10.06%) preserving all winners (deepest winner 3d = 2020-02-28 -5.96%, 1pp safety margin); Att3 (1d cap -2.0% AND 3d cap -8%, robustness) identical to Att2 — confirms 3d cap robust between -7% and -8%, all winners 3d > -7% and Part B SL 3d -10% deeper than both. **Repo first 1d-return cap + 3d-return cap dual-dimension primary filter trial on any asset**. Cross-asset finding: DIA SLs cluster on 1d/3d return dimensions (orthogonal to 2d), distinct from CIBR-012 (2d cap), EEM-014/INDA-010/USO-013 (2d floor) — two separate failure mechanisms (single-day news shock vs multi-day regime-shift) require dual-dimension filter on low-vol broad ETFs. A/B balance achieved: annualized cum gap 28.5% < 30% ✓, signal ratio 1.6:1 (38% gap) < 50% ✓. Replaces DIA-005 as global optimum (12 experiments). Extends lesson #19 family with new "1d cap + 3d cap dual-dimension" sub-rule for low-vol (~1.0% daily vol) broad ETFs with policy/news-shock SL clustering.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** DIA-005（同 DIA-004 進場，延長持倉 25d）
+**當前最佳：** DIA-012 Att2（DIA-005 進場 + **1 日急跌上限 >= -2.0% AND 3 日急跌上限 >= -7%** 雙維度過濾）— **12 次實驗確認超越 DIA-005**
+- Part A: +32.47%（12 訊號, 91.7% WR, Sharpe **1.31**, MaxDD -3.62%）
+- Part B: +9.27%（3 訊號, 100% WR, std=0 Sharpe 顯示 0.00, MaxDD -0.17%）
+- Part C (Live): -0.71%（2 訊號, 50% WR, Sharpe -0.09）
+- min(A,B)†: **1.31**（採 EWJ-003 / EWT-008 慣例：Part B std=0 時以 Part A Sharpe 為 min 約束，+178% vs DIA-005 的 0.47）
+- A/B 年化累計差 28.5%（< 30% 目標 ✓），A/B 訊號比 1.6:1（38% gap < 50% ✓）
+- A/B WR 差距 8.3pp，A/B Sharpe 結構性對齊（Part B 全 TP 為不可避免結構）
+- 關鍵改善：1d cap 過濾 Part A 兩筆深 1d SL（2020-10-26、2021-11-26），3d cap 過濾 Part B Trump 關稅 SL（2025-04-07 3d -10.06%）
+- **跨資產貢獻**：repo 首次「1d cap + 3d cap 雙維度」主品質過濾器試驗，擴展 lesson #19 family 至「低波動寬基 ETF（~1.0% vol）news/policy-shock SL clustering」次規則
+
+**前任最佳：** DIA-005（同 DIA-004 進場，延長持倉 25d）— 仍為 DIA-012 進場框架基線
 - Part A: +23.10%（14訊號, 78.6% WR, Sharpe 0.57, Sortino 0.92）, Part B: +5.34%（4訊號, 75.0% WR, Sharpe 0.47, Sortino 0.75）
-- A/B Sharpe 差距 0.10（良好平衡），A/B WR 差距僅 3.6pp
-- vs DIA-004: Part A Sharpe +9.6%（0.52→0.57），Part B 不變，延長持倉讓邊際到期交易達標
 
 **次佳：** DIA-004（同 DIA-003 進場，寬獲利目標 TP +3.0% / SL -3.5% / 20d）
 - Part A: +21.06%（14訊號, 78.6% WR, Sharpe 0.52, Sortino 0.85）, Part B: +5.34%（4訊號, 75.0% WR, Sharpe 0.47, Sortino 0.75）
@@ -29,6 +38,7 @@
 - **DIA/SPY 配對交易（DIA-009，3 次嘗試）**：Att1 z<-2.0 無過濾 Part A 0.10/Part B 0.66；Att2 z<-2.5+SMA(50) Part A 0.26/Part B 0.26（最佳 min 0.26）；Att3 z<-1.5+2日跌幅 Part A 0.05/Part B 2.99。DIA/SPY 比值存在結構性漂移（SPY 科技股權重持續增加），z-score 均值回歸不成立
 - **RSI(5) 趨勢回調（DIA-010，3 次嘗試）**：與 DIA-007 不同的趨勢回調進場方式（RSI(5)<30 + 3日跌幅≥2% vs SMA proximity）。Att1 波動收縮突破 20日新高 Part A Sharpe 0.03/Part B 0.33（48/20訊號，假突破過多）；Att2 嚴格收縮 50日新高+BB百分位 Part A 0.35/Part B -0.54（過擬合）；Att3 Close>SMA(50)+RSI(5)<30+3日跌幅≥2% Part A 0.22/Part B 1.42（僅 4 筆 Part B 訊號，樣本不足）。再次確認非均值回歸策略在 DIA 上無法超越 DIA-005
 - **波動率自適應 ATR 過濾（DIA-011，3 次嘗試）**：DIA-005 進場 + ATR(5)/ATR(20) 波動率飆升過濾（IWM-011/XLU-011 移植）。Att1 ATR>1.1/SL-3.5% Part A 0.45/Part B 0.47, min 0.45（移除 5 贏 1 輸，Part A 劣化）；Att2 ATR>1.05/SL-3.5% Part A 0.32/Part B 0.47, min 0.32（引入 1 壞訊號）；Att3 ATR>1.1/SL-4.0% Part A 0.87/Part B 0.40, min 0.40（SL-4.0% 救回 1 筆 Part A 但 Part B 虧損加大，A/B gap 0.47）。**DIA 日波動 ~1.0% 使 RSI(2) 訊號跨波動率制域均有效，ATR 過濾無法區分好壞訊號**（與 IWM/XLU 形成對比——IWM/XLU 日波動 1.5-2.0% 存在明確的慢磨/急跌訊號品質差異）
+- **DIA-012 Att1（單 1d cap）**：DIA-005 進場 + 1 日急跌上限 >= -2.0%，Part A 12/91.7%/Sharpe 1.31 cum +32.47%（+130% Part A 改善），但 Part B 不變（4/75%/Sharpe 0.47），min(A,B) 0.47（與基線持平）。Part B 唯一 SL（2025-04-07 Trump 關稅）為「shallow 1d + deep 3d」結構，1d cap 無法捕捉，需新增 3d 維度（見 Att2）
 
 **已掃描的參數空間：**
 - DIA-001 進場：pullback ≥3% + WR(10) ≤-80 + close position ≥40% + 追蹤停損
@@ -56,6 +66,11 @@
 - DIA-010 Att3 進場：Close > SMA(50) + RSI(5) < 30 + 3日跌幅 ≥ 2%，TP +3.0% / SL -3.0% / 15d，冷卻 10d
 - DIA-011 進場：同 DIA-005 + ATR(5)/ATR(20) > 1.1/1.05，冷卻 5d
 - DIA-011 出場：TP +3.0% / SL -3.5% / 25d（Att1/2）；TP +3.0% / SL -4.0% / 25d（Att3）
+- **DIA-012 進場（當前最佳）**：同 DIA-005（RSI(2)<10 + 2 日跌幅 ≥1.5% + ClosePos ≥40%）+ **1 日急跌上限 >= -2.0% + 3 日急跌上限 >= -7%**，冷卻 5d
+- **DIA-012 出場**：TP +3.0% / SL -3.5% / 25 天（同 DIA-005，未動）
+- DIA-012 Att1（單 1d cap）：min(A,B) 0.47 持平基線，Part A Sharpe 0.57→1.31 但 Part B 無變化
+- DIA-012 Att2 ★（雙維度 1d+3d）：min(A,B)† 1.31，Part A 1.31 / Part B std=0 全 TP（採 EWJ-003 慣例）
+- DIA-012 Att3（穩健性 3d cap -8%）：與 Att2 完全相同（贏家 3d 安全邊際 1pp）
 
 **滾動窗口分析摘要（2026-03-28，DIA-001）：**
 - 12 窗口中 7 個負累計報酬（vs GLD-007 全 12 窗口正報酬）

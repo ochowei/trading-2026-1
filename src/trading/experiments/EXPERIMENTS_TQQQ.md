@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-23
   data_through: 2025-12-31
-  note: TQQQ-016 added 2026-04-17 (Gap-Down Capitulation + Intraday Reversal MR, 3 iterations all failed). Att1 gap-3% Part A 0/Part B -0.07 (too sparse 3/2 signals), Att2 gap-2% Part A 0.13/Part B -0.07 (added 2 false reversals), Att3 +volume Part A 0.49/Part B -0.07 (Part B unchanged). Validates lesson #20a boundary: Gap-Down reversal pattern does NOT extend to leveraged tech ETFs (QQQ underlying lacks 24/7 continuous price discovery; 2025-04-07 tariff gap-down continued declining).
+  note: TQQQ-017 added 2026-04-23 (Capitulation + Intraday/Acceleration/Multi-day Confirmation Filters, 3 iterations all failed vs TQQQ-010 min 0.36). Att1 (ClosePos>=30%) Part A 0.43 / Part B 0.13 min 0.13 — ClosePos filter removed 5/7 Part B winners (TQQQ 3x vol keeps most capitulation days closing near Low); Att2 (2-day return<=-10%) Part A 0.13 / Part B 0.49 min 0.13 — 2DD filter removed 8 Part A winners vs only 2 losers, acceleration is not the key winner/loser discriminator; Att3 (Prev RSI(5)<30) Part A 0.34 / Part B 1.02 min 0.34 — Prev RSI naturally already satisfied on most TQQQ-010 signals (Part B signals identical), marginal net effect -0.02. Core finding: **TQQQ-010's 6 Part A losers cannot be reliably distinguished from winners by single-day / 2-day / prev-day technical filters** — their distributions overlap on ClosePos, 2DD, and Prev RSI dimensions. Part A Sharpe 0.36 reflects structural noise of 3x leveraged ETF in extreme regimes (std_return 6.92%), not a filterable feature. Extends lesson #20b failure family to "single-period confirmation" filter category on leveraged index ETFs — paralleling ClosePos/acceleration/hook failures on policy-driven ETFs (URA/TLT/FXI). TQQQ-010 remains global optimum (17 experiments, across MR / trend-momentum-breakout / Gap-Down / intraday-acceleration-multi-day-confirmation five categories). TQQQ-016 added 2026-04-17 (Gap-Down Capitulation + Intraday Reversal MR, 3 iterations all failed). Att1 gap-3% Part A 0/Part B -0.07 (too sparse 3/2 signals), Att2 gap-2% Part A 0.13/Part B -0.07 (added 2 false reversals), Att3 +volume Part A 0.49/Part B -0.07 (Part B unchanged). Validates lesson #20a boundary: Gap-Down reversal pattern does NOT extend to leveraged tech ETFs (QQQ underlying lacks 24/7 continuous price discovery; 2025-04-07 tariff gap-down continued declining).
 -->
 ## AI Agent 快速索引
 
@@ -36,18 +36,29 @@
 - **核心失敗**：Part B 2025-04-07 Trump 關稅公告後符合「gap-down + 日內反轉」結構但隔日繼續深跌，觸發 -8% 停損。與 IBIT 24/7 連續交易不同，QQQ 盤外流動性有限，日內反彈常為技術性反應而非真正底部
 - **min(A,B) 最佳 -0.07**（vs TQQQ-010 的 0.36）——3 次迭代全部無法超越
 
+**TQQQ-017 實驗摘要（2026-04-23，恐慌抄底 + 盤中/加速/多日確認過濾，3 次嘗試全部失敗）：**
+動機：TQQQ-010 Part A 20 訊號 / WR 70% / Sharpe 0.36 拖累 min(A,B)（Part B 1.02），6 筆 Part A 停損（2020-02-24、2020-03-12、2021-09-28、2022-03-08、2022-09-01、2022-09-21）無單一技術模式共通點。本實驗測試三類單日/雙日/前日過濾器能否可靠區分 Part A 贏家 vs 輸家。
+- **Att1**（TQQQ-010 + ClosePos = (Close-Low)/(High-Low) >= 0.30）：Part A n=11, WR 72.7%, Sharpe 0.43（+19% vs TQQQ-010）；Part B n=5, WR 60%, Sharpe 0.13（-87% vs TQQQ-010）。min(A,B) 0.13。ClosePos 在 Part A 成功篩除 3/4 stop-loss（2020-03-12、2021-09-28、2022-03-08、2022-09-21 中前三者），但 Part B 崩壞——TQQQ-010 原 7 勝者中 5 筆 ClosePos<0.30（2024-04-19、2024-07-24、2024-09-06、2025-02-27、2025-04-04），過濾器同時移除這些好訊號，並因冷卻期偏移引入新壞訊號（2025-03-04、2025-04-07 兩筆 SL）。**驗證 cross_asset_lesson #6 邊界**：ClosePos 在 TQQQ 5-6% vol 上失效（lesson #6 邊界 ≤ 2% vol）
+- **Att2**（TQQQ-010 + 2 日累計報酬 <= -10%）：Part A n=10, WR 60%, Sharpe 0.13；Part B n=4, WR 75%, Sharpe 0.49。min(A,B) 0.13。2-day -10% 過濾器移除 Part A 20 訊號中 10 筆，但篩除比例無選擇性——移除 8 個勝者（2019-10-02、2021-02-25、2021-05-12、2021-10-04、2022-01-10、2022-04-26、2022-05-11、2023-09-27）與 2 個敗者（2022-09-01、2022-09-21）。**加速度不是 TQQQ 贏/輸的關鍵區分軸**：多數 TQQQ 勝者是「中等 2 日下跌疊加既有 DD」的訊號（如 2021-02-25 Fed pivot、2022-01-10 科技財報擔憂），強制 2 日 -10% 門檻移除這些高品質中等加速訊號
+- **Att3**（TQQQ-010 + Prev RSI(5) < 30）：Part A n=13, WR 69.2%, Sharpe 0.34（-0.02 vs TQQQ-010 的 0.36）；Part B n=8, WR 87.5%, Sharpe 1.02（與 TQQQ-010 **完全相同**）。min(A,B) 0.34（-0.02 邊際劣化）。Part B 訊號結構與 TQQQ-010 完全一致——確認 Part B 所有 TQQQ-010 訊號之前一日 RSI(5) 皆 < 30（即「雙日超賣」條件天然成立）。Part A 篩除 7 筆（4 勝者 + 2 敗者 + 1 冷卻偏移勝者），篩除比例無選擇性（30% 敗者 vs 29% 勝者）
+- **核心失敗**：**TQQQ-010 的 6 筆 Part A 停損無法用單日/雙日/前日技術過濾器可靠區分**——停損訊號在 ClosePos、2DD、Prev RSI 三維度上與勝率訊號分布重疊。Part A Sharpe 0.36 天花板反映 3x 槓桿 ETF 在極端跌勢中的結構性噪音（std_return 6.92%），包含 2020 COVID + 2022 科技熊市使 Part A 必然承受 -8% SL 的機械觸發
+- **Lesson #20b 失敗家族擴展**：ClosePos/加速/前日超賣三類「單週期確認」過濾器在槓桿指數 ETF 上失敗，平行於政策驅動 ETF（URA/TLT/FXI）的 oscillator hook / day-after reversal / 強反轉 K 線失敗模式
+- **min(A,B) 最佳 0.34**（Att3，vs TQQQ-010 的 0.36）——3 次迭代全部無法超越
+
 **已證明無效（禁止重複嘗試）：**（更新）
 原有項目加上：
 - QQQ BB Squeeze Breakout → Trade TQQQ：QQQ 突破訊號在 TQQQ 幅度不足，Part B 零達標（TQQQ-015 Att1/Att2）
 - QQQ 動量策略 ROC(10)>5% → Trade TQQQ：A/B 平衡好但 Sharpe ~0.17 遠低於均值回歸（TQQQ-015 Att3）
 - **趨勢/突破/動量策略在 3x 槓桿 ETF 上無效**：高日波動使停損過寬但突破/動量訊號幅度不足（與 SOXL-009 一致）
 - **Gap-Down 資本化 + 日內反轉模式（TQQQ-016，3 次嘗試全失敗）**：Att1 gap-3% 過嚴（3/2 訊號）、Att2 gap-2% 過鬆（Part A 0.13 含 2 假反彈停損）、Att3 加回 volume（Part A 0.49 但 Part B 不變）。**失敗根因**：與 IBIT 24/7 連續交易資產不同，QQQ 盤外流動性有限，盤前 gap-down 常反映事件衝擊（Fed/CPI/科技巨頭財報/政策公告）而非投降式拋壓；若事件利空持續，日內反彈只是技術反應（如 2025-04-07 關稅公告日 gap-down 反彈 + 隔日繼續深跌停損）。確認 **lesson #20a 不延伸至傳統（非 24/7）標的的槓桿 ETF**
+- **盤中/加速/多日確認過濾模式（TQQQ-017，3 次嘗試全失敗）**：Att1 ClosePos>=0.30 Part A 0.43/Part B 0.13 min 0.13（Part B 崩壞）、Att2 2-day<=-10% Part A 0.13/Part B 0.49 min 0.13（篩除比例無選擇性）、Att3 Prev RSI<30 Part A 0.34/Part B 1.02 min 0.34（Part B 不變，Part A 邊際劣化）。**失敗根因**：TQQQ-010 的 6 筆 Part A 停損在 ClosePos、2DD、Prev RSI 三維度上與勝率訊號分布重疊，無單一維度具區分力。Part A Sharpe 0.36 天花板反映 3x 槓桿 ETF 在極端跌勢中的結構性噪音，std_return 達 6.92%。**Lesson #20b 失敗家族擴展**：單週期（單日/雙日/前日）確認過濾器在槓桿指數 ETF 上失敗，平行於政策驅動 ETF 的 hook divergence / day-after reversal 失敗模式
 
 **尚未嘗試的方向（可探索，但預期改善極低）：**
 - 分批進場/出場（如達到 +5% 賣出一半，剩餘追蹤）
 - 結合大盤均線（例如 SPY SMA200）確認多空趨勢背景（但 cross-asset lesson #5 警告均值回歸+趨勢過濾=災難）
 - ~~Gap-Down 資本化 + 日內反轉~~（TQQQ-016 驗證失敗，lesson #20a 不延伸至槓桿科技 ETF）
-- **TQQQ-010 已確認為全域最優**（16 次實驗、含均值回歸、趨勢/動量/突破、Gap-Down 資本化四大策略類型）
+- ~~盤中/加速/多日確認過濾~~（TQQQ-017 驗證失敗，三維度均無區分力）
+- **TQQQ-010 已確認為全域最優**（17 次實驗、含均值回歸、趨勢/動量/突破、Gap-Down 資本化、盤中/加速/多日確認過濾五大策略類型）
 
 **關鍵資產特性：**
 - 高槓桿 (3x)，波動極大，不適合過緊的停損或追蹤停利
@@ -58,7 +69,7 @@
 
 # TQQQ 實驗總覽 (TQQQ Experiment Index)
 
-> **最新實驗 (Latest):** TQQQ-016 `tqqq_016_gap_reversal_mr`
+> **最新實驗 (Latest):** TQQQ-017 `tqqq_017_cap_reversal_confirm`
 > **當前最佳 (Best):** TQQQ-008 `tqqq_008_cap_optimized_exit`（無成交模型）/ TQQQ-010 `tqqq_010_cap_exec_optimized`（含成交模型）
 
 ## 實驗清單 (Experiments)
@@ -81,6 +92,7 @@
 | TQQQ-014 | `tqqq_014_cap_exec_vix_adaptive` | VIX 自適應出場 + 成交模型 | 訊號日 VIX 決定 TP/SL/持倉：VIX≥35 → +9%/-10%/12d，<35 → +7%/-8%/10d | ❌ 失敗 |
 | TQQQ-015 | `tqqq_015_qqq_trend_breakout` | QQQ 趨勢/動量策略 → Trade TQQQ + 成交模型 | Att1: BB Squeeze, Att2: BB 降TP, Att3: Momentum ROC(10)>5% | ❌ 失敗 |
 | TQQQ-016 | `tqqq_016_gap_reversal_mr` | Gap-Down 資本化 + 日內反轉均值回歸（IBIT-006 移植） | Att1 gap-3% Part A 0/Part B -0.07; Att2 gap-2% 0.13/-0.07; Att3 +volume 0.49/-0.07 | ❌ 失敗 |
+| TQQQ-017 | `tqqq_017_cap_reversal_confirm` | 恐慌抄底 + 盤中/加速/多日確認過濾 | Att1 ClosePos>=0.30 min 0.13; Att2 2-day<=-10% min 0.13; Att3 Prev RSI<30 min 0.34 | ❌ 失敗 |
 
 ## 演進路線 (Lineage)
 
@@ -108,7 +120,10 @@ TQQQ-001 tqqq_001_capitulation (基礎版：DD -15%, RSI<25, Vol 1.5x)
 ├── TQQQ-015 tqqq_015_qqq_trend_breakout (QQQ 趨勢/動量 → Trade TQQQ + 成交模型)
 │
 │   ── Gap-Down 資本化系列 (Gap-Down Capitulation Series) ──
-└── TQQQ-016 tqqq_016_gap_reversal_mr (Gap-Down + 日內反轉 MR，IBIT-006 移植，3 次失敗)
+├── TQQQ-016 tqqq_016_gap_reversal_mr (Gap-Down + 日內反轉 MR，IBIT-006 移植，3 次失敗)
+│
+│   ── 盤中/加速/多日確認系列 (Intraday/Acceleration/Multi-day Confirmation Series) ──
+└── TQQQ-017 tqqq_017_cap_reversal_confirm (ClosePos/2DD/Prev RSI 三類過濾器，3 次失敗)
 ```
 
 ## 參數對照 (Parameter Comparison)
