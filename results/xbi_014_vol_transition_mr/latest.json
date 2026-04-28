@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-28T01:07:16.194429"
+    "execution_time": "2026-04-28T01:12:20.673976"
   },
   "part_a": {
     "ticker": "XBI",
@@ -9,7 +9,7 @@
     "win_rate": 0.75,
     "avg_return_pct": 1.19,
     "std_return_pct": 3.7,
-    "cumulative_return_pct": 24.96,
+    "cumulative_return_pct": 24.93,
     "avg_holding_days": 3.7,
     "max_drawdown_pct": -9.08,
     "profit_factor": 1.93,
@@ -72,7 +72,7 @@
         "exit_date": "2021-02-23",
         "entry": 158.14,
         "exit": 150.08,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 1,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -9.08
@@ -127,7 +127,7 @@
         "exit_date": "2022-01-13",
         "entry": 104.72,
         "exit": 99.39,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 4,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -7.17

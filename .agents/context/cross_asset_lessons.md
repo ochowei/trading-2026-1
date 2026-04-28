@@ -174,7 +174,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | SOXL | SOXL-010 Att3 | 板塊 RS 動量回調 | 0.70 | 11 次實驗 ✓ |
 | TSM | TSM-008 | RS 出場優化 | 0.79 | 9 次實驗 ✓ |
 | IWM | IWM-013 Att3 | Capitulation-Depth Filter MR (RSI<8 oscillator depth) | 0.59† | 13 次實驗 ✓ |
-| XBI | XBI-005 | 回檔範圍+WR+反轉K線 | 0.36 | 12 次實驗 ✓ |
+| XBI | XBI-005 | 回檔範圍+WR+反轉K線 | 0.36 | 14 次實驗 ✓ |
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 10 次實驗 ✓ |
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
 | NVDA | NVDA-004 | BB 擠壓突破（優化）| 0.47 | 11 次實驗 ✓（NVDA-009 MBPC 三次失敗 / NVDA-010 ADX-Filtered RSI(2) MR 三次失敗，repo 首次 ADX/DMI 主過濾器試驗 / NVDA-011 Capitulation-Depth Filter MR 三次失敗，repo 首次 >3% vol 高波動單股測試 lesson #19 family）|
