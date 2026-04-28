@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-04-28T20:59:37.089403"
+    "execution_time": "2026-04-28T21:00:39.518399"
   },
   "part_a": {
     "ticker": "SOXL",
-    "total_signals": 8,
-    "wins": 5,
-    "win_rate": 0.625,
-    "avg_return_pct": 7.5,
-    "std_return_pct": 13.67,
-    "cumulative_return_pct": 66.58,
-    "avg_holding_days": 11.2,
+    "total_signals": 6,
+    "wins": 4,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 9.02,
+    "std_return_pct": 12.83,
+    "cumulative_return_pct": 60.59,
+    "avg_holding_days": 11.3,
     "max_drawdown_pct": -18.64,
-    "profit_factor": 3.0,
-    "sharpe_ratio": 0.55,
-    "sortino_ratio": 1.18,
-    "calmar_ratio": 0.4,
+    "profit_factor": 4.03,
+    "sharpe_ratio": 0.7,
+    "sortino_ratio": 1.65,
+    "calmar_ratio": 0.48,
     "max_consecutive_losses": 1,
-    "target_exits": 5,
-    "stop_loss_exits": 2,
+    "target_exits": 4,
+    "stop_loss_exits": 1,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
@@ -32,28 +32,6 @@
         "holding_days": 4,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -18.64
-      },
-      {
-        "date": "2019-08-05",
-        "entry_date": "2019-08-06",
-        "exit_date": "2019-09-05",
-        "entry": 9.1,
-        "exit": 10.74,
-        "return_pct": 18.0,
-        "holding_days": 21,
-        "exit_type": "target",
-        "max_drawdown_pct": -5.94
-      },
-      {
-        "date": "2020-02-25",
-        "entry_date": "2020-02-26",
-        "exit_date": "2020-02-27",
-        "entry": 14.6,
-        "exit": 12.84,
-        "return_pct": -12.09,
-        "holding_days": 1,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -16.08
       },
       {
         "date": "2020-10-28",
@@ -111,7 +89,7 @@
         "max_drawdown_pct": -7.5
       }
     ],
-    "filled_count": 8,
+    "filled_count": 6,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

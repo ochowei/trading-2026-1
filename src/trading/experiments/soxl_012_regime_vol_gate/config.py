@@ -23,9 +23,14 @@
 滑價 0.1%、3x 槓桿適用標準成交模型。
 
 迭代紀錄（最多三次）：
-  Att1（max_bb_width_ratio=0.55）：
-    SOXL 日波動 ~6% (vs TQQQ ~5%)，BB-width threshold 預期略高於 TQQQ 0.48。
-    0.55 為初步甜蜜點預測。
+  Att1（max_bb_width_ratio=0.55）— FAILED min(A,B) 0.55:
+    Part A 8/62.5%/0.55、Part B 3/66.7%/0.56。BB<0.55 過濾 Part A 1W+1SL
+    互抵；Part B 損失 2 winners（2024-09-06 BB 0.709 / 2025-12-17 BB 0.628）
+    使 Part B Sharpe 從 baseline 0.79 降至 0.56。
+  Att2（max_bb_width_ratio=0.50）— 加嚴測試:
+    收緊閾值預期過濾 2020-02-25 SL（BB 0.515）+ 2022-01-20 SL（BB 0.615）
+    + 2019-08-05 W（BB 0.527）+ 2021-05-12 W（BB 0.576）—— 2 SL + 2 W 同時
+    過濾，目標 Part A WR 從 60% → ~67%。
 """
 
 from dataclasses import dataclass
@@ -47,7 +52,7 @@ class SOXL012Config(SOXLSelectiveOversoldConfig):
     # 波動率 regime 閘門（新增）：BB(bb_period, bb_std) 寬度 / Close < max_bb_width_ratio
     bb_period: int = 20
     bb_std: float = 2.0
-    max_bb_width_ratio: float = 0.55
+    max_bb_width_ratio: float = 0.50
 
     # 「進場前已在回撤」過濾器
     # T-N 日的 Drawdown 必須 <= prior_drawdown_lookback_threshold
