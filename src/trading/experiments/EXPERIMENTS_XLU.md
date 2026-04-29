@@ -1,10 +1,12 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-09
+  last_validated: 2026-04-27
   data_through: 2025-12-31
+  note: XLU-012 added 2026-04-27 (Post-Capitulation Vol-Transition MR — Att3 SUCCESS，repo 第 4 次「ATR-vol-filtered MR + TP 突破型擴張」方向發現). Three iterations: Att1 (XLU-011 框架 + 2DD cap >= -2.5% CIBR-012 方向 + TP +2.5%) Part A 7/85.7%/0.67 同 baseline / Part B 3/100% **zero-var 0.00**（過濾 1 expiry + 1 winner，cooldown 移入 2024-11-06 zero-var TP）/ min **0.00** — 2DD cap 在 XLU 結構性失敗：Part A 訊號 2DD 全 >= -2.5% 不影響、Part B 退化為純 TPs zero-var；Att2 (Att1 + TP 加寬 +3.0%) Part A 7/85.7%/Sharpe 0.75（+12%，TP 擴張捕獲更深反彈）/ Part B 3/100% zero-var 0.00 / min 0.00 — TP 改善僅作用於 Part A，Part B 仍 zero-var；Att3 ★ (移除 2DD 過濾、保留 TP +3.0%) Part A 7 訊號 WR 85.7% Sharpe **0.75** cum +13.26% / Part B 4 訊號 WR 75.0% Sharpe **1.59** cum +9.05% / min(A,B) **0.75**（+12% vs XLU-011 0.67）/ A/B cum 差 31.7%（vs baseline 33.4% 略改善）/ A/B 訊號比 1.75:1（同 baseline，結構性）. **核心發現**：XLU-011 的 ATR(5)/ATR(20) > 1.15 動能濾波後，TP 應採突破型 +3.0% 而非 MR 標準 +2.5%；2DD 區間過濾在 1.08% vol 利率敏感 ETF 上對 winners/losers 無區分力（2DD 維度分布重疊）。**跨資產貢獻**：(1) 擴展 lesson #6 邊界——2DD secondary filter 在 ATR 已捕捉 panic 動能的低-中波動 ETF 上失效；(2) 擴展 lesson #20b 失敗家族——2DD 區間過濾加入 oscillator-hook / day-after / signal-day filter 失敗類別；(3) **新發現**：MR 框架疊加動能濾波後，TP 上限可從 +2.5% 擴張至 +3.0%（突破型甜蜜點），挑戰原 cross_asset 規則「TP +2.5% 為 MR 統一甜蜜點」的普適性，實證範圍：1.08% vol + ATR > 1.15 動能濾波框架。XLU-012 Att3 為新全域最優（12 次實驗、35+ 次嘗試，含 MR、突破、KC squeeze、配對、動量回調、ATR 過濾、2DD 過濾共 7 大策略類型）.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XLU-011（波動率自適應均值回歸，ATR(5)/ATR(20) > 1.15 + XLU-003 框架，Part A Sharpe 0.67，Part B Sharpe 1.56，min(A,B) 0.67，+272% vs 前任最佳 XLU-004 的 0.18）
+**當前最佳：** XLU-012 Att3（XLU-011 框架 + TP **+3.0%** / SL -4.0% / 20 天，**移除 2DD 過濾**，Part A Sharpe **0.75** / Part B Sharpe **1.59** / min(A,B) **0.75**，+12% vs XLU-011 0.67）★ **2026-04-27 新全域最優**
+**前任最佳：** XLU-011（波動率自適應均值回歸，ATR(5)/ATR(20) > 1.15 + XLU-003 框架，Part A Sharpe 0.67，Part B Sharpe 1.56，min(A,B) 0.67，+272% vs XLU-004 的 0.18）
 **前任最佳（突破）：** XLU-004（BB Squeeze Breakout，Part A Sharpe 0.18，Part B Sharpe 0.26，min(A,B) 0.18）
 **前任最佳（均值回歸）：** XLU-003（回檔範圍 3.5-7% + WR + ClosePos，Part A Sharpe 0.06，Part B Sharpe 0.35）
 **XLU-008 探索性結果：** BB(20,2.5) 寬帶突破 Att3 Part A Sharpe 0.40（+122% vs XLU-004），但 Part B 僅 2 訊號（統計意義不足），A/B 比 4:1，未達 A/B 平衡標準，不取代 XLU-004
@@ -78,12 +80,20 @@
 - Att3（ATR > 1.1 放寬門檻）：Part A Sharpe 0.10（9 訊號，WR 66.7%），Part B 0.38（5 訊號）。重新引入 3 個 2021-2022 停損，品質下降
 
 **XLU-011 結果（波動率自適應均值回歸，3 次嘗試）：**
-- **Att1（ATR > 1.15，最終選擇）：Part A Sharpe 0.67（7 訊號，WR 85.7%），Part B Sharpe 1.56（4 訊號，WR 75.0%）。min(A,B) 0.67（+272% vs XLU-004 的 0.18）**。ATR > 1.15 比 1.2 多捕捉 2 個 Part A + 1 個 Part B 好訊號（11 vs 8），年化訊號率 Part A 1.4/yr，Part B 2.0/yr（1:1.43 比 Part B 更頻繁，無過擬合）
+- **Att1（ATR > 1.15）：Part A Sharpe 0.67（7 訊號，WR 85.7%），Part B Sharpe 1.56（4 訊號，WR 75.0%）。min(A,B) 0.67**。ATR > 1.15 比 1.2 多捕捉 2 個 Part A + 1 個 Part B 好訊號（11 vs 8），年化訊號率 Part A 1.4/yr，Part B 2.0/yr（1:1.43 比 Part B 更頻繁，無過擬合）
 - Att2（ATR > 1.12）：Part A 不變（7 訊號），Part B 5 訊號 Sharpe 0.38（vs 1.56），新增 2025-10-22 到期虧損。嚴格劣化
 - Att3（ATR > 1.15 + 回檔上限 8%）：與 Att1 完全相同（7-8% 範圍內無額外訊號）
 
+**XLU-012 結果（Post-Capitulation Vol-Transition MR，3 次嘗試）★ 2026-04-27 新全域最優：**
+- Att1（XLU-011 框架 + 2DD cap >= -2.5% CIBR-012 方向 + TP +2.5%）：Part A 7/85.7%/Sharpe 0.67（同 baseline，2DD 結構非綁定）/ Part B 3/100%/**Sharpe 0.00（zero-var, 3 純 TPs）**/ min **0.00**（崩壞）。失敗根因：(a) Part A 訊號 2DD 全 >= -2.5%（auto_adjust=True 後 max 為 -2.09%），cap 不過濾任何訊號；(b) Part B 移除 1 expiry（2024-01-18 -2.51%）+ 1 winner（2024-11-04 -3.39%），cooldown 移入 2024-11-06 zero-var TP，淨結果為純 TPs 退化
+- Att2（Att1 + TP 加寬至 +3.0% 嘗試打破 zero-var）：Part A 7/85.7%/**Sharpe 0.75**（+12%，5 TPs 從 +2.5%→+3.0%）/ Part B 3/100%/**仍 zero-var Sharpe 0.00（3 TPs 皆 +3.00%）**/ min **0.00**。確認 2DD cap 對 XLU Part B 結構性退化，TP 加寬僅作用於 Part A
+- **Att3 ★（移除 2DD 過濾，僅保留 TP +3.0%）：Part A 7 訊號 WR 85.7% Sharpe 0.75 cum +13.26%（5 TP +3.00%、1 SL -4.10%、1 Expiry +1.88% — 2019-11-08 從 baseline TP 變為 expiry，引入 Part A 變異源）/ Part B 4 訊號 WR 75.0% Sharpe 1.59 cum +9.05%（3 TP +3.00%、1 Expiry -0.20% — 保留 2024-01-18 expiry 為 Part B 變異源）/ min(A,B) 0.75（+12% vs XLU-011 0.67）**
+- **目標達成**：Sharpe > XLU-011 ✓（0.75 > 0.67），A/B cum 差距 31.7%（vs baseline 33.4% 略改善但 >30% 目標）✗，A/B 訊號比 1.75:1（同 baseline，結構性）✗。Sharpe 改善為主要成就
+
 **尚未嘗試的方向（預期邊際效益極低，不建議繼續探索）：**
 - ATR 比率 1.13-1.14（ATR 1.12 已引入壞訊號，1.15 已是甜蜜點邊界）
+- TP +3.5% 或更寬（Att3 中 TP +3.0% 已使 2019-11-08 訊號退化為 expiry +1.88%，再加寬將惡化此筆）
+- 2DD floor / 2DD cap 任何方向（XLU-012 Att1/Att2 驗證 2DD 維度對 XLU winners/losers 無區分力）
 
 **關鍵資產特性：**
 - XLU（Utilities Select Sector SPDR Fund）：美國公用事業類股 ETF
@@ -102,7 +112,9 @@
 - **Keltner Channel 不優於 Bollinger Band**：KC(EMA20,ATR10,mult 2.5) Part A 優於 BB（0.27 vs 0.18，+50%），但 Part B 遠遜（0.06 vs 0.26，-77%）。ATR-based 波動度衡量在 OOS 期間比 σ-based 更不穩定。ClosePos 過濾在 KC 突破上無效（突破日天然 ClosePos 高）
 - **波動率飆升過濾（ATR ratio）是 XLU 均值回歸的突破性發現**：ATR(5)/ATR(20) > 1.2 成功區分急跌（恐慌，可回歸）與慢跌（利率驅動，不回歸），Part A 從 0.06（XLU-003）提升至 100% WR。XLU-011 將門檻降至 1.15，多捕捉 3 個好訊號（11 vs 8），Part A Sharpe 0.67（有方差可計算），Part B 1.56
 - **ATR > 1.15 是 XLU 波動率過濾的甜蜜點**：1.12 引入 Part B 壞訊號（2025-10-22），1.2 訊號過少（8），1.15 在品質和數量間取得最佳平衡（11 訊號，min(A,B) 0.67）
-- **XLU 已確認為全域最優**（11 次實驗、43 次嘗試，含均值回歸、突破（BB/KC/寬帶/成交量確認）、趨勢回檔、跨資產配對/過濾、動量回檔、XLU/SPY 配對交易、波動率飆升過濾八種策略類型）
+- **TP +3.0% 為 ATR-動能濾波 MR 的甜蜜點（XLU-012 Att3 發現）**：XLU-003/011 原 TP +2.5%（MR 標準甜蜜點）截斷部分仍在反彈中的交易；XLU-011 的 ATR > 1.15 過濾使訊號天然帶有強動能，TP 上限可從 +2.5% 擴張至 +3.0%（突破型甜蜜點）。**挑戰原 cross_asset 規則**「TP +2.5% 為 MR 統一甜蜜點」的普適性——當 MR 框架疊加動能濾波，TP 上限可隨之擴張。實證範圍：1.08% vol + ATR > 1.15 動能濾波框架（XLU-012 Att3 +12% Sharpe）
+- **2DD 區間過濾在 XLU 1.08% vol 利率敏感 ETF 上失效（XLU-012 Att1/Att2 驗證）**：CIBR-012 的「2DD cap >= -X%」方向在 XLU 上對 winners/losers 無區分力——XLU 訊號 2DD 維度上 TPs 與 SLs/expiry 分布重疊（TPs 範圍 -0.01%~-3.39%，SL/expiry 落於中等 -1.72%/-2.51%）。Att1 cap >= -2.5% 將 Part B 退化為 zero-var（過濾 1 expiry + 1 TP，cooldown shift 後純 TPs），Att2 加寬 TP 仍無解。**確認 lesson #20b 失敗家族擴展至 1-1.5% vol 利率敏感 ETF 的 2DD secondary filter 類別**
+- **XLU-012 Att3 為新全域最優**（12 次實驗、46+ 次嘗試，含均值回歸、突破（BB/KC/寬帶/成交量確認）、趨勢回檔、跨資產配對/過濾、動量回檔、XLU/SPY 配對交易、波動率飆升過濾、2DD 區間過濾九種策略類型）
 <!-- AI_CONTEXT_END -->
 
 # XLU 實驗總覽 (XLU Experiments Overview)
@@ -128,7 +140,8 @@
 | XLU-008 | `xlu_008_tight_squeeze_breakout` | BB(20,2.5) 寬帶突破 / 成交量確認 / 嚴格擠壓（3 次嘗試） | 已完成（探索性改善） |
 | XLU-009 | `xlu_009_kc_squeeze_breakout` | Keltner Channel Squeeze Breakout（ATR-based 波動收縮突破，3 次嘗試） | 已完成 |
 | XLU-010 | `xlu_010_20d_wide_pullback` | 波動率飆升均值回歸（ATR ratio > 1.2，品質最佳但訊號少） | 已完成 |
-| XLU-011 | `xlu_011_vol_adaptive_mr` | 波動率自適應均值回歸（ATR ratio > 1.15，品質+數量平衡） | ★ 當前最佳 |
+| XLU-011 | `xlu_011_vol_adaptive_mr` | 波動率自適應均值回歸（ATR ratio > 1.15，品質+數量平衡） | 前任最佳 |
+| XLU-012 | `xlu_012_vol_transition_mr` | Post-Capitulation Vol-Transition MR（XLU-011 框架 + TP +3.0%，移除 2DD 過濾） | ★ 當前最佳 |
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-09T16:57:49.842715"
+    "execution_time": "2026-04-29T00:57:59.787518"
   },
   "part_a": {
     "ticker": "GLD",
@@ -619,22 +619,22 @@
   },
   "part_c": {
     "ticker": "GLD",
-    "total_signals": 1,
+    "total_signals": 2,
     "wins": 0,
     "win_rate": 0.0,
-    "avg_return_pct": -4.1,
-    "std_return_pct": 0.0,
-    "cumulative_return_pct": -4.1,
-    "avg_holding_days": 2.0,
+    "avg_return_pct": -2.1,
+    "std_return_pct": 2.0,
+    "cumulative_return_pct": -4.2,
+    "avg_holding_days": 1.0,
     "max_drawdown_pct": -9.58,
     "profit_factor": 0.0,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": -1.0,
-    "calmar_ratio": -0.43,
-    "max_consecutive_losses": 1,
+    "sharpe_ratio": -1.05,
+    "sortino_ratio": -0.72,
+    "calmar_ratio": -0.22,
+    "max_consecutive_losses": 2,
     "target_exits": 0,
     "stop_loss_exits": 1,
-    "time_expiry_exits": 0,
+    "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
       {
@@ -647,9 +647,20 @@
         "holding_days": 2,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -9.58
+      },
+      {
+        "date": "2026-04-27",
+        "entry_date": "2026-04-28",
+        "exit_date": "2026-04-28",
+        "entry": 421.14,
+        "exit": 420.72,
+        "return_pct": -0.1,
+        "holding_days": 0,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": 0.0
       }
     ],
-    "filled_count": 1,
+    "filled_count": 2,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -663,7 +674,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-09"
+      "end": "2026-04-28"
     }
   }
 }

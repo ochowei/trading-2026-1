@@ -1,0 +1,218 @@
+{
+  "metadata": {
+    "execution_time": "2026-04-28T21:09:50.157661"
+  },
+  "part_a": {
+    "ticker": "SOXL",
+    "total_signals": 5,
+    "wins": 4,
+    "win_rate": 0.8,
+    "avg_return_pct": 13.24,
+    "std_return_pct": 9.51,
+    "cumulative_return_pct": 82.67,
+    "avg_holding_days": 12.8,
+    "max_drawdown_pct": -8.48,
+    "profit_factor": 12.46,
+    "sharpe_ratio": 1.39,
+    "sortino_ratio": 5.12,
+    "calmar_ratio": 1.56,
+    "max_consecutive_losses": 1,
+    "target_exits": 4,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2020-10-28",
+        "entry_date": "2020-10-29",
+        "exit_date": "2020-11-04",
+        "entry": 15.79,
+        "exit": 18.63,
+        "return_pct": 18.0,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.7
+      },
+      {
+        "date": "2023-04-25",
+        "entry_date": "2023-04-26",
+        "exit_date": "2023-05-17",
+        "entry": 13.36,
+        "exit": 15.77,
+        "return_pct": 18.0,
+        "holding_days": 15,
+        "exit_type": "target",
+        "max_drawdown_pct": -8.17
+      },
+      {
+        "date": "2023-08-11",
+        "entry_date": "2023-08-14",
+        "exit_date": "2023-09-20",
+        "entry": 20.49,
+        "exit": 19.31,
+        "return_pct": -5.78,
+        "holding_days": 25,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -8.48
+      },
+      {
+        "date": "2023-09-21",
+        "entry_date": "2023-09-22",
+        "exit_date": "2023-10-12",
+        "entry": 17.62,
+        "exit": 20.79,
+        "return_pct": 18.0,
+        "holding_days": 14,
+        "exit_type": "target",
+        "max_drawdown_pct": -5.74
+      },
+      {
+        "date": "2023-10-25",
+        "entry_date": "2023-10-26",
+        "exit_date": "2023-11-03",
+        "entry": 14.89,
+        "exit": 17.57,
+        "return_pct": 18.0,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -7.5
+      }
+    ],
+    "filled_count": 5,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "SOXL",
+    "total_signals": 2,
+    "wins": 2,
+    "win_rate": 1.0,
+    "avg_return_pct": 18.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 39.24,
+    "avg_holding_days": 8.0,
+    "max_drawdown_pct": -10.28,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 1.75,
+    "max_consecutive_losses": 0,
+    "target_exits": 2,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-04-18",
+        "entry_date": "2024-04-19",
+        "exit_date": "2024-04-26",
+        "entry": 33.52,
+        "exit": 39.56,
+        "return_pct": 18.0,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -10.28
+      },
+      {
+        "date": "2024-11-15",
+        "entry_date": "2024-11-18",
+        "exit_date": "2024-12-04",
+        "entry": 26.48,
+        "exit": 31.24,
+        "return_pct": 18.0,
+        "holding_days": 11,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.29
+      }
+    ],
+    "filled_count": 2,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "SOXL",
+    "total_signals": 2,
+    "wins": 1,
+    "win_rate": 0.5,
+    "avg_return_pct": 2.96,
+    "std_return_pct": 15.04,
+    "cumulative_return_pct": 3.73,
+    "avg_holding_days": 1.5,
+    "max_drawdown_pct": -16.45,
+    "profit_factor": 1.49,
+    "sharpe_ratio": 0.2,
+    "sortino_ratio": 0.35,
+    "calmar_ratio": 0.18,
+    "max_consecutive_losses": 1,
+    "target_exits": 1,
+    "stop_loss_exits": 1,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2026-03-03",
+        "entry_date": "2026-03-04",
+        "exit_date": "2026-03-06",
+        "entry": 56.02,
+        "exit": 49.24,
+        "return_pct": -12.09,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -16.45
+      },
+      {
+        "date": "2026-03-30",
+        "entry_date": "2026-03-31",
+        "exit_date": "2026-04-01",
+        "entry": 42.92,
+        "exit": 50.65,
+        "return_pct": 18.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 15.6
+      }
+    ],
+    "filled_count": 2,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.001,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-04-28"
+    }
+  }
+}

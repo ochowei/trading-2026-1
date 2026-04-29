@@ -1,10 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-10
+  last_validated: 2026-04-21
   data_through: 2025-12-31
+  note: URA-011 added 2026-04-21 (Volume-Confirmed Capitulation MR, **repo 第 3 次將 Volume Spike 作為主品質過濾器試驗** — 前兩次 USO-006 Att2 與 TSLA-012 Att1 均失敗)。Three iterations all failed vs URA-004 min 0.39: Att1 (URA-004 entry + Volume/Avg20 ≥ 1.5x) Part A 6/66.7%/**0.39** / Part B 6/66.7%/**0.39** / min **0.39（完美 A/B 平衡但等同 URA-004）** — 6/6 訊號 identical WR/cum +12.53%/identical 4TP+2SL structure，Volume filter 創造 A/B 對稱性但未提升品質上限；Att2 (Vol ≥ 2.0x + ClosePos ≥ 40%) Part A 2/50%/**0.04** / Part B 3/66.7%/0.39 / min **0.04（崩壞）** — 收緊 Volume + ClosePos 移除 TPs 多於 SLs，Part A 從 4TP2SL 降至 1TP1SL，進場日期偏移使 2020-02-27 TP 日變 2020-02-28 SL 日（lesson #19）；URA 政策驅動使 ClosePos 無選擇性（與 URA-007 ATR 重複過濾失敗同類）。Att3 (Att1 移除 2DD，Vol ≥ 1.5x alone) Part A 7/57.1%/**0.18** / Part B 6/66.7%/0.39（同 Att1）/ min **0.18** — Volume 與 2DD 結構性獨立，移除 2DD 在 Part A 新增 2 訊號（2022-10-12 TP + 2023-03-10 SL）使 WR 降至 57.1%；Part B 2DD 對 Volume spike 訊號為非綁定（不變）。**結論**：(1) Volume spike 作為 supplementary filter 可產生完美 A/B 對稱但品質天花板等同 URA-004；(2) 2DD 與 Volume 互補非重複——2DD 在 Part A 有真實選擇性，Part B 為非綁定；(3) URA 政策驅動使 ClosePos 日內反轉確認失敗。**Repo 第 3 次 Volume Spike 作為主過濾器試驗**（USO-006 Att2 / TSLA-012 Att1 皆失敗），URA 首次。擴展 lesson #6（確認指標邊際效益遞減）至 Volume 類別：Volume 在已飽和 pullback+RSI(2)+2DD 框架上僅提供對稱性而非品質提升。**新 cross-asset 發現**：Volume supplementary filter 在高流動性 ETF 上可創造 perfect A/B balance（6/6 訊號、同 WR、同 cum）但無法突破底層框架的品質天花板——validated 於 URA，待跨資產驗證。URA's 11th failed strategy type. URA-004 remains global optimum (11 experiments, 33+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** URA-004（回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3%，TP +6.0% / SL -5.5%，Part A Sharpe 0.41，Part B Sharpe 0.39，A/B gap 0.02）**已確認全域最優**（7 次實驗、21+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器七大策略類型）
+**當前最佳：** URA-004（回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3%，TP +6.0% / SL -5.5%，Part A Sharpe 0.41，Part B Sharpe 0.39，A/B gap 0.02）**已確認全域最優**（11 次實驗、33+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器、RSI bullish hook divergence、Day-After Capitulation 強反轉 K 線確認、Williams Vix Fix capitulation、Volume-Confirmed Capitulation 十一大策略類型）
 **前任最佳：** URA-003（回檔 10-20% + RSI(2) < 15，Part A Sharpe 0.34，Part B Sharpe 0.44，A/B gap 0.10）
 **滾動窗口分析摘要：** URA-001 ✗✓（精準度突變 ΔWR 25.0pp，績效漸變，早期鈾礦暴漲→2022 回檔為主因）
 
@@ -25,6 +26,29 @@
 - ATR(5)/ATR(20) > 1.05 疊加 URA-004（URA-007 Att1）：Part A 0.27（-34%）/ Part B 0.71（+82%），ATR 移除 5 贏家 1 輸家，2日跌幅已捕捉急跌特徵使 ATR 重複過濾
 - ATR(5)/ATR(20) > 1.1 取代 2日跌幅（URA-007 Att2）：Part A 0.07 / Part B 1.19，移除 2日跌幅導致 Part A 崩潰，ATR 無法替代 2日跌幅的精確短期恐慌過濾
 - WR(10) ≤ -80 雙振盪器確認（URA-007 Att3）：Part A 0.29 / Part B 0.39（Part B 不變），WR 通過冷卻鏈偏移引入新的停損訊號（2022-01-13、2022-09-16），4 連敗
+- **RSI(14) Bullish Hook Divergence 疊加（URA-008，3 次嘗試均失敗，擴展 lesson #20b 邊界）：**
+  - Att1（URA-004 base + hook delta=3 lookback=5）：Part A 0.04 / Part B 0.00，訊號 2/2——2日跌幅 ≤ -3% 要求近期下挫，但 hook 要求 RSI 從近期低點回升，兩條件矛盾
+  - Att2（移除 2DD，pullback+RSI(2)+hook）：Part A 0.57 / Part B 0.00，訊號 4/2——RSI(2)<15 過嚴配合 hook 後 Part B 僅 2 訊號皆達標零方差 Sharpe 未定義
+  - Att3（改用 WR(10)+hook，SIVR-015 結構直移）：Part A 0.36 / Part B **-0.32**，訊號 6/3——Part B 3 訊號 2 停損 1 達標，WR 33.3%
+  - 失敗根因：URA 2024-2025 鈾價高波動期間（11 月雙筆 V 型反彈），hook 過濾器無法辨識「RSI 轉折是暫時回彈還是真實見底」。SIVR 2024-2025 銀價避險需求維持活躍反轉能量，URA 則因核電題材+供應缺口使衝擊後價格常延續更深跌。擴展 lesson #20b 邊界：RSI bullish hook divergence 需資產具備「RSI 轉折=真實反轉」的結構，URA 核能政策驅動使此結構不成立
+- **Day-After Capitulation + 強反轉 K 線確認（URA-009，3 次嘗試均失敗）：**
+  - Att1（WR≤-85 + 2DD≤-4% + Close>Prev Close + Close>Open）：Part A -0.25 / Part B 0.15，訊號 11/9——Part A 4 連敗集中於 2022 鈾礦熊市，純粹「向上 bar」反轉過濾太弱
+  - Att2（加嚴反轉：Close > 昨日 High 收復昨高）：Part A 0.24 / Part B 0.24，訊號 5/5，WR 60%/60%——A/B 完美平衡（累計差 0pp），但年化訊號僅 ~1 筆，樣本過薄
+  - Att3（放寬 T-1 至 WR≤-80, 2DD≤-3% 同 URA-004，保留強反轉）：Part A -0.08 / Part B -0.11，訊號 9/7，WR 44.4%/42.9%——放寬後新增訊號品質崩壞，強反轉無法挽救
+  - 失敗根因：與 URA-008 hook 同屬「V-bounce ≠ genuine reversal」模式——URA 核能政策驅動使任何單日/雙日反轉過濾器（無論振盪器 hook 還是 price-action bar）均無法區分真反轉 vs 暫時回彈。Att2 的強反轉過濾雖能維持高 WR，但訊號稀少至無統計意義。Att3 確認 URA-004 的 WR≤-80 + 2DD≤-3% 配置已是 capitulation-day 進場的最優解
+- **Williams Vix Fix (WVF) 資本化均值回歸（URA-010，repo 首次 WVF 試驗，3 次嘗試均失敗）：**
+  - Att1（WVF(22)>BB_upper(20,2.0) + 10d 回檔 [-8%,-25%] + cd=10）：Part A 23/65.2%/0.33 / Part B 11/45.5%/**-0.06**——Part B 6 筆停損（2024-02-13/06-04/10-31, 2025-02-21/10-17/11-07）皆為「持續下跌中段的 capitulation 假象」，WVF spike 後續跌
+  - Att2（加入 2 日跌幅 ≤ -3%）：Part A 21/61.9%/0.25 / Part B 11/45.5%/**-0.06**（不變）——2DD 對 WVF 結構性非綁定（WVF spike 隱含近期急跌），Part B 訊號完全相同；Part A 反而退步（移除 2 筆好訊號）
+  - Att3（加深回檔下限至 -10%，URA-004 標準）：Part A 13/76.9%/**0.68** / Part B 8/50%/**0.04**（min 0.04）——深回檔大幅提升 Part A 品質（Sharpe 0.25→0.68，+172%）但 A/B 累計差 50.4pp 遠超 30% 目標，Part B 仍有 4 筆停損（含 2025-10-17/11-07 post-rally crash 系列）
+  - 失敗根因：擴展 lesson #20b 失敗家族至 **capitulation-depth 指標**（WVF）——URA 政策驅動性質（核能政策/俄烏鈾供應）使 capitulation 深度本身也無法區分真假底部，與 oscillator hook（URA-008）/ day-after price-action bar（URA-009）同屬同一失敗模式。**正面發現**：Att3 顯示「WVF + 深回檔」Part A Sharpe 0.68 為 URA 系列 in-sample 最高，模式可能適用於 Part A/B 兩段皆活躍 MR regime 的高波動資產（SIVR/COPX 待跨資產驗證）
+  - **Repo 首次 WVF 試驗** — WVF = (max(Close,N)−Low)/max(Close,N)*100，是純粹 capitulation 深度指標（非 turn-up 指標）。Att1 證實即使結構性與 hook 不同，URA Part B 仍因 regime change 失效
+- **Volume-Confirmed Capitulation 均值回歸（URA-011，repo 第 3 次 Volume Spike 作為主過濾器試驗，3 次嘗試均失敗）：**
+  - Att1（URA-004 entry + Volume(today)/Avg20(Volume) ≥ 1.5x）：Part A 6/66.7%/**0.39** / Part B 6/66.7%/**0.39** / min **0.39**（**完美 A/B 平衡但等同 URA-004**）——訊號數 6/6（比例 1:1）、WR 同為 66.7%、累計報酬同為 +12.53%、4 TPs + 2 SLs 結構完全對稱，Volume filter 創造 A/B 對稱性但未突破 URA-004 品質天花板
+  - Att2（Vol ≥ 2.0x + ClosePos ≥ 40%）：Part A 2/50%/**0.04** / Part B 3/66.7%/0.39 / min **0.04**（崩壞）——收緊 Volume + ClosePos 移除 TPs 多於 SLs，Part A 從 4TP2SL 降至 1TP1SL，進場日期偏移使 2020-02-27 TP 日變 2020-02-28 SL 日（lesson #19 現象）；URA 政策驅動使 ClosePos 無選擇性（與 URA-007 ATR 重複過濾失敗同類）
+  - Att3（Att1 移除 2DD，Vol ≥ 1.5x alone）：Part A 7/57.1%/**0.18** / Part B 6/66.7%/**0.39**（同 Att1）/ min **0.18**——Volume 與 2DD 結構性獨立（非重複過濾），移除 2DD 在 Part A 新增 2 訊號（2022-10-12 TP + 2023-03-10 SL）使 WR 降至 57.1%；Part B 2DD 對 Volume spike 訊號為完全非綁定（訊號集與 Att1 完全相同）
+  - 失敗根因：(1) Volume 作為 supplementary filter 在已飽和 pullback+RSI(2)+2DD 框架上僅提供對稱性而非品質提升，擴展 lesson #6（確認指標邊際效益遞減）至 Volume 類別；(2) 2DD 與 Volume 互補非重複——2DD 在 Part A 有真實選擇性（URA-007 Att2 驗證 ATR 無法替代 2DD，本實驗 Att3 驗證 Volume 亦無法替代 2DD），Part B 為非綁定；(3) Volume + ClosePos 組合在政策驅動 URA 上無選擇性（URA 事件驅動的 capitulation 常無盤中強反彈結尾）
+  - **正面發現**：Att1 驗證「URA-004 entry + Volume spike」可產生完美 A/B 對稱（identical 6 訊號、identical WR、identical cum）。此為 URA 系列首次達到完美 A/B 對稱，可作為未來訊號結構驗證的 sanity check
+  - **Repo 第 3 次 Volume Spike 作為主過濾器試驗**（USO-006 Att2「Volume >1.3x」Part A 退步 failed / TSLA-012 Att1「Volume >1.3x BB Squeeze」Part B 訊號減半 failed），URA 首次。**新 cross-asset 發現**：Volume supplementary filter 在高流動性 ETF 上可創造 perfect A/B balance 但無法突破底層框架品質天花板——validated 於 URA，待 SIVR/FXI/INDA 等高流動性資產跨資產驗證
 
 **已掃描的參數空間：**
 - 均值回歸進場：回檔 8~10% + 上限 15~20% + WR(10) ≤ -80 / RSI(2) < 12~15 + 2日跌幅 -2.5%~-4%
@@ -38,10 +62,16 @@
 - **相對強度（URA vs XLE）**：20日報酬差≥8% + SMA(50) + 5日回調 3-8% → Part A -0.28/Part B -0.01（WR 37.5%，6連敗）
 - **波動率自適應**：ATR(5)/ATR(20) > 1.05/1.1 疊加或取代 2日跌幅 → ATR 在 2.34% 日波動下無額外區分力
 - **雙振盪器（WR+RSI）**：WR(10) ≤ -80 + RSI(2) < 15 + 2日跌幅 → 冷卻鏈偏移引入壞訊號
+- **Day-After Capitulation 強反轉 K 線確認**：T-1 capitulation + T 今日反轉 K 線（Close>Prev Close/High + Close>Open），3 次迭代最佳 min(A,B) 0.24
+- **Williams Vix Fix（WVF）+ 回檔深度**：WVF(22)>BB_upper(WVF,20,2.0) + 10d 回檔 [-8%/-10%, -25%] + 可選 2DD ≤ -3%。Att3（深回檔 -10%）Part A Sharpe 0.68（URA 系列 in-sample 最高），但 Part B 0.04 拖累 min(A,B)。Repo 首次 WVF 試驗
+- **Volume-Confirmed Capitulation**：URA-004 entry + Volume(today)/Avg20(Volume) ≥ 1.5x/2.0x，可選 ClosePos ≥ 40%。Att1 完美 A/B 對稱（6/6 訊號、同 WR、同累計）但 min 0.39 等同 URA-004；Att2（Vol 2.0x + ClosePos）min 0.04 崩壞；Att3（移除 2DD）min 0.18
 
 **尚未嘗試的方向（預期改善極低）：**
 - 鈾期貨/鈾價相關 ETF 確認（跨資產驗證，預期邊際效益低）
 - 配對交易（URA vs CCJ）— 但跨資產教訓顯示配對交易在大多數資產上失敗（結構性漂移）
+- Gap-Down 資本化（lesson #20a）— URA 盤外流動性不足，結構性不適用
+- ~~Williams Vix Fix capitulation~~ → URA-010 驗證失敗（3 次嘗試，extends lesson #20b 至 capitulation-depth 指標）
+- ~~Volume-Confirmed Capitulation~~ → URA-011 驗證失敗（3 次嘗試，Volume supplementary filter 無法突破 URA-004 品質天花板）
 
 **關鍵資產特性：**
 - URA (Global X Uranium ETF) 日波動約 2.34%，GLD 比率 2.11x
@@ -54,6 +84,9 @@
 - **BB Squeeze Breakout 在 URA 上完全無效**：鈾礦 ETF 的波動擠壓後突破缺乏持續動能，可能因板塊由政策/事件驅動而非技術動能驅動，突破後快速反轉是常態
 - **趨勢/動量/RS 策略在 URA 上全面失敗**：SMA 金叉、ROC(20) 動量、URA vs XLE 相對強度三種順勢進場方式均產生負或近零 Sharpe，鈾礦 ETF 的事件驅動特性使動量訊號不可靠，回調後常繼續下跌而非恢復上漲
 - **雙振盪器確認在 URA 上失敗**：WR(10) 不過濾 Part B 任何訊號（RSI(2)+2DD 訊號在 Part B 天然通過 WR），但在 Part A 通過冷卻鏈偏移引入新壞訊號
+- **RSI(14) Bullish Hook Divergence 在 URA 上失敗（URA-008 驗證）**：URA 形式上符合 lesson #20b 全部四項條件（日波動 2.34%、10日回檔框架、兩段活躍 MR regime、已驗證 pullback+WR/RSI(2) 框架），但三次迭代均無法超越 URA-004。關鍵失敗點發生在 Part B：hook 過濾器大幅收斂訊號數（SIVR 保留率 44% vs URA 保留率 25%），殘餘 Part B 訊號中停損佔比升至 67%。URA 的核能政策/鈾價供應衝擊使 RSI(14) 轉折不代表真實反轉，常發生「V-bounce 後繼續深跌」模式（如 2025-11-05 訊號後隔日直接跌穿 SL）。擴展 lesson #20b 邊界：SIVR-015 模式需 RSI 轉折 = 真實反轉 的 regime，URA 事件驅動特性使此結構不成立
+- **Day-After Capitulation + 強反轉 K 線確認在 URA 上失敗（URA-009 驗證）**：三次迭代最佳 min(A,B) 0.24（Att2 Close>Prev High），遠低於 URA-004 的 0.39。強反轉過濾（收復昨日高點）能維持 WR 60%，但年化訊號僅 ~1 筆；放寬 T-1 capitulation 閾值後訊號品質立即崩壞（WR 崩至 43%）。與 URA-008 hook 屬於同一失敗模式：政策驅動資產的任何單日/雙日反轉確認（無論振盪器 hook 或 price-action bar）均無法區分真反轉 vs 暫時回彈。Att2 A/B 完美平衡但樣本過薄，Att3 放寬後樣本增但品質丟失——證明 URA-004 的 WR≤-80 + 2DD≤-3% 配置已是 capitulation-day 進場的最優解，day-after 額外一日等待換取的確認訊號價值低於失去的進場速度
+- **Volume-Confirmed Capitulation 在 URA 上無法超越 URA-004（URA-011 驗證，repo 第 3 次 Volume Spike 作為主過濾器試驗）**：Att1（URA-004 entry + Volume ≥ 1.5x）產生 URA 首次「完美 A/B 對稱」——Part A/B 均 6 訊號、同為 66.7% WR、同為 +12.53% 累計報酬、同為 4TP+2SL 結構、同為 0.39 Sharpe。Volume spike 作為 supplementary filter 創造對稱性但未突破 URA-004 品質天花板。Att2（收緊至 2.0x + ClosePos 40%）min 0.04 崩壞，進場日期偏移使 2020-02-27 TP 轉 2020-02-28 SL；URA 政策驅動使 ClosePos 無選擇性（與 URA-007 ATR 重複過濾失敗同類）。Att3（移除 2DD，Vol 1.5x alone）min 0.18——Volume 與 2DD 結構性獨立（非重複過濾），2DD 在 Part A 有真實選擇性。**核心發現**：(1) Volume 在已飽和 pullback+RSI(2)+2DD 框架上僅提供對稱性而非品質提升，擴展 lesson #6 至 Volume 類別；(2) 2DD 無法被 ATR（URA-007）、Volume（URA-011）任一替代，URA-004 的 2DD 過濾為真實不可省略元素。新 cross-asset 假設：Volume supplementary filter 可在高流動性 ETF 產生完美 A/B 對稱但無法突破品質天花板，待 SIVR/FXI/INDA 跨資產驗證
 <!-- AI_CONTEXT_END -->
 
 # URA 實驗總覽 (URA Experiments Overview)
@@ -77,6 +110,10 @@
 | URA-005 | `ura_005_bb_squeeze_breakout`   | BB Squeeze Breakout（3 次嘗試均失敗）       | 已完成（未改善） |
 | URA-006 | `ura_006_trend_pullback`        | 趨勢/動量/RS 回調（3 次嘗試均失敗）        | 已完成（未改善） |
 | URA-007 | `ura_007_vol_adaptive`          | 波動率自適應/雙振盪器（3 次嘗試均失敗）     | 已完成（未改善） |
+| URA-008 | `ura_008_rsi_divergence_mr`     | RSI(14) Bullish Hook Divergence（3 次嘗試均失敗） | 已完成（未改善） |
+| URA-009 | `ura_009_day_after_reversal_mr` | Day-After Capitulation + 強反彈 K 線確認（3 次嘗試均失敗） | 已完成（未改善） |
+| URA-010 | `ura_010_wvf_capitulation_mr`   | Williams Vix Fix Capitulation + 回檔深度 MR（3 次嘗試均失敗） | 已完成（未改善） |
+| URA-011 | `ura_011_volume_capitulation_mr` | Volume-Confirmed Capitulation MR（Volume Spike + URA-004 框架，3 次嘗試均失敗） | 已完成（未改善） |
 
 ---
 
@@ -692,3 +729,262 @@ URA 日波動 2.34% 接近 COPX (2.25%)，ATR > 1.05 為起始測試門檻。
 3. **雙振盪器確認觸發冷卻鏈偏移**：WR(10) 不僅移除訊號，還通過改變冷卻計時引入新（且更差的）訊號
 
 **最終確認：URA-004 為全域最優（7 次實驗、21+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器七大策略類型）。**
+
+---
+
+## URA-008: RSI(14) Bullish Hook Divergence 疊加（3 次嘗試均失敗）
+
+### 目標 (Goal)
+
+移植 SIVR-015 Att1 的 RSI(14) bullish hook divergence 過濾器（lesson #20b）。URA 形式上符合 20b 全部四項條件：
+- 日波動 2.34%（2-3% 範圍）
+- 已驗證 pullback+WR 均值回歸框架（URA-001/002/004）
+- Pullback lookback 10 日（≤10 日要求）
+- URA-004 Part A Sharpe 0.41 / Part B 0.39（兩段活躍 MR regime）
+
+Hypothesis: URA-004 Part A 22 筆訊號中的 7 筆停損部分源自 RSI(14) 仍在下探中的「falling knife」情境，加入 RSI(14) hook divergence 可選擇性移除持續下跌訊號，保留 capitulation 尾聲訊號。
+
+### 三次嘗試 (Three Attempts)
+
+#### Att1: URA-004 base + RSI(14) bullish hook（delta 3 / lookback 5 / max-min 35）
+
+**進場條件：** 10日回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3% + **RSI(14) hook: today - 5d min ≥ 3 且 5d min ≤ 35**
+**出場：** TP +6.0% / SL -5.5% / 20 天 / cd 10
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 2 (0.4/yr) | 2 (1.0/yr) |
+| WR | 50.0% | 100.0% |
+| Sharpe | **0.04** | **0.00** |
+| 累計 | +0.07% | +12.36% |
+
+**分析：** 2日跌幅 ≤ -3% 與 RSI(14) hook up ≥ 3 兩條件在邏輯上矛盾——前者要求近期下挫（會壓低 RSI(14)），後者要求 RSI(14) 已從近期低點回升。僅在極罕見情境同時成立，訊號從 URA-004 的 22/15 崩跌至 2/2。min(A,B) = 0.00 ✗
+
+#### Att2: 移除 2日跌幅，pullback + RSI(2) + hook
+
+**進場條件：** 10日回檔 10-20% + RSI(2) < 15 + **RSI(14) hook**（移除 2DD）
+**出場：** 同 Att1
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 4 (0.8/yr) | 2 (1.0/yr) |
+| WR | 75.0% | 100.0% |
+| Sharpe | **0.57** | **0.00**（零方差未定義） |
+| 累計 | +11.05% | +12.36% |
+
+**分析：** 移除 2DD 後訊號增至 4/2，Part A Sharpe 升至 0.57，但 Part B 仍僅 2 訊號全達標（零方差使 Sharpe 無意義）。RSI(2) < 15 搭配 hook divergence 過度過濾——URA 的 RSI(2) 超賣日通常伴隨 RSI(14) 繼續下探，hook delta ≥ 3 過於嚴格。min(A,B) = 0.00 ✗
+
+#### Att3: pullback + WR(10) + hook（SIVR-015 結構直移）
+
+**進場條件：** 10日回檔 10-20% + **WR(10) ≤ -80**（替代 RSI(2)）+ RSI(14) hook
+**出場：** 同 Att1
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 6 (1.2/yr) | 3 (1.5/yr) |
+| WR | 66.7% | 33.3% |
+| Sharpe | **0.36** | **-0.32** |
+| 累計 | +11.14% | -5.52% |
+| 最大連敗 | 1 | 2 |
+
+**Part B 3 筆訊號明細：**
+| 訊號日 | 進場 | 出場 | 報酬 | 出場類型 |
+|--------|------|------|------|---------|
+| 2025-02-27 | 23.36 | 22.05 | -5.59% | 停損 |
+| 2025-11-05 | 47.16 | 44.52 | -5.59% | 停損（隔日即停損） |
+| 2025-11-20 | 40.14 | 42.54 | +6.00% | 達標 |
+
+**分析：** WR(10) 比 RSI(2)<15 寬鬆，訊號增至 6/3，Part A Sharpe 0.36（接近 URA-004 的 0.41）。但 Part B WR 崩跌至 33.3%，Sharpe -0.32。關鍵失敗：2025-11-05 訊號進場隔日即跌穿 SL -5.5%——hook 過濾器識別出 RSI 轉折但未能區分「V-bounce 暫時回彈」與「真實見底」。min(A,B) = -0.32 ✗
+
+### 整體結論
+
+三次嘗試均嚴重低於 URA-004 基線 0.39：
+
+| 嘗試 | Part A | Part B | min(A,B) | 結論 |
+|------|--------|--------|----------|------|
+| URA-004（基線）| 0.41 | 0.39 | **0.39** | — |
+| Att1 URA-004+hook | 0.04 | 0.00 | 0.00 | 2DD 與 hook 矛盾 |
+| Att2 RSI(2)+hook | 0.57 | 0.00 | 0.00 | Part B 零方差未定義 |
+| Att3 WR+hook（SIVR-015 結構） | 0.36 | -0.32 | -0.32 | Part B 2/3 停損 |
+
+**失敗根因分析：**
+
+1. **訊號保留率差異（URA 25% vs SIVR 44%）**：hook 過濾器對 URA pullback+WR 基底的削減遠強於 SIVR。URA-002 的 24/16 訊號剩 6/3（保留率 25%），SIVR-005 的 32 訊號剩 14（保留率 44%）。此差異反映 URA 在 RSI(14) ≤ 35 期間的 hook-up 事件稀少
+2. **事件驅動 vs 週期性反轉**：URA 的 2024-2025 銅鈾供應題材+政策消息使衝擊後價格常延續更深跌，形如「V-bounce 後繼續深跌」（2025-11-05 即例）。SIVR 則由避險需求主導，短期拋售後有系統性回升
+3. **Part B 小樣本放大噪音**：3 筆 Part B 訊號中任一筆的勝負翻轉都會大幅改變 Sharpe，hook 過濾器將訊號削減至無法消化統計噪音的程度
+
+### 擴展 lesson #20b 邊界
+
+URA-008 為 RSI(14) bullish hook divergence 模式的**第五個負向驗證**（SIVR-015 後 FCX-009、COPX-009、URA-008 皆失敗；EEM/XBI/COPX 等嘗試越界）：
+
+| 驗證 | 結果 | 失敗模式 |
+|------|------|---------|
+| SIVR-015 Att1 | ✓ min 0.48 | 全域最佳（原始驗證）|
+| FCX-009（2-3% vol, 10日 PB） | ✗ min 0.30 | Part B post-peak 持續下跌無 MR regime |
+| COPX-009（2-3% vol, 20日 PB） | ✗ min 0.15 | 20日 PB 超過 lesson 20b 邊界 |
+| URA-008（2-3% vol, 10日 PB, 兩段活躍 MR）| ✗ min -0.32 | **事件驅動型資產 RSI 轉折≠真實反轉** |
+
+URA-008 的失敗揭示 lesson #20b 的第五個必要條件：**資產需具備「RSI 轉折 = 真實反轉」的結構**。事件驅動/政策驅動資產（如 URA 核能政策、FXI 政策、TLT 利率）即使符合波動、框架、regime 三條件，hook divergence 仍會被噪音反轉所欺。目前僅 SIVR（銀價避險需求）通過此隱含條件驗證。
+
+**最終確認：URA-004 仍為全域最優（8 次實驗、24+ 次嘗試，含均值回歸、突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器、RSI bullish hook divergence 八大策略類型）。**
+
+---
+
+## URA-010: Williams Vix Fix 資本化均值回歸 (Williams Vix Fix Capitulation MR)
+
+### 目標 (Goal)
+
+URA-008（RSI bullish hook divergence）與 URA-009（day-after capitulation +
+強反轉 K 線）皆失敗，根因為「V-bounce ≠ genuine reversal」。本實驗改用
+**Larry Williams 的 Vix Fix（WVF）** 作為主進場訊號：
+
+> WVF(N) = (max(Close, N) − Low) / max(Close, N) × 100
+
+WVF 結構性與 oscillator hook 不同——它測量「當下 Low 相對近 N 日最高
+Close 的折價深度」，是純 capitulation 深度指標而非 turn-up 指標。當 WVF
+上穿其自身的 Bollinger 上軌（WVF series 的 BB 帶寬擴張至極值），代表
+市場處於相對近期最深的折價狀態。理論假設：在「深淵」進場可避開 hook
+divergence 的「等候反彈確認」失敗模式。
+
+### 進場條件演進 (Entry Iteration)
+
+| Att | WVF 主訊號 | 回檔下限 | 回檔上限 | 2DD 過濾 |
+|-----|-----------|----------|----------|---------|
+| Att1 | WVF(22) > BB_upper(20, 2.0) | -8% | -25% | — |
+| Att2 | 同 Att1 | -8% | -25% | ≤ -3% |
+| Att3 | 同 Att1 | **-10%** | -25% | ≤ -3% |
+
+### 出場參數 (Exit Parameters)
+
+沿用 URA-004 對稱範圍：TP +6.0% / SL -5.5% / 持倉 20 天 / 冷卻 10 天。
+成交模型：隔日開盤市價、悲觀認定、滑價 0.10%。
+
+### 結果摘要 (Results Summary)
+
+| Att | Part A (n/WR/Sharpe) | Part B (n/WR/Sharpe) | min(A,B) | A/B 累計差 |
+|-----|-----------------------|-----------------------|----------|----------|
+| URA-004（基線）| 22/68.2%/0.41 | 9/66.7%/0.39 | **0.39** | ~3pp |
+| Att1 | 23/65.2%/0.33 | 11/45.5%/-0.06 | **-0.06** | 50pp |
+| Att2 | 21/61.9%/0.25 | 11/45.5%/-0.06 | **-0.06** | 34pp |
+| Att3 | 13/76.9%/**0.68** | 8/50%/0.04 | **0.04** | 50pp |
+
+### 逐次失敗分析 (Iteration Analysis)
+
+**Att1：WVF 基線**
+- Part A 23 訊號 65% WR Sharpe 0.33（合理水準，略低於 URA-004）
+- Part B 11 訊號中 6 筆停損（2024-02-13、06-04、10-31，2025-02-21、10-17、11-07）
+- 失敗模式：每筆停損均在進場後 1-4 日觸發，WVF spike 後 URA 持續下跌
+- 2025-10-17 與 11-07 為 URA 從 $30 暴漲至 $52 後的 post-rally crash，WVF 認定 panic 但反向繼續
+
+**Att2：加入 2DD ≤ -3%（URA-004 已驗證過濾器）**
+- Part B 訊號完全相同（11 筆），2DD 對 WVF 結構性非綁定
+- 原因：WVF spike 機制要求 Low 相對近 22 日最高 Close 折價達極值，這隱含
+  近期已有大跌；故 2DD 條件被自動滿足
+- Part A 反退步（21 訊號 Sharpe 0.25），移除 2 筆好訊號（其 2DD 介於 -2~-3%）
+
+**Att3：加深回檔下限至 -10%（URA-004 標準）**
+- Part A 大幅改善（13 訊號 Sharpe 0.68，URA 系列 in-sample 最高）
+- Part B 從負轉正但僅 0.04，A/B 累計差 50pp 遠超 30% 目標
+- 殘餘 Part B 失敗訊號（含 2025-10-17/11-07）皆為 post-rally crash 類型，
+  深回檔過濾仍無法區分 V-bounce vs 真實見底
+
+### 擴展 lesson #20b 邊界（capitulation-depth 指標）
+
+URA-010 為 lesson #20b 失敗家族的第六個負向驗證，首次擴展至 **capitulation-depth 指標**（前五個皆為 oscillator turn-up 或 single/dual-bar reversal confirmation）：
+
+| 失敗模式 | 代表實驗 | 共同根因 |
+|---------|---------|---------|
+| RSI bullish hook divergence | URA-008、FCX-009、COPX-009、XBI-011、USO-022 | RSI 轉折 ≠ 真實反轉 |
+| Day-After capitulation + bar reversal | URA-009、TLT-006 | 反轉 K 線 ≠ 真實反轉 |
+| CCI oversold turn-up | INDA-009 | Oscillator hook 同類 |
+| Connors RSI（CRSI） | FXI-011 | 多組件 hook |
+| Stochastic %K cross | FXI-008 | Oscillator hook 同類 |
+| **Williams Vix Fix（WVF）capitulation 深度** | **URA-010** | **Capitulation 深度 ≠ 真實反轉** |
+
+**整合規則**：URA 為政策驅動資產，**任何 entry-time 過濾器**（無論
+基於 oscillator turn-up、single/dual-bar reversal、或 capitulation
+depth metric）均無法在 Part B 2024-2025 V-shaped + post-rally crash
+regime 中區分真假底部。URA-004（RSI(2) + 2DD + pullback）已是 URA
+capitulation-day 進場的全域最優解。
+
+### 跨資產假設（待後續驗證）
+
+Att3 的 Part A Sharpe 0.68 顯示「WVF + 深回檔」在 in-sample（URA Part A
+2019-2023 含 2020 COVID + 2022 鈾礦熊市 + 2023 復甦）為高品質訊號生成器。
+推測有效資產需同時滿足：
+
+1. 中高波動（日波動 ≥ 2%）使 WVF spike 具足夠選擇性
+2. Part A/B 兩段皆活躍 MR regime（不同於 URA Part B 的事件驅動偏離）
+3. 深度回檔（pullback ≥ 1.5% × 日波動倍數）作為 quality filter
+
+候選驗證資產：SIVR（2.5% vol，銀價避險需求 → MR 活躍）、COPX（2.25% vol，
+銅週期 → MR 活躍）。預期失效資產：FXI、TLT（政策驅動，類比 URA Part B）。
+
+**最終確認：URA-004 仍為全域最優（10 次實驗、30+ 次嘗試，含均值回歸、
+突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器、RSI bullish
+hook divergence、Day-After capitulation + bar reversal、Williams Vix Fix
+capitulation 十大策略類型）。**
+
+---
+
+## URA-011: Volume-Confirmed Capitulation 均值回歸 (Volume-Confirmed Capitulation MR)
+
+### 目標 (Goal)
+
+測試 **成交量放大（Volume Spike）** 作為品質過濾器能否超越 URA-004。
+URA-007（ATR）、URA-008（RSI hook）、URA-009（day-after bar）、URA-010
+（WVF）四次強化進場品質的嘗試均失敗，共同根因：過濾器與既有 pullback /
+RSI(2) / 2DD 結構性重複或無選擇性。Volume 提供與 ATR / price range / RSI
+turn-up **結構性獨立** 的資訊（市場參與度 / institutional flow 而非 volatility
+或 overbought/oversold），理論上可過濾「急跌但無大量（ATR 高 + Volume 低
+= 流動性真空）」與「慢磨（ATR 低 + Volume 低 = retail drift）」兩類假訊號。
+
+Repo 現狀：Volume 作為主過濾器僅試過 2 次（USO-006 Att2 失敗、TSLA-012
+Att1 失敗），屬 repo 較少使用方向。
+
+### 迭代總結 (Iteration Summary)
+
+- **Att1**（URA-004 entry + Volume/Avg20 ≥ 1.5x，出場 TP +6% / SL -5.5% / 20天 / cd 10）：
+  Part A 6/66.7%/**0.39** / Part B 6/66.7%/**0.39** / min **0.39（等同 URA-004）**
+  - **完美 A/B 對稱**：6/6 訊號、同 WR、同累計 +12.53%、同 4TP+2SL 結構
+  - Volume filter 將 Part A 訊號從 URA-004 的 19 個削減至 6 個（與 Part B 相同），
+    形成對稱品質但未突破 URA-004 品質天花板
+
+- **Att2**（Att1 + 收緊 Volume ≥ 2.0x + ClosePos ≥ 40%）：
+  Part A 2/50%/**0.04** / Part B 3/66.7%/0.39 / min **0.04（崩壞）**
+  - 過嚴過濾移除 TPs 多於 SLs，Part A 從 4TP+2SL 降至 1TP+1SL
+  - 2020-02-27 原 TP 日因過濾變為 2020-02-28 SL 日（lesson #19 日期偏移）
+  - ClosePos 在 URA 政策驅動資產上無選擇性（與 URA-007 ATR 重複過濾同類）
+
+- **Att3**（Att1 移除 2DD，Volume ≥ 1.5x alone）：
+  Part A 7/57.1%/**0.18** / Part B 6/66.7%/0.39（同 Att1）/ min **0.18**
+  - Volume 與 2DD 結構性獨立——移除 2DD 在 Part A 新增 2 訊號（2022-10-12
+    TP + 2023-03-10 SL），WR 降至 57.1%
+  - Part B 2DD 對 Volume spike 訊號為完全非綁定（訊號集與 Att1 完全相同）
+
+### 結論 (Conclusion)
+
+URA-011 為 URA 第 11 種失敗策略類型。三次迭代均未超越 URA-004 min(A,B) 0.39。
+
+**核心學習**：
+1. Volume 作為 supplementary filter 在已飽和 pullback+RSI(2)+2DD 框架上僅
+   提供 A/B 對稱性而非品質提升（擴展 lesson #6 至 Volume 類別）
+2. 2DD 無法被 ATR（URA-007 Att2）、Volume（URA-011 Att3）任一替代；2DD
+   在 Part A 有真實選擇性（過濾好訊號以外的 2 個 marginal 訊號）
+3. Volume + ClosePos 組合在政策驅動 URA 上無選擇性
+
+**正面發現**：Att1 首次在 URA 系列達到「完美 A/B 對稱」（6/6 訊號、
+identical WR、identical cum），此結構可作為未來訊號品質驗證的 sanity check
+基準——若 A/B 訊號結構完美對稱但 Sharpe 無提升，代表 filter 僅達 re-balancing
+作用而非 quality enhancement。
+
+**Repo 第 3 次 Volume Spike 作為主過濾器試驗**（USO-006 Att2「Volume
+>1.3x」Part A 退步 / TSLA-012 Att1「Volume >1.3x BB Squeeze」Part B 訊號
+減半），URA 首次。**新 cross-asset 假設（待驗證）**：Volume supplementary
+filter 可在高流動性 ETF 創造 perfect A/B balance 但無法突破底層框架品質
+天花板——validated 於 URA，待 SIVR / FXI / INDA 等高流動性資產跨資產驗證。
+
+**最終確認：URA-004 仍為全域最優（11 次實驗、33+ 次嘗試，含均值回歸、
+突破、趨勢跟蹤、動量回調、相對強度、波動率自適應、雙振盪器、RSI bullish
+hook divergence、Day-After capitulation + bar reversal、Williams Vix Fix
+capitulation、Volume-Confirmed Capitulation 十一大策略類型）。**

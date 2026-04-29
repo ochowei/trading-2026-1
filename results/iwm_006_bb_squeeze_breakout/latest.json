@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-02T16:42:29.909750"
+    "execution_time": "2026-04-29T04:43:24.236548"
   },
   "part_a": {
     "ticker": "IWM",
@@ -399,7 +399,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-02"
+      "end": "2026-04-28"
     }
   }
 }

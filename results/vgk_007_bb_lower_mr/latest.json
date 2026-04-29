@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-16T20:44:57.310868"
+    "execution_time": "2026-04-22T04:44:03.650085"
   },
   "part_a": {
     "ticker": "VGK",
@@ -300,7 +300,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-16"
+      "end": "2026-04-21"
     }
   }
 }

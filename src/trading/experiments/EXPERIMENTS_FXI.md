@@ -1,11 +1,11 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-17
+  last_validated: 2026-04-22
   data_through: 2025-12-31
-  note: FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed to beat FXI-005 min 0.38; best Att1 0.00, Att2 -0.11, Att3 Part A 0 signals). Confirms short-horizon structure-break + reclaim patterns DO NOT work on policy-driven single-country EM ETFs. Extends lesson #52 to failed-breakdown / Turtle Soup variant. FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed; best Att3 dual-osc 0.37). A/B signal imbalance (5:1) is structural and cannot be fixed via entry-mechanism changes alone.
+  note: FXI-013 added 2026-04-22 (Volatility-Regime-Gated MR, **repo first BB-width regime gate trial on FXI** — cross-asset port from TLT-007 Att2). Three iterations all failed vs FXI-005 min 0.38: Att1 (FXI-005 full framework + BB(20,2) width/Close < 8%, TP+5.5%/SL-5.0%/20d/cd10) Part A 5 signals WR 60% cum +5.76% Sharpe **0.24** / Part B 1 signal time-expiry -0.64% Sharpe 0.00 / min **0.00** — BB 8% over-tight (FXI 2% vol vs TLT 1% means ratio doubles), only 2019-2020 early signals pass, 2021-2023 multi-regime crisis periods all blocked; Att2 (widen BB to 12%) Part A 16 signals WR 50% cum +5.67% Sharpe **0.09** / Part B 3 signals WR 66.7% cum +8.35% Sharpe 1.08 / min **0.09** — BB 12% too loose (FXI 2021/2022/2023 regimes have BB 7-11%), admits 7 SLs (2020-03/09, 2021-02/07/11, 2023-02) from regime-transition shocks, also loses 2 FXI-005 Part B winners; Att3 (BB 10% + dynamic 252d BB-width percentile < 50%) Part A 8 signals WR 50% Sharpe **0.04** / Part B 2 signals WR 50% Sharpe 0.68 / min **0.04** — percentile filter over-penalizes Part B 2025-01-13 TP winner (ranked >50% despite calm spot BB). **Core finding**: FXI vs TLT structural difference — TLT 2022 hiking cycle is **single extreme vol regime episode** (BB width persistently >5% carveoutable by fixed threshold); FXI 2019-2023 has **multiple overlapping mid-vol regimes** (trade war, COVID, regulatory crackdown, pandemic policy, weak recovery) with BB width distributions (7-12%) overlapping across good/bad signals — fixed AND dynamic BB thresholds both fail. **Repo first BB-width regime gate trial** on policy-driven EM ETF. Extends lesson #52 (all short-horizon reversal structures reject on policy-driven EM) to include **volatility-regime classifier** as another failed direction — not just entry-mechanism changes but also regime-filter approaches fail on multi-regime-overlapping assets. Cross-asset rule: BB-width regime gate requires asset to have **single extreme vol episode** cleanly separable; fails on assets with **multi-regime overlap** (FXI validated, pending INDA/FXI-family assets). FXI's 11th failed strategy type. FXI-005 remains global optimum (13 experiments, 42+ attempts). FXI-012 added 2026-04-21 (Momentum Breakout Pullback Continuation, **repo first absolute momentum continuation trial on FXI** — distinct from FXI-007 RS momentum). Three iterations all failed vs FXI-005 min 0.38: Att1 (Donchian 20d new high within last 5d + Close>SMA50 + 5d shallow pullback [-2%,-5%] + RSI(14) [40,60] + cd 10, TP+4%/SL-3.5%/15d) Part A 26 signals WR 42.3% cum -9.96% Sharpe **-0.09** / Part B 12 signals WR 58.3% cum +9.42% Sharpe 0.24 — Part A 2019-2023 China bear market false breakouts dominate (15/26 SLs, 1-7 day fast stops); Att2 (add SMA(20)>SMA(50) golden cross + tighten RSI [45,58]) Part A 16 WR 43.8% Sharpe -0.11 / Part B 10 WR **70.0%** Sharpe **0.55** (+129% vs Att1, exceeds FXI-005 Part A Sharpe 0.38) — golden cross boosts Part B but **cannot filter Part A bear-rally false breakouts** (2019 trade war rallies / 2021 regulatory crackdown precursor / 2023 weak recovery all had short-term golden cross); Att3 (+ SMA(50) slope positive: today > 60d ago, remove golden cross) Part A 8 WR 37.5% Sharpe **-0.21** / Part B 9 WR 55.6% Sharpe 0.26 / min -0.21 — **counterintuitive**: SMA slope filter worsens BOTH parts — FXI's best momentum continuation signals occur during regime-transition periods (2022 Q4 reopening, 2024 Q3 stimulus early phase) when SMA(50) slope still negative but about to turn; by time slope turns positive, best entry is missed. **Three iterations reveal**: absolute momentum continuation (Donchian + pullback) **structurally fails on policy-driven single-country EM ETFs** — China policy shocks cluster in regime-transition periods where ALL trend filters (Close>SMA, SMA crossover, SMA slope) are lagging indicators. Extends lesson #25 (RS momentum failure) and lesson #52 (all reversal structures rejected) with new finding: **absolute momentum continuation also rejected**. FXI suffers dual structural rejection — neither reversal (mean-revert) structures nor continuation (trend-follow) structures generalize. FXI's 10th failed strategy type. FXI-005 remains global optimum (12 experiments, 36+ attempts). FXI-011 added 2026-04-20 (Connor's RSI Mean Reversion: composite oscillator RSI(3)+Streak_RSI(2)+PercentRank(1d return,100d), first repo trial of CRSI). Three iterations all failed vs FXI-005 min 0.38: Att1 (CRSI≤10 + PB 4-12% + ClosePos + ATR + cd10) Part A 6 signals 50% WR Sharpe 0.01 / Part B 2/2 100% WR Sharpe 4.14 — CRSI≤10 stacked on PB+ATR over-restrictive, retains only 23% of FXI-005 signal flow with 50% WR; Att2 (CRSI≤20 + PB 4-12% + ClosePos, drop ATR) Part A 16 signals 56.2% WR Sharpe 0.12 / Part B 4/4 100% WR Sharpe 5.36 — CRSI removed 8 wins but only 2 losses (CRSI dis-favors 1-day flush wins that FXI-005 captures via WR); Att3 (FXI-005 framework + CRSI≤25 as additional filter) Part A 18 signals 55.6% WR Sharpe 0.17 / Part B 3/3 100% WR Sharpe 4.74 — wins reduced 17→10 (41% drop) vs signals 26→18 (31% drop), confirming CRSI penalizes single-day flushes (high RSI(3), short streak length). Core failure: FXI's profitable MR signals are sharp 1-2 day flushes with rapid intraday recovery; CRSI's three components all penalize this profile (RSI(3) bounces back fast, streak only -1/-2, %Rank not extreme). Extends lesson #6 boundary: CRSI as additional MR filter on policy-driven EM ETFs penalizes the very signals MR rewards. FXI's 9th failed strategy type (after BB Squeeze, RSI(5), BB Lower MR, RS momentum, Stoch, Failed Breakdown, Gap-Down Capitulation, plus FXI-001 baseline). FXI-005 remains global optimum (11 experiments, 33+ attempts). FXI-010 added 2026-04-18 (Gap-Down Capitulation + Intraday Reversal MR, ported from IBIT-006 Att2 framework). Three iterations all failed to beat FXI-005 min 0.38: Att1 (gap≤-1.5%, tight exit TP+3.5%/SL-3%) Part A -0.33 / Part B -0.51 (22 signals 31.8% WR, FXI gap-down often continues, not capitulates); Att2 (gap≤-2.5% + close>midpoint + deep pullback + FXI-005 wide exit) Part A 0.04 / Part B 0.00 (too few signals 5/1); Att3 (gap as regime filter: recent 5d contains gap≤-2% + FXI-005 entry) Part A 0.34 / Part B 0.00 (22/2 signals, Part B zero variance, 2024-2025 policy event scarcity). Extends lesson #52 to gap-down capitulation structure: policy-driven EM rejects gap-down capitulation (both as entry trigger and regime filter), unlike IBIT where BTC 24/7 continuous price discovery creates genuine capitulation. FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed to beat FXI-005 min 0.38; best Att1 0.00, Att2 -0.11, Att3 Part A 0 signals). Confirms short-horizon structure-break + reclaim patterns DO NOT work on policy-driven single-country EM ETFs. Extends lesson #52 to failed-breakdown / Turtle Soup variant. FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed; best Att3 dual-osc 0.37). A/B signal imbalance (5:1) is structural and cannot be fixed via entry-mechanism changes alone.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（9 次實驗）**
+**當前最佳：** FXI-005 Att3（出場優化均值回歸：PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%，TP+5.5%/SL-5.0%/20d）**已確認全域最優（13 次實驗）**
 - Part A Sharpe 0.38（WR65.4%, 26訊號, +54.97%）, Part B Sharpe 1.61（WR80%, 5訊號, +20.59%）
 - min(A,B) Sharpe **0.38**（vs FXI-002 0.33，+15.2% 提升）
 - Part B WR 80%（FXI-002 為 60%），SL -5.0% 拯救 2025-04-04 關鍵交易（SL→TP，+10.6pp）
@@ -49,6 +49,35 @@
   - Att3 breakdown_lookback=10 + breakdown depth≥1% + ClosePos + bullish：Part A 0 訊號；Part B 1 訊號 WR 0% Sharpe 0.00。min 0.00（Part A 訊號枯竭）
   - **根因：政策驅動 EM 缺乏可靠的短期反轉結構**。FXI 的破底後「奪回」常被後續多日連環下跌（2021-11、2022-09、2023-02、2025-04 均在 reclaim 後續跌）吞噬。這與 BB 擠壓突破（FXI-003）、BB 下軌 MR（FXI-006）的失敗同根源——中國政策/事件驅動使盤中級別結構失效
   - 擴展跨資產教訓 #52 至「Turtle Soup / 失效破底反轉」——政策驅動單一國家 EM ETF 所有短週期反轉結構（BB Squeeze、BB 下軌、Stoch 交叉、failed breakdown reclaim）均無效
+- **Connor's RSI (CRSI) 均值回歸**（FXI-011，三次迭代均失敗）：
+  - Att1（CRSI(3,2,100)≤10 + PB 4-12% + ClosePos≥40% + ATR>1.05 + cd10）：Part A 6 訊號（3W/3L）50% WR Sharpe 0.01 / Part B 2/2 100% WR Sharpe 4.14。**過度過濾**：CRSI≤10（Connors 「extreme oversold」）+ FXI-005 三重過濾僅保留 23% 訊號流量，且 50% WR 低於 FXI-005 的 65.4%
+  - Att2（CRSI≤20 + PB 4-12% + ClosePos，移除 ATR）：Part A 16 訊號 56.2% WR Sharpe 0.12 / Part B 4/4 100% WR Sharpe 5.36。CRSI≤20（標準 Connors 門檻）作為 PRIMARY 振盪器，**WR 卻 *劣於* FXI-005**——CRSI 過濾移除 8 個贏家但只移除 2 個輸家
+  - Att3（FXI-005 完整框架 + CRSI≤25 作為附加過濾）：Part A 18 訊號 55.6% WR Sharpe 0.17 / Part B 3/3 100% WR Sharpe 4.74。**贏家被偏向移除**：訊號 26→18（-31%）、贏家 17→10（-41%），CRSI 反而懲罰高品質訊號
+  - **核心失敗根因**：FXI 的高品質均值回歸訊號為**急跌 1-2 天 + 盤中強反彈**結構，CRSI 三組件均懲罰此類型——(a) RSI(3) 在 1-2 日反彈中已快速回升至中位，(b) Streak 長度僅 -1 或 -2（非長期下跌），(c) %Rank(1d return,100d) 在政策驅動環境的 1 日 -3% 下跌相對「常見」，並非極端。CRSI 真正觸發的條件是**多日連續慢磨下跌**——這正是 FXI-005 的 ATR>1.05 + WR≤-80 已經過濾掉的低品質訊號類型
+  - **擴展 lesson #6 邊界**：CRSI 作為附加過濾器在政策驅動單一國家 EM ETF 上**反向移除好訊號**，違反「特定失敗模式濾波器」原則。FXI 第 9 種失敗策略類型（前 8 種：BB Squeeze、RSI(5)、BB 下軌 MR、RS 動量、Stoch、Failed Breakdown、Gap-Down Capitulation、FXI-001 基準）
+  - **Repo 首次驗證 CRSI**：跨資產假設——CRSI 在低波動寬基 ETF（SPY/DIA/VOO ≤1.0% vol）可能仍有效，因該類資產的反轉通常涉及 3-5 日漸進過程而非 1 日急跌
+- **Momentum Breakout Pullback Continuation**（FXI-012，**repo 首次絕對動量連續試驗**，三次迭代均失敗）：
+  - Att1（Donchian 20d 新高近 5d 內曾觸發 + Close>SMA(50) + 5d 淺回檔 [-2%,-5%] + RSI(14) ∈ [40,60] + cd 10，TP+4%/SL-3.5%/15d）：Part A 26 訊號 WR 42.3% 累計 -9.96% Sharpe **-0.09** / Part B 12 訊號 WR 58.3% 累計 +9.42% Sharpe 0.24 / min(A,B) **-0.09**。Part A 2019-2023 中國熊市期假突破主導（15/26 筆 SL 多為 1-7 天快速停損：2019 貿易戰、2021 監管衝擊、2023 弱勢復甦）
+  - Att2（新增 SMA(20)>SMA(50) 黃金排列 + 收緊 RSI [45,58]）：Part A 16 訊號 WR 43.8% Sharpe -0.11 / Part B 10 訊號 WR **70.0%** Sharpe **0.55**（+129% vs Att1，超越 FXI-005 Part A Sharpe 0.38）/ min(A,B) -0.11。黃金排列**顯著改善 Part B 但無法濾除 Part A 熊市反彈假突破**——2019 貿易戰 / 2021 監管衝擊前反彈 / 2023 弱勢期均含短期黃金排列但快速反轉
+  - Att3（新增 SMA(50) slope 正：今日 > 60 日前 + 移除黃金排列）：Part A 8 訊號 WR 37.5% Sharpe **-0.21** / Part B 9 訊號 WR 55.6% Sharpe 0.26 / min(A,B) **-0.21**（三次迭代最差）。**反直覺發現**：SMA slope filter **雙向惡化**——Part A 訊號減半（16→8）但 WR 下滑（43.8%→37.5%）；Part B WR 崩壞（70%→55.6%）Sharpe 減半（0.55→0.26）
+  - **核心失敗根因**：FXI 最佳動量連續訊號常發生在「regime 轉換期」（如 2022 Q4 reopening 初期、2024 Q3 刺激政策初期）——此時 SMA slope 仍在下降但即將轉折；slope 已轉正時往往已錯過最佳進場點。中國政策衝擊（貿易戰、監管、疫情）常於 regime 轉換期出現，**所有趨勢過濾器（Close>SMA、SMA crossover、SMA slope）在此時點皆為滯後指標**
+  - **擴展 lesson #25 與 lesson #52**：lesson #25 已記錄 RS 動量（相對強度）在政策驅動單一國家 EM 失敗；本實驗新增：**絕對動量連續（Donchian 新高 + 淺回檔）同樣失敗**。lesson #52 已記錄所有短週期反轉結構（BB 下軌、BB Squeeze、Stoch、Failed Breakdown、Gap-Down Capitulation）在 FXI 失敗；本實驗新增：**趨勢延續結構（動量連續）亦失敗**——FXI 兼具「短週期反轉失效」與「趨勢延續失效」雙重結構性限制
+  - **跨資產啟示（待驗證）**：動量連續策略可能在非政策驅動的單一國家 ETF（EWT 半導體驅動、EWZ 商品驅動）有效，需於後續實驗驗證。對於政策驅動單一 EM 國家 ETF（FXI，可能涵蓋 INDA 政策面），**絕對動量連續應列為禁忌方向**
+  - FXI 第 10 種失敗策略類型
+- **Gap-Down Capitulation + Intraday Reversal**（FXI-010，三次迭代均失敗）：
+  - Att1 gap≤-1.5% + Close>Open + PB [-5%,-15%] + WR≤-80 + TP+3.5%/SL-3%/20d/cd10：Part A 22 訊號 WR 31.8% -20.67% Sharpe -0.33；Part B 4 訊號 WR 25% -5.83% Sharpe -0.51。min -0.51（嚴重失敗）
+  - Att2 加嚴 gap≤-2.5% + Close>midpoint + PB [-8%,-20%] + FXI-005 寬出場（TP+5.5%/SL-5%/20d/cd15）：Part A 5 訊號 WR 60% +0.36% Sharpe 0.04；Part B 1 訊號 WR 100% Sharpe 0.00。min 0.00（訊號太稀疏）
+  - Att3 Gap 作為 regime filter（近 5d 內曾發生 gap≤-2%）+ FXI-005 entry（PB+WR+ClosePos+ATR）+ FXI-005 寬出場：Part A 22 訊號 WR 63.6% +39.08% Sharpe **0.34**；Part B 2 訊號 WR 100% +11.30% Sharpe 0.00（零方差）。min 0.00（Part A 0.34 接近但未超越 FXI-005 的 0.38）
+  - **根因：政策驅動 EM 拒斥 gap-down 資本化結構**。FXI 的 HK 隔夜 gap-down 不同於 IBIT（BTC 24/7 連續交易已完成拋壓），FXI 的 gap 常因中國政策/經濟消息持續下行（Att1 中 15/22 訊號停損）。即便改為 regime filter（Att3），也過度收縮 Part B 訊號頻率（2024-2025 政策事件稀少，Part B 僅 2 訊號 1.0/yr vs FXI-005 3.0/yr），A/B 訊號比 4.4:1 遠超 1.5:1 目標
+  - **擴展 lesson #52**：Gap-down capitulation 作為 entry trigger 或 regime filter 在政策驅動 EM 均無效。與 BB Squeeze、BB 下軌 MR、Stoch 交叉、failed breakdown reclaim 同列禁忌
+  - **擴展 lesson #20a 邊界**：Gap-down 資本化反轉模式在傳統（非 24/7 連續交易）資產上普遍無效。此前 TQQQ-016 驗證「槓桿科技 ETF」失效，FXI-010 進一步驗證「政策驅動單一國家 EM ETF」失效——即便 FXI 擁有 HK 盤後價格發現機制，因政策/事件驅動的持續性使 gap 不等於 capitulation 終點
+- **Volatility-Regime-Gated Mean Reversion（FXI-013，repo 首次 BB 寬度 regime 閘門試驗，三次迭代均失敗）**：移植自 TLT-007 Att2 成功結構（TLT min(A,B) 由 -0.20 轉正至 0.12），測試是否泛化至政策驅動單一國家 EM ETF。
+  - Att1（FXI-005 完整框架 + BB(20, 2) width/Close < 8%，TP+5.5%/SL-5.0%/20d/cd10）：Part A 5 訊號 WR 60% 累計 +5.76% Sharpe **0.24** / Part B 1 訊號（2025-11-21 到期 -0.64%）Sharpe 0.00 / min(A,B) **0.00**。BB 8% 過嚴——FXI 2% vol 為 TLT 1% vol 的 2 倍，BB 寬度 ratio 常態範圍翻倍，8% 僅通過 2019-2020 早期低波動期訊號（5 訊號全落於此），2021-2023 多 regime crisis 期所有訊號被過濾
+  - Att2（放寬 BB 至 12%）：Part A 16 訊號 WR 50% Sharpe **0.09** / Part B 3 訊號 WR 66.7% Sharpe **1.08** / min **0.09**。BB 12% 過於寬鬆——2021 科技監管 / 2022 防疫 / 2023 弱勢復甦期的 BB 寬度多落於 7-11% 區間，12% 門檻無法過濾這些 crisis 期的低品質訊號（新增 7 筆停損集中於 2020-03/09, 2021-02/07/11, 2023-02 regime 轉換衝擊期）；同時失去 2 個 FXI-005 Part B 贏家
+  - Att3（BB 10% + 動態 252 日 BB 寬度百分位 < 50%）：Part A 8 訊號 WR 50% Sharpe **0.04** / Part B 2 訊號 WR 50% Sharpe 0.68 / min(A,B) **0.04**（三次迭代最差）。百分位過濾**過度懲罰 Part B 贏家**：2025-01-13（FXI-005 核心贏家）因 2024 下半年 BB 寬度持續走高使 2025 初排名仍在前 50% 內而被過濾。動態百分位對「regime 轉換初期」反轉訊號反向不利
+  - **核心失敗根因（FXI vs TLT 結構性差異）**：TLT 2022 升息為**單一極端 vol regime episode**（BB 寬度持續 > 5% 的連續窗口），固定 BB 閾值可一次性排除；FXI 2019-2023 為**多段中等強度 vol regime**（貿易戰、COVID、監管、防疫、弱復甦），各期 BB 寬度分佈重疊（7-12%），固定或動態門檻均無法 cross-regime 區分 good signals from bad signals
+  - **擴展 lesson #52 邊界**：政策驅動單一國家 EM ETF 不僅對「短期反轉結構」（BB Squeeze / BB 下軌 / Stoch / Failed Breakdown / Gap-Down / CRSI / Momentum Continuation）失效，對「波動率 regime 分類器」（BB 寬度 regime 閘門）亦失效，因多 regime 重疊無單一 calm vs crisis 切割點
+  - **新 cross-asset 規則**：BB 寬度 regime 閘門有效先決條件為資產含**單一極端 vol regime 片段**（如 TLT 2022 升息）可一刀切除；若資產含**多段中等 vol regime 重疊**（政策驅動 EM、事件驅動），此方向結構性失效。FXI 第 11 種失敗策略類型
 - **WR(14) 替代 WR(10)**（FXI-005 Att1）：
   - WR(14) 未提供任何增量（Part B 訊號完全相同），WR(10) 對 FXI 仍為最佳
 - **延長冷卻期 15d**（FXI-005 Att1）：
@@ -75,7 +104,10 @@
 - ~~RS 動量（FXI vs EEM）~~ → FXI-007 三次迭代均失敗
 - ~~Stochastic Oscillator 均值回歸~~ → FXI-008 三次迭代均失敗（%K>%D 交叉、%K 等級替代 WR、雙振盪器均無加成）
 - ~~Failed Breakdown Reversal / Turtle Soup~~ → FXI-009 三次迭代均失敗（10d/5d breakdown、ClosePos、深度門檻均無法勝過 FXI-005）
-- 動量回調（在高波動 EM ETF 上普遍失敗）
+- ~~Gap-Down Capitulation + Intraday Reversal~~ → FXI-010 三次迭代均失敗（entry trigger、regime filter 均無法勝過 FXI-005；HK 隔夜 gap 不同於 BTC 24/7 價格發現，常因政策消息持續下行）
+- ~~Connor's RSI (CRSI) 均值回歸~~ → FXI-011 三次迭代均失敗（CRSI 三組件全部懲罰 1-2 日急跌+盤中反彈的高品質訊號）
+- ~~動量連續（Donchian 新高 + 淺回檔）~~ → FXI-012 三次迭代均失敗（Att1 基線 min -0.09、Att2 黃金排列 min -0.11、Att3 SMA slope min -0.21）。擴展 lesson #25 絕對動量亦失敗 + lesson #52 新增趨勢延續結構禁忌
+- ~~Volatility-Regime-Gated MR（BB 寬度 regime 閘門，移植 TLT-007）~~ → FXI-013 三次迭代均失敗（Att1 BB<8% min 0.00、Att2 BB<12% min 0.09、Att3 BB<10%+動態百分位 min 0.04）。多 regime 重疊使 BB 寬度分佈無區分力，新 cross-asset 規則：BB 寬度 regime 閘門需**單一極端 vol episode**（TLT 2022）可一刀切除；**多段中等 vol regime 重疊**（FXI 政策驅動 EM）結構性失效
 - SL -4.75%（介於 -4.5% 和 -5.0% 之間，可能是更精確甜蜜點）
 
 **關鍵資產特性：**
@@ -90,6 +122,7 @@
 - **RS 動量（FXI vs EEM）無效（FXI-007 驗證）**：中國相對 EM 的超額/劣勢由政策週期驅動（2022 regulatory、2024-2025 stimulus），非結構性。與 INDA/EWZ 失敗模式一致，確認跨資產教訓 #25 延伸至中國 ETF。SMA(200) 趨勢過濾可改善 Part A 但無法解決 A/B 累積差失衡（最佳 Att2 min 0.16，仍遠低於 FXI-005 的 0.38）
 - **Stochastic Oscillator 均值回歸無加成（FXI-008 驗證）**：三次迭代均未勝過 FXI-005（Att1 %K>%D 交叉 min 0.16、Att2 %K 等級替代 WR min 0.34、Att3 WR+Stoch 雙振盪器 min 0.37）。根因：(a) %K>%D 交叉延遲（已回升 1-3 天），TP 空間不足；(b) Stoch %K(14,3) 與 WR(10) ≤ -80 幾乎同義（等價於 raw %K(10) ≤ 20 vs 14 週期 + 3 日 SMA），選擇性僅微差；(c) 雙振盪器 intersection 提升品質但同時移除 Part B 好訊號。A/B 訊號比 5:1 為結構性（熊市回檔多 vs 牛市反彈少），非振盪器類型可修正
 - **Failed Breakdown Reversal / Turtle Soup 無效（FXI-009 驗證）**：三次迭代均未勝過 FXI-005（Att1 10d breakdown + bullish bar min 0.00、Att2 5d breakdown + ClosePos min -0.11、Att3 10d + 1% 深度 Part A 訊號枯竭 min 0.00）。根因：FXI 政策/事件驅動使短期反轉結構全面失效——破底後「奪回」不等於反轉，常被後續多日連環下跌吞噬（Att1 所有 SL 交易 2021-11/2022-09/2023-02/2025-04 均在 reclaim 後 2-10 天停損）。擴展 lesson #52：政策驅動單一國家 EM 在所有短週期反轉結構（BB Squeeze、BB 下軌、Stoch 交叉、failed breakdown reclaim）均無效
+- **Gap-Down Capitulation + Intraday Reversal 無效（FXI-010 驗證）**：三次迭代均未勝過 FXI-005。Att1（gap≤-1.5% entry trigger + tight exit）min -0.51——FXI 的 HK 隔夜 gap 不等於 capitulation 終點，中國政策消息常在美股盤中持續發酵（15/22 停損）。Att2（gap≤-2.5% + Close>midpoint + 深 pullback + FXI-005 寬出場）min 0.00——加嚴後訊號暴跌至 5/1。Att3（Gap 作為近 5d regime filter + FXI-005 entry）Part A Sharpe 0.34 最接近基線，但 Part B 僅 2 訊號（零方差）且 A/B 訊號比 4.4:1。**雙重擴展跨資產教訓**：(a) lesson #52：政策驅動 EM 拒斥 gap-down 資本化結構（entry 或 regime filter 皆失敗）；(b) lesson #20a：Gap-down 資本化反轉模式需 24/7 連續價格發現為必要前提——繼 TQQQ-016（槓桿科技 ETF）後，FXI-010 驗證「即便擁有盤後 HK 價格發現的單一國家 EM ETF」亦無法套用該模式，因政策/事件驅動使 gap 不等於 capitulation 終點
 <!-- AI_CONTEXT_END -->
 
 # FXI 實驗總覽 (FXI Experiments Overview)
@@ -114,6 +147,10 @@
 | FXI-007 | `fxi_007_rs_momentum`          | RS 動量回調（FXI vs EEM）         | 已完成（失敗，確認 RS 動量在單一國家 EM 無效）|
 | FXI-008 | `fxi_008_stochastic_mr`        | Stochastic Oscillator 均值回歸（3 次迭代均失敗）| 已完成（失敗，確認 Stoch 對 FXI 無加成）|
 | FXI-009 | `fxi_009_failed_breakdown_reversal` | Failed Breakdown Reversal / Turtle Soup（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #52 至 breakdown reclaim 結構）|
+| FXI-010 | `fxi_010_gap_reversal_mr`      | Gap-Down Capitulation + Intraday Reversal MR（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #52 至 gap-down 資本化；雙重驗證 lesson #20a 的 24/7 先決條件）|
+| FXI-011 | `fxi_011_connors_rsi_mr`       | Connor's RSI (CRSI) 均值回歸（3 次迭代均失敗）| 已完成（失敗，擴展 lesson #6 至 CRSI 過濾器在政策驅動 EM 反向移除好訊號）|
+| FXI-012 | `fxi_012_momentum_pullback`    | Donchian 動量突破 + 淺回檔連續進場（repo 首次絕對動量試驗，3 次迭代均失敗）| 已完成（失敗，擴展 lesson #25 絕對動量亦失敗 + lesson #52 新增趨勢延續結構禁忌）|
+| FXI-013 | `fxi_013_regime_vol_gate_mr`   | Volatility-Regime-Gated MR（BB 寬度 regime 閘門，repo 首次跨資產移植 TLT-007 至政策驅動 EM，3 次迭代均失敗）| 已完成（失敗，新 cross-asset 規則：BB 寬度 regime 閘門需**單一極端 vol episode** 可一刀切除，**多段中等 vol regime 重疊**結構性失效）|
 
 ---
 
@@ -698,3 +735,418 @@ _* Part A 0 訊號，無法計算有意義的 Sharpe_
   事件由政策/消息驅動，無法用純技術面的 breakdown reclaim 型態捕捉。FXI-005
   的 PB+WR+ATR+ClosePos 框架仍為全域最優，且訊號頻率結構性不平衡（5:1）無法用
   進場結構改變解決
+
+---
+
+## FXI-010: Gap-Down Capitulation + Intraday Reversal MR（三次迭代均失敗）
+
+**目標**：驗證 IBIT-006 Att2 的 Gap-Down 資本化 + 日內反轉模式是否延伸至 FXI。
+FXI 追蹤香港 H 股，HK 市場於美股盤後交易（HKT 9:30-16:00 = ET 21:30-04:00），
+重大中國政策/事件消息常導致 FXI 隔夜出現結構性跳空下跌；若市場盤中反轉
+（Close > Open），理論上可視為事件拋壓消化完畢的 buy-the-dip 訊號。
+
+**策略方向**：均值回歸（事件驅動拋壓 + 日內反轉確認）
+
+**關鍵假設**：Gap-down 資本化反轉模式不僅限於 24/7 連續交易加密 ETF（IBIT），可能延伸至「盤外存在實質價格發現 + 高波動」的單一國家 EM ETF。
+
+### Att1（Baseline）— 直接移植 IBIT-006 Att2 架構，按 FXI 波動度縮放
+**進場**：Gap ≤ -1.5% + Close > Open + 10d Pullback [-5%, -15%] + WR(10) ≤ -80 + cd=10
+**出場**：TP +3.5% / SL -3.0% / 持倉 20 天（緊出場，對應 IBIT-006 的 TP 4.5%/SL 4.0% 按波動度 2.0%/3.17% 縮放）
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 22 | 4 |
+| 勝率 | 31.8% | 25.0% |
+| 累計報酬 | -20.67% | -5.83% |
+| Sharpe | -0.33 | -0.51 |
+
+**失敗分析**：
+1. Gap-down -1.5% 為 0.75σ 過鬆，放入大量普通回檔日，22 訊號中 15 停損、7 達標，盈虧比 0.53
+2. FXI 的 HK 隔夜 gap 不同於 IBIT（BTC 24/7 連續交易已完成拋壓）——中國政策/經濟消息常在美股盤中持續發酵，gap-down 後常續跌而非反轉
+3. A/B 訊號比 5.5:1 嚴重不平衡（超出 50% 目標）
+
+### Att2 — 加嚴 gap 門檻 + 深回檔 + 寬 SL 呼吸空間
+**進場**：Gap ≤ -2.5% + Close > Open + Close > (High+Low)/2 + 10d Pullback [-8%, -20%] + WR(10) ≤ -80 + cd=15
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天（FXI-005 寬出場框架）
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 5 | 1 |
+| 勝率 | 60.0% | 100% |
+| 累計報酬 | +0.36% | +5.50% |
+| Sharpe | 0.04 | 0.00（零方差）|
+
+**失敗分析**：加嚴到 gap ≤ -2.5%（1.25σ）+ 強反轉（Close 高於當日中點）+ 深 pullback（下界 8%）後，Part A 訊號暴跌 22→5，Part B 僅 1 訊號（年化 0.5/yr，遠低於可評估閾值）。WR 雖提升至 60%，但樣本稀薄無統計信心。
+
+### Att3 — Gap-Down 作為近期 capitulation regime filter
+**進場**：FXI-005 entry（PB≥5% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05 + cap12%） + 近 5 日內至少 1 日 Gap ≤ -2.0% 事件 + cd10
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天（FXI-005 框架）
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 22 | 2 |
+| 勝率 | 63.6% | 100% |
+| 累計報酬 | +39.08% | +11.30% |
+| Sharpe | **0.34** | 0.00（零方差）|
+
+**最接近基線但仍失敗**：
+1. Part A Sharpe 0.34 接近但未超越 FXI-005 的 0.38
+2. Part B 僅 2 訊號（2024-2025 政策事件稀少），年化訊號頻率 1.0/yr vs FXI-005 的 3.0/yr
+3. A/B 訊號比 4.4:1 遠超 1.5:1 目標；A/B 累計差 27.78pp（71% 相對差）超出 30% 目標
+4. Part B 2 筆皆 +5.5% 達標（零方差使 Sharpe 綁定 = 0.00）
+
+### 結論與跨資產教訓更新
+
+**失敗根因（三次迭代一致）**：
+1. **FXI gap 不等於 capitulation**：HK 隔夜政策/經濟消息常在美股盤中持續發酵，與 IBIT 的「24/7 拋壓完成 + 美股開盤撿便宜」結構本質不同
+2. **Gap 作為 entry trigger** 過度放入低品質訊號（Att1 WR 31.8%）
+3. **Gap 作為 regime filter** 過度收縮 Part B 訊號頻率（Att3 Part B 僅 2 訊號）
+4. **政策事件稀疏性** 在 Part B 被進一步暴露——2024-2025 中國政策事件不如 2019-2023 密集
+
+**擴展跨資產教訓 #52**：
+- 政策驅動單一國家 EM ETF（FXI）在所有短週期反轉結構均失敗：
+  - BB Squeeze 突破（FXI-003）
+  - BB 下軌 MR（FXI-006）
+  - Stochastic %K>%D 交叉（FXI-008）
+  - Failed breakdown reclaim（FXI-009）
+  - **Gap-down capitulation（FXI-010，新增）**——entry trigger 或 regime filter 均無效
+
+**擴展跨資產教訓 #20a（IBIT-006 模式）邊界**：
+- 此前 TQQQ-016 驗證「槓桿科技 ETF」失效
+- FXI-010 進一步驗證「即便擁有盤後 HK 價格發現的單一國家 EM ETF」亦無法套用
+- **精煉先決條件**：Gap-down 資本化反轉模式需「盤外連續價格發現」+「拋壓不受政策/事件持續性影響」兩項必要條件；FXI 滿足前者但不滿足後者
+
+---
+
+## FXI-011: Connor's RSI (CRSI) Mean Reversion（三次迭代均失敗）
+
+**目標**：以 Connor's RSI（CRSI = mean of RSI(3) + Streak_RSI(2) + PercentRank(1d return,100d)）作為複合超賣指標，驗證是否能修正 FXI-005 的 A/B 績效落差（Part A Sharpe 0.38 / Part B 1.61，cum 差 62.5%、訊號數差 80.7%）。
+
+**策略方向**：均值回歸（複合超賣振盪器，repo 首次驗證）
+
+**關鍵假設**：CRSI 三組件分別捕捉動能（RSI(3)）、持續性（Streak_RSI(2)）、相對歷史強度（%Rank(100d)），可比單一 WR/RSI 更精準辨別「真實 capitulation vs 慢磨延續」。Streak 組件特別應有助於分辨 1 日急跌（短 streak）vs 多日慢磨（長 streak）。
+
+### Att1 — CRSI ≤ 10（Connors「extreme oversold」）+ FXI-005 三重過濾
+**進場**：CRSI ≤ 10 + 10d Pullback [-4%, -12%] + ClosePos ≥ 40% + ATR > 1.05 + cd10
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 6 | 2 |
+| 勝率 | 50.0% | 100% |
+| 累計報酬 | -0.33% | +9.04% |
+| Sharpe | **0.01** | 4.14 |
+
+**失敗分析**：CRSI ≤ 10 為「極端」門檻（Connors 標準為 ≤ 5），疊加 PB+ClosePos+ATR 三重過濾後僅保留 23% 訊號流量，Part A 6 筆中 3 停損 + 2 到期 + 1 達標，WR 僅 50%（vs FXI-005 65.4%）。CRSI 過度過濾。
+
+### Att2 — CRSI ≤ 20 取代 WR + 移除 ATR
+**進場**：CRSI ≤ 20 + 10d Pullback [-4%, -12%] + ClosePos ≥ 40% + cd10（移除 ATR、移除 WR(10)）
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 16 | 4 |
+| 勝率 | 56.2% | 100% |
+| 累計報酬 | +7.69% | +21.37% |
+| Sharpe | **0.12** | 5.36 |
+
+**失敗分析**：CRSI ≤ 20（標準 Connors 門檻）作為 PRIMARY 振盪器，Part A WR 56.2% **劣於** FXI-005 的 65.4%。對比 FXI-005 的 Part A 26 訊號 17 贏家：
+- CRSI 過濾保留 16/26 = 62% 訊號
+- 但僅保留 9/17 = 53% 贏家
+- 而保留 7/9 = 78% 輸家
+
+**CRSI 對 FXI 的訊號選擇 *偏向移除贏家*** — 反向效果。
+
+### Att3 — FXI-005 完整框架 + CRSI ≤ 25 作為附加過濾
+**進場**：10d Pullback [-5%, -12%] + WR(10) ≤ -80 + CRSI ≤ 25 + ClosePos ≥ 40% + ATR > 1.05 + cd10
+**出場**：TP +5.5% / SL -5.0% / 持倉 20 天
+
+| 指標 | Part A | Part B |
+|------|--------|--------|
+| 訊號數 | 18 | 3 |
+| 勝率 | 55.6% | 100% |
+| 累計報酬 | +13.63% | +15.04% |
+| Sharpe | **0.17** | 4.74 |
+
+**失敗分析**：CRSI ≤ 25 為「寬鬆」附加過濾，仍偏向移除贏家：
+- 訊號 26→18（-31%）
+- 贏家 17→10（-41%）
+- 輸家 9→8（-11%）
+**贏家流失率（41%）顯著高於輸家流失率（11%）**——CRSI 確認系統性懲罰高品質訊號。
+
+### 結論與跨資產教訓更新
+
+**失敗根因（三次迭代一致）**：
+1. **FXI 的高品質 MR 訊號為「急跌 1-2 天 + 盤中強反彈」結構**，CRSI 三組件全部懲罰此類型：
+   - **RSI(3)**：1-2 日急跌後盤中反彈使 RSI(3) 已快速回升至中位（30-50），CRSI 第一組件不夠低
+   - **Streak_RSI(2)**：streak 長度僅 -1 或 -2（非長期下跌），Streak_RSI 不夠低
+   - **%Rank(1d return, 100d)**：政策驅動環境的 1 日 -3% 下跌相對「常見」，%Rank 不夠極端
+2. **CRSI 真正觸發的條件是多日連續慢磨下跌**（streak -4 以上、%Rank 極低），但這正是 FXI-005 的 ATR>1.05 + WR≤-80 + ClosePos≥40% 已過濾掉的低品質訊號類型
+3. **Att3 的「直接相加 CRSI 過濾」沒有任何附加價值**——CRSI 與 FXI-005 既有過濾器系統性反向
+4. A/B 訊號比 6:1（Att3 18:3）遠超 50% 目標，與 FXI-010 失敗模式相同
+
+**擴展跨資產教訓 #6 邊界**：
+- Lesson #6 的「特定失敗模式濾波器」例外條件**不適用 CRSI 在政策驅動 EM 上**
+- **CRSI 作為附加過濾器在政策驅動單一國家 EM ETF 上反向移除好訊號**，加入「禁止重複嘗試」清單
+
+**Repo 首次驗證 CRSI**：
+- 跨資產假設：CRSI 在低波動寬基 ETF（SPY/DIA/VOO ≤ 1.0% vol）可能仍有效，因該類資產的反轉通常涉及 3-5 日漸進過程而非 1 日急跌；建議優先測試 DIA-005 RSI(2) 框架的 CRSI 替代版本
+- **不適用範圍**：政策/事件驅動單一國家 ETF（FXI、URA、TLT 同類），高波動加密 ETF（IBIT 同類），高波動個股（TSLA/NVDA 同類，動能特性使 streak 成分過於波動）
+
+**FXI 第 9 種失敗策略類型**（前 8 種：BB Squeeze、RSI(5)、BB 下軌 MR、RS 動量、Stoch、Failed Breakdown、Gap-Down Capitulation、FXI-001 1:1 對稱出場）。FXI-005 確認為全域最優（11 次實驗、33+ 次嘗試）。
+
+
+---
+
+## FXI-012: Momentum Breakout Pullback Continuation（三次迭代均失敗）
+
+**目標**：repo 首次於 FXI 試驗「絕對動量連續」策略（非 RS 動量），探索趨勢跟蹤 / 動量連續方向是否能解決 FXI-005 的 Part A/B 訊號不平衡。
+
+### 設計動機
+
+FXI-005 全域最優 min(A,B) 0.38，但存在嚴重 Part A/B 不平衡：
+- 累計報酬差 163%（Part A 55% vs Part B 20.6%），遠超 30% 目標
+- 訊號數比 5.2:1（Part A 26 vs Part B 5），遠超 50% 目標
+
+假設：MR 框架捕捉 Part A 深回檔但漏掉 Part B 2024-2025 刺激驅動的連續上升趨勢中的淺回檔機會。嘗試動量連續進場互補。
+
+**本實驗為 repo 首次於 FXI 試驗絕對動量策略**（FXI-007 為 RS 動量 vs EEM，概念不同）。
+
+### Att1: Donchian 新高 + 淺回檔連續進場 Baseline
+
+進場條件（五項）：
+1. 近 5 日內曾創 20 日 Donchian 新高
+2. Close > SMA(50)
+3. 5 日高點回檔 -2% ~ -5%
+4. RSI(14) ∈ [40, 60]（中性）
+5. 冷卻 10 天
+
+出場：TP +4.0% / SL -3.5% / 15 天（0.15% 滑價）
+
+**結果**：
+
+| 指標 | Part A | Part B | Part C |
+|------|--------|--------|--------|
+| 訊號 | 26 | 12 | 2 |
+| 年化 | 5.2/yr | 6.0/yr | 6.8/yr |
+| WR | 42.3% | 58.3% | 50.0% |
+| 累計 | -9.96% | +9.42% | +1.73% |
+| Sharpe | **-0.09** | 0.24 | 0.29 |
+| min(A,B) | \multicolumn{3}{c}{**-0.09**}|
+
+**分析**：
+- 訊號頻率 A/B 5.2:6.0（改善 vs FXI-005 的 5.2:2.5），但品質不足
+- Part A 熊市假突破（2019 貿易戰、2021 監管、2023 弱勢）導致 15/26 筆快速 SL
+- Part B WR 58.3% 顯示策略在真正上升趨勢中有部分效用但不及 FXI-005
+
+### Att2: 收緊趨勢 regime 過濾（SMA20>SMA50 + RSI [45,58]）
+
+**調整**：
+- 新增 SMA(20) > SMA(50)（短中均線黃金排列）
+- 收緊 RSI 範圍至 [45, 58]
+
+**結果**：
+
+| 指標 | Part A | Part B | Part C |
+|------|--------|--------|--------|
+| 訊號 | 16 | 10 | 1 |
+| WR | 43.8% | **70.0%** | 100% |
+| 累計 | -7.11% | +17.84% | +4.00% |
+| Sharpe | -0.11 | **0.55** | 0.00 |
+| min(A,B) | \multicolumn{3}{c}{-0.11}|
+
+**分析**：
+- **Part B 大幅改善**：WR 58.3%→70%，Sharpe 0.24→0.55（+129%），超越 FXI-005 Part A Sharpe 0.38
+- **Part A 惡化**：-0.09→-0.11，WR 僅 42.3%→43.8%（無實質改善）
+- 訊號數 26→16（-38%）但非選擇性（同比例移除好壞訊號）
+- **核心發現**：SMA20>SMA50 黃金排列**無法濾除**中國 2019 貿易戰、2021 監管衝擊前、2023 弱勢期的反彈假突破——此等時期常有短期黃金排列但快速反轉
+
+### Att3: SMA(50) slope 正 bull regime 過濾
+
+**調整**：
+- 新增 SMA(50)[今日] > SMA(50)[60 日前]（SMA50 本身持續上升 60 日）
+- 移除 SMA(20) > SMA(50)（Att2 驗證無效）
+- 保留 RSI [45, 58]
+
+**結果**：
+
+| 指標 | Part A | Part B | Part C |
+|------|--------|--------|--------|
+| 訊號 | 8 | 9 | 1 |
+| WR | 37.5% | 55.6% | 100% |
+| 累計 | -6.55% | +7.86% | +4.00% |
+| Sharpe | **-0.21** | 0.26 | 0.00 |
+| min(A,B) | \multicolumn{3}{c}{**-0.21**}|
+
+**分析**：
+- 三次迭代中最差結果
+- **Part A 雙重惡化**：訊號減半（16→8）但 WR 下滑（43.8%→37.5%），slope filter 反而移除 Part A 贏家
+- **Part B 亦惡化**：WR 70%→55.6%，Sharpe 0.55→0.26（半減）
+- **反直覺核心發現**：FXI 最佳動量連續訊號常發生在「regime 轉換期」（2022 Q4 reopening 初期、2024 Q3 刺激政策初期）——此時 SMA(50) slope 仍為負但即將轉折；slope 已轉正時往往已錯過最佳進場點
+- 中國政策衝擊（貿易戰、監管、疫情）常於 regime 轉換期出現，**所有趨勢過濾器（Close>SMA、SMA crossover、SMA slope）在此時點皆為滯後指標**
+
+### 結論與跨資產教訓更新
+
+**三次迭代全部失敗結論**（min 最佳 Att1 -0.09，遠低於 FXI-005 的 0.38）：
+
+**擴展 lesson #25**：
+- 已記錄 RS 動量（相對強度 vs EEM）在政策驅動單一國家 EM 失敗（FXI-007 三次失敗）
+- **本實驗新增**：**絕對動量連續（Donchian 新高 + 淺回檔）同樣失敗**，三種 regime filter（無、SMA20>SMA50、SMA slope）均無法拯救
+
+**擴展 lesson #52**：
+- 已記錄所有短週期反轉結構在 FXI 失敗（BB 下軌、BB Squeeze、Stoch 交叉、Failed Breakdown、Gap-Down Capitulation）
+- **本實驗新增**：**趨勢延續結構（動量連續）亦失敗**——FXI 兼具「短週期反轉失效」與「趨勢延續失效」雙重結構性限制
+
+**Part A/B 不平衡為 FXI 內生結構**：
+- MR 框架（FXI-005）：Part A 訊號多（5.2/yr）品質中等 / Part B 訊號少（2.5/yr）品質高
+- 動量框架（FXI-012 Att2）：Part A 訊號多（3.2/yr）品質差 / Part B 訊號適中（5/yr）品質較好
+- 兩種相反方向策略都無法平衡 A/B——FXI 的結構性風險（政策週期、美中關係、匯率）在不同時期產生完全不同類型的市場行為，任何單一技術分析框架皆難以跨越
+
+**跨資產啟示（待驗證）**：
+- 動量連續策略可能在**非政策驅動**的單一國家 ETF（EWT 半導體驅動、EWZ 商品驅動）有效，需於後續實驗驗證
+- 對於**政策驅動單一 EM 國家 ETF**（FXI，可能涵蓋 INDA 政策面），**絕對動量連續應列為禁忌方向**
+
+**FXI 第 10 種失敗策略類型**（前 9 種：BB Squeeze、RSI(5)、BB 下軌 MR、RS 動量、Stoch、Failed Breakdown、Gap-Down Capitulation、CRSI、FXI-001 對稱出場）。FXI-005 Att3 確認為全域最優（12 次實驗、36+ 次嘗試）。
+
+---
+
+## FXI-013: Volatility-Regime-Gated Mean Reversion（三次迭代均失敗）
+
+### 目標
+
+移植 TLT-007 Att2 的 BB 寬度 regime 閘門成功結構（TLT min(A,B) 由 -0.20 轉正至 0.12）。
+TLT-007 核心機制：BB(20, 2) 寬度/Close < 5% 作為「calm regime」分類器，一次性排除
+2022 升息期連續高波動訊號。測試此方向是否泛化至政策驅動單一國家 EM ETF。
+
+### 關鍵假設與風險
+
+**假設**：FXI 的 Part A (2019-2023) 高雜訊 Part B (2024-2025) 高品質結構，是因為
+Part A 含多段政策衝擊期（貿易戰、COVID、監管、防疫、弱復甦），若能透過 BB 寬度
+分類器排除高波動 regime，Part A 訊號品質應可提升至接近 Part B。
+
+**風險（已在設計時警示）**：TLT 2022 升息為**單一連續高 vol 窗口**（BB 寬度持續 > 5%），
+而 FXI 多政策期為**多段中等強度 vol 插曲**（BB 寬度 7-12% 重疊）。若 FXI 的 good
+signals 與 bad signals 的 BB 寬度分佈重疊，固定或動態門檻均無法區分。
+
+### Att1: BB(20, 2) width/Close < 8% 基線
+
+**參數**：
+- 進場：FXI-005 完整框架（pullback 5-12% + WR(10)≤-80 + ClosePos≥40% + ATR>1.05）
+- 新增 regime 閘門：BB(20, 2) width/Close < 8%
+- 出場：TP+5.5%/SL-5.0%/20d/cd10（同 FXI-005）
+
+**結果**：
+
+| 指標 | Part A | Part B | Part C |
+|------|--------|--------|--------|
+| 訊號 | 5 | 1 | 2 |
+| WR | 60.0% | 0.0% | 0.0% |
+| 累計 | +5.76% | -0.64% | -5.74% |
+| Sharpe | **0.24** | 0.00 | -1.30 |
+| min(A,B) | \multicolumn{3}{c}{**0.00**} |
+
+**交易明細（Part A 僅 5 筆）**：
+- 2019-03-08 TP +5.5%
+- 2019-11-14 TP +5.5%
+- 2020-01-23 SL -5.1%
+- 2020-05-22 TP +5.5%
+- 2020-09-08 SL -5.1%
+
+**分析**：
+- BB 8% 過於嚴格——FXI 2% vol 為 TLT 1% vol 的 2 倍，BB 寬度常態範圍翻倍
+- 8% 門檻**僅通過 2019-2020 早期低波動期訊號**（5 訊號全落於此時段）
+- 2021-2023 多 regime crisis 期（監管、防疫、弱復甦）BB 寬度持續 > 8%，所有
+  FXI-005 在此期間的贏家（2021-09、2021-12、2023-05、2023-10 等）均被過濾
+- Part B 僅 1 訊號（2025-11-21 到期 -0.64%），失去 FXI-005 全部 5 個 Part B 贏家
+
+### Att2: BB width/Close < 12% 放寬
+
+**調整**：放寬 BB 閾值 8% → 12%（理論值 ≈ TLT 5% × FXI vol 倍率 2.4）
+
+**結果**：
+
+| 指標 | Part A | Part B | Part C |
+|------|--------|--------|--------|
+| 訊號 | 16 | 3 | 2 |
+| WR | 50.0% | 66.7% | 0.0% |
+| 累計 | +5.67% | +8.35% | -5.74% |
+| Sharpe | **0.09** | **1.08** | -1.30 |
+| min(A,B) | \multicolumn{3}{c}{**0.09**} |
+
+**交易明細**：
+- Part A 16 筆（8 TP + 7 SL + 1 expiry），SL 集中於 2020-03、2020-09、2021-02、
+  2021-07、2021-11、2023-02——皆為 regime 轉換衝擊期假反轉
+- Part B 3 筆：2025-01-13 TP +5.5% / 2025-08-01 expiry +3.36% / 2025-11-21
+  expiry -0.64%。相較 FXI-005 失去 2024 政策刺激期 2 個贏家
+
+**分析**：
+- BB 12% 過於寬鬆——2021 科技監管 / 2022 防疫 / 2023 弱勢期 BB 寬度多落於 7-11%，
+  12% 門檻無法過濾 crisis 期低品質訊號
+- Part A Sharpe 崩至 0.09（比 Att1 的 0.24 更差）——新增 11 訊號中 7 筆停損
+- Part B 亦失去 FXI-005 贏家（BB 寬度在 2024 H1 政策 shock 後仍偏高）
+- 結構性問題：FXI 的 good signals 與 bad signals 的 BB 寬度分佈**重疊**，無法
+  cross-regime 區分
+
+### Att3: BB width/Close < 10% + 動態 252 日百分位 < 50%
+
+**調整**：
+- BB 固定閾值 10%（中間值）
+- 新增動態 regime 閘門：BB 寬度必須位於 252 日回看期的前 50% 分位內
+- 理論：動態百分位自動適應不同 regime（calm 期閾值收緊、crisis 期放寬），
+  解決多 regime 重疊問題
+
+**結果**：
+
+| 指標 | Part A | Part B | Part C |
+|------|--------|--------|--------|
+| 訊號 | 8 | 2 | 1 |
+| WR | 50.0% | 50.0% | 0.0% |
+| 累計 | +0.48% | +2.70% | -5.10% |
+| Sharpe | **0.04** | 0.68 | 0.00 |
+| min(A,B) | \multicolumn{3}{c}{**0.04**}（三次迭代最差）|
+
+**交易明細**：
+- Part A 8 筆（4 TP + 4 SL），失去 FXI-005 關鍵贏家（2020-09-25、2021-09-21、
+  2021-12-17、2023-05-26、2023-10-05）
+- Part B 僅 2 筆（2025-08-01 expiry +3.36% / 2025-11-21 expiry -0.64%）——
+  **百分位過濾移除 2025-01-13 TP 贏家**（2024 下半年 BB 寬度持續走高使 2025 初
+  排名仍在前 50% 內）
+
+**分析**：
+- 動態百分位過濾**過度懲罰 regime 轉換初期的反轉訊號**——此時波動率剛從高檔
+  滑落但仍在過去 252 日的上半部，被排除
+- 百分位 + 固定 10% AND 組合反而更嚴，但品質未改善
+- 證實 FXI 的多 regime 結構無法透過 BB 寬度（無論固定或動態）分離
+
+### 結論與跨資產教訓更新
+
+**三次迭代全部失敗結論**（min 最佳 Att2 0.09，遠低於 FXI-005 的 0.38）：
+
+**核心發現 — FXI vs TLT 結構性差異**：
+- **TLT 2022 升息為單一極端 vol regime episode**（BB 寬度持續 > 5% 的連續窗口），
+  固定 BB 閾值可一次性排除；TLT-007 Att2 成功將 min(A,B) 由 -0.20 轉正至 0.12
+- **FXI 2019-2023 為多段中等強度 vol regime**（貿易戰、COVID、監管、防疫、
+  弱復甦），各期 BB 寬度分佈重疊（7-12%），固定或動態門檻均無法 cross-regime
+  區分 good signals from bad signals
+- **BB 寬度分類器的前提**：需要 good signals 與 bad signals 在 vol 分佈上**可分離**，
+  FXI 不滿足此條件
+
+**擴展 lesson #52**：
+- 已記錄政策驅動單一國家 EM ETF 對「短期反轉結構」（BB Squeeze / BB 下軌 /
+  Stoch / Failed Breakdown / Gap-Down / CRSI / Momentum Continuation）全面失效
+- **本實驗新增**：政策驅動 EM 對「波動率 regime 分類器」（BB 寬度 regime 閘門）
+  亦失效，因多 regime 重疊無單一 calm vs crisis 切割點
+
+**新 cross-asset 規則**：
+- BB 寬度 regime 閘門有效先決條件為資產含**單一極端 vol regime 片段**（如 TLT
+  2022 升息）可一刀切除
+- 若資產含**多段中等 vol regime 重疊**（政策驅動 EM、事件驅動資產），此方向
+  結構性失效
+- 預期同樣失效的候選資產：FXI（已驗證）、INDA（政策面，待驗證）、EWZ（事件
+  驅動，待驗證）、URA（核能政策，待驗證）
+- 預期可能成功的候選資產：SPY/DIA/VOO（寬基，2020 COVID 單一極端 episode）、
+  TQQQ（2022 科技單一熊市）
+
+**FXI 第 11 種失敗策略類型**（前 10 種：BB Squeeze、RSI(5)、BB 下軌 MR、RS 動量、
+Stoch、Failed Breakdown、Gap-Down Capitulation、CRSI、Momentum Continuation、
+FXI-001 對稱出場）。FXI-005 Att3 確認為全域最優（13 次實驗、42+ 次嘗試）。
