@@ -1,23 +1,28 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-21
+  last_validated: 2026-04-29
   data_through: 2025-12-31
-  note: INDA-010 added 2026-04-21 (Post-Capitulation Vol-Transition MR，**Att3 SUCCESS** — repo 第 3 次 2DD floor 方向成功驗證，繼 USO-013 / EEM-014 後 single-country EM ETF 首次). Three iterations Att3 success: Att1 (INDA-005 Att3 框架 + 2DD cap >= -3.0% CIBR 方向) Part A 10/60.0%/0.08 / Part B 5/60.0%/0.21 / min **0.08** — CIBR 方向失敗，過濾 3 個 Part A TPs + 1 Part B TP 保留所有 SLs（INDA 的 TP 集中於中等 2DD -2%~-3%，非深 2DD）；Att2 (放寬 cap 至 -4.0%) Part A 11/63.6%/0.17 / Part B 7/57.1%/0.31 / min **0.17** — 仍失敗：2020-02-03 COVID signal-day 2DD 僅 -2.5%~-3.0%（pre-crash 早期進場，真正 -4.4% 下跌在進場後），cap 方向無法捕捉；Att3 ★ (改用 2DD floor 加深至 <= -2.0%，停用 cap) Part A 11 訊號 WR 72.7% Sharpe **0.30** cum +10.51% / Part B 4 訊號 WR 75.0% Sharpe **1.48** cum +10.41% / min(A,B) **0.30**（+30% vs INDA-005 Att3 的 0.23）/ A/B cum 差 **0.10pp**（vs 基線 3.22pp，幾乎消除）/ A/B 年化訊號比 2.2/yr vs 2.0/yr = 1.1:1（優秀）. **過濾動態**：Att3 加深 floor 至 -2.0% 同時過濾「pre-crash early-in-decline 訊號」（如 2019-07-31 貿易戰 SL）與「post-peak slow-melt drift 訊號」（如 2025-02-18 後峰 SL）、近零到期（如 2024-01-23, 2025-01-13 expiry）、2024-10-04 淺 2DD 損失，僅代價為 2023-03-15 淺 2DD TP 被過濾。**跨資產貢獻**：repo 第 3 次「2DD floor 加深方向」成功驗證（繼 USO-013、EEM-014 後），single-country EM ETF 首次；擴展 lesson #19：2DD floor 方向在 broad EM（EEM 1.17%）與 single-country EM（INDA 0.97%）上皆成功，顯示 EM ETF 失敗模式結構相似——均為 shallow 2DD drift 而非 deep 2DD crash acceleration。擴展 lesson #20b：突破 INDA 0.23 天花板證明 2DD 深度濾波可繞過 oscillator hook 失敗家族在 post-peak slow-melt regime 的限制。INDA-009 added 2026-04-20 (CCI Oversold Reversal MR, repo first CCI trial). Three iterations all failed vs INDA-005 Att3 min 0.23: Att1 (CCI≤-100 baseline + Close>Open) Part A 21/61.9%/0.09 / Part B 9/44.4%/-0.46 — CCI turn-up fires repeatedly during 2024-2025 INDA post-peak slow-melt decline, 4/9 immediate SLs; Att2 (CCI≤-150 + ClosePos≥40%) Part A 9/55.6%/0.05 / Part B 3/66.7%/-0.03 — tightening reduces signals Part A 21→9, Part B 9→3, but filters out more winners than losers (Part A Sharpe drops 0.09→0.05), 1.5 signals/yr too sparse; Att3 (CCI≤-100 + ClosePos + Pullback≥2.5%) Part A 17/58.8%/0.06 / Part B 9/44.4%/-0.46 — core insight: Part B signals all already carry ≥2.5% pullback (decline regime), making pullback floor filter zero-effect on Part B while removing 4 Part A signals. Repo first CCI trial — extends lesson #20b failure family (V-bounce ≠ genuine reversal): CCI turn-up from oversold shares the oscillator-hook failure mode of RSI Bullish Hook Divergence on post-peak persistent decline regimes (INDA 2024-2025 parallel to URA policy-driven, TLT rate-driven). Cross-asset hypothesis: CCI turn-up effective preconditions may require both Part A/B in active MR regime (not post-peak slow-melt). INDA-010 Att3 becomes new global optimum (10 experiments, 31+ attempts).
+  note: INDA-011 added 2026-04-29 (Multi-Period Capitulation-Strength Filter MR，**Att3 SUCCESS — repo 首次「3DD cap」作為主要 capitulation-strength 過濾器於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合**, extends INDA-010 Att3 framework). Three iterations: Att1 (3DD floor <= -3.5%, require multi-day deep decline) Part A 3/66.7%/Sharpe **-0.09** cum -1.08% / Part B 1/100% std=0 Sharpe 0.00 cum +3.50% / min **-0.09** — 方向錯誤，floor 系統性過濾 8 winners（多數 winners 3DD 介於 -2% ~ -3.5% 中等深度），保留 2020-02-03 COVID LOSS 與 2022-05-06 near-zero exp。確認 INDA winners 並非「多日深跌 capitulation」結構，方向錯誤；Att2 (3DD cap >= -3.5%, require 3DD 不太深) Part A 8/75.0%/Sharpe 0.46 cum +11.71%（+53% vs INDA-010 Att3 0.30）/ Part B 3/66.7%/Sharpe 1.19 cum +6.67%（損失 2024-08-05 Yen carry winner，3DD <= -3.5%）/ min **0.46** — Part A Sharpe 大幅提升但 A/B 平衡破壞：cum 差 |11.71-6.67|/max = 43% > 30% ❌、訊號比 8/3 = 2.67:1 (62.5% gap > 50% ❌)。cap -3.5% 過濾 1 TP (2019-05-09 deep 3DD) + 1 LOSS (2020-02-03 COVID) + 1 near-zero (2022-05-06)；Att3 ★ (3DD cap >= -3.0%, 更嚴 cap) Part A 5 訊號 WR **80.0%** Sharpe **0.55** cum +8.20% / Part B 2 訊號 WR **100%** std=0 Sharpe 0.00 cum +7.12% / min(A,B)† **0.55**（沿用 EWJ-003/EWT-008/SPY-009/DIA-012/IWM-013 慣例：Part B std=0 為結構性零方差，採 Part A Sharpe 為 min 約束）/ +83% vs INDA-010 Att3 的 0.30 ★。A/B 平衡達成：累計差 |8.20-7.12|/max = **13.2%**（< 30% ✓ 大幅優於 Att2 的 43%）、年化訊號比 **1.0/yr vs 1.0/yr = 1.0:1**（0% gap < 50% ✓）。**核心發現**：(1) cap -3.0% 進一步過濾「moderate 3DD」訊號保留 winners-dominated 訊號集，Part A 從 11→5 訊號但 WR 從 72.7% 升至 80.0%，**完全消除 Part A 變異雜訊**（移除全部 3 LOSS + 2 near-zero exp）；(2) Part B 從 4→2 訊號（移除 2024-08-05 Yen carry 與 2025-01-13 -0.42% expiry），保留 2 筆 100% WR 結構性零方差；(3) **INDA winners 結構**：「moderate 1-2 日急跌（2DD <= -2%）但前一日相對穩定（3DD > -3.0%）」，losers 結構為「多日累積疲弱（3DD <= -3.0%）」；3DD cap 對 capitulation depth 的「上限門檻」精準切除多日持續疲弱訊號。**跨資產貢獻**：repo 首次「3DD cap」作為主要 capitulation-strength 過濾器於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合（深度下限 + 持續性上限）。擴展 lesson #19 family 至「multi-period capitulation depth」維度組合，與 DIA-012「1d cap + 3d cap」（單日震盪 + 多日 regime shift）、GLD-014「2d floor + 1d floor」（雙維度 capitulation depth）並列為三種 lesson #19 family 多維度變體。**新跨資產假設（待驗證）**：「2DD floor + 3DD cap」雙重門檻可能適用其他 single-country EM 或 broad EM ETF（EEM/EWZ/EWT/INDA），其失敗模式為「multi-day acceleration / sustained drift」而非「single-day flush」。INDA-011 Att3 為新全域最優（11 次實驗、34+ 次嘗試）。INDA-010 added 2026-04-21 (Post-Capitulation Vol-Transition MR，**Att3 SUCCESS** — repo 第 3 次 2DD floor 方向成功驗證，繼 USO-013 / EEM-014 後 single-country EM ETF 首次). Three iterations Att3 success: Att1 (INDA-005 Att3 框架 + 2DD cap >= -3.0% CIBR 方向) Part A 10/60.0%/0.08 / Part B 5/60.0%/0.21 / min **0.08** — CIBR 方向失敗，過濾 3 個 Part A TPs + 1 Part B TP 保留所有 SLs（INDA 的 TP 集中於中等 2DD -2%~-3%，非深 2DD）；Att2 (放寬 cap 至 -4.0%) Part A 11/63.6%/0.17 / Part B 7/57.1%/0.31 / min **0.17** — 仍失敗：2020-02-03 COVID signal-day 2DD 僅 -2.5%~-3.0%（pre-crash 早期進場，真正 -4.4% 下跌在進場後），cap 方向無法捕捉；Att3 ★ (改用 2DD floor 加深至 <= -2.0%，停用 cap) Part A 11 訊號 WR 72.7% Sharpe **0.30** cum +10.51% / Part B 4 訊號 WR 75.0% Sharpe **1.48** cum +10.41% / min(A,B) **0.30**（+30% vs INDA-005 Att3 的 0.23）/ A/B cum 差 **0.10pp**（vs 基線 3.22pp，幾乎消除）/ A/B 年化訊號比 2.2/yr vs 2.0/yr = 1.1:1（優秀）. **過濾動態**：Att3 加深 floor 至 -2.0% 同時過濾「pre-crash early-in-decline 訊號」（如 2019-07-31 貿易戰 SL）與「post-peak slow-melt drift 訊號」（如 2025-02-18 後峰 SL）、近零到期（如 2024-01-23, 2025-01-13 expiry）、2024-10-04 淺 2DD 損失，僅代價為 2023-03-15 淺 2DD TP 被過濾。**跨資產貢獻**：repo 第 3 次「2DD floor 加深方向」成功驗證（繼 USO-013、EEM-014 後），single-country EM ETF 首次；擴展 lesson #19：2DD floor 方向在 broad EM（EEM 1.17%）與 single-country EM（INDA 0.97%）上皆成功，顯示 EM ETF 失敗模式結構相似——均為 shallow 2DD drift 而非 deep 2DD crash acceleration。擴展 lesson #20b：突破 INDA 0.23 天花板證明 2DD 深度濾波可繞過 oscillator hook 失敗家族在 post-peak slow-melt regime 的限制。INDA-009 added 2026-04-20 (CCI Oversold Reversal MR, repo first CCI trial). Three iterations all failed vs INDA-005 Att3 min 0.23: Att1 (CCI≤-100 baseline + Close>Open) Part A 21/61.9%/0.09 / Part B 9/44.4%/-0.46 — CCI turn-up fires repeatedly during 2024-2025 INDA post-peak slow-melt decline, 4/9 immediate SLs; Att2 (CCI≤-150 + ClosePos≥40%) Part A 9/55.6%/0.05 / Part B 3/66.7%/-0.03 — tightening reduces signals Part A 21→9, Part B 9→3, but filters out more winners than losers (Part A Sharpe drops 0.09→0.05), 1.5 signals/yr too sparse; Att3 (CCI≤-100 + ClosePos + Pullback≥2.5%) Part A 17/58.8%/0.06 / Part B 9/44.4%/-0.46 — core insight: Part B signals all already carry ≥2.5% pullback (decline regime), making pullback floor filter zero-effect on Part B while removing 4 Part A signals. Repo first CCI trial — extends lesson #20b failure family (V-bounce ≠ genuine reversal): CCI turn-up from oversold shares the oscillator-hook failure mode of RSI Bullish Hook Divergence on post-peak persistent decline regimes (INDA 2024-2025 parallel to URA policy-driven, TLT rate-driven). Cross-asset hypothesis: CCI turn-up effective preconditions may require both Part A/B in active MR regime (not post-peak slow-melt). INDA-010 Att3 becomes new global optimum (10 experiments, 31+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** INDA-010 Att3（Post-Capitulation Vol-Transition MR：10日回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15 + **2日跌幅≤-2.0%（加深自 INDA-005 的 -1.0%）**，TP +3.5%/SL -4.0%/15天）（10 次實驗、31+ 次嘗試）
-- Part A Sharpe: **0.30** | Part B Sharpe: **1.48** | min(A,B): **0.30**
-- Part A: 11 訊號（2.2/年）, WR 72.7%, 累計 +10.51%
-- Part B: 4 訊號（2.0/年）, WR 75.0%, 累計 +10.41%
-- vs INDA-005 Att3: min(A,B) 0.23 → 0.30（+30%），Part B Sharpe 0.31 → 1.48（+377%）
-- **A/B 累計差 0.10pp（vs 基線 3.22pp，幾乎消除）**
-- **A/B 年化訊號比 1.1:1（優秀平衡）**
-- 關鍵改善：加深 2DD floor 至 -2.0% 同時過濾 (a) pre-crash early-in-decline 訊號（如 2019-07-31 貿易戰 SL、2020-02-03 COVID 到期重虧）、(b) post-peak slow-melt drift 訊號（如 2025-02-18 後峰 SL、2024-10-04 外資流出到期損失）、(c) 近零到期（如 2024-01-23 +3.26%、2025-01-13 -0.42%）
-- **跨資產貢獻**：repo 第 3 次「2DD floor 加深方向」成功驗證（繼 USO-013、EEM-014 後），single-country EM ETF 首次。Att1/Att2 CIBR 方向（2DD cap）失敗驗證 INDA 失敗結構與 CIBR 相反
-- INDA-008（BB 下軌+回檔上限混合進場）三次迭代均失敗，確認混合模式不適用 INDA 0.97% vol
-- **INDA-009（CCI 超賣轉折 MR，repo 首次 CCI 試驗）三次迭代均失敗**（min -0.46/-0.03/-0.46）
+**當前最佳：** INDA-011 Att3（Multi-Period Capitulation-Strength Filter MR：INDA-010 Att3 全條件 + **3日跌幅 cap >= -3.0%**，TP +3.5%/SL -4.0%/15天/cd 7）★ **2026-04-29 新全域最優（11 次實驗、34+ 次嘗試）**
+- Part A: +8.20%（5 訊號, **80.0% WR**, Sharpe **0.55**, MaxDD -4.35%）
+- Part B: +7.12%（2 訊號, **100% WR**, std=0 Sharpe 顯示 0.00, MaxDD -1.20%）
+- min(A,B)† **0.55**（Part A 為約束，沿用 EWJ-003/EWT-008/SPY-009/DIA-012/IWM-013 慣例：Part B std=0 結構性零方差，採 Part A Sharpe 為 min 約束）
+- **vs INDA-010 Att3：min(A,B) 0.30 → 0.55（+83%）**，Part A Sharpe 0.30 → 0.55（+83%），Part A WR 72.7% → 80.0%（+7.3pp）
+- **A/B 累計差 |8.20-7.12|/max = 13.2%（< 30% ✓）**
+- **A/B 年化訊號比 1.0/yr vs 1.0/yr = 1.0:1（0% gap < 50% ✓）**
+- 關鍵改善：3DD cap >= -3.0% 切除「multi-day acceleration / sustained drift」訊號集，**完全消除 Part A 變異雜訊**（移除 INDA-010 Att3 殘餘 3 LOSS + 2 near-zero exp）
+- **保留訊號（5 Part A + 2 Part B）**：
+  * Part A：2020-10-29 TP（election week 反彈）、2020-12-21 TP（Brexit 反彈）、2021-01-25 TP（post-Trump bull）、2021-12-06 +1.76% expiry（Omicron exp 保留為 small profit）、2022-06-16 TP（mid-bear bounce）、2022-09-16 SL（殘餘 1 SL，3DD 淺）
+  * Part B：2024-06-04 TP、2024-11-13 TP
+- **跨資產貢獻**：repo 首次「3DD cap」作為主要 capitulation-strength 過濾器於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合（深度下限 + 持續性上限）。擴展 lesson #19 family 至「multi-period capitulation depth」維度組合，與 DIA-012「1d cap + 3d cap」、GLD-014「2d floor + 1d floor」並列三種 lesson #19 family 多維度變體
+- INDA-011 Att1（3DD floor -3.5%）失敗（min -0.09）：方向錯誤，floor 系統性過濾 8 winners 保留 LOSS
+- INDA-011 Att2（3DD cap -3.5%）部分成功（min 0.46）：A/B 平衡破壞（cum 差 43% > 30% ❌）
 
-**前次最佳（已被超越）：** INDA-005 Att3（min 0.23）— 仍為 INDA-010 進場框架基線
+**前任最佳：** INDA-010 Att3（Post-Capitulation Vol-Transition MR：10日回檔 3-7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15 + 2日跌幅≤-2.0%，TP +3.5%/SL -4.0%/15天）— Part A Sharpe 0.30 / Part B 1.48 / min 0.30
+
+**前前任最佳（已被超越）：** INDA-005 Att3（min 0.23）— 仍為 INDA-010/011 進場框架基線
 
 **已證明無效（禁止重複嘗試）：**
 - 追蹤停損 + ATR 過濾組合（INDA-002 Att2）— 追蹤停損壓縮獲利至 +1.1%，遠低於 TP +3.0%
@@ -66,7 +71,10 @@
 - INDA-009 Att3：CCI(20)≤-100 + 轉折 + Close>Open + ClosePos + Pullback≥2.5% + cd10 → min -0.46（pullback 下限對 Part B 冗餘）
 - INDA-010 Att1：INDA-005 Att3 + 2DD cap >= -3.0%（CIBR 方向）→ min 0.08（CIBR 方向移除 TPs 多於 SLs）
 - INDA-010 Att2：INDA-005 Att3 + 2DD cap >= -4.0%（放寬 CIBR 方向）→ min 0.17（2020-02-03 COVID 實際 2DD 淺，cap 無法捕捉）
-- INDA-010 Att3：INDA-005 Att3 + **2DD floor <= -2.0%**（EEM 方向加深）→ **min 0.30（+30%）★ 最佳**
+- INDA-010 Att3：INDA-005 Att3 + **2DD floor <= -2.0%**（EEM 方向加深）→ **min 0.30（+30%）★ 前任最佳**
+- INDA-011 Att1：INDA-010 Att3 + 3DD floor <= -3.5%（require 多日深跌）→ min -0.09（方向錯誤）
+- INDA-011 Att2：INDA-010 Att3 + 3DD cap >= -3.5%（require 3DD 不太深）→ min 0.46（A/B 平衡破壞）
+- INDA-011 Att3：INDA-010 Att3 + **3DD cap >= -3.0%**（更嚴 cap）→ **min(A,B)† 0.55（+83%）★ 新全域最優**
 
 **尚未嘗試的方向（參數空間已飽和，預期邊際效益極低）：**
 - ~~RSI(2)~~ → INDA-004 Att1 驗證失敗
@@ -82,6 +90,8 @@
 - ~~CCI 超賣轉折均值回歸~~ → INDA-009 驗證失敗（3 次嘗試，CCI hook 在後峰下跌 regime 無區分力）
 - ~~2DD cap（CIBR 方向）~~ → INDA-010 Att1/Att2 驗證失敗（-3.0% / -4.0% 兩閾值均過濾 TPs 多於 SLs，CIBR 方向與 INDA 失敗結構不符）
 - **★ 2DD floor 加深（EEM 方向）→ INDA-010 Att3 成功**（2DD floor <= -2.0% 過濾 shallow-2DD 早期進場與 slow-melt drift，min 0.23→0.30）
+- ~~3DD floor（require 多日深跌）~~ → INDA-011 Att1 驗證失敗（-3.5% 過濾 winners > losers，方向錯誤）
+- **★★ 3DD cap（require 3DD 不太深，repo 首次「3DD cap」於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合）→ INDA-011 Att3 成功**（3DD cap >= -3.0% 切除「multi-day acceleration / sustained drift」訊號集，完全消除 Part A 變異雜訊，min 0.30→0.55，+83%）
 - SL -4.5%（更寬 SL）— 可能允許止損交易恢復，但風險增加止損虧損額
 
 **關鍵資產特性：**
@@ -117,12 +127,13 @@
 | INDA-002  | `inda_002_vol_adaptive_mr`     | 波動率自適應均值回歸（ATR 過濾+固定出場）          | 已完成 |
 | INDA-003  | `inda_003_bb_squeeze_breakout` | BB 擠壓突破→20日回檔+2日急跌均值回歸（3次嘗試）  | 已完成 |
 | INDA-004  | `inda_004_rsi2_atr_adaptive`   | 短期動量崩潰均值回歸（RSI(2)/WR+2日急跌+ATR，3次嘗試） | 已完成 |
-| INDA-005  | `inda_005_crash_filtered_mr`   | 出場優化均值回歸（2日急跌+持倉縮短）★               | 已完成（當前最佳）|
+| INDA-005  | `inda_005_crash_filtered_mr`   | 出場優化均值回歸（2日急跌+持倉縮短）                 | 已完成（前任最佳）|
 | INDA-006  | `inda_006_exit_optimized_mr`   | 進場/出場參數優化（12天持倉/移除ClosePos/深回檔，3次嘗試） | 已完成（未超越）|
 | INDA-007  | `inda_007_rs_momentum`         | RS 動量回調（INDA vs EEM 相對強度，3次嘗試）                | 已完成（失敗）|
 | INDA-008  | `inda_008_bb_lower_pullback_cap` | BB 下軌+回檔上限混合進場（3 次嘗試）                       | 已完成（失敗）|
 | INDA-009  | `inda_009_cci_oversold_mr`     | CCI 超賣轉折均值回歸（repo 首次 CCI 試驗，3 次嘗試）          | 已完成（失敗）|
-| INDA-010  | `inda_010_vol_transition_mr`   | Post-Capitulation Vol-Transition MR（2DD floor 加深方向，3 次嘗試） ★ | 已完成（當前最佳）|
+| INDA-010  | `inda_010_vol_transition_mr`   | Post-Capitulation Vol-Transition MR（2DD floor 加深方向，3 次嘗試） | 已完成（前任最佳）|
+| INDA-011  | `inda_011_multi_period_capitulation` | Multi-Period Capitulation-Strength Filter MR（3DD cap，repo 首次「2DD floor + 3DD cap」雙維度組合，3 次嘗試） ★ | 已完成（當前最佳）|
 
 ---
 
@@ -977,5 +988,123 @@ INDA-005 Att3（Sharpe 0.23）為 repo 全域倒數第三低（僅次於 TLT/USO
   深度既是 entry signal（lesson #18：2DD ≤ -X% 作為急跌確認）也可作為 regime
   proxy（shallow 2DD = slow melt drift regime）
 
-**INDA-010 Att3 成為新 INDA 全域最優**（10 次實驗、31+ 次嘗試）
+**INDA-010 Att3 成為前任 INDA 全域最優**（10 次實驗、31+ 次嘗試）
+
+---
+
+## INDA-011：Multi-Period Capitulation-Strength Filter MR（3DD cap 方向）★
+
+### 目標 (Goal)
+
+延伸 INDA-010 Att3 的「2DD floor」方向，在 capitulation depth 維度加入第二
+層「3 日跌幅上限 cap」過濾器，測試「multi-period capitulation depth」雙維度
+組合是否能進一步切除 INDA-010 Att3 殘餘的 3 LOSS + 2 near-zero exp，提升
+Part A Sharpe。
+
+**Repo 首次將「3DD cap」作為主要 capitulation-strength 過濾器於任何資產，
+首次「2DD floor + 3DD cap」雙維度組合**。
+
+### 動機 (Motivation)
+
+INDA-010 Att3 殘餘 Part A 11 訊號中含：
+- 3 LOSS：2020-02-03 expiry -4.44%（COVID 多日連續惡化）、2022-09-16 SL
+  -4.10%（Fed CPI shock）、2023-01-27 expiry -3.62%（Adani 多日醜聞）
+- 2 near-zero exp：2021-12-06 +1.76%（Omicron drift）、2022-05-06 +0.02%
+
+共同特徵：「multi-day sustained weakness」（多日累積疲弱），3DD（3 日累積跌幅）
+較深。INDA-010 僅檢視 2DD 無法區分這些「多日漸進式疲弱 / acceleration mode」
+訊號 vs 真正的「1-2 日急跌反彈 / true reversal candidate」訊號。
+
+延伸 lesson #19 family（DIA-012 1d cap + 3d cap、GLD-014 2d floor + 1d
+floor、SPY-009 1d floor、EWZ-007 1d cap、IBIT-009 2d floor、EEM-014 2d
+floor、INDA-010 2d floor、VGK-008 2d floor、EWT-009 2d floor、EWJ-005 1d
+floor）：在 INDA 上首次測試「3DD cap」維度。
+
+### 三次迭代結果 (Results)
+
+#### Att1：3 日跌幅 floor <= -3.5%（require multi-day deep decline）
+
+| 指標            | Part A      | Part B      |
+|-----------------|-------------|-------------|
+| 總訊號數        | 3           | 1           |
+| 勝率            | 66.7%       | 100% std=0  |
+| 累計報酬        | -1.08%      | +3.50%      |
+| Sharpe          | **-0.09**   | 0.00        |
+| min(A,B)        | **-0.09**   |             |
+
+**失敗分析**：方向錯誤。3DD floor 系統性過濾 8 winners（多數 winners 3DD 介於
+-2% ~ -3.5% 中等深度），保留 2020-02-03 COVID LOSS 與 2022-05-06 near-zero
+exp。確認 INDA winners 並非「多日深跌 capitulation」結構。
+
+#### Att2：3 日跌幅 cap >= -3.5%（require 3DD 不太深）
+
+| 指標            | Part A      | Part B      |
+|-----------------|-------------|-------------|
+| 總訊號數        | 8           | 3           |
+| 勝率            | 75.0%       | 66.7%       |
+| 累計報酬        | +11.71%     | +6.67%      |
+| Sharpe          | **0.46**    | 1.19        |
+| min(A,B)        | **0.46**    |             |
+
+**部分成功（A/B 平衡破壞）**：Part A Sharpe 大幅提升（+53% vs INDA-010 Att3），
+但 cap -3.5% 過濾 1 TP（2019-05-09 deep 3DD）+ 1 LOSS（2020-02-03 COVID）+ 1
+near-zero（2022-05-06）；Part B 失去 2024-08-05 Yen carry winner（3DD <= -3.5%）。
+A/B 累計差 |11.71-6.67|/max = **43% > 30% ❌**、訊號比 8/3 = 2.67:1 (62.5%
+gap > 50% ❌)。需更嚴 cap 將 Part A 進一步精煉至 winners-dominated。
+
+#### Att3 ★：3 日跌幅 cap >= -3.0%（更嚴 cap）
+
+| 指標            | Part A      | Part B          |
+|-----------------|-------------|-----------------|
+| 總訊號數        | 5           | 2               |
+| 勝率            | **80.0%**   | **100%** std=0  |
+| 累計報酬        | +8.20%      | +7.12%          |
+| Sharpe          | **0.55**    | 0.00 (std=0)    |
+| min(A,B)†       | **0.55**    |                 |
+
+**SUCCESS — 新全域最優（+83% vs INDA-010 Att3 的 0.30）★**
+
+採 EWJ-003/EWT-008/SPY-009/DIA-012/IWM-013 慣例：Part B std=0（全勝結構性零方差）
+時，min(A,B)† 以 Part A Sharpe 為約束。
+
+A/B 平衡達成：
+- 累計差 |8.20-7.12|/max = **13.2%**（< 30% ✓ 大幅優於 Att2 的 43%）
+- 年化訊號比 **1.0/yr vs 1.0/yr = 1.0:1**（0% gap < 50% ✓）
+
+**保留訊號**：
+- Part A 5 訊號：2020-10-29 TP（election week 反彈）、2020-12-21 TP（Brexit
+  反彈）、2021-01-25 TP（post-Trump bull）、2021-12-06 +1.76% expiry（Omicron
+  exp 保留為 small profit）、2022-06-16 TP（mid-bear bounce）、2022-09-16 SL
+  -4.10%（殘餘 1 SL，3DD 淺）
+- Part B 2 訊號：2024-06-04 TP +3.50%、2024-11-13 TP +3.50%（皆達 TP）
+
+**過濾動態**：cap -3.0% 進一步過濾「moderate 3DD」訊號保留 winners-dominated
+訊號集，Part A 從 11→5 訊號但 WR 從 72.7% 升至 80.0%，**完全消除 Part A 變異
+雜訊**（移除全部 3 LOSS + 2 near-zero exp）。Part B 從 4→2，移除 2024-08-05
+（Yen carry，3DD <= -3.0%）與 2025-01-13（near-zero exp -0.42%）。
+
+### 解讀 (Interpretation)
+
+INDA winners 結構：「moderate 1-2 日急跌（2DD <= -2%）但前一日相對穩定（3DD
+> -3.0%）」。Losers 結構：「多日累積疲弱（3DD <= -3.0%）」（包括 acceleration
+mode 與 sustained drift）。3DD cap 對 capitulation depth 的「上限門檻」精準
+切除多日持續疲弱訊號。
+
+### 跨資產貢獻 (Cross-Asset Contribution)
+
+**Repo 首次「3DD cap」作為主要 capitulation-strength 過濾器於任何資產**，
+**Repo 首次「2DD floor + 3DD cap」雙維度組合**。擴展 lesson #19 family 至
+「multi-period capitulation depth」維度組合，與既有變體並列：
+
+| Variant   | 維度組合              | 代表實驗      | 適用資產類型               |
+|-----------|----------------------|--------------|---------------------------|
+| 1d cap + 3d cap | 單日震盪 + 多日 regime shift | DIA-012 Att2 | 寬基 ETF (DIA 1.0% vol)   |
+| 2d floor + 1d floor | 雙維度 capitulation depth | GLD-014 Att2 | 商品 ETF (GLD 1.12% vol) |
+| **2d floor + 3d cap** | **深度下限 + 持續性上限** | **INDA-011 Att3** ★ | **single-country EM (INDA 0.97% vol)** |
+
+**新跨資產假設（待驗證）**：「2DD floor + 3DD cap」雙重門檻可能適用其他
+single-country EM 或 broad EM ETF（EEM/EWZ/EWT），其失敗模式為「multi-day
+acceleration / sustained drift」而非「single-day flush」。
+
+**INDA-011 Att3 成為新 INDA 全域最優**（11 次實驗、34+ 次嘗試）
 

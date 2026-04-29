@@ -313,6 +313,7 @@ on:
           - "INDA-008: inda_008_bb_lower_pullback_cap"
           - "INDA-009: inda_009_cci_oversold_mr"
           - "INDA-010: inda_010_vol_transition_mr"
+          - "INDA-011: inda_011_multi_period_capitulation"
 
 jobs:
   backtest:
