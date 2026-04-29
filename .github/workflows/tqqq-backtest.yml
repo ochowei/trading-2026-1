@@ -40,6 +40,7 @@ on:
           - "GLD-011: gld_011_donchian_breakout"
           - "GLD-012: gld_012_atr_adaptive"
           - "GLD-013: gld_013_vol_transition_mr"
+          - "GLD-014: gld_014_capitulation_filter"
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "SIVR-003: sivr_003_pullback_wr"

@@ -1,17 +1,24 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-22
+  last_validated: 2026-04-29
   data_through: 2025-12-31
-  last_experiment_attempt: GLD-013 (3 attempts, 0 success — Post-Capitulation Vol-Transition MR 不適用商品 ETF)
-  note: GLD-013 added 2026-04-22. VGK-008 Att2 (+390% on European broad ETF) and similar successes on EEM/INDA/CIBR prompted cross-category extension to commodity ETF. All 3 iterations failed (Att1 1 signal / Att2 Part A 0.20 / Att3 Part A -0.69). Extends Post-Capitulation Vol-Transition MR boundary: pattern requires equity-style capitulation dynamics, fails on macro-driven commodity declines (rates/USD/inflation repricing does not cluster SLs at shallow 2DD). GLD-012 Att3 remains global optimum.
+  last_experiment_attempt: GLD-014 (3 attempts, Att2 marginal SUCCESS — 2d floor + 1d floor combo, min(A,B) 0.48→0.49)
+  note: GLD-014 added 2026-04-29 (Signal-Day Capitulation-Strength Filter MR, **repo 第 7 次「2d floor」方向跨資產試驗、首次商品 ETF 在 pullback+WR 框架成功，repo 首次「2d floor + 1d floor 雙維度組合」**, cross-asset port from EEM-014/SPY-009/EWJ-005). Three iterations: Att1 (2d floor <= -0.5% only) Part A 30/76.7%/Sharpe 0.45 cum +39.31% / Part B 12/100%/Sharpe 7.56 cum +40.67% / min **0.45**（-6% 回退）—— cooldown chain shift 引入 2 筆新 SL（2020-11-19 1d -0.19% Stop -4.10%、2021-02-04 1d -2.15% Stop -4.10%），淨效果負面；Att2 ★ (2d floor <= -0.5% AND 1d floor <= -0.3%) Part A 20 訊號 WR **80.0%** Sharpe **0.49** cum +27.37% / Part B 9 訊號 100% WR Sharpe 6.56 cum +28.73% / min(A,B) **0.49**（+2% vs baseline 0.48）/ A/B 累計差 4.7%（< 30% ✓）/ A/B 年化訊號比 4.0/yr vs 4.5/yr = 11.1%（< 50% ✓）—— 1d floor -0.3% 過濾 cooldown shift 衍生 2020-11-19 SL（1d -0.19% > -0.3%），同時過濾原 4 筆失敗交易中 1d 過淺/UP 日（2019-09-11 1d +0.61%、2023-02-06 1d +0.21%、2023-05-17 1d -0.35%、2023-08-14 1d -0.30%）；Att3 (1d floor <= -0.5% only, 停用 2d) Part A 20/75.0%/Sharpe 0.31 cum +17.89% / Part B 10/100%/Sharpe 4.11 cum +30.22% / min **0.31**（-35% 嚴重回退）—— 1d floor -0.5% 純單維度過嚴移除 14 筆 winners（GLD wins 1d 分布範圍廣，多筆「淺 1d + 深 2d」winner 被誤殺）。**核心發現**：(1) **Repo 首次「2d floor + 1d floor 雙維度組合」**——單一 2d floor 過濾觸發 cooldown chain shift 引入新 SL，1d floor 輔助過濾 shifted 訊號的「淺 1d」結構；(2) **2d floor 方向首次在商品 ETF 成功**（GLD-013 BB 下軌框架失敗 vs GLD-014 pullback+WR 框架成功，**框架選擇 > 過濾器類型**）；(3) **GLD 結構性 Sharpe 上限約 0.50**——macro 驅動商品 ETF 的 pullback+WR 訊號集已接近捕捉所有真實 MR 機會，過濾器主要作用為提升 WR 與 A/B 平衡（75%→80%），而非顯著放大絕對報酬。GLD-014 Att2 為新全域最優（14 次實驗、47+ 次嘗試）。**新 cross-asset 規則（lesson #19 v4）**：當 2d floor 過濾觸發 cooldown chain shift 引入新 SL 時，1d floor -0.3% ~ -0.5% 為輔助過濾甜蜜點，雙維度組合可繞過單維度的 cooldown 副作用。GLD-013 added 2026-04-22 (Post-Capitulation Vol-Transition MR — 不適用商品 ETF，3 attempts 0 success, BB-lower 框架). VGK-008 Att2 (+390% on European broad ETF) and similar successes on EEM/INDA/CIBR prompted cross-category extension to commodity ETF. All 3 iterations failed (Att1 1 signal / Att2 Part A 0.20 / Att3 Part A -0.69). Extends Post-Capitulation Vol-Transition MR boundary: pattern requires equity-style capitulation dynamics, fails on macro-driven commodity declines (rates/USD/inflation repricing does not cluster SLs at shallow 2DD). **GLD-014 反證 GLD-013 結論**：2d floor 失敗根因為**框架（BB 下軌）**而非**過濾器類型**，GLD-014 在 pullback+WR 框架同樣使用 2d floor 並成功（雖需配合 1d floor 解決 cooldown shift）。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** GLD-012 Att3（同 GLD-008 進場，移除追蹤停損，純 TP/SL/到期出場）**已確認為 min(A,B) 全域最優（13 次實驗）**
+**當前最佳：** GLD-014 Att2（同 GLD-012 進場 + **2 日跌幅下限 <= -0.5% AND 1 日跌幅下限 <= -0.3%** 雙維度 capitulation-strength 過濾）★ **2026-04-29 新全域最優（14 次實驗、47+ 次嘗試）**
+- Part A: +27.37%（20 訊號, **80.0% WR**, Sharpe **0.49**, MaxDD -3.62%）
+- Part B: +28.73%（9 訊號, 100% WR, std=0 Sharpe 顯示 6.56, MaxDD -2.33%）
+- Part C (Live): -4.10%（1 訊號 Stop, 0% WR）
+- min(A,B) **0.49**（Part A 為約束，+2% vs GLD-012 Att3 的 0.48）
+- A/B 累計差 **4.7%**（< 30% ✓ 大幅優於 GLD-012 的 15.6%），A/B 年化訊號比 4.0/yr vs 4.5/yr = 11.1%（< 50% ✓）
+
+**前任最佳：** GLD-012 Att3（同 GLD-008 進場，移除追蹤停損，純 TP/SL/到期出場）
 - Part A: +50.15%（36訊號, 75.0% WR, Sharpe 0.48, Sortino 0.78）, Part B: +42.30%（13訊號, 100% WR, Sharpe 4.68, Sortino 999.99）
 - vs GLD-008: Part A Sharpe +6.7%（0.45→0.48），Part B Sharpe +101%（2.33→4.68），cumul. +10.5%/+28.8%
 - A/B 累計差距 15.6%（vs GLD-008 的 28%），A/B 訊號比 2.77:1（不變）
 
-**前任最佳：** GLD-008（20日回檔 ≥3% + WR ≤-80 + 收盤位置 ≥40%，TP +3.0% + 追蹤停損）
+**前前任最佳：** GLD-008（20日回檔 ≥3% + WR ≤-80 + 收盤位置 ≥40%，TP +3.0% + 追蹤停損）
 
 **滾動窗口分析摘要（2026-03-29）：**
 - **GLD-006：** 12/12 窗口全正累計（最低 +0.41%，最高 +32.49%），勝率 64-83%，**雙漸變通過**（ΔWR 最大 10.3pp），但低谷期累計僅 +0.41%，差點成功比例高
@@ -112,8 +119,9 @@
 | GLD-009 | `gld_009_bb_squeeze_breakout` | BB 擠壓突破 | BB(20,2) Squeeze 60日25th百分位 + 突破上軌 + SMA(50), TP +3.0%, SL -3.0% | ❌ 未超越 |
 | GLD-010 | `gld_010_momentum_pullback` | 動量回檔 | ROC(20) > 5% + 5日回檔 ≥1.5% + SMA(50), TP +3.5%, SL -4.0%, 25d | ❌ 未超越 |
 | GLD-011 | `gld_011_donchian_breakout` | Donchian 突破 | Donchian(50) + SMA(100), TP +4.0%, SL -3.5%, 25d | ❌ 未超越 |
-| GLD-012 | `gld_012_atr_adaptive` | 無追蹤停損均值回歸 | 同 GLD-008 進場，移除追蹤停損，TP +3.0%, SL -4.0%, 20d | ✅ 新最佳 |
+| GLD-012 | `gld_012_atr_adaptive` | 無追蹤停損均值回歸 | 同 GLD-008 進場，移除追蹤停損，TP +3.0%, SL -4.0%, 20d | ✅ 前最佳 |
 | GLD-013 | `gld_013_vol_transition_mr` | Post-Capitulation Vol-Transition MR（3次嘗試均失敗）| BB(20,2) 下軌 + 10日回檔上限 + WR + ClosePos + ATR + 2DD floor，跨類別延伸 VGK-008 | ❌ 未超越 |
+| GLD-014 | `gld_014_capitulation_filter` | Signal-Day Capitulation-Strength Filter MR（Att2 SUCCESS）| 同 GLD-012 進場 + **2d floor <= -0.5% AND 1d floor <= -0.3%**, TP +3.0%, SL -4.0%, 20d | ✅ **新最佳** |
 
 ## 演進路線 (Lineage)
 
@@ -126,7 +134,8 @@ GLD-001 gld_001_mean_reversion (基礎版：RSI(10)<30, SMA20 Dev -1.5%, cooldow
                 └── GLD-006 gld_006_pullback_wr (回檔+WR進場：10d高點回檔≥3%, WR(10)≤-80, cooldown 7d)
                     └── GLD-007 gld_007_pullback_wr_reversal (回檔+WR+反轉K線：新增 ClosePos≥40%, TP +3.5%)
                         └── GLD-008 gld_008_rsi2_trailing (20日回看+TP+3.0%：回看窗口 10d→20d, TP +3.5%→+3.0%)
-                            └── GLD-012 gld_012_atr_adaptive (移除追蹤停損：Sharpe 0.48/4.68 ✅ 新最佳)
+                            └── GLD-012 gld_012_atr_adaptive (移除追蹤停損：Sharpe 0.48/4.68 ✅ 前最佳)
+                                └── GLD-014 gld_014_capitulation_filter (★ 新最佳：+2d floor -0.5% +1d floor -0.3%, Sharpe 0.49/6.56, A/B cum diff 4.7%)
 
 GLD-009 gld_009_bb_squeeze_breakout (BB 擠壓突破：獨立策略線，Sharpe 0.28/0.27 ❌)
 GLD-010 gld_010_momentum_pullback (動量回檔：ROC(20)>5% + 5日回檔≥1.5% + SMA(50)，Sharpe 0.38/0.84 ❌)

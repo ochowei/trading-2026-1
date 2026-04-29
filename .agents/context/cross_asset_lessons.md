@@ -415,10 +415,10 @@ BB 上軌（均值+N 倍標準差）隨波動度自動縮放，嚴格優於 Donc
 
 ---
 
-## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25，IWM-013 oscillator depth 替代 raw return depth 2026-04-26，EWT-009 2DD floor 閾值精準度規則 2026-04-27，EWZ-007 outlier-event surgical filter 規則 2026-04-28**）
+## 19. N 日急跌過濾（雙向性發現 2026-04-21，VGK-008 再確認 2026-04-22，**DIA-012 1d+3d 雙維度擴展 2026-04-24，TSLA-013 突破策略失敗邊界 2026-04-25，SPY-009 1d FLOOR 反向擴展 2026-04-25，TSLA-014 高 vol 單股結構性邊界 2026-04-25，IWM-013 oscillator depth 替代 raw return depth 2026-04-26，EWT-009 2DD floor 閾值精準度規則 2026-04-27，EWZ-007 outlier-event surgical filter 規則 2026-04-28，GLD-014 2d+1d 雙 floor 組合解決 cooldown chain shift 2026-04-29**）
 <!-- freshness:
-  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014,IWM-013,EWT-009,EWZ-007]
-  validated: 2026-04-28
+  derived_from: [FCX-008,USO-013,EWT-004,VGK-005,CIBR-012,EEM-014,INDA-010,VGK-008,DIA-012,TSLA-013,SPY-009,TSLA-014,IWM-013,EWT-009,EWZ-007,GLD-014]
+  validated: 2026-04-29
   data_through: 2025-12-31
   confidence: high
 -->

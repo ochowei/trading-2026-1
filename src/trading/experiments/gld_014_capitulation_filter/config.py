@@ -124,11 +124,17 @@ class GLD014Config(ExperimentConfig):
     # 收盤位置過濾（同 GLD-012）
     close_position_threshold: float = 0.4
 
-    # 2 日累計跌幅下限（Att3 ablation: 停用 2d 測試純 1d floor）
-    twoday_return_floor: float = 0.99  # Att3 ablation: 停用 2d
+    # 2 日累計跌幅下限（lesson #19 family 跨資產移植）
+    # Att1 -0.5% only：min 0.45（cooldown chain shift 引入 2 筆新 SL）
+    # Att2 ★ -0.5% + 1d floor -0.3%：min(A,B) **0.49** SUCCESS
+    # Att3 disabled (0.99) / 1d floor -0.5% only：min 0.31 失敗
+    twoday_return_floor: float = -0.005  # Att2 ★: 2d floor <= -0.5%
 
-    # 1 日累計跌幅下限（Att3 ablation: 1d floor only -0.5%，SPY-009 直接移植）
-    oneday_return_floor: float = -0.005  # Att3 ablation: 1d floor <= -0.5%
+    # 1 日累計跌幅下限（Att2 引入，過濾 cooldown chain shift 衍生 SL）
+    # Att1 停用 (0.99)
+    # Att2 ★ -0.3%：搭配 2d floor 過濾「淺 1d / 中等 2d」cooldown shift 衍生 SL
+    # Att3 -0.5% 純 1d（無 2d）：SPY-009 直接移植 → 過嚴移除 14 winners 失敗
+    oneday_return_floor: float = -0.003  # Att2 ★: 1d floor <= -0.3%
 
 
 def create_default_config() -> GLD014Config:
