@@ -692,10 +692,10 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 
 ---
 
-## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28，COPX-011 商品/礦業 ETF 首次驗證 + repo 首次 regime BOX 雙向過濾發現 2026-04-28**）
+## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28，COPX-011 商品/礦業 ETF 首次驗證 + repo 首次 regime BOX 雙向過濾發現 2026-04-28，USO-024 純單一商品 ETF 失敗邊界發現 2026-04-29**）
 <!-- freshness:
-  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013,COPX-011]
-  validated: 2026-04-28
+  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013,COPX-011,USO-024]
+  validated: 2026-04-29
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -778,6 +778,11 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
   - **ETF 形式（COPX-011）：需 BOX 結構 [k_min, k_max] 雙向過濾**
   - COPX-011 規則：BB Squeeze breakout 框架疊加 1.00 ≤ SMA(20)/SMA(60) ≤ 1.09，min(A,B) 0.45→**0.64**（+42%）
 - **跨類驗證假設（待測）**：lesson #22 BOX 結構應於其他商品/礦業 ETF（XBI、CIBR 嗎？）上驗證；尤其 SLs 是否同樣集中於過熱 ratio 區間。對於股票寬基/槓桿 ETF（IWM、TQQQ 等），ETF 平均化效應假設仍待驗證
+
+- **失敗邊界發現：純單一商品 ETF（USO 原油）—— USO-024（2026-04-29）★**：repo 第 5 次 lesson #22 試驗，**首次純單一商品 ETF 驗證**，三次迭代全部失敗 vs USO-013 baseline min 0.26：Att1（k_min=1.00 strict，FCX 直接移植）Part A 12/66.7%/Sharpe **0.38** cum +21.49%（Part A 改善 +73% vs USO-021 baseline 0.22）/ Part B 4/50%/Sharpe **-0.01** cum -0.70%（2 TP / 2 SL — 2025-06-12 Iran-Israel spike-reverse 1d SL，2025-07-29 OPEC+ unwind 3d SL，皆 mid-regime ratio 1.00-1.05）/ min **-0.01**；Att2（regime BOX [1.00, 1.09] COPX 移植）Part A 9/55.6%/0.13 / Part B **4 訊號完全不變** Sharpe -0.01 / min **-0.01**——k_max=1.09 對 USO Part B 完全非綁定（所有 4 訊號 ratio<1.09）；Att3（squeeze 收緊 30th→20th + recent 3d）Part A 8/62.5%/0.29 / Part B 3/33.3%/Sharpe **-0.36**（-5.43% cum）/ min **-0.36**（最差）。**核心跨資產發現**：(1) **lesson #22 在純單一商品 ETF 結構性失敗**——USO 2024-2025 為地緣政治驅動橫盤（ratio 集中 [1.00, 1.05]），無「過熱牛末」訊號可被 k_max 過濾；(2) **驅動因子差異**：COPX 為「銅礦企業基本面 + 銅價」雙重平滑；USO 為「原油期貨直接 expose」，受 OPEC+/地緣政治單日衝擊主導，技術面 regime gate 無區分力；(3) **與 lesson #20b 平行**：當資產主驅動為「外部事件衝擊」（USO 油 / FXI 中國政策 / TLT 利率），技術面 regime gate 結構性失效。**lesson #22 v3 適用邊界精煉**：
+  - ✅ 適用：高波動單股（TSLA/NVDA/FCX）+ 混合驅動商品 ETF（COPX 銅礦企業）
+  - ❌ 不適用：**純單一商品 ETF（USO 原油）**，純政策驅動 EM ETF（FXI 中國），純利率驅動債券 ETF（TLT，BB-width regime gate 已是 lesson #23 範疇）
+  - **判別準則**：資產 SL 是否受「外部事件衝擊」（OPEC+/地緣政治/政策/Fed）主導而非 trend regime——若是則 lesson #22 結構性失效
 
 ---
 

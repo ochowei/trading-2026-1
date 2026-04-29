@@ -1,8 +1,8 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-24
+  last_validated: 2026-04-29
   data_through: 2025-12-31
-  last_experiment_attempt: USO-023 (3 attempts, 0 success — USO-013 仍為最佳)
-  note: USO-023 added 2026-04-24 (Volatility-Adaptive / 2DD cap / 20d lookback triple-direction exploration). Three iterations all failed to beat USO-013 min 0.26: Att1 (ATR(5)/ATR(20) > 1.05 cross-asset port from COPX-007) Part A 26 signals WR 65.4% cum +20.14% Sharpe **0.25** / Part B 9 signals WR 77.8% Sharpe 0.60 / min **0.25** — ATR filter has NO selectivity on USO (removes 6 wins + 3 losses nearly equally, WR unchanged), consistent with USO-020's finding "技術指標無區分力"; unexpectedly removes 3 Part B winners (2024 range-bound period) dropping WR 83.3%→77.8%. Att2 (2DD cap ≥ -6%, CIBR-012 direction) Part A 28 WR 57.1% cum +5.31% Sharpe **0.08** / Part B 9 WR 88.9% Sharpe 1.15 / min **0.08** — **key inverse finding**: 2DD cap removes 7 winners and 0 losers in Part A (all 12 Part A SLs have 2DD > -6%, i.e. shallower than -6%), opposite structure to CIBR (deep 2DD SLs); USO 2020 oil crash deep-2DD days actually produce strong V-bounce winners being wrongly filtered. Att3 (20d pullback lookback, 10-18% range) Part A 29 WR 62.1% cum +17.03% Sharpe **0.19** / Part B 8 WR 37.5% cum **-5.61%** Sharpe **-0.23** / min **-0.23** — reconfirms lesson #38 "回檔回看窗口不可跨資產移植": 20d works on GLD/COPX but fails on SIVR/URA/IBIT/INDA, now extending failure list to USO. **Three failures integrated**: (1) confirms USO-020 finding that USO-013 framework is at technical ceiling; (2) **2DD direction asset-dependence extended**: USO SL 2DD distribution shallow (> -6%) vs CIBR deep (≤ -4%) — direction not portable, must check per-asset SL 2DD distribution first; (3) lesson #38 failure list extended to USO. **USO-013 confirmed global optimum** (23 experiments, 30+ attempts); breakthrough would require cross-framework innovation (event-driven model, asymmetric holding, flow analysis) beyond pure technical filtering. USO-022 added 2026-04-19 (RSI(14) Bullish Hook Divergence ported from SIVR-015 Att1). Three iterations all failed to beat USO-013 min 0.26: Att1 (USO-013 entry + hook delta≥3/max_min≤35) Part A 3 signals all +3% TP zero-variance Sharpe 0.00 / Part B 0 signals — USO-013 的 RSI(2)<15 + 2DD≤-2.5% 與 hook delta≥3 結構性互斥（前者要求當日 RSI 新低、後者要求 RSI 已回升）。Att2 (移除 2DD) Part A 4/0 signals still zero-variance — 症狀相同，RSI(2)<15 仍與 hook delta 結構性互斥。Att3 (SIVR-015 pattern 直接移植: pullback 7-12% + WR(10)≤-80 + hook) Part A Sharpe 0.51 (4 signals WR 75%) / Part B Sharpe -0.06 (2 signals 1W 1L, -0.45% cumulative). Part B 2024-09-10 訊號 1日停損 -3.35%，2025-10-20 訊號 TP +3%。USO 形式上符合 lesson #20b 前四項條件（日波動 ~2.2%、10日回檔框架、USO-013 已驗證框架、Part A/B 皆活躍 MR regime），但 Part B 2 訊號 50% WR 證明 USO 不滿足「RSI 轉折=真實反轉」結構——油價由 OPEC 決策、地緣政治、庫存數據驅動，與 URA/FXI/TLT 政策/事件驅動同類型失敗。擴展 lesson #20b 失敗清單：USO（商品 ETF，油價 event-driven）與 URA（核能政策）、FXI（中國政策）、TLT（利率政策）、XBI（生技事件）、COPX（20d 框架）、FCX（post-peak）同列 hook divergence 失效資產。USO-013 已確認全域最優（22 次實驗、27+ 次嘗試）。
+  last_experiment_attempt: USO-024 (3 attempts, 0 success — USO-013 仍為最佳)
+  note: USO-024 added 2026-04-29 (Multi-Week Regime-Aware BB Squeeze Breakout, **repo 第 5 次 lesson #22 跨資產試驗，首次純單一商品 ETF（原油）驗證**, cross-asset port from FCX-013 / COPX-011). Three iterations all failed vs USO-013 min 0.26: Att1 (k_min=1.00 strict, FCX-013 純下限直接移植) Part A 12/66.7%/Sharpe **0.38** cum +21.49% (vs USO-021 baseline 0.22, +73% Part A 改善) / Part B 4/50.0%/Sharpe **-0.01** cum -0.70% (2 TP / 2 SL — 2025-06-12 Iran-Israel spike-reverse 1d SL, 2025-07-29 OPEC+ unwind 3d SL) / min **-0.01** — 純下限 lesson #22 規範閘門過濾 Part A 弱 regime SLs，但 Part B 2025 mid-regime（ratio 1.00-1.05）地緣政治反轉 SLs 結構性無法被 SMA20/SMA60 ratio 過濾。Att2 (regime BOX [k_min=1.00, k_max=1.09] COPX-011 移植) Part A 9/55.6%/0.13 cum +4.95% / Part B **4 訊號完全不變** Sharpe -0.01 / min **-0.01** — k_max=1.09 對 USO 2024-2025 Part B 完全非綁定（所有 4 個 Part B 訊號 ratio < 1.09，USO 在此期橫盤無「過熱牛末」），Part A k_max 移除 3 訊號含部分 winners 退化 0.38→0.13。Att3 (BB squeeze 收緊 30th→20th + recent 5d→3d，保留 BOX [1.00, 1.09]) Part A 8/62.5%/0.29 / Part B 3/33.3%/Sharpe **-0.36** cum -5.43% (移除 2025-01-02 winner，保留 2 SLs) / min **-0.36** (三次最差) — 收緊 squeeze 反向選擇移除 winner 而非 losers。**核心跨資產發現（lesson #22 邊界擴展）**：(1) **lesson #22 buffered multi-week SMA regime gate 在純單一商品 ETF（油）結構性失敗**——USO 2024-2025 為地緣政治驅動的橫盤（ratio 集中 [1.00, 1.05]），無「過熱牛末」訊號可被 k_max 過濾，與 COPX 銅礦 ETF 的明顯週期性過熱結構不同；(2) **驅動因子差異**：COPX 為「銅礦企業基本面 + 銅價」雙重平滑，USO 為「原油期貨直接 expose」，受 OPEC+/地緣政治單日衝擊明顯，即便 regime 健康亦頻繁 1-3 日反轉。(3) **與 lesson #20b（V-bounce 失敗家族）平行**：當資產主驅動為「外部事件衝擊」（USO 油 / FXI 中國政策 / TLT 利率），技術面 regime gate 結構性失效——USO 加入 lesson #22 失敗家族（先前僅 ETF/個股 5 次成功）；(4) **lesson #22 適用邊界精煉**：適用於高波動單股（TSLA/NVDA/FCX）+ 混合驅動商品 ETF（COPX 銅礦企業）；不適用於純單一商品 ETF（USO 原油）。USO-013 確認為純技術面 Sharpe 結構性上限 ~0.26（24 次實驗、33+ 次嘗試）。USO-023 added 2026-04-24 (Volatility-Adaptive / 2DD cap / 20d lookback triple-direction exploration). Three iterations all failed to beat USO-013 min 0.26: Att1 (ATR(5)/ATR(20) > 1.05 cross-asset port from COPX-007) Part A 26 signals WR 65.4% cum +20.14% Sharpe **0.25** / Part B 9 signals WR 77.8% Sharpe 0.60 / min **0.25** — ATR filter has NO selectivity on USO (removes 6 wins + 3 losses nearly equally, WR unchanged), consistent with USO-020's finding "技術指標無區分力"; unexpectedly removes 3 Part B winners (2024 range-bound period) dropping WR 83.3%→77.8%. Att2 (2DD cap ≥ -6%, CIBR-012 direction) Part A 28 WR 57.1% cum +5.31% Sharpe **0.08** / Part B 9 WR 88.9% Sharpe 1.15 / min **0.08** — **key inverse finding**: 2DD cap removes 7 winners and 0 losers in Part A (all 12 Part A SLs have 2DD > -6%, i.e. shallower than -6%), opposite structure to CIBR (deep 2DD SLs); USO 2020 oil crash deep-2DD days actually produce strong V-bounce winners being wrongly filtered. Att3 (20d pullback lookback, 10-18% range) Part A 29 WR 62.1% cum +17.03% Sharpe **0.19** / Part B 8 WR 37.5% cum **-5.61%** Sharpe **-0.23** / min **-0.23** — reconfirms lesson #38 "回檔回看窗口不可跨資產移植": 20d works on GLD/COPX but fails on SIVR/URA/IBIT/INDA, now extending failure list to USO. **Three failures integrated**: (1) confirms USO-020 finding that USO-013 framework is at technical ceiling; (2) **2DD direction asset-dependence extended**: USO SL 2DD distribution shallow (> -6%) vs CIBR deep (≤ -4%) — direction not portable, must check per-asset SL 2DD distribution first; (3) lesson #38 failure list extended to USO. **USO-013 confirmed global optimum** (23 experiments, 30+ attempts); breakthrough would require cross-framework innovation (event-driven model, asymmetric holding, flow analysis) beyond pure technical filtering. USO-022 added 2026-04-19 (RSI(14) Bullish Hook Divergence ported from SIVR-015 Att1). Three iterations all failed to beat USO-013 min 0.26: Att1 (USO-013 entry + hook delta≥3/max_min≤35) Part A 3 signals all +3% TP zero-variance Sharpe 0.00 / Part B 0 signals — USO-013 的 RSI(2)<15 + 2DD≤-2.5% 與 hook delta≥3 結構性互斥（前者要求當日 RSI 新低、後者要求 RSI 已回升）。Att2 (移除 2DD) Part A 4/0 signals still zero-variance — 症狀相同，RSI(2)<15 仍與 hook delta 結構性互斥。Att3 (SIVR-015 pattern 直接移植: pullback 7-12% + WR(10)≤-80 + hook) Part A Sharpe 0.51 (4 signals WR 75%) / Part B Sharpe -0.06 (2 signals 1W 1L, -0.45% cumulative). Part B 2024-09-10 訊號 1日停損 -3.35%，2025-10-20 訊號 TP +3%。USO 形式上符合 lesson #20b 前四項條件（日波動 ~2.2%、10日回檔框架、USO-013 已驗證框架、Part A/B 皆活躍 MR regime），但 Part B 2 訊號 50% WR 證明 USO 不滿足「RSI 轉折=真實反轉」結構——油價由 OPEC 決策、地緣政治、庫存數據驅動，與 URA/FXI/TLT 政策/事件驅動同類型失敗。擴展 lesson #20b 失敗清單：USO（商品 ETF，油價 event-driven）與 URA（核能政策）、FXI（中國政策）、TLT（利率政策）、XBI（生技事件）、COPX（20d 框架）、FCX（post-peak）同列 hook divergence 失效資產。USO-013 已確認全域最優（22 次實驗、27+ 次嘗試）。
 -->
 ## AI Agent 快速索引
 
@@ -99,11 +99,17 @@
   - Att3（20 日回看窗口 + 回檔 10-18%，lesson #38 跨資產驗證）：Part A 29 訊號 WR 62.1% cum +17.03% Sharpe **0.19** / Part B 8 訊號 WR 37.5% cum **-5.61%** Sharpe **-0.23**，min(A,B) **-0.23**（-0.49 vs 基線）。再次確認 lesson #38「回檔回看窗口不可跨資產移植」——20日在 GLD/COPX 有效，在 SIVR/URA/IBIT/INDA 失敗，現擴展失敗清單至 USO。
   - **三方向失敗整合**：(1) 確認 USO-020 發現 USO-013 框架已達技術面天花板；(2) **2DD 方向的資產依賴性擴展**：USO SL 2DD 淺分布（> -6%）與 CIBR 深分布（≤ -4%）完全相反，**方向不可跨資產移植**，必須先檢查該資產 SL 的 2DD 分布；(3) lesson #38 擴展：20 日回看窗口失敗資產清單加入 USO。突破 USO-013 結構性上限需跨框架創新（事件驅動模型、非對稱持倉、流量分析等），純技術面濾波器路徑已窮盡。
 
+- **Multi-Week Regime-Aware BB Squeeze Breakout（USO-024，3 次嘗試全部失敗）：**
+  - Att1（k_min=1.00 strict，FCX-013 / COPX-011 純下限直接移植）：Part A 12 訊號 WR 66.7% cum +21.49% Sharpe **0.38**（vs USO-021 baseline 0.22，+73% Part A 改善）/ Part B 4 訊號 WR 50.0% cum -0.70% Sharpe **-0.01**（2 TP / 2 SL — 2025-06-12 Iran-Israel spike-reverse 1日 SL，2025-07-29 OPEC+ unwind 3日 SL）/ min(A,B) **-0.01**（-0.27 vs USO-013 的 0.26）。純下限 lesson #22 規範閘門過濾 Part A 弱 regime SLs，但 Part B mid-2025 地緣政治反轉 SLs（ratio 1.00-1.05 mid-regime）結構性無法被 SMA20/SMA60 ratio 過濾。
+  - Att2（regime BOX [k_min=1.00, k_max=1.09]，COPX-011 移植）：Part A 9 訊號 WR 55.6% cum +4.95% Sharpe 0.13 / Part B **4 訊號完全不變** WR 50% Sharpe -0.01 / min(A,B) **-0.01**。**k_max=1.09 對 USO Part B 完全非綁定**——所有 4 個 Part B 訊號 ratio < 1.09，USO 2024-2025 為地緣政治驅動的橫盤（ratio 集中 [1.00, 1.05]），無「過熱牛末」訊號可被 k_max 過濾，與 COPX 銅礦 ETF 的明顯週期性過熱結構不同。Part A k_max 移除 3 訊號含部分 winners 退化 0.38→0.13。
+  - Att3（BB squeeze 收緊 30th→20th + recent 5d→3d，保留 BOX [1.00, 1.09]）：Part A 8 訊號 WR 62.5% Sharpe 0.29 / Part B 3 訊號 WR 33.3% Sharpe **-0.36** cum -5.43%（移除 2025-01-02 winner，保留 2 SLs）/ min(A,B) **-0.36**（三次最差）。收緊 squeeze 反向選擇：移除 1 個 Part B winner 而非 SLs（2 個 mid-2025 SLs 為「真實 squeeze 後突破隨即反轉」結構，squeeze 緊度不是區分點）。
+  - **核心跨資產發現（lesson #22 邊界擴展）**：(1) **lesson #22 buffered multi-week SMA regime gate 在純單一商品 ETF（油）結構性失敗**——擴展失敗家族；(2) **驅動因子差異**：COPX 為「銅礦企業基本面 + 銅價」雙重平滑，過熱訊號可被 SMA20/SMA60 ratio 捕捉；USO 為「原油期貨直接 expose」，受 OPEC+/地緣政治單日衝擊主導，技術面 regime gate 無區分力；(3) **與 lesson #20b 平行**：當資產主驅動為「外部事件衝擊」（USO 油 / FXI 中國政策 / TLT 利率），技術面 regime gate 結構性失效；(4) **lesson #22 適用邊界精煉**：適用於高波動單股（TSLA/NVDA/FCX）+ 混合驅動商品 ETF（COPX 銅礦企業）；不適用於純單一商品 ETF（USO 原油）。USO-013 確認為純技術面 Sharpe 結構性上限 ~0.26（24 次實驗、33+ 次嘗試）。
+
 **尚未嘗試的方向（可探索，但預期收益極低）：**
 - 追蹤停損（預期無效，日波動率 > 1.5%）
 - OVX（原油波動率指數）過濾（已驗證 Part B 損失日 OVX 在正常水位 ~35，無法區分好壞訊號）
 - ~~BB Squeeze Breakout（突破策略）~~ → USO-021 已驗證（3 次嘗試，最佳 min(A,B) 0.22 < USO-013 的 0.26）
-- 注意：USO-014～USO-023 各嘗試 3 個方向共 30 次均失敗。核心參數空間、替代進場機制、K線結構過濾、回檔計算方法變體、回看窗口、雙時框確認、累積 RSI、RSI 週期變體、持倉縮短、趨勢強度過濾、波動率政權過濾、回復日時機、條件簡化、**BB Squeeze Breakout（突破策略）**、**RSI(14) Bullish Hook Divergence**、**ATR(5)/ATR(20) 波動率飆升過濾**、**2DD cap**、**20日回看窗口**均已窮盡，USO-013 已確認為全域最優。
+- 注意：USO-014～USO-024 各嘗試 3 個方向共 33 次均失敗。核心參數空間、替代進場機制、K線結構過濾、回檔計算方法變體、回看窗口、雙時框確認、累積 RSI、RSI 週期變體、持倉縮短、趨勢強度過濾、波動率政權過濾、回復日時機、條件簡化、**BB Squeeze Breakout（突破策略）**、**RSI(14) Bullish Hook Divergence**、**ATR(5)/ATR(20) 波動率飆升過濾**、**2DD cap**、**20日回看窗口**、**Multi-Week SMA Regime Gate (lesson #22)** 均已窮盡，USO-013 已確認為全域最優。
 - **重要發現（USO-020 數據分析）**：停損交易與達標交易在 20日實現波動率（avg 35.1% vs 35.9%）、波動率動量 vol10/vol20（avg 1.04 vs 1.05）、日內範圍擴張 range_ratio（avg 1.30 vs 1.40）上完全重疊，不存在任何技術面指標能區分 USO-013 的好壞訊號。剩餘停損交易本質上是隨機的。
 - **重要發現（USO-021 突破策略測試）**：BB Squeeze Breakout 在 Part A 表現優異（Sharpe 0.47，遠超均值回歸的 0.26），但 Part B 在盤整市場中假突破過多（Sharpe 0.22）。SMA(100) 趨勢過濾有效改善 Part B（-0.05→0.22），但突破策略本質上受市場狀態依賴，無法匹敵均值回歸的穩健性。
 
@@ -152,7 +158,7 @@
 
 # USO 實驗總覽 (USO Experiment Index)
 
-> **最新實驗 (Latest):** USO-023 `uso_023_vol_adaptive_mr`
+> **最新實驗 (Latest):** USO-024 `uso_024_regime_breakout`
 > **當前最佳 (Best):** USO-013 `uso_013_tight_cap`
 
 ## 實驗清單 (Experiments)
@@ -169,6 +175,7 @@
 | USO-021 | `uso_021_bb_squeeze_breakout` | BB Squeeze Breakout（首次突破策略） | BB(20,2) 20th pct + SMA(100) + TP+5%/SL-5%/20d | ❌ min 0.22 < 0.26 |
 | USO-022 | `uso_022_rsi_divergence_mr` | RSI(14) Bullish Hook Divergence + Pullback+WR（SIVR-015 移植） | 10d 回檔 7-12% + WR(10)≤-80 + RSI(14) hook（delta≥3, max_min≤35） | ❌ min -0.06 < 0.26 |
 | USO-023 | `uso_023_vol_adaptive_mr` | 波動率自適應 / 2DD cap / 20日回看 三方向探索 | USO-013 進場 + (Att1 ATR>1.05 / Att2 2DD cap≥-6% / Att3 20日回檔 10-18%) | ❌ min 0.25 / 0.08 / -0.23 全部 < 0.26 |
+| USO-024 | `uso_024_regime_breakout` | Multi-Week Regime-Aware BB Squeeze Breakout（lesson #22 跨資產移植，首次純單一商品 ETF） | BB(20,2) 30th pct + Close>SMA(50) + SMA(20)/SMA(60) regime gate（k_min=1.00 / BOX [1.00,1.09] / 收緊 squeeze） | ❌ min -0.01 / -0.01 / -0.36 全部 < 0.26 |
 
 ## 演進路線 (Lineage)
 
@@ -1568,7 +1575,91 @@ USO-013 確認為現技術面框架結構性上限。突破需跨框架創新
 36. **20 日回看窗口在 USO 失敗（USO-023 Att3 驗證）**：Part B WR 崩壞至 37.5%，
     lesson #38 跨資產失敗清單擴展：20 日在 GLD/COPX 有效，在 SIVR/URA/IBIT/INDA/**USO**
     失敗。USO 油價 MR 甜蜜點鎖定 10 日窗口。
-37. **USO 突破 min(A,B) 0.26 需跨框架創新**：USO-014~USO-023 共 30 次純技術面嘗試均失敗，
+37. **USO 突破 min(A,B) 0.26 需跨框架創新**：USO-014~USO-024 共 33 次純技術面嘗試均失敗，
     確認 USO-013 為現框架結構性上限。未來方向應為事件驅動模型（OPEC 會議、EIA 庫存、
     地緣政治風險評分）、非對稱持倉（基於進場時 term structure）、或油價 term structure
     （contango/backwardation）信號等跨框架機制。
+
+## USO-024: Multi-Week Regime-Aware BB Squeeze Breakout（lesson #22 跨資產移植，3 次嘗試全部失敗）
+
+### 概念
+
+跨資產移植 lesson #22（TSLA-015 / NVDA-012 / FCX-013 / COPX-011 buffered multi-week
+SMA regime gate）至 USO-021 BB Squeeze Breakout 框架之上。**Repo 第 5 次 lesson #22
+試驗，首次純單一商品 ETF（原油）驗證**。
+
+合理性：
+- USO 追蹤原油期貨（單一商品 ETF），與 COPX 銅礦 ETF 同屬商品類型
+- COPX-011 驗證商品 ETF 形式需 BOX 結構（k_min=1.00 + k_max=1.09）
+- USO-021 BB Squeeze 三次嘗試最佳 min(A,B) 0.22（< USO-013 的 0.26）
+  主因為 2022 升息期 / 2024 衰退預期假突破多
+- 23 次 USO 實驗均在 MR 框架，從未嘗試 regime-level 趨勢過濾
+
+### 三次迭代結果
+
+**Att1（k_min=1.00 嚴格，FCX-013 / COPX-011 純下限直接移植）：FAILED min(A,B) -0.01**
+
+- Part A: 12 訊號 WR 66.7% Sharpe **0.38** cum +21.49% MaxDD -6.94% PF 2.10
+- Part B: 4 訊號 WR 50.0% Sharpe **-0.01** cum -0.70% MaxDD -5.96% PF 0.98
+  - 2 TP（2024-03-14, 2025-01-02）
+  - 2 SL（2025-06-12 Iran-Israel spike-reverse 1日 SL，2025-07-29 OPEC+ unwind 3日 SL）
+
+Part A 略改善（USO-021 baseline 0.22→0.38），但 Part B 完全 break。Part B 2 個快速 SL
+（1日/3日）為 mid-2025 oil 地緣政治衝擊後反轉，SMA20/SMA60 ratio 在此時段仍處
+[1.00, 1.05]（不算過熱），純下限無法過濾。
+
+**Att2（regime BOX [k_min=1.00, k_max=1.09]，COPX-011 移植）：FAILED min(A,B) -0.01**
+
+- Part A: 9 訊號 WR 55.6% Sharpe 0.13 cum +4.95%
+- Part B: **4 訊號完全不變** WR 50% Sharpe -0.01
+
+**k_max=1.09 對 Part B 完全非綁定**：所有 4 個 Part B 訊號 ratio 皆 < 1.09，
+即 Part B 並非「過熱牛末」結構（不同於 COPX 2024-05-14 SL ratio 1.094）。
+k_max 在 Part A 移除 3 訊號（含部分 winners），Part A Sharpe 大幅退化（0.38→0.13）。
+**核心發現**：USO 2024-2025 處於「moderate regime」橫盤，整體 ratio 在 1.00-1.05 區間，
+與 COPX 的「明顯過熱牛末」結構不同。
+
+**Att3（squeeze 收緊：20th percentile + 3 日內，保留 BOX [1.00, 1.09]）：FAILED min(A,B) -0.36（最差）**
+
+- Part A: 8 訊號 WR 62.5% Sharpe 0.29 cum +10.59% PF 1.79
+- Part B: 3 訊號 WR 33.3% Sharpe **-0.36** cum -5.43% PF 0.49
+  - 1 TP（2024-03-14）/ 2 SL（2025-06-12, 2025-07-29 — 仍未過濾）
+  - 2025-01-02 winner 被收緊 squeeze 移除
+
+收緊 squeeze percentile 30th→20th + 5d→3d 反向選擇——移除 1 個 Part B winner 而非
+losers。**失敗根因**：USO 2025-06/07 SLs 為「真實 squeeze 後突破隨即反轉」結構，
+與假突破不同——squeeze percentile 不具區分力。
+
+### 核心跨資產發現
+
+USO-024 為 **repo 第 5 次 lesson #22 跨資產試驗，首次純單一商品 ETF**：
+- TSLA-015 ★ (3.72% vol AI growth stock, k=0.99 buffered)
+- NVDA-012 ★ (2.5-3% vol AI growth stock, k=0.97 buffered, BB Squeeze)
+- NVDA-013 ★ (cross-strategy MBPC, k=1.00 strict + ATR vol regime)
+- FCX-013 ★ (3% vol commodity/mining stock, k=1.00 strict)
+- COPX-011 ★ (2.25% vol commodity/mining ETF, BOX [1.00, 1.09])
+- **USO-024 ✗ (2.2% vol pure single-commodity ETF, ALL 3 ATTEMPTS FAILED)**
+
+**結構性差異（為何 USO 失敗而 COPX 成功）**：
+1. **regime 結構**：COPX 2024-2025 經歷明顯銅價週期過熱（2024-05 ratio >1.09），
+   可被 k_max=1.09 過濾；USO 2024-2025 為地緣政治驅動橫盤，ratio 集中 [1.00, 1.05]，
+   無「過熱牛末」訊號可被 k_max 過濾
+2. **SL 機制**：COPX SLs 集中於 transition zone（ratio<1.00）+ 過熱牛末（ratio>1.09），
+   雙向過濾有效；USO Part B SLs 為 mid-regime 的快速地緣政治反轉
+   （Iran-Israel spike, OPEC+ unwind），ratio 區間正常，regime gate 無區分力
+3. **資產驅動因子**：COPX 為「銅礦企業基本面 + 銅價」雙重平滑；USO 為「原油期貨直接
+   expose」，受 OPEC+/地緣政治單日衝擊明顯，即便 regime 健康亦頻繁 1-3 日反轉
+
+### 跨實驗教訓（更新）
+
+38. **lesson #22 邊界精煉（USO-024 加入失敗家族）**：
+    適用 = 高波動單股（TSLA/NVDA/FCX）+ 混合驅動商品 ETF（COPX 銅礦企業）；
+    不適用 = 純單一商品 ETF（USO 原油），其 SLs 受地緣政治衝擊主導而非 regime。
+    此規則平行 lesson #20b（V-bounce hook 失敗家族）：當資產主驅動為「外部
+    事件衝擊」（USO 油 / FXI 中國政策 / TLT 利率），技術面 regime gate 結構性失效。
+39. **regime BOX k_max 非綁定條件（USO-024 Att2 驗證）**：當資產 Part B 訊號
+    SMA20/SMA60 ratio 集中 [1.00, k_max] 範圍內，k_max 過濾無效。檢查方法：
+    若 k_max 不變更 Part B 訊號數，則該資產不適用 BOX 結構。USO 2024-2025 為此情境。
+40. **squeeze 收緊不能救援 BB Squeeze 在事件驅動資產的失敗（USO-024 Att3 驗證）**：
+    收緊 squeeze percentile（30th→20th）反向選擇——移除 winner 而非 losers。
+    SLs 來自「真實 squeeze 後快速反轉」結構（地緣政治衝擊），squeeze 緊度不是區分點。
