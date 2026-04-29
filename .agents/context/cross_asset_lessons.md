@@ -174,7 +174,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | VOO | VOO-004 Att3 | **Donchian 突破 + 5d 內 + 窄帶淺回檔（MBPC）** | 1.12† | 4 次實驗 ✓（**repo 首次 MBPC 成功**） |
 | SOXL | SOXL-012 Att3 | BB-Width Regime Gate (<0.43) + 精選超賣 | 1.39† | 12 次實驗 ✓（**repo 第 3 次 lesson #23 BB-width regime gate 成功 / 首次 leveraged 板塊 ETF 驗證**）|
 | TSM | TSM-008 | RS 出場優化 | 0.79 | 9 次實驗 ✓ |
-| IWM | IWM-013 Att3 | Capitulation-Depth Filter MR (RSI<8 oscillator depth) | 0.59† | 13 次實驗 ✓ |
+| IWM | IWM-013 Att3 | Capitulation-Depth Filter MR (RSI<8 oscillator depth) | 0.59† | 14 次實驗 ✓（IWM-014 MBPC 三次失敗，repo 第 4 次 MBPC 試驗、首次小型股寬基 ETF，擴展 lesson #21 失敗家族）|
 | XBI | XBI-005 | 回檔範圍+WR+反轉K線 | 0.36 | 14 次實驗 ✓ |
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 10 次實驗 ✓ |
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
@@ -629,10 +629,10 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 
 ---
 
-## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產（VOO-004 確認 broad-uptrend ETF 可成功）
+## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產（VOO-004 確認 broad-uptrend ETF 可成功，**IWM-014 small-cap broad ETF 失敗確認 2026-04-29**）
 <!-- freshness:
-  derived_from: [FXI-012,NVDA-009,VOO-004]
-  validated: 2026-04-25
+  derived_from: [FXI-012,NVDA-009,VOO-004,IWM-014]
+  validated: 2026-04-29
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -660,23 +660,33 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 - **VOO 為純 broad-uptrend ETF**：S&P 500 自 2010 上市年化 +12-13%，2019-2025 期間僅 2020-03 COVID + 2022 升息為顯著 bear regime（短暫且結構單純），符合 MBPC 有效先決條件
 - **進場參數敏感度（呼應 lesson #4）**：breakout_recency 10→5d + pullback range 收緊使 min(A,B) 從 0.12→1.12（+833%）
 
-**整合規則（MBPC 有效性邊界）**：
-- **有效先決條件**：資產處於**單一純上升 regime**或**主要為 broad-uptrend 的廣基 ETF**
+**IWM-014（2026-04-29，repo 第 4 次 MBPC 試驗，首次小型股寬基 ETF 驗證 — 失敗）**：
+- Att1 (VOO-004 Att3 vol-scaled tight: recency 5d, pullback [-3%,-4.5%], RSI[40,60], TP+4.5%/SL-3.75%/20d)：Part A 3/0%/Sharpe 0.00 cum -11.11%（3/3 SLs all macro-shock days：2019-05-09 trade-war、2021-03-19 rates spike、2022-11-17 mid-bear）/ Part B 4/75%/Sharpe 0.67 cum +9.72% / min **0.00**——訊號密度過低（Part A 0.6/yr）使統計無意義
+- Att2 (Loose: recency 10d, pullback [-2%,-5%], RSI[40,65])：Part A 20/30%/Sharpe -0.38 cum -25.97% / Part B 13/46.2%/Sharpe 0.02 cum +0.10% / min **-0.38**——放寬 entry 引入大量低品質假突破，印證 small-cap event-aggregation noise 結構
+- Att3 (Att1 tight + ATR(5)/ATR(20)>1.10 + RSI[42,58] 收緊)：Part A 1/0%/Sharpe 0.00 / Part B 1/0%/Sharpe 0.00 / min **0.00**——三重交集過嚴，訊號崩至 0.4/yr
+- **失敗機制（與 FXI/NVDA-009 不同）**：IWM 為 Russell 2000 小型股寬基 ETF（含 2000+ 個股），ETF 聚合層級的個股事件雜訊使 MBPC pullback signals 無法清晰區分「genuine continuation」與「macro-shock false breakout」。**進場敏感度反向案例**：VOO 上 entry tight→loose 翻轉 1.12→0.12（Sharpe 9 倍差距），IWM 上 tight→loose 翻轉 0.00→-0.38，兩者皆顯示進場敏感度，但 IWM 的「最佳訊號帶」在當前 MBPC 框架內可能不存在。
+- **trade-level 預先分析（IWM-006 BB Squeeze baseline 16 trades 的 SMA20/SMA60 ratio 分布）**：Part A SLs 1.013-1.084 與 TPs 0.943-1.095 在 ratio 維度高度重疊（4 TPs ratio<1.00 為 post-bear transition winners + 4 TPs 1.04-1.10 為 mid-uptrend winners），lesson #22 BOX 結構性無效（pivot 至 MBPC 前已驗證），故未進入本實驗測試
+- **新跨資產發現**：IWM-012（BB Lower Hybrid，2026-04-25）已揭示「small-cap broad ETF 個股事件聚合 noise」結構不適用 statistical-adaptive entry；IWM-014 進一步揭示 trend-continuation entry 同樣失效。**IWM 適用框架為直接捕捉個股事件聚合 capitulation 的 RSI(2) oscillator 深度**（IWM-013 ★全域最優）
+
+**整合規則（MBPC 有效性邊界，2026-04-29 更新）**：
+- **有效先決條件**：資產處於**單一純上升 regime**或**主要為 broad-uptrend 的大型廣基 ETF**
     - 純趨勢期（NVDA 2024-2025 AI 主升段 Part B Sharpe 0.96）
-    - **broad-uptrend ETF**（VOO-004 Att3 Part A 0.85 WR + 1.12 Sharpe，repo 首次成功）
+    - **大型 broad-uptrend ETF**（VOO-004 Att3 Part A 0.85 WR + 1.12 Sharpe，repo 唯一成功）
 - **結構性失敗條件**：
     - **政策/事件驅動 regime**（FXI 中國政策、URA 核能政策、TLT 利率政策）
-    - **多 regime 混合 + 個股 bubble cycle**（NVDA bubble 2021 + bear 2022 + chop 2023 + bull 2024-25）
+    - **多 regime 混合 + 個股 bubble cycle**（NVDA bubble 2021 + bear 2022 + chop 2023 + bull 2024-25 純 MBPC）
+    - **small-cap broad ETF（個股事件聚合 + mixed regimes）**（IWM 2026-04-29 新增失敗數據點 — Russell 2000 含 2000+ 個股的 ETF 聚合層級雜訊）
     - **low-vol 慢磨 regime**（推測，待驗證）
 
-**規則**：MBPC 在「純結構性上升趨勢資產」（廣基 S&P/Dow/Nasdaq ETF、純牛市個股）有效，在多 regime 或事件驅動資產失效。
+**規則**：MBPC 在「純結構性上升趨勢大型廣基 ETF」（VOO/SPY/DIA 類）或「純牛市個股配 lesson #22 regime gate」（NVDA-013）有效。在多 regime、事件驅動、small-cap broad ETF 類失效。
 
-**進場精煉 vs regime 閘門選擇（VOO-004 + NVDA-009 共同教訓）**：
-- **regime 閘門（SMA(200)）為非選擇性過濾**：在兩個資產上都失敗
+**進場精煉 vs regime 閘門選擇（VOO-004 + NVDA-009 + IWM-014 共同教訓）**：
+- **regime 閘門（SMA(200)）為非選擇性過濾**：在 VOO、NVDA 上都失敗
 - **進場層精煉（breakout_recency + 窄帶 pullback）為勝出方向**：VOO-004 Att3 證明
-- **規則**：MBPC 框架下優先收緊 breakout 新鮮度與 pullback 範圍，而非加入長均線 regime 閘門
+- **波動度縮放對 entry 參數有效性下降（IWM-014 新發現）**：VOO 1.0% → IWM 1.5% 1.5x scaling 後 tight 參數訊號密度過低（0.6/yr），loose 參數品質崩壞（30% WR），cross-vol 移植 entry 參數不可靠
+- **規則**：MBPC 框架下優先收緊 breakout 新鮮度與 pullback 範圍，但需確認資產符合「有效先決條件」；在 small-cap broad ETF 上參數調整無法救回結構性失敗
 
-**跨資產假設（待續驗證）**：MBPC 可能在 SPY、DIA（同 broad-uptrend ETF 類別）中有效，VOO-004 已建立先例。在**週期性 / 事件驅動 / 多 regime 資產**（FXI、URA、TLT、INDA、EEM、NVDA、FCX）中已被驗證結構性劣化。
+**跨資產假設（待續驗證）**：MBPC 可能在 SPY、DIA（同大型 broad-uptrend ETF 類別）中有效，VOO-004 已建立先例。在**週期性 / 事件驅動 / 多 regime 資產**（FXI、URA、TLT、INDA、EEM、NVDA、FCX）以及**small-cap broad ETF（IWM）**中已被驗證結構性劣化。
 
 ---
 

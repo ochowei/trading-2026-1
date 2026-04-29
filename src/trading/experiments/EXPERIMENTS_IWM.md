@@ -1,8 +1,8 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-26
+  last_validated: 2026-04-29
   data_through: 2025-12-31
-  last_experiment_attempt: IWM-013 (3 attempts, Att3 SUCCESS — RSI oscillator depth as new global optimum)
-  note: IWM-013 added 2026-04-26 (Capitulation-Depth Filter MR, **Att3 SUCCESS — repo 第 4 次「capitulation-depth filter」成功（繼 DIA-012 / SPY-009 / EWJ-005 後），首次以 oscillator depth (RSI threshold) 替代 raw return depth (1d/3d) 維度，首次小型股寬基 ETF 驗證**). Three iterations: Att1 (1d cap >= -3% AND 3d cap >= -10%, DIA-012 跨資產移植) Part A 9/77.8%/Sharpe **0.84** cum +24.13% (Part A 強勢提升 +62%) / Part B 2/50%/Sharpe **-0.04** cum -0.52% (崩壞，移除 2024-08-02 Yen carry +4% TP 與 2025-04-04 tariff +4% TP，保留 2025-03-04 SL) / min **-0.04** — IWM Part B winners 集中於深 1d/3d gap-down recoveries（與 DIA Part B 完全相反結構），cap 直接過濾這類高品質訊號；Att2 (3d FLOOR <= -3.0%, replace caps) Part A 9/66.7%/Sharpe **0.43** cum +14.17% / Part B 3/100%/std=0 cum +12.49% / min **0.43** — 3d FLOOR 移除 Part A 2019-10-02 winner (3d=-2.59%) 使 Part A WR 降至 66.7%；Att3 ★ (RSI(2) < 8.0, 從 IWM-011 的 < 10 加嚴 1.25x，停用 1d/3d 過濾器) Part A **10/80.0%/Sharpe 0.59** cum +20.92% (+13.5% vs IWM-011) / Part B 3/100%/std=0 Sharpe 0.00 cum +12.49% / min(A,B)† **0.59** (沿用 EWJ-003/EWT-008/SPY-009/DIA-012 慣例，Part B std=0 為結構性零方差，採 Part A Sharpe 為 min 約束). **核心發現**：(1) IWM Part A/B losers 在 raw return 維度（1d、3d）與 winners 高度重疊（2021-11-26 SL 1d=-3.77% 與 2020-09-21 TP 1d=-3.50% 不可分；2025-03-04 SL 與 2025-08-01 TP 在 3d 維度接近），但在 oscillator 維度（RSI(2)）有清晰分隔——losers 集中於 RSI 8-10 區間（2019-08-02 RSI=8.2、2025-03-04 RSI=9.1），全部 Part B winners RSI <= 5.0、全部 Part A winners RSI <= 7.9；(2) RSI(2) 較 raw return 更能捕捉「多日累積動能耗竭」的 capitulation 強度，因 RSI(2) 為 EWMA-based 反映多日壓力累積而非單日 snapshot；(3) Cooldown shift（lesson #19）：原 2019-08-02 LOSS 過濾後新增 2019-08-05 expiry +0.44%，淨效果 -1.38% → +0.44%（淨改善 +1.82pp），未再產生連鎖 SL（不同於 NVDA-010 Att3 / TLT-010 失敗模式）. **Repo 首次驗證 oscillator depth 為 raw return depth 的更穩健替代維度**——擴展 lesson #19 family 的維度從「1d/3d/2DD raw return」拓展至「RSI(2)/WR(10)/CCI 等 oscillator」。**新 cross-asset 規則（lesson #19 v3）**：對於小型股寬基 ETF（個股事件驅動加總，winners/losers 在 raw return 維度高度重疊），oscillator depth (RSI threshold tightening) 為更精準的 capitulation strength 度量；對於發達/單一國家寬基 ETF（DIA/SPY/EWJ/VGK/EEM），raw return depth (1d/3d/2DD floor or cap) 仍為主要工具。A/B 平衡：訊號比 2.0/yr vs 1.5/yr = 1.3:1 (25% gap < 50% ✓)；cum 年化 4.18% vs 6.25%（Part B std=0 結構性壓縮使比較失準，與 EWJ-005 36.1% / EWT-008 36.1% / SPY-009 std=0 同類）. IWM-013 Att3 為新全域最優（13 次實驗、43+ 次嘗試）.
+  last_experiment_attempt: IWM-014 (3 attempts, ALL FAILED — MBPC framework structurally fails on small-cap broad ETF)
+  note: IWM-014 added 2026-04-29 (Momentum Breakout Pullback Continuation MBPC, **repo 第 4 次 MBPC 試驗、首次小型股寬基 ETF 驗證**, cross-asset port from VOO-004 Att3 with 1.5x vol-scaling). Three iterations all failed vs IWM-013 Att3 min 0.59: Att1 (VOO-004 Att3 vol-scaled tight: recency 5d, pullback [-3%,-4.5%], RSI[40,60], TP+4.5%/SL-3.75%) Part A 3/0%/Sharpe **0.00**(formal) cum -11.11% (3/3 SLs all macro-shock days: 2019-05-09 trade-war, 2021-03-19 rates spike, 2022-11-17 mid-bear) / Part B 4/75%/Sharpe **0.67** cum +9.72% (3 TPs + 1 SL) / min **0.00** — 訊號密度過低（Part A 0.6/yr 統計無意義），框架在 macro-stable Part B 有效但 Part A 全為 macro-shock; Att2 (Loose: recency 10d, pullback [-2%,-5%], RSI[40,65]) Part A 20/30%/Sharpe **-0.38** cum -25.97% / Part B 13/46.2%/Sharpe **0.02** cum +0.10% / min **-0.38** — 放寬 entry 引入大量低品質假突破（30% WR），印證 small-cap event-aggregation noise 結構; Att3 (Att1 tight + ATR(5)/ATR(20)>1.10 + RSI[42,58] 收緊) Part A 1/0%/Sharpe **0.00** / Part B 1/0%/Sharpe **0.00** / min **0.00** — 三重交集過嚴，訊號崩至 0.4/yr。**核心失敗根因**：(1) **MBPC 在 IWM 結構性失效**：擴展 lesson #21 失敗家族至「小型股寬基 ETF」，前 3 次 MBPC：VOO-004 ★成功 / NVDA-009 失敗 / FXI-012 失敗 / NVDA-013 ★成功配 lesson #22 regime gate; (2) **波動度縮放 entry 參數有效性下降**：VOO 1.0% → IWM 1.5% 1.5x scaling 後 tight 參數訊號密度過低（0.6/yr），loose 參數品質崩壞（30% WR），三次迭代未找到正 Sharpe 區間; (3) **trade-level SMA20/SMA60 ratio 分析**（IWM-006 baseline 16 trades）：Part A SLs 1.013-1.084 與 TPs 0.943-1.095 在 ratio 維度高度重疊（4 TPs ratio<1.00 post-bear transition + 4 TPs 1.04-1.10 mid-uptrend），lesson #22 BOX 結構性無效（pivot 至 MBPC 前已驗證）; (4) **進場敏感度反向案例（lesson #4 反例）**：VOO 上 entry tight→loose 翻轉 1.12→0.12（Sharpe 9 倍差距），IWM 上 tight→loose 翻轉 0.00→-0.38，兩者皆顯示進場敏感度但 IWM 的「最佳訊號帶」在當前 MBPC 框架內可能不存在。**新跨資產規則（lesson #21 family 精煉）**：MBPC 適用範圍重新定義為「single-pure-uptrend 大型廣基 ETF（VOO/SPY/DIA 類）」或「single-regime growth 個股配 lesson #22 regime gate（NVDA-013）」；**不適用 small-cap broad ETF（IWM 為新失敗數據點）**、policy-driven EM (FXI)、mixed-regime 個股（NVDA-009 純 MBPC）。IWM 第 8 種失敗策略類型（Pullback+WR、BB Squeeze、SMA Trend Pullback、IWM/SPY RS、Pullback Range Filtering、Deep RSI(2) Entry、BB Lower Hybrid、MBPC）。IWM-013 Att3 仍為 IWM 全域最優（14 次實驗、46+ 次嘗試）. IWM-013 added 2026-04-26 (Capitulation-Depth Filter MR, **Att3 SUCCESS — repo 第 4 次「capitulation-depth filter」成功（繼 DIA-012 / SPY-009 / EWJ-005 後），首次以 oscillator depth (RSI threshold) 替代 raw return depth (1d/3d) 維度，首次小型股寬基 ETF 驗證**). Three iterations: Att1 (1d cap >= -3% AND 3d cap >= -10%, DIA-012 跨資產移植) Part A 9/77.8%/Sharpe **0.84** cum +24.13% (Part A 強勢提升 +62%) / Part B 2/50%/Sharpe **-0.04** cum -0.52% (崩壞，移除 2024-08-02 Yen carry +4% TP 與 2025-04-04 tariff +4% TP，保留 2025-03-04 SL) / min **-0.04** — IWM Part B winners 集中於深 1d/3d gap-down recoveries（與 DIA Part B 完全相反結構），cap 直接過濾這類高品質訊號；Att2 (3d FLOOR <= -3.0%, replace caps) Part A 9/66.7%/Sharpe **0.43** cum +14.17% / Part B 3/100%/std=0 cum +12.49% / min **0.43** — 3d FLOOR 移除 Part A 2019-10-02 winner (3d=-2.59%) 使 Part A WR 降至 66.7%；Att3 ★ (RSI(2) < 8.0, 從 IWM-011 的 < 10 加嚴 1.25x，停用 1d/3d 過濾器) Part A **10/80.0%/Sharpe 0.59** cum +20.92% (+13.5% vs IWM-011) / Part B 3/100%/std=0 Sharpe 0.00 cum +12.49% / min(A,B)† **0.59** (沿用 EWJ-003/EWT-008/SPY-009/DIA-012 慣例，Part B std=0 為結構性零方差，採 Part A Sharpe 為 min 約束). **核心發現**：(1) IWM Part A/B losers 在 raw return 維度（1d、3d）與 winners 高度重疊（2021-11-26 SL 1d=-3.77% 與 2020-09-21 TP 1d=-3.50% 不可分；2025-03-04 SL 與 2025-08-01 TP 在 3d 維度接近），但在 oscillator 維度（RSI(2)）有清晰分隔——losers 集中於 RSI 8-10 區間（2019-08-02 RSI=8.2、2025-03-04 RSI=9.1），全部 Part B winners RSI <= 5.0、全部 Part A winners RSI <= 7.9；(2) RSI(2) 較 raw return 更能捕捉「多日累積動能耗竭」的 capitulation 強度，因 RSI(2) 為 EWMA-based 反映多日壓力累積而非單日 snapshot；(3) Cooldown shift（lesson #19）：原 2019-08-02 LOSS 過濾後新增 2019-08-05 expiry +0.44%，淨效果 -1.38% → +0.44%（淨改善 +1.82pp），未再產生連鎖 SL（不同於 NVDA-010 Att3 / TLT-010 失敗模式）. **Repo 首次驗證 oscillator depth 為 raw return depth 的更穩健替代維度**——擴展 lesson #19 family 的維度從「1d/3d/2DD raw return」拓展至「RSI(2)/WR(10)/CCI 等 oscillator」。**新 cross-asset 規則（lesson #19 v3）**：對於小型股寬基 ETF（個股事件驅動加總，winners/losers 在 raw return 維度高度重疊），oscillator depth (RSI threshold tightening) 為更精準的 capitulation strength 度量；對於發達/單一國家寬基 ETF（DIA/SPY/EWJ/VGK/EEM），raw return depth (1d/3d/2DD floor or cap) 仍為主要工具。A/B 平衡：訊號比 2.0/yr vs 1.5/yr = 1.3:1 (25% gap < 50% ✓)；cum 年化 4.18% vs 6.25%（Part B std=0 結構性壓縮使比較失準，與 EWJ-005 36.1% / EWT-008 36.1% / SPY-009 std=0 同類）. IWM-013 Att3 為新全域最優（13 次實驗、43+ 次嘗試）.
 -->
 ## AI Agent 快速索引
 
@@ -153,6 +153,7 @@
 | IWM-011 | `iwm_011_vol_adaptive_rsi2`   | 波動率自適應 RSI(2)（ATR>1.1 過濾，超越 IWM-005 +67.7%）| ✅ 當前最佳 |
 | IWM-012 | `iwm_012_bb_lower_pullback_cap` | BB 下軌 + 回檔上限混合進場（**repo 首次小型股寬基 ETF 試驗**，3 次迭代全部失敗） | ❌ 失敗 |
 | IWM-013 | `iwm_013_capitulation_filter` | Capitulation-Depth Filter MR（**RSI 維度替代 1d/3d raw return 維度**，Att3 RSI<8 超越 IWM-011 +13.5%） | ✅ 新最佳 |
+| IWM-014 | `iwm_014_momentum_pullback`   | Momentum Breakout Pullback Continuation MBPC（**repo 第 4 次 MBPC、首次小型股寬基 ETF 試驗**，3 次迭代全部失敗，擴展 lesson #21 失敗家族） | ❌ 失敗 |
 
 ---
 
@@ -1102,3 +1103,129 @@ depth 維度，首次小型股寬基 ETF 驗證。**新 cross-asset 規則（les
 對於小型股寬基 ETF（個股事件驅動加總），oscillator depth (RSI threshold) 為
 更精準的 capitulation strength 度量；對於發達/單一國家寬基 ETF，raw return
 depth (1d/3d/2DD) 仍為主要工具。
+
+---
+
+## IWM-014: Momentum Breakout Pullback Continuation MBPC ❌ 失敗
+
+### 目標 (Goal)
+
+跨資產驗證 lesson #21（VOO-004 Att3 MBPC 框架）於 IWM 小型股寬基 ETF。
+Repo 第 4 次 MBPC 試驗（前 3 次：VOO-004 Att3 ★成功、NVDA-009 失敗純 MBPC、
+NVDA-013 ★成功配 lesson #22 regime gate、FXI-012 失敗）。探索 IWM 過往 13 次
+實驗中相對較少使用的「動量延續」方向（IWM-007 SMA pullback 為「趨勢回檔 MR」、
+IWM-009 RS momentum 為「相對動量回檔」皆非純動量延續）。
+
+### 進場條件 (Entry conditions) — Att3 最終版
+
+1. 近 5 日內 High 曾突破前 20 日最高（breakout freshness）
+2. Close > SMA(50)（中期趨勢向上）
+3. 當前 Close 相對於 5 日高點回檔在 [-4.5%, -3.0%]（淺回檔）
+4. RSI(14) ∈ [42, 58]（中性區，避免過熱/超賣）
+5. ATR(5) / ATR(20) ≥ 1.10（高 ATR 擴張過濾，require_atr_ratio=True）
+6. Close > Open（多頭 K 棒確認）
+7. 冷卻 10 個交易日
+
+### 出場參數 (Exit parameters)
+
+- TP +4.5%（VOO +3.0% 按 1.5x 波動度縮放）
+- SL -3.75%（VOO -2.5% 按 1.5x 波動度縮放）
+- 持倉 20 天
+- 滑價 0.10%（IWM 流動性高）
+- 悲觀認定（pessimistic exec.）：是
+
+### 設計理念 (Design rationale)
+
+**Pre-experiment trade-level analysis**（IWM-006 BB Squeeze baseline 16 trades）：
+- Part A SLs SMA20/SMA60 ratio 範圍：1.013, 1.013, 1.027, 1.084, 1.050（5 SLs）
+- Part A TPs ratio 範圍：1.006, 1.056, 1.038, 1.095, 0.966, 0.943, 0.982, 0.984
+  （8 TPs，4 筆 ratio < 1.00 為 post-bear transition winners）
+- **lesson #22 BOX 結構性無效**：Part A SLs 與 TPs 在 ratio 維度高度重疊，
+  4 winners 在 transition zone (<1.00) 與 4 winners 在 mid-uptrend (1.04-1.10)
+- **pivot 至 lesson #21 MBPC** 為次要備案
+
+### 迭代嘗試紀錄 (Iteration log) — 全部失敗
+
+#### Att1：VOO-004 Att3 vol-scaled tight baseline — 失敗 (min(A,B) 0.00)
+
+進場：recency 5d, pullback [-3%, -4.5%], RSI [40, 60], cd 10
+出場：TP +4.5% / SL -3.75% / 20d
+
+| 段別 | 訊號數 | WR    | Sharpe | 累計    | 備註                                |
+|------|--------|-------|--------|---------|-------------------------------------|
+| Part A | 3    | 0.0%  | **0.00** | -11.11% | 3/3 SLs (2019-05-09 trade-war / 2021-03-19 rates / 2022-11-17 mid-bear) |
+| Part B | 4    | 75.0% | **0.67** | +9.72%  | 3 TPs + 1 SL (2025-10-17)           |
+
+失敗根因：訊號密度過低（Part A 0.6/yr 統計無意義），3 SLs 全為 macro-shock
+日，框架在 macro-stable Part B 有效但 Part A 全為 macro-shock。
+
+#### Att2：Loose entry — 失敗 (min(A,B) -0.38)
+
+進場：recency 10d, pullback [-2%, -5%], RSI [40, 65]
+出場：同 Att1
+
+| 段別 | 訊號數 | WR    | Sharpe | 累計     |
+|------|--------|-------|--------|----------|
+| Part A | 20   | 30.0% | **-0.38** | -25.97% |
+| Part B | 13   | 46.2% | **0.02**  | +0.10%  |
+
+失敗根因：放寬 entry 引入大量低品質假突破（30% WR），印證 small-cap
+event-aggregation noise 結構（Russell 2000 含 2000+ 個股事件雜訊在 ETF
+聚合層級）。與 VOO 的關鍵差異：VOO 寬-tight 兩端皆有訊號，IWM 寬端訊號
+品質崩壞。
+
+#### Att3：Att1 tight + ATR + RSI 收緊 — 失敗 (min(A,B) 0.00)
+
+進場：Att1 + require_atr_ratio (atr_ratio_min 1.10) + RSI [42, 58]
+出場：同 Att1
+
+| 段別 | 訊號數 | WR    | Sharpe | 累計    |
+|------|--------|-------|--------|---------|
+| Part A | 1    | 0.0%  | **0.00** | -3.85% |
+| Part B | 1    | 0.0%  | **0.00** | -3.85% |
+
+失敗根因：ATR(5)/ATR(20)>1.10 + RSI[42,58] + 緊 pullback 三重交集過嚴，
+訊號密度崩潰至 0.4/yr。與 IWM-008 BB Squeeze 過度優化失敗模式同類。
+
+### 三次迭代總結與跨資產發現
+
+| Att | 進場                              | A 訊號 | A WR  | A Sharpe | B Sharpe | min(A,B) |
+|-----|-----------------------------------|--------|-------|----------|----------|----------|
+| 1   | Tight (VOO Att3 vol-scaled)       | 3      | 0%    | 0.00     | 0.67     | **0.00** |
+| 2   | Loose                             | 20     | 30%   | -0.38    | 0.02     | **-0.38** |
+| 3   | Tight + ATR + RSI 緊              | 1      | 0%    | 0.00     | 0.00     | **0.00** |
+
+**核心失敗根因**：
+
+1. **MBPC 框架在 IWM 上結構性失效**：擴展 lesson #21 失敗家族至「小型股
+   寬基 ETF」。MBPC 適用範圍重新定義為「single-pure-uptrend 大型廣基 ETF
+   （VOO/SPY/DIA 類）」或「single-regime growth 個股配 lesson #22 regime
+   gate（NVDA-013）」；**不適用 small-cap broad ETF（IWM 為新失敗數據點）**、
+   policy-driven EM (FXI)、mixed-regime 個股（NVDA-009 純 MBPC）。
+
+2. **波動度縮放對 entry 參數有效性下降**：VOO 1.0% → IWM 1.5% 1.5x scaling
+   後 tight 參數訊號密度過低（0.6/yr），loose 參數品質崩壞（30% WR），
+   三次迭代未找到正 Sharpe 區間。
+
+3. **進場敏感度反向案例（lesson #4 反例）**：VOO 上 entry tight→loose 翻轉
+   1.12→0.12（Sharpe 9 倍差距），IWM 上 tight→loose 翻轉 0.00→-0.38，兩者
+   皆顯示進場敏感度但 IWM 的「最佳訊號帶」在當前 MBPC 框架內可能不存在。
+
+4. **小型股寬基 ETF 結構限制再確認**：IWM-012 (BB Lower Hybrid) 已驗證
+   「個股事件驅動加總」結構不適用 BB-lower hybrid mode；IWM-014 進一步
+   驗證 MBPC 框架同樣失效。兩者共同揭示：IWM 適用框架為**直接捕捉個股
+   事件聚合 capitulation 的 RSI(2) oscillator 深度**（IWM-013 ★全域最優）
+   而非 trend continuation 或 statistical-adaptive entry。
+
+### 結論
+
+IWM-014 為 IWM 第 8 種失敗策略類型（Pullback+WR、BB Squeeze、SMA Trend
+Pullback、IWM/SPY RS、Pullback Range Filtering、Deep RSI(2) Entry、BB
+Lower Hybrid、MBPC）。IWM-013 Att3 仍為 IWM 全域最優（14 次實驗、46+ 次
+嘗試）。
+
+**新跨資產規則（lesson #21 family 精煉，2026-04-29）**：MBPC 框架不適用
+「small-cap broad ETF（個股事件聚合 + mixed regimes）」。建議未來 MBPC
+試驗優先選擇 single-pure-uptrend 大型廣基 ETF 或配 lesson #22 regime gate
+的 single-regime growth 個股。
+
