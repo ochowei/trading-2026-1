@@ -125,11 +125,14 @@ class GLD014Config(ExperimentConfig):
     close_position_threshold: float = 0.4
 
     # 2 日累計跌幅下限（lesson #19 family 跨資產移植）
-    # Att1: 2d floor only <= -0.5%，EEM-014 / SPY-009 標準門檻
-    twoday_return_floor: float = -0.005  # Att1: 2d floor <= -0.5%
+    # Att1 -0.5% only：min 0.45（cooldown chain shift 引入 2 筆新 SL）
+    # Att2 ★ -0.5% + 1d floor -0.3%：min(A,B) **0.49** SUCCESS
+    twoday_return_floor: float = -0.005  # Att2 ★: 2d floor <= -0.5%
 
-    # 1 日累計跌幅下限（Att1 停用，等 cooldown shift 觀察結果再加）
-    oneday_return_floor: float = 0.99  # Att1: 停用
+    # 1 日累計跌幅下限（Att2 引入，過濾 cooldown chain shift 衍生 SL）
+    # Att2 ★ -0.3%：搭配 2d floor 過濾「淺 1d / 中等 2d」cooldown shift 衍生 SL
+    # 過濾 2020-11-19（1d -0.19% > -0.3% 邊界外）SL 但保留 2021-02-04（1d -2.15%）
+    oneday_return_floor: float = -0.003  # Att2 ★: 1d floor <= -0.3%
 
 
 def create_default_config() -> GLD014Config:
