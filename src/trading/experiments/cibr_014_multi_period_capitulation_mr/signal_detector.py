@@ -1,19 +1,20 @@
 """
 CIBR-014 訊號偵測器：Multi-Period Capitulation-Strength Filter MR
+（Att2：1d return cap + ATR ratio BAND）
 
-核心創新：在 CIBR-008 BB 下軌混合進場框架上新增「1 日急跌上限 + 3 日急跌上限」
-雙維度過濾器，排除兩類延續性下跌：
-- 1d <= -3%：news/policy-driven 單日深度急跌
-- 3d <= -7%：跨夜 regime-shift 級別 3 日深度急跌
+核心創新：在 CIBR-008 BB 下軌混合進場框架上新增雙維度過濾：
+- Return 維度：1d return cap >= -3.0%（過濾單日深度急跌，如 2020-02-24 COVID）
+- Vol-regime 維度：ATR(5)/ATR(20) BAND ∈ [1.15, 1.40]（過濾兩極端：< 1.15
+  慢磨下跌、> 1.40 in-crash 加速；如 2021-02-26 ATR ratio 1.5065）
 
 進場條件（全部滿足）：
 1. Close <= BB(20, 2.0) 下軌
 2. 10 日高點回檔 >= -12%（崩盤隔離，同 CIBR-008）
 3. Williams %R(10) <= -80
 4. ClosePos >= 40%
-5. ATR(5)/ATR(20) > 1.15（signal-day panic 過濾，同 CIBR-008）
-6. 1 日報酬 >= -3.0%（CIBR-014 第一維度：排除單日深度急跌）
-7. 3 日報酬 >= -7.0%（CIBR-014 第二維度：排除 3 日延續性下跌）
+5. ATR(5)/ATR(20) > 1.15（CIBR-008 既有 panic FLOOR）
+6. ATR(5)/ATR(20) <= 1.40（CIBR-014 Att2 新增 in-crash CEILING）
+7. 1 日報酬 >= -3.0%（CIBR-014 第一維度：排除單日深度急跌）
 8. 冷卻期 8 個交易日（同 CIBR-008）
 """
 
@@ -70,9 +71,8 @@ class CIBR014SignalDetector(BaseSignalDetector):
         df["ATR_slow"] = tr.rolling(self.config.atr_slow).mean()
         df["ATR_ratio"] = df["ATR_fast"] / df["ATR_slow"].where(df["ATR_slow"] > 0, float("nan"))
 
-        # Multi-Period Capitulation-Strength Filter（CIBR-014 雙維度）
+        # 1 日報酬（return-based 維度）
         df["Return_1d"] = df["Close"].pct_change(1)
-        df["Return_3d"] = df["Close"].pct_change(3)
 
         return df
 
@@ -83,18 +83,18 @@ class CIBR014SignalDetector(BaseSignalDetector):
         cond_pullback = df["Pullback"] >= self.config.pullback_cap
         cond_wr = df["WR"] <= self.config.wr_threshold
         cond_closepos = df["ClosePos"] >= self.config.close_pos_threshold
-        cond_atr = df["ATR_ratio"] > self.config.atr_ratio_threshold
+        cond_atr_floor = df["ATR_ratio"] > self.config.atr_ratio_threshold
+        cond_atr_ceiling = df["ATR_ratio"] <= self.config.atr_ratio_ceiling
         cond_oneday = df["Return_1d"] >= self.config.oneday_return_cap
-        cond_threeday = df["Return_3d"] >= self.config.threeday_return_cap
 
         df["Signal"] = (
             cond_bb
             & cond_pullback
             & cond_wr
             & cond_closepos
-            & cond_atr
+            & cond_atr_floor
+            & cond_atr_ceiling
             & cond_oneday
-            & cond_threeday
         )
 
         # Cooldown

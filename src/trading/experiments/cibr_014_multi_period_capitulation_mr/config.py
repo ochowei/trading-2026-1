@@ -75,11 +75,15 @@ class CIBR014Config(ExperimentConfig):
     atr_slow: int = 20
     atr_ratio_threshold: float = 1.15
 
-    # Multi-Period Capitulation-Strength Filter（CIBR-014 雙維度創新）
     # 1 日報酬上限（filter 單日 news/policy-driven 急跌）
     oneday_return_cap: float = -0.030
-    # 3 日報酬上限（filter 跨夜 regime-shift 延續性下跌）
-    threeday_return_cap: float = -0.070
+
+    # ATR(5)/ATR(20) ratio CEILING（Att2 核心創新：filter in-crash 訊號）
+    # 既有 atr_ratio_threshold = 1.15 為 FLOOR（panic 過濾）
+    # 新增 atr_ratio_ceiling = 1.40 為 CEILING（in-crash 過濾）
+    # 形成 ATR ratio BAND [1.15, 1.40]：panic 過後 settling，非 in-crash 加速
+    # 2021-02-26 SL 之 ATR ratio = 1.5065 將被精準過濾
+    atr_ratio_ceiling: float = 1.40
 
     cooldown_days: int = 8
 
