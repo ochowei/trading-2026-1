@@ -243,6 +243,7 @@ on:
           - "XBI-012: xbi_012_capitulation_accel"
           - "XBI-013: xbi_013_gap_reversal_mr"
           - "XBI-014: xbi_014_vol_transition_mr"
+          - "XBI-015: xbi_015_regime_pullback_mr"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "XLU-002: xlu_002_capped_pullback_wr"
           - "XLU-003: xlu_003_tight_pullback_wr"

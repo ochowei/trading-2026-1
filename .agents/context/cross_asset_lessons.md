@@ -177,7 +177,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | SOXL | SOXL-012 Att3 | BB-Width Regime Gate (<0.43) + 精選超賣 | 1.39† | 12 次實驗 ✓（**repo 第 3 次 lesson #23 BB-width regime gate 成功 / 首次 leveraged 板塊 ETF 驗證**）|
 | TSM | TSM-008 | RS 出場優化 | 0.79 | 9 次實驗 ✓ |
 | IWM | IWM-013 Att3 | Capitulation-Depth Filter MR (RSI<8 oscillator depth) | 0.59† | 14 次實驗 ✓（IWM-014 MBPC 三次失敗，repo 第 4 次 MBPC 試驗、首次小型股寬基 ETF，擴展 lesson #21 失敗家族）|
-| XBI | XBI-005 | 回檔範圍+WR+反轉K線 | 0.36 | 14 次實驗 ✓ |
+| XBI | XBI-015 Att2 | 回檔範圍+WR+反轉K線+**ATR(20)/ATR(60) ≤ 1.10 vol stability gate**（lesson #22 跨策略 MR） | 0.46† | 15 次實驗 ✓（**repo 第 1 次 lesson #22 跨策略類型移植至 Pullback MR，第 1 次 ATR vol regime 在 MR 框架非冗餘驗證**） |
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 10 次實驗 ✓ |
 | URA | URA-004 | 回檔範圍+RSI(2)+2日急跌 | 0.39 | 11 次實驗 ✓ |
 | NVDA | NVDA-004 | BB 擠壓突破（優化）| 0.47 | 11 次實驗 ✓（NVDA-009 MBPC 三次失敗 / NVDA-010 ADX-Filtered RSI(2) MR 三次失敗，repo 首次 ADX/DMI 主過濾器試驗 / NVDA-011 Capitulation-Depth Filter MR 三次失敗，repo 首次 >3% vol 高波動單股測試 lesson #19 family）|
@@ -711,10 +711,10 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 
 ---
 
-## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28，COPX-011 商品/礦業 ETF 首次驗證 + repo 首次 regime BOX 雙向過濾發現 2026-04-28，USO-024 純單一商品 ETF 失敗邊界發現 2026-04-29**）
+## 22. Buffered Multi-Week SMA Trend Regime 對 BB Squeeze breakout 高波動單股有效（TSLA-015 確認，**NVDA-012 跨資產再確認 + k 值精煉 2026-04-26，FCX-013 商品/礦業單股反向發現 + k=1.00 嚴格甜蜜點 2026-04-27，NVDA-013 cross-strategy 首次擴展至 MBPC 框架 + vol regime 框架相依性發現 2026-04-28，COPX-011 商品/礦業 ETF 首次驗證 + repo 首次 regime BOX 雙向過濾發現 2026-04-28，USO-024 純單一商品 ETF 失敗邊界發現 2026-04-29，XBI-015 cross-strategy 首次擴展至 Pullback MR 框架 + ATR vol regime 在 MR 非冗餘 + k=1.10 板塊 ETF 甜蜜點 2026-04-30**）
 <!-- freshness:
-  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013,COPX-011,USO-024]
-  validated: 2026-04-29
+  derived_from: [TSLA-013,TSLA-015,NVDA-012,FCX-013,NVDA-013,COPX-011,USO-024,XBI-015]
+  validated: 2026-04-30
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -802,6 +802,13 @@ SMA(20) ≥ k × SMA(60)，其中 k ≈ 0.99（1% 緩衝）
   - ✅ 適用：高波動單股（TSLA/NVDA/FCX）+ 混合驅動商品 ETF（COPX 銅礦企業）
   - ❌ 不適用：**純單一商品 ETF（USO 原油）**，純政策驅動 EM ETF（FXI 中國），純利率驅動債券 ETF（TLT，BB-width regime gate 已是 lesson #23 範疇）
   - **判別準則**：資產 SL 是否受「外部事件衝擊」（OPEC+/地緣政治/政策/Fed）主導而非 trend regime——若是則 lesson #22 結構性失效
+
+- **跨策略類型擴展（cross-strategy port）：Pullback MR 框架 — XBI-015（2026-04-30）★**：repo 第 6 次 lesson #22 試驗，**首次跨策略類型移植至 Pullback MR 框架**（先前 TSLA-015 / NVDA-012 / FCX-013 / COPX-011 為 BB Squeeze、NVDA-013 為 MBPC，皆非 MR）。XBI 2.0% 日波動 + FDA 事件驅動板塊 ETF。三次迭代：Att1（vol_regime_max_ratio=1.30 NVDA-013 中位移植）非綁定 min(A,B) 0.36 持平 baseline——XBI 訊號日 ATR(20)/ATR(60) 中位約 1.05-1.15，1.30 從未觸發；**Att2 ★（k=1.10）SUCCESS** Part A 15 訊號 WR **80.0%** Sharpe **0.46** cum +25.13% / Part B 6 訊號（與 XBI-005 baseline 完全相同，k=1.10 對 Part B 非綁定）/ min(A,B) **0.46**（**+28% vs XBI-005 0.36**）；Att3（k=1.05）Part B 從 6 崩至 2（移除 4 winners） min(A,B) **-0.19**。**核心發現**：(1) **lesson #22 vol regime gate 在 Pullback MR 框架非冗餘**——XBI-005 進場（Pullback+WR+ClosePos）不含波動限制，ATR(20)/ATR(60) ≤ 1.10 提供獨立選擇力，與 NVDA-013 vol regime 在 MBPC 框架非冗餘的發現平行；(2) **k 閾值跨策略類型對比**：BB Squeeze 框架 vol regime 冗餘（TSLA-015 Att3 ablation）/ MBPC 框架 k=1.40 / **Pullback MR 框架 k=1.10（事件驅動板塊 ETF 甜蜜點）**——k 閾值依資產 vol ratio 分布調整，非通用值；(3) **未啟用 SMA trend regime**：避免 lesson #5「趨勢濾波器+MR=災難」風險，純 ATR vol regime 已達成 +28% Sharpe 提升；(4) **過濾結構**：Att2 過濾 6 個 Part A 訊號（21→15）= 4 winners + **2 SLs**（2021-02-19 late-bull peak vol expansion、2022-01-06 early-bear vol expansion），Part A WR 76.2%→80.0%。**lesson #22 v4 跨策略類型適用範圍**：
+  - ✅ BB Squeeze breakout（高波動單股 / 商品礦業 ETF；vol regime 冗餘）
+  - ✅ MBPC 動量延續（高波動單股；vol regime k=1.40 非冗餘）
+  - ✅ **Pullback MR（事件驅動板塊 ETF；vol regime k=1.10 非冗餘，未啟用 SMA 避免 lesson #5）**
+  - **vol regime 必要性判別**：進場框架是否含「隱含波動限制」（BB Squeeze 顯式低波動進場 → vol regime 冗餘；MBPC / Pullback MR 無波動限制 → vol regime 非冗餘）
+- **新跨資產假設（待驗證）**：buffered ATR vol regime 在 Pullback MR 框架對其他事件驅動板塊 ETF（CIBR / KIE / IGV / IYR）可能有效，閾值需依資產 vol ratio 分布調整（不可直接移植 1.10）
 
 ---
 

@@ -149,10 +149,10 @@ class XBI015Config(ExperimentConfig):
     # ATR(short) ≤ vol_regime_max_ratio × ATR(long)
     # Att1: k=1.30（NVDA-013 vol regime 中位移植）→ FAILED 非綁定（min 0.36 持平）
     # Att2 ★: k=1.10 → SUCCESS Part A 0.36→0.46（+28%），Part B 0.64 不變
-    # Att3: k=1.05 進一步收緊試圖過濾殘餘 SLs
+    # Att3: k=1.05 → FAILED 過嚴，Part B 6→2（移除 4 winners），min(A,B) -0.19
     atr_regime_short: int = 20
     atr_regime_long: int = 60
-    vol_regime_max_ratio: float = 1.05
+    vol_regime_max_ratio: float = 1.10
     use_vol_regime: bool = True
 
     # === 多週期趨勢 regime gate（預設停用，避免 lesson #5 風險）===

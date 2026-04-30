@@ -1,12 +1,22 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-28
+  last_validated: 2026-04-30
   data_through: 2025-12-31
-  note: XBI-014 added 2026-04-28 (Post-Capitulation Vol-Transition MR, **repo 第 6 次「2DD floor 加深方向」跨資產試驗，首次 US 板塊 ETF 測試**, cross-asset port from VGK-008 / INDA-010 / EEM-014 / USO-013 / IBIT-009). Three iterations, all failed vs XBI-005 min 0.36 — **threshold sweep complete failure curve**: Att1 (drop_2d_floor=-2.0%, INDA/VGK 標準門檻) Part A 18/72.2%/Sharpe **0.24** cum +16.64% / Part B 6/66.7%/Sharpe 0.16 cum +3.37% / min **0.16** (-56% vs 0.36) — cooldown chain shift（lesson #19）將原 2024-03-14 TP（2DD -1.82% 不滿足）釋放成 2024-03-15 SL，淨增 1 筆 Part B SL。Att2 (drop_2d_floor=-2.5%，向 USO 2.20% vol 門檻靠攏) Part A 16/68.8%/Sharpe **0.16** cum +8.90% / Part B 5/80.0%/Sharpe 0.52 cum +8.90% / min **0.16** — Part A WR 從 baseline 76% → Att1 72.2% → Att2 68.8% **單調下降**，加深 floor 系統性移除 TPs 多於 SLs（Part A 殘餘 SL 2DD 分布 -1.03%~-5.53%，僅 1 筆 -1.03 可被 -1.5% floor 過濾，TPs 中 9/15 筆 2DD > -2.5% 被誤殺）。Att3 (drop_2d_floor=-1.0%，最輕度 ablation) Part A 20/75.0%/Sharpe **0.32** cum +24.96% / Part B 6/83.3%/Sharpe 0.64 cum +12.71% / min **0.32** — 三次最接近 baseline，僅過濾 2021-01-05 TP（2DD -0.23%）。**Threshold sweep 完整失敗曲線**：baseline（無 filter） 0.36 → -1.0% 0.32 → -2.0% 0.16 → -2.5% 0.16 單調退化，**確認 2DD floor 加深方向對 XBI 完全無效**。失敗根因：(1) XBI 2DD 分布 NO unidirectional selectivity——Part A SLs 範圍 -1.03%~-5.53%，TPs 範圍 -0.23%~-6.86%，重疊整個範圍；(2) XBI 生技板塊 FDA event-driven 性質使 V-bounce winners 涵蓋 shallow 2DD（短期反彈）與 deep 2DD（acute capitulation）兩極；(3) Cooldown chain shift（lesson #19）使任何 filter 對 Part B 引入「相鄰日轉移」的 SL。**Repo 第 6 次 2DD floor 加深方向跨資產試驗**，第 6 個確認**無效**的資產（繼 GLD-013 macro 商品 / COPX-010 礦業雙向 / FCX-011 高波動個股 / TSLA-014 高波動個股 / GLD-013 後）。**首次 US 板塊 ETF 測試**：Post-Capitulation Vol-Transition MR 模板 vol 適用範圍 [0.97%, 3.17%] 正確涵蓋 XBI 2.0% vol，但**驅動類別（FDA event-driven 板塊 ETF）使 winners 2DD 分布雙峰化**，與 INDA/EEM/VGK/USO/IBIT 的「shallow 2DD = drift」單峰失敗結構不同。整合規則更新：Post-Capitulation Vol-Transition MR（2DD floor 加深方向）有效條件需同時滿足 (a) vol ∈ [0.97%, 3.17%] AND (b) winners 2DD 分布單峰（broad ETF / 商品 / 加密 ETF），**事件驅動板塊 ETF（XBI FDA / CIBR 政策）winners 2DD 分布橫跨 shallow~deep 全段使任何單向 filter 失效**。XBI 第 11 個失敗策略類型（後於突破、ROC、動量回調、配對、ATR 自適應、RSI(2)、BB-lower 混合、RSI hook divergence、capitulation-accel、Gap-Down、**2DD floor**）。XBI-005 仍為全域最優（14 次實驗、44+ 次嘗試）。XBI-013 added 2026-04-22 (Gap-Down Capitulation + Intraday Reversal MR, **repo 第 5 次 Gap-Down 試驗，首次 US 板塊 ETF 測試**，cross-asset port from IBIT-006 Att2). Three iterations all failed vs XBI-005 min 0.36: Att1 (Gap ≤ -1.0% primary + Close>Open + 10d PB [-5%,-15%] + WR ≤ -80, TP +3.0%/SL -3.0%/15d) Part A 8/50% WR Sharpe **-0.02** cum -0.77%（4TP/4SL，全部 1-3 日出場）/ Part B 1/0% WR Sharpe 0.00 cum -3.10% / min **-0.02** — 生技 gap-down 為 FDA/臨床 negative news 續跌結構，非 IBIT 隔夜拋壓耗盡；Att2 (Gap as supplementary filter on XBI-005 base + ClosePos ≥ 35%) Part A 3/66.7% WR Sharpe 1.39 cum +7.08% / Part B 1/0% WR Sharpe 0.00 cum -5.10% / min **0.00** — Gap 濾波將 XBI-005 原 35/8 訊號濾至 3/1，樣本過薄且 Part B 唯一訊號 2024-01-17 仍 1 日 SL；Att3 (deep Gap ≤ -2.0% + wider pullback [-5%,-18%]) Part A 1/100% WR 零方差 Sharpe 0.00 / Part B 1/0% WR Sharpe 0.00 / min **0.00** — 深 gap 過嚴僅 1 訊號每 Part，Part B 2024-07-29 訊號仍 SL。**Repo 第 5 次 Gap-Down Capitulation MR 試驗** — 首次 US 板塊 ETF 測試。Gap-Down 失敗家族正式擴展為 4 大類（IBIT 為唯一成功）：(1) TQQQ-016（non-24/7 槓桿股指 ETF）(2) FXI-010（政策驅動 EM 單一國家 ETF）(3) FCX-010（商品關聯個股）(4) **XBI-013（US 板塊 ETF with 事件驅動 gap）**。整合失敗規則：Gap-Down MR 需要 (a) 24/7 連續交易 underlying AND (b) 拋壓耗盡與當日 session 不相關聯；XBI 生技板塊兩者皆不符——事件常盤後宣告產生跨 session 持續拋壓，平行 FXI 政策延續 / FCX 商品衝擊延續 / TQQQ 槓桿結構失敗。IBIT 為唯一合格 Gap-Down underlying。XBI 第 10 個失敗策略類型（後於突破、ROC 單獨、動量回調、配對、ATR 自適應、RSI(2)、BB-lower 混合、RSI hook divergence、capitulation-accel、Gap-Down）。XBI-005 仍為全域最優（13 次實驗、41+ 次嘗試）. XBI-012 added 2026-04-19 (Capitulation + Acceleration Reversal MR: Pullback(10) + ROC(3) + ClosePos + UpDay + WR). Three iterations all failed vs XBI-005 min 0.36. Att1 (ROC -4%, ClosePos 50%, UpDay) Part A 3/0.16 / Part B 3/0.16 — too restrictive, 0.6 yr signal. Att2 (ROC -3%, ClosePos 40%, UpDay) Part A 7/0.27 / Part B 3/0.16 — Part A improves +69% but Part B stuck because 2024-2025 XBI lacks ROC(3) ≤ -3% events. Att3 (ROC -3%, ClosePos 35%, no UpDay) Part A 21/0.18 / Part B 8/0.07 — signals triple but quality dilutes: UpDay filter confirmed essential. Extends XBI failure pattern list: short-term ROC acceleration + intraday recovery cannot distinguish genuine reversal from technical bounce on event-driven biotech ETF. XBI-005's pullback+WR+ClosePos 35% framework confirmed as structurally optimal for XBI 2.0% daily vol + FDA event-driven MR (13 experiments, 41+ attempts).
+  note: XBI-015 added 2026-04-30 (Multi-Week Regime-Aware Pullback MR, **Att2 SUCCESS — repo 第 1 次 lesson #22 跨策略類型移植至 Pullback MR 框架，第 1 次 ATR vol regime 在 MR 框架非冗餘驗證**, cross-strategy port from NVDA-013 MBPC vol regime). Three iterations: Att1 (vol_regime_max_ratio=1.30, NVDA-013 中位移植) Part A 21/76.2%/Sharpe **0.36** / Part B 6/83.3%/Sharpe 0.64 / min **0.36**（與 XBI-005 baseline 持平，k=1.30 對 XBI 訊號日 ATR(20)/ATR(60) 完全非綁定）— XBI 訊號日 vol ratio 中位約 1.05-1.15，1.30 從未觸發；Att2 ★ (vol_regime_max_ratio=1.10) Part A 15 訊號 WR **80.0%** Sharpe **0.46** cum +25.13% MDD -7.09% / Part B 6 訊號 WR 83.3% Sharpe 0.64 cum +12.71%（k=1.10 對 Part B 非綁定，6/6 完全相同）/ min(A,B) **0.46**（vs XBI-005 0.36，**+28%**）★ A/B 平衡達成：年化 cum 4.59%/yr vs 6.16%/yr（gap 25.5% < 30% ✓）、年化訊號比 3.0/yr vs 3.0/yr = 1.0:1（gap 0% < 50% ✓）；Att3 (vol_regime_max_ratio=1.05) Part A 13 訊號/76.9%/Sharpe 0.35 cum +16.80% / Part B **2 訊號**/50.0%/Sharpe **-0.19** cum -1.78% / min **-0.19**（崩壞）— k=1.05 過嚴 Part B 從 6 崩至 2（移除 4 winners：2024-03-14、2024-11-18、2024-12-19、2025-05-07 全部 TP），Part B 訊號日 vol ratio 中位約 1.05-1.10，k=1.05 落於分布中段切除大量 winners；同時觸發 lesson #19 cooldown chain shift（2019-04-18→2019-04-22）。**核心發現**：(1) **lesson #22 cross-strategy: BB Squeeze / MBPC → MR 移植成功**——repo 第 1 次驗證 vol regime gate 在 Pullback MR 框架非冗餘（Pullback+WR+ClosePos 進場架構不含波動限制，ATR(20)/ATR(60) ≤ 1.10 提供獨立選擇力，與 NVDA-013 vol regime 在 MBPC 框架非冗餘平行）；(2) **k=1.10 為 Part A/Part B vol 分布交集精準甜蜜點**——k=1.30 非綁定、k=1.05 切 Part B 中段，僅 k=1.10 同時過濾 Part A late-bull/early-bear vol expansion SLs 而保留 Part B 全部 winners；(3) **過濾 6 個 Part A 訊號（21→15）：4 winners + **2 SLs**（2021-02-19 late-bull peak vol expansion、2022-01-06 early-bear vol expansion）**，殘餘 3 SLs（2021-05-06、2022-04-19、2023-09-21）均處於 vol ratio < 1.10 環境，非 vol gate 可解；(4) **未啟用 SMA trend regime**（避免 lesson #5「趨勢濾波器+MR=災難」風險，純 ATR vol regime 已達成 +28% Sharpe 提升）。**跨資產貢獻**：repo 第 1 次 lesson #22 應用於 Pullback MR 框架（先前 TSLA-015/NVDA-012/FCX-013/COPX-011 BB Squeeze、NVDA-013 MBPC 五次驗證皆於非 MR 框架）。**新跨資產假設（待驗證）**：buffered ATR vol regime 在 Pullback MR 框架對其他「事件驅動板塊 ETF」（CIBR / KIE / IGV / IYR）可能有效，閾值需依資產 vol ratio 分布調整（XBI 甜蜜點 1.10 vs NVDA-013 MBPC 1.40 vs TLT-007 5%）。XBI-015 Att2 為新全域最優（15 次實驗、47+ 次嘗試）。**取代 XBI-005 為當前最佳**。XBI-014 added 2026-04-28 (Post-Capitulation Vol-Transition MR, **repo 第 6 次「2DD floor 加深方向」跨資產試驗，首次 US 板塊 ETF 測試**, cross-asset port from VGK-008 / INDA-010 / EEM-014 / USO-013 / IBIT-009). Three iterations, all failed vs XBI-005 min 0.36 — **threshold sweep complete failure curve**: Att1 (drop_2d_floor=-2.0%, INDA/VGK 標準門檻) Part A 18/72.2%/Sharpe **0.24** cum +16.64% / Part B 6/66.7%/Sharpe 0.16 cum +3.37% / min **0.16** (-56% vs 0.36) — cooldown chain shift（lesson #19）將原 2024-03-14 TP（2DD -1.82% 不滿足）釋放成 2024-03-15 SL，淨增 1 筆 Part B SL。Att2 (drop_2d_floor=-2.5%，向 USO 2.20% vol 門檻靠攏) Part A 16/68.8%/Sharpe **0.16** cum +8.90% / Part B 5/80.0%/Sharpe 0.52 cum +8.90% / min **0.16** — Part A WR 從 baseline 76% → Att1 72.2% → Att2 68.8% **單調下降**，加深 floor 系統性移除 TPs 多於 SLs（Part A 殘餘 SL 2DD 分布 -1.03%~-5.53%，僅 1 筆 -1.03 可被 -1.5% floor 過濾，TPs 中 9/15 筆 2DD > -2.5% 被誤殺）。Att3 (drop_2d_floor=-1.0%，最輕度 ablation) Part A 20/75.0%/Sharpe **0.32** cum +24.96% / Part B 6/83.3%/Sharpe 0.64 cum +12.71% / min **0.32** — 三次最接近 baseline，僅過濾 2021-01-05 TP（2DD -0.23%）。**Threshold sweep 完整失敗曲線**：baseline（無 filter） 0.36 → -1.0% 0.32 → -2.0% 0.16 → -2.5% 0.16 單調退化，**確認 2DD floor 加深方向對 XBI 完全無效**。失敗根因：(1) XBI 2DD 分布 NO unidirectional selectivity——Part A SLs 範圍 -1.03%~-5.53%，TPs 範圍 -0.23%~-6.86%，重疊整個範圍；(2) XBI 生技板塊 FDA event-driven 性質使 V-bounce winners 涵蓋 shallow 2DD（短期反彈）與 deep 2DD（acute capitulation）兩極；(3) Cooldown chain shift（lesson #19）使任何 filter 對 Part B 引入「相鄰日轉移」的 SL。**Repo 第 6 次 2DD floor 加深方向跨資產試驗**，第 6 個確認**無效**的資產（繼 GLD-013 macro 商品 / COPX-010 礦業雙向 / FCX-011 高波動個股 / TSLA-014 高波動個股 / GLD-013 後）。**首次 US 板塊 ETF 測試**：Post-Capitulation Vol-Transition MR 模板 vol 適用範圍 [0.97%, 3.17%] 正確涵蓋 XBI 2.0% vol，但**驅動類別（FDA event-driven 板塊 ETF）使 winners 2DD 分布雙峰化**，與 INDA/EEM/VGK/USO/IBIT 的「shallow 2DD = drift」單峰失敗結構不同。整合規則更新：Post-Capitulation Vol-Transition MR（2DD floor 加深方向）有效條件需同時滿足 (a) vol ∈ [0.97%, 3.17%] AND (b) winners 2DD 分布單峰（broad ETF / 商品 / 加密 ETF），**事件驅動板塊 ETF（XBI FDA / CIBR 政策）winners 2DD 分布橫跨 shallow~deep 全段使任何單向 filter 失效**。XBI 第 11 個失敗策略類型（後於突破、ROC、動量回調、配對、ATR 自適應、RSI(2)、BB-lower 混合、RSI hook divergence、capitulation-accel、Gap-Down、**2DD floor**）。XBI-005 仍為全域最優（14 次實驗、44+ 次嘗試）。XBI-013 added 2026-04-22 (Gap-Down Capitulation + Intraday Reversal MR, **repo 第 5 次 Gap-Down 試驗，首次 US 板塊 ETF 測試**，cross-asset port from IBIT-006 Att2). Three iterations all failed vs XBI-005 min 0.36: Att1 (Gap ≤ -1.0% primary + Close>Open + 10d PB [-5%,-15%] + WR ≤ -80, TP +3.0%/SL -3.0%/15d) Part A 8/50% WR Sharpe **-0.02** cum -0.77%（4TP/4SL，全部 1-3 日出場）/ Part B 1/0% WR Sharpe 0.00 cum -3.10% / min **-0.02** — 生技 gap-down 為 FDA/臨床 negative news 續跌結構，非 IBIT 隔夜拋壓耗盡；Att2 (Gap as supplementary filter on XBI-005 base + ClosePos ≥ 35%) Part A 3/66.7% WR Sharpe 1.39 cum +7.08% / Part B 1/0% WR Sharpe 0.00 cum -5.10% / min **0.00** — Gap 濾波將 XBI-005 原 35/8 訊號濾至 3/1，樣本過薄且 Part B 唯一訊號 2024-01-17 仍 1 日 SL；Att3 (deep Gap ≤ -2.0% + wider pullback [-5%,-18%]) Part A 1/100% WR 零方差 Sharpe 0.00 / Part B 1/0% WR Sharpe 0.00 / min **0.00** — 深 gap 過嚴僅 1 訊號每 Part，Part B 2024-07-29 訊號仍 SL。**Repo 第 5 次 Gap-Down Capitulation MR 試驗** — 首次 US 板塊 ETF 測試。Gap-Down 失敗家族正式擴展為 4 大類（IBIT 為唯一成功）：(1) TQQQ-016（non-24/7 槓桿股指 ETF）(2) FXI-010（政策驅動 EM 單一國家 ETF）(3) FCX-010（商品關聯個股）(4) **XBI-013（US 板塊 ETF with 事件驅動 gap）**。整合失敗規則：Gap-Down MR 需要 (a) 24/7 連續交易 underlying AND (b) 拋壓耗盡與當日 session 不相關聯；XBI 生技板塊兩者皆不符——事件常盤後宣告產生跨 session 持續拋壓，平行 FXI 政策延續 / FCX 商品衝擊延續 / TQQQ 槓桿結構失敗。IBIT 為唯一合格 Gap-Down underlying。XBI 第 10 個失敗策略類型（後於突破、ROC 單獨、動量回調、配對、ATR 自適應、RSI(2)、BB-lower 混合、RSI hook divergence、capitulation-accel、Gap-Down）。XBI-005 仍為全域最優（13 次實驗、41+ 次嘗試）. XBI-012 added 2026-04-19 (Capitulation + Acceleration Reversal MR: Pullback(10) + ROC(3) + ClosePos + UpDay + WR). Three iterations all failed vs XBI-005 min 0.36. Att1 (ROC -4%, ClosePos 50%, UpDay) Part A 3/0.16 / Part B 3/0.16 — too restrictive, 0.6 yr signal. Att2 (ROC -3%, ClosePos 40%, UpDay) Part A 7/0.27 / Part B 3/0.16 — Part A improves +69% but Part B stuck because 2024-2025 XBI lacks ROC(3) ≤ -3% events. Att3 (ROC -3%, ClosePos 35%, no UpDay) Part A 21/0.18 / Part B 8/0.07 — signals triple but quality dilutes: UpDay filter confirmed essential. Extends XBI failure pattern list: short-term ROC acceleration + intraday recovery cannot distinguish genuine reversal from technical bounce on event-driven biotech ETF. XBI-005's pullback+WR+ClosePos 35% framework confirmed as structurally optimal for XBI 2.0% daily vol + FDA event-driven MR (13 experiments, 41+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— **已確認為全域最優**（14 次實驗、44+ 次嘗試，含突破策略、ROC 策略、動量回調策略、配對交易策略、波動率自適應過濾、RSI(2) 獨立驗證、BB 下軌混合進場、RSI(14) bullish hook divergence、短期 ROC 急跌 + 日內反攻、Gap-Down Capitulation、**Post-Capitulation Vol-Transition MR（2DD floor）**）
-**前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
+**當前最佳：** ★ **XBI-015 Att2**（Multi-Week Regime-Aware Pullback MR：XBI-005 完整框架 + **ATR(20) ≤ 1.10 × ATR(60)** vol stability gate，TP+3.5%/SL-5.0%/15d/cd 10）★ **2026-04-30 新全域最優（15 次實驗、47+ 次嘗試）**
+- Part A: 15 訊號 / WR **80.0%** / Sharpe **0.46** / cum +25.13% / MDD -7.09%
+- Part B: 6 訊號 / WR 83.3% / Sharpe 0.64 / cum +12.71%（與 XBI-005 baseline 完全相同，k=1.10 對 Part B 非綁定）
+- min(A,B) **0.46**（+28% vs XBI-005 0.36）
+- A/B 年化 cum 4.59%/yr vs 6.16%/yr（gap 25.5% < 30% ✓）
+- A/B 年化訊號比 3.0/yr vs 3.0/yr = 1.0:1（gap 0% < 50% ✓）
+- 關鍵改善：vol regime gate k=1.10 過濾 2 筆 Part A SLs（2021-02-19 late-bull peak vol expansion、2022-01-06 early-bear vol expansion）+ 4 筆中性訊號，Part A WR 76.2%→80.0%
+- **Repo 第 1 次 lesson #22 跨策略類型移植**：BB Squeeze（TSLA-015/NVDA-012/FCX-013/COPX-011）/ MBPC（NVDA-013）→ Pullback MR
+- **Repo 第 1 次驗證 ATR vol regime 在 Pullback MR 框架非冗餘**（與 NVDA-013 vol regime 在 MBPC 框架非冗餘平行）
+
+**前任最佳：** XBI-005（回檔 8-20% + WR(10) ≤ -80 + ClosePos ≥ 35%，Part A Sharpe 0.36，Part B Sharpe 0.64）— 14 次實驗、44+ 次嘗試已確認為基線
+**前前任最佳：** XBI-001（同進場無 ClosePos，Part A Sharpe 0.11，Part B Sharpe 0.23）
 **滾動窗口分析摘要：** XBI-001 ✗✓（精準度突變 ΔWR 23.8pp，績效漸變，2023 生技低迷為主因）
 
 **已證明無效（禁止重複嘗試）：**
@@ -49,6 +59,8 @@
 - **Post-Capitulation Vol-Transition MR（XBI-014 Att1，2DD floor -2.0%）**（XBI-005 base + Return_2d ≤ -2.0%）：Part A 18/72.2%/Sharpe 0.24 / Part B 6/66.7%/Sharpe 0.16 / min **0.16**，cooldown chain shift 引入 2024-03-15 SL
 - **Post-Capitulation Vol-Transition MR（XBI-014 Att2，2DD floor -2.5%）**（向 USO 門檻靠攏）：Part A 16/68.8%/Sharpe 0.16 / Part B 5/80.0%/Sharpe 0.52 / min **0.16**，Part A WR 系統性下降至 68.8%（baseline 76.2%）
 - **Post-Capitulation Vol-Transition MR（XBI-014 Att3，2DD floor -1.0% 最輕度 ablation）**：Part A 20/75.0%/Sharpe 0.32 / Part B 6/83.3%/Sharpe 0.64 / min **0.32**，三次最接近 baseline 但仍未超越，threshold sweep 完整失敗曲線（baseline 0.36 → -1.0% 0.32 → -2.0% 0.16 → -2.5% 0.16）確認 2DD floor 加深方向對 XBI **完全無效**
+- **Multi-Week Regime-Aware Pullback MR vol_regime_max_ratio=1.30（XBI-015 Att1，NVDA-013 中位移植）**：Part A 21/76.2%/Sharpe 0.36 / Part B 6/83.3%/Sharpe 0.64 / min **0.36**（持平 baseline），k=1.30 對 XBI 訊號日 ATR(20)/ATR(60) 完全非綁定（XBI 訊號日 vol ratio 中位約 1.05-1.15，1.30 從未觸發）
+- **Multi-Week Regime-Aware Pullback MR vol_regime_max_ratio=1.05（XBI-015 Att3）**：Part A 13/76.9%/Sharpe 0.35 / Part B **2/50%/Sharpe -0.19** / min **-0.19**（崩壞），k=1.05 過嚴 Part B 從 6 崩至 2（移除 4 winners：2024-03-14、2024-11-18、2024-12-19、2025-05-07 全部 TP），Part B 訊號日 vol ratio 中位約 1.05-1.10，k=1.05 落於分布中段切除大量 winners
 
 **已掃描的參數空間：**
 - 進場條件：回檔 6~8% + 上限 15~20% + WR(10) ≤ -80（有/無 2日急跌 ≤ -3%）
@@ -110,7 +122,7 @@
 |---------|-------------------------|--------------------------------------|-------|
 | XBI-001 | `xbi_001_pullback_wr`    | 回檔範圍 8-20% + Williams %R 均值回歸 | 已完成 |
 | XBI-004 | `xbi_004_capped_cooldown` | 回檔 8-15% + WR + 冷卻15天（未勝出） | 已完成 |
-| XBI-005 | `xbi_005_closepos_reversal` | 回檔 8-20% + WR + ClosePos ≥ 35%（**全域最佳**） | 已完成 |
+| XBI-005 | `xbi_005_closepos_reversal` | 回檔 8-20% + WR + ClosePos ≥ 35%（前任最佳，XBI-015 進場框架基線） | 已完成 |
 | XBI-006 | `xbi_006_bb_squeeze_breakout` | BB Squeeze Breakout + 3次嘗試（未勝出） | 已完成 |
 | XBI-007 | `xbi_007_momentum_pullback` | 動量回調 ROC+回撤+SMA50 + 3次嘗試（未勝出） | 已完成 |
 | XBI-008 | `xbi_008_pairs_ibb` | XBI/IBB 配對交易 z-score + 3次嘗試（未勝出） | 已完成 |
@@ -120,6 +132,7 @@
 | XBI-012 | `xbi_012_capitulation_accel` | Capitulation + Acceleration Reversal（ROC(3) + ClosePos + UpDay + WR） + 3次嘗試（未勝出） | 已完成（未改善） |
 | XBI-013 | `xbi_013_gap_reversal_mr` | Gap-Down Capitulation + Intraday Reversal MR（IBIT-006 移植） + 3次嘗試（未勝出） | 已完成（失敗，repo 首次 US 板塊 ETF Gap-Down 試驗） |
 | XBI-014 | `xbi_014_vol_transition_mr` | Post-Capitulation Vol-Transition MR（VGK-008/INDA-010/EEM-014 移植，2DD floor sweep） + 3次嘗試（未勝出） | 已完成（失敗，repo 第 6 次 2DD floor 跨資產試驗） |
+| XBI-015 | `xbi_015_regime_pullback_mr` | Multi-Week Regime-Aware Pullback MR（XBI-005 + ATR(20)/ATR(60) ≤ 1.10 vol stability gate，**Att2 SUCCESS**，repo 第 1 次 lesson #22 跨策略類型移植至 Pullback MR） | ✅ **當前最佳**（Att2 SUCCESS，min(A,B) **0.46**，+28% vs XBI-005 0.36） |
 
 ---
 
@@ -910,3 +923,77 @@ ROC、動量回調、配對交易、ATR 自適應、RSI(2)、BB 下軌混合、R
 capitulation+acceleration、Gap-Down、**2DD floor**）。XBI 2.0% 日波動 + 生技 FDA
 事件驅動下，**pullback+WR+ClosePos 35% 反轉 K 線框架**為結構最優，所有後續嘗試
 皆無法跨越。
+
+---
+
+## XBI-015: Multi-Week Regime-Aware Pullback MR ★ 當前最佳（Att2 SUCCESS）
+
+### 策略動機
+
+- XBI-005 baseline Part A Sharpe 0.36 / Part B Sharpe 0.64，**A/B 落差 0.28（78%）**
+  為跨資產 Part A/B 落差最大者之一。
+- XBI-014 確認「事件驅動板塊 ETF 的 winners 2DD 分布雙峰化」使 capitulation-depth
+  維度濾波結構性失效。需從**新維度**改善 Part A 品質。
+- lesson #22「buffered multi-week SMA + ATR vol regime」歷經 5 次成功（TSLA-015 /
+  NVDA-012 / FCX-013 / COPX-011 BB Squeeze + NVDA-013 MBPC），但**從未應用於
+  Pullback MR 框架**。XBI-015 為 repo 首次此類跨策略類型移植。
+
+### 設計
+
+- 進場（同 XBI-005）：10 日高點回檔 [-8%, -20%] + WR(10) ≤ -80 + ClosePos ≥ 35%
+- **新增 lesson #22 vol regime gate**：ATR(20) ≤ k × ATR(60)
+- **未啟用 SMA trend regime**：避免 lesson #5「趨勢濾波器+MR=災難」風險
+- 出場（同 XBI-005）：TP +3.5% / SL -5.0% / 15 天 / 冷卻 10 天 / 滑價 0.1%
+
+### 迭代結果
+
+| Att | k 閾值 | Part A | Part B | min(A,B) | 結論 |
+|-----|--------|--------|--------|----------|------|
+| 1   | 1.30   | 21/76.2%/0.36 | 6/83.3%/0.64 | 0.36 | 非綁定（XBI 訊號日 vol ratio 中位 1.05-1.15） |
+| **2 ★** | **1.10** | **15/80.0%/0.46** | **6/83.3%/0.64** | **0.46** | **SUCCESS（+28%）** |
+| 3   | 1.05   | 13/76.9%/0.35 | 2/50.0%/-0.19 | -0.19 | 過嚴，Part B 從 6 崩至 2 |
+
+### Att2 ★ 詳細結果
+
+- Part A: 15 訊號 / WR **80.0%** / Sharpe **0.46** / 累計 +25.13% / MDD -7.09% /
+  PF 2.54
+- Part B: 6 訊號 / WR 83.3% / Sharpe 0.64 / 累計 +12.71%（與 XBI-005 baseline
+  完全相同 — k=1.10 對 Part B 非綁定）
+- min(A,B) **0.46**（+28% vs XBI-005 0.36）
+- A/B 平衡（驗收目標全達）：
+  - 年化 cum: 4.59%/yr vs 6.16%/yr（gap **25.5% < 30% ✓**）
+  - 年化訊號比: 3.0/yr vs 3.0/yr = **1.0:1（gap 0% < 50% ✓）**
+
+### 過濾動態（Part A 21 → 15）
+
+**過濾的 2 筆 SLs**（gate 主要功能）：
+- 2021-02-19 SL（late-bull peak vol expansion，ATR(20)/ATR(60) > 1.10）
+- 2022-01-06 SL（early-bear vol expansion）
+
+**過濾的 4 筆 winners**（中性副作用）：
+- 2020-01-31 TP、2021-01-05 TP、2021-03-30 TP、2021-12-06 TP
+
+**殘餘 3 SLs**（vol regime 無法過濾）：
+- 2021-05-06、2022-04-19、2023-09-21（均處於 vol ratio < 1.10 環境）
+
+### 跨資產貢獻（cross-asset findings）
+
+1. **Repo 第 1 次 lesson #22 跨策略類型移植**：BB Squeeze（TSLA-015 / NVDA-012 /
+   FCX-013 / COPX-011 四次）/ MBPC（NVDA-013）→ Pullback MR
+2. **Repo 第 1 次驗證 ATR vol regime 在 Pullback MR 框架非冗餘**：
+   - Pullback+WR+ClosePos 進場架構不含波動限制
+   - ATR(20)/ATR(60) ≤ k 提供獨立選擇力
+   - 與 NVDA-013 vol regime 在 MBPC 框架非冗餘的發現平行
+3. **k 閾值跨策略類型對比**：
+   - BB Squeeze 框架（TSLA-015 Att3 ablation）：vol regime **冗餘**
+   - MBPC 框架（NVDA-013）：vol regime 非冗餘，**k=1.40**
+   - Pullback MR 框架（XBI-015 Att2）：vol regime 非冗餘，**k=1.10**
+   - **發現**：vol regime 必要性取決於進場框架是否含「隱含波動限制」；k 閾值
+     依資產 vol ratio 分布調整（非通用值）
+
+### 待驗證的跨資產假設
+
+buffered ATR vol regime 在 Pullback MR 框架對其他「事件驅動板塊 ETF」可能有效：
+- CIBR（網路資安政策驅動）
+- KIE（保險）/ IGV（軟體）/ IYR（房地產）
+- 閾值需依資產 vol ratio 分布調整（不可直接移植）
