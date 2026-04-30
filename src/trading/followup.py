@@ -74,8 +74,8 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "fxi_005_wr14_extended_mr",
-        "label": "FXI-005",
+        "experiment_name": "fxi_014_atr_band_mr",
+        "label": "FXI-014",
         "ticker": "FXI",
         "has_trailing_stop": False,
     },
