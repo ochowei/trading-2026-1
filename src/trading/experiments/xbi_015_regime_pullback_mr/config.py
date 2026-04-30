@@ -109,6 +109,23 @@ Att2 ★（k=1.10，閾值對齊 XBI 訊號分布）：SUCCESS min(A,B) 0.46
           可解，需其他維度
         - **Repo 第 1 次驗證 lesson #22 cross-strategy: BB Squeeze /
           MBPC → MR 移植，且 vol regime 在 MR 框架非冗餘**
+
+Att3（k=1.05，進一步收緊試圖過濾殘餘 SLs）：FAILED 過度過濾
+    參數調整：vol_regime_max_ratio 1.10 → 1.05
+    結果：Part A 13 訊號 / WR 76.9% / Sharpe **0.35** / 累計 +16.80%
+          Part B  2 訊號 / WR 50.0% / Sharpe **-0.19** / 累計 -1.78%
+          min(A,B) **-0.19**（崩壞）
+    失敗分析：
+        - k=1.05 過嚴，**Part B 從 6 訊號崩至 2**（移除 4 winners：
+          2024-03-14、2024-11-18、2024-12-19、2025-05-07 全部 TP）
+        - Part B 訊號日 vol ratio 中位約 1.05-1.10，k=1.05 落於分布
+          中段切除大量 winners
+        - Part A 額外過濾 2 訊號（15→13）含 2022-05-12 TP，且 lesson
+          #19 cooldown chain shift 觸發 2019-04-18→2019-04-22 訊號日
+          移轉
+        - **核心發現**：k=1.10 為 Part A/Part B vol 分布交集的精準
+          甜蜜點，再緊 5pp 即破壞 Part B
+        - 結論：Att2 k=1.10 為結構性最優，無進一步收緊空間
 """
 
 from dataclasses import dataclass
@@ -131,10 +148,11 @@ class XBI015Config(ExperimentConfig):
     # === 多週期波動 regime gate（lesson #22 cross-strategy MR port）===
     # ATR(short) ≤ vol_regime_max_ratio × ATR(long)
     # Att1: k=1.30（NVDA-013 vol regime 中位移植）→ FAILED 非綁定（min 0.36 持平）
-    # Att2 ★: k=1.10（閾值對齊 XBI 訊號日 vol ratio 分布中位）
+    # Att2 ★: k=1.10 → SUCCESS Part A 0.36→0.46（+28%），Part B 0.64 不變
+    # Att3: k=1.05 進一步收緊試圖過濾殘餘 SLs
     atr_regime_short: int = 20
     atr_regime_long: int = 60
-    vol_regime_max_ratio: float = 1.10
+    vol_regime_max_ratio: float = 1.05
     use_vol_regime: bool = True
 
     # === 多週期趨勢 regime gate（預設停用，避免 lesson #5 風險）===
