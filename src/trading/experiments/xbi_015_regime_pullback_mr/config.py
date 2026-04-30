@@ -55,7 +55,7 @@ XBI-015: Multi-Week Regime-Aware Pullback MR
 XBI-015 新增（lesson #22 cross-strategy MR port）
 ================================================================================
 - **多週期波動 regime gate**：ATR(20) ≤ k × ATR(60)
-- 預設 k = 1.30（NVDA-013 vol regime 移植，介於 1.20 嚴格與 1.40 寬鬆之間）
+- 預設 k = 1.10（Att2 ★ SUCCESS，閾值對齊 XBI 訊號分布中位）
 - （可選）多週期趨勢 regime：SMA(20) ≥ k_sma × SMA(60)，預設停用
   以避免 lesson #5「趨勢濾波器+MR=災難」風險
 
@@ -83,6 +83,32 @@ Att1（k=1.30，NVDA-013 vol regime 中位移植）：FAILED 非綁定
         - 與 XBI-009 結論一致：XBI 不存在 ATR ratio > 1.10 訊號
         - 結論：閾值需從 NVDA-013 的「multi-driver 高波動單股」假設
           下調至 XBI 的「事件驅動板塊 ETF」尺度
+
+Att2 ★（k=1.10，閾值對齊 XBI 訊號分布）：SUCCESS min(A,B) 0.46
+    參數調整：vol_regime_max_ratio 1.30 → 1.10
+    結果：Part A 15 訊號 / WR **80.0%**（+3.8pp）/ Sharpe **0.46** /
+              累計 +25.13% / MDD -7.09%
+          Part B  6 訊號 / WR 83.3% / Sharpe 0.64 / 累計 +12.71%
+                       （與 XBI-005 完全相同，k=1.10 對 Part B 非綁定）
+          min(A,B) **0.46**（vs XBI-005 0.36，**+28%**）★
+    A/B 平衡（驗收目標全達）：
+        - Part A 年化 cum: (1+0.2513)^(1/5)-1 = 4.59%/yr
+        - Part B 年化 cum: (1+0.1271)^(1/2)-1 = 6.16%/yr
+        - 相對差: |6.16-4.59|/6.16 = **25.5% < 30% ✓**
+        - 訊號比 3.0/yr vs 3.0/yr = **1.0:1（gap 0% < 50% ✓）**
+    成功分析：
+        - 過濾 6 個訊號（21→15）：4 winners + **2 SLs**（2021-02-19
+          late-bull peak vol expansion、2022-01-06 early-bear vol
+          expansion）
+        - **vol expansion gate 在 MR 框架非冗餘**：Pullback+WR+ClosePos
+          進場架構不含波動限制，ATR(20)/ATR(60) ≤ 1.10 提供獨立選擇力
+          （與 NVDA-013 vol regime 在 MBPC 框架非冗餘的發現平行）
+        - Part A WR 76.2%→80.0%、Sharpe 0.36→0.46 雙提升
+        - 殘餘 3 SLs（2021-05-06 post-peak、2022-04-19 mid-bear、
+          2023-09-21 chop）均處於 vol ratio < 1.10 環境，非 vol gate
+          可解，需其他維度
+        - **Repo 第 1 次驗證 lesson #22 cross-strategy: BB Squeeze /
+          MBPC → MR 移植，且 vol regime 在 MR 框架非冗餘**
 """
 
 from dataclasses import dataclass
@@ -104,10 +130,11 @@ class XBI015Config(ExperimentConfig):
 
     # === 多週期波動 regime gate（lesson #22 cross-strategy MR port）===
     # ATR(short) ≤ vol_regime_max_ratio × ATR(long)
-    # Att1: k=1.30（NVDA-013 vol regime 中位移植）
+    # Att1: k=1.30（NVDA-013 vol regime 中位移植）→ FAILED 非綁定（min 0.36 持平）
+    # Att2 ★: k=1.10（閾值對齊 XBI 訊號日 vol ratio 分布中位）
     atr_regime_short: int = 20
     atr_regime_long: int = 60
-    vol_regime_max_ratio: float = 1.30
+    vol_regime_max_ratio: float = 1.10
     use_vol_regime: bool = True
 
     # === 多週期趨勢 regime gate（預設停用，避免 lesson #5 風險）===
