@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-23
+  last_validated: 2026-04-30
   data_through: 2025-12-31
-  note: SIVR-016 added 2026-04-23 (Williams Vix Fix Capitulation MR, **repo 第 2 次 WVF 試驗**，cross-asset extension from URA-010 Att3). Three iterations all failed vs SIVR-015 Att1 min(A,B) 0.48: Att1 (WVF(22) > BB_upper(20,2.0σ) + 10d pullback [-7%,-20%] + cd=10 + TP+3.5%/SL-3.5%/20d) Part A 22/50.0%/Sharpe **0.02** cum +0.26% / Part B 9/55.6%/Sharpe 0.09 cum +2.40% / min **0.02** — WVF BB-upper 上穿在 SIVR 2.34% vol 上產生過多假 capitulation 訊號（9 筆 Part A 1-4 天快速停損），pullback [-7%,-20%] 過寬引入淺回檔假訊號；Att2 (tighten pullback to [-10%,-20%], URA-010 Att3 direction) Part A 12/66.7%/Sharpe **0.33** cum +13.53% / Part B 4/75.0%/Sharpe 0.55 cum +6.84% / min **0.33** — 深回檔門檻移除大多數淺 capitulation 假訊號（22→12 Part A），A/B 年化訊號比 1.2:1 ✓ 但 A/B 累計差 49.5% ✗，殘餘 4 筆 Part A SL（2020-09-21/2021-12-01/2022-05-02/2022-07-05）為深回檔真跌；Att3 (+ RSI(14) bullish hook from SIVR-015 Att1) Part A 1/100%/zero-var Sharpe 0.00 / Part B 0 signals / min **0.00（over-filter）** — WVF 與 RSI hook 幾乎正交（WVF 要求 price-depth capitulation，RSI hook 要求 momentum turn-up），在 SIVR 極少同日觸發。**結論**：(1) WVF 單獨在 SIVR 2-3% vol 上缺乏 capitulation 真假區分力，需搭配 -10% 深回檔方具選擇性；(2) WVF + 深回檔為 SIVR 次優配置（0.33），仍次於 SIVR-015 RSI hook 框架（0.48）；(3) WVF 與 RSI hook 結構性重疊非互補；(4) 擴展 lesson #20b 失敗家族至 **capitulation-depth 類別（SIVR 維度）**——URA-010 政策驅動 + SIVR-016 活躍 MR regime 兩資產 WVF 主訊號皆失敗，確認 **WVF 缺乏 momentum turn confirmation** 為其跨資產限制；(5) **Repo 第 2 次 WVF 試驗失敗**（URA-010 Part A 0.68/Part B 0.04，SIVR-016 Part A 0.33/Part B 0.55），WVF 在 repo 內尚未成功。新跨資產規則：SIVR 的 MR 核心為「capitulation 尾聲 + momentum turn-up」（SIVR-015 Att1），非「capitulation 深度本身」。SIVR-015 Att1 remains global optimum (16 experiments, 43+ attempts). SIVR-015 added 2026-04-17 (RSI Bullish Hook Divergence filter + SIVR-005 entry; Att1 RSI(14)/lookback 5d/delta 3/near-low 35 new global best min(A,B) 0.22→0.48 +118%, Part B 0.26→1.41 +442%). First validation of classical bullish divergence pattern in repo — filters out signals where RSI is still declining (prolonged downtrend). Att2 (lookback 7/delta 2) loosened too much, Part A 0.48→0.28; Att3 (RSI(7)/delta 4) noisy, both parts negative Sharpe. RSI(14) is the right period for this pattern on SIVR.
+  note: SIVR-017 added 2026-04-30 (Money Flow Index Capitulation MR, **repo 首次 MFI 試驗於任何資產，repo 首次 volume-weighted oscillator 主訊號**). Three iterations all failed vs SIVR-015 Att1 min(A,B) 0.48: Att1 (MFI(14) ≤ 25 standard oversold + SIVR-005 base, TP+3.5%/SL-3.5%/15d/cd10) Part A 8/37.5%/Sharpe **-0.28** cum -7.89% (3 TPs + 5 SLs)/ Part B 2/100% std=0 Sharpe 0.00 cum +7.12% / min **-0.28** — MFI ≤ 25 為 volume-weighted 深度超賣，捕捉「下跌中段量增急跌」（價格仍續跌）而非 capitulation 尾聲，Part A 5 SLs 集中於 2020-09 銀價 hike-fear / 2021-12 Fed 鷹派 / 2022 升息熊市 / 2023-02 SVB pre-shock 等持續下跌期；Att2 (MFI bullish hook lookback 5d / delta ≥ 3 / near-low ≤ 35，無 RSI hook) Part A 9/55.6%/Sharpe **0.09** cum +2.40% / Part B 3/66.7%/Sharpe **1.41** cum +7.12%（2024-07-26 TP / 2024-11-12 expiry / 2025-04-07 TP）/ min **0.09** — MFI hook 結構平行 RSI hook (turn-up + max-min oversold) 但 selectivity 次於 RSI hook，與 SIVR-015 Att1 訊號集合**部分正交**（重疊 ~38%）；Att3 (MFI hook + RSI(14) hook stack 雙重 capitulation 確認) Part A 5/**80.0%**/Sharpe **0.73** cum +10.58%（4 TPs + 1 SL，SIVR 系列 in-sample 最高 +52% vs SIVR-015 Att1 的 0.48）/ Part B 1 訊號（2024-11-12 expiry 0%）zero-var Sharpe 0.00 / min **0.00（over-filter）** — 雙 hook 在 Part B 觸發日幾乎不重疊（MFI hook 抓 2024-07-26、2025-04-07；RSI hook 抓 2024-05-02、2024-08-07；唯一交集為 2024-11-12 zero-return），stack 結果為兩 hook 交集的「下界」訊號，在低 signal-count 資產上**結構性 over-filter**。**結論**：(1) MFI 標準 oversold (≤25) 在 SIVR 上完全錯誤方向（捕捉早期 panic 而非 capitulation 尾聲）；(2) MFI hook 為合理結構但 selectivity 次於 RSI hook（與 SIVR-015 訊號重疊 ~38%）；(3) MFI hook + RSI hook stack 在 Part B 結構性 over-filter（兩 hook 觸發日不重疊）；(4) **擴展 lesson #6 至 volume-weighted 振盪器類別**：MFI 作為主要 capitulation 過濾器在已飽和 RSI hook 框架（SIVR-015 Att1）上**無邊際品質提升**，平行 URA-011 Volume spike 結論（Volume filter 創造 A/B 對稱性但不突破品質天花板）；(5) **擴展 lesson #20b 失敗家族至 volume-weighted oscillator hook 類別**——MFI hook 在 SIVR 結構性次於 RSI hook，因 SIVR 的 capitulation 結構由 price momentum 主導而非 volume profile；(6) **Repo 首次 MFI 試驗失敗** — volume-weighted oscillators 適用於 volume-driven assets（個股 earnings spikes），對 ETF（成份分散）幫助有限。新跨資產規則：volume-based filters（MFI、CMF、Force Index、Volume spike）在 price-momentum-driven MR 策略上為 **supplementary 而非 substitutive 維度**。SIVR-015 Att1 remains global optimum (17 experiments, 46+ attempts). SIVR-016 added 2026-04-23 (Williams Vix Fix Capitulation MR, **repo 第 2 次 WVF 試驗**，cross-asset extension from URA-010 Att3). Three iterations all failed vs SIVR-015 Att1 min(A,B) 0.48: Att1 (WVF(22) > BB_upper(20,2.0σ) + 10d pullback [-7%,-20%] + cd=10 + TP+3.5%/SL-3.5%/20d) Part A 22/50.0%/Sharpe **0.02** cum +0.26% / Part B 9/55.6%/Sharpe 0.09 cum +2.40% / min **0.02** — WVF BB-upper 上穿在 SIVR 2.34% vol 上產生過多假 capitulation 訊號（9 筆 Part A 1-4 天快速停損），pullback [-7%,-20%] 過寬引入淺回檔假訊號；Att2 (tighten pullback to [-10%,-20%], URA-010 Att3 direction) Part A 12/66.7%/Sharpe **0.33** cum +13.53% / Part B 4/75.0%/Sharpe 0.55 cum +6.84% / min **0.33** — 深回檔門檻移除大多數淺 capitulation 假訊號（22→12 Part A），A/B 年化訊號比 1.2:1 ✓ 但 A/B 累計差 49.5% ✗，殘餘 4 筆 Part A SL（2020-09-21/2021-12-01/2022-05-02/2022-07-05）為深回檔真跌；Att3 (+ RSI(14) bullish hook from SIVR-015 Att1) Part A 1/100%/zero-var Sharpe 0.00 / Part B 0 signals / min **0.00（over-filter）** — WVF 與 RSI hook 幾乎正交（WVF 要求 price-depth capitulation，RSI hook 要求 momentum turn-up），在 SIVR 極少同日觸發。**結論**：(1) WVF 單獨在 SIVR 2-3% vol 上缺乏 capitulation 真假區分力，需搭配 -10% 深回檔方具選擇性；(2) WVF + 深回檔為 SIVR 次優配置（0.33），仍次於 SIVR-015 RSI hook 框架（0.48）；(3) WVF 與 RSI hook 結構性重疊非互補；(4) 擴展 lesson #20b 失敗家族至 **capitulation-depth 類別（SIVR 維度）**——URA-010 政策驅動 + SIVR-016 活躍 MR regime 兩資產 WVF 主訊號皆失敗，確認 **WVF 缺乏 momentum turn confirmation** 為其跨資產限制；(5) **Repo 第 2 次 WVF 試驗失敗**（URA-010 Part A 0.68/Part B 0.04，SIVR-016 Part A 0.33/Part B 0.55），WVF 在 repo 內尚未成功。新跨資產規則：SIVR 的 MR 核心為「capitulation 尾聲 + momentum turn-up」（SIVR-015 Att1），非「capitulation 深度本身」。SIVR-015 Att1 remains global optimum (16 experiments, 43+ attempts). SIVR-015 added 2026-04-17 (RSI Bullish Hook Divergence filter + SIVR-005 entry; Att1 RSI(14)/lookback 5d/delta 3/near-low 35 new global best min(A,B) 0.22→0.48 +118%, Part B 0.26→1.41 +442%). First validation of classical bullish divergence pattern in repo — filters out signals where RSI is still declining (prolonged downtrend). Att2 (lookback 7/delta 2) loosened too much, Part A 0.48→0.28; Att3 (RSI(7)/delta 4) noisy, both parts negative Sharpe. RSI(14) is the right period for this pattern on SIVR.
 -->
 ## AI Agent 快速索引
 
@@ -80,6 +80,12 @@
 - WVF + 深回檔 + RSI(14) bullish hook（SIVR-016 Att3 疊加測試）：Part A 1 訊號零方差 / Part B 0 訊號，min 0.00（over-filter）。WVF 與 RSI hook 幾乎正交——WVF 要求 price-depth capitulation，RSI hook 要求 momentum turn-up，在 SIVR 極少同日觸發
 - **結論**：擴展 lesson #20b 失敗家族至 **capitulation-depth 類別（SIVR 維度）**。URA-010 政策驅動資產 + SIVR-016 活躍 MR regime 資產兩次 WVF 主訊號嘗試皆失敗，確認 **WVF 缺乏 momentum turn confirmation** 為其跨資產限制。Repo 第 2 次 WVF 試驗失敗。SIVR 的 MR 核心為「capitulation 尾聲 + momentum turn-up」（SIVR-015 Att1 RSI hook），非「capitulation 深度本身」
 
+**已證明無效（Money Flow Index Capitulation，SIVR-017 三次嘗試，repo 首次 MFI 試驗於任何資產）：**
+- MFI(14) ≤ 25 standard oversold + SIVR-005 base（SIVR-017 Att1）：Part A 8 訊號 WR 37.5% Sharpe **-0.28** cum -7.89%（3 TPs + 5 SLs：2020-09-22 / 2021-12-03 / 2022-05-02 / 2022-07-07 / 2023-02-15）/ Part B 2 訊號 100% WR std=0 Sharpe 0.00 cum +7.12%，min **-0.28**。MFI ≤ 25 為「volume-weighted 深度超賣」，捕捉的是「下跌中段量增急跌」（價格仍在下挫）而非 capitulation 尾聲，Part A 5 SLs 集中於 2020-09 銀價 hike-fear、2021-12 Fed 鷹派、2022 升息熊市、2023-02 SVB pre-shock 等持續下跌期。確認 MFI 標準 oversold 閾值在 SIVR 上選擇早期 panic（仍續跌）而非後期 capitulation（已反轉）
+- MFI bullish hook（lookback 5d / delta ≥ 3 / near-low ≤ 35），無 RSI hook（SIVR-017 Att2）：Part A 9 訊號 WR 55.6% Sharpe **0.09** cum +2.40% / Part B 3 訊號 WR 66.7% Sharpe **1.41** cum +7.12%（2024-07-26 TP / 2024-11-12 expiry / 2025-04-07 TP），min **0.09**。MFI hook 採用 RSI hook 同樣 turn-up 邏輯（自 5d 低點回升 ≥3 點，且 5d 低點曾 ≤ 35），結構性參數對齊 SIVR-015 Att1。Part A 9 訊號中 4 SLs 多為「MFI hook 觸發但價格仍續跌」結構；訊號集合與 SIVR-015 Att1 **部分正交**（重疊 ~38%）。Part B 3 訊號中僅 2024-11-12 與 SIVR-015 Att1 重疊，其餘為 MFI hook 獨有訊號——MFI hook 在 SIVR Part B 上仍有合理 selectivity，但 Part A 整體選擇力低於 RSI hook
+- MFI hook + RSI(14) hook stack 雙重 capitulation 確認（SIVR-017 Att3）：Part A 5 訊號 WR **80.0%** Sharpe **0.73** cum +10.58%（4 TPs + 1 SL，**SIVR 系列 in-sample 最高 +52% vs SIVR-015 Att1 的 0.48**）/ Part B 1 訊號（2024-11-12 expiry 0%）zero-var Sharpe 0.00 / min **0.00（over-filter）**。雙 hook 在 SIVR Part B 觸發日**幾乎不重疊**（MFI hook 抓 2024-07-26、2025-04-07；RSI hook 抓 2024-05-02、2024-08-07；唯一交集為 2024-11-12 zero-return expiry）。Stack 結果為兩 hook 交集的「下界」訊號，在低 signal-count 資產上必然 over-filter。**雖 Part A Sharpe 0.73 ≫ baseline，但 Part B 1 zero-return signal 使 min(A,B)=0 無法作為實戰策略**
+- **結論**：(1) **擴展 lesson #6 至 volume-weighted 振盪器類別**：MFI 作為主要 capitulation 過濾器在已飽和 RSI hook 框架（SIVR-015 Att1）上**無邊際品質提升**，平行 URA-011 Volume spike 結論（Volume filter 創造 A/B 對稱性但不突破品質天花板）；(2) **擴展 lesson #20b 失敗家族至 volume-weighted oscillator hook 類別**——MFI hook 在 SIVR 結構性次於 RSI hook，因 SIVR 的 capitulation 結構由 price momentum 主導而非 volume profile；(3) **Repo 首次 MFI 試驗失敗** — volume-weighted oscillators 適用於 volume-driven assets（個股 earnings spikes），對 ETF（成份分散）幫助有限。新跨資產規則：volume-based filters（MFI、CMF、Force Index、Volume spike）在 price-momentum-driven MR 策略上為 **supplementary 而非 substitutive 維度**
+
 **尚未嘗試的方向（預期邊際效益極低，不建議繼續探索）：**
 - 多根 K 線確認（連續 2-3 根收高）— 但跨資產教訓 #23 顯示 K 線方向過濾在均值回歸中無效
 - MACD histogram divergence — RSI(14) divergence 已成功，預期 MACD 為近似訊號
@@ -108,7 +114,7 @@
 
 # SIVR 實驗總覽 (SIVR Experiment Index)
 
-> **最新實驗 (Latest):** SIVR-015 `sivr_015_rsi_divergence_mr`（RSI(14) bullish hook divergence 過濾 + SIVR-005 進場，★ **新全域最優**，min(A,B) 0.22→0.48 +118%）
+> **最新實驗 (Latest):** SIVR-017 `sivr_017_mfi_capitulation_mr`（Money Flow Index Capitulation MR，**repo 首次 MFI 試驗於任何資產**，三次嘗試均未超越 SIVR-015 Att1）
 > **當前最佳 (Best):** SIVR-015 `sivr_015_rsi_divergence_mr`（classical bullish divergence 首次於 repo 驗證有效，過濾掉 RSI 仍在下跌的訊號）
 
 ## 實驗清單 (Experiments)
@@ -131,6 +137,7 @@
 | SIVR-014 | `sivr_014_donchian_breakout` | SIVR Donchian 通道突破 | Donchian(20)+SMA(50)+5%回檔, TP+5%/SL-5%/20d | ❌ 失敗（3次嘗試） |
 | SIVR-015 | `sivr_015_rsi_divergence_mr` | SIVR RSI Bullish Divergence + 回檔+WR | SIVR-005 + RSI(14) hook: lookback 5d + delta ≥3 + near-low ≤35, TP+3.5%/SL-3.5%/15d | ✅ **當前全域最佳** |
 | SIVR-016 | `sivr_016_wvf_capitulation_mr` | SIVR Williams Vix Fix Capitulation MR | WVF(22) > BB_upper(20,2.0σ) + 10d pullback [-10%,-20%], TP+3.5%/SL-3.5%/20d | ❌ 失敗（3次嘗試均未超越 SIVR-015） |
+| SIVR-017 | `sivr_017_mfi_capitulation_mr` | SIVR MFI Capitulation MR（**repo 首次 MFI 試驗**） | MFI(14) bullish hook lookback 5d / delta ≥ 3 / near-low ≤ 35 + SIVR-005 base, TP+3.5%/SL-3.5%/15d | ❌ 失敗（3次嘗試均未超越 SIVR-015，stack 雙 hook Part A Sharpe 0.73 但 Part B over-filter） |
 
 ## 演進路線 (Lineage)
 
@@ -156,26 +163,29 @@ SIVR-013 sivr_013_bb_lower_mr (獨立分支：BB 下軌取代固定回檔門檻)
 SIVR-014 sivr_014_donchian_breakout (獨立分支：Donchian 通道突破) ❌ 三次嘗試均未超越 SIVR-005
 
 SIVR-016 sivr_016_wvf_capitulation_mr (獨立分支：Williams Vix Fix 資本化，跨資產移植自 URA-010) ❌ 三次嘗試均未超越 SIVR-015
+
+SIVR-017 sivr_017_mfi_capitulation_mr (獨立分支：Money Flow Index Capitulation，**repo 首次 MFI 試驗於任何資產**) ❌ 三次嘗試均未超越 SIVR-015
 ```
 
 ## 參數對照 (Parameter Comparison)
 
-| 參數 | SIVR-001 | SIVR-002 | SIVR-003 | SIVR-004 | SIVR-005 | SIVR-006 | SIVR-007 | SIVR-009 | SIVR-012 | SIVR-013 | SIVR-014 | SIVR-015 | SIVR-016 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| RSI | 10 日 < 28.0 | 同左 | — | **RSI(2) < 15** | — | — | — | — | — | — | — | **RSI(14) hook** | — |
-| SMA Deviation | 20 日 ≤ -2.5% | 同左 | — | — | — | — | — | — | — | — | — | — | — |
-| Ratio Z-score | — | — | — | — | — | — | — | **GLD/SIVR 60d ≥ 1.5** | — | — | — | — | — |
-| BB Lower Band | — | — | — | — | — | — | — | — | — | **BB(20,2) Close < Lower** | — | — | — |
-| Donchian | — | — | — | — | — | — | — | — | — | — | **20d High 突破** | — | — |
-| WVF Capitulation | — | — | — | — | — | — | — | — | — | — | — | — | **WVF(22) > BB_upper(20,2.0σ)** |
-| Pullback | — | — | **10d 高點回檔 ≥ 7%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **20d 回檔 8-15%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **10d 回檔上限 15%** | **10d 回檔 ≥ 5%** | **10d 回檔 7-15%** | **10d 回檔 10-20%** |
-| Williams %R | — | — | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** | — |
-| SMA Trend | — | — | — | — | — | — | — | — | — | — | **Close > SMA(50)** | — | — |
-| ATR Ratio | — | — | — | — | — | — | — | — | **ATR(5)/ATR(20) > 1.15** | **ATR(5)/ATR(20) > 1.05** | — | — | — |
-| Profit Target | +3.0% | +3.0% | **+3.5%** | +3.5% | +3.5% | **+4.0%** | +3.5% | +3.5% | +3.5% | +3.5% | **+5.0%** | +3.5% | +3.5% |
-| Stop Loss | -4.5% | -4.5% | **-3.5%** | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% | **-5.0%** | -3.5% | -3.5% |
-| Holding Days | 15 | 15 | 15 | 15 | 15 | **20** | 15 | 15 | 15 | 15 | **20** | 15 | **20** |
-| Cooldown Days | 15 | 15 | **10** | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
+| 參數 | SIVR-001 | SIVR-002 | SIVR-003 | SIVR-004 | SIVR-005 | SIVR-006 | SIVR-007 | SIVR-009 | SIVR-012 | SIVR-013 | SIVR-014 | SIVR-015 | SIVR-016 | SIVR-017 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| RSI | 10 日 < 28.0 | 同左 | — | **RSI(2) < 15** | — | — | — | — | — | — | — | **RSI(14) hook** | — | — |
+| SMA Deviation | 20 日 ≤ -2.5% | 同左 | — | — | — | — | — | — | — | — | — | — | — | — |
+| Ratio Z-score | — | — | — | — | — | — | — | **GLD/SIVR 60d ≥ 1.5** | — | — | — | — | — | — |
+| BB Lower Band | — | — | — | — | — | — | — | — | — | **BB(20,2) Close < Lower** | — | — | — | — |
+| Donchian | — | — | — | — | — | — | — | — | — | — | **20d High 突破** | — | — | — |
+| WVF Capitulation | — | — | — | — | — | — | — | — | — | — | — | — | **WVF(22) > BB_upper(20,2.0σ)** | — |
+| MFI Bullish Hook | — | — | — | — | — | — | — | — | — | — | — | — | — | **MFI(14) hook lookback 5 / delta 3 / near-low ≤ 35** |
+| Pullback | — | — | **10d 高點回檔 ≥ 7%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **20d 回檔 8-15%** | **10d 回檔 7-15%** | **10d 回檔 7-15%** | **10d 回檔上限 15%** | **10d 回檔 ≥ 5%** | **10d 回檔 7-15%** | **10d 回檔 10-20%** | **10d 回檔 7-15%** |
+| Williams %R | — | — | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** | — | **WR(10) ≤ -80** |
+| SMA Trend | — | — | — | — | — | — | — | — | — | — | **Close > SMA(50)** | — | — | — |
+| ATR Ratio | — | — | — | — | — | — | — | — | **ATR(5)/ATR(20) > 1.15** | **ATR(5)/ATR(20) > 1.05** | — | — | — | — |
+| Profit Target | +3.0% | +3.0% | **+3.5%** | +3.5% | +3.5% | **+4.0%** | +3.5% | +3.5% | +3.5% | +3.5% | **+5.0%** | +3.5% | +3.5% | +3.5% |
+| Stop Loss | -4.5% | -4.5% | **-3.5%** | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% | -3.5% | **-5.0%** | -3.5% | -3.5% | -3.5% |
+| Holding Days | 15 | 15 | 15 | 15 | 15 | **20** | 15 | 15 | 15 | 15 | **20** | 15 | **20** | 15 |
+| Cooldown Days | 15 | 15 | **10** | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 | 10 |
 | Slippage | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% | 0.15% |
 | Trail Activation | — | +2.0% | — | — | — | — | — | — | — | — | — | — | — |
 | Trail Distance | — | 1.5% | — | — | — | — | — | — | — | — | — | — | — |
