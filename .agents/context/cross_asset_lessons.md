@@ -631,10 +631,10 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 
 ---
 
-## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產（VOO-004 確認 broad-uptrend ETF 可成功，**IWM-014 small-cap broad ETF 失敗確認 2026-04-29**）
+## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產（VOO-004 確認 broad-uptrend ETF 可成功，**IWM-014 small-cap broad ETF 失敗確認 2026-04-29，TSM-010 半導體個股 cross-asset NVDA→TSM 失敗確認 2026-04-30**）
 <!-- freshness:
-  derived_from: [FXI-012,NVDA-009,VOO-004,IWM-014]
-  validated: 2026-04-29
+  derived_from: [FXI-012,NVDA-009,VOO-004,IWM-014,TSM-010]
+  validated: 2026-04-30
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -670,17 +670,28 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 - **trade-level 預先分析（IWM-006 BB Squeeze baseline 16 trades 的 SMA20/SMA60 ratio 分布）**：Part A SLs 1.013-1.084 與 TPs 0.943-1.095 在 ratio 維度高度重疊（4 TPs ratio<1.00 為 post-bear transition winners + 4 TPs 1.04-1.10 為 mid-uptrend winners），lesson #22 BOX 結構性無效（pivot 至 MBPC 前已驗證），故未進入本實驗測試
 - **新跨資產發現**：IWM-012（BB Lower Hybrid，2026-04-25）已揭示「small-cap broad ETF 個股事件聚合 noise」結構不適用 statistical-adaptive entry；IWM-014 進一步揭示 trend-continuation entry 同樣失效。**IWM 適用框架為直接捕捉個股事件聚合 capitulation 的 RSI(2) oscillator 深度**（IWM-013 ★全域最優）
 
-**整合規則（MBPC 有效性邊界，2026-04-29 更新）**：
+**TSM-010（2026-04-30，repo 第 5 次 MBPC 試驗、首次半導體 cross-asset NVDA→TSM 移植 — 失敗）**：
+- Att1（NVDA-013 Att3 直接移植：k=1.00 + ATR ≤ 1.40 + recency 10d + pullback [-3%,-8%]）：Part A 19/47.4%/Sharpe **0.03** cum -0.06% / Part B 12/58.3%/Sharpe **0.23** cum +18.33% / min **0.03**——TSM Part A 8 SLs 散佈於多 regime（trade war / pre-COVID / 2021-02 / 2022-08/12 / 2023-03/07），SMA regime + ATR vol 雙 gate 對 TSM SLs 缺乏選擇性，因 SLs 多發生於 SMA20/SMA60 仍 > 1.00 的「短暫地緣政治震盪」期間
+- Att2（VOO-004 Att3 方向：recency 5d + pullback [-2%,-5%] 收緊）：Part A 13/46.2%/**-0.10** cum -11.10% / Part B 5/60%/**0.26** / min **-0.10**（三次最差）——收緊進場後 WR 幾乎不變（47.4%→46.2%）為**非選擇性過濾**，與 VOO 上 tight→loose 反向（VOO 0.12→1.12，TSM 0.00→-0.38）
+- Att3（恢復 NVDA-013 預設 + 2DD cap >= -2%，lesson #19 cap 方向）：Part A 14/50%/**0.08** cum +4.75% / Part B 12（不變）/ min **0.08**——2DD cap 過濾 5 訊號，cooldown chain shift 將 2020-09-17 SL 釋放為 2020-09-21 TP（正向 chain shift），但仍 7 SLs 殘留（2DD 維度淺）
+- **失敗機制**：TSM 為 multi-driver semi 個股（中國地緣政治 + 半導體景氣週期 + 客戶集中度）vs NVDA single-secular AI driver。lesson #22 SMA + ATR vol 雙 regime gate 設計用於分隔「真實牛市」vs「late-cycle/bear/chop」，但 TSM 的「短暫地緣政治震盪」往往發生於 regime 仍正常的期間，雙 gate 無法切除
+- **新跨資產發現（lesson #4 邊界擴展）**：進場敏感度方向取決於資產 regime 結構——VOO 單一 secular uptrend 中 tight 捕捉高品質訊號；TSM multi-regime 中 tight 反而捕捉「短暫 regime 突破假動量」訊號
+- **lesson #19 family 邊界擴展（2DD cap on MBPC）**：MR 框架（DIA-012/CIBR-012/USO-023）2DD cap 顯著有效；MBPC 框架選擇力受限，因 MBPC 進場本質為「shallow pullback」signal day 2DD 集中淺帶
+- **跨資產對照**：NVDA-013 ★ min 0.55 vs TSM-010 ✗ min 0.08，**半導體 cross-asset 移植 +47% 退化**——反映 NVDA single-secular driver vs TSM multi-driver 結構性差異
+
+**整合規則（MBPC 有效性邊界，2026-04-30 更新）**：
 - **有效先決條件**：資產處於**單一純上升 regime**或**主要為 broad-uptrend 的大型廣基 ETF**
     - 純趨勢期（NVDA 2024-2025 AI 主升段 Part B Sharpe 0.96）
     - **大型 broad-uptrend ETF**（VOO-004 Att3 Part A 0.85 WR + 1.12 Sharpe，repo 唯一成功）
+    - **single-secular-driver 高波動個股 + lesson #22 雙 regime gate**（NVDA-013 ★ AI secular driver 為唯一成功個股案例）
 - **結構性失敗條件**：
     - **政策/事件驅動 regime**（FXI 中國政策、URA 核能政策、TLT 利率政策）
     - **多 regime 混合 + 個股 bubble cycle**（NVDA bubble 2021 + bear 2022 + chop 2023 + bull 2024-25 純 MBPC）
-    - **small-cap broad ETF（個股事件聚合 + mixed regimes）**（IWM 2026-04-29 新增失敗數據點 — Russell 2000 含 2000+ 個股的 ETF 聚合層級雜訊）
+    - **small-cap broad ETF（個股事件聚合 + mixed regimes）**（IWM 2026-04-29 — Russell 2000 含 2000+ 個股的 ETF 聚合層級雜訊）
+    - **multi-driver 個股 + lesson #22 移植**（TSM 2026-04-30 — 中國地緣政治 + 半導體週期 + 客戶集中度，雙 regime gate 無法切除短暫 shock 期）
     - **low-vol 慢磨 regime**（推測，待驗證）
 
-**規則**：MBPC 在「純結構性上升趨勢大型廣基 ETF」（VOO/SPY/DIA 類）或「純牛市個股配 lesson #22 regime gate」（NVDA-013）有效。在多 regime、事件驅動、small-cap broad ETF 類失效。
+**規則**：MBPC 在「純結構性上升趨勢大型廣基 ETF」（VOO/SPY/DIA 類）或「single-secular-driver 牛市個股配 lesson #22 regime gate」（NVDA-013 為唯一成功個股案例）有效。在多 regime、事件驅動、small-cap broad ETF、multi-driver 個股類失效。**lesson #22 + MBPC 跨個股移植需檢查 driver 結構同質性**（NVDA AI single driver → TSM multi-driver 失敗為首例）。
 
 **進場精煉 vs regime 閘門選擇（VOO-004 + NVDA-009 + IWM-014 共同教訓）**：
 - **regime 閘門（SMA(200)）為非選擇性過濾**：在 VOO、NVDA 上都失敗
