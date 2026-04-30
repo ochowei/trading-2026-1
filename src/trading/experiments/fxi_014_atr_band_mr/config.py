@@ -18,8 +18,13 @@ FLOOR-only; "ATR > 1.40 marks in-crash acceleration phase" is the
 inverse failure.
 
 Att1: ATR ratio CEILING <= 1.40 (CIBR-014 cross-asset reference threshold)
-Att2: ATR ratio CEILING <= 1.30 (tighter, repo first sub-CIBR threshold)
-Att3: ATR ratio CEILING <= 1.35 (sensitivity boundary check)
+  → Part A 0.83 (+118% vs FXI-005), Part B 1.61 (unchanged), min 0.83
+Att2 ★: ATR ratio CEILING <= 1.35 (tightened — adds 2020-03-09 SL filter)
+  → Part A 1.01 (+166% vs FXI-005), Part B 1.61, min 1.01 (best)
+Att3: ATR ratio CEILING <= 1.30 (further tightened, ablation)
+  → Part A 0.93 (-8% vs Att2), Part B 1.61, min 0.93
+  → Confirms 1.30 over-tightens (filters 2020-05-22 ATR 1.30 + 2023-10-05
+     ATR 1.32 winners alongside zero additional SL benefit)
 """
 
 from dataclasses import dataclass
@@ -47,7 +52,7 @@ class FXI014Config(ExperimentConfig):
     atr_short_period: int = 5
     atr_long_period: int = 20
     atr_ratio_floor: float = 1.05
-    atr_ratio_ceiling: float = 1.40
+    atr_ratio_ceiling: float = 1.35
 
     # Cooldown (same as FXI-005)
     cooldown_days: int = 10
