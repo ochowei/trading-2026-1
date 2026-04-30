@@ -80,9 +80,12 @@ class CIBR014Config(ExperimentConfig):
 
     # ATR(5)/ATR(20) ratio CEILING（Att2 核心創新：filter in-crash 訊號）
     # 既有 atr_ratio_threshold = 1.15 為 FLOOR（panic 過濾）
-    # 新增 atr_ratio_ceiling = 1.40 為 CEILING（in-crash 過濾）
-    # 形成 ATR ratio BAND [1.15, 1.40]：panic 過後 settling，非 in-crash 加速
-    # 2021-02-26 SL 之 ATR ratio = 1.5065 將被精準過濾
+    # Att2 ★ 最終 = 1.40 為 CEILING；Att3 ablation 驗證 1.45 結果完全相同
+    # （所有 8 筆訊號 ATR ratio ∈ {1.16, 1.21, 1.22, 1.25, 1.25, 1.30, 1.31, 1.51}，
+    # 1.40-1.45 區間無訊號），採 1.40 提供更高 SL 安全邊際（vs outlier 1.51 緩衝
+    # 0.11 > 1.45 的 0.06，跟隨 DIA-012 「更緊閾值更高安全邊際」設計慣例）
+    # ATR ratio BAND (1.15, 1.40]：panic 過後 settling，非 in-crash 加速
+    # 2021-02-26 SL 之 ATR ratio = 1.5065 被精準過濾
     atr_ratio_ceiling: float = 1.40
 
     cooldown_days: int = 8
