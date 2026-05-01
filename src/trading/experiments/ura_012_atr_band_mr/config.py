@@ -38,12 +38,10 @@ class URA012Config(ExperimentConfig):
     # 2-day decline (same as URA-004)
     two_day_decline: float = -0.03
 
-    # ATR ratio BAND (Att2 — Part A/B mirror-image discovery)
-    # Trade-level analysis: Part A SLs cluster high ATR (CEILING helps),
-    # Part B SLs cluster low ATR (FLOOR helps) — BAND balances both.
+    # ATR ratio BAND (Att3 — tighten FLOOR to 1.05 to push Part A WR)
     atr_short_period: int = 5
     atr_long_period: int = 20
-    atr_ratio_floor: float = 1.00
+    atr_ratio_floor: float = 1.05
     atr_ratio_ceiling: float = 1.50
 
     # Cooldown (same as URA-004)

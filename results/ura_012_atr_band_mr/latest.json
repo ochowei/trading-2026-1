@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "execution_time": "2026-05-01T04:48:17.429421"
+    "execution_time": "2026-05-01T04:49:32.143816"
   },
   "part_a": {
     "ticker": "URA",
-    "total_signals": 17,
-    "wins": 12,
-    "win_rate": 0.7058823529411765,
-    "avg_return_pct": 2.44,
-    "std_return_pct": 5.22,
-    "cumulative_return_pct": 47.28,
-    "avg_holding_days": 6.2,
+    "total_signals": 15,
+    "wins": 10,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 1.97,
+    "std_return_pct": 5.38,
+    "cumulative_return_pct": 31.08,
+    "avg_holding_days": 6.4,
     "max_drawdown_pct": -9.62,
-    "profit_factor": 2.48,
-    "sharpe_ratio": 0.47,
-    "sortino_ratio": 0.81,
-    "calmar_ratio": 0.25,
+    "profit_factor": 2.06,
+    "sharpe_ratio": 0.37,
+    "sortino_ratio": 0.61,
+    "calmar_ratio": 0.2,
     "max_consecutive_losses": 3,
-    "target_exits": 11,
+    "target_exits": 9,
     "stop_loss_exits": 5,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
@@ -43,17 +43,6 @@
         "holding_days": 2,
         "exit_type": "target",
         "max_drawdown_pct": 2.32
-      },
-      {
-        "date": "2021-03-23",
-        "entry_date": "2021-03-24",
-        "exit_date": "2021-04-05",
-        "entry": 15.48,
-        "exit": 16.4,
-        "return_pct": 6.0,
-        "holding_days": 7,
-        "exit_type": "target",
-        "max_drawdown_pct": -5.14
       },
       {
         "date": "2021-05-13",
@@ -166,17 +155,6 @@
         "max_drawdown_pct": -7.49
       },
       {
-        "date": "2022-08-19",
-        "entry_date": "2022-08-22",
-        "exit_date": "2022-08-24",
-        "entry": 16.98,
-        "exit": 18.0,
-        "return_pct": 6.0,
-        "holding_days": 2,
-        "exit_type": "target",
-        "max_drawdown_pct": 0.72
-      },
-      {
         "date": "2022-12-06",
         "entry_date": "2022-12-07",
         "exit_date": "2023-01-06",
@@ -210,7 +188,7 @@
         "max_drawdown_pct": -2.7
       }
     ],
-    "filled_count": 17,
+    "filled_count": 15,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -229,20 +207,20 @@
   },
   "part_b": {
     "ticker": "URA",
-    "total_signals": 8,
-    "wins": 6,
-    "win_rate": 0.75,
-    "avg_return_pct": 3.1,
-    "std_return_pct": 5.02,
-    "cumulative_return_pct": 26.44,
-    "avg_holding_days": 4.9,
+    "total_signals": 7,
+    "wins": 5,
+    "win_rate": 0.7142857142857143,
+    "avg_return_pct": 2.69,
+    "std_return_pct": 5.24,
+    "cumulative_return_pct": 19.28,
+    "avg_holding_days": 5.3,
     "max_drawdown_pct": -8.4,
-    "profit_factor": 3.22,
-    "sharpe_ratio": 0.62,
-    "sortino_ratio": 1.11,
-    "calmar_ratio": 0.37,
+    "profit_factor": 2.68,
+    "sharpe_ratio": 0.51,
+    "sortino_ratio": 0.9,
+    "calmar_ratio": 0.32,
     "max_consecutive_losses": 1,
-    "target_exits": 6,
+    "target_exits": 5,
     "stop_loss_exits": 2,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
@@ -303,17 +281,6 @@
         "max_drawdown_pct": -1.19
       },
       {
-        "date": "2025-08-19",
-        "entry_date": "2025-08-20",
-        "exit_date": "2025-08-22",
-        "entry": 34.76,
-        "exit": 36.84,
-        "return_pct": 6.0,
-        "holding_days": 2,
-        "exit_type": "target",
-        "max_drawdown_pct": 0.67
-      },
-      {
         "date": "2025-10-21",
         "entry_date": "2025-10-22",
         "exit_date": "2025-10-24",
@@ -336,7 +303,7 @@
         "max_drawdown_pct": -2.6
       }
     ],
-    "filled_count": 8,
+    "filled_count": 7,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
