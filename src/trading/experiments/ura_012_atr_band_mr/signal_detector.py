@@ -68,10 +68,16 @@ class URA012SignalDetector(BaseSignalDetector):
         cond_upper = df["Pullback"] >= self.config.pullback_upper
         cond_rsi = df["RSI2"] < self.config.rsi_threshold
         cond_decline = df["TwoDayDecline"] <= self.config.two_day_decline
+        cond_vol_floor = df["ATR_Ratio"] >= self.config.atr_ratio_floor
         cond_vol_ceiling = df["ATR_Ratio"] <= self.config.atr_ratio_ceiling
 
         df["Signal"] = (
-            cond_pullback & cond_upper & cond_rsi & cond_decline & cond_vol_ceiling
+            cond_pullback
+            & cond_upper
+            & cond_rsi
+            & cond_decline
+            & cond_vol_floor
+            & cond_vol_ceiling
         )
 
         signal_indices = df.index[df["Signal"]].tolist()

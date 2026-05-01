@@ -36,7 +36,7 @@ class URA012Strategy(ExecutionModelStrategy):
             print(f"  RSI({config.rsi_period}) < {config.rsi_threshold}")
             print(f"  2-Day Decline: <= {config.two_day_decline:.0%}")
             print(
-                f"  ATR Ceiling: ATR({config.atr_short_period})"
+                f"  ATR Band: {config.atr_ratio_floor} <= ATR({config.atr_short_period})"
                 f"/ATR({config.atr_long_period})"
                 f" <= {config.atr_ratio_ceiling}"
             )
