@@ -69,8 +69,9 @@ class EEM015Config(ExperimentConfig):
     twoday_return_floor: float = -0.005  # 2DD <= -0.5%
 
     # 新增：3 日急跌 cap（INDA-011 Att3 方向，移植測試）
-    # Att1：-3.0%（直接移植 INDA-011 參數，~2.6σ for EEM 1.17% vol）
-    threeday_return_cap: float = -0.030
+    # Att1：-3.0%（直接移植 INDA-011）— FAILED Part A 2/0.00 / Part B 2/-0.02 過嚴
+    # Att2：-4.0%（vol-scaled 放寬，~3.4σ for EEM 1.17% vol）
+    threeday_return_cap: float = -0.040
 
     # 冷卻期（同 EEM-014）
     cooldown_days: int = 10
