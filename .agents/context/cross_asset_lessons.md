@@ -101,7 +101,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 **反例 4（signal-day secondary filter 疊加 regime-level gate 失敗）**：**TLT-010 驗證 2DD floor / 2DD cap / ATR expansion 三類 signal-day filter** 疊加於 TLT-007 Att2（BB-width regime gate）之上全部失敗（repo 首次 TLT 2DD/ATR 測試）。三次迭代 min(A,B) -0.11 / 0.02 / -0.18 均未勝過 TLT-007 Att2 的 0.12。Att1 2DD floor <=-1.5%（lesson #19 方向）：Part A 6/33.3% 並引入 cooldown-shift 新 SL、Part B 移除 3/6 winners；Att2 2DD cap >=-2.0%（CIBR-012 方向）：移除近零到期但同時移除深 2DD 贏家並引入 cooldown-shift 新 SL；Att3 ATR(5)/ATR(20) >=1.05：Part B 崩潰至 1 訊號。**核心發現**：當 regime-level classifier（BB-width gate）已一次性切除 single-extreme-vol regime（2022 升息期）後，剩餘訊號流中 winners/losers 在 2DD、ATR 維度皆分布重疊，signal-day secondary filter 結構性無選擇力。**新 cross-asset 規則**：**rate-driven 資產在已套用 regime-level gate 後，signal-day secondary filters 結構性失效**——此規則平行於 URA/FXI 政策驅動 ETF 的 oscillator-hook 失敗家族（lesson #20b），擴展 lesson #6 邊界至「regime-gate-after secondary filter」類別。TLT 改進方向應為更精細的 regime-level classifier（BB-width 60d percentile dynamic regime、或動態隨 ATR 分位調整），而非 signal-day filter。
 
-**反例 5（percentile-based dynamic regime gate 在 single-extreme-regime 資產上結構性失敗）**：**TLT-011 驗證 rolling percentile-based BB-width regime gate** 在 TLT 上全面失敗（**repo 首次 percentile-based BB-width regime gate 試驗於任何資產**）。三次迭代 min(A,B) -0.11 / 0.01 / 0.03 均未勝過 TLT-007 Att2 固定 5% 的 0.12。Att1（252d lookback + 50th pctile 純動態）Part A 24 訊號（vs TLT-007 Att2 12）/Sharpe -0.11 cum -7.76%——50th pctile 過寬，2022 升息期 trailing 252d 窗口被自身主導，中位數本身被拉高，「當日 <= 中位數」仍放行整片 2022 訊號流；Att2（504d lookback + 40th pctile 純動態）Part A 13 訊號/Sharpe 0.01——擴視窗 + 收緊閾值仍不足，504d 窗口 2022 仍佔 >50%；Att3（252d/40th + 絕對 BB<5% 雙閘門 AND）Part A 10 訊號/Sharpe 0.03——pctile 系統性移除 TLT-007 Att2 的 2 筆贏家（絕對 BB<5% 但相對近 252 日為高分位數的 calm regime 末期訊號），Part B 與 TLT-007 Att2 完全相同（6/83.3%/0.65/+9.07%）。**核心發現**：rolling percentile 在**單一持續 12+ 個月極端 vol regime**中**自我稀釋**——參考窗口被 regime 期間主導，percentile 失去 cross-regime 區分力；即使與絕對閾值組合，pctile 以「相對近期歷史」為基準錯誤標記 calm regime 末期好訊號為「相對高」而過濾之。**新 cross-asset 規則（精煉 lesson #6 + lesson #20b）**：**對於單一極端 vol regime episode 持續時間長於 percentile lookback 視窗 50% 的資產，rolling percentile-based regime gate 結構性失效**——固定絕對閾值為唯一有效解。與 FXI-013（多段中等 vol regime 下固定和動態皆失敗）互補，精煉 BB-width regime gate 三層適用邊界：(1) **單一極端且短於 lookback 50% 的 vol regime** → 動態 percentile 可行；(2) **單一極端且長於 lookback 50% 的 vol regime**（TLT 2022）→ 僅固定絕對閾值有效；(3) **多段中等 vol regime**（FXI）→ BB-width 所有型式皆失敗。TLT min 0.12 可能為其技術面策略結構性上限——除非引入 regime-prediction（非 classification）機制（forward-looking Fed 政策指標、30d-implied-vol 等 forward derived），否則現有框架內應停止「regime-classifier 精煉」方向。
+**反例 5（percentile-based dynamic regime gate 在 single-extreme-regime 資產上結構性失敗）**：**TLT-011 驗證 rolling percentile-based BB-width regime gate** 在 TLT 上全面失敗（**repo 首次 percentile-based BB-width regime gate 試驗於任何資產**）。三次迭代 min(A,B) -0.11 / 0.01 / 0.03 均未勝過 TLT-007 Att2 固定 5% 的 0.12。Att1（252d lookback + 50th pctile 純動態）Part A 24 訊號（vs TLT-007 Att2 12）/Sharpe -0.11 cum -7.76%——50th pctile 過寬，2022 升息期 trailing 252d 窗口被自身主導，中位數本身被拉高，「當日 <= 中位數」仍放行整片 2022 訊號流；Att2（504d lookback + 40th pctile 純動態）Part A 13 訊號/Sharpe 0.01——擴視窗 + 收緊閾值仍不足，504d 窗口 2022 仍佔 >50%；Att3（252d/40th + 絕對 BB<5% 雙閘門 AND）Part A 10 訊號/Sharpe 0.03——pctile 系統性移除 TLT-007 Att2 的 2 筆贏家（絕對 BB<5% 但相對近 252 日為高分位數的 calm regime 末期訊號），Part B 與 TLT-007 Att2 完全相同（6/83.3%/0.65/+9.07%）。**核心發現**：rolling percentile 在**單一持續 12+ 個月極端 vol regime**中**自我稀釋**——參考窗口被 regime 期間主導，percentile 失去 cross-regime 區分力；即使與絕對閾值組合，pctile 以「相對近期歷史」為基準錯誤標記 calm regime 末期好訊號為「相對高」而過濾之。**新 cross-asset 規則（精煉 lesson #6 + lesson #20b）**：**對於單一極端 vol regime episode 持續時間長於 percentile lookback 視窗 50% 的資產，rolling percentile-based regime gate 結構性失效**——固定絕對閾值為唯一有效解。與 FXI-013（多段中等 vol regime 下固定和動態皆失敗）互補，精煉 BB-width regime gate 三層適用邊界：(1) **單一極端且短於 lookback 50% 的 vol regime** → 動態 percentile 可行；(2) **單一極端且長於 lookback 50% 的 vol regime**（TLT 2022）→ 僅固定絕對閾值有效；(3) **多段中等 vol regime**（FXI）→ BB-width 所有型式皆失敗。TLT min 0.12 為**技術面 regime-classifier 精煉**結構性上限——已由 **TLT-013 Att1（^MOVE forward-looking implied vol regime gate）2026-05-01 突破至 0.14（+17%），驗證 lesson #24 forward-looking implied volatility derivative 為 backward-looking 飽和後的下一維度**。Regime-classifier 精煉方向（TLT-010/011/012 已飽和）應停止；forward-looking implied vol（^MOVE）方向已開啟。
 
 **反例 7（ADX/DMI 作為 MR 主規範閘門在多 regime 高波動個股上結構性失敗）**：**NVDA-010 驗證 ADX(14)+RSI(2) MR 框架** 在 NVDA 3.26% vol 多 regime 個股上失敗（**repo 首次將 ADX/DMI 作為主規範閘門試驗於任何資產**）。三次迭代 min(A,B) 0.00 / 0.00 / -0.27 均未勝過 NVDA-004 / NVDA-006 的 0.47。Att1（ADX>=25 + +DI>-DI + RSI(2)<=15 + Pullback[-3%,-10%] + cd10）Part A 3/66.7%/0.26 / Part B 1/0%/0.00 zero-var SL —— **ADX>=25 強趨勢與 RSI(2)<=15 deep oversold 罕見共存**：RSI(2)<=15 需持續下挫，但持續下挫使 +DI<<-DI 必然違反方向過濾，多重綁定交集結構性狹窄（0.6 訊號/yr）；Att2（放寬 ADX>=20 + RSI(2)<=20 + PB[-2%,-12%] + cd8）Part A 8/62.5%/0.22 / Part B **1**/0%/0.00 —— Part B 仍卡 1 訊號：NVDA 2024-2025 深度修正（2024-08 -17%、2025-04 tariff -25%）違反 -12% pullback 上限、Close>SMA(50) 規範閘門、或 +DI>-DI（DMI 快速崩盤翻轉），**結構不匹配 Part B 的 deep-capitulation 機會**；Att3（移除 +DI>-DI + RSI(3)<=25 + PB to -15%）Part A 8/**37.5%**/-0.27（4 連續 SL！）/ Part B 2/0%/0.00 / min -0.27 —— **cooldown chain shift（lesson #19）**：移除 +DI>-DI 釋放原本被壓制的 4 訊號（2020-02-24 pre-COVID drop / 2021-02-23 Feb 修正 / 2021-12-06 post-COVID 反彈 / 2022-12-20 bear 反彈）全部 SL，+DI>-DI 提供真實品質過濾，naively 移除使框架退化（WR 62.5%→37.5%）。**核心發現**：(1) ADX>=25 與 RSI(2)<=15 罕見共存（RSI 下挫使 DMI 翻轉）；(2) ADX>=20 weak-trend 過於包容（納入震盪 2023 summer 使 MR 訊號隨機化）；(3) +DI>-DI 與 Close>SMA(50) 大部分時間冗餘但移除觸發 cooldown-shift；(4) ADX+RSI+SMA+Pullback+Close>Open+Cooldown 高約束相關性，放寬一條件不會比例增長訊號。**新 cross-asset 規則**：**ADX/DMI 作為主規範閘門對多 regime 高波動（>3% vol）個股的短期 MR 結構性無效**——擴展 lesson #20b 失敗家族至 trend-strength oscillator 類別，加入 RSI/CCI/Stoch/MACD hook divergence 作為多 regime 高波動個股的無效進場主過濾器。NVDA 結構性 Sharpe 上限約 0.5，2019-2023 多 regime（COVID + late-bull + bear + chop）變異使單一參數集難以同時優化 Part A/B；NVDA-004（BB Squeeze）/ NVDA-006（RS）維持全域最優（10 次實驗、31+ 次嘗試）。
 
@@ -907,5 +907,53 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 2. **第二步**：若是，計算資產 BB-width 全期 75-80th percentile 為閾值起點，迭代調整
 3. **第三步**：分析 Part A SLs 在 prior drawdown depth 維度上的分布。若有「first-day-of-decline」型 SLs（DD_5d_ago > -1%），疊加 prior DD filter
 4. **第四步**：驗證 Part B 訊號未被過度過濾（保留 ≥ 80% baseline 訊號）
+
+---
+
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01）
+<!-- freshness:
+  derived_from: [TLT-013]
+  validated: 2026-05-01
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+當資產的 backward-looking BB-width regime gate（lesson #6 規則 #5 + #23）已達結構性 ceiling，**forward-looking implied volatility derivatives**（option-implied vol indices）為下一個有效維度。
+
+**核心原理**：
+- BB-width 為 backward-looking realized volatility classifier（已成形數據）
+- ^MOVE / ^VIX / ^OVX / ^GVZ 為 forward-looking implied volatility predictor（option price 反映市場對未來波動的預期）
+- 兩者**正交資訊維度**——當 backward-looking 已達飽和，forward-looking 可進一步區分訊號品質
+
+**TLT-013 驗證（repo 首次任何資產，2026-05-01）**：
+- TLT-007 Att2 BB-width regime gate（固定 5% 閾值）為 lesson #6 規則 #5 + #23 的 TLT 最佳，但 min(A,B) 0.12 為**結構性上限**（TLT-010/011/012 三次 regime classifier 精煉皆失敗）
+- TLT-013 Att1（TLT-007 Att2 base + ^MOVE Close <= 130）達成 min(A,B) **0.14**（+17%），**首次突破 TLT 0.12 ceiling**
+- ^MOVE 130 過濾僅作用於 2023-05-16 SL（MOVE 130.3，SVB 高峰期），保留 2022-02-07 winner（MOVE 87.4）與 2024-2025 全部 winners（MOVE 86-103）
+- **驗證 cross_asset_lessons.md 對 TLT 的明確指引**：「除非引入 regime-prediction（forward-looking Fed 政策指標、30d-implied vol），否則應停止 regime-classifier 精煉」
+
+**失敗子變體（不要重複嘗試）**：
+- **MOVE 60d SMA 平滑 regime 過濾**（TLT-013 Att2）：在 Part B 2024-04-08 (MOVE 99.4) 與 2024-11-15 (MOVE 102.5) 之間無選擇力，過濾 SL 同時誤殺 TP，A/B 訊號比惡化至 64% 違反 < 50% 平衡
+- **TQQQ-018 prior-DD filter cross-asset port**（TLT-013 Att3）：TLT Part A SLs 為 multi-day decline 而非 first-day-of-decline 結構，方向錯誤——濾掉 winners 但保留所有 SLs，Sharpe 0.14→0.02 嚴重退化
+
+**規則**：
+1. **僅當 backward-looking regime gate 已飽和時使用**：先確認 BB-width / ATR / pullback 等 backward-looking gate 已達結構性 ceiling（多次 regime classifier 精煉失敗）
+2. **資產與 implied vol index 對應關係**：
+   - Bond ETFs (TLT, IEF, IEI, etc.) → ^MOVE
+   - Stock ETFs (SPY, QQQ, IWM, etc.) → ^VIX
+   - Oil-related (USO, XLE, etc.) → ^OVX
+   - Gold-related (GLD, SIVR, GDX, etc.) → ^GVZ
+3. **閾值校準步驟**：(a) 計算資產 winners 在 implied vol index 的最大值；(b) 計算 known-SL 訊號日的 implied vol index 值；(c) 閾值設於 max(winners_iv) 與 min(SLs_iv) 之間
+4. **不疊加平滑 / 方向變體**：MOVE 60d SMA、5d 變化方向、percentile rank 等變體在 TLT 上皆失敗，level filter 為唯一驗證方向
+5. **不疊加其他 cross-asset filter port**：TQQQ-018 prior-DD filter 對 TLT 反向，cross-asset filter 移植需先驗證資產 SL 結構
+
+**跨資產假設（待驗證）**：
+- ^VIX <= X 對 SPY/QQQ/IWM/TQQQ MR 訊號的影響（TQQQ-004 已驗證 VIX>=25 過濾過嚴失敗，但相反方向 VIX<=X 過濾未測）
+- ^OVX 對 USO/XLE MR 過濾（USO 已飽和於 0.26，^OVX 可能突破）
+- ^GVZ 對 GLD/SIVR/GDX MR 過濾（GLD 已飽和於 0.49，^GVZ 可能突破）
+
+**Lesson #6 邊界精煉**：
+- ✅ **適用**：backward-looking realized vol gate 已飽和的高政策驅動資產（TLT 已驗證）
+- 🔄 **待驗證**：其他 implied vol indices 對其底層 underlying（VIX/OVX/GVZ）
+- ❌ **不適用**：沒有對應 implied vol index 的資產（無 option market 或 option market 流動性不足）
 
 ---
