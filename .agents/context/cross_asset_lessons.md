@@ -647,10 +647,10 @@ EEM TPs 2DD 集中 -1.47% ~ -3.88%（真急跌後反彈），故深 2DD = 真 ca
 
 ---
 
-## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產（VOO-004 確認 broad-uptrend ETF 可成功，**IWM-014 small-cap broad ETF 失敗確認 2026-04-29，TSM-010 半導體個股 cross-asset NVDA→TSM 失敗確認 2026-04-30**）
+## 21. Momentum Breakout Pullback Continuation（MBPC）需要單一純上升 regime 資產（VOO-004 確認 broad-uptrend ETF 可成功，**IWM-014 small-cap broad ETF 失敗確認 2026-04-29，TSM-010 半導體個股 cross-asset NVDA→TSM 失敗確認 2026-04-30，CIBR-015 sector ETF 失敗確認 2026-05-01**）
 <!-- freshness:
-  derived_from: [FXI-012,NVDA-009,VOO-004,IWM-014,TSM-010]
-  validated: 2026-04-30
+  derived_from: [FXI-012,NVDA-009,VOO-004,IWM-014,TSM-010,CIBR-015]
+  validated: 2026-05-01
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -695,7 +695,17 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
 - **lesson #19 family 邊界擴展（2DD cap on MBPC）**：MR 框架（DIA-012/CIBR-012/USO-023）2DD cap 顯著有效；MBPC 框架選擇力受限，因 MBPC 進場本質為「shallow pullback」signal day 2DD 集中淺帶
 - **跨資產對照**：NVDA-013 ★ min 0.55 vs TSM-010 ✗ min 0.08，**半導體 cross-asset 移植 +47% 退化**——反映 NVDA single-secular driver vs TSM multi-driver 結構性差異
 
-**整合規則（MBPC 有效性邊界，2026-04-30 更新）**：
+**CIBR-015（2026-05-01，repo 第 6 次 MBPC 試驗、首次 sector ETF 試驗 — 失敗）**：
+- Att1（VOO-004 Att3 vol-scaled 直接移植，CIBR 1.53% / VOO 1.0% = 1.53x：breakout_recency=5, pullback [-3%,-4.5%], RSI [40,60], TP+4%/SL-3.5%/20d/cd10）：Part A 10/50.0%/Sharpe **0.05** cum +1.29%（5 SL 集中於 macro/regime-shift 日：2020-01-28 COVID precursor、2021-02 科技股輪動、2022-03/04 升息熊市、2023-08 Fitch 美債降評）/ Part B 3/33.3%/Sharpe **-0.02** cum -0.35%（1.5/yr 訊號稀缺）/ min **-0.02**（遠低於 CIBR-014 Att2† 的 4.08）
+- Att2（buffered SMA(20) >= 0.99 × SMA(60) regime gate，lesson #22 cross-strategy 移植 NVDA-013 路徑）：Part A 9/55.6%/Sharpe **0.16**（+220% vs Att1，過濾 2022-03-09 SL）cum +5.07% / Part B 3 訊號**完全非綁定**（Part B 3 訊號 SMA20/60 ratio 皆已 >= 0.99）Sharpe -0.02 / min **-0.02**
+- Att3（Regime BOX [k_min=1.00, k_max=1.09]，COPX-011 路徑）：Part A 8/50.0%/Sharpe **0.05**（k_min=1.00 嚴格反而過濾 2021-01-27 winner，移除贏家而非輸家）cum +1.03% / Part B 3 訊號不變（k_max=1.09 對 2025-07-14 SL 非綁定，ratio 已在 BOX 內）/ min **-0.02**
+- **失敗機制（與 IWM/FXI/NVDA 不同）**：CIBR 為 sector-concentrated ETF（網路安全），sector 集中度使 macro shock + sector-rotation 直接打擊單一 sector，false breakout 率高於 broad ETF。Part A 5 SLs 集中於 macro/regime-shift 日，與 NVDA-009 Att1 相同模式但訊號密度更低（2.0/yr vs NVDA 6.8/yr）
+- **lesson #22 cross-strategy 移植在 sector ETF MBPC 上失效**：NVDA-013 個股成功（macro + sector 雙重 regime 風險可被 SMA 抓到）/ CIBR-015 sector ETF 失敗（sector-specific microstructure 不在 SMA ratio 維度），新增 cross-strategy 適用邊界
+- **lesson #22 v2 regime BOX（COPX-011）在 sector ETF MBPC 上不重現**：COPX 商品/礦業 ETF winners/losers 在 SMA ratio 維度的分佈結構與 CIBR sector ETF 不同；driver 類別差異使 BOX 結構非通用
+- **Part B 訊號稀缺結構性問題**：3 次迭代均維持 3 訊號（1.5/yr），無法經由放寬 entry 改善（放寬將反向引入更多 Part A SLs）
+- **跨資產對照**：VOO-004 ★ min 1.12 (broad-uptrend ETF) vs CIBR-015 ✗ min -0.02 (sector ETF)，**broad ETF → sector ETF 移植完全失敗**——確認 lesson #21 邊界 sector ETF 不支持 MBPC
+
+**整合規則（MBPC 有效性邊界，2026-05-01 更新）**：
 - **有效先決條件**：資產處於**單一純上升 regime**或**主要為 broad-uptrend 的大型廣基 ETF**
     - 純趨勢期（NVDA 2024-2025 AI 主升段 Part B Sharpe 0.96）
     - **大型 broad-uptrend ETF**（VOO-004 Att3 Part A 0.85 WR + 1.12 Sharpe，repo 唯一成功）
@@ -705,17 +715,20 @@ Momentum Breakout Pullback Continuation（MBPC，Donchian 新高 freshness + 淺
     - **多 regime 混合 + 個股 bubble cycle**（NVDA bubble 2021 + bear 2022 + chop 2023 + bull 2024-25 純 MBPC）
     - **small-cap broad ETF（個股事件聚合 + mixed regimes）**（IWM 2026-04-29 — Russell 2000 含 2000+ 個股的 ETF 聚合層級雜訊）
     - **multi-driver 個股 + lesson #22 移植**（TSM 2026-04-30 — 中國地緣政治 + 半導體週期 + 客戶集中度，雙 regime gate 無法切除短暫 shock 期）
+    - **sector ETF（板塊集中 + macro/sector-rotation shock）**（CIBR 2026-05-01 — 網路安全板塊集中度使 macro shock 直接打擊單一 sector，false breakout 率高於 broad ETF；buffered SMA regime gate 對 Part B 完全非綁定；regime BOX 結構在 sector ETF 不重現）
     - **low-vol 慢磨 regime**（推測，待驗證）
 
-**規則**：MBPC 在「純結構性上升趨勢大型廣基 ETF」（VOO/SPY/DIA 類）或「single-secular-driver 牛市個股配 lesson #22 regime gate」（NVDA-013 為唯一成功個股案例）有效。在多 regime、事件驅動、small-cap broad ETF、multi-driver 個股類失效。**lesson #22 + MBPC 跨個股移植需檢查 driver 結構同質性**（NVDA AI single driver → TSM multi-driver 失敗為首例）。
+**規則**：MBPC 在「純結構性上升趨勢大型廣基 ETF」（VOO/SPY/DIA 類）或「single-secular-driver 牛市個股配 lesson #22 regime gate」（NVDA-013 為唯一成功個股案例）有效。在多 regime、事件驅動、small-cap broad ETF、multi-driver 個股、sector ETF 類失效。**lesson #22 + MBPC 跨個股移植需檢查 driver 結構同質性**（NVDA AI single driver → TSM multi-driver 失敗）；**lesson #22 cross-strategy 移植在 sector ETF MBPC 上失效**（NVDA-013 個股成功 / CIBR-015 sector ETF 失敗）。
 
-**進場精煉 vs regime 閘門選擇（VOO-004 + NVDA-009 + IWM-014 共同教訓）**：
+**進場精煉 vs regime 閘門選擇（VOO-004 + NVDA-009 + IWM-014 + CIBR-015 共同教訓）**：
 - **regime 閘門（SMA(200)）為非選擇性過濾**：在 VOO、NVDA 上都失敗
 - **進場層精煉（breakout_recency + 窄帶 pullback）為勝出方向**：VOO-004 Att3 證明
-- **波動度縮放對 entry 參數有效性下降（IWM-014 新發現）**：VOO 1.0% → IWM 1.5% 1.5x scaling 後 tight 參數訊號密度過低（0.6/yr），loose 參數品質崩壞（30% WR），cross-vol 移植 entry 參數不可靠
-- **規則**：MBPC 框架下優先收緊 breakout 新鮮度與 pullback 範圍，但需確認資產符合「有效先決條件」；在 small-cap broad ETF 上參數調整無法救回結構性失敗
+- **波動度縮放對 entry 參數有效性下降（IWM-014 / CIBR-015 確認）**：VOO 1.0% → IWM 1.5%、CIBR 1.53% 1.5x scaling 後 tight 參數訊號密度過低（IWM 0.6/yr，CIBR 2.0/yr）或品質崩壞（IWM-014 Att2 30% WR），cross-vol 移植 entry 參數不可靠
+- **lesson #22 buffered SMA regime gate 在 MBPC 框架下的適用範圍（CIBR-015 新發現）**：個股（NVDA-013）成功 / sector ETF（CIBR-015）失敗——sector-specific microstructure 不在 SMA ratio 維度，buffered SMA gate 對 Part B 完全非綁定
+- **lesson #22 v2 regime BOX 適用條件（CIBR-015 新發現）**：商品/礦業 ETF（COPX-011）成功 / sector ETF（CIBR-015）失敗——driver 類別差異使 BOX 結構非通用
+- **規則**：MBPC 框架下優先收緊 breakout 新鮮度與 pullback 範圍，但需確認資產符合「有效先決條件」；在 small-cap broad ETF / sector ETF 上參數調整與 regime gate 皆無法救回結構性失敗
 
-**跨資產假設（待續驗證）**：MBPC 可能在 SPY、DIA（同大型 broad-uptrend ETF 類別）中有效，VOO-004 已建立先例。在**週期性 / 事件驅動 / 多 regime 資產**（FXI、URA、TLT、INDA、EEM、NVDA、FCX）以及**small-cap broad ETF（IWM）**中已被驗證結構性劣化。
+**跨資產假設（待續驗證）**：MBPC 可能在 SPY、DIA（同大型 broad-uptrend ETF 類別）中有效，VOO-004 已建立先例。在**週期性 / 事件驅動 / 多 regime 資產**（FXI、URA、TLT、INDA、EEM、NVDA、FCX）、**small-cap broad ETF（IWM）**以及**sector ETF（CIBR）**中已被驗證結構性劣化。
 
 ---
 
