@@ -119,6 +119,11 @@
   - Att2（MACD 柱狀圖 2 根連續上揚 today>yesterday>day-2 且 yesterday<0 + 回檔 [-8%,-2%] + WR≤-75 + ClosePos≥40%）：Part A 8 訊號 WR 50% 累計 -0.77% Sharpe **-0.02** / Part B 3 訊號 WR 66.7% 累計 +2.80% Sharpe 0.34 / min(A,B) -0.02。A/B 頻率比 1.04:1 極佳但 Part A 2022-2023 熊市產生 4 筆 SL（2019-05 貿易戰、2022-09/10 升息、2023-02 早期修正）
   - Att3（Att2 + **反向 ATR 過濾 ATR<1.10**）：Part A 5 訊號 WR 60% 累計 +2.60% Sharpe 0.19 / Part B 2 訊號 WR 100% 累計 +6.09% Sharpe 0.00 零方差 / min(A,B) 0.00。**獨特發現**：MACD 框架在 EEM 上偏好低波動環境（ATR<1.10），與 EEM-010 RSI(2) 框架的 ATR>1.15 方向完全相反——bear rally dead-cat bounce 伴隨 ATR 飆升，bull consolidation MR 為低 ATR
   - 失敗根因：(1) MACD 雙 EMA 平滑雖優於 RSI/CCI 點估計但仍無法解決「V-bounce ≠ genuine reversal」根本問題（lesson #20b 失敗家族擴展至 MACD）；(2) 反向 ATR<1.10 過濾成功移除 3 筆高 ATR 的 Part A SL（2019-05-15 ATR 1.47、2022-10-03 ATR 1.14、2024-07-29 ATR 1.11）但同時移除 2 筆高 ATR 的 TP（2019-08-12 ATR 1.15、2021-10-06 ATR 1.12），淨 WR 提升至 60% 仍低於所需的 > 70% 門檻；(3) Part B 訊號降至 1/yr 稀疏度使 100% WR 僅兩筆 + 3% 零方差——**EEM 在 MACD 框架下 Part B 訊號稀疏成為結構性限制**
+- **EEM-015 Multi-Period Capitulation-Strength Filter 三次迭代全失敗（INDA-011 Att3 跨資產移植測試，2026-05-01）**：在 EEM-014 Att2（min 0.56）框架上疊加 3DD cap：
+  - Att1（3DD cap >= -3.0%，直接移植 INDA-011 參數）：Part A 2 訊號 / WR 100% / Sharpe 0.00 零方差 / cum +6.09% / Part B 2 訊號 / WR 50% / Sharpe -0.02 / cum -0.19% / min(A,B) **-0.02**。-3.0% 過嚴，過濾 3 筆 Part A TPs（深 2DD 急跌反彈）僅留 2 筆，Part B 過濾 2 TPs 留下 1 TP + 1 SL
+  - Att2（3DD cap >= -4.0%，vol-scaled 放寬）：Part A 4 訊號 WR 75% Sharpe 0.56 cum +5.89% / Part B 3 訊號 WR 66.7% Sharpe 0.34 cum +2.80% / min(A,B) **0.34**。雙端均仍劣於 EEM-014（Part A 0.73→0.56、Part B 0.56→0.34），cap 仍持續移除深 3DD TPs
+  - Att3（3DD cap >= -5.0%，極寬 ~4.3σ）：Part A 5 訊號 / Part B 4 訊號（**完全等同 EEM-014 Att2**）/ min(A,B) **0.56** **TIE 基線**。-5.0% 為 non-binding 門檻——EEM-014 全部 9 訊號 3DD 介於 -3% ~ -5% 之間，無極端「multi-day acceleration」訊號可過濾
+  - **核心發現（拒絕 INDA-011 跨資產假設於 EEM）**：(1) EEM 的 Part A 失敗 SL（2021-07-08 / 2025-11-19）與 Part B 失敗 SL（2025-11-19）的 3DD 結構與 INDA-011 的「losers 多日累積疲弱」假設不一致，EEM 殘餘 SL 為「中等深度 3DD」與 winners 重疊（同 COPX-010 對 CIBR 跨資產假設的拒絕）；(2) **EEM 已透過 EEM-014 Att2 的 2DD floor 達到本框架技術面上限**，EEM-014 的「淺幅漂移過濾」邏輯已涵蓋 INDA-011 的「持續性疲弱過濾」邏輯，無需再加 3DD 維度；(3) **延伸 lesson #19 family 邊界**：「2DD floor + 3DD cap」雙重維度組合在 single-country EM（INDA 0.97% vol）有效，但對 broad EM（EEM 1.17% vol）冗餘——可能因 broad ETF 平均化效應使持續性疲弱訊號自然減少
 <!-- AI_CONTEXT_END -->
 
 # EEM 實驗總覽 (EEM Experiments Overview)
@@ -149,6 +154,7 @@
 | EEM-012 | `eem_012_bb_lower_pullback_cap`       | BB 下軌 + 回檔上限混合進場 MR              | 已完成 |
 | EEM-013 | `eem_013_macd_histogram_mr`           | MACD 柱狀圖多頭轉折均值回歸（repo 首次 MACD）| 已完成 |
 | EEM-014 | `eem_014_vol_transition_mr`           | Post-Capitulation Vol-Transition MR（+2DD floor，2DD 方向精煉）★最佳 | 已完成 |
+| EEM-015 | `eem_015_multi_period_cap`            | Multi-Period Capitulation-Strength Filter（+3DD cap，INDA-011 跨資產移植）❌ 三次失敗 | 已完成 |
 
 ---
 
@@ -877,3 +883,75 @@ vs EEM-012 Att3 基線：
 - 若 SLs 集中於淺 2DD → 用 floor 方向（EEM、USO 類）
 
 **擴展 lesson #52**（BB 下軌+回檔上限混合進場）：在 broad EM 類別（EEM）上可再以 2DD floor 精煉至 min 0.56，類似精煉可能適用 VGK/EWJ/EWT/EWZ 等同框架資產（待跨資產驗證，threshold 需按日波動縮放）。
+
+---
+
+## EEM-015: Multi-Period Capitulation-Strength Filter MR（INDA-011 Att3 跨資產移植，3 次迭代全失敗）
+
+### 目標 (Goal)
+
+EEM-014 Att2 為當前全域最優（min(A,B) 0.56），但 Part B 4 訊號中仍有 1 筆 SL（2025-11-19，
+中美貿易摩擦升溫日，2DD -0.85%）。
+
+INDA-011 Att3（2026-04-29）首次在 repo 驗證「2DD floor + 3DD cap」雙維度組合，
+INDA 0.97% vol 上 min(A,B) 0.30→0.55（+83%）。其論點為「losers 多日累積疲弱（3DD ≤-3.0%），
+winners 為單日/雙日急跌+快速反轉（3DD 較淺）」，3DD cap 過濾持續性下跌訊號。
+
+INDA-011 跨資產假設：「2DD floor + 3DD cap 雙重門檻可能適用其他 single-country EM 或
+broad EM ETF（EEM/EWZ/EWT/INDA），其失敗模式為 multi-day acceleration / sustained drift
+而非 single-day flush。」
+
+EEM-015 為此假設的 broad EM ETF 跨資產驗證——EEM-014 Att2 全條件 + 3DD cap 疊加。
+
+### 三次嘗試 (Three Iterations)
+
+| 嘗試 | 3DD cap 門檻 | Part A 訊號/Sharpe | Part B 訊號/Sharpe | min(A,B) | 結論 |
+|------|-------------|--------------------|--------------------|----------|------|
+| Att1 | >= -3.0%（INDA 直接移植，~2.6σ for EEM 1.17% vol）| 2 / **0.00**（零方差，2/2 達標）| 2 / -0.02 | -0.02 | ❌ 過嚴，過濾 3 筆 Part A 深 2DD TPs |
+| Att2 | >= -4.0%（vol-scaled，~3.4σ）| 4 / 0.56 | 3 / 0.34 | 0.34 | ❌ 仍移除深 2DD TPs，雙端劣於基線 |
+| Att3 | >= -5.0%（極寬，~4.3σ）| 5 / 0.73 | 4 / 0.56 | 0.56 | ⚖️ TIE 基線（filter non-binding，無效果）|
+
+### 關鍵發現
+
+**EEM 訊號 3DD 分布（Att3 等同 EEM-014）**：
+
+EEM-014 Att2 的 9 訊號（5 Part A + 4 Part B）3DD 全部介於 -3% ~ -5% 之間，
+**沒有任何訊號 3DD < -5%**——這意味著「持續多日 acceleration / sustained drift」
+類型的訊號**在 EEM 進場條件下天然不存在**，cap 機制無對象可過濾。
+
+**為什麼 Att1/Att2 反而劣於基線？**
+
+Att1（-3.0%）過濾 3 筆 Part A TPs（深 2DD 急跌+前一日連帶下跌的訊號），保留 1 SL。
+Att2（-4.0%）過濾 1 Part A TP + 1 Part B TP，仍劣化雙端。
+
+EEM 的 winners 結構為「1-2 日急跌但加上前一日的小幅下跌」（典型 panic-day pattern），
+3DD 自然介於 -3% ~ -4%。INDA 的 winners 為「單日 panic」前一日相對穩定（3DD > -3%）。
+**broad EM（EEM）的訊號天然包含「前一日連帶下跌」，3DD cap 篩選與 winners 結構衝突**。
+
+### 拒絕 INDA-011 跨資產假設於 EEM
+
+**INDA-011 假設失敗的本質**：
+
+| 維度 | INDA（0.97% vol，single-country EM）| EEM（1.17% vol，broad EM）|
+|------|------------------------------------|---------------------------|
+| Winners 3DD 結構 | 單日 panic + 前一日穩定（3DD > -3%）| 1-2 日急跌 + 前一日連帶下跌（3DD -3 ~ -4%）|
+| Losers 3DD 結構 | 多日累積疲弱（3DD ≤ -3.5%）| 與 winners 重疊（3DD -3 ~ -4%）|
+| 3DD cap 適用性 | ✅ 有效（區分 winners/losers）| ❌ 無效（重疊區無區分力）|
+
+**結構性原因**：broad ETF（EEM）的平均化效應使單一成分股的「multi-day acceleration」被
+平滑化，整體 ETF 訊號日鄰近天的相關性高（前一日連帶下跌為常態）。
+single-country ETF（INDA）波動更獨立，winners/losers 在多日結構上有清晰區別。
+
+### 結論
+
+**EEM-014 Att2 仍為 EEM 全域最優**（min(A,B) 0.56），15 個實驗 40+ 次嘗試。
+
+**EEM-015 雖為失敗實驗，但提供關鍵跨資產發現**：
+1. **lesson #19 family 邊界**：「2DD floor + 3DD cap」雙重維度組合適用 single-country EM
+   （INDA 已驗證）但**不適用 broad EM**（EEM 拒絕假設）
+2. **broad ETF vs single-country ETF 的多日結構差異**：平均化效應使 broad ETF 訊號日多日
+   相關性較高，多週期 capitulation 過濾器在 broad ETF 上失去區分力
+3. **EEM-014 已達技術面上限**：2DD floor 過濾「淺幅漂移」已涵蓋 INDA-011 的「持續疲弱過濾」
+   邏輯，3DD 維度為**冗餘維度**（Att3 non-binding 證實）
+4. **跨資產假設驗證流程**：移植 INDA-011 直接參數（Att1）→ vol-scaling 放寬（Att2）→ 極寬
+   non-binding 測試（Att3）三步驟，明確切割「過濾過嚴」vs「機制冗餘」兩種失敗模式

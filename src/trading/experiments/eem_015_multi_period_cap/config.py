@@ -70,8 +70,10 @@ class EEM015Config(ExperimentConfig):
 
     # 新增：3 日急跌 cap（INDA-011 Att3 方向，移植測試）
     # Att1：-3.0%（直接移植 INDA-011）— FAILED Part A 2/0.00 / Part B 2/-0.02 過嚴
-    # Att2：-4.0%（vol-scaled 放寬，~3.4σ for EEM 1.17% vol）
-    threeday_return_cap: float = -0.040
+    # Att2：-4.0%（vol-scaled 放寬）— FAILED Part A 0.56 / Part B 0.34 仍移除 TPs
+    # Att3：-5.0%（極寬 ~4.3σ）— TIE 基線 non-binding，filter 無對象可過濾
+    # 最終配置採用 Att3，三次迭代均未勝過 EEM-014 Att2（min 0.56）
+    threeday_return_cap: float = -0.050
 
     # 冷卻期（同 EEM-014）
     cooldown_days: int = 10
