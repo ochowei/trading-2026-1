@@ -1,14 +1,18 @@
 """
-URA-012 signal detector: Volatility-Acceleration-Bounded MR (ATR CEILING)
+URA-012 signal detector: Volatility-Acceleration-Bounded MR (ATR BAND)
 
 Entry conditions (all must be met):
 1. 10-day high pullback >= 10% (depth, same as URA-004)
 2. 10-day high pullback <= 20% (crash isolation, same as URA-004)
 3. RSI(2) < 15 (short-period oversold, same as URA-004)
 4. 2-day decline <= -3% (panic confirmation, same as URA-004)
-5. ATR(5)/ATR(20) <= 1.30 (CEILING — exclude in-crash acceleration phase,
-                           cross-asset port from FXI-014/CIBR-014)
-6. Cooldown 10 trading days
+5. ATR(5)/ATR(20) >= 1.00 (FLOOR — exclude calm-grind low-vol regime
+                           that produces Part B losers; mirror image of
+                           Part A SL distribution)
+6. ATR(5)/ATR(20) <= 1.50 (CEILING — exclude in-crash acceleration phase
+                           that produces Part A losers; cross-asset port
+                           from FXI-014/CIBR-014)
+7. Cooldown 10 trading days
 """
 
 import logging
@@ -23,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class URA012SignalDetector(BaseSignalDetector):
-    """URA-012 ATR ratio CEILING mean reversion signal detector"""
+    """URA-012 ATR ratio BAND mean reversion signal detector"""
 
     def __init__(self, config: URA012Config):
         self.config = config
@@ -72,12 +76,7 @@ class URA012SignalDetector(BaseSignalDetector):
         cond_vol_ceiling = df["ATR_Ratio"] <= self.config.atr_ratio_ceiling
 
         df["Signal"] = (
-            cond_pullback
-            & cond_upper
-            & cond_rsi
-            & cond_decline
-            & cond_vol_floor
-            & cond_vol_ceiling
+            cond_pullback & cond_upper & cond_rsi & cond_decline & cond_vol_floor & cond_vol_ceiling
         )
 
         signal_indices = df.index[df["Signal"]].tolist()
@@ -100,5 +99,5 @@ class URA012SignalDetector(BaseSignalDetector):
             )
 
         signal_count = df["Signal"].sum()
-        logger.info("URA-012: Detected %d ATR-ceiling MR signals", signal_count)
+        logger.info("URA-012: Detected %d ATR-band MR signals", signal_count)
         return df

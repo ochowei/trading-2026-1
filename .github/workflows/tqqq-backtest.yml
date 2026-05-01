@@ -292,6 +292,7 @@ on:
           - "URA-009: ura_009_day_after_reversal_mr"
           - "URA-010: ura_010_wvf_capitulation_mr"
           - "URA-011: ura_011_volume_capitulation_mr"
+          - "URA-012: ura_012_atr_band_mr"
           - "VGK-001: vgk_001_rsi2_mean_reversion"
           - "VGK-002: vgk_002_vol_adaptive_pullback"
           - "VGK-002-RSI2: vgk_002_vol_adaptive_rsi2"

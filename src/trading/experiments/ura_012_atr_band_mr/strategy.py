@@ -1,5 +1,5 @@
 """
-URA-012: Volatility-Acceleration-Bounded MR (ATR Ratio CEILING)
+URA-012: Volatility-Acceleration-Bounded MR (ATR Ratio BAND)
 Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar).
 """
 
@@ -16,7 +16,7 @@ from trading.experiments.ura_012_atr_band_mr.signal_detector import (
 
 
 class URA012Strategy(ExecutionModelStrategy):
-    """URA ATR-Ceiling MR (URA-012)"""
+    """URA ATR-Band MR (URA-012)"""
 
     slippage_pct: float = 0.001
 
