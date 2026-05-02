@@ -1,12 +1,13 @@
 """
 NVDA-014 訊號偵測器：Negative Relative Strength Mean Reversion (Pairs MR vs SMH)
 
-進場條件（Att2，全部滿足）：
-1. NVDA 20日報酬 - SMH 20日報酬 ≤ -3%（NVDA 相對板塊弱勢 ≥ 3pp）
-2. 10日高點回檔 ≥ 6%（深回檔，capitulation 確認）
+進場條件（Att3 final，全部滿足）：
+1. NVDA 20日報酬 - SMH 20日報酬 ≤ -5%（NVDA 相對板塊弱勢 ≥ 5pp，高 conviction）
+2. 10日高點回檔 ≥ 6%（深回檔）
 3. ATR(20) ≤ 1.40 × ATR(60)（避免極端波動爆發）
-4. SMA(20) ≥ 1.00 × SMA(60)（趨勢 regime gate，lesson #22；Att2 新增）
-5. 冷卻期 12 個交易日
+4. ClosePos ≥ 0.40（盤中反彈確認，過濾續跌型訊號；Att3 新增）
+5. SMA regime gate 停用（Att2 已驗證在 MR 框架反向，lesson #5）
+6. 冷卻期 12 個交易日
 """
 
 import logging
@@ -71,6 +72,10 @@ class NVDA014Detector(BaseSignalDetector):
         df["High_Lookback"] = df["High"].rolling(lookback).max()
         df["Pullback"] = (df["High_Lookback"] - df["Close"]) / df["High_Lookback"]
 
+        # 盤中收盤位置 ClosePos = (Close - Low) / (High - Low)（Att3 新增）
+        day_range = df["High"] - df["Low"]
+        df["ClosePos"] = ((df["Close"] - df["Low"]) / day_range).where(day_range > 0, 0.5)
+
         # ATR ratio: ATR(20) / ATR(60)
         high_low = df["High"] - df["Low"]
         high_close = (df["High"] - df["Close"].shift(1)).abs()
@@ -101,7 +106,11 @@ class NVDA014Detector(BaseSignalDetector):
 
         signal = cond_rs & cond_pullback & cond_vol
 
-        # 4. 趨勢 regime gate（lesson #22，Att2 新增）
+        # 4. 盤中反彈確認（ClosePos ≥ 0.40，Att3 新增）
+        if self.config.use_close_position:
+            signal = signal & (df["ClosePos"] >= self.config.close_position_min)
+
+        # 5. 趨勢 regime gate（lesson #22；Att2 已驗證在 MR 框架反向，預設停用）
         if self.config.use_sma_regime:
             signal = signal & (df["SMA_Ratio"] >= self.config.sma_regime_ratio_min)
 
