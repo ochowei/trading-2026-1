@@ -1,0 +1,438 @@
+{
+  "metadata": {
+    "execution_time": "2026-05-02T13:01:40.009844"
+  },
+  "part_a": {
+    "ticker": "NVDA",
+    "total_signals": 21,
+    "wins": 13,
+    "win_rate": 0.6190476190476191,
+    "avg_return_pct": 1.65,
+    "std_return_pct": 5.67,
+    "cumulative_return_pct": 36.36,
+    "avg_holding_days": 4.5,
+    "max_drawdown_pct": -9.2,
+    "profit_factor": 1.8,
+    "sharpe_ratio": 0.29,
+    "sortino_ratio": 0.47,
+    "calmar_ratio": 0.18,
+    "max_consecutive_losses": 2,
+    "target_exits": 13,
+    "stop_loss_exits": 7,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-01-02",
+        "entry_date": "2019-01-03",
+        "exit_date": "2019-01-07",
+        "entry": 3.32,
+        "exit": 3.52,
+        "return_pct": 6.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.2
+      },
+      {
+        "date": "2019-01-28",
+        "entry_date": "2019-01-29",
+        "exit_date": "2019-01-31",
+        "entry": 3.38,
+        "exit": 3.58,
+        "return_pct": 6.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.59
+      },
+      {
+        "date": "2019-04-26",
+        "entry_date": "2019-04-29",
+        "exit_date": "2019-05-09",
+        "entry": 4.43,
+        "exit": 4.16,
+        "return_pct": -6.14,
+        "holding_days": 8,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -7.43
+      },
+      {
+        "date": "2019-05-15",
+        "entry_date": "2019-05-16",
+        "exit_date": "2019-05-23",
+        "entry": 3.96,
+        "exit": 3.72,
+        "return_pct": -6.14,
+        "holding_days": 5,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -9.2
+      },
+      {
+        "date": "2019-06-04",
+        "entry_date": "2019-06-05",
+        "exit_date": "2019-06-18",
+        "entry": 3.63,
+        "exit": 3.85,
+        "return_pct": 6.0,
+        "holding_days": 9,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.31
+      },
+      {
+        "date": "2019-08-08",
+        "entry_date": "2019-08-09",
+        "exit_date": "2019-08-15",
+        "entry": 3.9,
+        "exit": 3.66,
+        "return_pct": -6.14,
+        "holding_days": 4,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.03
+      },
+      {
+        "date": "2020-11-02",
+        "entry_date": "2020-11-03",
+        "exit_date": "2020-11-04",
+        "entry": 12.69,
+        "exit": 13.45,
+        "return_pct": 6.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 4.79
+      },
+      {
+        "date": "2020-11-19",
+        "entry_date": "2020-11-20",
+        "exit_date": "2020-12-15",
+        "entry": 13.43,
+        "exit": 13.38,
+        "return_pct": -0.38,
+        "holding_days": 15,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -4.8
+      },
+      {
+        "date": "2021-01-19",
+        "entry_date": "2021-01-20",
+        "exit_date": "2021-01-21",
+        "entry": 13.09,
+        "exit": 13.88,
+        "return_pct": 6.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.93
+      },
+      {
+        "date": "2021-03-05",
+        "entry_date": "2021-03-08",
+        "exit_date": "2021-03-16",
+        "entry": 12.43,
+        "exit": 13.18,
+        "return_pct": 6.0,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.25
+      },
+      {
+        "date": "2021-12-20",
+        "entry_date": "2021-12-21",
+        "exit_date": "2021-12-27",
+        "entry": 28.36,
+        "exit": 30.06,
+        "return_pct": 6.0,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.11
+      },
+      {
+        "date": "2022-01-10",
+        "entry_date": "2022-01-11",
+        "exit_date": "2022-01-19",
+        "entry": 27.31,
+        "exit": 25.63,
+        "return_pct": -6.14,
+        "holding_days": 5,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -8.45
+      },
+      {
+        "date": "2022-01-28",
+        "entry_date": "2022-01-31",
+        "exit_date": "2022-02-01",
+        "entry": 23.17,
+        "exit": 24.56,
+        "return_pct": 6.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 2.9
+      },
+      {
+        "date": "2022-04-18",
+        "entry_date": "2022-04-19",
+        "exit_date": "2022-04-21",
+        "entry": 21.71,
+        "exit": 20.38,
+        "return_pct": -6.14,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -8.06
+      },
+      {
+        "date": "2022-05-06",
+        "entry_date": "2022-05-09",
+        "exit_date": "2022-05-11",
+        "entry": 18.03,
+        "exit": 16.92,
+        "return_pct": -6.14,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -8.27
+      },
+      {
+        "date": "2022-05-25",
+        "entry_date": "2022-05-26",
+        "exit_date": "2022-05-27",
+        "entry": 16.03,
+        "exit": 16.99,
+        "return_pct": 6.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 12.7
+      },
+      {
+        "date": "2022-09-01",
+        "entry_date": "2022-09-02",
+        "exit_date": "2022-09-13",
+        "entry": 14.1,
+        "exit": 13.23,
+        "return_pct": -6.14,
+        "holding_days": 6,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -7.21
+      },
+      {
+        "date": "2022-09-23",
+        "entry_date": "2022-09-26",
+        "exit_date": "2022-10-05",
+        "entry": 12.49,
+        "exit": 13.24,
+        "return_pct": 6.0,
+        "holding_days": 7,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.51
+      },
+      {
+        "date": "2022-12-30",
+        "entry_date": "2023-01-03",
+        "exit_date": "2023-01-09",
+        "entry": 14.86,
+        "exit": 15.75,
+        "return_pct": 6.0,
+        "holding_days": 4,
+        "exit_type": "target",
+        "max_drawdown_pct": -5.64
+      },
+      {
+        "date": "2023-09-22",
+        "entry_date": "2023-09-25",
+        "exit_date": "2023-10-02",
+        "entry": 41.62,
+        "exit": 44.12,
+        "return_pct": 6.0,
+        "holding_days": 5,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.06
+      },
+      {
+        "date": "2023-12-04",
+        "entry_date": "2023-12-05",
+        "exit_date": "2023-12-13",
+        "entry": 45.51,
+        "exit": 48.24,
+        "return_pct": 6.0,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.27
+      }
+    ],
+    "filled_count": 21,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "NVDA",
+    "total_signals": 6,
+    "wins": 4,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 1.95,
+    "std_return_pct": 5.72,
+    "cumulative_return_pct": 11.22,
+    "avg_holding_days": 6.2,
+    "max_drawdown_pct": -8.33,
+    "profit_factor": 1.95,
+    "sharpe_ratio": 0.34,
+    "sortino_ratio": 0.55,
+    "calmar_ratio": 0.23,
+    "max_consecutive_losses": 1,
+    "target_exits": 4,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-12-17",
+        "entry_date": "2024-12-18",
+        "exit_date": "2025-01-03",
+        "entry": 134.02,
+        "exit": 142.06,
+        "return_pct": 6.0,
+        "holding_days": 10,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.36
+      },
+      {
+        "date": "2025-01-29",
+        "entry_date": "2025-01-30",
+        "exit_date": "2025-02-03",
+        "entry": 123.24,
+        "exit": 115.68,
+        "return_pct": -6.14,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -8.33
+      },
+      {
+        "date": "2025-09-04",
+        "entry_date": "2025-09-05",
+        "exit_date": "2025-09-10",
+        "entry": 168.25,
+        "exit": 178.35,
+        "return_pct": 6.0,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.92
+      },
+      {
+        "date": "2025-10-16",
+        "entry_date": "2025-10-17",
+        "exit_date": "2025-10-27",
+        "entry": 180.43,
+        "exit": 191.26,
+        "return_pct": 6.0,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.05
+      },
+      {
+        "date": "2025-11-25",
+        "entry_date": "2025-11-26",
+        "exit_date": "2025-12-17",
+        "entry": 181.88,
+        "exit": 170.71,
+        "return_pct": -6.14,
+        "holding_days": 14,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -6.37
+      },
+      {
+        "date": "2025-12-18",
+        "entry_date": "2025-12-19",
+        "exit_date": "2025-12-23",
+        "entry": 176.93,
+        "exit": 187.54,
+        "return_pct": 6.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 3.06
+      }
+    ],
+    "filled_count": 6,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "NVDA",
+    "total_signals": 2,
+    "wins": 1,
+    "win_rate": 0.5,
+    "avg_return_pct": 2.46,
+    "std_return_pct": 3.54,
+    "cumulative_return_pct": 4.87,
+    "avg_holding_days": 9.0,
+    "max_drawdown_pct": -4.84,
+    "profit_factor": 5.61,
+    "sharpe_ratio": 0.7,
+    "sortino_ratio": 3.26,
+    "calmar_ratio": 0.51,
+    "max_consecutive_losses": 1,
+    "target_exits": 1,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 1,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2026-02-03",
+        "entry_date": "2026-02-04",
+        "exit_date": "2026-02-09",
+        "entry": 179.72,
+        "exit": 190.5,
+        "return_pct": 6.0,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": -4.84
+      },
+      {
+        "date": "2026-03-02",
+        "entry_date": "2026-03-03",
+        "exit_date": "2026-03-25",
+        "entry": 178.75,
+        "exit": 176.83,
+        "return_pct": -1.07,
+        "holding_days": 15,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -3.93
+      }
+    ],
+    "filled_count": 2,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-05-01"
+    }
+  }
+}
