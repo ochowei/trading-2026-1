@@ -35,13 +35,14 @@ NVDA-014: Negative Relative Strength Mean Reversion (Pairs MR vs SMH)
 策略類型：配對交易 / 相對均值回歸 + 波動 regime gate
 
 ================================================================================
-進場條件（Att1 baseline，全部滿足）
+進場條件（Att2，全部滿足）
 ================================================================================
 1. **負向相對強度**：NVDA 20d return - SMH 20d return ≤ -3%
 2. **深回檔**：10 日高點回檔 ≥ 6%
 3. **波動 regime gate**：ATR(20) ≤ 1.40 × ATR(60)
-   （NVDA-013 Att3 已驗證該 gate 在 NVDA 上有效）
-4. **冷卻期**：12 個交易日
+4. **趨勢 regime gate（lesson #22 新增）**：SMA(20) ≥ 1.00 × SMA(60)
+   （NVDA-013 Att3 已驗證該 gate 在 NVDA MBPC 框架有效）
+5. **冷卻期**：12 個交易日
 
 ================================================================================
 出場參數
@@ -86,6 +87,26 @@ Att1（RS ≤ -3%, pullback ≥ 6%, ATR ≤ 1.40, cd 12, TP+6%/SL-6%/15d）：FA
           有效過濾這類起始崩盤期
     下一步：加入 SMA(20) ≥ 1.00 × SMA(60) 趨勢 regime 過濾（NVDA-013 已驗證
     該 gate 在 MBPC 框架有效），希望避開 2022 bear / 2024-2025 correction periods
+
+Att2（Att1 + SMA(20) ≥ 1.00 × SMA(60) trend regime, lesson #22）：FAILED
+    參數調整：sma_regime_ratio_min=1.00, use_sma_regime=True
+    結果：
+        Part A: 17 訊號, WR 47.1%, 累計 -9.08%, Sharpe **-0.06**
+        Part B:  7 訊號, WR 28.6%, 累計 -18.15%, Sharpe **-0.49**
+        min(A,B): **-0.49**（兩部分皆退化，比 Att1 更差）
+    失敗分析：
+        - **lesson #5 失敗模式驗證**：「趨勢濾波器 + 均值回歸 = 災難」
+        - 負向 RS + 深回檔的訊號**本質上**伴隨 SMA(20) < SMA(60)
+          （NVDA 跑輸 SMH 通常意味短中期均線下穿）
+        - SMA regime gate 過濾了 high-quality 真實 MR 機會
+          （Att1 Part A 32 → 17 訊號），移除了 winners 多於 losers
+        - 與 NVDA-013 MBPC 框架不同：MBPC 為**動量延續**（uptrend pullback continuation）
+          所以 SMA regime 為**同向**過濾；負向 RS MR 為**反向**訊號，
+          SMA regime 為**反向**過濾
+    下一步：捨棄 SMA regime gate，改採進場品質過濾：
+        - 收緊 RS 門檻至 -5%（高 conviction 訊號）
+        - 加入 ClosePos ≥ 40% 確認盤中反彈（intraday capitulation reversal）
+        以濾掉 Part B 「續跌型」起始崩盤訊號
 """
 
 from dataclasses import dataclass
@@ -112,6 +133,12 @@ class NVDA014Config(ExperimentConfig):
     atr_regime_short: int = 20
     atr_regime_long: int = 60
     vol_regime_max_ratio: float = 1.40
+
+    # 趨勢 regime gate（lesson #22 buffered SMA regime，Att2 新增）
+    sma_regime_short: int = 20
+    sma_regime_long: int = 60
+    sma_regime_ratio_min: float = 1.00
+    use_sma_regime: bool = True
 
     # 冷卻期
     cooldown_days: int = 12

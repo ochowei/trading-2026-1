@@ -1,11 +1,12 @@
 """
 NVDA-014 訊號偵測器：Negative Relative Strength Mean Reversion (Pairs MR vs SMH)
 
-進場條件（Att1 baseline，全部滿足）：
+進場條件（Att2，全部滿足）：
 1. NVDA 20日報酬 - SMH 20日報酬 ≤ -3%（NVDA 相對板塊弱勢 ≥ 3pp）
 2. 10日高點回檔 ≥ 6%（深回檔，capitulation 確認）
 3. ATR(20) ≤ 1.40 × ATR(60)（避免極端波動爆發）
-4. 冷卻期 12 個交易日
+4. SMA(20) ≥ 1.00 × SMA(60)（趨勢 regime gate，lesson #22；Att2 新增）
+5. 冷卻期 12 個交易日
 """
 
 import logging
@@ -79,6 +80,11 @@ class NVDA014Detector(BaseSignalDetector):
         atr_long = true_range.rolling(self.config.atr_regime_long).mean()
         df["ATR_Ratio"] = atr_short / atr_long
 
+        # SMA regime: SMA(20) / SMA(60)（lesson #22，Att2 新增）
+        sma_short = df["Close"].rolling(self.config.sma_regime_short).mean()
+        sma_long = df["Close"].rolling(self.config.sma_regime_long).mean()
+        df["SMA_Ratio"] = sma_short / sma_long
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -93,7 +99,13 @@ class NVDA014Detector(BaseSignalDetector):
         # 3. 波動 regime gate
         cond_vol = df["ATR_Ratio"] <= self.config.vol_regime_max_ratio
 
-        df["Signal"] = cond_rs & cond_pullback & cond_vol
+        signal = cond_rs & cond_pullback & cond_vol
+
+        # 4. 趨勢 regime gate（lesson #22，Att2 新增）
+        if self.config.use_sma_regime:
+            signal = signal & (df["SMA_Ratio"] >= self.config.sma_regime_ratio_min)
+
+        df["Signal"] = signal
 
         # 冷卻機制
         signal_indices = df.index[df["Signal"]].tolist()
