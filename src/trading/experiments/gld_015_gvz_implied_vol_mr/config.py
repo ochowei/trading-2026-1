@@ -85,14 +85,22 @@ class GLD015Config(ExperimentConfig):
 
     # ^GVZ forward-looking implied vol regime gate（GLD-015 核心新增）
     # Att1 (LEVEL filter, max_gvz_level=20.0): min(A,B) 0.30 REJECT — over-filters
+    #   Part A 15/73.3% WR/Sharpe 0.30 cum +12.75% / Part B 6/100% WR/Sharpe 5.39
+    #   (lost 3 winners with GVZ>20: 2025-05-01/2025-05-14/2025-10-28)
     # Att2 ★ (DIRECTION filter, 10d change <= +0.40): min(A,B) **0.76** SUCCESS
-    # Att3 (5d lookback ablation, 5d change <= +0.40): min(A,B) 0.23 REJECT
+    #   Part A 12/83.3% WR/Sharpe 0.76 cum +21.68% / Part B 9 訊號 unchanged
+    #   3 SLs filtered (10d_chg 0.45/1.10/2.44 all > +0.40) + cooldown chain shift
+    #   introduced 1 new SL (2022-04-27 GVZ_10d=-0.21 passes filter)
+    #   Part B all preserved (10d_chg ranges -0.20 to -5.79, all < +0.40)
+    # Att3 (5d lookback ablation): min(A,B) 0.23 REJECT — confirms 10d optimal
+    #   Part A 13/69.2% WR/Sharpe 0.23 cum +8.65% / Part B unchanged
+    #   5d 過短：僅 1/3 SLs filtered (2022-09-01 5d=+2.23) + 4 Part A TPs 誤殺
     gvz_ticker: str = "^GVZ"
     use_gvz_level_filter: bool = False
-    max_gvz_level: float = 999.0
+    max_gvz_level: float = 999.0  # disabled
     use_gvz_direction_filter: bool = True
-    gvz_direction_lookback: int = 5  # Att3: 5d lookback (vs Att2 10d)
-    max_gvz_direction_change: float = 0.40
+    gvz_direction_lookback: int = 10  # Att2 ★: 10d lookback (5d ablation REJECT)
+    max_gvz_direction_change: float = 0.40  # Att2 ★: GVZ 10d change <= +0.40
 
 
 def create_default_config() -> GLD015Config:
