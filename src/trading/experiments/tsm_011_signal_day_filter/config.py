@@ -63,8 +63,8 @@ class TSMSignalDayFilterConfig(ExperimentConfig):
     cooldown_days: int = 10
 
     # Signal-day return CEILING 過濾（>= 999 視為停用）
-    ret_1d_max: float = 0.01  # 1 日報酬上限 +1.0%（Att1: true pullback day filter）
-    ret_5d_max: float = 999.0  # 5 日報酬上限（Att1 停用）
+    ret_1d_max: float = 999.0  # 1 日報酬上限（Att1 驗證單獨無效，停用）
+    ret_5d_max: float = 0.095  # 5 日報酬上限 +9.5%（Att2: aggressive rally exhaustion filter）
 
 
 def create_default_config() -> TSMSignalDayFilterConfig:
