@@ -139,7 +139,7 @@ class FCX014Config(ExperimentConfig):
     #              訊號集與 cum 完全相同 0.64 確認 11-12% 為 robust sweet spot 區間）
     # Att3: 0.09（9.0%，下邊界測試；預期 cum 大幅下降，確認下邊界）
     # 設為 None 表示不啟用此過濾
-    max_signal_day_3d_return: float | None = 0.11
+    max_signal_day_3d_return: float | None = 0.09
 
     # 1 日報酬上限：要求 signal_day_1d_return <= max_signal_day_1d_return
     # 中間嘗試（已棄用）：Att3-mid（3d 0.12 + 1d 0.08）— cooldown chain shift

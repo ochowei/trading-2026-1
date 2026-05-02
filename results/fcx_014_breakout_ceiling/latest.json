@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-05-02T08:50:29.603278"
+    "execution_time": "2026-05-02T08:51:23.398664"
   },
   "part_a": {
     "ticker": "FCX",
-    "total_signals": 16,
-    "wins": 12,
-    "win_rate": 0.75,
-    "avg_return_pct": 4.26,
-    "std_return_pct": 6.16,
-    "cumulative_return_pct": 89.38,
-    "avg_holding_days": 7.3,
+    "total_signals": 15,
+    "wins": 10,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 3.0,
+    "std_return_pct": 6.76,
+    "cumulative_return_pct": 50.77,
+    "avg_holding_days": 7.9,
     "max_drawdown_pct": -10.09,
-    "profit_factor": 3.72,
-    "sharpe_ratio": 0.69,
-    "sortino_ratio": 1.32,
-    "calmar_ratio": 0.42,
-    "max_consecutive_losses": 1,
-    "target_exits": 11,
-    "stop_loss_exits": 3,
+    "profit_factor": 2.4,
+    "sharpe_ratio": 0.44,
+    "sortino_ratio": 0.79,
+    "calmar_ratio": 0.3,
+    "max_consecutive_losses": 2,
+    "target_exits": 9,
+    "stop_loss_exits": 4,
     "time_expiry_exits": 2,
     "pessimistic_exits": 0,
     "trades": [
@@ -89,17 +89,6 @@
         "max_drawdown_pct": 0.05
       },
       {
-        "date": "2020-07-06",
-        "entry_date": "2020-07-07",
-        "exit_date": "2020-07-13",
-        "entry": 11.85,
-        "exit": 12.8,
-        "return_pct": 8.0,
-        "holding_days": 4,
-        "exit_type": "target",
-        "max_drawdown_pct": -1.56
-      },
-      {
         "date": "2020-08-05",
         "entry_date": "2020-08-06",
         "exit_date": "2020-08-19",
@@ -166,15 +155,15 @@
         "max_drawdown_pct": 1.63
       },
       {
-        "date": "2023-01-09",
-        "entry_date": "2023-01-10",
-        "exit_date": "2023-01-25",
-        "entry": 41.31,
-        "exit": 44.62,
-        "return_pct": 8.0,
-        "holding_days": 10,
-        "exit_type": "target",
-        "max_drawdown_pct": -1.07
+        "date": "2023-01-11",
+        "entry_date": "2023-01-12",
+        "exit_date": "2023-02-06",
+        "entry": 43.64,
+        "exit": 40.53,
+        "return_pct": -7.14,
+        "holding_days": 16,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -7.54
       },
       {
         "date": "2023-07-13",
@@ -199,7 +188,7 @@
         "max_drawdown_pct": 1.46
       }
     ],
-    "filled_count": 16,
+    "filled_count": 15,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
