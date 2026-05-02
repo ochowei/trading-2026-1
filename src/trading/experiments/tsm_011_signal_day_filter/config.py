@@ -64,7 +64,7 @@ class TSMSignalDayFilterConfig(ExperimentConfig):
 
     # Signal-day return CEILING 過濾（>= 999 視為停用）
     ret_1d_max: float = 999.0  # 1 日報酬上限（Att1 驗證單獨無效，停用）
-    ret_5d_max: float = 0.095  # 5 日報酬上限 +9.5%（Att2: aggressive rally exhaustion filter）
+    ret_5d_max: float = 0.105  # 5 日報酬上限 +10.5%（Att3: rally exhaustion filter，最終）
 
 
 def create_default_config() -> TSMSignalDayFilterConfig:
