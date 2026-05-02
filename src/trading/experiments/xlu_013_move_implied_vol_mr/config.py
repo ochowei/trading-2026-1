@@ -73,9 +73,12 @@ class XLU013Config(ExperimentConfig):
     # ^MOVE forward-looking implied vol regime gate（XLU-013 核心新增）
     move_ticker: str = "^MOVE"
     max_move_level: float = 130.0
-    # 選用：^MOVE direction filter（N 日變化 <= 0 表示 vol regime 改善方向）
-    use_move_direction_filter: bool = False
-    move_direction_lookback: int = 5
+    # ^MOVE direction filter — N 日 absolute change <= max_move_change
+    # （正向上限過濾「Fed 政策訊號日 bond vol 跳升」結構，e.g. 2021-09-20 SL：
+    #  MOVE 3d change +5.65，恰於 +5 邊界外）
+    use_move_direction_filter: bool = True
+    move_direction_lookback: int = 3
+    max_move_change: float = 5.0
 
     # 冷卻期（同 XLU-011 / XLU-012）
     cooldown_days: int = 7

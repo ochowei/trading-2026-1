@@ -46,7 +46,7 @@ class XLU013Strategy(ExecutionModelStrategy):
             if config.use_move_direction_filter:
                 print(
                     f"  MOVE direction filter: {config.move_ticker} "
-                    f"{config.move_direction_lookback}d change <= 0"
+                    f"{config.move_direction_lookback}d change <= {config.max_move_change:+.1f}"
                 )
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
             print("  追蹤停損 (Trailing Stop): 無 (Disabled)")

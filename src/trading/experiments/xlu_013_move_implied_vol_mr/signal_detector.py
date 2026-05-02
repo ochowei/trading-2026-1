@@ -108,7 +108,7 @@ class XLU013SignalDetector(BaseSignalDetector):
         cond_move_level = df["MOVE_Close"] <= self.config.max_move_level
 
         if self.config.use_move_direction_filter:
-            cond_move_dir = df["MOVE_Change_Nd"] <= 0
+            cond_move_dir = df["MOVE_Change_Nd"] <= self.config.max_move_change
         else:
             cond_move_dir = pd.Series(True, index=df.index)
 
