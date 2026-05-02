@@ -961,9 +961,9 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 25. Broad-Market Macro Context Confirmation Gate 為 sub-segment ETF capitulation MR 的雙來源 confirmation 維度（QQQ 對 IWM 首次驗證 2026-05-02）
+## 25. Broad-Market Macro Context Confirmation Gate 為 sub-segment ETF capitulation MR 的雙來源 confirmation 維度（QQQ 對 IWM 首次驗證 2026-05-02，**XBI 邊界發現失敗 2026-05-02**）
 <!-- freshness:
-  derived_from: [IWM-015]
+  derived_from: [IWM-015,XBI-016]
   validated: 2026-05-02
   data_through: 2025-12-31
   confidence: medium
@@ -998,13 +998,11 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 4. **lookback 期間調整**：N=10 日為 IWM 上 SLs vs winners 分隔最清晰，N=5 / N=15 可作 robustness check 但通常 10 日為正交於 1d/3d/5d 自身過濾的最佳維度
 5. **不可疊加 pair trading RS**：cross-asset confirmation 與 pair trading RS 為**根本不同的 cross-asset 用法**——前者要求 broad-market **同向確認** capitulation 結構，後者尋找 sub-segment vs broad-market **相對方向背離** 機會。IWM-009（IWM/SPY RS 配對）三次嘗試全部失敗已證實。
 
-**跨資產假設（待驗證）**：
-- **XBI (生技板塊)**：FDA event-driven 急殺 vs broad-market 確認 risk-off
-  → QQQ 或 SPY 10d gate 可能過濾 XBI-005 殘存 SLs
-- **KRE (區域銀行)**：銀行業利空（SVB / Signature Bank）vs broad-market 確認
-  → SPY 或 XLF 10d gate 可能過濾 KRE 訊號集合中「孤立銀行擠兌」訊號
-- **SOXX / IGV (半導體 / 軟體)**：科技 sub-sector 急殺 vs QQQ 同步確認
-  → QQQ 10d 為自然對應 broad-market
+**跨資產假設（驗證進度）**：
+- **XBI (生技板塊)**：❌ **FAILED**（XBI-016 三次迭代驗證 2026-05-02）—— Att1 QQQ 10d ≤ -1.5% 直接 port from IWM-015 達 min(A,B) **-0.55**（崩壞，Part B 6 winners → 1 winner）；Att2 SPY 10d ≤ -3.0% 達雙 100% WR 但 signal count 21→7（-67%）over-filter，A/B 訊號比 60% > 50%；Att3 SPY 10d ≤ -1.5% 達 min(A,B) 0.34（-26% vs baseline 0.46）。**XBI vs IWM 結構鏡像反向**——XBI biotech 為事件驅動板塊 ETF，SLs 多發於 broad market 同步修正期（QQQ/SPY 通過 gate），winners 多為 biotech-specific 反彈或淺 broad correction（QQQ/SPY 未達閾值），lesson #25 結構性失敗
+- **KRE (區域銀行)**：🔄 **待驗證**——XBI 失敗暗示 event-driven sector 結構可能類同失敗，但 KRE 銀行業利空（SVB / Signature）為「監管/系統性危機」非個股事件，可能與 broad-market 同步性更強
+- **SOXX / IGV (半導體 / 軟體)**：🔄 **待驗證**——cyclical sub-segment 介於 IWM (broad cap-segment 成功) 與 XBI (event-driven sector 失敗) 之間
+- **XLF (金融)**：🔄 **待驗證**——broad sector ETF，更接近 IWM broad cap-segment 結構
 
 **Lesson #19 family v9（dual-source capitulation confirmation）**：
 - v1-v8（USO-013 / DIA-012 / SPY-009 / EWJ-005 / EWT-008 / IWM-013 / EEM-014 / EWZ-007 / GLD-014 / INDA-011 / SIVR-018 / URA-013）：單一資產 raw return / oscillator depth
@@ -1016,9 +1014,15 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 - Lesson #25（QQQ / SPY 5-10d return）：broad-market 同步 realized return 作為 macro context confirmation
 - 兩者**正交資訊維度**：implied vol 反映「未來波動預期」，broad-market return 反映「過去 N 日 macro stress 確認」
 
-**Lesson #25 邊界精煉**：
-- ✅ **適用**：sub-cap-segment / sub-sector ETF 已驗證 oscillator depth filter 結構性 ceiling，且 SLs/winners 在「broad-market N 日 return」維度可清晰分隔
-- 🔄 **待驗證**：XBI / KRE / SOXX / IGV / XLF 等 sub-segment ETF
+**Lesson #25 邊界精煉（2026-05-02 XBI-016 跨資產驗證後更新）**：
+- ✅ **適用**：**broad cap-segment ETF**（IWM small-cap 已驗證 ✓；MDY mid-cap、SPLG large-cap 待驗證）—— SLs 為「broad market 健康時的 isolated cap-segment 急殺」結構，broad-market gate 提供清晰區分
+- ❌ **不適用**：**event-driven sector / sub-segment ETF**（XBI biotech 已失敗驗證 ❌）—— SLs 多發於 broad market 同步修正期，winners 多為 sub-segment-specific 反彈或淺 broad correction，broad-market gate **結構性鏡像反向**
+- 🔄 **待驗證**：KRE 區域銀行 / SOXX 半導體 / IGV 軟體 / XLF 金融——cyclical / monetary-driven sector 是否如 IWM broad cap-segment（成功）或 XBI event-driven sector（失敗）需個別 trade-level 驗證
 - ❌ **不適用**：broad-market ETF 自身（SPY/QQQ/DIA/VOO）—— 自身即為 broad-market；single-country EM ETF（FXI / EWZ / INDA）—— broad-market 確認應使用 EEM 而非美國 broad index
+
+**XBI-016 失敗根因分析（2026-05-02）**：
+- IWM 小型股寬基 winners QQQ 10d 範圍 -1.31% ~ -12.04% / SLs QQQ 10d +0.16% / -1.11%（**清晰分隔 -1.5% 閾值**）
+- XBI 生技板塊 winners QQQ/SPY 10d 跨整個 [+0%, -10%] 範圍 / SLs QQQ/SPY 10d 多在 -2% ~ -8% 深度修正期（**winners/SLs 在 broad-market 維度完全重疊**）
+- 結構性根因：XBI biotech 為**FDA / 臨床試驗事件驅動**，winners 反彈不依賴 broad-market 同步 risk-off；XBI SLs 多在 broad market 一同下跌時（bear regime / chop period）發生**生技持續續跌**，broad-market gate 無法區分
 
 ---
