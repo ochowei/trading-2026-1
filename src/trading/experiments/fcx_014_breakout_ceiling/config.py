@@ -134,9 +134,19 @@ class FCX014Config(ExperimentConfig):
 
     # === 訊號日方向過濾（lesson #19 family，本實驗新增）===
     # 3 日累計報酬上限：要求 signal_day_3d_return <= max_signal_day_3d_return
-    # Att1: 0.12（12.0%，rally exhaustion threshold）
+    # Att1 ★ 0.12（12.0%，rally exhaustion threshold；min(A,B) 0.64 +16%，全域最優）
+    # Att2: 0.11（11.0%，邊界測試；cooldown chain shift 2023-01-06→01-09 同 TP，
+    #              訊號集與 cum 完全相同 0.64 確認 11-12% 為 robust sweet spot 區間）
+    # Att3: 0.09（9.0%，下邊界測試；預期 cum 大幅下降，確認下邊界）
     # 設為 None 表示不啟用此過濾
-    max_signal_day_3d_return: float | None = 0.12
+    max_signal_day_3d_return: float | None = 0.11
+
+    # 1 日報酬上限：要求 signal_day_1d_return <= max_signal_day_1d_return
+    # 中間嘗試（已棄用）：Att3-mid（3d 0.12 + 1d 0.08）— cooldown chain shift
+    # 使 2020-07-06 → 07-07、2021-11-11 → 11-12 訊號日期偏移 1 日但出場類型完全
+    # 不變，1d ceiling 在 3d ceiling 已啟用時 redundant
+    # 設為 None 表示不啟用此過濾
+    max_signal_day_1d_return: float | None = None
 
 
 def create_default_config() -> FCX014Config:

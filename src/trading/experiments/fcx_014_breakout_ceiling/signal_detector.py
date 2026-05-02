@@ -67,8 +67,9 @@ class FCX014BreakoutCeilingDetector(BaseSignalDetector):
         df["SMA_Regime_Short"] = df["Close"].rolling(self.config.sma_regime_short).mean()
         df["SMA_Regime_Long"] = df["Close"].rolling(self.config.sma_regime_long).mean()
 
-        # === 訊號日 3 日累計報酬（lesson #19 family）===
+        # === 訊號日 3 日 / 1 日累計報酬（lesson #19 family）===
         df["Ret_3d"] = df["Close"].pct_change(3)
+        df["Ret_1d"] = df["Close"].pct_change(1)
 
         return df
 
@@ -88,8 +89,19 @@ class FCX014BreakoutCeilingDetector(BaseSignalDetector):
         else:
             cond_3d_ceiling = pd.Series(True, index=df.index)
 
+        # 訊號日 1 日報酬上限（lesson #19 family，1d spike exhaustion）
+        if self.config.max_signal_day_1d_return is not None:
+            cond_1d_ceiling = df["Ret_1d"] <= self.config.max_signal_day_1d_return
+        else:
+            cond_1d_ceiling = pd.Series(True, index=df.index)
+
         df["Signal"] = (
-            cond_squeeze & cond_breakout & cond_trend & cond_regime_trend & cond_3d_ceiling
+            cond_squeeze
+            & cond_breakout
+            & cond_trend
+            & cond_regime_trend
+            & cond_3d_ceiling
+            & cond_1d_ceiling
         )
 
         # 冷卻期
