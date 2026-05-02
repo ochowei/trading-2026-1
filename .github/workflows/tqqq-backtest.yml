@@ -186,6 +186,7 @@ on:
           - "TLT-011: tlt_011_dynamic_regime_mr"
           - "TLT-012: tlt_012_sustained_regime_mr"
           - "TLT-013: tlt_013_move_implied_vol_mr"
+          - "TLT-014: tlt_014_tlt_spy_divergence_mr"
           - "TSLA-001: tsla_001_extreme_oversold"
           - "TSLA-002: tsla_002_wider_exit"
           - "TSLA-003: tsla_003_tight_retracement"

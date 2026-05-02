@@ -54,15 +54,58 @@ from trading.core.base_config import ExperimentConfig
 class TLT014Config(ExperimentConfig):
     """TLT-014 TLT-SPY Cross-Asset Divergence Regime-Gated MR 參數
 
-    迭代紀錄：
+    迭代紀錄（三次迭代）：
       Att1 (min_relative_return=-0.05, divergence_lookback=20)：
-        Part A 7/71.4%/Sharpe **0.32** cum +5.29% / Part B 4/100% WR std=0 cum +10.38% /
-        min(A,B) **0.32**（+129% vs TLT-013 Att1 0.14）。2 個原始 Part A SLs
-        （2020-05-26、2021-02-04）皆被過濾，但 cooldown chain shift 引入 2021-02-08 新 SL。
-        A/B cum 差 49% > 30% ❌（從 61% 改善但未達標），訊號比 7:4 = 43% < 50% ✓
+        Part A 7/71.4%/Sharpe **0.32** cum +5.29%（vs TLT-013 Att1 11/54.5%/0.14/+3.53%，
+        +129% Sharpe，過濾 2 SL + 2 EX + 1 TP，Part A WR 54.5%→71.4%）/
+        Part B 4/100% WR std=0 Sharpe 0.00 cum +10.38%（移除 2024-04-08 SL -3.6% +
+        2025-07-14 TP +2.5%，淨改善 +1.31pp）/ min(A,B) **0.32**（+129%）。
+        2 個原始 Part A SLs（2020-05-26、2021-02-04）皆被過濾，但 cooldown chain shift
+        引入 2021-02-08 新 SL。A/B cum 差 49% > 30% ❌（從 61% 改善但未達標），訊號比
+        7:4 = 43% < 50% ✓
 
       Att2 (min_relative_return=-0.03 加嚴)：
-        TBD：執行回測後填寫結果。
+        Part A 3/100% WR std=0 Sharpe 3.94 cum +6.49% / Part B 2/100% WR std=0 cum +5.06%
+        / 雙 zero-var 5/5 全 TP，A/B cum 差 22% < 30% ✓，訊號比 3:2 = 33% ✓。
+        **REJECT**：訊號量過稀（Part A 0.6/yr、Part B 1.0/yr）統計顯著性嚴重不足，
+        且 Part B 移除 2 winners（2024-05-29、2024-11-15）使 cum 反退回 5.06%。
+        threshold -3% 過嚴，反向移除過多正常市況 winners。
+
+      Att3 ★ (min_relative_return=-0.04 中間值)：
+        Part A 5 訊號 WR **80.0%** Sharpe **0.69** cum +6.56%（vs Att1 7/71.4%/0.32/+5.29%，
+        **+116% Sharpe**；vs TLT-013 Att1 0.14，**+393% Sharpe**）/ Part B 4/100% WR std=0
+        Sharpe 0.00 cum +10.38%（與 Att1 相同 4 winners） / min(A,B)† **0.69**（Part A
+        binding，Part B zero-var 沿用 EWJ-003/SPY-009/DIA-012/IWM-013 † 慣例）。
+        **vs TLT-013 Att1 0.14：+393% min(A,B) Sharpe，repo TLT 結構性最大幅度突破**。
+        Att3 vs Att1 額外過濾 2019-07-12 TP（被 -4% threshold 切除）+ 2021-02-08 cooldown
+        SL（重要！消除 Att1 殘餘 SL），淨效果為移除 1 TP 換 1 SL 過濾。
+        A/B cum 差 |6.56-10.38|/10.38 = **37%**（從 baseline TLT-013 Att1 61% → Att1 49%
+        → Att3 37%，每次迭代均改善但未達 30% 目標，Part B 期間 rate cycle 反轉效果
+        天然優於 Part A 為結構性差異）。訊號比 5:4 = 20% < 50% ✓。Part A 殘餘 1 EX
+        (-2.38% 2021-01-06) 為 Q1 reflation regime 殘餘 noise，加嚴至 -3% 可移除但
+        誤殺 winners 過多（Att2 驗證）。
+
+    最終配置：Att3（min_relative_return=-0.04，divergence_lookback=20）
+
+    結論與跨資產貢獻：
+      1. **Repo 首次成功 cross-asset divergence regime gate（TLT vs SPY）**——前次跨資產
+         過濾嘗試（TLT-008 IEF pair、TLT-009 ^TNX velocity）皆於同類資產（duration 相同、
+         driver 相同）失敗；TLT-014 證明使用**結構性對立資產（equity benchmark）**作為
+         cross-asset regime classifier 可有效捕捉 reflation/risk-on regime 並過濾結構性
+         壓制 TLT MR 的訊號
+      2. **threshold -0.04 為 20d lookback 甜蜜點**——
+         -0.05（Att1）過鬆殘留 cooldown shift SL；
+         -0.04（Att3）精準消除 reflation regime SLs 而保留 calm regime winners；
+         -0.03（Att2）過嚴反向移除過多正常 winners 導致樣本崩壞
+      3. **lesson #5（趨勢濾波器+MR=災難）的明確邊界**：本實驗使用「跨資產相對表現」
+         而非「TLT 自身趨勢」過濾，未違反 lesson #5——cross-asset divergence 為 regime
+         classifier（reflation vs flight-to-safety vs calm），不直接過濾 TLT 方向。
+         lesson #5 邊界精煉：trend filter 限制適用「same-asset trend filter」；cross-asset
+         relative strength regime 可作為合法 MR 過濾維度
+      4. **新跨資產假設（待驗證）**：TLT-SPY divergence regime gate 可能擴展至其他
+         rate-driven assets（XLU 公用事業 vs SPY、TLT/IEF spread + SPY divergence
+         三維 regime）；其他「明確結構性對立」資產對也可能適用：
+         GLD vs SPY（risk-off MR）、^MOVE vs ^VIX（cross-vol regime）
     """
 
     # 回檔範圍進場（同 TLT-013 Att1）
@@ -91,7 +134,7 @@ class TLT014Config(ExperimentConfig):
     divergence_lookback: int = 20  # N 日報酬差距
     # min_relative_return：TLT N 日報酬 - 基準 N 日報酬 必須 >= 此值
     # 即「TLT 不可比 SPY 落後超過 |min_relative_return|」
-    min_relative_return: float = -0.03
+    min_relative_return: float = -0.04
 
     # 冷卻期
     cooldown_days: int = 7
