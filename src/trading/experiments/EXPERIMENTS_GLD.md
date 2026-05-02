@@ -1,19 +1,26 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-29
+  last_validated: 2026-05-02
   data_through: 2025-12-31
-  last_experiment_attempt: GLD-014 (3 attempts, Att2 marginal SUCCESS — 2d floor + 1d floor combo, min(A,B) 0.48→0.49)
-  note: GLD-014 added 2026-04-29 (Signal-Day Capitulation-Strength Filter MR, **repo 第 7 次「2d floor」方向跨資產試驗、首次商品 ETF 在 pullback+WR 框架成功，repo 首次「2d floor + 1d floor 雙維度組合」**, cross-asset port from EEM-014/SPY-009/EWJ-005). Three iterations: Att1 (2d floor <= -0.5% only) Part A 30/76.7%/Sharpe 0.45 cum +39.31% / Part B 12/100%/Sharpe 7.56 cum +40.67% / min **0.45**（-6% 回退）—— cooldown chain shift 引入 2 筆新 SL（2020-11-19 1d -0.19% Stop -4.10%、2021-02-04 1d -2.15% Stop -4.10%），淨效果負面；Att2 ★ (2d floor <= -0.5% AND 1d floor <= -0.3%) Part A 20 訊號 WR **80.0%** Sharpe **0.49** cum +27.37% / Part B 9 訊號 100% WR Sharpe 6.56 cum +28.73% / min(A,B) **0.49**（+2% vs baseline 0.48）/ A/B 累計差 4.7%（< 30% ✓）/ A/B 年化訊號比 4.0/yr vs 4.5/yr = 11.1%（< 50% ✓）—— 1d floor -0.3% 過濾 cooldown shift 衍生 2020-11-19 SL（1d -0.19% > -0.3%），同時過濾原 4 筆失敗交易中 1d 過淺/UP 日（2019-09-11 1d +0.61%、2023-02-06 1d +0.21%、2023-05-17 1d -0.35%、2023-08-14 1d -0.30%）；Att3 (1d floor <= -0.5% only, 停用 2d) Part A 20/75.0%/Sharpe 0.31 cum +17.89% / Part B 10/100%/Sharpe 4.11 cum +30.22% / min **0.31**（-35% 嚴重回退）—— 1d floor -0.5% 純單維度過嚴移除 14 筆 winners（GLD wins 1d 分布範圍廣，多筆「淺 1d + 深 2d」winner 被誤殺）。**核心發現**：(1) **Repo 首次「2d floor + 1d floor 雙維度組合」**——單一 2d floor 過濾觸發 cooldown chain shift 引入新 SL，1d floor 輔助過濾 shifted 訊號的「淺 1d」結構；(2) **2d floor 方向首次在商品 ETF 成功**（GLD-013 BB 下軌框架失敗 vs GLD-014 pullback+WR 框架成功，**框架選擇 > 過濾器類型**）；(3) **GLD 結構性 Sharpe 上限約 0.50**——macro 驅動商品 ETF 的 pullback+WR 訊號集已接近捕捉所有真實 MR 機會，過濾器主要作用為提升 WR 與 A/B 平衡（75%→80%），而非顯著放大絕對報酬。GLD-014 Att2 為新全域最優（14 次實驗、47+ 次嘗試）。**新 cross-asset 規則（lesson #19 v4）**：當 2d floor 過濾觸發 cooldown chain shift 引入新 SL 時，1d floor -0.3% ~ -0.5% 為輔助過濾甜蜜點，雙維度組合可繞過單維度的 cooldown 副作用。GLD-013 added 2026-04-22 (Post-Capitulation Vol-Transition MR — 不適用商品 ETF，3 attempts 0 success, BB-lower 框架). VGK-008 Att2 (+390% on European broad ETF) and similar successes on EEM/INDA/CIBR prompted cross-category extension to commodity ETF. All 3 iterations failed (Att1 1 signal / Att2 Part A 0.20 / Att3 Part A -0.69). Extends Post-Capitulation Vol-Transition MR boundary: pattern requires equity-style capitulation dynamics, fails on macro-driven commodity declines (rates/USD/inflation repricing does not cluster SLs at shallow 2DD). **GLD-014 反證 GLD-013 結論**：2d floor 失敗根因為**框架（BB 下軌）**而非**過濾器類型**，GLD-014 在 pullback+WR 框架同樣使用 2d floor 並成功（雖需配合 1d floor 解決 cooldown shift）。
+  last_experiment_attempt: GLD-015 (3 attempts, Att2 SUCCESS — ^GVZ 10d direction filter, min(A,B) 0.49→0.76, +55%)
+  note: GLD-015 added 2026-05-02 (GVZ Implied-Volatility Forward-Looking Regime-Gated MR, **Att2 SUCCESS — repo 第 3 次 implied-vol regime gate 跨資產移植，repo 首次 ^GVZ 應用於任何資產，repo 首次 implied-vol DIRECTION 維度成功應用於商品 ETF，首次突破 GLD 結構性 Sharpe 上限 0.50**, cross-asset port from TLT-013 Att1 / XLU-013 Att2 patterns). Three iterations: Att1 (max_gvz_level=20.0, LEVEL filter pure port of TLT-013 Att1) FAILED min(A,B) **0.30** (-39% vs baseline 0.49) Part A 15/73.3%/Sharpe 0.30 cum +12.75% / Part B 6/100% WR/Sharpe 5.39 cum +17.81% (lost 3 Part B winners 2025-05-01/2025-05-14/2025-10-28 with GVZ 21.51/20.78/24.03 > 20). LEVEL filter for GLD over-filters because Part A TPs span GVZ 9.08-48.98 (COVID-era spike winner GVZ=48.98) and Part B winners include 21.51-24.03; no clean LEVEL separator. **Att2 ★ SUCCESS (DIRECTION filter, GVZ 10d change <= +0.40)** Part A 12 訊號 WR **83.3%** Sharpe **0.76** cum +21.68% / Part B 9 訊號 WR 100% Sharpe 6.56 cum +28.73% (**完全等於 GLD-014 baseline，9 winners 全部保留**) / min(A,B) **0.76** (**+55% vs baseline 0.49，repo 首次突破 GLD 0.50 結構性上限**). Trade-level 分析顯示 GLD-014 Att2 殘餘 3 筆 Part A SLs (2021-02-04/2022-04-25/2022-09-01) 之 GVZ_10d_change = +0.45/+1.10/+2.44 (全部 > +0.40 rising-vol regime)，而 9 筆 Part B winners 之 GVZ_10d_change ∈ [-5.79, -0.20] (全部負向 falling-vol regime)，10d direction 維度提供結構性 separator。Filter 過濾原 3 SLs (-12.30%) + 4 Part A TPs (2020-03-18 COVID 10d=+30.43、2022-05-13/2022-07-14/2023-09-28 10d=+1.37/+1.52/+2.87) + 2 small expiries，但 cooldown chain shift 引入 1 筆新 SL (2022-04-27 GVZ=19.16, 10d=-0.21 通過 filter)。淨效果：Part A WR 75%→83.3%、Sharpe 0.49→0.76 (+55%)。三項 acceptance criteria 全部達標：A/B cum 差 |21.68-28.73|/28.73 = 24.6% < 30% ✓ / A/B 訊號比 12:9 = 1.33:1 (gap 25%) < 50% ✓ / Sharpe > baseline ✓。Att3 (5d lookback ablation, 5d change <= +0.40) FAILED min(A,B) **0.23** (-70% vs Att2) Part A 13/69.2%/Sharpe 0.23 cum +8.65% / Part B unchanged — 確認 10d 為 GLD ^GVZ direction 的最佳 lookback，5d 因 SLs 5d 分布 (-0.08, +0.40, +2.23) 跨越 +0.40 邊界僅 1/3 SL filter，且 4 Part A TPs (2020-05-06 5d=+0.31、2020-10-29 5d=+0.52、2020-11-24 5d=+2.55、2020-03-18 5d=+22.24) 被誤殺。**核心發現（lesson #24 v3 邊界精煉）**: (1) **Repo 首次 ^GVZ 應用於任何資產 + repo 首次 implied-vol DIRECTION 維度成功應用於商品 ETF**——cross_asset_lessons.md lesson #24 v2 明確列出未驗證假設「^GVZ 對 GLD/SIVR/GDX MR 過濾 (GLD 已飽和於 0.49，^GVZ 可能突破)」，GLD-015 Att2 為首次驗證且突破成功；(2) **GLD ^GVZ 維度選擇與 TLT/XLU 對比**：TLT (rate-direct) → ^MOVE LEVEL binding，XLU (rate-indirect) → ^MOVE DIRECTION 3d binding，**GLD (commodity + safe-haven 雙屬性) → ^GVZ DIRECTION 10d binding** — implied-vol 維度選擇取決於資產 vol regime 結構，三類資產 (rate-direct / rate-indirect / commodity-safe-haven) 各自綁定不同維度且 lookback；(3) **GLD ^GVZ 10d > 5d 區分力結構性發現**：GLD 黃金 vol regime 變化以中期 (10d) 而非短期 (5d) 為主導週期，與 XLU ^MOVE 3d binding 形成對比 (rate-indirect 資產 vol shock 短期反應更敏銳)；(4) **首次突破 GLD 0.50 結構性 Sharpe 上限**——GLD-014 文件明確指出「pullback+WR 訊號集已接近捕捉所有真實 MR 機會」，但加入 forward-looking ^GVZ 維度後 Part A 殘餘 SLs 系統性集中於「黃金 vol regime 上升期」可被精準過濾。**新跨資產假設（待驗證）**：(a) ^GVZ direction filter 可能擴展至 SIVR (silver) / GDX (gold miners) / SLV (silver) 等其他金屬 ETF；(b) ^OVX direction filter 可能適用於 USO (oil)；(c) ^VIX direction filter 可能適用於 SPY/QQQ broad-market 寬基 ETF MR。GLD-015 Att2 為新全域最優（15 次實驗、50+ 次嘗試）。GLD-014 added 2026-04-29 (Signal-Day Capitulation-Strength Filter MR, **repo 第 7 次「2d floor」方向跨資產試驗、首次商品 ETF 在 pullback+WR 框架成功，repo 首次「2d floor + 1d floor 雙維度組合」**, cross-asset port from EEM-014/SPY-009/EWJ-005). Three iterations: Att1 (2d floor <= -0.5% only) Part A 30/76.7%/Sharpe 0.45 cum +39.31% / Part B 12/100%/Sharpe 7.56 cum +40.67% / min **0.45**（-6% 回退）—— cooldown chain shift 引入 2 筆新 SL（2020-11-19 1d -0.19% Stop -4.10%、2021-02-04 1d -2.15% Stop -4.10%），淨效果負面；Att2 ★ (2d floor <= -0.5% AND 1d floor <= -0.3%) Part A 20 訊號 WR **80.0%** Sharpe **0.49** cum +27.37% / Part B 9 訊號 100% WR Sharpe 6.56 cum +28.73% / min(A,B) **0.49**（+2% vs baseline 0.48）/ A/B 累計差 4.7%（< 30% ✓）/ A/B 年化訊號比 4.0/yr vs 4.5/yr = 11.1%（< 50% ✓）—— 1d floor -0.3% 過濾 cooldown shift 衍生 2020-11-19 SL（1d -0.19% > -0.3%），同時過濾原 4 筆失敗交易中 1d 過淺/UP 日（2019-09-11 1d +0.61%、2023-02-06 1d +0.21%、2023-05-17 1d -0.35%、2023-08-14 1d -0.30%）；Att3 (1d floor <= -0.5% only, 停用 2d) Part A 20/75.0%/Sharpe 0.31 cum +17.89% / Part B 10/100%/Sharpe 4.11 cum +30.22% / min **0.31**（-35% 嚴重回退）—— 1d floor -0.5% 純單維度過嚴移除 14 筆 winners（GLD wins 1d 分布範圍廣，多筆「淺 1d + 深 2d」winner 被誤殺）。**核心發現**：(1) **Repo 首次「2d floor + 1d floor 雙維度組合」**——單一 2d floor 過濾觸發 cooldown chain shift 引入新 SL，1d floor 輔助過濾 shifted 訊號的「淺 1d」結構；(2) **2d floor 方向首次在商品 ETF 成功**（GLD-013 BB 下軌框架失敗 vs GLD-014 pullback+WR 框架成功，**框架選擇 > 過濾器類型**）；(3) **GLD 結構性 Sharpe 上限約 0.50**——macro 驅動商品 ETF 的 pullback+WR 訊號集已接近捕捉所有真實 MR 機會，過濾器主要作用為提升 WR 與 A/B 平衡（75%→80%），而非顯著放大絕對報酬。GLD-014 Att2 為新全域最優（14 次實驗、47+ 次嘗試）。**新 cross-asset 規則（lesson #19 v4）**：當 2d floor 過濾觸發 cooldown chain shift 引入新 SL 時，1d floor -0.3% ~ -0.5% 為輔助過濾甜蜜點，雙維度組合可繞過單維度的 cooldown 副作用。GLD-013 added 2026-04-22 (Post-Capitulation Vol-Transition MR — 不適用商品 ETF，3 attempts 0 success, BB-lower 框架). VGK-008 Att2 (+390% on European broad ETF) and similar successes on EEM/INDA/CIBR prompted cross-category extension to commodity ETF. All 3 iterations failed (Att1 1 signal / Att2 Part A 0.20 / Att3 Part A -0.69). Extends Post-Capitulation Vol-Transition MR boundary: pattern requires equity-style capitulation dynamics, fails on macro-driven commodity declines (rates/USD/inflation repricing does not cluster SLs at shallow 2DD). **GLD-014 反證 GLD-013 結論**：2d floor 失敗根因為**框架（BB 下軌）**而非**過濾器類型**，GLD-014 在 pullback+WR 框架同樣使用 2d floor 並成功（雖需配合 1d floor 解決 cooldown shift）。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** GLD-014 Att2（同 GLD-012 進場 + **2 日跌幅下限 <= -0.5% AND 1 日跌幅下限 <= -0.3%** 雙維度 capitulation-strength 過濾）★ **2026-04-29 新全域最優（14 次實驗、47+ 次嘗試）**
-- Part A: +27.37%（20 訊號, **80.0% WR**, Sharpe **0.49**, MaxDD -3.62%）
-- Part B: +28.73%（9 訊號, 100% WR, std=0 Sharpe 顯示 6.56, MaxDD -2.33%）
-- Part C (Live): -4.10%（1 訊號 Stop, 0% WR）
-- min(A,B) **0.49**（Part A 為約束，+2% vs GLD-012 Att3 的 0.48）
-- A/B 累計差 **4.7%**（< 30% ✓ 大幅優於 GLD-012 的 15.6%），A/B 年化訊號比 4.0/yr vs 4.5/yr = 11.1%（< 50% ✓）
+**當前最佳：** ★ **GLD-015 Att2**（GLD-014 Att2 完整框架 + **^GVZ 10 日變化 <= +0.40** forward-looking implied vol DIRECTION regime gate，TP +3.0% / SL -4.0% / 20 天）★ **2026-05-02 新全域最優（15 次實驗、50+ 次嘗試）**
+- Part A: +21.68%（12 訊號, **83.3% WR**, Sharpe **0.76**, MaxDD -4.59%）
+- Part B: +28.73%（9 訊號, 100% WR, std=0 Sharpe 顯示 6.56, MaxDD -2.33%）— **完全等於 GLD-014 baseline，9 winners 全部保留**
+- Part C (Live): -2.81%（2 訊號 1W/1L, 50% WR）
+- min(A,B) **0.76**（Part A 為約束，**+55% vs GLD-014 0.49，repo 首次突破 GLD 0.50 結構性 Sharpe 上限**）
+- A/B 累計差 **24.6%**（< 30% ✓），A/B 訊號比 12:9 = 1.33:1（gap 25% < 50% ✓）
+- 三項 acceptance criteria 全部達標
+- **跨資產貢獻**：repo 首次 ^GVZ 應用於任何資產 + repo 首次 implied-vol DIRECTION 維度成功應用於商品 ETF；驗證 cross_asset_lessons.md lesson #24 v2 明確假設「^GVZ 對 GLD MR 過濾可突破 0.49 上限」
 
-**前任最佳：** GLD-012 Att3（同 GLD-008 進場，移除追蹤停損，純 TP/SL/到期出場）
+**前任最佳：** GLD-014 Att2（同 GLD-012 進場 + **2 日跌幅下限 <= -0.5% AND 1 日跌幅下限 <= -0.3%** 雙維度 capitulation-strength 過濾）— 14 次實驗、47+ 次嘗試
+- Part A: +27.37%（20 訊號, 80.0% WR, Sharpe **0.49**, MaxDD -3.62%）
+- Part B: +28.73%（9 訊號, 100% WR, std=0 Sharpe 顯示 6.56, MaxDD -2.33%）
+- min(A,B) **0.49**（Part A 為約束，已被 GLD-015 Att2 超越）
+
+**前前任最佳：** GLD-012 Att3（同 GLD-008 進場，移除追蹤停損，純 TP/SL/到期出場）
 - Part A: +50.15%（36訊號, 75.0% WR, Sharpe 0.48, Sortino 0.78）, Part B: +42.30%（13訊號, 100% WR, Sharpe 4.68, Sortino 999.99）
 - vs GLD-008: Part A Sharpe +6.7%（0.45→0.48），Part B Sharpe +101%（2.33→4.68），cumul. +10.5%/+28.8%
 - A/B 累計差距 15.6%（vs GLD-008 的 28%），A/B 訊號比 2.77:1（不變）
@@ -101,8 +108,8 @@
 
 # GLD 實驗總覽 (GLD Experiment Index)
 
-> **最新實驗 (Latest):** GLD-012 `gld_012_atr_adaptive`
-> **當前最佳 (Best):** GLD-012 `gld_012_atr_adaptive`（同 GLD-008 進場，移除追蹤停損，Sharpe 0.48/4.68 超越 GLD-008 的 0.45/2.33）
+> **最新實驗 (Latest):** GLD-015 `gld_015_gvz_implied_vol_mr`
+> **當前最佳 (Best):** GLD-015 Att2 `gld_015_gvz_implied_vol_mr`（GLD-014 Att2 + ^GVZ 10d direction <= +0.40，Sharpe 0.76/6.56，min 0.76 +55% vs GLD-014 的 0.49）
 
 ## 實驗清單 (Experiments)
 
@@ -121,7 +128,8 @@
 | GLD-011 | `gld_011_donchian_breakout` | Donchian 突破 | Donchian(50) + SMA(100), TP +4.0%, SL -3.5%, 25d | ❌ 未超越 |
 | GLD-012 | `gld_012_atr_adaptive` | 無追蹤停損均值回歸 | 同 GLD-008 進場，移除追蹤停損，TP +3.0%, SL -4.0%, 20d | ✅ 前最佳 |
 | GLD-013 | `gld_013_vol_transition_mr` | Post-Capitulation Vol-Transition MR（3次嘗試均失敗）| BB(20,2) 下軌 + 10日回檔上限 + WR + ClosePos + ATR + 2DD floor，跨類別延伸 VGK-008 | ❌ 未超越 |
-| GLD-014 | `gld_014_capitulation_filter` | Signal-Day Capitulation-Strength Filter MR（Att2 SUCCESS）| 同 GLD-012 進場 + **2d floor <= -0.5% AND 1d floor <= -0.3%**, TP +3.0%, SL -4.0%, 20d | ✅ **新最佳** |
+| GLD-014 | `gld_014_capitulation_filter` | Signal-Day Capitulation-Strength Filter MR（Att2 SUCCESS）| 同 GLD-012 進場 + **2d floor <= -0.5% AND 1d floor <= -0.3%**, TP +3.0%, SL -4.0%, 20d | ✅ 前最佳 |
+| GLD-015 | `gld_015_gvz_implied_vol_mr` | GVZ Implied-Vol Forward-Looking Regime-Gated MR（Att2 SUCCESS）| 同 GLD-014 Att2 + **^GVZ 10d change <= +0.40**, TP +3.0%, SL -4.0%, 20d | ✅ **新最佳** |
 
 ## 演進路線 (Lineage)
 
@@ -135,7 +143,8 @@ GLD-001 gld_001_mean_reversion (基礎版：RSI(10)<30, SMA20 Dev -1.5%, cooldow
                     └── GLD-007 gld_007_pullback_wr_reversal (回檔+WR+反轉K線：新增 ClosePos≥40%, TP +3.5%)
                         └── GLD-008 gld_008_rsi2_trailing (20日回看+TP+3.0%：回看窗口 10d→20d, TP +3.5%→+3.0%)
                             └── GLD-012 gld_012_atr_adaptive (移除追蹤停損：Sharpe 0.48/4.68 ✅ 前最佳)
-                                └── GLD-014 gld_014_capitulation_filter (★ 新最佳：+2d floor -0.5% +1d floor -0.3%, Sharpe 0.49/6.56, A/B cum diff 4.7%)
+                                └── GLD-014 gld_014_capitulation_filter (Sharpe 0.49/6.56, A/B cum diff 4.7% ✅ 前最佳)
+                                    └── GLD-015 gld_015_gvz_implied_vol_mr (★ 新最佳：+ ^GVZ 10d direction <= +0.40, Sharpe 0.76/6.56, min 0.76 +55%)
 
 GLD-009 gld_009_bb_squeeze_breakout (BB 擠壓突破：獨立策略線，Sharpe 0.28/0.27 ❌)
 GLD-010 gld_010_momentum_pullback (動量回檔：ROC(20)>5% + 5日回檔≥1.5% + SMA(50)，Sharpe 0.38/0.84 ❌)

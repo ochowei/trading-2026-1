@@ -920,9 +920,9 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02**）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02**）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013]
+  derived_from: [TLT-013,XLU-013,GLD-015]
   validated: 2026-05-02
   data_through: 2025-12-31
   confidence: medium
@@ -962,29 +962,40 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 - **Att2 ★ SUCCESS（max_move_level=130 + ^MOVE 3d change <= +5.0 DIRECTION filter）**：min(A,B) **1.59**（**+112% vs XLU-012 baseline 0.75**），Part A 6/100% WR/Sharpe 6.74/cum +18.11%，Part B 4/75% WR/Sharpe 1.59 不變。2021-09-20 SL 當日 MOVE 3d change=+5.65（恰於 +5 邊界外）為 isolated discriminator，所有 Part A TPs 3d change ∈ [-23.6, +4.03]
 - **Att3 ablation（max_move_level=999 disabled, direction filter only）**：與 Att2 完全相同 → **^MOVE LEVEL cap 對 XLU 結構性冗餘，DIRECTION (3d change) 為唯一 binding dimension**
 
-**核心新發現（lesson #24 v2）**：
-- **TLT vs XLU 維度選擇取決於資產與 rate 的耦合程度**：
-  - **TLT（rate-direct，30y treasury price tracking）→ MOVE LEVEL cap binding**（TLT-013 sweet spot 130，filter 2023-05-16 SVB SL）
-  - **XLU（rate-indirect，yield-spread + flight-to-defensive）→ MOVE DIRECTION (3d change) binding**（XLU-013 sweet spot +5.0，filter 2021-09-20 FOMC SL）
-- 結構差異：TLT 直接受 rate vol regime 影響，level cap 過濾持續高 vol 時期；XLU 透過 yield-spread 間接影響，僅「Fed 政策訊號日 bond vol 跳升 (rising direction)」造成失敗（duration shock + safety bid 同時崩壞）
+**核心新發現（lesson #24 v3）**：
+- **TLT vs XLU vs GLD 維度選擇取決於資產類別與 vol regime 機制**：
+  - **TLT（rate-direct，30y treasury price tracking）→ ^MOVE LEVEL cap binding**（TLT-013 sweet spot 130，filter 2023-05-16 SVB SL）
+  - **XLU（rate-indirect，yield-spread + flight-to-defensive）→ ^MOVE DIRECTION (3d change) binding**（XLU-013 sweet spot +5.0，filter 2021-09-20 FOMC SL）
+  - **GLD（commodity + safe-haven 雙屬性）→ ^GVZ DIRECTION (10d change) binding**（GLD-015 sweet spot +0.40，filter 2021-02-04 reflation rotation / 2022-04-25 Fed pivot / 2022-09-01 Jackson Hole hawkish 三筆 SLs）
+- 結構差異：TLT 直接受 rate vol regime 影響（level cap 過濾持續高 vol 時期）；XLU 透過 yield-spread 間接影響（僅「Fed 政策訊號日 bond vol 跳升」短期 direction 維度）；GLD 為商品+safe-haven 雙屬性（黃金 vol regime 變化以中期 10d 為主導週期，rising-vol regime 結構性壓制 MR 反彈）
 - **Implied vol 維度兩類**：(1) **LEVEL** = 持續高 vol regime 識別 / (2) **DIRECTION** = vol regime trajectory（rising / falling）識別。二者結構性正交
+- **DIRECTION lookback 長度差異**：XLU ^MOVE 3d binding (rate shock 短期反應敏銳) / GLD ^GVZ 10d binding (商品 vol 中期 regime 主導) — lookback 長度反映資產 vol regime 變化速度
 
 **XLU-013 失敗子變體（不要重複嘗試）**：
 - **^MOVE 5d change 視窗**：5d 視窗使 2024-06-14 TP（5d +8.34）+ 2025-03-05 TP（+6.80）被誤殺。3d 視窗為 XLU 上 MOVE direction 唯一有效視窗
 - **^MOVE 3d change <= +4 加嚴閾值**：2020-10-30 TP（3d +4.03）被誤殺，Part A 1 TP 損失。+5.0 為 XLU 上甜蜜點邊界
 - **^MOVE 3d change <= +6 放寬閾值**：2021-09-20 SL（3d +5.65）未被過濾，等同 baseline
 
+**GLD-015 失敗子變體（不要重複嘗試）**：
+- **^GVZ LEVEL filter (max_gvz_level=20.0)**：min(A,B) 0.30（**-39% vs baseline 0.49**），over-filter Part B 3 winners (GVZ 21.51/20.78/24.03)。GLD 的 Part A TPs span GVZ 9.08-48.98（COVID-era spike winner GVZ=48.98 不應被 LEVEL filter 移除），LEVEL 維度結構性無法區分 GLD MR 訊號品質
+- **^GVZ DIRECTION 5d lookback (5d change <= +0.40)**：min(A,B) 0.23（**-70% vs Att2 0.76**），5d 過短誤殺 4 Part A TPs (2020-05-06/2020-10-29/2020-11-24 5d change 集中 +0.31~+2.55) 而僅 filter 1/3 SLs。確認 GLD ^GVZ direction 必須使用 10d lookback
+
 **跨資產假設（待驗證）**：
-- **lesson #24 v2 適用範圍假設**：rate-indirect ETFs（XLRE / XLF / KRE 真實銀行 / IYR REIT）→ ^MOVE DIRECTION 維度可能 binding，閾值需依資產與 bond market 耦合強度調整
-- **rate-direct vs rate-indirect 判斷準則**：(a) duration sensitivity 直接 ≥ 90%（如 TLT、IEF）→ LEVEL 維度；(b) duration + risk premium 雙因子（如 XLU、XLRE、KRE）→ DIRECTION 維度
+- **lesson #24 v3 適用範圍假設**：
+  - rate-indirect ETFs（XLRE / XLF / KRE 真實銀行 / IYR REIT）→ ^MOVE DIRECTION 維度可能 binding（XLU-013 已驗證）
+  - commodity-safe-haven 類別 ETF（SIVR silver / GDX gold miners / SLV silver）→ ^GVZ DIRECTION 10d binding 可能適用（GLD-015 已驗證，閾值需依資產 vol scale 調整）
+- **資產類別 → ^IV index → 維度 → lookback 對應表**：
+  - rate-direct → ^MOVE → LEVEL → cap (TLT 130)
+  - rate-indirect → ^MOVE → DIRECTION → 3d (XLU +5.0)
+  - commodity-safe-haven → ^GVZ → DIRECTION → 10d (GLD +0.40)
+  - 待驗證：broad-market stock → ^VIX → ?, oil-related → ^OVX → ?
 - ^VIX <= X 對 SPY/QQQ/IWM/TQQQ MR 訊號的影響（TQQQ-004 已驗證 VIX>=25 過濾過嚴失敗，但相反方向 VIX<=X 過濾未測）
-- ^OVX 對 USO/XLE MR 過濾（USO 已飽和於 0.26，^OVX 可能突破）
-- ^GVZ 對 GLD/SIVR/GDX MR 過濾（GLD 已飽和於 0.49，^GVZ 可能突破）
-- **二維度組合假設**：對於耦合程度中等的資產，LEVEL + DIRECTION 雙重 implied vol gate 可能進一步精煉（XLU-013 Att2 已驗證單獨 DIRECTION 飽和，疊加 LEVEL 冗餘；其他資產可能不同）
+- ^OVX 對 USO/XLE MR 過濾（USO 已飽和於 0.26，^OVX 可能突破，DIRECTION 10d 為候選假設）
+- **二維度組合假設**：對於耦合程度中等的資產，LEVEL + DIRECTION 雙重 implied vol gate 可能進一步精煉（XLU-013 Att2 已驗證單獨 DIRECTION 飽和；GLD-015 Att1 LEVEL 失敗 + Att2 DIRECTION 成功，二維度組合未測）
 
 **Lesson #6 邊界精煉**：
-- ✅ **適用**：backward-looking realized vol gate 已飽和的高政策驅動資產（TLT 已驗證）
-- 🔄 **待驗證**：其他 implied vol indices 對其底層 underlying（VIX/OVX/GVZ）
+- ✅ **適用**：backward-looking realized vol gate 已飽和的高政策驅動資產（TLT 已驗證）+ 商品 ETF（GLD 已驗證）
+- 🔄 **待驗證**：其他 implied vol indices 對其底層 underlying（VIX/OVX）
 - ❌ **不適用**：沒有對應 implied vol index 的資產（無 option market 或 option market 流動性不足）
 
 ---

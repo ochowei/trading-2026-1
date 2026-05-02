@@ -84,13 +84,15 @@ class GLD015Config(ExperimentConfig):
     oneday_return_floor: float = -0.003  # 1d 跌幅 ≤ -0.3%
 
     # ^GVZ forward-looking implied vol regime gate（GLD-015 核心新增）
-    # Att1: LEVEL filter (max_gvz_level=20.0, port of TLT-013 Att1 pattern)
+    # Att1 (LEVEL filter, max_gvz_level=20.0): min(A,B) 0.30 REJECT — over-filters
+    #   Part A 15/73.3% WR/Sharpe 0.30 / Part B 6/100% WR/Sharpe 5.39 (lost 3 winners)
+    # Att2 ★ (DIRECTION filter, 10d change <= +0.40): min(A,B) **0.76** SUCCESS
     gvz_ticker: str = "^GVZ"
-    use_gvz_level_filter: bool = True
-    max_gvz_level: float = 20.0  # Att1: ^GVZ Close <= 20.0
-    use_gvz_direction_filter: bool = False
-    gvz_direction_lookback: int = 10
-    max_gvz_direction_change: float = 0.40
+    use_gvz_level_filter: bool = False  # Att2: disable LEVEL
+    max_gvz_level: float = 999.0
+    use_gvz_direction_filter: bool = True  # Att2: enable DIRECTION
+    gvz_direction_lookback: int = 10  # Att2 ★: 10d lookback
+    max_gvz_direction_change: float = 0.40  # Att2 ★: GVZ 10d change <= +0.40
 
 
 def create_default_config() -> GLD015Config:
