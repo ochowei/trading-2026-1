@@ -85,14 +85,14 @@ class GLD015Config(ExperimentConfig):
 
     # ^GVZ forward-looking implied vol regime gate（GLD-015 核心新增）
     # Att1 (LEVEL filter, max_gvz_level=20.0): min(A,B) 0.30 REJECT — over-filters
-    #   Part A 15/73.3% WR/Sharpe 0.30 / Part B 6/100% WR/Sharpe 5.39 (lost 3 winners)
     # Att2 ★ (DIRECTION filter, 10d change <= +0.40): min(A,B) **0.76** SUCCESS
+    # Att3 (5d lookback ablation, 5d change <= +0.40): min(A,B) 0.23 REJECT
     gvz_ticker: str = "^GVZ"
-    use_gvz_level_filter: bool = False  # Att2: disable LEVEL
+    use_gvz_level_filter: bool = False
     max_gvz_level: float = 999.0
-    use_gvz_direction_filter: bool = True  # Att2: enable DIRECTION
-    gvz_direction_lookback: int = 10  # Att2 ★: 10d lookback
-    max_gvz_direction_change: float = 0.40  # Att2 ★: GVZ 10d change <= +0.40
+    use_gvz_direction_filter: bool = True
+    gvz_direction_lookback: int = 5  # Att3: 5d lookback (vs Att2 10d)
+    max_gvz_direction_change: float = 0.40
 
 
 def create_default_config() -> GLD015Config:
