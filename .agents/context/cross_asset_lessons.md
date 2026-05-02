@@ -158,6 +158,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   validated: 2026-05-02
   data_through: 2025-12-31
   confidence: high
+  note_2026_05_02_xlu: XLU-013 Att2/Att3 added (MOVE Implied-Vol Forward-Looking Regime-Gated MR, **repo 第 2 次 lesson #24 跨資產驗證（繼 TLT-013 後），首次 ^MOVE DIRECTION 維度發現於任何資產**, cross-asset port from TLT-013 Att1). Three iterations: Att1 (max_move_level=130 直接移植) Part A 7/85.7%/Sharpe 0.75（與 baseline 完全相同）/ Part B 4/75% (cooldown shift) / min 0.75 (0% 改善) — XLU 殘餘 SL 2021-09-20 當日 MOVE=59.6 calm 區，LEVEL cap 結構非綁定；Att2 ★ (max_move_level=130 + ^MOVE 3d change <= +5.0 DIRECTION filter) Part A 6 訊號 WR **100%** Sharpe **6.74** cum +18.11% / Part B 4/75% Sharpe 1.59 不變 / min(A,B) **1.59** (**+112% vs XLU-012 baseline 0.75**) / A/B 年化幾何報酬差距 23.5% (< 30% ✓) / 訊號比 1.2:2.0 = 40% (< 50% ✓) — 2021-09-20 SL 當日 MOVE 3d change=+5.65（恰於 +5 邊界外）為 isolated discriminator；Att3 ablation (max_move_level=999 disabled) 與 Att2 完全相同 → 確認 ^MOVE LEVEL cap 對 XLU 結構性冗餘，DIRECTION (3d change) 為唯一 binding dimension. **核心發現（lesson #24 v2）**：(1) **TLT vs XLU 維度選擇取決於資產與 rate 的耦合程度** — TLT 直接（30y treasury price）→ MOVE LEVEL cap 130 binding; XLU 間接（yield-spread + flight-to-defensive）→ MOVE DIRECTION (3d change) binding；(2) **Implied vol 維度兩類**：LEVEL = 持續高 vol regime 識別 / DIRECTION = vol regime trajectory 識別，二者結構性正交；(3) XLU 失敗結構為「Fed 政策訊號日 bond vol 跳升」(rising direction) 造成 duration shock + safety bid 同時崩壞。**新跨資產假設（待驗證）**：lesson #24 v2 適用於 rate-indirect ETFs (XLRE / XLF / KRE / IYR)，閾值需依資產與 bond market 耦合強度調整. XLU-013 為新全域最優 (13 次實驗、38+ 次嘗試).
   note_2026_05_02_iwm: IWM-015 Att1 added (Macro-Confirmed Capitulation MR with QQQ 10d Gate, **repo 第 1 次 broad-equity-index macro context confirmation gate（非 pair trading RS），第 5 次 capitulation-depth filter 跨資產延伸（IWM-013 後），lesson #19 family v9「dual-source capitulation confirmation」首例**, cross-asset extension on IWM-013 Att3 base). Three iterations: Att1 ★ (max_qqq_10d_return=-0.015) Part A 7/100% WR/Sharpe **2.80** cum +27.09% / Part B 2/100% WR std=0 cum +8.16% / min(A,B)† **2.80** (+374% vs IWM-013 Att3 0.59), 過濾兩筆 IWM-013 殘存 SL（2021-11-26 Omicron QQQ 10d=+0.16% / 2023-03-13 SVB QQQ 10d=-1.11%）, A/B 累計差 33.1%→18.5% (< 30% ✓) ; Att2 (max_qqq_10d_return=-0.020) 與 Att1 完全相同, robustness 確認 (-2.0%, -1.5%) 為甜蜜帶 ; Att3 (max_qqq_10d_return=-0.010) min 0.98（放回 SVB SL）, 確認 (-1.5%, -1.11%) 為 SVB SL 過濾甜蜜邊界. **新跨資產 lesson #25 候選**：Broad-Market Macro Context Confirmation Gate 為 sub-segment ETF capitulation MR 的雙來源 confirmation 維度. **跨資產假設（待驗證）**：QQQ 10d gate 應在 XBI / KRE / SOXX / IGV / XLF 等 sub-segment ETF 上有效（threshold 需依 sub-segment vs QQQ 相關性調整）.
   note_2026_05_01_ura: URA-013 Att2 added (Multi-Period Capitulation-Strength Filter MR, **repo 首次「5日 return cap」維度於任何資產，repo 首次「ATR ratio BAND + 多日 return cap」雙重 supplement 組合**, lesson #19 family extension to 5-day window). Three iterations on URA-012 Att2 base + 5d return cap. Att1 (5d cap >= -10.5%) Part A 14/78.6%/Sharpe 0.71 / Part B 7/85.7%/Sharpe 1.07 / min 0.71 (+51%); Att2 ★ (5d cap >= -9.0%) Part A 9/88.9%/Sharpe **1.22** / Part B 4/100% std=0 / min(A,B)† **1.22** (+160% vs URA-012 0.47, **URA 結構性 Sharpe 上限第二次連續突破，repo 罕見**); Att3 (5d cap >= -9.5% robustness check) min 0.90 (-26% vs Att2, 確認 -9.0% 為 URA Part A 5d return 分布最佳切點). **Core findings (lesson #19 family v8)**: (1) 5d return cap 為 lesson #19 family 第 5 個有效維度（補 1d/2d/3d/ATR）; (2) 「ATR ratio BAND + 多日 return cap」雙重 supplement 為 repo 首次正交維度組合（vol-regime filter + multi-day acceleration filter）; (3) Lesson #19 family 5d window 適用條件：baseline 殘餘 SLs 集中於「multi-day continuation」結構（5d 顯著 deeper than winners）; (4) URA-013 為 lesson #19 family 第 5 種多維度組合變體（前作：DIA-012 1d+3d / GLD-014 2d+1d / INDA-011 2d+3d / EWZ-007 1d-surgical / SIVR-018 ATR+3d；URA-013 首次 ATR-BAND+5d 最廣維度組合）。**新跨資產假設（待驗證）**：5d cap 維度可能適用其他 12+ 次實驗已飽和的政策/事件驅動高波動 ETF（FCX/COPX/IWM）。
   note_2026_04_28_soxl: SOXL-012 Att3 added (Volatility-Regime-Gated Capitulation Buy, **repo 第 3 次 lesson #23 BB-Width Regime Gate 成功，首次 leveraged 板塊 ETF (3x 半導體) 驗證**, cross-asset port from TQQQ-018 / TLT-007). Three iterations: Att1 (BB<0.55) min 0.55 — Part B 損失 2 winners (BB 0.709 / 0.628); Att2 (BB<0.50) min 0.56 — Part A 達標 0.70 但 Part B 仍卡 2024-07-19 SL (BB 0.486 剛通過); **Att3 ★ (BB<0.43)** Part A 5/80%/Sharpe **1.39** cum +82.67% MDD -8.48% / Part B 2/100% std=0 cum +39.24% / min(A,B)† **1.39** (+99% vs SOXL-010 0.70，+196% vs SOXL-006 0.47)。**核心發現（lesson #23 邊界擴展）**：(1) BB-width 閾值不可線性對 vol 縮放 — TLT 0.05 / TQQQ 0.48 / SOXL 0.43，閾值取決於資產 SLs/Ws BB 分布重疊結構而非 vol 量級；(2) SOXL Part A SLs/Ws BB 高度重疊 (SLs 0.386-0.615 / Ws 0.366-0.576)，需極窄閾值才能達成 80% WR Part A；(3) Part B std=0 採 lesson #19 family convention 同 EWJ-005/EWT-008/SPY-009/IWM-013；(4) leveraged ETF lesson #23 適用性驗證 — TQQQ (3x QQQ index) → SOXL (3x SOXX sector) 雙資料點，建議擴展至 TECL/FNGU/CURE 跨資產驗證.
@@ -190,7 +191,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | EWJ | EWJ-003 Att3 | BB 下軌+回檔上限+WR+ATR（混合進場）| 0.60† | 4 次實驗 ✓ |
 | EWT | EWT-009 Att3 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor ≤-1.5%**（混合進場+2DD floor 精煉）| 1.11† | 9 次實驗 ✓ |
 | VGK | VGK-008 Att2 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor <=-2.0%**（VGK-007 + 2DD floor 精煉）| 2.60 | 8 次實驗 ✓ |
-| XLU | XLU-011 | 波動率自適應均值回歸 | 0.67 | 11 次實驗 ✓ |
+| XLU | XLU-013 Att2/Att3 | XLU-012 ATR-vol-filtered MR + **^MOVE 3d change <= +5.0**（forward-looking implied vol DIRECTION filter，repo 第 2 次 lesson #24 跨資產驗證 + 首次 ^MOVE DIRECTION 維度發現）| **1.59** | 13 次實驗 ✓ |
 | INDA | INDA-010 Att3 | 回檔+WR+ClosePos+ATR+**2DD floor <=-2.0%**（EEM 方向加深）| 0.30 | 10 次實驗 ✓ |
 | FXI | FXI-005 Att3 | 出場優化均值回歸（TP5.5%/SL5%/20d）| 0.38 | 13 次實驗 ✓ |
 | EWZ | EWZ-007 Att3 | BB 下軌+回檔上限+WR+ClosePos+ATR+**1d cap >= -5.0%（surgical Petrobras filter）** | 0.95 | 7 次實驗 ✓ |
@@ -913,10 +914,10 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02**）
 <!-- freshness:
-  derived_from: [TLT-013]
-  validated: 2026-05-01
+  derived_from: [TLT-013,XLU-013]
+  validated: 2026-05-02
   data_through: 2025-12-31
   confidence: medium
 -->
@@ -949,10 +950,31 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 4. **不疊加平滑 / 方向變體**：MOVE 60d SMA、5d 變化方向、percentile rank 等變體在 TLT 上皆失敗，level filter 為唯一驗證方向
 5. **不疊加其他 cross-asset filter port**：TQQQ-018 prior-DD filter 對 TLT 反向，cross-asset filter 移植需先驗證資產 SL 結構
 
+**XLU-013 跨資產驗證 + DIRECTION 維度首次發現（2026-05-02，repo 第 2 次）**：
+- XLU-012 Att3（前任最佳 min(A,B) 0.75）有 1 筆 Part A SL（2021-09-20 FOMC taper signaling）+ A/B 訊號比 1.75:1（略不平衡）
+- **Att1（max_move_level=130 直接移植 TLT-013）失敗**：min(A,B) 0.75（與 baseline 完全相同，0% 改善）—— XLU 殘餘 SL 當日 MOVE=59.6 為 calm 區，LEVEL cap 結構非綁定。**MOVE LEVEL 維度對 XLU 結構性冗餘**
+- **Att2 ★ SUCCESS（max_move_level=130 + ^MOVE 3d change <= +5.0 DIRECTION filter）**：min(A,B) **1.59**（**+112% vs XLU-012 baseline 0.75**），Part A 6/100% WR/Sharpe 6.74/cum +18.11%，Part B 4/75% WR/Sharpe 1.59 不變。2021-09-20 SL 當日 MOVE 3d change=+5.65（恰於 +5 邊界外）為 isolated discriminator，所有 Part A TPs 3d change ∈ [-23.6, +4.03]
+- **Att3 ablation（max_move_level=999 disabled, direction filter only）**：與 Att2 完全相同 → **^MOVE LEVEL cap 對 XLU 結構性冗餘，DIRECTION (3d change) 為唯一 binding dimension**
+
+**核心新發現（lesson #24 v2）**：
+- **TLT vs XLU 維度選擇取決於資產與 rate 的耦合程度**：
+  - **TLT（rate-direct，30y treasury price tracking）→ MOVE LEVEL cap binding**（TLT-013 sweet spot 130，filter 2023-05-16 SVB SL）
+  - **XLU（rate-indirect，yield-spread + flight-to-defensive）→ MOVE DIRECTION (3d change) binding**（XLU-013 sweet spot +5.0，filter 2021-09-20 FOMC SL）
+- 結構差異：TLT 直接受 rate vol regime 影響，level cap 過濾持續高 vol 時期；XLU 透過 yield-spread 間接影響，僅「Fed 政策訊號日 bond vol 跳升 (rising direction)」造成失敗（duration shock + safety bid 同時崩壞）
+- **Implied vol 維度兩類**：(1) **LEVEL** = 持續高 vol regime 識別 / (2) **DIRECTION** = vol regime trajectory（rising / falling）識別。二者結構性正交
+
+**XLU-013 失敗子變體（不要重複嘗試）**：
+- **^MOVE 5d change 視窗**：5d 視窗使 2024-06-14 TP（5d +8.34）+ 2025-03-05 TP（+6.80）被誤殺。3d 視窗為 XLU 上 MOVE direction 唯一有效視窗
+- **^MOVE 3d change <= +4 加嚴閾值**：2020-10-30 TP（3d +4.03）被誤殺，Part A 1 TP 損失。+5.0 為 XLU 上甜蜜點邊界
+- **^MOVE 3d change <= +6 放寬閾值**：2021-09-20 SL（3d +5.65）未被過濾，等同 baseline
+
 **跨資產假設（待驗證）**：
+- **lesson #24 v2 適用範圍假設**：rate-indirect ETFs（XLRE / XLF / KRE 真實銀行 / IYR REIT）→ ^MOVE DIRECTION 維度可能 binding，閾值需依資產與 bond market 耦合強度調整
+- **rate-direct vs rate-indirect 判斷準則**：(a) duration sensitivity 直接 ≥ 90%（如 TLT、IEF）→ LEVEL 維度；(b) duration + risk premium 雙因子（如 XLU、XLRE、KRE）→ DIRECTION 維度
 - ^VIX <= X 對 SPY/QQQ/IWM/TQQQ MR 訊號的影響（TQQQ-004 已驗證 VIX>=25 過濾過嚴失敗，但相反方向 VIX<=X 過濾未測）
 - ^OVX 對 USO/XLE MR 過濾（USO 已飽和於 0.26，^OVX 可能突破）
 - ^GVZ 對 GLD/SIVR/GDX MR 過濾（GLD 已飽和於 0.49，^GVZ 可能突破）
+- **二維度組合假設**：對於耦合程度中等的資產，LEVEL + DIRECTION 雙重 implied vol gate 可能進一步精煉（XLU-013 Att2 已驗證單獨 DIRECTION 飽和，疊加 LEVEL 冗餘；其他資產可能不同）
 
 **Lesson #6 邊界精煉**：
 - ✅ **適用**：backward-looking realized vol gate 已飽和的高政策驅動資產（TLT 已驗證）

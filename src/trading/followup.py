@@ -176,8 +176,8 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "xlu_002_capped_pullback_wr",
-        "label": "XLU-002",
+        "experiment_name": "xlu_013_move_implied_vol_mr",
+        "label": "XLU-013",
         "ticker": "XLU",
         "has_trailing_stop": False,
     },
