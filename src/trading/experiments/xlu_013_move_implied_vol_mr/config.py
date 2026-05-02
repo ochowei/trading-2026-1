@@ -72,7 +72,9 @@ class XLU013Config(ExperimentConfig):
 
     # ^MOVE forward-looking implied vol regime gate（XLU-013 核心新增）
     move_ticker: str = "^MOVE"
-    max_move_level: float = 130.0
+    # Att3 ablation：max_move_level=999.0 effectively disables LEVEL cap，
+    # 隔離測試 DIRECTION filter 單獨效果（與 Att2 比較確認 cap 是否冗餘）
+    max_move_level: float = 999.0
     # ^MOVE direction filter — N 日 absolute change <= max_move_change
     # （正向上限過濾「Fed 政策訊號日 bond vol 跳升」結構，e.g. 2021-09-20 SL：
     #  MOVE 3d change +5.65，恰於 +5 邊界外）
