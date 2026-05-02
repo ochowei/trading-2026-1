@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-27T01:10:21.285771"
+    "execution_time": "2026-05-02T00:59:07.439287"
   },
   "part_a": {
     "ticker": "FCX",
@@ -355,7 +355,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-24"
+      "end": "2026-05-01"
     }
   }
 }

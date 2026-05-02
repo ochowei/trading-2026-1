@@ -155,9 +155,10 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 9. 各資產最佳策略速覽
 <!-- freshness:
-  validated: 2026-05-01
+  validated: 2026-05-02
   data_through: 2025-12-31
   confidence: high
+  note_2026_05_02_iwm: IWM-015 Att1 added (Macro-Confirmed Capitulation MR with QQQ 10d Gate, **repo 第 1 次 broad-equity-index macro context confirmation gate（非 pair trading RS），第 5 次 capitulation-depth filter 跨資產延伸（IWM-013 後），lesson #19 family v9「dual-source capitulation confirmation」首例**, cross-asset extension on IWM-013 Att3 base). Three iterations: Att1 ★ (max_qqq_10d_return=-0.015) Part A 7/100% WR/Sharpe **2.80** cum +27.09% / Part B 2/100% WR std=0 cum +8.16% / min(A,B)† **2.80** (+374% vs IWM-013 Att3 0.59), 過濾兩筆 IWM-013 殘存 SL（2021-11-26 Omicron QQQ 10d=+0.16% / 2023-03-13 SVB QQQ 10d=-1.11%）, A/B 累計差 33.1%→18.5% (< 30% ✓) ; Att2 (max_qqq_10d_return=-0.020) 與 Att1 完全相同, robustness 確認 (-2.0%, -1.5%) 為甜蜜帶 ; Att3 (max_qqq_10d_return=-0.010) min 0.98（放回 SVB SL）, 確認 (-1.5%, -1.11%) 為 SVB SL 過濾甜蜜邊界. **新跨資產 lesson #25 候選**：Broad-Market Macro Context Confirmation Gate 為 sub-segment ETF capitulation MR 的雙來源 confirmation 維度. **跨資產假設（待驗證）**：QQQ 10d gate 應在 XBI / KRE / SOXX / IGV / XLF 等 sub-segment ETF 上有效（threshold 需依 sub-segment vs QQQ 相關性調整）.
   note_2026_05_01_ura: URA-013 Att2 added (Multi-Period Capitulation-Strength Filter MR, **repo 首次「5日 return cap」維度於任何資產，repo 首次「ATR ratio BAND + 多日 return cap」雙重 supplement 組合**, lesson #19 family extension to 5-day window). Three iterations on URA-012 Att2 base + 5d return cap. Att1 (5d cap >= -10.5%) Part A 14/78.6%/Sharpe 0.71 / Part B 7/85.7%/Sharpe 1.07 / min 0.71 (+51%); Att2 ★ (5d cap >= -9.0%) Part A 9/88.9%/Sharpe **1.22** / Part B 4/100% std=0 / min(A,B)† **1.22** (+160% vs URA-012 0.47, **URA 結構性 Sharpe 上限第二次連續突破，repo 罕見**); Att3 (5d cap >= -9.5% robustness check) min 0.90 (-26% vs Att2, 確認 -9.0% 為 URA Part A 5d return 分布最佳切點). **Core findings (lesson #19 family v8)**: (1) 5d return cap 為 lesson #19 family 第 5 個有效維度（補 1d/2d/3d/ATR）; (2) 「ATR ratio BAND + 多日 return cap」雙重 supplement 為 repo 首次正交維度組合（vol-regime filter + multi-day acceleration filter）; (3) Lesson #19 family 5d window 適用條件：baseline 殘餘 SLs 集中於「multi-day continuation」結構（5d 顯著 deeper than winners）; (4) URA-013 為 lesson #19 family 第 5 種多維度組合變體（前作：DIA-012 1d+3d / GLD-014 2d+1d / INDA-011 2d+3d / EWZ-007 1d-surgical / SIVR-018 ATR+3d；URA-013 首次 ATR-BAND+5d 最廣維度組合）。**新跨資產假設（待驗證）**：5d cap 維度可能適用其他 12+ 次實驗已飽和的政策/事件驅動高波動 ETF（FCX/COPX/IWM）。
   note_2026_04_28_soxl: SOXL-012 Att3 added (Volatility-Regime-Gated Capitulation Buy, **repo 第 3 次 lesson #23 BB-Width Regime Gate 成功，首次 leveraged 板塊 ETF (3x 半導體) 驗證**, cross-asset port from TQQQ-018 / TLT-007). Three iterations: Att1 (BB<0.55) min 0.55 — Part B 損失 2 winners (BB 0.709 / 0.628); Att2 (BB<0.50) min 0.56 — Part A 達標 0.70 但 Part B 仍卡 2024-07-19 SL (BB 0.486 剛通過); **Att3 ★ (BB<0.43)** Part A 5/80%/Sharpe **1.39** cum +82.67% MDD -8.48% / Part B 2/100% std=0 cum +39.24% / min(A,B)† **1.39** (+99% vs SOXL-010 0.70，+196% vs SOXL-006 0.47)。**核心發現（lesson #23 邊界擴展）**：(1) BB-width 閾值不可線性對 vol 縮放 — TLT 0.05 / TQQQ 0.48 / SOXL 0.43，閾值取決於資產 SLs/Ws BB 分布重疊結構而非 vol 量級；(2) SOXL Part A SLs/Ws BB 高度重疊 (SLs 0.386-0.615 / Ws 0.366-0.576)，需極窄閾值才能達成 80% WR Part A；(3) Part B std=0 採 lesson #19 family convention 同 EWJ-005/EWT-008/SPY-009/IWM-013；(4) leveraged ETF lesson #23 適用性驗證 — TQQQ (3x QQQ index) → SOXL (3x SOXX sector) 雙資料點，建議擴展至 TECL/FNGU/CURE 跨資產驗證.
   note_2026_04_27: EWT-009 Att3 added (Post-Capitulation Vol-Transition MR, **repo 第 6 次「2DD floor」方向成功**，繼 USO-013 / EEM-014 / INDA-010 / VGK-008 / EWJ-005 後**首次半導體驅動 EM 單一國家 ETF 驗證**). Three iterations: Att1 (2DD floor <= -2.0%, VGK-008 直接移植) min 0.91 (+59.6% vs EWT-008 0.57，但 -2.0% 過嚴過濾 2 winners 並引入 cooldown shift 新 SL); Att2 (1d floor <= -1.0%, SPY-009/EWJ-005 1d 維度移植) min 1.01 但 **誤殺 Part B 2025-11-18 winner**（1d -0.78%）使 Part B 從 3 縮至 2; Att3 ★ (2DD floor <= -1.5%，精準目標 2022-01-25 SL 之 2d -0.46%) Part A 9/88.9%/Sharpe **1.11** cum +26.28% / Part B 3/100%/std=0 cum +10.87% / min(A,B)† **1.11**（+94.7% vs baseline 0.57）。**意外收益（cooldown chain shift 正向，lesson #19 例外）**：移除 2022-01-25 SL 後，原本被 cooldown 抑制的 2022-01-28 訊號活化並達標 +3.50%，Part A 訊號數保持 9 不變，WR 從 77.8%→88.9%（8 TPs + 1 SL）。Part B 全部 3 筆 winners 保留（2d -3.70%/-4.23%/-3.84% 皆深於 -1.5%）。**核心發現**：(1) EWT 2DD 維度有效（不同於 EWJ-005 Att1 的 2DD -2.0% 過嚴），因 EWT 有 1 筆淺 2DD SL（2022-01-25 2d -0.46%）剛好被 -1.5% 過濾，且所有 winners 2d 皆深於 -1.5%（最淺 -1.87% = 2023-03-15 TP）；(2) Att2 1d -1.0% 雖在 EWJ 上成功（EWJ-005 Att2 1d -0.5%）但 EWT 上 Part B 含 1 筆 1d -0.78% 淺 1d winner 而失敗，跨資產 1d 維度需檢查 Part B winners 1d 分布；(3) **lesson #19 雙向發現再擴展**：2DD floor 對 EWT 1.41% vol 半導體驅動 EM 單一國家 ETF 有效，**閾值精準度（-1.5% vs -2.0%）為關鍵變量**——2DD floor 並非「越深越好」，需逐資產檢視 winners/losers 的 2d 分布找最大切點。**新跨資產規則（lesson #19 family 精煉）**：2DD floor 閾值需匹配資產 winners 最淺 2d 與 losers 2d 的中位點 — EWT losers 含 -0.46% 淺 2d, winners 最淺 -1.87%, 甜蜜點 -1.5%；VGK losers 最淺 -1.47%~-1.68%, winners 最深 -2.0% 內, 甜蜜點 -2.0%；EWJ winners 廣泛分布 +0.17%~-2.43%, 2DD 無精準切點, 1d 維度 -0.5% 為甜蜜點。跨資產 2DD 閾值不可直接移植，需先做 trade-level 2d 分布分析。EWT-009 Att3 為新全域最優（9 次實驗、30+ 次嘗試）。
@@ -177,7 +178,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | VOO | VOO-004 Att3 | **Donchian 突破 + 5d 內 + 窄帶淺回檔（MBPC）** | 1.12† | 4 次實驗 ✓（**repo 首次 MBPC 成功**） |
 | SOXL | SOXL-012 Att3 | BB-Width Regime Gate (<0.43) + 精選超賣 | 1.39† | 12 次實驗 ✓（**repo 第 3 次 lesson #23 BB-width regime gate 成功 / 首次 leveraged 板塊 ETF 驗證**）|
 | TSM | TSM-008 | RS 出場優化 | 0.79 | 9 次實驗 ✓ |
-| IWM | IWM-013 Att3 | Capitulation-Depth Filter MR (RSI<8 oscillator depth) | 0.59† | 14 次實驗 ✓（IWM-014 MBPC 三次失敗，repo 第 4 次 MBPC 試驗、首次小型股寬基 ETF，擴展 lesson #21 失敗家族）|
+| IWM | **IWM-015 Att1** | **Macro-Confirmed Capitulation MR (IWM-013 Att3 + QQQ 10d <= -1.5% gate)** | **2.80†** | **15 次實驗 ★（IWM-015 repo 首次 broad-equity-index macro context confirmation gate，第 5 次 capitulation-depth filter 跨資產延伸，lesson #19 family v9 dual-source confirmation 首例，+374% vs IWM-013 Att3）**|
 | XBI | XBI-015 Att2 | 回檔範圍+WR+反轉K線+**ATR(20)/ATR(60) ≤ 1.10 vol stability gate**（lesson #22 跨策略 MR） | 0.46† | 15 次實驗 ✓（**repo 第 1 次 lesson #22 跨策略類型移植至 Pullback MR，第 1 次 ATR vol regime 在 MR 框架非冗餘驗證**） |
 | COPX | COPX-007 | 波動率自適應均值回歸 | 0.45 | 10 次實驗 ✓ |
 | URA | URA-013 Att2 | 回檔+RSI(2)+2DD+ATR BAND+**5日報酬 cap >= -9.0%**（lesson #19 family 5日維度擴展） | 1.22† | 13 次實驗 ✓（**repo 首次 5日報酬 cap 維度於任何資產 / repo 首次 ATR BAND + 多日 return cap 雙重 supplement 組合 / URA 結構性 Sharpe 上限第二次突破**）|
@@ -957,5 +958,67 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 - ✅ **適用**：backward-looking realized vol gate 已飽和的高政策驅動資產（TLT 已驗證）
 - 🔄 **待驗證**：其他 implied vol indices 對其底層 underlying（VIX/OVX/GVZ）
 - ❌ **不適用**：沒有對應 implied vol index 的資產（無 option market 或 option market 流動性不足）
+
+---
+
+## 25. Broad-Market Macro Context Confirmation Gate 為 sub-segment ETF capitulation MR 的雙來源 confirmation 維度（QQQ 對 IWM 首次驗證 2026-05-02）
+<!-- freshness:
+  derived_from: [IWM-015]
+  validated: 2026-05-02
+  data_through: 2025-12-31
+  confidence: medium
+-->
+
+當 sub-cap-segment / sub-sector ETF（IWM 小型股 / XBI 生技 / KRE 區域銀行 / SOXX 半導體 / IGV 軟體）在自身 oscillator depth filter 後仍殘存「孤立 sub-segment 急殺」SLs 時，**broad-equity-index 5-10 日報酬作為 macro context confirmation gate** 為下一個有效正交維度。
+
+**核心原理**：
+- Sub-segment ETF capitulation 結構分為兩類：
+  - **「broad-market 系統性 capitulation」**（COVID、升息週期、Yen carry、tariff shock）→ V 形反彈率高，dip-buying 受益
+  - **「孤立 sub-segment 急殺」**（個別 sub-segment 利空：FDA 壞消息 / 銀行擠兌 / 變種病毒）→ 續跌率高，dip-buying 易遭吞噬
+- 自身 RSI(2) / WR / pullback 維度無法區分（兩類訊號日的 sub-segment 行情皆極端），但 **broad-market（QQQ/SPY）在前 10 天的 return depth 為清晰分隔維度**
+
+**IWM-015 驗證（repo 首次任何資產，2026-05-02）**：
+- IWM-013 Att3（RSI(2)<8 oscillator depth）為 IWM 前任最優，min(A,B)† 0.59；殘存 2 SLs：2021-11-26 Omicron / 2023-03-13 SVB
+- 兩 SLs 訊號日 QQQ 10d：+0.16% / -1.11%（broad-market 健康或微回檔）
+- 全部 IWM-013 winners 訊號日 QQQ 10d 範圍：-1.31% ~ -12.04%（多數 <= -4%）
+- IWM-015 Att1（IWM-013 Att3 + QQQ 10d <= -1.5% gate）達成 min(A,B)† **2.80**（**+374%**），**首次突破 IWM 結構性 0.59 ceiling**
+- Part A WR 80% → **100%**, Part B WR 100% 維持
+- A/B 累計差 33.1% → **18.5%**（< 30% 達標，IWM-013 略超 30%）
+
+**失敗子變體（不要重複嘗試）**：
+- **過寬閾值（QQQ 10d <= -1.0%）**（IWM-015 Att3）：放回 SVB SL（QQQ 10d -1.11%）但 Omicron LOSS 仍被過濾，min 0.98（-65% vs Att1 2.80）；確認 (-1.5%, -1.11%) 為 SVB SL 過濾甜蜜邊界
+
+**規則**：
+1. **僅當自身 oscillator-depth filter 後仍殘存可清晰歸類為「孤立 sub-segment 急殺」的 SLs 時使用**：先確認自身 RSI / WR / pullback 維度已達結構性 ceiling
+2. **sub-segment ETF 與 broad-market index 對應關係**：
+   - Small-cap broad ETF (IWM) → QQQ 或 SPY（IWM 與 QQQ 較不重疊，QQQ 純 large-cap growth proxy）
+   - Sector ETF (XBI / KRE / SOXX / IGV / XLF / XLE) → SPY 或 QQQ（依 sector 風險偏好屬性）
+   - Single-country EM ETF (FXI / EWZ) → EEM 或 SPY（broad EM vs 美國 broad）
+3. **閾值校準步驟**：(a) 計算 SL 訊號日的 broad-market N 日報酬；(b) 計算 winner 訊號日 broad-market N 日報酬最大值；(c) 閾值設於 SL 區間與 winner 區間之間（IWM 上 SL = +0.16% / -1.11%，winner max = -1.31%，閾值 -1.5%）
+4. **lookback 期間調整**：N=10 日為 IWM 上 SLs vs winners 分隔最清晰，N=5 / N=15 可作 robustness check 但通常 10 日為正交於 1d/3d/5d 自身過濾的最佳維度
+5. **不可疊加 pair trading RS**：cross-asset confirmation 與 pair trading RS 為**根本不同的 cross-asset 用法**——前者要求 broad-market **同向確認** capitulation 結構，後者尋找 sub-segment vs broad-market **相對方向背離** 機會。IWM-009（IWM/SPY RS 配對）三次嘗試全部失敗已證實。
+
+**跨資產假設（待驗證）**：
+- **XBI (生技板塊)**：FDA event-driven 急殺 vs broad-market 確認 risk-off
+  → QQQ 或 SPY 10d gate 可能過濾 XBI-005 殘存 SLs
+- **KRE (區域銀行)**：銀行業利空（SVB / Signature Bank）vs broad-market 確認
+  → SPY 或 XLF 10d gate 可能過濾 KRE 訊號集合中「孤立銀行擠兌」訊號
+- **SOXX / IGV (半導體 / 軟體)**：科技 sub-sector 急殺 vs QQQ 同步確認
+  → QQQ 10d 為自然對應 broad-market
+
+**Lesson #19 family v9（dual-source capitulation confirmation）**：
+- v1-v8（USO-013 / DIA-012 / SPY-009 / EWJ-005 / EWT-008 / IWM-013 / EEM-014 / EWZ-007 / GLD-014 / INDA-011 / SIVR-018 / URA-013）：單一資產 raw return / oscillator depth
+- **v9 (IWM-015)**：自身 oscillator depth + 外部 broad-market N 日 return depth 雙來源 confirmation
+- 規則範圍擴展：當單一資產 capitulation depth filter 已達結構性 ceiling，引入外部 broad-market 作為第二維度可進一步分隔「broad-market 系統性 capitulation」vs「孤立 sub-segment 急殺」
+
+**Lesson #25 vs Lesson #24 對比**：
+- Lesson #24（^MOVE / ^VIX / forward-looking implied vol）：option market 隱含預期作為 forward-looking regime gate
+- Lesson #25（QQQ / SPY 5-10d return）：broad-market 同步 realized return 作為 macro context confirmation
+- 兩者**正交資訊維度**：implied vol 反映「未來波動預期」，broad-market return 反映「過去 N 日 macro stress 確認」
+
+**Lesson #25 邊界精煉**：
+- ✅ **適用**：sub-cap-segment / sub-sector ETF 已驗證 oscillator depth filter 結構性 ceiling，且 SLs/winners 在「broad-market N 日 return」維度可清晰分隔
+- 🔄 **待驗證**：XBI / KRE / SOXX / IGV / XLF 等 sub-segment ETF
+- ❌ **不適用**：broad-market ETF 自身（SPY/QQQ/DIA/VOO）—— 自身即為 broad-market；single-country EM ETF（FXI / EWZ / INDA）—— broad-market 確認應使用 EEM 而非美國 broad index
 
 ---
