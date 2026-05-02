@@ -56,7 +56,12 @@ class TLT014Config(ExperimentConfig):
 
     迭代紀錄：
       Att1 (min_relative_return=-0.05, divergence_lookback=20)：
-        TLT 20d return - SPY 20d return >= -5% 過濾，疊加於 TLT-013 Att1 完整框架。
+        Part A 7/71.4%/Sharpe **0.32** cum +5.29% / Part B 4/100% WR std=0 cum +10.38% /
+        min(A,B) **0.32**（+129% vs TLT-013 Att1 0.14）。2 個原始 Part A SLs
+        （2020-05-26、2021-02-04）皆被過濾，但 cooldown chain shift 引入 2021-02-08 新 SL。
+        A/B cum 差 49% > 30% ❌（從 61% 改善但未達標），訊號比 7:4 = 43% < 50% ✓
+
+      Att2 (min_relative_return=-0.03 加嚴)：
         TBD：執行回測後填寫結果。
     """
 
@@ -86,7 +91,7 @@ class TLT014Config(ExperimentConfig):
     divergence_lookback: int = 20  # N 日報酬差距
     # min_relative_return：TLT N 日報酬 - 基準 N 日報酬 必須 >= 此值
     # 即「TLT 不可比 SPY 落後超過 |min_relative_return|」
-    min_relative_return: float = -0.05
+    min_relative_return: float = -0.03
 
     # 冷卻期
     cooldown_days: int = 7
