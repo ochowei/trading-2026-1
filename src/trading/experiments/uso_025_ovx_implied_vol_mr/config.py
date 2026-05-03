@@ -67,10 +67,12 @@ class USO025Config(ExperimentConfig):
     # ^OVX forward-looking implied vol regime gate（USO-025 核心新增）
     ovx_ticker: str = "^OVX"
     # ^OVX direction filter — N 日 absolute change <= max_ovx_change
-    # 移植自 XLU-013 Att2/Att3（DIRECTION binding case）
+    # Att1: max_ovx_change=+5.0（XLU-013 sweet spot port，min 0.34）— SUCCESS baseline
+    # Att2: max_ovx_change=+3.0（tighter threshold，目標過濾 Part A 殘餘 SLs，
+    #       測試 USO event-driven shock 是否需要更嚴格的 implied vol DIRECTION 邊界）
     use_ovx_direction_filter: bool = True
     ovx_direction_lookback: int = 3
-    max_ovx_change: float = 5.0
+    max_ovx_change: float = 3.0
 
     # 冷卻期（同 USO-013）
     cooldown_days: int = 10
