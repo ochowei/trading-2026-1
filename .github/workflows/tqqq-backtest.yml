@@ -158,6 +158,7 @@ on:
           - "USO-022: uso_022_rsi_divergence_mr"
           - "USO-023: uso_023_vol_adaptive_mr"
           - "USO-024: uso_024_regime_breakout"
+          - "USO-025: uso_025_ovx_implied_vol_mr"
           - "SPY-001: spy_001_pullback_wr"
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
