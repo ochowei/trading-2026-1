@@ -61,11 +61,78 @@ NVDA-015 新增（lesson #22 + ATR vol regime）
 驗收目標：min(A,B) > 0.55，維持 A/B 平衡（cum diff < 30%、訊號比 < 50%）。
 
 ================================================================================
-迭代歷程（Iteration Log，待回測後填入實際結果）
+迭代歷程（Iteration Log）
 ================================================================================
-Att1：k_trend=1.00 strict（NVDA-013 MBPC 甜蜜點直接移植，停用 vol regime）
-Att2：k_trend=0.97 buffered（NVDA-012 BB Squeeze 甜蜜點，停用 vol regime）
-Att3：擇 Att1/Att2 之較佳 k_trend + 啟用 ATR vol regime k_vol=1.40
+Att1（k_trend=1.00 strict, vol regime disabled）：REJECT min(A,B) 0.37
+    結果：
+        Part A: 33 訊號, WR 63.6%, 累計 +117.18%, Sharpe **0.37**
+        Part B: 11 訊號, WR 81.8%, 累計  +72.37%, Sharpe **0.90**
+        min(A,B): **0.37**（vs NVDA-006 0.47 退化 -21%, vs NVDA-013 0.55 -33%）
+    失敗分析：
+        k=1.00 strict 過濾 2 Part A 訊號（NVDA-006 baseline 35→33）但 Part A
+        Sharpe 反而從 0.47 退化至 0.37。NVDA-006 Part A 11 SLs 集中於 2021 H2
+        泡沫期，當時 NVDA 持續強勢 SMA20 仍 > SMA60，SMA regime gate 對該批
+        SL 結構性無選擇性。
+
+Att2（k_trend=0.97 buffered, vol regime disabled）：REJECT min(A,B) 0.37（=Att1）
+    結果：與 Att1 完全相同（Part A 33/0.37, Part B 11/0.90, min 0.37）
+    失敗分析（核心發現）：
+        k=0.97 vs k=1.00 訊號集**完全相同**——RS 框架 signal-day SMA20/SMA60
+        ratio 全部 >= 1.00，無訊號落於 (0.97, 1.00) transition zone。
+
+        **核心發現（lesson #22 邊界精煉）**：RS Momentum 框架的進場條件
+        「NVDA 20d return - SMH 20d return >= 5%」**已隱含 NVDA 處於明顯
+        uptrend regime**——20 日 outperformance 幾乎不可能在 SMA20 < SMA60
+        的 bear regime 出現。因此 lesson #22 multi-week SMA regime gate 對
+        RS Momentum 框架**結構性非綁定**。
+
+        框架選擇力對比：
+        - BB Squeeze（TSLA-015/NVDA-012/FCX-013/COPX-011）→ SMA regime 提供
+          獨立選擇力（過濾 bear regime 假突破）
+        - MBPC（NVDA-013）→ SMA regime 提供部分選擇力 + ATR vol regime 提供
+          獨立選擇力（雙 gate 必要）
+        - Pullback MR（XBI-015）→ ATR vol regime 提供獨立選擇力
+        - **RS Momentum（NVDA-015）→ SMA regime gate 結構性冗餘**（RS 條件
+          已隱含 uptrend）
+
+Att3（k_trend=0.97 + ATR vol regime k_vol=1.40 啟用）：REJECT min(A,B) 0.48
+    結果：
+        Part A: 28 訊號, WR 67.9%, 累計 +132.53%, Sharpe **0.48**
+        Part B: 10 訊號, WR 90.0%, 累計  +85.63%, Sharpe **1.43**
+        min(A,B): **0.48**（vs NVDA-006 0.47 略升 +2%, vs NVDA-013 0.55 -13%）
+    A/B 平衡：
+        - 訊號比 5.6/yr vs 5.0/yr = 1.12:1（gap 11% < 50% ✓）
+        - cum 年化: Part A 18.3%/yr vs Part B 36.5%/yr, |36.5-18.3|/36.5
+          = 49.9% > 30% ❌（A/B 累計差 fail）
+    失敗分析：
+        ATR vol regime k=1.40 過濾 5 Part A 訊號（33→28）+ 1 Part B 訊號
+        （11→10），Part A WR 從 63.6% 升至 67.9%，Sharpe 0.37→0.48。
+        微幅改善，但仍未達 NVDA-013 Att3 全域最佳 0.55。
+        Part A 殘餘 SLs（Att3 仍有 9 LOSS）多為 2021 末段非 ATR 擴張的
+        高位 LOSS（pullback 過淺進場後續跌），ATR vol regime 無法捕捉。
+
+================================================================================
+跨資產 / 跨策略貢獻（Cross-Asset / Cross-Strategy Findings）
+================================================================================
+1. **lesson #22 邊界精煉（repo 第 1 次 RS Momentum 框架移植 — REJECT）**：
+   RS Momentum 框架因進場條件已隱含 uptrend regime，buffered multi-week SMA
+   regime gate **結構性冗餘**。lesson #22 適用框架更新為：
+   - 適用：BB Squeeze、MBPC、Pullback MR（進場無顯式趨勢限制）
+   - 不適用：RS Momentum（進場 RS 條件已隱含 uptrend）
+
+2. **NVDA-013 Att3 ATR vol regime 跨策略移植部分有效**：
+   ATR(20) ≤ 1.40 × ATR(60) 對 RS 框架提供 +0.11 Sharpe 改善（0.37→0.48），
+   但無法突破 NVDA-013 0.55 全域最佳。RS 框架 Part A 殘餘 SLs 集中於
+   non-ATR-expansion 結構（高位淺回檔後續跌），需其他維度過濾器。
+
+3. **NVDA 結構性 Sharpe 上限**：
+   NVDA-013 Att3 0.55 仍為全域最佳。RS 框架在 NVDA 上 min(A,B) 結構性
+   上限約 0.48-0.50，需突破需引入新維度（如 RS 動能 ROC、交易量確認、
+   Part-A-specific event filter）。
+
+4. **NVDA-014（負向 RS pairs MR）+ NVDA-015（lesson #22 至 RS）兩次 RS
+   framework 子方向 cross-strategy port 均失敗**——RS framework 與
+   regime/divergence overlay 結合於 NVDA 上達結構性飽和。
 """
 
 from dataclasses import dataclass
@@ -96,11 +163,12 @@ class NVDA015Config(ExperimentConfig):
     sma_regime_ratio_min: float = 0.97
 
     # === 多週期波動 regime 過濾（NVDA-013 ATR vol regime）===
-    # Att3 嘗試啟用，預期過濾 2021 H2 泡沫末段 ATR 擴張的假動量訊號
+    # Att3 ★ 啟用 vol regime（Att1/Att2 證實 SMA regime 對 RS 框架冗餘）
+    # k=1.40 為 NVDA-013 MBPC 框架甜蜜點直接移植
     atr_regime_short: int = 20
     atr_regime_long: int = 60
     vol_regime_max_ratio: float = 1.40
-    use_vol_regime: bool = False
+    use_vol_regime: bool = True
 
 
 def create_default_config() -> NVDA015Config:
