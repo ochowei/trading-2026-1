@@ -93,7 +93,7 @@ class NVDA015Config(ExperimentConfig):
     # Att2: k=0.97（NVDA-012 BB Squeeze 甜蜜點移植）
     sma_regime_short: int = 20
     sma_regime_long: int = 60
-    sma_regime_ratio_min: float = 1.00
+    sma_regime_ratio_min: float = 0.97
 
     # === 多週期波動 regime 過濾（NVDA-013 ATR vol regime）===
     # Att3 嘗試啟用，預期過濾 2021 H2 泡沫末段 ATR 擴張的假動量訊號
