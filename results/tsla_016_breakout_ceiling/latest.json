@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "execution_time": "2026-05-04T13:10:18.055962"
+    "execution_time": "2026-05-04T13:18:41.593155"
   },
   "part_a": {
     "ticker": "TSLA",
-    "total_signals": 11,
-    "wins": 8,
-    "win_rate": 0.7272727272727273,
-    "avg_return_pct": 5.85,
-    "std_return_pct": 6.93,
-    "cumulative_return_pct": 82.29,
-    "avg_holding_days": 6.4,
+    "total_signals": 10,
+    "wins": 7,
+    "win_rate": 0.7,
+    "avg_return_pct": 5.43,
+    "std_return_pct": 7.13,
+    "cumulative_return_pct": 65.72,
+    "avg_holding_days": 6.7,
     "max_drawdown_pct": -8.22,
-    "profit_factor": 5.11,
-    "sharpe_ratio": 0.84,
-    "sortino_ratio": 1.9,
-    "calmar_ratio": 0.71,
+    "profit_factor": 4.47,
+    "sharpe_ratio": 0.76,
+    "sortino_ratio": 1.69,
+    "calmar_ratio": 0.66,
     "max_consecutive_losses": 2,
-    "target_exits": 8,
+    "target_exits": 7,
     "stop_loss_exits": 2,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
@@ -78,17 +78,6 @@
         "max_drawdown_pct": 9.31
       },
       {
-        "date": "2020-08-17",
-        "entry_date": "2020-08-18",
-        "exit_date": "2020-08-21",
-        "entry": 126.79,
-        "exit": 139.47,
-        "return_pct": 10.0,
-        "holding_days": 3,
-        "exit_type": "target",
-        "max_drawdown_pct": -3.19
-      },
-      {
         "date": "2020-11-18",
         "entry_date": "2020-11-19",
         "exit_date": "2020-11-24",
@@ -144,7 +133,7 @@
         "max_drawdown_pct": -1.82
       }
     ],
-    "filled_count": 11,
+    "filled_count": 10,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
