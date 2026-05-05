@@ -1,8 +1,8 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-05-01
+  last_validated: 2026-05-05
   gradient_validated: 2026-03-30
   data_through: 2025-12-31
-  note: COPX-012 added 2026-05-01 (Volatility-Acceleration-Bounded MR, **repo 第 3 次 ATR ratio CEILING 跨資產試驗、repo 首次商品/礦業 ETF BAND 驗證 — 全部失敗**, cross-asset port from CIBR-014 Att2 / FXI-014 Att2 / URA-013 Att2). Three iterations all failed vs COPX-007 baseline 0.45 與全域最佳 COPX-011 Att3 0.64. Att1 (CEILING <= 1.40, CIBR-014 reference 直接移植) Part A 20/70.0%/Sharpe **0.28** cum +21.72% / Part B 9/77.8%/Sharpe 0.50 cum +15.70% / min **0.28** — CEILING 1.40 過濾 1 個 Part A winner + 1 個 Part B winner 並觸發 lesson #19 cooldown chain shift（max consec losses 2→4，連續 4 個 Part A SLs：2019-05-06/2019-08-01/2020-01-28/2020-02-25）；Att2 (CEILING <= 1.55 放鬆至最極端) Part A 21/71.4%/Sharpe **0.32** cum +25.98% / Part B 10/80.0%/Sharpe 0.57 cum +19.74%（Part B 完全不變）/ min **0.32** — CEILING 1.55 對 Part B 非綁定，但 Part A 訊號日期改變（cooldown chain shift），新訊號為 SL；Att3 (停用 CEILING + 5d return cap >= -8%, URA-013 cross-asset port) Part A 14/57.1%/Sharpe **0.00** cum -0.98% / Part B 8/87.5%/Sharpe **0.92** cum +21.32%（**+62% vs baseline**）/ min **0.00** — 5d cap -8% 過濾 7 個 Part A 訊號幾乎全為 winners（COPX winners 系統性伴隨深 5d 累計跌幅 -8%~-15%），但 Part B 受惠於過濾 2024-07-19 SL（5d -8.5%）。**核心發現**：(1) **COPX winners 在 ATR ratio 維度反向於 CIBR/FXI**——COPX 高品質 panic flush bounces 伴隨 ATR ratio > 1.40 in-crash acceleration，與 CIBR (FDA news-driven 持續崩盤) / FXI (policy continuation 持續崩盤) 結構**反向**；(2) **COPX winners 在 5d return 維度反向於 URA**——COPX winners 集中深 5d capitulation (-8%~-15%)，URA winners 集中淺 5d (-3%~-8%)，cap 方向結構相反；(3) **新跨資產規則（lesson #15 v2 + #19 v8 邊界擴展）**：任何 oscillator/return-based 上限濾波器（CEILING / cap 方向）對「商品超級週期驅動的礦業 ETF」（COPX、CIBR-XME 類別）結構性失效——winners 與 losers 在 acceleration / multi-day decline 維度的分布**winners 偏深**且跨完整範圍，無單一切點可區分；(4) **與 FCX-013 lesson #22 反向發現平行**（k=1.00 嚴格優於 k<1 buffered），共同確認商品/礦業類別「extreme regime entry 策略空間」與其他資產類別不同。**Att3 Part B 改善 +62%（0.57→0.92）為唯一 partial signal**——5d cap 雖過濾 Part B 1 SL 為甜蜜方向，但與 Part A 災難性退化不可調和。COPX 第 12 次失敗策略類型（後於突破、配對、動量、ATR 自適應、RSI(2)、BB 下軌混合、RSI hook、2DD/1DD filter、Donchian、RS 動量、ATR ceiling/5d cap 共 12 大方向）。COPX-011 Att3 仍為全域最優（12 次實驗、51+ 次嘗試）。COPX-011 added 2026-04-28 (Multi-Week Regime-Aware BB Squeeze Breakout, **repo 第 4 次 lesson #22 跨資產試驗，首次商品/礦業 ETF 驗證**, cross-asset port from FCX-013). Three iterations, **Att3 SUCCESS — repo 首次 regime BOX（k_min + k_max 雙向）發現**. Att1 (k_min=1.00 strict, FCX-013 直接移植) FAILED min(A,B) **-0.04** Part A 14/78.6%/Sharpe **0.65**（+97% vs COPX-005 baseline 0.33）/ Part B 3/33.3%/Sharpe -0.04 — k=1.00 強過濾 Part A 弱 regime SLs，但同時過濾 Part B 唯一 transition winner（2024-03-06 TP，ratio ~0.99）並觸發 lesson #19 cooldown chain shift 引入 2024-05-14 SL（ratio ~1.094 過熱）。Att2 (k_min=0.99 buffered, TSLA 移植) FAILED min(A,B) **0.28** Part A 14/71.4%/Sharpe 0.43 / Part B 4/50%/Sharpe 0.28 — k=0.99 緩衝保留 2024-03-07 TP 解除 cooldown shift 副作用，但同時放行 2020-10-23 Part A SL，且 2024-05-14 SL（ratio 1.094）仍未過濾。Att3 ★ (regime BOX = [k_min=1.00, k_max=1.09]，雙向 regime 過濾) SUCCESS min(A,B) **0.64**（+42% vs COPX-007 baseline 0.45）Part A 10 訊號 WR **80.0%**/Sharpe **0.72** cum +40.03% MDD -6.57% PF 4.29（6 TP / 1 SL / 3 EX）/ Part B 2/50%/Sharpe **0.64** cum +5.35%（1 TP / 1 EX，2024-05-14 SL ratio 1.094 被 k_max=1.09 精準過濾）。**核心發現（repo 首次 regime BOX）**：(1) 商品/礦業 ETF（COPX）vs 個股（FCX）regime 結構差異：FCX 個股 Part B SL 集中於 ratio<1.00（k_min=1.00 解決），COPX ETF Part B SL 集中於 ratio>1.09 過熱牛末（需 k_max=1.09）；(2) ETF 平均化效應使 SMA20/SMA60 ratio 變化更平滑，過熱訊號在 ETF 上更明顯（個股波動使 ratio 噪音消除過熱信號）；(3) lesson #22 v2 精煉：buffered SMA regime 在商品/礦業類資產的應用上，ETF 形式需 BOX 結構（k_min + k_max 雙向）。**Acceptance criteria**：✓ Sharpe +42% > 基線 / ✗ A/B annualized cum gap 66.4%（>30%，COPX 結構性邊界，與 FCX-013 Att3 44% 同類）/ ~ A/B annualized signal gap 50%（boundary）/ ✓ 成交模型完整 / ✓ Repo 較少使用方向（lesson #22 第 4 次跨資產 + repo 首次 regime BOX）。**新跨資產規則**：lesson #22 buffered SMA regime 對商品/礦業類資產，個股形式需單純下限（FCX-013 k=1.00），ETF 形式需 BOX（COPX-011 [1.00, 1.09]）—— 推測 ETF 平均化效應為機制差異根源。COPX-011 Att3 為新全域最優（11 次實驗、48+ 次嘗試）。COPX-010 added 2026-04-23 (Post-Capitulation Vol-Transition MR, **repo first 2DD/1DD entry-time filter trial on commodity ETF**, cross-asset port from CIBR-012 Att3). Three iterations all failed vs COPX-007 min 0.45. **Trade-level analysis (n=21 Part A trades) reveals COPX winners and losers cannot be reliably distinguished by 2DD or 1DD direction**: losers Pullback -10~-13%/2dRet +0.2~-7.5%/1dRet -2.1~-5.3% overlap with winners' broader ranges. Att1 (2DD cap >= -5.5% CIBR direction) Part A WR 76.2%->61.1% Sharpe 0.08 — cap removed deep-2DD winners (COPX winners 2dRet typically deeper than losers, OPPOSITE to CIBR pattern). Att2 (2DD floor <= -3% EEM/INDA direction) Part A unchanged (most signals naturally have deep 2DD) but Part B WR 80%->66.7% Sharpe 0.21 — filtered 5 shallow-2DD winners (2024-01-22, 2024-08-07, 2024-12-17, 2025-03-03, 2025-11-20). Att3 (weak-capitulation filter: skip if 1DD>-3% AND ClosePos>0.30, best of 3) precisely targeted 2 weak-capitulation losers (2019-05-06 1DD-2.12%/CP0.97, 2025-03-31 1DD-2.35%/CP0.81); Part A 0.38 / **Part B 0.57 unchanged** (filter+cooldown shift exchange 1W+1L for 1W+1L) / min **0.38**. **A/B balance achieved (cum diff 28.6%<30%, signal ratio 1.9:1<50%) but Part A Sharpe degraded by cooldown chain shift (lesson #19) introducing 2019-05-13 new SL (4-month trade war continuation)**. **Cross-asset finding**: REJECT CIBR-012 cross-asset hypothesis on COPX 2.25% vol commodity ETF — CIBR 1.53% vol losers cluster deep 2DD (cap effective), COPX winners span deep+shallow 2DD (cap/floor both fail). Extends lesson #20b failure family to "single-day momentum filter" category on commodity ETFs — paralleling TQQQ-017 (ClosePos/2DD/Prev RSI failure on leveraged index). COPX-010 superseded by COPX-011 as global optimum.
+  note: COPX-013 added 2026-05-05 (Macro-Confirmed Vol-Adaptive Capitulation MR, **repo 第 3 次 lesson #25 cross-asset 試驗、首次 commodity miners ETF 上 lesson #24 + #25 雙來源組合 — 全部失敗**, cross-asset port from IWM-015 + cross-strategy port to commodity miners ETF). Three iterations all failed vs COPX-011 Att3 全域最佳 0.64. Att1 (SPY 10d <= 0%, loose threshold) Part A 20/80.0%/Sharpe **0.57** cum +43.39% (+27% Part A 改善 vs baseline 0.45) / Part B 8/75.0%/Sharpe **0.42** cum +11.78% (-26% vs baseline 0.57，cooldown chain shift 引入新 SL 2024-07-22 替換被過濾的 2024-07-18) / min **0.42** REJECT vs 0.64; Att2 (SPY 10d <= -1.5%, IWM-015 sweet spot 直接移植) Part A 16/75.0%/Sharpe **0.42** cum +24.95% (-1.5% 閾值過嚴切除 6 個 -1.5%~0 中性帶 winners) / Part B 6/83.3%/Sharpe **0.71** cum +13.26% (+25% Part B 改善 vs baseline) / min **0.42** REJECT — A/B 平衡達標 (cum gap 24.7%<30% / signal ratio 1.07:1) 但 Part A 退化使 min 不變; Att3 (SPY 10d <= 0 AND VIX 3d <= +5, 雙來源 lesson #24 + #25 組合) Part A 15/**60.0%**/Sharpe **0.06** cum +2.49% (max consec losses **4**! WR 76.2%→60%) / Part B 8/75%/Sharpe 0.42 / min **0.06** REJECT (三次最差) — 雙閘門組合理論覆蓋全部 7 SLs，但激活原本被壓制的 5 個新 Part A SLs（含 2 連續 SLs 模式），cooldown chain shift 結構性放大反向選擇. **核心失敗模式**: cooldown chain shift（lesson #19 family）系統性抵消濾波效應——當基礎策略 cooldown 12 日 + 訊號密度 ~4/yr，過濾任何訊號解除 12 日 cooldown lockout 激活鄰近訊號，COPX 的 SLs 與 winners 在 SPY 10d/VIX 3d 維度無乾淨分隔。**lesson #25 cross-asset hypothesis REJECT**: 既有 lesson #25 僅適用「broad-market 為主要驅動因子的 sub-segment ETF」（IWM small-cap ✓），不適用 commodity miners ETF（COPX winners SPY 10d 廣泛分布 -9.13%~+4.72%，無單向 macro confirmation 區分力）。**lesson #19 family 邊界擴展**：當基礎策略 cooldown ≥10 日 + 訊號密度 < 5/yr + filter 過濾比例 > 40% 時，cooldown chain shift 結構性放大反向選擇——多重 macro filter 疊加為 lesson #19 family 中的「chain-shift collapse」失敗模式（repo 首次發現）。**新失敗家族擴展**: lesson #25 適用邊界精煉至「broad-market 為主要驅動因子的 sub-segment ETF」（IWM ✓ / XBI ✗ / COPX ✗）；lesson #24 + #25 雙來源組合在 chain-shift 敏感策略上結構性失敗。COPX 第 13 次失敗策略類型，COPX-011 Att3 仍為全域最優（13 次實驗、51+ 次嘗試）。COPX-012 added 2026-05-01 (Volatility-Acceleration-Bounded MR, **repo 第 3 次 ATR ratio CEILING 跨資產試驗、repo 首次商品/礦業 ETF BAND 驗證 — 全部失敗**, cross-asset port from CIBR-014 Att2 / FXI-014 Att2 / URA-013 Att2). Three iterations all failed vs COPX-007 baseline 0.45 與全域最佳 COPX-011 Att3 0.64. Att1 (CEILING <= 1.40, CIBR-014 reference 直接移植) Part A 20/70.0%/Sharpe **0.28** cum +21.72% / Part B 9/77.8%/Sharpe 0.50 cum +15.70% / min **0.28** — CEILING 1.40 過濾 1 個 Part A winner + 1 個 Part B winner 並觸發 lesson #19 cooldown chain shift（max consec losses 2→4，連續 4 個 Part A SLs：2019-05-06/2019-08-01/2020-01-28/2020-02-25）；Att2 (CEILING <= 1.55 放鬆至最極端) Part A 21/71.4%/Sharpe **0.32** cum +25.98% / Part B 10/80.0%/Sharpe 0.57 cum +19.74%（Part B 完全不變）/ min **0.32** — CEILING 1.55 對 Part B 非綁定，但 Part A 訊號日期改變（cooldown chain shift），新訊號為 SL；Att3 (停用 CEILING + 5d return cap >= -8%, URA-013 cross-asset port) Part A 14/57.1%/Sharpe **0.00** cum -0.98% / Part B 8/87.5%/Sharpe **0.92** cum +21.32%（**+62% vs baseline**）/ min **0.00** — 5d cap -8% 過濾 7 個 Part A 訊號幾乎全為 winners（COPX winners 系統性伴隨深 5d 累計跌幅 -8%~-15%），但 Part B 受惠於過濾 2024-07-19 SL（5d -8.5%）。**核心發現**：(1) **COPX winners 在 ATR ratio 維度反向於 CIBR/FXI**——COPX 高品質 panic flush bounces 伴隨 ATR ratio > 1.40 in-crash acceleration，與 CIBR (FDA news-driven 持續崩盤) / FXI (policy continuation 持續崩盤) 結構**反向**；(2) **COPX winners 在 5d return 維度反向於 URA**——COPX winners 集中深 5d capitulation (-8%~-15%)，URA winners 集中淺 5d (-3%~-8%)，cap 方向結構相反；(3) **新跨資產規則（lesson #15 v2 + #19 v8 邊界擴展）**：任何 oscillator/return-based 上限濾波器（CEILING / cap 方向）對「商品超級週期驅動的礦業 ETF」（COPX、CIBR-XME 類別）結構性失效——winners 與 losers 在 acceleration / multi-day decline 維度的分布**winners 偏深**且跨完整範圍，無單一切點可區分；(4) **與 FCX-013 lesson #22 反向發現平行**（k=1.00 嚴格優於 k<1 buffered），共同確認商品/礦業類別「extreme regime entry 策略空間」與其他資產類別不同。**Att3 Part B 改善 +62%（0.57→0.92）為唯一 partial signal**——5d cap 雖過濾 Part B 1 SL 為甜蜜方向，但與 Part A 災難性退化不可調和。COPX 第 12 次失敗策略類型（後於突破、配對、動量、ATR 自適應、RSI(2)、BB 下軌混合、RSI hook、2DD/1DD filter、Donchian、RS 動量、ATR ceiling/5d cap 共 12 大方向）。COPX-011 Att3 仍為全域最優（12 次實驗、51+ 次嘗試）。COPX-011 added 2026-04-28 (Multi-Week Regime-Aware BB Squeeze Breakout, **repo 第 4 次 lesson #22 跨資產試驗，首次商品/礦業 ETF 驗證**, cross-asset port from FCX-013). Three iterations, **Att3 SUCCESS — repo 首次 regime BOX（k_min + k_max 雙向）發現**. Att1 (k_min=1.00 strict, FCX-013 直接移植) FAILED min(A,B) **-0.04** Part A 14/78.6%/Sharpe **0.65**（+97% vs COPX-005 baseline 0.33）/ Part B 3/33.3%/Sharpe -0.04 — k=1.00 強過濾 Part A 弱 regime SLs，但同時過濾 Part B 唯一 transition winner（2024-03-06 TP，ratio ~0.99）並觸發 lesson #19 cooldown chain shift 引入 2024-05-14 SL（ratio ~1.094 過熱）。Att2 (k_min=0.99 buffered, TSLA 移植) FAILED min(A,B) **0.28** Part A 14/71.4%/Sharpe 0.43 / Part B 4/50%/Sharpe 0.28 — k=0.99 緩衝保留 2024-03-07 TP 解除 cooldown shift 副作用，但同時放行 2020-10-23 Part A SL，且 2024-05-14 SL（ratio 1.094）仍未過濾。Att3 ★ (regime BOX = [k_min=1.00, k_max=1.09]，雙向 regime 過濾) SUCCESS min(A,B) **0.64**（+42% vs COPX-007 baseline 0.45）Part A 10 訊號 WR **80.0%**/Sharpe **0.72** cum +40.03% MDD -6.57% PF 4.29（6 TP / 1 SL / 3 EX）/ Part B 2/50%/Sharpe **0.64** cum +5.35%（1 TP / 1 EX，2024-05-14 SL ratio 1.094 被 k_max=1.09 精準過濾）。**核心發現（repo 首次 regime BOX）**：(1) 商品/礦業 ETF（COPX）vs 個股（FCX）regime 結構差異：FCX 個股 Part B SL 集中於 ratio<1.00（k_min=1.00 解決），COPX ETF Part B SL 集中於 ratio>1.09 過熱牛末（需 k_max=1.09）；(2) ETF 平均化效應使 SMA20/SMA60 ratio 變化更平滑，過熱訊號在 ETF 上更明顯（個股波動使 ratio 噪音消除過熱信號）；(3) lesson #22 v2 精煉：buffered SMA regime 在商品/礦業類資產的應用上，ETF 形式需 BOX 結構（k_min + k_max 雙向）。**Acceptance criteria**：✓ Sharpe +42% > 基線 / ✗ A/B annualized cum gap 66.4%（>30%，COPX 結構性邊界，與 FCX-013 Att3 44% 同類）/ ~ A/B annualized signal gap 50%（boundary）/ ✓ 成交模型完整 / ✓ Repo 較少使用方向（lesson #22 第 4 次跨資產 + repo 首次 regime BOX）。**新跨資產規則**：lesson #22 buffered SMA regime 對商品/礦業類資產，個股形式需單純下限（FCX-013 k=1.00），ETF 形式需 BOX（COPX-011 [1.00, 1.09]）—— 推測 ETF 平均化效應為機制差異根源。COPX-011 Att3 為新全域最優（11 次實驗、48+ 次嘗試）。COPX-010 added 2026-04-23 (Post-Capitulation Vol-Transition MR, **repo first 2DD/1DD entry-time filter trial on commodity ETF**, cross-asset port from CIBR-012 Att3). Three iterations all failed vs COPX-007 min 0.45. **Trade-level analysis (n=21 Part A trades) reveals COPX winners and losers cannot be reliably distinguished by 2DD or 1DD direction**: losers Pullback -10~-13%/2dRet +0.2~-7.5%/1dRet -2.1~-5.3% overlap with winners' broader ranges. Att1 (2DD cap >= -5.5% CIBR direction) Part A WR 76.2%->61.1% Sharpe 0.08 — cap removed deep-2DD winners (COPX winners 2dRet typically deeper than losers, OPPOSITE to CIBR pattern). Att2 (2DD floor <= -3% EEM/INDA direction) Part A unchanged (most signals naturally have deep 2DD) but Part B WR 80%->66.7% Sharpe 0.21 — filtered 5 shallow-2DD winners (2024-01-22, 2024-08-07, 2024-12-17, 2025-03-03, 2025-11-20). Att3 (weak-capitulation filter: skip if 1DD>-3% AND ClosePos>0.30, best of 3) precisely targeted 2 weak-capitulation losers (2019-05-06 1DD-2.12%/CP0.97, 2025-03-31 1DD-2.35%/CP0.81); Part A 0.38 / **Part B 0.57 unchanged** (filter+cooldown shift exchange 1W+1L for 1W+1L) / min **0.38**. **A/B balance achieved (cum diff 28.6%<30%, signal ratio 1.9:1<50%) but Part A Sharpe degraded by cooldown chain shift (lesson #19) introducing 2019-05-13 new SL (4-month trade war continuation)**. **Cross-asset finding**: REJECT CIBR-012 cross-asset hypothesis on COPX 2.25% vol commodity ETF — CIBR 1.53% vol losers cluster deep 2DD (cap effective), COPX winners span deep+shallow 2DD (cap/floor both fail). Extends lesson #20b failure family to "single-day momentum filter" category on commodity ETFs — paralleling TQQQ-017 (ClosePos/2DD/Prev RSI failure on leveraged index). COPX-010 superseded by COPX-011 as global optimum.
 -->
 ## AI Agent 快速索引
 
@@ -10,7 +10,7 @@
 **前任最佳：** COPX-007（COPX-003 框架 + ATR(5)/ATR(20) > 1.05 波動率自適應過濾，Part A Sharpe 0.45，Part B Sharpe 0.57，min(A,B) 0.45，+28.6% vs COPX-003）
 **前前任最佳：** COPX-003（20日回檔 10-20% + WR(10) ≤ -80 + SL -4.5%，Part A Sharpe 0.39，Part B Sharpe 0.35）
 **滾動窗口分析摘要：** COPX-001 ✓✓ 雙漸變（ΔWR max 9.2pp，10/12 正報酬窗口）
-**最新實驗：** COPX-011（Multi-Week Regime-Aware BB Squeeze Breakout，lesson #22 跨資產移植 + repo 首次 regime BOX 發現，**Att3 SUCCESS**）
+**最新實驗：** COPX-013（Macro-Confirmed Vol-Adaptive Capitulation MR，lesson #25 + lesson #24 雙來源 forward-looking macro filter，**3 次嘗試全部失敗**，REJECT lesson #25 cross-asset to commodity miners ETF）
 
 **已證明無效（禁止重複嘗試）：**
 - 回檔 ≥ 8% 搭配 WR-80（Part A WR 59.5% = 盈虧平衡線，Sharpe 0.00，累計 -2.99%）
@@ -39,6 +39,13 @@
   - Att2（2DD floor <= -3.0%，EEM/INDA 方向）：Part A 21 訊號 Sharpe 0.45（一筆 cooldown 偏移仍 SL）/ Part B 6 訊號 WR 66.7% Sharpe **0.21** cum +4.35%，min(A,B) 0.21。COPX 2024-2025 牛市淺 2DD 反彈訊號為 Part B 主要贏家，floor 方向系統性殺死它們
   - Att3（弱 capitulation 雙條件過濾：跳過 1DD>-3% AND CP>0.30，best of 3）：Part A 19 訊號 WR 73.7% Sharpe **0.38** cum +27.64% / Part B 10 訊號 WR 80% Sharpe **0.57**（**完全持平**）cum +19.74%，min(A,B) **0.38**。**A/B 平衡達標**（cum 差 28.6%<30%、訊號比 1.9:1<50%）但 Part A 退化由 cooldown shift 引入 2019-05-13 新 SL 抵消
   - **核心失敗**：(1) COPX winners/losers 的 2DD/1DD 分佈大幅重疊，無單一維度具區分力；(2) cooldown chain shift（lesson #19）即便精準過濾 2 個 weak-capitulation losers 仍引入新 SL；(3) **拒絕 CIBR-012 跨資產假設於 COPX**：CIBR 1.53% vol losers 集中深 2DD（cap 有效），COPX 2.25% vol winners 跨深淺 2DD 廣泛分佈（cap/floor 雙向均失效）。延伸 lesson #20b 失敗家族至「single-day momentum filter」類別於商品 ETF，平行於 TQQQ-017 槓桿指數失敗。**COPX-007 確認為 2.25% vol 商品 ETF 結構性 Sharpe 上限**
+- **Macro-Confirmed Vol-Adaptive Capitulation MR（COPX-013，lesson #25 IWM-015 + lesson #24 ^VIX 雙來源跨資產移植，3 次嘗試全部失敗）**：
+  - Att1（SPY 10d <= 0%，loose threshold）：Part A 20/80%/**0.57**/cum +43.39% / Part B 8/75%/**0.42**/cum +11.78%，min **0.42**。Part A 改善（過濾 1 broad-up SL），Part B 因 cooldown chain shift 引入新 SL（2024-07-22 替換被過濾的 2024-07-18）+ 過濾 3 winners
+  - Att2（SPY 10d <= -1.5%，IWM-015 sweet spot 直接移植）：Part A 16/75%/**0.42**/cum +24.95% / Part B 6/83.3%/**0.71**/cum +13.26%，min **0.42**。Part B 改善（zero-loss 直觀方向）+ A/B 平衡達標（cum gap 24.7%<30%，signal ratio 1.07:1<50%）但 Part A 退化（過嚴切除 6 個 -1.5%~0 中性帶 winners）
+  - Att3（SPY 10d <= 0 AND VIX 3d <= +5，lesson #25 + lesson #24 雙來源組合）：Part A 15/**60%**/**0.06**/cum +2.49%（max consec losses **4**! WR 76.2%→60%）/ Part B 8/75%/0.42/cum +11.78%，min **0.06**（三次最差）。雙閘門組合理論覆蓋全部 7 SLs，但激活原本被 cooldown 壓制的 5 個新 Part A SLs（含 2 連續 SLs 模式），cooldown chain shift 結構性放大反向選擇
+  - **核心失敗模式（repo 首次發現）**：cooldown chain shift collapse — 當基礎策略 cooldown ≥10 日 + 訊號密度 < 5/yr + filter 過濾比例 > 40% 時，多重 macro filter 疊加結構性放大反向選擇，winners/losers 在 SPY 10d/VIX 3d 維度無乾淨分隔加劇問題
+  - **lesson #25 cross-asset REJECT**：既有 lesson #25 僅適用「broad-market 為主要驅動因子的 sub-segment ETF」（IWM small-cap ✓），不適用 commodity miners ETF（COPX winners SPY 10d 廣泛分布 -9.13%~+4.72%，無單向 macro confirmation 區分力）
+  - **lesson #19 family 邊界擴展**：lesson #25 適用邊界精煉至「broad-market 為主要驅動因子的 sub-segment ETF」（IWM ✓ / XBI ✗ / COPX ✗）；多重 forward-looking macro filter 疊加為 lesson #19 family 中的「chain-shift collapse」失敗模式
 - **Volatility-Acceleration-Bounded MR（COPX-012，CIBR-014/FXI-014/URA-013 跨資產移植，3 次嘗試全部失敗）**：
   - Att1（CEILING <= 1.40，CIBR-014 reference 直接移植）：Part A 20/70.0%/Sharpe **0.28** cum +21.72% / Part B 9/77.8%/Sharpe 0.50 cum +15.70%，min(A,B) 0.28。CEILING 1.40 過濾 1 個 Part A winner + 1 個 Part B winner，並觸發 cooldown chain shift（max consec losses 2→4，連續 4 個 Part A SLs：2019-05-06/2019-08-01/2020-01-28/2020-02-25）
   - Att2（CEILING <= 1.55 放鬆至最極端）：Part A 21/71.4%/Sharpe **0.32** cum +25.98% / Part B 10/80.0%/Sharpe 0.57（**完全持平 baseline**）cum +19.74%，min(A,B) 0.32。CEILING 1.55 對 Part B 非綁定，但 Part A 訊號日期改變（cooldown chain shift），新訊號為 SL
@@ -108,6 +115,8 @@
 | COPX-009 | `copx_009_rsi_divergence_mr` | RSI(14) bullish hook divergence（SIVR-015 跨資產泛化測試，3 次嘗試均失敗）| ❌ 失敗 |
 | COPX-010 | `copx_010_vol_transition_mr` | Post-Capitulation Vol-Transition MR（CIBR-012 跨資產泛化測試，3 次嘗試均失敗）| ❌ 失敗 |
 | COPX-011 | `copx_011_regime_breakout` | Multi-Week Regime-Aware BB Squeeze Breakout（lesson #22 + regime BOX）| ✅ 當前最佳 |
+| COPX-012 | `copx_012_atr_ceiling_mr` | Volatility-Acceleration-Bounded MR（CEILING / 5d cap，3 次嘗試均失敗）| ❌ 失敗 |
+| COPX-013 | `copx_013_macro_confirmed_mr` | Macro-Confirmed Vol-Adaptive Capitulation MR（lesson #25 + #24 雙來源 forward-looking macro filter，3 次嘗試均失敗）| ❌ 失敗 |
 
 ---
 
@@ -942,3 +951,75 @@ SMA trend regime 至 COPX-005 BB Squeeze Breakout 之上，目標突破 COPX-007
 4. **COPX-005 BB Squeeze 失敗的真正原因**：非「突破策略不適用 COPX」，而是缺乏 regime
    context（無法區分健康牛市突破 vs 過熱牛末假突破）
 5. COPX-011 Att3 為新全域最優（11 次實驗、48+ 次嘗試）
+
+---
+
+## COPX-012: Volatility-Acceleration-Bounded MR（ATR ratio CEILING / 5d cap，3 次嘗試全部失敗）
+
+詳見 AI_CONTEXT 區塊（CIBR-014 / FXI-014 / URA-013 跨資產移植，全部失敗）。COPX winners 在 ATR ratio 與 5d return 維度與 CIBR/FXI/URA 反向分布——商品超級週期驅動的礦業 ETF（COPX、CIBR-XME 類別）winners 偏深 ATR 與 5d capitulation，winners/losers 跨完整範圍無單一切點可區分。
+
+---
+
+## COPX-013: Macro-Confirmed Vol-Adaptive Capitulation MR（lesson #25 + #24 雙來源 forward-looking macro filter，3 次嘗試全部失敗）
+
+### 目標 (Goal)
+
+跨資產移植 lesson #25（IWM-015 broad-market macro context confirmation gate）+ lesson #24（forward-looking implied volatility direction filter）至 COPX 銅礦 ETF，希望以 broad-market regime 過濾 COPX idiosyncratic decline（中美貿易戰、銅價特定衝擊）。
+
+### 進場條件
+
+| 條件 | 指標 | 閾值 |
+|------|------|------|
+| 1 | 20 日高點回檔 | 10-20%（同 COPX-007） |
+| 2 | Williams %R(10) | ≤ -80（同 COPX-007） |
+| 3 | ATR(5)/ATR(20) | > 1.05（同 COPX-007） |
+| 4 | SPY N 日報酬 | <= max_spy_return（lesson #25） |
+| 5 | ^VIX N 日變化 | <= max_vix_change（lesson #24） |
+| 6 | 冷卻期 | 12 天 |
+
+### 出場參數
+
+同 COPX-007（TP +3.5% / SL -4.5% / 持倉 20 天）
+
+### 迭代嘗試紀錄
+
+| # | 變更 | Part A | Part B | min(A,B) | 結論 |
+|---|------|--------|--------|----------|------|
+| 1 | SPY 10d <= 0%（loose） | 20/80%/0.57/+43.4% | 8/75%/0.42/+11.8% | 0.42 | ❌ Part B chain shift 引入新 SL |
+| 2 | SPY 10d <= -1.5%（IWM-015 sweet spot） | 16/75%/**0.42**/+24.9% | 6/83.3%/**0.71**/+13.3% | 0.42 | ❌ Part A 退化（過嚴切除 winners） |
+| 3 | SPY 10d <= 0 AND VIX 3d <= +5（雙來源） | 15/60%/**0.06**/+2.5% | 8/75%/0.42/+11.8% | 0.06 | ❌ chain shift 災難（4 連續 SL） |
+
+### 失敗分析
+
+**核心失敗模式：Cooldown chain shift（lesson #19 family）系統性抵消濾波效應**
+
+當基礎策略 cooldown 12 日且原始訊號密度約 4/yr，過濾任何訊號會解除其 12 日 cooldown lockout，激活原本被壓制的鄰近訊號。COPX 的 SLs 與 winners 在 SPY 10d、VIX 3d 維度無乾淨分隔，激活的鄰近訊號常為 SL（macro stress 期間 COPX 多筆訊號 cluster）。
+
+**三次迭代揭示**：
+1. **Att1（loose threshold）**：Part A 改善（過濾 broad-up SL）但 Part B 因 chain shift 引入新 SL（2024-07-22 替換 2024-07-18）
+2. **Att2（tight threshold IWM 移植）**：Part B 改善（5 TPs / 1 SL，Sharpe 0.71）但 Part A 過嚴切除 6 個 -1.5%~0 中性帶 winners
+3. **Att3（雙來源組合）**：兩 filter 交集激活更多 cooldown lockouts，最大連續虧損從 baseline 2 增至 **4**，Part A WR 76.2% → 60%
+
+### 跨資產結論
+
+**lesson #25 cross-asset hypothesis 在 commodity miners ETF 上拒絕**——既有 lesson #25 僅適用「sub-segment ETF capitulation MR」（IWM small-cap），不適用商品/礦業 ETF。**機制差異**：
+- IWM small-cap：broad-market 驅動明顯，QQQ 10d return 為單向 macro confirmation
+- COPX commodity miners：受全球工業景氣 + 銅價週期 + 中國需求驅動，broad-market 非主要驅動因子，winners SPY 10d 廣泛分布（-9.13%~+4.72%）
+
+**新失敗家族擴展**：lesson #25 適用邊界精煉至「broad-market 為主要驅動因子的 sub-segment ETF」（IWM ✓ / XBI ✗ / COPX ✗）。
+
+**lesson #19 family 邊界擴展**：當基礎策略 cooldown 較長（≥10 日）+ 訊號密度低（< 5/yr）+ filter 過濾比例 > 40% 時，cooldown chain shift 結構性放大反向選擇——多重 macro filter 疊加為 lesson #19 family 中的「chain-shift collapse」失敗模式。
+
+### Acceptance Criteria
+
+| 標準 | Att3 結果 | 是否達標 |
+|------|-----------|----------|
+| Sharpe > COPX-011 全域最佳 0.64 | 0.06 | ✗ |
+| A/B annualized cum gap < 30% | — | — |
+| A/B annualized signal gap < 50% | — | — |
+| 使用成交模型 | 完整 | ✓ |
+| Repo 較少使用方向 | lesson #25 第 3 次 + lesson #24 + #25 首次組合 | ✓ |
+
+### 結論
+
+REJECT cross-asset hypothesis：lesson #25 broad-market macro confirmation gate + lesson #24 ^VIX direction filter 對 commodity miners ETF（COPX）結構性失敗。COPX-011 Att3 維持全域最優（13 次實驗、51+ 次嘗試）。

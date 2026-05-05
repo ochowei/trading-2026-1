@@ -33,10 +33,23 @@ Att1（SPY 10d <= 0%）：FAILED min(A,B) 0.42
 - Part B: 8 sig / WR 75.0% / Sharpe 0.42 cum +11.78%（cooldown chain shift
   引入新 SL 2024-07-22 替換 2024-07-18，且 3 winners 被過濾）
 
-Att2（SPY 10d <= -1.5%，IWM-015 sweet spot 直接移植）：
-- 收緊閾值希望同時過濾兩個 Part B SLs（2024-07-18 +0.22 / 2025-03-31 -1.07）
-- Part B winners SPY 10d 分布 -4.17~+3.32，僅 -4.17/-4.25/-2.65 通過 -1.5% 閘門
-- 預期：Part B 結構性 zero-variance 100% WR；Part A Sharpe 受 winner 過濾影響
+Att2（SPY 10d <= -1.5%，IWM-015 sweet spot）：FAILED min(A,B) 0.42
+- Part A: 16 sig / WR 75.0% / Sharpe 0.42 cum +24.95%（-1.5% 閾值過嚴切除
+  6 個 Part A winners 在 -1.5%~0 中性帶）
+- Part B: 6 sig / WR 83.3% / Sharpe 0.71 cum +13.26%（Part B 改善 +25% vs
+  baseline 0.57；過濾 2024-07-18 SL + chain shift 引入 2025-04-04 替換 2025-03-31）
+- A/B 平衡 ✓（cum gap 24.7% < 30%, signal ratio 1.07:1）但 Part A 退化使 min 不變
+
+Att3（SPY 10d <= 0 AND VIX 3d <= +5，雙來源 lesson #24 + #25 組合）：FAILED min 0.06
+- 嘗試以 ^VIX 3d direction filter 補強 Att1，過濾 panic-acceleration false-bottom
+- 雙閘門組合理論上覆蓋全部 7 SLs（5 Part A + 2 Part B 中 1 個）
+- 結果：cooldown chain shift 災難性放大——過濾 9 winners 後解除多個 cooldown
+  lockouts，激活原本被壓制的 5 個新 Part A SLs（含 2 連續 SLs 模式）
+- Part A: 15 sig / WR 60.0%（!!） / Sharpe 0.06 cum +2.49%（嚴重退化）
+- Part B: 8 sig / WR 75.0% / Sharpe 0.42（Att1 同樣的 chain shift 模式）
+- 教訓：當基礎策略 cooldown 12 日且原始訊號密度 ~4/yr，疊加多重 macro filter
+  使被過濾訊號占比超過 ~50% 時，cooldown chain shift 結構性激活更多 SL，
+  filter selectivity 完全反轉
 
 ================================================================================
 Acceptance criteria（vs current global best COPX-011 Att3 min 0.64）：
@@ -79,14 +92,22 @@ class COPX013Config(ExperimentConfig):
     atr_long_period: int = 20
     atr_ratio_threshold: float = 1.05
 
-    # === COPX-013 核心新增：SPY broad-market macro context confirmation gate ===
-    # SPY 過去 N 日報酬 <= max_spy_return 才允許進場
-    # （broad market 也走弱才允許，過濾 idiosyncratic decline）
+    # === COPX-013 核心新增：dual-source forward-looking macro filter ===
+    # (1) SPY broad-market macro context confirmation gate（lesson #25 source）
+    # (2) ^VIX direction cap（lesson #24 family forward-looking IV direction）
+    #
+    # Att1：max_spy_return = 0.0 (loose) → REJECT min 0.42（chain shift Part B）
+    # Att2：max_spy_return = -0.015 → REJECT min 0.42（Part A 過嚴退化）
+    # Att3：SPY 10d <= 0 AND VIX 3d <= +5 → REJECT min 0.06（chain shift 災難）
+    #
+    # Default 設為 Att3 參數（最後一次迭代狀態，符合 NVDA-015 慣例）
     macro_ticker: str = "SPY"
     macro_lookback: int = 10
-    # Att1：max_spy_return = 0.0 (loose) → REJECT min 0.42
-    # Att2：max_spy_return = -0.015 (-1.5%, IWM-015 sweet spot)
-    max_spy_return: float = -0.015
+    max_spy_return: float = 0.0
+    # ^VIX forward-looking macro vol direction filter（lesson #24 cross-asset port）
+    vix_ticker: str = "^VIX"
+    vix_direction_lookback: int = 3
+    max_vix_change: float = 5.0
 
 
 def create_default_config() -> COPX013Config:

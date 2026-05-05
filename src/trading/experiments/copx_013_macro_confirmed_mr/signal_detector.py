@@ -5,12 +5,14 @@ COPX-013 訊號偵測器：Macro-Confirmed Vol-Adaptive Capitulation MR
 1. 收盤價相對 20 日最高價回檔 10-20%（同 COPX-007）
 2. Williams %R(10) <= -80（超賣確認）
 3. ATR(5) / ATR(20) > 1.05（波動率飆升，過濾慢磨下跌）
-4. **SPY 10 日報酬 <= 0%**（COPX-013 核心新增 broad-market macro
-   confirmation gate）
-5. 冷卻期 12 個交易日
+4. SPY N 日報酬 <= max_spy_return（lesson #25 broad-market macro gate）
+5. ^VIX N 日變化 <= max_vix_change（lesson #24 forward-looking IV direction）
+6. 冷卻期 12 個交易日
 
-設計依據：lesson #25 cross-asset port from IWM-015 + cross-strategy port to
-commodity miners ETF（既有 lesson #25 僅驗證於 IWM 子板塊 ETF 成功 / XBI 失敗）
+設計依據：lesson #24 + lesson #25 雙來源 forward-looking macro filter
+- lesson #25 cross-asset port from IWM-015（broad-market context confirmation）
+- lesson #24 cross-asset port from TLT-013/XLU-013/USO-025（^VIX direction）
+- 跨策略：兩 lesson 既往均應用於 MR 與 BB Squeeze；首次組合於 commodity miners ETF
 """
 
 import logging
@@ -30,10 +32,10 @@ class COPX013SignalDetector(BaseSignalDetector):
     def __init__(self, config: COPX013Config):
         self.config = config
 
-    def _fetch_macro_data(self, start_date: str) -> pd.DataFrame | None:
+    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
         try:
             df = yf.download(
-                self.config.macro_ticker,
+                ticker,
                 start=start_date,
                 progress=False,
                 auto_adjust=True,
@@ -44,7 +46,7 @@ class COPX013SignalDetector(BaseSignalDetector):
                 df.columns = df.columns.get_level_values(0)
             return df
         except Exception:
-            logger.exception("Failed to fetch %s data", self.config.macro_ticker)
+            logger.exception("Failed to fetch %s data", ticker)
             return None
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -77,9 +79,9 @@ class COPX013SignalDetector(BaseSignalDetector):
         atr_long = tr.rolling(self.config.atr_long_period).mean()
         df["ATR_Ratio"] = atr_short / atr_long.where(atr_long > 0, float("nan"))
 
-        # SPY broad-market macro context confirmation gate（COPX-013 核心新增）
+        # SPY broad-market macro context confirmation gate（lesson #25）
         start_date = df.index[0].strftime("%Y-%m-%d")
-        macro_df = self._fetch_macro_data(start_date)
+        macro_df = self._fetch_external(self.config.macro_ticker, start_date)
 
         if macro_df is None or macro_df.empty:
             logger.error(
@@ -91,6 +93,18 @@ class COPX013SignalDetector(BaseSignalDetector):
             macro_close = macro_df["Close"].reindex(df.index, method="ffill")
             df["Macro_Return_Nd"] = macro_close.pct_change(self.config.macro_lookback)
 
+        # ^VIX forward-looking macro vol direction filter（lesson #24）
+        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
+        if vix_df is None or vix_df.empty:
+            logger.error(
+                "無法取得 %s 數據，VIX direction filter 停用",
+                self.config.vix_ticker,
+            )
+            df["VIX_Change_Nd"] = 0.0
+        else:
+            vix_close = vix_df["Close"].reindex(df.index, method="ffill")
+            df["VIX_Change_Nd"] = vix_close.diff(self.config.vix_direction_lookback)
+
         return df
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -101,8 +115,9 @@ class COPX013SignalDetector(BaseSignalDetector):
         cond_wr = df["WR"] <= self.config.wr_threshold
         cond_vol = df["ATR_Ratio"] > self.config.atr_ratio_threshold
         cond_macro = df["Macro_Return_Nd"] <= self.config.max_spy_return
+        cond_vix = df["VIX_Change_Nd"] <= self.config.max_vix_change
 
-        df["Signal"] = cond_pullback & cond_upper & cond_wr & cond_vol & cond_macro
+        df["Signal"] = cond_pullback & cond_upper & cond_wr & cond_vol & cond_macro & cond_vix
 
         # Cooldown
         signal_indices = df.index[df["Signal"]].tolist()

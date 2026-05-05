@@ -38,5 +38,9 @@ class COPX013Strategy(ExecutionModelStrategy):
                 f"  Macro confirmation: {config.macro_ticker}"
                 f" {config.macro_lookback}d return <= {config.max_spy_return:+.1%}"
             )
+            print(
+                f"  VIX direction filter: {config.vix_ticker}"
+                f" {config.vix_direction_lookback}d change <= {config.max_vix_change:+.1f}"
+            )
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)
