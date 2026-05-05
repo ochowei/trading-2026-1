@@ -28,9 +28,15 @@ trade-level 證據（COPX-007 baseline，5 SL Part A + 2 SL Part B）：
 3 個 SL 落於 SPY 10d > 0% 區（broad up 期 COPX idiosyncratic decline）：
 - 2019-05-06 / 2021-06-16 / 2024-07-18 — 占 7 個 SL 的 43%
 
-Att1（SPY 10d <= 0%，loose threshold）預估：
-- 過濾 3 個 broad-up SL + 4 個 winners (1 Part A TP + 3 Part B TPs)
-- 預期：min(A,B) ~0.71，突破 COPX-011 Att3 全域最佳 0.64
+Att1（SPY 10d <= 0%）：FAILED min(A,B) 0.42
+- Part A: 20 sig / WR 80.0% / Sharpe 0.57 cum +43.39%
+- Part B: 8 sig / WR 75.0% / Sharpe 0.42 cum +11.78%（cooldown chain shift
+  引入新 SL 2024-07-22 替換 2024-07-18，且 3 winners 被過濾）
+
+Att2（SPY 10d <= -1.5%，IWM-015 sweet spot 直接移植）：
+- 收緊閾值希望同時過濾兩個 Part B SLs（2024-07-18 +0.22 / 2025-03-31 -1.07）
+- Part B winners SPY 10d 分布 -4.17~+3.32，僅 -4.17/-4.25/-2.65 通過 -1.5% 閘門
+- 預期：Part B 結構性 zero-variance 100% WR；Part A Sharpe 受 winner 過濾影響
 
 ================================================================================
 Acceptance criteria（vs current global best COPX-011 Att3 min 0.64）：
@@ -78,8 +84,9 @@ class COPX013Config(ExperimentConfig):
     # （broad market 也走弱才允許，過濾 idiosyncratic decline）
     macro_ticker: str = "SPY"
     macro_lookback: int = 10
-    # Att1：max_spy_return = 0.0（broad market 10 日不可正報酬）
-    max_spy_return: float = 0.0
+    # Att1：max_spy_return = 0.0 (loose) → REJECT min 0.42
+    # Att2：max_spy_return = -0.015 (-1.5%, IWM-015 sweet spot)
+    max_spy_return: float = -0.015
 
 
 def create_default_config() -> COPX013Config:
