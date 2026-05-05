@@ -244,6 +244,7 @@ on:
           - "NVDA-014: nvda_014_negative_rs_mr"
           - "NVDA-015: nvda_015_regime_rs"
           - "NVDA-016: nvda_016_sector_confirmed_mbpc"
+          - "NVDA-017: nvda_017_signal_day_filter"
           - "XBI-001: xbi_001_pullback_wr"
           - "XBI-004: xbi_004_capped_cooldown"
           - "XBI-005: xbi_005_closepos_reversal"
