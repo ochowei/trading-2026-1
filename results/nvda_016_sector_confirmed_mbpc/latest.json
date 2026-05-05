@@ -1,0 +1,250 @@
+{
+  "metadata": {
+    "execution_time": "2026-05-05T20:50:20.469302"
+  },
+  "part_a": {
+    "ticker": "NVDA",
+    "total_signals": 9,
+    "wins": 7,
+    "win_rate": 0.7777777777777778,
+    "avg_return_pct": 3.77,
+    "std_return_pct": 6.1,
+    "cumulative_return_pct": 37.31,
+    "avg_holding_days": 10.1,
+    "max_drawdown_pct": -11.02,
+    "profit_factor": 3.38,
+    "sharpe_ratio": 0.62,
+    "sortino_ratio": 1.12,
+    "calmar_ratio": 0.34,
+    "max_consecutive_losses": 1,
+    "target_exits": 5,
+    "stop_loss_exits": 2,
+    "time_expiry_exits": 2,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2019-02-20",
+        "entry_date": "2019-02-21",
+        "exit_date": "2019-03-07",
+        "entry": 3.95,
+        "exit": 3.67,
+        "return_pct": -7.14,
+        "holding_days": 10,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -7.37
+      },
+      {
+        "date": "2019-09-13",
+        "entry_date": "2019-09-16",
+        "exit_date": "2019-10-15",
+        "entry": 4.46,
+        "exit": 4.72,
+        "return_pct": 5.96,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -5.51
+      },
+      {
+        "date": "2019-11-01",
+        "entry_date": "2019-11-04",
+        "exit_date": "2019-12-04",
+        "entry": 5.13,
+        "exit": 5.24,
+        "return_pct": 2.28,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -2.74
+      },
+      {
+        "date": "2020-04-22",
+        "entry_date": "2020-04-23",
+        "exit_date": "2020-05-08",
+        "entry": 7.18,
+        "exit": 7.75,
+        "return_pct": 8.0,
+        "holding_days": 11,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.66
+      },
+      {
+        "date": "2020-05-29",
+        "entry_date": "2020-06-01",
+        "exit_date": "2020-06-23",
+        "entry": 8.81,
+        "exit": 9.52,
+        "return_pct": 8.0,
+        "holding_days": 16,
+        "exit_type": "target",
+        "max_drawdown_pct": -2.13
+      },
+      {
+        "date": "2021-02-18",
+        "entry_date": "2021-02-19",
+        "exit_date": "2021-02-23",
+        "entry": 15.0,
+        "exit": 13.93,
+        "return_pct": -7.14,
+        "holding_days": 2,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -11.02
+      },
+      {
+        "date": "2022-08-08",
+        "entry_date": "2022-08-09",
+        "exit_date": "2022-08-11",
+        "entry": 17.25,
+        "exit": 18.63,
+        "return_pct": 8.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": 0.23
+      },
+      {
+        "date": "2023-01-31",
+        "entry_date": "2023-02-01",
+        "exit_date": "2023-02-02",
+        "entry": 19.7,
+        "exit": 21.28,
+        "return_pct": 8.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 4.97
+      },
+      {
+        "date": "2023-06-28",
+        "entry_date": "2023-06-29",
+        "exit_date": "2023-07-13",
+        "entry": 41.59,
+        "exit": 44.91,
+        "return_pct": 8.0,
+        "holding_days": 9,
+        "exit_type": "target",
+        "max_drawdown_pct": -0.66
+      }
+    ],
+    "filled_count": 9,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2019-01-01",
+      "end": "2023-12-31"
+    }
+  },
+  "part_b": {
+    "ticker": "NVDA",
+    "total_signals": 3,
+    "wins": 3,
+    "win_rate": 1.0,
+    "avg_return_pct": 8.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 25.97,
+    "avg_holding_days": 6.0,
+    "max_drawdown_pct": -3.62,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 2.21,
+    "max_consecutive_losses": 0,
+    "target_exits": 3,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [
+      {
+        "date": "2024-07-02",
+        "entry_date": "2024-07-03",
+        "exit_date": "2024-07-09",
+        "entry": 121.78,
+        "exit": 131.53,
+        "return_pct": 8.0,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": 3.15
+      },
+      {
+        "date": "2025-09-25",
+        "entry_date": "2025-09-26",
+        "exit_date": "2025-10-09",
+        "entry": 178.42,
+        "exit": 192.69,
+        "return_pct": 8.0,
+        "holding_days": 9,
+        "exit_type": "target",
+        "max_drawdown_pct": 1.06
+      },
+      {
+        "date": "2025-10-17",
+        "entry_date": "2025-10-20",
+        "exit_date": "2025-10-28",
+        "entry": 183.38,
+        "exit": 198.06,
+        "return_pct": 8.0,
+        "holding_days": 6,
+        "exit_type": "target",
+        "max_drawdown_pct": -3.62
+      }
+    ],
+    "filled_count": 3,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 1.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2024-01-01",
+      "end": "2025-12-31"
+    }
+  },
+  "part_c": {
+    "ticker": "NVDA",
+    "total_signals": 0,
+    "wins": 0,
+    "win_rate": 0.0,
+    "avg_return_pct": 0.0,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 0.0,
+    "avg_holding_days": 0.0,
+    "max_drawdown_pct": 0.0,
+    "profit_factor": 0.0,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 0.0,
+    "calmar_ratio": 0.0,
+    "max_consecutive_losses": 0,
+    "target_exits": 0,
+    "stop_loss_exits": 0,
+    "time_expiry_exits": 0,
+    "pessimistic_exits": 0,
+    "trades": [],
+    "filled_count": 0,
+    "unfilled_count": 0,
+    "unfilled_signals": [],
+    "fill_rate": 0.0,
+    "execution_model": {
+      "entry_mode": "next_open_market",
+      "exit_profit": "limit_order_day",
+      "exit_stop": "stop_market_gtc",
+      "exit_expiry": "next_open_market",
+      "slippage_pct": 0.0015,
+      "pessimistic_execution": true
+    },
+    "backtest_period": {
+      "start": "2026-01-01",
+      "end": "2026-05-05"
+    }
+  }
+}
