@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-01T05:20:41.751807"
+    "execution_time": "2026-05-01T04:42:34.224413"
   },
   "part_a": {
     "ticker": "URA",
@@ -487,20 +487,20 @@
   },
   "part_c": {
     "ticker": "URA",
-    "total_signals": 3,
+    "total_signals": 4,
     "wins": 2,
-    "win_rate": 0.6666666666666666,
-    "avg_return_pct": 0.88,
+    "win_rate": 0.5,
+    "avg_return_pct": 1.58,
     "std_return_pct": 4.83,
-    "cumulative_return_pct": 2.31,
-    "avg_holding_days": 3.0,
+    "cumulative_return_pct": 5.97,
+    "avg_holding_days": 2.5,
     "max_drawdown_pct": -9.58,
-    "profit_factor": 1.47,
-    "sharpe_ratio": 0.18,
-    "sortino_ratio": 0.27,
-    "calmar_ratio": 0.09,
+    "profit_factor": 2.11,
+    "sharpe_ratio": 0.33,
+    "sortino_ratio": 0.56,
+    "calmar_ratio": 0.16,
     "max_consecutive_losses": 1,
-    "target_exits": 1,
+    "target_exits": 2,
     "stop_loss_exits": 1,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
@@ -530,16 +530,27 @@
       {
         "date": "2026-03-20",
         "entry_date": "2026-03-23",
-        "exit_date": "2026-03-31",
+        "exit_date": "2026-04-01",
         "entry": 47.33,
-        "exit": 48.38,
-        "return_pct": 2.23,
-        "holding_days": 6,
-        "exit_type": "time_expiry",
+        "exit": 50.17,
+        "return_pct": 6.0,
+        "holding_days": 7,
+        "exit_type": "target",
         "max_drawdown_pct": -5.42
+      },
+      {
+        "date": "2026-04-29",
+        "entry_date": "2026-04-30",
+        "exit_date": "2026-04-30",
+        "entry": 53.75,
+        "exit": 53.7,
+        "return_pct": -0.1,
+        "holding_days": 0,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": 0.0
       }
     ],
-    "filled_count": 3,
+    "filled_count": 4,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
@@ -553,7 +564,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-03-31"
+      "end": "2026-04-30"
     }
   }
 }

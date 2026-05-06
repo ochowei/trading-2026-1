@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-21T16:57:59.793055"
+    "execution_time": "2026-05-01T01:14:35.522666"
   },
   "part_a": {
     "ticker": "EEM",
@@ -211,7 +211,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-21"
+      "end": "2026-04-30"
     }
   }
 }

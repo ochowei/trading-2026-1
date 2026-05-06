@@ -1,10 +1,22 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-05
+  last_validated: 2026-05-02
   data_through: 2025-12-31
+  note_2026_05_02: TSM-011 added 2026-05-02 (Signal-Day Direction Filter on RS Momentum Pullback, **repo 首次「return CEILING（rally exhaustion filter）」於任何資產 + repo 首次 lesson #19 family cross-strategy 鏡像擴展（MR floor → momentum ceiling）**, applied to TSM-008 RS framework). Three iterations: Att1 (1d ceiling <= +1.0%) FAILED — Part A 12/75.0%/Sharpe **0.78** cum +68.73% / Part B unchanged / min 0.78 — 1d 過濾觸發 cooldown chain shift 將 2020-07-24 expiry -1.72% 替換為 2020-07-31 expiry -2.22%（更差），淨效果負面；Att2 (5d ceiling <= +9.5%) Part A 11/90.9%/Sharpe **1.30** cum **+87.38%** / Part B 10/80%/Sharpe 0.83 不變 cum +59.78% / min(A,B) **0.83** (+5% vs 0.79) — 顯著 Part A 改善但 A/B 累計差 31.6% **略超 30% 目標**（cooldown chain shift 移除 2022-11-21 SL 與 2022-12-07 SL，僅留 2022-11-28 SL）；Att3 ★ (5d ceiling <= +10.5%) Part A 12 訊號 WR **83.3%** Sharpe **0.86** cum **+74.10%** / Part B 10/80%/Sharpe 0.83 不變 cum +59.78% / min(A,B) **0.83** (+5% vs TSM-008 baseline 0.79) / A/B 累計差 **19.3%** (< 30% ✓) / A/B 訊號比 1.2:1 (gap 16.7% < 50% ✓) — **acceptance criteria 全部達標**。關鍵改善：5d ceiling +10.5% 僅過濾 2020-07-24 訊號（5d +11.30%, expiry -1.72%），cooldown chain shift 引入 2020-07-31 expiry +0.89%（從負轉正）+ 2020-08-20 TP +8%；Part B 完全不受影響（最高 5d 為 2024-02-12 +9.82% < +10.5%）。**核心發現（lesson #19 family v10）**：(1) **Repo 首次「return CEILING（rally exhaustion filter）」於任何資產**——既往 lesson #19 family 全部為 FLOOR 方向（capitulation depth filter，DIA-012/SPY-009/EWJ-005/EWZ-007/CIBR-014/SIVR-018/URA-013/INDA-011/GLD-014），TSM-011 開啟鏡像 CEILING 方向；(2) **Repo 首次 cross-strategy lesson #19 移植**：MR 框架 → RS momentum 框架（lesson #21 family），與既往 lesson #19 全部於 MR 框架平行；(3) **MR 失敗模式（太淺 capitulation）vs momentum 失敗模式（太深 rally）為結構性鏡像**——TSM Part A 2020-07-24 expiry 與 2022-11-21 SL 均屬「5 日大漲後淺回檔但實為趨勢反轉前兆」（Att2 確認 9.79 SL 與 9.82 TP 邊界精準 < 0.05 percentage points 區分，Att3 採取保守 +10.5% 邊界僅清除最極端 +11.30 case）；(4) **5d > 1d ceiling 區分力**——signal-day 1d 過濾因 cooldown chain shift 反向（Att1）而 5d 過濾因 2020-07-24 受 prior 5d 大漲驅動（5d +11.30 vs 1d +9.69 同向 signal）使 5d 為較穩健 rally exhaustion proxy。**新跨資產假設（待驗證）**：rally exhaustion 5d ceiling 可能適用於其他 RS / MBPC 動量框架（NVDA-006 RS / TSM-007 RS / VOO-004 MBPC / SOXL-010 RS 等），閾值需依資產 5d return 分布調整（TSM 甜蜜點 +10.5%，其他資產需 trade-level 分析）。TSM-011 Att3 為新全域最優（11 次實驗、33+ 次嘗試）。
+  note: TSM-010 added 2026-04-30 (Multi-Week Regime-Aware Momentum Breakout Pullback Continuation, **repo 第 2 次 lesson #22 + MBPC 試驗、首次半導體 cross-asset NVDA→TSM 移植**, cross-asset port from NVDA-013 Att3). Three iterations all FAILED vs TSM-008 min 0.79: Att1 (NVDA-013 Att3 直接移植：k=1.00 + ATR ≤ 1.40 + recency 10d + pullback [-3%,-8%]) Part A 19/47.4%/Sharpe **0.03** cum -0.06% / Part B 12/58.3%/Sharpe **0.23** cum +18.33% / min **0.03** — TSM Part A 8 SLs 散佈於多 regime（trade war / pre-COVID / 2021-02 / 2022-08/12 / 2023-03/07），SMA regime + ATR vol 雙 gate 對 TSM SLs 缺乏選擇性，因 SLs 多發生於 SMA20/SMA60 仍 > 1.00 的「短暫地緣政治震盪」期間；Att2 (VOO-004 Att3 方向：recency 5d + pullback [-2%,-5%] 收緊) Part A 13/46.2%/Sharpe **-0.10** cum -11.10% / Part B 5/60%/Sharpe **0.26** cum +8.62% / min **-0.10** — 收緊進場後 WR 幾乎不變（47.4%→46.2%）顯示為**非選擇性過濾**，與 VOO 上 tight→loose 反向（VOO 0.12→1.12，TSM 0.00→-0.38）；Att3 (恢復 NVDA-013 預設 + 2DD cap >= -2%，lesson #19 cap 方向) Part A 14/50%/Sharpe **0.08** cum +4.75% / Part B 12（不變）/ min **0.08** — 2DD cap 過濾 5 訊號，cooldown chain shift 將 2020-09-17 SL 釋放為 2020-09-21 TP（正向 chain shift），但仍 7 SLs 殘留（2DD 維度淺）。**核心跨資產發現**：(1) **lesson #21 失敗家族擴展至 TSM 半導體 cross-asset**：NVDA-013 ★（單一 AI secular driver）→ TSM-010 ✗（multi-driver: 中國地緣政治 + 半導體景氣週期 + 客戶集中度），半導體個股 lesson #22 + MBPC 跨資產移植**結構性失敗**；(2) **新規則候選**：lesson #22 + MBPC 適用於「single-secular-driver 高波動個股」，**不適用於多重結構性驅動的個股**（TSM 為首例 multi-driver 失敗）；(3) **進場敏感度方向取決於資產 regime 結構**（lesson #4 邊界擴展）：VOO single uptrend 中 tight 捕捉高品質訊號；TSM multi-regime 中 tight 反而捕捉「短暫 regime 突破假動量」訊號；(4) **lesson #19 family 邊界擴展（2DD cap on MBPC）**：MR 框架（DIA-012/CIBR-012/USO-023）2DD cap 顯著有效；MBPC 框架選擇力受限，因 MBPC 進場本質為「shallow pullback」signal day 2DD 集中淺帶。**TSM 第 10 次實驗、30+ 次嘗試**，TSM-008 RS framework 仍為全域最優，TSM-010 確認「TSM 最佳訊號為 TSM/SMH RS spread」（cross-sectional 機制天然消化半導體週期 effect）。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** TSM-008（RS 出場優化：同 TSM-007 進場，TP+8%/SL-7%/25天）— Part A Sharpe 0.79/Part B 0.83，min(A,B) 0.79，A/B 訊號數 12/10，A/B gap �� 0.04（極佳平衡）
+**當前最佳：** ★ **TSM-011 Att3**（Signal-Day Direction Filter on RS Momentum Pullback：TSM-008 完整框架 + **5 日報酬 ceiling <= +10.5%** rally exhaustion filter，TP+8%/SL-7%/25天/cd 10）★ **2026-05-02 新全域最優（11 次實驗、33+ 次嘗試）**
+- Part A: Sharpe **0.86**, 累計 +74.10%, 12 訊號 (2.4/年), WR **83.3%**, MDD -7.89%
+- Part B: Sharpe 0.83, 累計 +59.78%, 10 訊號 (5.0/年), WR 80.0%（與 TSM-008 baseline 完全相同）
+- min(A,B) **0.83**（+5% vs TSM-008 baseline 0.79）
+- A/B 累計差 **19.3%**（< 30% ✓，vs baseline 14.1% 略增），A/B 訊號比 1.2:1（gap 16.7% < 50% ✓）
+- 關鍵改善：5d ceiling +10.5% 僅過濾 2020-07-24 訊號（5d +11.30%，原為 expiry -1.72%），cooldown chain shift 引入 2020-07-31 expiry +0.89%（從負轉正）+ 2020-08-20 TP +8%；Part B 訊號完全不受影響
+- **跨資產貢獻**：repo 首次「return CEILING（rally exhaustion filter）」方向於任何資產 + repo 首次 lesson #19 family cross-strategy 鏡像擴展（MR floor → momentum ceiling）
+
+**前任最佳：** TSM-008（RS 出場優化：同 TSM-007 進場，TP+8%/SL-7%/25天）— Part A Sharpe 0.79/Part B 0.83，min(A,B) 0.79，A/B 訊號數 12/10，A/B gap 0.04（極佳平衡）
+
+**前前任失敗實驗：** TSM-010（lesson #22 + MBPC 跨資產移植自 NVDA-013，三次迭代全部失敗，min(A,B) 最佳 0.08 vs TSM-008 0.79）— 確認半導體 NVDA→TSM lesson #22 + MBPC **結構性不可移植**（TSM multi-driver 結構不同於 NVDA single-secular AI driver）
 
 **前最佳（RS 原版）：** TSM-007（TSM-SMH 20日報酬差≥5% + 5日回撤3-7% + Close>SMA(50)，TP+7%/SL-7%/20天）— Part A Sharpe 0.64/Part B 1.32，min(A,B) 0.64
 
@@ -35,6 +47,7 @@
 - 相對強度動量進場：TSM-SMH 20日報酬差 ≥ 3%/5%/8% + 5日回撤 3-7% + Close > SMA(50)
 - RS 出場優化：TP+7%/SL-7%/25天、TP+8%/SL-7%/25天、TP+7.5%/SL-7%/25天（TSM-008，3次嘗試）
 - 配對交易進場：TSM/NVDA 對數價格比值 z-score（60日回看）< -2.0/-2.5（TSM-009，3次嘗試）
+- Multi-Week Regime-Aware MBPC（lesson #22 + ATR vol regime + 2DD cap）：Donchian 20d + 5d 淺回檔 + RSI [40,65] + SMA(20)≥k×SMA(60) + ATR(20)≤1.40×ATR(60) + 2DD cap，三次迭代全部失敗（TSM-010）
 - 出場條件：TP+10%/SL-12%/25天、TP+7%/SL-7%/20天、TP+7%/SL-6%/20天、TP±5%/15天、TP±6%/15天、TP+8%/SL-7%/20天、TP+8%/SL-8%/25天、TP+8%/SL-8%/20天、TP+7%/SL-7%/25天、TP+8%/SL-7%/25天、TP+7.5%/SL-7%/25天
 - 冷卻期：7天、10天、15天、20天
 
@@ -44,6 +57,7 @@
 
 **已排除的方向：**
 - **配對交易（TSM/NVDA z-score 均值回歸）**：TSM-009 三次嘗試全部失敗（最佳 min(A,B) 0.40 vs TSM-008 0.79）。TSM/NVDA 價格比值存在結構性漂移（NVDA AI 驅動成長），z-score 均值回歸假設不成立，與 SIVR/GLD、COPX/FCX 配對交易失敗模式一致
+- **Multi-Week Regime-Aware MBPC（lesson #22 + MBPC，NVDA-013 cross-asset 移植）**：TSM-010 三次嘗試全部失敗（Att1 0.03 / Att2 -0.10 / Att3 0.08）vs TSM-008 0.79。NVDA→TSM **半導體 cross-asset 移植結構性失敗**：TSM 為 multi-driver（中國地緣政治 + 半導體景氣週期 + 客戶集中度）vs NVDA single-secular AI driver，lesson #22 SMA + ATR vol 雙 regime gate **缺乏選擇性**（TSM Part A SLs 多發生於 regime 仍正常的「短暫地緣政治震盪」期間）。確認 lesson #22 + MBPC 適用邊界為「single-secular-driver 高波動個股」
 - RSI(2) 短期動能耗竭模式（SPY-004 風格）：TSM-003 三次嘗試全部失敗，Part A Sharpe 均為負值。確認跨資產教訓 #13：高波動個股 (>2%) RSI(2) 不適用
 - 半導體指數（SMH）確認：TSM-004 Att1 驗證，SMH 過濾移除好訊號多於壞訊號。確認跨資產教訓 #6：已精確訊號上疊加確認指標無效
 - 非對稱 TP/SL（TP+8%）在均值回歸上：TSM-004 Att1/Att2 驗證，TP +7% 是均值回歸甜蜜點。但 TSM-008 驗證 RS 動量進場下 TP+8% 可行（min(A,B) 0.79）
@@ -61,7 +75,8 @@
 - **動量回調策略有效**：TSM-006 驗證順勢回調在 TSM 上表現優異，SMA(50) 過濾避開 2022 熊市假訊號，ROC(20)≥10% 確認中期動量，A/B 平衡 1.2:1
 - **相對強度優於絕對動量**：TSM-007 使用 TSM-SMH 20日報酬差替代 ROC(20)，過濾純板塊 beta 上漲，min(A,B) Sharpe 從 0.46 提升至 0.64（+39%）。RS 5% 是甜蜜點（3% 過鬆引入低品質訊號，8% 過嚴只剩 8+3 訊號）
 - **RS 出場優化有效**：TSM-008 驗證 RS 進場配合 TP+8%/SL-7%/25天出場，min(A,B) 從 0.64→0.79（+23%），A/B gap 從 0.68→0.04。延長持倉 20→25天改善到期交易，TP+8% 在 RS 動量進場下可行（vs 均值回歸 TP+8% 失敗）
-- **配對交易不適用**：TSM-009 驗證 TSM/NVDA z-score 配對交易（3次嘗試，最佳 min(A,B) 0.40），TSM/NVDA 比值存在結構性漂移，**已確認 TSM-008 為全域最優**（9 次實驗、27 次嘗試，含均值回歸、突破、動量回調、相對強度、配對交易六大策略類型）
+- **配對交易不適用**：TSM-009 驗證 TSM/NVDA z-score 配對交易（3次嘗試，最佳 min(A,B) 0.40），TSM/NVDA 比值存在結構性漂移
+- **lesson #22 + MBPC 不適用**：TSM-010 驗證 NVDA-013 cross-asset 移植在半導體個股 NVDA→TSM **結構性失敗**（三次嘗試最佳 0.08 vs TSM-008 0.79）。TSM multi-driver 結構（中國地緣政治 + 半導體景氣 + 客戶集中度）使 lesson #22 SMA regime + ATR vol regime 對 Part A SLs 缺乏選擇性。**已確認 TSM-008 為全域最優**（10 次實驗、30+ 次嘗試，含均值回歸、突破、動量回調、相對強度、配對交易、lesson #22 MBPC 七大策略類型）
 <!-- AI_CONTEXT_END -->
 
 # TSM 實驗總覽 (TSM Experiments Overview)
@@ -85,8 +100,10 @@
 | TSM-005 | `tsm_005_bb_squeeze_breakout`   | BB 擠壓突破（3次嘗試均失敗）      | 失敗 |
 | TSM-006 | `tsm_006_momentum_pullback`    | 動量回調（ROC+短期回撤+SMA50）    | 前最佳 |
 | TSM-007 | `tsm_007_relative_strength`    | 相對強度動量回調（TSM vs SMH+回撤+SMA50）| 前最佳 |
-| TSM-008 | `tsm_008_rs_exit_optimization` | RS 出場優化（同 TSM-007 進場，TP+8%/SL-7%/25天）| **最佳** |
+| TSM-008 | `tsm_008_rs_exit_optimization` | RS 出場優化（同 TSM-007 進場，TP+8%/SL-7%/25天）| 前最佳 |
 | TSM-009 | `tsm_009_pairs_trading`        | 配對交易 TSM/NVDA z-score 均值回歸（3次嘗試均失敗） | 失敗 |
+| TSM-010 | `tsm_010_regime_mbpc`           | Multi-Week Regime-Aware MBPC（NVDA-013 cross-asset 移植，3次嘗試均失敗） | 失敗 |
+| TSM-011 | `tsm_011_signal_day_filter`     | Signal-Day Direction Filter on RS（5d ceiling +10.5% rally exhaustion filter，Att3 SUCCESS） | **最佳** |
 
 ## 參數對照表 (Parameter Comparison)
 
@@ -626,3 +643,159 @@ TSM-001 (極端超賣基準線) — Sharpe A:0.06 B:-0.09
 3. **TP+8% 改善 A/B 平衡**：Part B 1 筆交易（2024-10-31）原本在 TP+7% 達標，TP+8% 後反轉停損。但 Part A 每筆贏利多 +1pp 使 Part A Sharpe 從 0.72→0.79。net 效果：min(A,B) 提升，A/B gap 大幅收窄
 4. **TP+7.5% 不是甜蜜點**：2024-10-31 交易在 +7.5% 也未達標（與 +8% 同樣翻轉停損），所以 TP+7.5% 只得到較低的贏利而沒有救回該交易
 5. **TP+8% 是 TSM RS 策略的甜蜜點**：+7% 壓縮獲利空間，+8% 是所有 Part A 贏利交易均可達標的上限
+
+---
+
+## TSM-010: Multi-Week Regime-Aware MBPC (3 次嘗試均失敗)
+
+**目標**：將 lesson #22「buffered multi-week SMA trend regime」+ ATR vol regime 跨資產移植自 NVDA-013 Att3（min 0.55 全域最優）至 TSM。Repo 第 2 次 lesson #22 + MBPC 試驗，首次半導體個股 NVDA→TSM 跨資產移植。
+
+### 設計理念
+
+NVDA-013 Att3 在半導體個股 NVDA 上以「Donchian 20d 突破 + 5d 淺回檔 + RSI [40,65] + Close>SMA(50) + SMA(20)≥1.00×SMA(60) strict trend regime + ATR(20)≤1.40×ATR(60) vol regime」達成 min(A,B) 0.55，+34% vs NVDA-009 baseline 0.41。
+
+跨資產假設：TSM 與 NVDA 同為高波動半導體個股（TSM ~2.1% vol vs NVDA ~3% vol），預期 lesson #22 雙重 regime gate 能精準分隔「真實多週期上升 regime」與「late-cycle / chop regime」，過濾 Part A 的中國地緣政治震盪 + AI 高基期回檔失敗訊號。
+
+### 三次嘗試結果
+
+| 指標 | TSM-008 (基準) | Att1 (NVDA-013 直接移植) | Att2 (VOO-004 收緊) | Att3 (NVDA-013 + 2DD cap -2%) |
+|------|---------------|------------------------|--------------------|--------------------------------|
+| breakout_recency | — | 10d | 5d | 10d |
+| pullback range | — | [-3%, -8%] | [-2%, -5%] | [-3%, -8%] |
+| RSI 範圍 | — | [40, 65] | [40, 65] | [40, 65] |
+| SMA regime k | — | 1.00 strict | 1.00 strict | 1.00 strict |
+| ATR vol regime | — | ≤ 1.40 | ≤ 1.40 | ≤ 1.40 |
+| 2DD cap | — | 停用 | 停用 | ≥ -2% |
+| **Part A Sharpe** | 0.79 | **0.03** | **-0.10** | **0.08** |
+| **Part B Sharpe** | 0.83 | **0.23** | **0.26** | **0.23** |
+| **min(A,B)** | **0.79** | **0.03** | **-0.10** | **0.08** |
+| Part A 訊號 | 12 | 19 | 13 | 14 |
+| Part B 訊號 | 10 | 12 | 5 | 12 |
+| Part A WR | 75.0% | 47.4% | 46.2% | 50.0% |
+| Part B WR | 80.0% | 58.3% | 60.0% | 58.3% |
+
+### 失敗根因分析
+
+1. **TSM Part A multi-regime 結構**：TSM 2019-2023 含 4+ regimes（中美貿易戰 / COVID 震盪 / AI hype / 半導體景氣週期），SLs 散佈於多 regime，與 NVDA Part A SLs 集中於 2022 bear 結構不同
+2. **lesson #22 SMA regime 缺乏選擇性**：TSM Part A SLs 多發生於 SMA(20)/SMA(60) 仍 > 1.00 的「短暫地緣政治震盪 / 產業景氣轉折」期間，雙重 regime gate 無法切除
+3. **ATR vol regime 同樣失效**：TSM 的「短暫 shock」往往伴隨 ATR 短期擴張但仍 < 1.40 × ATR(60) 的中等水準
+4. **Att2 VOO-004 方向反向失敗**：VOO 上 tight→loose 翻轉 0.12→1.12（+833% Sharpe），TSM 上 tight→loose 翻轉 0.00→-0.38——**進場敏感度方向取決於資產 regime 結構**（lesson #4 邊界擴展）
+5. **Att3 2DD cap 邊際改善但仍遠不足**：MBPC 進場本質為「shallow pullback」，signal day 2DD 集中淺帶（-3%~0%），2DD cap 在 MBPC 框架選擇力 << MR 框架（DIA-012/CIBR-012/USO-023 顯著有效）
+
+### 跨資產 / 跨策略貢獻
+
+1. **lesson #21 失敗家族擴展至 TSM 半導體 cross-asset**：先前 lesson #21 適用範圍為「single-pure-uptrend 大型廣基 ETF（VOO）」或「single-regime growth 個股配 lesson #22（NVDA-013）」。**TSM-010 證明即使是同類半導體個股，multi-driver 結構差異使 lesson #22 + MBPC 跨資產移植結構性失敗**
+2. **新規則候選**：lesson #22 + MBPC 適用於「single-secular-driver 高波動個股」，**不適用於多重結構性驅動因子的個股**（TSM 為首例 multi-driver 失敗：中國地緣政治 + 半導體週期 + 客戶集中度）
+3. **進場敏感度方向取決於資產 regime 結構**（lesson #4 邊界擴展）：VOO 單一 secular uptrend 中 tight 捕捉高品質訊號；TSM multi-regime 中 tight 反而捕捉「短暫 regime 突破中的假動量」訊號
+4. **lesson #19 family 邊界擴展（2DD cap on MBPC）**：MR 框架 2DD cap 顯著有效；MBPC 框架選擇力受限，因 MBPC 進場本質為「shallow pullback」signal day 2DD 集中淺帶
+5. **TSM 全域最優確認**：TSM-008 RS framework 0.79 為當前最佳，TSM-010 三次迭代全部退化於 0.46（TSM-006 momentum pullback baseline）以下，反映 **TSM 的最佳訊號來源為「TSM/SMH RS spread」**（cross-sectional 機制天然消化半導體週期 effect）。**TSM 第 10 次實驗、30+ 次嘗試**確認 RS framework 為 TSM cyclical multi-regime 結構下的最佳策略類型
+
+### 結論
+
+TSM-010 確認 **TSM-008 RS framework 為當時全域最優**。未來 TSM 突破 0.79 可能需要：
+- 更精細的 RS 框架（動態 SMH 權重、加入 INTC/AMD/QCOM 三角 RS）
+- Calendar effect filter（Q4 holiday demand、Q2 capex slowdown）
+- 客戶集中度 regime（Apple/NVDA 訂單變動）
+- 不應再嘗試純技術面 MBPC / MR 框架——TSM-010 確認 cyclical multi-regime 結構性限制
+
+> **2026-05-02 更新**：TSM-011 Att3 透過 RS framework 上的 signal-day 5d return CEILING（rally exhaustion filter）達成 min(A,B) 0.83 (+5%)，**首次突破 TSM-008 0.79 結構性上限**。突破點為 lesson #19 family cross-strategy 鏡像擴展（MR floor → momentum ceiling），詳見下方 TSM-011 段落。
+
+---
+
+## TSM-011: Signal-Day Direction Filter on RS Momentum Pullback ★ 全域最優
+
+**目標**：在 TSM-008 RS 動量回調框架上加入 signal-day return CEILING 過濾，解決「rally exhaustion 偽訊號」（5 日已大漲後出現淺回檔但實為趨勢反轉前兆）。**Repo 首次「return CEILING（rally exhaustion filter）」於任何資產 + repo 首次 lesson #19 family cross-strategy 鏡像擴展（MR floor → momentum ceiling）。**
+
+### 設計理念（lesson #19 family v10）
+
+既往 lesson #19 family 全部為 FLOOR 方向（capitulation depth filter）：
+- DIA-012「1d cap + 3d cap」、SPY-009「1d floor」、EWJ-005「1d floor」、EWZ-007「1d cap」、CIBR-014「1d cap + ATR BAND」、SIVR-018「ATR ceiling + 3d floor」、URA-013「5d cap」、INDA-011「2d floor + 3d cap」、GLD-014「2d floor + 1d floor」
+- 這些皆為 MR 框架（pullback+WR+ClosePos / BB-lower+ClosePos / RSI-hook 等），對應失敗模式為「淺 capitulation」訊號
+
+TSM-011 提出鏡像擴展假設：
+- **RS 動量框架失敗模式 = 太深 rally**（rally exhaustion）
+- 對應過濾方向 = **return CEILING**
+- 平行於 MR 的「太淺 capitulation = floor 過濾」結構性鏡像
+
+具體假設：TSM-008 Part A 的 2 SLs（2022-11-21 / 2022-12-07）+ 1 expiry（2020-07-24 -1.72%）皆有「signal-day 之前 5 日大漲，出現 3-7% 淺回檔即觸發 RS 訊號，但隨後續跌停損 / 到期未達 +8%」結構。5d return ceiling 過濾「prior 5 日已大漲」狀態下的訊號。
+
+### 三次迭代結果
+
+| 指標 | TSM-008 (baseline) | Att1 (1d ceiling +1.0%) | Att2 (5d ceiling +9.5%) | Att3 ★ (5d ceiling +10.5%) |
+|------|---------------------|--------------------------|--------------------------|------------------------------|
+| 1d ceiling | — | +1.0% | 停用 | 停用 |
+| 5d ceiling | — | 停用 | +9.5% | **+10.5%** |
+| **Part A Sharpe** | 0.79 | **0.78** | **1.30** | **0.86** |
+| **Part B Sharpe** | 0.83 | 0.83 | 0.83 | 0.83 |
+| **min(A,B)** | **0.79** | 0.78 | 0.83 | **0.83** |
+| Part A WR | 75.0% | 75.0% | **90.9%** | **83.3%** |
+| Part A 累計 | +69.59% | +68.73% | **+87.38%** | **+74.10%** |
+| Part B 累計 | +59.78% | +59.78% | +59.78% | +59.78% |
+| Part A/B 累計差 | 14.1% ✓ | 13.0% ✓ | 31.6% ✗ | **19.3% ✓** |
+| Part A/B 訊號比 | 12/10 ✓ | 12/10 ✓ | 11/10 ✓ | 12/10 ✓ |
+
+### Att1 失敗分析（1d ceiling +1.0%）
+
+過濾 2020-07-24（1d +9.69%）但 cooldown chain shift 引入 2020-07-31 expiry **-2.22%**（比原 -1.72% 更差）。**1d ceiling 單獨無效**——signal-day 1d 過大的訊號在 TSM 上稀少（僅 2020-07-24 一筆），其他失敗訊號 1d 已為負（2022-11-21 -2.84%、2022-12-07 -0.40%、2024-07-16 +0.44% 邊界外、2024-10-30 -1.25%）。
+
+### Att2 結構性突破但 A/B 失衡
+
+5d ceiling +9.5% 過濾 3 個訊號：
+- Part A 2020-07-24（5d +11.30%, expiry -1.72%）→ cooldown shift 至 2020-07-31 expiry **+0.89%**（從負轉正）
+- Part A 2022-11-21（5d +9.79%, SL -7.09%）→ cooldown shift 至 2022-11-28 SL -7.09%（同類），但連帶讓 2022-12-07 SL 被新 cooldown 抑制，**淨效果為 2 SLs → 1 SL**
+- Part B 2024-02-12（5d +9.82%, TP +8%）→ cooldown shift 至 2024-02-13 TP +8%（同 +8%，無損）
+
+**Part A WR 75.0%→90.9%, Sharpe 0.79→1.30, cum +69.59%→+87.38%**（**結構性突破**）。但 Part A 累計大幅躍升使 A/B 差距從 14.1% 升至 31.6%（略超 30% 目標）。
+
+**Att2 邊界精準度發現**：2022-11-21 SL（5d +9.79%）與 2024-02-12 TP（5d +9.82%）邊界差距僅 **0.03 percentage points**，5d 為高度非線性 discriminator。
+
+### Att3 ★ 保守邊界達成全部 acceptance criteria
+
+5d ceiling +10.5% 僅過濾 1 個訊號：
+- Part A 2020-07-24（5d +11.30%, expiry -1.72%）→ cooldown shift 引入 2020-07-31 expiry +0.89% + 2020-08-20 TP +8%
+- Part B 完全不受影響（最高 5d 為 2024-02-12 +9.82% < +10.5%）
+
+**結果**：
+- Part A: Sharpe **0.86** (+9% vs baseline), cum **+74.10%**, WR **83.3%**, 12 訊號
+- Part B: Sharpe 0.83（不變）, cum +59.78%, WR 80.0%, 10 訊號
+- min(A,B) **0.83** (+5% vs TSM-008 0.79)
+- **A/B 累計差 19.3% (< 30% ✓)**, A/B 訊號比 1.2:1 (gap 16.7% < 50% ✓)
+
+### Part A 完整逐筆交易
+
+| 訊號日期 | 出場類型 | 報酬 | 持倉天數 |
+|---------|---------|------|---------|
+| 2019-10-18 | TP | +8.00% | 10 |
+| 2020-07-31 | 到期 | **+0.89%** | 25（從原 -1.72% 改善為 +0.89%，cooldown shift） |
+| 2020-08-20 | TP | +8.00% | 16（cooldown shift from 2020-08-10）|
+| 2020-09-16 | TP | +8.00% | 15 |
+| 2020-12-09 | TP | +8.00% | 15 |
+| 2021-01-08 | TP | +8.00% | 3 |
+| 2021-01-26 | TP | +8.00% | 10 |
+| 2022-01-05 | TP | +8.00% | 5 |
+| 2022-11-21 | SL | -7.09% | 19（保留，5d +9.79% < +10.5%）|
+| 2022-12-07 | SL | -7.09% | 13（保留）|
+| 2023-01-19 | TP | +8.00% | 2 |
+| 2023-10-20 | TP | +8.00% | 14 |
+
+### 跨資產 / 跨策略貢獻
+
+1. **Repo 首次「return CEILING（rally exhaustion filter）」於任何資產**——既往 lesson #19 family 全部為 FLOOR 方向（capitulation depth filter），TSM-011 開啟鏡像 CEILING 方向
+2. **Repo 首次 cross-strategy lesson #19 移植**：MR 框架 → RS momentum 框架（lesson #21 family），與既往 lesson #19 全部於 MR 框架平行
+3. **MR 失敗模式（太淺 capitulation）vs momentum 失敗模式（太深 rally）為結構性鏡像**——確立 lesson #19 family v10 雙向對稱性
+4. **5d > 1d ceiling 區分力**——signal-day 1d 過濾因 cooldown chain shift 反向（Att1）而 5d 過濾因 2020-07-24 受 prior 5d 大漲驅動（5d +11.30 vs 1d +9.69 同向 signal）使 5d 為較穩健 rally exhaustion proxy
+5. **保守 vs 激進門檻 trade-off**：Att2 (+9.5%) 為「Part A 結構最優」（Sharpe 1.30）但 A/B 失衡；Att3 (+10.5%) 為「criteria 全部達標」的保守選擇——保守 ceiling 透過 cooldown chain shift 仍能透過 expiry 改善獲得 +5% min(A,B)
+
+### 跨資產假設（待驗證）
+
+Rally exhaustion 5d ceiling 可能適用於其他 RS / MBPC 動量框架，閾值需依資產 5d return 分布調整：
+- NVDA-006 RS（NVDA-SMH RS）：類似 TSM-008 結構，預期 5d ceiling +10~12%（NVDA 較高 vol）
+- VOO-004 MBPC（broad-uptrend ETF）：MBPC 進場本質為「淺回檔」，5d 已較低，預期 ceiling +6~8%
+- SOXL-010 RS（leveraged RS）：3x 槓桿 vol 約 3x，預期 ceiling +25~30%
+- EWT-008 / SPY-009 等其他 RS / MBPC 框架
+
+下次跨資產驗證可優先試 NVDA-006 或 SOXL-010（同 RS 框架，cross-asset 移植最穩）。
+
+### 結論
+
+TSM-011 Att3 為 **TSM 第 11 次實驗、33+ 次嘗試的新全域最優**（min 0.83 vs TSM-008 0.79，+5%）。lesson #19 family v10 鏡像擴展（FLOOR ↔ CEILING）開啟 momentum 框架的「太深 rally」過濾新方向，與既有 MR 框架的「太淺 capitulation」過濾結構性正交。

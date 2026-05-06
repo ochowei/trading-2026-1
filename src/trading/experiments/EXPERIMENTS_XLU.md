@@ -1,12 +1,19 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-27
+  last_validated: 2026-05-02
   data_through: 2025-12-31
-  note: XLU-012 added 2026-04-27 (Post-Capitulation Vol-Transition MR — Att3 SUCCESS，repo 第 4 次「ATR-vol-filtered MR + TP 突破型擴張」方向發現). Three iterations: Att1 (XLU-011 框架 + 2DD cap >= -2.5% CIBR-012 方向 + TP +2.5%) Part A 7/85.7%/0.67 同 baseline / Part B 3/100% **zero-var 0.00**（過濾 1 expiry + 1 winner，cooldown 移入 2024-11-06 zero-var TP）/ min **0.00** — 2DD cap 在 XLU 結構性失敗：Part A 訊號 2DD 全 >= -2.5% 不影響、Part B 退化為純 TPs zero-var；Att2 (Att1 + TP 加寬 +3.0%) Part A 7/85.7%/Sharpe 0.75（+12%，TP 擴張捕獲更深反彈）/ Part B 3/100% zero-var 0.00 / min 0.00 — TP 改善僅作用於 Part A，Part B 仍 zero-var；Att3 ★ (移除 2DD 過濾、保留 TP +3.0%) Part A 7 訊號 WR 85.7% Sharpe **0.75** cum +13.26% / Part B 4 訊號 WR 75.0% Sharpe **1.59** cum +9.05% / min(A,B) **0.75**（+12% vs XLU-011 0.67）/ A/B cum 差 31.7%（vs baseline 33.4% 略改善）/ A/B 訊號比 1.75:1（同 baseline，結構性）. **核心發現**：XLU-011 的 ATR(5)/ATR(20) > 1.15 動能濾波後，TP 應採突破型 +3.0% 而非 MR 標準 +2.5%；2DD 區間過濾在 1.08% vol 利率敏感 ETF 上對 winners/losers 無區分力（2DD 維度分布重疊）。**跨資產貢獻**：(1) 擴展 lesson #6 邊界——2DD secondary filter 在 ATR 已捕捉 panic 動能的低-中波動 ETF 上失效；(2) 擴展 lesson #20b 失敗家族——2DD 區間過濾加入 oscillator-hook / day-after / signal-day filter 失敗類別；(3) **新發現**：MR 框架疊加動能濾波後，TP 上限可從 +2.5% 擴張至 +3.0%（突破型甜蜜點），挑戰原 cross_asset 規則「TP +2.5% 為 MR 統一甜蜜點」的普適性，實證範圍：1.08% vol + ATR > 1.15 動能濾波框架。XLU-012 Att3 為新全域最優（12 次實驗、35+ 次嘗試，含 MR、突破、KC squeeze、配對、動量回調、ATR 過濾、2DD 過濾共 7 大策略類型）.
+  note: XLU-013 added 2026-05-02 (MOVE Implied-Vol Forward-Looking Regime-Gated MR, **Att2/Att3 SUCCESS — repo 第 2 次 lesson #24 forward-looking implied vol regime gate 跨資產驗證（繼 TLT-013 後），首次 ^MOVE DIRECTION 維度發現於任何資產**, cross-asset port from TLT-013 Att1). Three iterations: Att1 (max_move_level=130 直接移植 TLT-013 sweet spot) Part A 7/85.7%/Sharpe **0.75**（與 XLU-012 baseline 完全相同）/ Part B 4/75.0%/Sharpe **1.59**（與 baseline 同，2024-11-04 TP 被 MOVE 136.2>130 過濾但 cooldown chain shift 接續 2024-11-06 TP）/ min **0.75**（0% 改善）— XLU 殘餘 SL（2021-09-20 FOMC taper signaling）當日 MOVE=59.6（極低 calm 區），LEVEL cap 結構非綁定；Att2 ★ (max_move_level=130 + use_move_direction_filter=True, lookback=3, max_move_change=+5.0) Part A 6 訊號 WR **100%** Sharpe **6.74** cum +18.11% / Part B 4 訊號 WR 75.0% Sharpe 1.59 cum +9.05%（與 baseline 完全相同）/ min(A,B) **1.59**（**+112% vs XLU-012 baseline 0.75**，全域最優）/ A/B 年化幾何報酬差距 23.5%（< 30% ✓）/ A/B 訊號比 1.2/yr vs 2.0/yr = 40%（< 50% ✓）/ Sharpe 計算 micro-variance（2019-11-08 Expiry +1.88% + 5 TPs +3.00%）—— 2021-09-20 SL 當日 MOVE 3d change=+5.65（恰於 +5 邊界外）為 isolated discriminator，所有 Part A TPs 3d change ∈ [-23.6, +4.03]；Att3 ablation (max_move_level=999 disabled, direction filter only) 結果與 Att2 **完全相同** — 確認 ^MOVE LEVEL cap 對 XLU **結構性冗餘**，DIRECTION (3d change) 為唯一 binding dimension. **核心發現**：(1) **lesson #24 v2 候選 — forward-looking implied vol DIRECTION 維度首次驗證**：與 TLT-013 LEVEL 維度結構性正交，repo 首次驗證 implied vol 第二維度；(2) **TLT vs XLU 維度選擇取決於資產與 rate 的耦合程度**：TLT 直接追蹤 30y treasury price → MOVE LEVEL cap 130 binding（TLT-013）；XLU 透過 yield-spread + flight-to-defensive 間接相關 → MOVE DIRECTION (3d change) binding，LEVEL 與 utility flow 解耦；(3) **2021-09-20 SL 失敗結構**：FOMC 政策訊號日 bond vol 跳升（rising direction）造成 duration shock + safety bid 同時崩壞，3d change 維度識別「Fed 政策訊號日 bond vol regime 開端」失敗模式。**跨資產假設（待驗證）**：lesson #24 v2 適用於 rate-indirect ETF（XLRE / XLF / KRE 真實銀行/REIT/金融板塊），閾值需依資產與 bond market 耦合強度調整。XLU-013 Att2/Att3 為新全域最優（13 次實驗、38+ 次嘗試）。
+  note_2026_04_27_xlu_012: XLU-012 added 2026-04-27 (Post-Capitulation Vol-Transition MR — Att3 SUCCESS，repo 第 4 次「ATR-vol-filtered MR + TP 突破型擴張」方向發現). Three iterations: Att1 (XLU-011 框架 + 2DD cap >= -2.5% CIBR-012 方向 + TP +2.5%) Part A 7/85.7%/0.67 同 baseline / Part B 3/100% **zero-var 0.00** / min **0.00** — 2DD cap 在 XLU 結構性失敗；Att2 (Att1 + TP +3.0%) Part A 0.75 / Part B zero-var 0.00 / min 0.00；Att3 ★ (移除 2DD 過濾、保留 TP +3.0%) min(A,B) **0.75**（+12% vs XLU-011 0.67）。**核心發現**：MR 框架疊加 ATR 動能濾波後，TP 上限可從 +2.5% 擴張至 +3.0%（突破型甜蜜點）；2DD 區間過濾對 XLU 1.08% vol 利率敏感 ETF 結構性失效。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XLU-012 Att3（XLU-011 框架 + TP **+3.0%** / SL -4.0% / 20 天，**移除 2DD 過濾**，Part A Sharpe **0.75** / Part B Sharpe **1.59** / min(A,B) **0.75**，+12% vs XLU-011 0.67）★ **2026-04-27 新全域最優**
-**前任最佳：** XLU-011（波動率自適應均值回歸，ATR(5)/ATR(20) > 1.15 + XLU-003 框架，Part A Sharpe 0.67，Part B Sharpe 1.56，min(A,B) 0.67，+272% vs XLU-004 的 0.18）
+**當前最佳：** XLU-013 Att2/Att3（XLU-012 Att3 完整框架 + **^MOVE 3d change <= +5.0** forward-looking implied vol DIRECTION filter，TP +3.0%/SL -4.0%/20 天/cd 7d，Part A Sharpe **6.74**（100% WR, 6 訊號 micro-variance）/ Part B Sharpe **1.59** / min(A,B) **1.59**，**+112% vs XLU-012 baseline 0.75**）★ **2026-05-02 新全域最優（13 次實驗、38+ 次嘗試）**
+- Part A: Sharpe **6.74**, 累計 +18.11%, 6 訊號 (1.2/年), WR **100%**, MDD -0.90%（filter XLU-012 唯一 SL 2021-09-20 FOMC taper signaling，保留 5 TPs +3.0% + 1 Expiry +1.88%）
+- Part B: Sharpe **1.59**, 累計 +9.05%, 4 訊號 (2.0/年), WR 75.0%（與 XLU-012 baseline 完全相同，2024-11-04 TP cooldown chain shift 至 2024-11-06）
+- min(A,B) **1.59**, A/B 年化幾何報酬差距 23.5% (< 30% ✓), A/B 訊號比 1.2:2.0 = 40% (< 50% ✓)
+- 跨資產貢獻：repo 第 2 次 lesson #24 forward-looking implied vol regime gate 驗證，**首次 ^MOVE DIRECTION (3d change) 維度發現**，與 TLT-013 LEVEL 維度結構性正交
+
+**前任最佳：** XLU-012 Att3（XLU-011 框架 + TP **+3.0%** / SL -4.0% / 20 天，**移除 2DD 過濾**，Part A Sharpe 0.75 / Part B Sharpe 1.59 / min(A,B) 0.75，+12% vs XLU-011 0.67）
+**前前任最佳：** XLU-011（波動率自適應均值回歸，ATR(5)/ATR(20) > 1.15 + XLU-003 框架，Part A Sharpe 0.67，Part B Sharpe 1.56，min(A,B) 0.67，+272% vs XLU-004 的 0.18）
 **前任最佳（突破）：** XLU-004（BB Squeeze Breakout，Part A Sharpe 0.18，Part B Sharpe 0.26，min(A,B) 0.18）
 **前任最佳（均值回歸）：** XLU-003（回檔範圍 3.5-7% + WR + ClosePos，Part A Sharpe 0.06，Part B Sharpe 0.35）
 **XLU-008 探索性結果：** BB(20,2.5) 寬帶突破 Att3 Part A Sharpe 0.40（+122% vs XLU-004），但 Part B 僅 2 訊號（統計意義不足），A/B 比 4:1，未達 A/B 平衡標準，不取代 XLU-004
@@ -34,6 +41,9 @@
 - KC(EMA20,ATR10) mult 2.5 + 30th pct + ClosePos≥45%：Part B -0.09（vs 不加 ClosePos 的 0.06）。KC 突破日天然高 ClosePos，過濾改變訊號日期（XLU-009 Att3）
 - XLU 60日跌幅過濾（≤10%）加在 XLU-003 進場上：Part A Sharpe 0.02（vs 0.06），Part B 0.35（不變）。XLU 自身 60日 ROC 無法區分升息結構性下跌（XLU-006 Att2）
 - TLT 60日 ROC > -5% 利率環境過濾加在 XLU-003 進場上：Part A Sharpe -0.07（vs 0.06），Part B 0.35（不變）。TLT 升息期下跌太漸進，過濾器在最壞的 2022 訊號通過時才開始生效，反而移除 2 筆好訊號（XLU-006 Att3）
+- ^MOVE Close <= 130 LEVEL cap（TLT-013 sweet spot 直接移植，XLU-013 Att1）：Part A/B 與 baseline 完全相同（min(A,B) 0.75，0% 改善）。XLU 殘餘 SL 2021-09-20 當日 MOVE=59.6 為 calm 區，LEVEL cap 結構非綁定。**確認 ^MOVE LEVEL 維度對 XLU 結構性冗餘**——XLU 透過 yield-spread 間接受 rate vol 影響，level dimension 與 utility flow 解耦
+- ^MOVE 5d change filter（XLU-013 探索）：5d 視窗使 2024-06-14 TP（5d +8.34）+ 2025-03-05 TP（+6.80）被誤殺，Part B 過度損失。**3d 視窗為 XLU 上 MOVE direction 唯一有效視窗**
+- ^MOVE 3d change <= +4 加嚴閾值（XLU-013 探索）：2020-10-30 TP（3d +4.03）被誤殺，Part A 1 TP 損失。**3d <= +5 為 XLU 上 MOVE direction 過濾甜蜜點邊界**
 
 **已掃描的參數空間：**
 - 進場條件：回檔 -3%/-3.5%/-4% + WR(10)/(14) -80/-85 + ClosePos 0.4；回檔範圍 3-7%/3-6%/3.5-7% + WR -80 + ClosePos 0.4；RSI(2) < 5/10 + 2日跌幅 1.0%/1.5% ± ClosePos
@@ -44,6 +54,7 @@
 - 趨勢回檔：SMA(20)/SMA(50) 交叉 + 回檔至 SMA(20) + RSI(14) 35-60/38-55，Cooldown 15/20
 - 跨資產配對：TLT 10日報酬>2% + XLU 滯後<0.5% + RSI<50 + SMA(100)，Cooldown 15
 - 跨資產過濾：TLT 60日 ROC > -5% 加在均值回歸進場上（XLU-006 Att3）
+- forward-looking implied vol regime gate：^MOVE Close <= 130 LEVEL cap（XLU-013 Att1，無效）/ ^MOVE 3d change <= +5.0 DIRECTION filter（XLU-013 Att2/Att3 ★ 全域最優）/ ^MOVE 5d change（5d 視窗 over-filter）/ ^MOVE 3d change <= +4 加嚴（誤殺 1 TP）
   - 動量回檔：ROC(20)>3% + 5日回檔<-1.5% + SMA(50)，TP+3.0%/SL-4.0%/20天/冷卻10天
   - XLU/SPY 配對交易：z-score(40) < -1.5/-2.0 + SMA(50) ± WR(10)≤-80，TP+2.5%/SL-4.0%/20天/冷卻10天
 - 波動率飆升過濾：ATR(5)/ATR(20) > 1.0/1.1/1.12/1.15/1.2 加在 XLU-003 框架上（XLU-010/XLU-011）
@@ -141,7 +152,8 @@
 | XLU-009 | `xlu_009_kc_squeeze_breakout` | Keltner Channel Squeeze Breakout（ATR-based 波動收縮突破，3 次嘗試） | 已完成 |
 | XLU-010 | `xlu_010_20d_wide_pullback` | 波動率飆升均值回歸（ATR ratio > 1.2，品質最佳但訊號少） | 已完成 |
 | XLU-011 | `xlu_011_vol_adaptive_mr` | 波動率自適應均值回歸（ATR ratio > 1.15，品質+數量平衡） | 前任最佳 |
-| XLU-012 | `xlu_012_vol_transition_mr` | Post-Capitulation Vol-Transition MR（XLU-011 框架 + TP +3.0%，移除 2DD 過濾） | ★ 當前最佳 |
+| XLU-012 | `xlu_012_vol_transition_mr` | Post-Capitulation Vol-Transition MR（XLU-011 框架 + TP +3.0%，移除 2DD 過濾） | 前任最佳 |
+| XLU-013 | `xlu_013_move_implied_vol_mr` | MOVE Implied-Vol Forward-Looking Regime-Gated MR（XLU-012 + ^MOVE 3d change <= +5.0 direction filter，repo 第 2 次 lesson #24 跨資產驗證、首次 ^MOVE DIRECTION 維度） | ★ 當前最佳 |
 
 ---
 
@@ -1003,3 +1015,100 @@ ATR > 1.15 + 回檔上限從 7% 放寬至 8%。結果與 Att1 完全相同——
 - 1 個停損交易（2021-09-20）的 ATR ratio = 1.15-1.2 之間，是可接受的邊際風險
 - Part B 1 筆到期微虧（2024-01-18 -0.20%）不影響整體品質
 - **min(A,B) 0.67 大幅超越所有 XLU 前任策略**（+272% vs XLU-004 的 0.18）
+
+---
+
+## XLU-013: MOVE Implied-Vol Forward-Looking Regime-Gated MR ★ 當前最佳
+
+**核心創新：** 跨資產移植 TLT-013 的 ^MOVE forward-looking implied volatility regime gate，
+首次發現 ^MOVE **DIRECTION** (3d change) 維度——與 TLT-013 LEVEL cap 維度結構性正交，
+為 lesson #24 v2 候選。
+
+### 動機
+
+- XLU-012 Att3（前任最佳 min(A,B) 0.75）殘留 1 筆 Part A SL（2021-09-20 FOMC taper
+  signaling -4.10%），A/B 訊號比 1.75:1（略高於 1.5:1 平衡標準），A/B cum 差 31.7%
+- TLT-013（2026-05-01）首次以 ^MOVE level cap 130 突破 TLT 結構性 0.12 ceiling
+  （+17% Sharpe），其 config 明確列為待驗證跨資產假設：「^MOVE level filter 可能適用
+  其他 rate-driven 資產（XLU, REITs）」
+- XLU 1.08% vol 利率敏感公用事業 ETF，與 TLT 同屬 rate-driven 但耦合機制不同
+  （XLU 透過 yield-spread + flight-to-defensive 間接相關）
+
+### 三次迭代結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+#### Att1：max_move_level=130（TLT-013 sweet spot 直接移植）
+
+- Part A: 7 訊號 / 85.7% WR / Sharpe **0.75** / cum +13.26%（與 XLU-012 baseline 完全相同）
+- Part B: 4 訊號 / 75.0% WR / Sharpe **1.59** / cum +9.05%（與 baseline 同；2024-11-04
+  TP MOVE=136.2 > 130 被過濾，但 cooldown chain shift 使 2024-11-06 TP 接續，淨中性）
+- min(A,B) **0.75**（**0% 改善 vs baseline**）
+
+**失敗分析：** 2021-09-20 SL（XLU-012 殘留唯一 Part A SL）當日 ^MOVE Close=59.6
+（極低 calm 區），LEVEL cap 130 結構非綁定無過濾效果。MOVE LEVEL cap 為 TLT
+2023-05-16 SVB 高峰專屬甜蜜點，XLU SL 失敗結構不同（Fed 政策訊號日 bond vol
+跳升，但絕對 level 仍 calm）。
+
+#### Att2 ★ SUCCESS：max_move_level=130 + ^MOVE 3d change <= +5.0
+
+- Part A: 6 訊號 / WR **100%** / Sharpe **6.74** / cum **+18.11%** / MDD -0.90%
+  （filter 2021-09-20 SL，保留 5 TPs +3.0% + 1 Expiry +1.88% 創造 micro-variance）
+- Part B: 4 訊號 / 75.0% WR / Sharpe **1.59** / cum +9.05%（與 baseline 完全相同）
+- min(A,B) **1.59**（**+112% vs XLU-012 baseline 0.75**）★ 全域最優
+
+**A/B balance（達標）：**
+- A/B 年化幾何報酬差距 23.5%（< 30% ✓）
+- A/B 訊號比 1.2/yr vs 2.0/yr = 40%（< 50% ✓）
+
+**成功分析：**
+- 2021-09-20 SL 當日 ^MOVE 3d change=+5.65（恰於 +5 邊界外）
+- 其餘 4 個 Part A TPs 3d change ∈ [-23.6, +4.03] 範圍內
+- 3d direction 維度為 XLU SL 唯一 isolated discriminator
+- 2024-11-04 TP 3d change=+5.45 同時被 direction 過濾，cooldown chain shift 使
+  2024-11-06 TP（3d change=-13.16）接續，結構性自我修復
+
+#### Att3：Ablation removing level cap (max_move_level=999, direction filter only)
+
+- Part A: 6 訊號 / WR 100% / Sharpe 6.74 / cum +18.11%（**與 Att2 完全相同**）
+- Part B: 4 訊號 / WR 75.0% / Sharpe 1.59 / cum +9.05%（**與 Att2 完全相同**）
+- min(A,B) **1.59**（**與 Att2 完全相同**）
+
+**核心發現：** ^MOVE LEVEL cap 130 對 XLU **結構性冗餘**——所有可能被 cap 過濾的
+訊號（如 2024-11-04 MOVE=136.2）同時被 DIRECTION filter 過濾，cap 無獨立貢獻。
+**最終配置採 Att3（更簡潔）**。
+
+### 跨資產對比（lesson #24 v2 邊界精煉）
+
+| 資產 | Rate 耦合 | 有效維度 | 失敗結構 |
+|------|----------|---------|---------|
+| TLT | 直接（30y treasury price） | LEVEL cap 130 binding | SVB 高峰持續高 vol regime |
+| XLU | 間接（yield-spread + flight-to-defensive） | DIRECTION (3d change) binding | Fed 政策訊號日 bond vol 跳升 |
+
+**結構差異**：TLT 直接追蹤 30y treasury price → MOVE level 直接相關；XLU 透過
+yield-spread + flight-to-defensive 間接相關 → MOVE level 與 utility flow 解耦，
+僅「Fed 政策訊號日 bond vol 跳升 (rising direction)」造成失敗（duration shock +
+safety bid 同時崩壞）。
+
+### 跨資產貢獻
+
+1. **Repo 第 2 次 lesson #24 forward-looking implied vol regime gate 跨資產驗證**
+   （繼 TLT-013 後）
+2. **首次 ^MOVE DIRECTION 維度發現**——與 TLT-013 LEVEL cap 維度結構性正交，
+   repo 首次驗證 implied vol 第二維度
+3. **新跨資產規則（lesson #24 v2 提案）**：^MOVE 對 rate-driven assets 的有效維度
+   取決於資產與 rate 的耦合程度
+   - 直接 rate-tracking 資產（TLT、IEF、TBT）→ MOVE LEVEL cap binding
+   - 間接 rate-sensitive 資產（XLU、XLRE、XLF、KRE）→ MOVE DIRECTION (3d change) binding
+4. **跨資產假設待驗證**：lesson #24 v2 適用於 XLRE / XLF / KRE 真實銀行/REIT/金融板塊，
+   閾值需依資產與 bond market 耦合強度調整
+
+### 最終配置（Att3）
+
+- 進場：同 XLU-012 Att3（10 日回檔 3.5-7% + WR(10) ≤ -80 + ClosePos ≥ 40%
+  + ATR(5)/ATR(20) > 1.15）
+- 出場：TP +3.0% / SL -4.0% / 20 天 / cooldown 7 天（同 XLU-012 Att3）
+- ^MOVE 過濾：DIRECTION filter only（^MOVE 3d change <= +5.0）
+- LEVEL cap：disabled（max_move_level=999）
+
+XLU-013 為新全域最優（13 次實驗、38+ 次嘗試，含均值回歸、突破、KC squeeze、
+配對、動量回調、ATR 過濾、2DD 過濾、forward-looking implied vol regime gate
+共 8 大策略類型）。

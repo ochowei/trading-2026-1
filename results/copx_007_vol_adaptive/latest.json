@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-23T16:47:50.274884"
+    "execution_time": "2026-05-01T22:39:22.748961"
   },
   "part_a": {
     "ticker": "COPX",
@@ -476,7 +476,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-23"
+      "end": "2026-05-01"
     }
   }
 }
