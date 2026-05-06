@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 # 各標的最佳策略 (Best strategy per ticker)
 STRATEGIES: list[dict[str, str | bool]] = [
     {
-        "experiment_name": "cibr_005_20d_lookback_mr",
-        "label": "CIBR-005",
+        "experiment_name": "cibr_014_multi_period_capitulation_mr",
+        "label": "CIBR-014",
         "ticker": "CIBR",
         "has_trailing_stop": False,
     },
@@ -44,8 +44,8 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "eem_012_bb_lower_pullback_cap",
-        "label": "EEM-012",
+        "experiment_name": "eem_014_vol_transition_mr",
+        "label": "EEM-014",
         "ticker": "EEM",
         "has_trailing_stop": False,
     },
@@ -62,8 +62,8 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": True,
     },
     {
-        "experiment_name": "ewz_006_bb_lower_pullback_cap",
-        "label": "EWZ-006",
+        "experiment_name": "ewz_007_vol_transition_mr",
+        "label": "EWZ-007",
         "ticker": "EWZ",
         "has_trailing_stop": False,
     },
@@ -84,12 +84,6 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "label": "GLD-006",
         "ticker": "GLD",
         "has_trailing_stop": True,
-    },
-    {
-        "experiment_name": "ibit_009_post_cap_vol_transition_mr",
-        "label": "IBIT-009",
-        "ticker": "IBIT",
-        "has_trailing_stop": False,
     },
     {
         "experiment_name": "inda_010_vol_transition_mr",
@@ -134,8 +128,8 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "tsla_009_bb_wide_breakout",
-        "label": "TSLA-009",
+        "experiment_name": "tsla_016_breakout_ceiling",
+        "label": "TSLA-016",
         "ticker": "TSLA",
         "has_trailing_stop": False,
     },
@@ -170,14 +164,14 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "xbi_005_closepos_reversal",
-        "label": "XBI-005",
+        "experiment_name": "xbi_015_regime_pullback_mr",
+        "label": "XBI-015",
         "ticker": "XBI",
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "xlu_013_move_implied_vol_mr",
-        "label": "XLU-013",
+        "experiment_name": "xlu_012_vol_transition_mr",
+        "label": "XLU-012",
         "ticker": "XLU",
         "has_trailing_stop": False,
     },
