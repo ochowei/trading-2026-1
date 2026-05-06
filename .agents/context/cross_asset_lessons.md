@@ -924,10 +924,10 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03**）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06**）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025]
-  validated: 2026-05-03
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018]
+  validated: 2026-05-06
   data_through: 2025-12-31
   confidence: high
 -->
@@ -1011,6 +1011,24 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 - ✅ **適用**：backward-looking realized vol gate 已飽和的高政策驅動資產（TLT 已驗證）+ 商品 ETF（GLD safe-haven / USO event-driven 雙類別已驗證）+ rate-indirect 類別（XLU 已驗證）
 - 🔄 **待驗證**：^VIX 對其底層 underlying（broad-market stocks）
 - ❌ **不適用**：沒有對應 implied vol index 的資產（無 option market 或 option market 流動性不足）
+- ❌ **不適用（NVDA-018 確立 2026-05-06）**：(a) **多成份 IV index 對單一成份股**——^VXN 為 NASDAQ-100 100 檔 IV 加權平均，單股失敗模式（earnings/guidance/competitive shocks）與 macro IV 弱相關（NVDA Part A 7 SLs 的 ^VXN 3d_chg 全部 ≤ +2.31，4/7 為負方向）；(b) **Trend-continuation framework**（MBPC、breakout）—— IV 與「突破後淺回檔趨勢延續」訊號日 forward-looking 預期相關性弱，IV 規則無法區分動量延續勝負
+
+**NVDA-018 失敗子變體（不要重複嘗試）**：
+- **^VXN 3d DIRECTION cap <= +5.0（XLU/USO sweet spot port）**：min(A,B) 0.52（**-5.5% vs NVDA-013 baseline 0.55**），過濾僅 1 訊號 2023-03-13 SVB 銀行危機日（VXN 3d +5.31 為 winner TP +8%），0 SLs 過濾——NVDA Part A 7 SLs 的 VXN 3d_chg 全部 ≤ +2.31（4/7 為負）。**證明 ^VXN 3d DIRECTION 維度對 NVDA mega-cap 個股 + MBPC 框架結構性非綁定**
+- **^VXN 10d DIRECTION cap <= 0.0（longer window tighter）**：min(A,B) 0.17（**-69%**），over-filter 嚴重——移除 7 baseline trades 中 6 為 TPs，WR 73.1%→57.9%，cooldown chain shift 引入新 SLs；Part B AI bull regime 中 VXN 持續下降使 7→3 訊號崩減。**確認 long-window DIRECTION 維度對 momentum continuation framework 結構性反向**
+- **^VXN LEVEL cap <= 25（lesson #24 v1 mirror TLT-013）**：min(A,B) 0.41（**-25%**），LEVEL cap 過濾 10 Part A 訊號（7 為 TPs 包括 2020 Q2-Q3 post-COVID 大量 high-VXN winners），NVDA MBPC 在 high VXN regime 反而 WR 較高（77% vs 67%）。**證明 LEVEL 維度對 mega-cap 個股 + MBPC 框架結構性反向**
+
+**Lesson #24 v5 適用邊界（NVDA-018 確立 2026-05-06）**：
+**Forward-looking IV regime gate 適用條件 = (a) Asset 為 single-driver IV 來源 AND (b) Strategy 為 capitulation MR 框架。違反任一條件結構性失效。**
+- **(a) Single-driver IV 條件**：
+  - ✅ rates: ^MOVE → TLT/XLU（rate-direct 或 rate-indirect 單一驅動）
+  - ✅ oil: ^OVX → USO（oil futures direct exposure）
+  - ✅ gold: ^GVZ → GLD（commodity safe-haven 單一驅動）
+  - ❌ broad-equity-component IV 對單一成份股：^VXN → NVDA（NASDAQ-100 100 檔成份混合，單股獨立失敗模式不被 macro IV 反映）
+  - 🔄 待驗證：^VIX → SPY/QQQ/IWM（broad-market 整體，underlying 即 IV index 計算對象）
+- **(b) Capitulation MR framework 條件**：
+  - ✅ MR / dip-buying 進場（IV stress 為 entry signal 反向過濾器）
+  - ❌ MBPC / breakout / trend-continuation（IV 與動量延續訊號相關性弱）
 
 ---
 
