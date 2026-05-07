@@ -97,15 +97,16 @@ class EWZ008Config(ExperimentConfig):
     vix_ticker: str = "^VIX"
     # DIRECTION mode：N 日累計 ^VIX 絕對變化，篩除 vol-acceleration regime
     # Att1 (+5.0) XLU-013 / GLD-015 / USO-025 sweet spot 直接移植 → 非綁定（同 EWZ-007 baseline）
-    # Att2 (+3.0) 加嚴假說：2019-03-25 / 2020-01-31 兩個殘餘 SLs 3d 變化均 <= +3.0
-    # Att3 視 Att2 結果決定（甜蜜點 / 雙重 dimension / LEVEL CAP fallback）
+    # Att2 (+3.0) 加嚴假說 → cooldown chain-shift collapse（過濾 2019-08-02 TP 引入 2019-08-15 SL，
+    #            兩個殘餘 SLs 仍未過濾 → 確認 DIRECTION 在 EWZ 上無乾淨切點）
+    # Att3 改採 LEVEL CAP（^VIX <= 18.0），測試 LEVEL 維度是否能精準過濾
+    #     2020-01-31 SL（VIX ~18.84）而保留 2019-03-25 SL（VIX ~16.5）
     vix_direction_lookback: int = 3
-    max_vix_change: float = 3.0
+    max_vix_change: float = 999.0  # 非綁定（DIRECTION dim 已於 Att2 證明無效）
 
     # LEVEL CAP：^VIX 收盤值 <= max_vix_level（999.0 表停用）
-    # Att1 / Att2：999.0（停用，純 DIRECTION 試驗）
-    # Att3：18.0（LEVEL CAP fallback）
-    max_vix_level: float = 999.0
+    # Att3 ★ LEVEL CAP <= 18.0（surgical 過濾 2020-01-31 SL 假設）
+    max_vix_level: float = 18.0
 
     cooldown_days: int = 10
 
