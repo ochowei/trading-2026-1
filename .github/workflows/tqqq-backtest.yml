@@ -122,6 +122,7 @@ on:
           - "FCX-012: fcx_012_donchian_low_washout"
           - "FCX-013: fcx_013_regime_breakout"
           - "FCX-014: fcx_014_breakout_ceiling"
+          - "FCX-015: fcx_015_vix_bands_breakout"
           - "FXI-001: fxi_001_pullback_wr"
           - "FXI-002: fxi_002_vol_adaptive_pullback"
           - "FXI-003: fxi_003_bb_squeeze_breakout"
