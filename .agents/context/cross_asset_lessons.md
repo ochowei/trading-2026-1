@@ -924,13 +924,26 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06**）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07**）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018]
-  validated: 2026-05-06
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015]
+  validated: 2026-05-07
   data_through: 2025-12-31
   confidence: high
 -->
+
+**v3 變體擴展（FCX-015，2026-05-07）**：lesson #24 family 共有 4 種已驗證變體 + 1 種被拒絕方向：
+- **LEVEL CAP**：TLT-013 ^MOVE <= 130（rate-driven asset class）
+- **DIRECTION（rising-vol filter）**：XLU-013 ^MOVE 3d、GLD-015 ^GVZ 10d、USO-025 ^OVX 3d（commodity-safe-haven / commodity event-driven 類別）
+- **BANDS exclude mid（U-shape regime hypothesis）**：XBI-017 ^VIX (17, 22] 排除中等 VIX 帶（biotech sector ETF Pullback MR）
+- **FLOOR（require above-floor）**：FCX-015 ^VIX > 14.0（commodity/mining single stock BB Squeeze Breakout）
+- **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架）
+
+**FCX-015 跨資產發現（反向 VIX 分布結構）**：
+- **FCX BB Squeeze breakout SLs 集中 low-VIX calm regime**（VIX <= 14），與 **XBI Pullback MR SLs 集中 mid-VIX complacency creep**（VIX 17-22）為**結構性反向** VIX 分布
+- 跨策略 lesson #24 移植**不可直接套用 sweet spot threshold**——需先做 trade-level signal-day VIX 分布分析
+- FCX-015 Att1（XBI-017 BANDS 17-22 直接移植）失敗 min(A,B) 0.41，過濾 3 TPs 而 0 SLs；Att2 反向 FLOOR 14.0 成功 min(A,B)† 1.43（+123%），A/B cum gap 從 52.5% 收斂至 7.1%（FCX 商品超級週期結構性邊界首次突破）
+- **新跨資產假設（待驗證）**：VIX FLOOR 變體可能適用於其他高 vol mining/commodity 突破策略（COPX 銅礦 ETF、SOXL 半導體 leveraged ETF），閾值依該資產 SL VIX 分布調整
 
 當資產的 backward-looking BB-width regime gate（lesson #6 規則 #5 + #23）已達結構性 ceiling，**forward-looking implied volatility derivatives**（option-implied vol indices）為下一個有效維度。
 

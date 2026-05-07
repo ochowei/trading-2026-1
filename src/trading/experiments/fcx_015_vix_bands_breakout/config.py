@@ -131,7 +131,15 @@ class FCX015Config(ExperimentConfig):
     #     過濾 expiries: 2023-07-13 (-3.69%) + 2023-12-13 (+5.32%) 兩個 calm-period expiry
     #     淨效果：3 SLs 全過濾 + 5 calm-period 邊際 trades 過濾，
     #     Part A WR 75%→90%，Part B WR 75%→100%
-    #   Att3（依 Att2 結果決定：threshold robustness 或 ablation）
+    #   Att3（mode=floor, vix_low=15.0, threshold robustness check）：
+    #     結果：Part A **完全相同 Att2**（10/90%/1.43/+85.63%）
+    #            Part B 2/100%/std=0/cum +16.64%（-1 TP vs Att2 3/100%/+25.97%）
+    #     min(A,B)† = Part A Sharpe 1.43（同 Att2）
+    #     A/B 年化 13.18% vs 8.00% → gap 39.3% > 30% ❌
+    #     失去 2024-04-29 Part B TP（VIX 介於 14-15 之間，FLOOR 15 過嚴）
+    #     確認 Att2 FLOOR 14 為甜蜜點：稍嚴（15）損失邊際 winner，A/B cum gap
+    #     重回 >30%；Att1 BANDS 模式系統性錯誤
+    #     Att2 (FLOOR 14) 為新全域最優
     vix_ticker: str = "^VIX"
     vix_filter_mode: str = "floor"
     vix_low_threshold: float = 14.0
