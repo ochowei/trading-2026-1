@@ -119,11 +119,22 @@ class FCX015Config(ExperimentConfig):
     #     全 3 SLs 保留（2019-07-24/2020-01-13/2021-11-11→shifted 11-12）
     #     發現：FCX BB Squeeze 突破與 XBI MR 為**反向 VIX U 形**：
     #     FCX TPs 集中於 mid-VIX，SLs 在 low-VIX；XBI 為相反
-    #   Att2（依 Att1 trade-level 反向假說調整）
-    #   Att3（ablation 或 alternative dimension）
+    #   Att2 ★ SUCCESS（mode=floor, vix_low=14.0）：反向假說 VIX FLOOR
+    #     結果：Part A 10/90.0%/Sharpe 1.43/cum +85.63%
+    #            Part B  3/100%/std=0/cum +25.97%（3 TP 全勝）
+    #     min(A,B)† = Part A Sharpe **1.43**（+123% vs baseline 0.64）
+    #     A/B 年化 13.18%/yr vs 12.24%/yr → gap 7.1% << 30% ✓✓✓
+    #     A/B 訊號比 2.0/yr vs 1.5/yr → 1.33:1 (25% gap < 50% ✓)
+    #     過濾 SLs: 2019-07-24 (VIX ~13 calm) + 2020-01-13 (VIX ~12.6 pre-COVID calm)
+    #              + Part B 2024-05-14 SL (VIX ~13)
+    #     過濾 TPs: 2019-04-04 / 2019-11-07（calm-period winners 損失）
+    #     過濾 expiries: 2023-07-13 (-3.69%) + 2023-12-13 (+5.32%) 兩個 calm-period expiry
+    #     淨效果：3 SLs 全過濾 + 5 calm-period 邊際 trades 過濾，
+    #     Part A WR 75%→90%，Part B WR 75%→100%
+    #   Att3（依 Att2 結果決定：threshold robustness 或 ablation）
     vix_ticker: str = "^VIX"
-    vix_filter_mode: str = "bands_exclude_mid"
-    vix_low_threshold: float = 17.0
+    vix_filter_mode: str = "floor"
+    vix_low_threshold: float = 14.0
     vix_high_threshold: float = 22.0
 
 
