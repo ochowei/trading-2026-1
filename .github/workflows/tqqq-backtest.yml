@@ -304,6 +304,7 @@ on:
           - "COPX-011: copx_011_regime_breakout"
           - "COPX-012: copx_012_atr_ceiling_mr"
           - "COPX-013: copx_013_macro_confirmed_mr"
+          - "COPX-014: copx_014_gld_divergence_breakout"
           - "URA-001: ura_001_pullback_wr"
           - "URA-002: ura_002_asymmetric_narrow"
           - "URA-003: ura_003_pullback_rsi2"
