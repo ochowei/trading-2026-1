@@ -96,11 +96,11 @@ class EWZ008Config(ExperimentConfig):
     # ^VIX forward-looking implied vol regime gate（EWZ-008 核心新增）
     vix_ticker: str = "^VIX"
     # DIRECTION mode：N 日累計 ^VIX 絕對變化，篩除 vol-acceleration regime
-    # Att1 (+5.0) XLU-013 / GLD-015 / USO-025 sweet spot 直接移植
+    # Att1 (+5.0) XLU-013 / GLD-015 / USO-025 sweet spot 直接移植 → 非綁定（同 EWZ-007 baseline）
     # Att2 (+3.0) 加嚴假說：2019-03-25 / 2020-01-31 兩個殘餘 SLs 3d 變化均 <= +3.0
     # Att3 視 Att2 結果決定（甜蜜點 / 雙重 dimension / LEVEL CAP fallback）
     vix_direction_lookback: int = 3
-    max_vix_change: float = 5.0
+    max_vix_change: float = 3.0
 
     # LEVEL CAP：^VIX 收盤值 <= max_vix_level（999.0 表停用）
     # Att1 / Att2：999.0（停用，純 DIRECTION 試驗）
