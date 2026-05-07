@@ -37,7 +37,8 @@ BB Squeeze Breakout 框架，cross-strategy port from TLT-014）：
 
 迭代計畫 (Iteration Plan)：
 - Att1：min_relative_return = -0.10（loose，TLT-014 -0.04 vol-scaled to TSLA 3.72% vol）
-- Att2：根據 Att1 結果調整閾值
+- Att2：min_relative_return = -0.01（基於 Att1 trade-level 分析，所有 Part A SLs
+  divergence 落於 -1.45% ~ -2.37% 區間，winners 均 > +4.82%）
 - Att3：根據 Att1/Att2 結果挑選甜蜜點
 
 ================================================================================
@@ -49,7 +50,23 @@ Att1 (min_relative_return = -0.10)：FAILED non-binding
       min(A,B) 0.53（與 baseline 相同，無改善）
 失敗：全部 17 baseline 訊號 divergence 皆 >= -10%（最低 -2.37%），閾值非綁定。
 策略方向（lesson #19 family v14 cross-asset divergence regime gate）正確但閾值過鬆，
-等同 baseline。下一迭代需大幅收緊閾值至 ~-0.01 區間。
+等同 baseline。
+
+================================================================================
+Att2 (min_relative_return = -0.01)：PARTIAL Part A SUCCESS / Part B 非綁定
+================================================================================
+參數：min_relative_return=-0.01（surgical 切除 Part A 全部 3 losers），其餘同 Att1
+結果：Part A 10/80.0%/Sharpe **1.17** cum +94.32%（**+39% Part A** vs baseline 0.84）
+      Part B 6/66.7%/Sharpe 0.53 cum +26.25%（**完全相同**）
+      min(A,B) 0.53（Part B 為約束，未提升）
+- Part A 過濾 3 losers（2021-07-30 SL div -1.45%、2023-03-31 SL div -2.37%、
+  2023-12-14 Expiry div -1.23%，全部 div < -1%），cooldown chain shift 釋放
+  2021-08-02 + 2023-12-15 替代訊號（仍部分 losers），淨 Part A 訊號 11→10、
+  WR 72.7%→80.0%、Sharpe 0.84→1.17
+- Part B 2024-06-17 winner（div -1.75%）被過濾，cooldown chain shift 釋放
+  2024-06-26 winner（div +6.43%，亦 +10% TP）替代——**淨無變化**
+失敗：閾值 -1% 對 Part A 高度有效但對 Part B 非綁定（最低 SL div -0.67% 仍 > -1%）。
+下一迭代需收緊至 -0.005 區間以 surgical 過濾 Part B 2025-11-03 SL（div -0.67%）。
 """
 
 from dataclasses import dataclass
@@ -79,11 +96,11 @@ class TSLA017Config(ExperimentConfig):
     # benchmark：QQQ（NASDAQ-100，TSLA 主要市場 context）
     # divergence_lookback：20 日（與 TLT-014 一致）
     # min_relative_return：TSLA N 日報酬 - QQQ N 日報酬 必須 >= 此值
-    # Att1：-0.10 loose（TLT-014 -0.04 vol-scaled to TSLA 3.72% vol ≈ 0.04*3.7≈0.15→取 -0.10
-    # 為起始，留收緊空間）
+    # Att1：-0.10 loose（非綁定）
+    # Att2：-0.01 moderate（surgical 切除 Part A 全部 3 losers div -1.23%~-2.37%）
     benchmark_ticker: str = "QQQ"
     divergence_lookback: int = 20
-    min_relative_return: float = -0.10
+    min_relative_return: float = -0.01
 
 
 def create_default_config() -> TSLA017Config:
