@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-03T14:47:31.083046"
+    "execution_time": "2026-05-07T20:44:42.653309"
   },
   "part_a": {
     "ticker": "USO",
@@ -465,28 +465,40 @@
   },
   "part_c": {
     "ticker": "USO",
-    "total_signals": 0,
+    "total_signals": 1,
     "wins": 0,
     "win_rate": 0.0,
-    "avg_return_pct": 0.0,
+    "avg_return_pct": -0.1,
     "std_return_pct": 0.0,
-    "cumulative_return_pct": 0.0,
+    "cumulative_return_pct": -0.1,
     "avg_holding_days": 0.0,
     "max_drawdown_pct": 0.0,
     "profit_factor": 0.0,
     "sharpe_ratio": 0.0,
-    "sortino_ratio": 0.0,
+    "sortino_ratio": -1.0,
     "calmar_ratio": 0.0,
-    "max_consecutive_losses": 0,
+    "max_consecutive_losses": 1,
     "target_exits": 0,
     "stop_loss_exits": 0,
-    "time_expiry_exits": 0,
+    "time_expiry_exits": 1,
     "pessimistic_exits": 0,
-    "trades": [],
-    "filled_count": 0,
+    "trades": [
+      {
+        "date": "2026-05-06",
+        "entry_date": "2026-05-07",
+        "exit_date": "2026-05-07",
+        "entry": 128.9,
+        "exit": 128.77,
+        "return_pct": -0.1,
+        "holding_days": 0,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": 0.0
+      }
+    ],
+    "filled_count": 1,
     "unfilled_count": 0,
     "unfilled_signals": [],
-    "fill_rate": 0.0,
+    "fill_rate": 1.0,
     "execution_model": {
       "entry_mode": "next_open_market",
       "exit_profit": "limit_order_day",
@@ -497,7 +509,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-05-01"
+      "end": "2026-05-07"
     }
   }
 }
