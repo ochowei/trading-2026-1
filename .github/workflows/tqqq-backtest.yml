@@ -251,6 +251,7 @@ on:
           - "NVDA-016: nvda_016_sector_confirmed_mbpc"
           - "NVDA-017: nvda_017_signal_day_filter"
           - "NVDA-018: nvda_018_vxn_implied_vol_mbpc"
+          - "NVDA-019: nvda_019_failed_breakdown_mr"
           - "XBI-001: xbi_001_pullback_wr"
           - "XBI-004: xbi_004_capped_cooldown"
           - "XBI-005: xbi_005_closepos_reversal"
