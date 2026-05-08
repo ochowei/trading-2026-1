@@ -114,7 +114,7 @@ class TSM013Config(ExperimentConfig):
     # 訊號通過條件：TSM 20d 報酬 - QQQ 20d 報酬 <= max_relative_return
     # （CEILING 方向：過濾 TSM 已過度跑贏 QQQ 的 rally exhaustion regime）
     benchmark_ticker: str = "QQQ"
-    divergence_lookback: int = 20
+    divergence_lookback: int = 10
     max_relative_return: float = 0.10
     use_divergence_filter: bool = True
 
