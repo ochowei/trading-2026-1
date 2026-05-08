@@ -133,7 +133,7 @@ class TLT015Config(ExperimentConfig):
     credit_lookback: int = 20  # N 日報酬差距
     # max_credit_outperformance：HYG N 日報酬 - TLT N 日報酬 <= 此值
     # 即「HYG 不可比 TLT 跑贏超過此值」（過濾 credit-on regime）
-    max_credit_outperformance: float = 0.05
+    max_credit_outperformance: float = 0.02
 
     # 冷卻期
     cooldown_days: int = 7
