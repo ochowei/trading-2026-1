@@ -108,6 +108,7 @@ on:
           - "EWZ-006: ewz_006_bb_lower_pullback_cap"
           - "EWZ-007: ewz_007_vol_transition_mr"
           - "EWZ-008: ewz_008_vix_implied_vol_mr"
+          - "EWZ-009: ewz_009_ewz_eem_divergence_mr"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "DIA-012: dia_012_oneday_capitulation_filter"
           - "FCX-002: fcx_002_pullback_wr"
