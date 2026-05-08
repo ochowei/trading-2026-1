@@ -86,12 +86,29 @@ class TQQQ020Config(TQQQ018Config):
     # 1d 變化閾值（今日 VIX - 昨日 VIX）
     # Att1: 0.0 → REJECT min(A,B) -0.07 / Part A 2 訊號 / Part B **0 訊號**
     #   結構性失敗 — capitulation 訊號日 VIX 必上升（恐慌爆發），1d <= 0 過嚴
-    #   過濾掉幾乎所有訊號，僅留 2 邊緣訊號，驗證「peak-passing 在 signal day
-    #   結構性與 capitulation 矛盾」初步信號
-    # Att2: 3.0 → 適度放寬（允許今日 VIX 較昨日漲不超過 3 點）
-    #   假設：filter「extreme single-day VIX 加速 >+3」訊號，仍允許正常 capitulation
-    # Att3: 待定，依結果調整
-    max_vix_1d_change: float = 3.0
+    #   過濾掉幾乎所有訊號，僅留 2 邊緣訊號（2021-02-26、2023-09-27），驗證
+    #   「peak-passing 在 signal day 結構性與 capitulation 矛盾」初步信號
+    # Att2: 3.0 → REJECT min(A,B) 0.80 TIE baseline 但 Part A 退化
+    #   Part A 10→6 訊號（WR 90→83.3%，Sharpe 1.21→0.80，過濾 4 winners 中 0 SL）
+    #   Part B 完全不變（6 訊號同 baseline，2025-03-06 SL VIX 1d 已 <= +3）
+    #   **驗證 Part B SL 與 Part A winners 在 VIX 1d 維度結構性反向**：
+    #   Part B SL 1d 低（~+3 以內，moderate spike）vs Part A winners 1d 高
+    #   （> +3，extreme spike）— filter 反向選擇移除 Part A winners
+    # Att3 ★ FINAL: 7.0 → REJECT min(A,B) 0.66 (-18% vs baseline 0.80)
+    #   Part A 10 訊號數同 baseline 但 cooldown chain shift（lesson #19 family）
+    #   引入新 SL：WR 90.0%→80.0%（8W/2L vs baseline 9W/1L）、Sharpe 1.21→0.66、
+    #   cum +68.97%→+45.14%；Part B 完全不變 6 訊號 5W/1L Sharpe 0.80
+    #   結論：放寬至 +7 雖訊號數恢復但破壞 baseline 訊號精準排程，cooldown shift
+    #   將原 winner 替換為 loser（典型 lesson #19 collapse）
+    # **整合結論（lesson #24 family v9 邊界擴展，repo 首次 ^VIX 1d momentum
+    # reversal / peak-passing 維度試驗失敗）**：
+    # - TQQQ extreme capitulation framework（DD≤-15% + RSI(5)<25 + Volume>1.5x）
+    #   在 VIX **1d 維度**亦結構性與 capitulation 共線（同 TQQQ-019 5d 維度結論）
+    # - Part B 2025-03-06 SL 之 VIX 1d 落於 [+0, +3] moderate spike 區間，與
+    #   Part A 部分 winners 重疊；無單一 1d threshold 可雙 Part 同步改善
+    # - lesson #24 family DIRECTION 維度（cumulative or 1d）對 extreme capitulation
+    #   framework 結構性失效——擴展自 TQQQ-019 驗證之 5d 維度至 1d 維度
+    max_vix_1d_change: float = 7.0
 
 
 def create_default_config() -> TQQQ020Config:

@@ -28,6 +28,7 @@ on:
           - "TQQQ-017: tqqq_017_cap_reversal_confirm"
           - "TQQQ-018: tqqq_018_regime_vol_gate"
           - "TQQQ-019: tqqq_019_vix_direction_mr"
+          - "TQQQ-020: tqqq_020_vix_peak_passing_mr"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
