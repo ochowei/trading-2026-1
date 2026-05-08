@@ -220,6 +220,7 @@ on:
           - "TSM-009: tsm_009_pairs_trading"
           - "TSM-010: tsm_010_regime_mbpc"
           - "TSM-011: tsm_011_signal_day_filter"
+          - "TSM-012: tsm_012_volume_confirmed_rs_pullback"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
