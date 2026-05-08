@@ -932,8 +932,8 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07，USO-028 多時框 DIRECTION combo 變體首次發現 + 同一 IV index 3d/5d 正交時框疊加首次驗證 2026-05-08**）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,USO-028]
-  validated: 2026-05-08
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,USO-028,TLT-016]
+  validated: 2026-05-09
   data_through: 2025-12-31
   confidence: high
 -->
@@ -943,8 +943,13 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 - **DIRECTION（rising-vol filter）**：XLU-013 ^MOVE 3d、GLD-015 ^GVZ 10d、USO-025 ^OVX 3d（commodity-safe-haven / commodity event-driven 類別）
 - **BANDS exclude mid（U-shape regime hypothesis）**：XBI-017 ^VIX (17, 22] 排除中等 VIX 帶（biotech sector ETF Pullback MR）
 - **FLOOR（require above-floor）**：FCX-015 ^VIX > 14.0（commodity/mining single stock BB Squeeze Breakout）
-- **MULTI-WINDOW DIRECTION COMBO（v6 候選，USO-028 2026-05-08）★**：USO-028 ^OVX 3d <= +4 + ^OVX 5d <= +6 雙時框疊加，min(A,B) 0.50→**0.64 (+28%)**——同一 IV index 不同時框 DIRECTION 結構性正交，3d 捕捉「acute event window」、5d 捕捉「sustained regime shift window」，可疊加為下一獨立維度。Threshold 5d ≈ 3d × 1.5x。**新跨資產假設（待驗證）**：(a) 多時框 IV DIRECTION combo 可能擴展至 TLT (^MOVE 3d + 5d/10d)、XLU (^MOVE 3d + 10d)、GLD (^GVZ 5d + 10d) 等已套用單時框 IV 的資產；(b)「3d acute + 5d sustained」雙時框結構可能成為 commodity event-driven ETF 通用 IV regime gate 範本（XLE / UNG / KOLD + 對應 IV proxy）
-- **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架）
+- **MULTI-WINDOW DIRECTION COMBO（v6 候選，USO-028 2026-05-08）★**：USO-028 ^OVX 3d <= +4 + ^OVX 5d <= +6 雙時框疊加，min(A,B) 0.50→**0.64 (+28%)**——同一 IV index 不同時框 DIRECTION 結構性正交，3d 捕捉「acute event window」、5d 捕捉「sustained regime shift window」，可疊加為下一獨立維度。Threshold 5d ≈ 3d × 1.5x。**新跨資產假設（已部分拒絕，見 TLT-016）**：(a) 多時框 IV DIRECTION combo 在 TLT 上**結構性失敗**（cross-strategy port from USO-028 Att1 拒絕，min(A,B) TIE/REJECT，TLT-016 三次嘗試）；(b)「3d acute + 5d sustained」雙時框結構可能成為 commodity event-driven ETF 通用 IV regime gate 範本（XLE / UNG / KOLD + 對應 IV proxy），但**不適用於 rate-driven 資產（TLT 已驗證）**
+- **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架）、**TLT-016 multi-window IV DIRECTION combo 跨策略移植**（rate-driven asset + MR 框架，2026-05-09）
+
+**TLT-016 跨資產發現（v6 適用邊界精煉，2026-05-09）**：
+- **Multi-window IV DIRECTION combo 不可直接跨資產移植至 TLT**——USO-028 Att1 (commodity event-driven asset + multi-period MR) 成功因 USO 殘餘 SLs 集中於「rising IV 累積期」，cap 變體可正向過濾；TLT 殘餘 EX 2021-01-06 為「Q1 reflation regime 中 IV trajectory 仍平靜」訊號，^MOVE 3d/5d/10d 三窗口皆 cluster mid-distribution among Part A winners，任一 cap/floor threshold 結構性無法 cleanly 分離
+- **新跨資產規則候選（v6 boundary）**：multi-window IV DIRECTION combo 適用先決條件 = 「base strategy 殘餘 SLs/EXs 在 IV trajectory 維度單向 cluster + Part B 訊號數 ≥ 5」雙條件——USO-028 ✓ ；TLT-016 ✗（EX cluster mid-distribution + Part B 4 訊號）
+- **意外 partial achievement**：TLT-016 Att1（5d cap +5）在不改變 Sharpe 的情況下將 Part B 2024-05-29 (MOVE 5d=+8.11) 過濾，使 TLT 結構性 A/B cum gap 從 37%→**14.7% ✓** 首次達標 < 30% balance，但 Part B 樣本減為 3 訊號統計顯著性下降。partial achievement 為「IV DIRECTION cap 可正向 normalize Part B 過度績優結構」之新發現，未來若 Part B 樣本擴增可再驗證
 
 **FCX-015 跨資產發現（反向 VIX 分布結構）**：
 - **FCX BB Squeeze breakout SLs 集中 low-VIX calm regime**（VIX <= 14），與 **XBI Pullback MR SLs 集中 mid-VIX complacency creep**（VIX 17-22）為**結構性反向** VIX 分布

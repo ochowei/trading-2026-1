@@ -5,6 +5,4 @@ from trading.experiments.tlt_016_move_multi_window_direction_mr.strategy import 
     TLT016MoveMultiWindowDirectionMRStrategy,
 )
 
-register("tlt_016_move_multi_window_direction_mr")(
-    TLT016MoveMultiWindowDirectionMRStrategy
-)
+register("tlt_016_move_multi_window_direction_mr")(TLT016MoveMultiWindowDirectionMRStrategy)

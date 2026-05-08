@@ -39,10 +39,7 @@ class TLT016MoveMultiWindowDirectionMRStrategy(ExecutionModelStrategy):
                 f"  BB regime gate: BB({config.bb_period}, {config.bb_std}) width"
                 f" / Close < {config.max_bb_width_ratio:.1%}"
             )
-            print(
-                f"  ^MOVE LEVEL gate: {config.move_ticker} Close <="
-                f" {config.max_move_level:.1f}"
-            )
+            print(f"  ^MOVE LEVEL gate: {config.move_ticker} Close <= {config.max_move_level:.1f}")
             print(
                 f"  Cross-asset divergence: TLT vs {config.benchmark_ticker}"
                 f" {config.divergence_lookback}d return diff >="
