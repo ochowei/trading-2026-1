@@ -147,7 +147,75 @@ Att2 ★ (max_relative_return = +0.03, +3% moderate)：SUCCESS min(A,B) **1.43**
         Cooldown chain shift 在 Part A 引入新訊號 2019-09-23（取代 2019-09-17）
         和 2023-04-14（取代 2023-04-05），均為 winners。
 
-Att3 (依 Att2 結果調整)：待執行
+Att3 (max_relative_return = +0.01, +1% tight ceiling)：PARTIAL，Part A 略劣於 Att2
+    結果：
+        Part A: 9 訊號, WR 88.9%, 累計  +71.88%, Sharpe **1.33**
+        Part B: 3 訊號, WR **100%**, std=0 zero-var, 累計 +25.97%, Sharpe 0.00
+        min(A,B)†: **1.33**（Part A 為約束，Part B std=0 結構性零方差時採 Part A
+                          Sharpe，沿用 EWJ-003/SPY-009/DIA-012/IWM-013/CIBR-014 慣例）
+        **vs Att2 min 1.43，-7% 退化**（Part A 從 10/90.0%/1.43 到 9/88.9%/1.33）
+    A/B 平衡（驗收目標達 + 樣本量警告）：
+        Part A 年化 cum: (1+0.7188)^(1/5)-1 = 11.46%/yr
+        Part B 年化 cum: (1+0.2597)^(1/2)-1 = 12.23%/yr
+        A/B 年化 cum 差 |11.46-12.23|/12.23 = **6.3% < 30% ✓**（極佳）
+        A/B 年化訊號比 1.8:1.5 = **1.2:1**（gap 16.7% < 50% ✓）
+        但 Part B 3 訊號（1.5/yr）統計顯著性偏低
+    失敗分析：
+        - +1% 過嚴：額外過濾 1 Part A 訊號（從 10→9，移除 2020-06-15 winner）
+          + 2 Part B 訊號（從 5→3，移除 2025-08-20 expiry +0.04% 與 2025-10-13 winner）
+        - Cooldown chain shift：移除 2020-06-15 後釋放 2020-06-29 訊號（同樣 winner，
+          但持倉縮短至 5 天，淨效果 Part A Sharpe 略降）
+        - 唯一殘留 Part A SL（2019-02-20）依舊未被過濾——其 NVDA-QQQ 20d ratio
+          結構性處於 +1% 之下，無單一 divergence threshold 可清除
+        - Part B 過濾過度：reduces signal density to 1.5/yr（與 NVDA-013 baseline 3.5/yr
+          相比下降 57%），統計顯著性不足
+
+================================================================================
+最終配置（最佳）：Att2（max_relative_return = +0.03，divergence_lookback = 20）
+================================================================================
+- 全域最優 min(A,B) **1.43**（+160% vs NVDA-013 baseline 0.55）
+- A/B 平衡完美（cum diff 20.5%、訊號比 0.8:1）
+- 殘留 1 Part A SL（2019-02-20）無法以單一 divergence ceiling 過濾，已達該維度
+  選擇力上限
+
+================================================================================
+跨資產 / 跨策略貢獻（Cross-Asset / Cross-Strategy Findings）
+================================================================================
+1. **Repo 首次 cross-asset divergence regime gate（CEILING 方向）成功移植至
+   高波動 AI mega-cap 個股 + MBPC 框架**：
+   - 既有 cross-asset divergence regime gate 成功案例：
+     - TLT-014 (TLT-SPY 20d FLOOR, 利率 vs 股票 MR)
+     - TSLA-017 (TSLA-QQQ 20d FLOOR, 高波動 AI 個股 vs 大盤 BB Squeeze)
+     - INDA-012 (INDA-EEM 60d CEILING, 單一國家 vs 大盤 EM MR)
+     - EWZ-009 (EWZ-EEM 10d CEILING, 商品國 EM vs 大盤 EM MR)
+   - NVDA-021 為**雙重邊界擴展首次成功**：
+     (a) CEILING 方向首次於 MBPC（動量延續）框架（先前 INDA-012/EWZ-009
+         皆於 MR 框架）
+     (b) CEILING 方向首次於高波動 AI 個股類別（先前 TSLA-017 為 FLOOR）
+
+2. **NVDA 結構性 Sharpe 0.55 ceiling 首次突破（13+ 次實驗、43+ 次嘗試後）**：
+   - NVDA-021 Att2 min(A,B) 1.43 = +160% vs NVDA-013 Att3 baseline 0.55
+   - 突破來源：cross-asset relative performance 維度為 NVDA-013 雙重 SMA/ATR
+     regime gate 飽和後的下一個獨立選擇維度
+
+3. **NVDA-QQQ vs NVDA-SMH anchor 選擇**：
+   - QQQ（NVDA ~5-12% 權重）較 SMH（NVDA ~20% 權重）為更獨立 anchor，
+     提供更乾淨的 NVDA-specific rally exhaustion 訊號
+   - NVDA-014/016 已驗證 NVDA-SMH 為 entry-trigger 與 confirmation 維度
+     皆有侷限，QQQ 為新有效 anchor
+
+4. **Threshold sweet spot**：
+   - +5%（Att1）：寬鬆 ceiling，過濾 5+ NVDA 過度跑贏 SLs，min 0.82
+   - +3%（Att2 ★）：中度，過濾額外 2 SLs（2020-10-20、2023-08-28），min 1.43
+   - +1%（Att3）：過嚴，過度過濾 Part B winners，min 1.33
+   - +3% 為 NVDA 20d NVDA-QQQ rally exhaustion 結構性甜蜜點
+
+5. **跨策略 lesson #19 family v3 / lesson #26 family v2 邊界精煉**：
+   - CEILING 方向適用「individual asset rally exhaustion vs broader benchmark」
+     結構：個股 vs 大盤、單一國家 ETF vs 區域 ETF
+   - FLOOR 方向適用「individual asset weakness vs broader benchmark」結構：
+     利率資產 vs 股票（reflation regime SL）、單一個股 event-driven sell-off
+   - 方向選擇依資產 SLs 在 divergence 維度的單向結構決定
 """
 
 from dataclasses import dataclass
@@ -188,12 +256,15 @@ class NVDA021Config(ExperimentConfig):
     # （CEILING 方向：過濾 NVDA 已過度跑贏 QQQ 的 rally exhaustion regime）
     benchmark_ticker: str = "QQQ"
     divergence_lookback: int = 20
-    max_relative_return: float = 0.03  # Att2: +3% moderate ceiling
+    # Att1: +0.05（loose）→ min 0.82
+    # Att2 ★: +0.03（moderate）→ min 1.43（全域最優，+160% vs NVDA-013 baseline 0.55）
+    # Att3: +0.01（tight）→ min 1.33（Part B 過度過濾 1.5/yr）
+    max_relative_return: float = 0.03
     use_divergence_filter: bool = True
 
 
 def create_default_config() -> NVDA021Config:
-    """預設配置（Att2：max_relative_return=+0.03, lookback=20d）"""
+    """預設配置（Att2 ★ SUCCESS：max_relative_return=+0.03, lookback=20d，全域最優）"""
     return NVDA021Config(
         name="nvda_021_qqq_divergence_mbpc",
         experiment_id="NVDA-021",
