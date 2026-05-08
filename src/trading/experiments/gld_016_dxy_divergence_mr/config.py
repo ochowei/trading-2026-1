@@ -95,11 +95,17 @@ class GLD016Config(ExperimentConfig):
     #   Part A 12→11 signals; filtered 2022-04-27 SL (DXY 5d +2.55% > +2.0%)
     #   Part A WR 83.3%→90.9%, Sharpe 0.76→1.55, cum +21.68%→+26.88%
     #   Part B 9 signals UNCHANGED; A/B cum diff 6.4% ✓, signal ratio 1.22:1 ✓
-    # Att2 (max_dxy_5d_change=+0.015) — threshold tightening test
-    # Att3 (max_dxy_10d_change=+0.026, switch to 10d) — alternative window
+    # Att2 (max_dxy_5d_change=+0.015) REJECT — Part B 9→8 lost 2024-11-11 winner
+    #   (DXY 5d +1.59% > +1.5%); Part A unchanged; min† TIE 1.55 but Part B
+    #   Sharpe degraded 6.56→6.20
+    # Att3 (max_dxy_10d_change=+0.026) REJECT — Part A 11→9 over-filtered
+    #   (10d cap誤殺 2023-02-15 TP DXY 10d +2.67% + 2021-11-23 expiry +1.23%);
+    #   Part B unchanged; min(A,B) 1.47 < Att1 1.55. Confirms 5d > 10d selectivity:
+    #   5d separates SL from TPs (SL +2.55% vs TP +0.49% gap), 10d does not
+    #   (SL +2.65% vs TP +2.67% indistinguishable)
     dxy_ticker: str = "DX-Y.NYB"
     dxy_lookback: int = 5
-    max_dxy_change: float = 0.015
+    max_dxy_change: float = 0.020
 
 
 def create_default_config() -> GLD016Config:
