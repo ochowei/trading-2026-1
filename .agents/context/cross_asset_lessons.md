@@ -181,7 +181,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | GLD | GLD-012 Att3 | 20日回調+WR（無追蹤停損）| 0.48 | 13 次實驗 ✓ |
 | SIVR | SIVR-015 Att1 | 回檔+WR+RSI bullish hook divergence | 0.48 | 17 次實驗 ✓ |
 | FCX | **FCX-014 Att1** | **Signal-Day 3d Return CEILING on BB Squeeze Regime Breakout (FCX-013 Att3 + 3d ceiling 12.0% rally exhaustion filter)** | **0.64** | **14 次實驗 ★（FCX-014 repo 首次 lesson #19 family ceiling 維度移植至 BB Squeeze Breakout 框架，cross-strategy port from TSM-011 Att3 RS Momentum，+16% vs FCX-013 Att3 0.55）**|
-| USO | USO-013 | 緊密回檔+RSI(2)+2日急跌 | 0.26 | 22 次實驗 ✓ |
+| USO | **USO-028 Att1** | **^OVX 5d Direction Multi-Window IV Regime Gate MR (USO-027 Att2 + ^OVX 5d change <= +6.0)** | **0.64** | **28 次實驗 ★（USO-028 repo 首次「IV DIRECTION 多時框正交組合」於任何資產，^OVX 3d acute + 5d sustained 雙窗口疊加，lesson #24 family v6 候選變體，+28% vs USO-027 0.50；先前 USO-027 Att2 0.50 / USO-025 Att3 0.41 / USO-013 0.26 連續結構性突破）**|
 | SPY | SPY-009 Att2 | RSI(2) + **1d FLOOR + 3d cap 雙維度** | 6.56† | 9 次實驗 ✓ |
 | DIA | DIA-012 Att2 | RSI(2) + **1d cap + 3d cap 雙維度** | 1.31† | 12 次實驗 ✓ |
 | VOO | VOO-004 Att3 | **Donchian 突破 + 5d 內 + 窄帶淺回檔（MBPC）** | 1.12† | 4 次實驗 ✓（**repo 首次 MBPC 成功**） |
@@ -928,19 +928,20 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07**）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07，USO-028 多時框 DIRECTION combo 變體首次發現 + 同一 IV index 3d/5d 正交時框疊加首次驗證 2026-05-08**）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015]
-  validated: 2026-05-07
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,USO-028]
+  validated: 2026-05-08
   data_through: 2025-12-31
   confidence: high
 -->
 
-**v3 變體擴展（FCX-015，2026-05-07）**：lesson #24 family 共有 4 種已驗證變體 + 1 種被拒絕方向：
+**v3 變體擴展（FCX-015，2026-05-07）+ v6 多時框 combo（USO-028，2026-05-08）**：lesson #24 family 共有 5 種已驗證變體 + 1 種被拒絕方向：
 - **LEVEL CAP**：TLT-013 ^MOVE <= 130（rate-driven asset class）
 - **DIRECTION（rising-vol filter）**：XLU-013 ^MOVE 3d、GLD-015 ^GVZ 10d、USO-025 ^OVX 3d（commodity-safe-haven / commodity event-driven 類別）
 - **BANDS exclude mid（U-shape regime hypothesis）**：XBI-017 ^VIX (17, 22] 排除中等 VIX 帶（biotech sector ETF Pullback MR）
 - **FLOOR（require above-floor）**：FCX-015 ^VIX > 14.0（commodity/mining single stock BB Squeeze Breakout）
+- **MULTI-WINDOW DIRECTION COMBO（v6 候選，USO-028 2026-05-08）★**：USO-028 ^OVX 3d <= +4 + ^OVX 5d <= +6 雙時框疊加，min(A,B) 0.50→**0.64 (+28%)**——同一 IV index 不同時框 DIRECTION 結構性正交，3d 捕捉「acute event window」、5d 捕捉「sustained regime shift window」，可疊加為下一獨立維度。Threshold 5d ≈ 3d × 1.5x。**新跨資產假設（待驗證）**：(a) 多時框 IV DIRECTION combo 可能擴展至 TLT (^MOVE 3d + 5d/10d)、XLU (^MOVE 3d + 10d)、GLD (^GVZ 5d + 10d) 等已套用單時框 IV 的資產；(b)「3d acute + 5d sustained」雙時框結構可能成為 commodity event-driven ETF 通用 IV regime gate 範本（XLE / UNG / KOLD + 對應 IV proxy）
 - **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架）
 
 **FCX-015 跨資產發現（反向 VIX 分布結構）**：

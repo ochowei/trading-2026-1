@@ -108,12 +108,16 @@ class USO028Config(ExperimentConfig):
     # 要求 5 日 ^OVX 累計變化 <= max_ovx_5d_change
     use_ovx_5d_filter: bool = True
     ovx_5d_lookback: int = 5
-    # Att1: +6.0（保守起點 ~1.5x 3d 閾值）→ SUCCESS min(A,B) 0.64 (+28% vs 0.50 baseline)
-    #   Part A 22/81.8%/Sharpe 0.73 cum +46.73% / Part B 10/80%/Sharpe 0.64 cum +16.85%
-    # Att2: +4.0（積極等同 3d 閾值）→ TIE 0.64 但 Part A binding 退化至 0.64（-12%）
-    #   Part A 19/78.9%/Sharpe 0.64 / Part B 8/87.5%/Sharpe 1.05
-    # Att3: +5.0（中間值，最終探索甜蜜點）→ TBD
-    max_ovx_5d_change: float = 5.0
+    # Att1 ★ FINAL: +6.0（保守起點 ~1.5x 3d 閾值，全域最優）
+    #   → SUCCESS min(A,B) 0.64 (+28% vs USO-027 baseline 0.50)
+    #   → Part A 22/81.8%/Sharpe 0.73 cum +46.73% / Part B 10/80%/Sharpe 0.64 cum +16.85%
+    #   → A/B 年化 cum 差 1.4% << 30% ✓、A/B 年化訊號比 4.4:5.0 = 12% gap << 50% ✓
+    # Att2: +4.0（過嚴等同 3d 閾值）→ TIE 0.64 但 Part A 退化至 0.64
+    #   → Part A 19/78.9%/Sharpe 0.64（-12%, 過濾 3 winners）/ Part B 8/87.5%/Sharpe 1.05
+    # Att3: +5.0（中間值）→ FAIL min 0.60
+    #   → Part A 22/81.8%/Sharpe 0.73（同 Att1）/ Part B 9/77.8%/Sharpe 0.60（流失 1 winner）
+    #   → +5.0 在 Part A 非綁定、在 Part B 過嚴，確認 Att1 +6.0 為甜蜜點
+    max_ovx_5d_change: float = 6.0
 
     # 冷卻期（沿用）
     cooldown_days: int = 10
