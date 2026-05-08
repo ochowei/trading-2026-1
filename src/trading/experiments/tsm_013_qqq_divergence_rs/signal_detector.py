@@ -124,12 +124,7 @@ class TSM013QQQDivergenceRSDetector(BaseSignalDetector):
             cond_divergence = pd.Series(True, index=df.index)
 
         df["Signal"] = (
-            cond_rs
-            & cond_pullback
-            & cond_trend
-            & cond_1d
-            & cond_5d
-            & cond_divergence
+            cond_rs & cond_pullback & cond_trend & cond_1d & cond_5d & cond_divergence
         ).fillna(False)
 
         signal_indices = df.index[df["Signal"]].tolist()

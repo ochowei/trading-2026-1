@@ -114,8 +114,15 @@ class TSM013Config(ExperimentConfig):
     # 訊號通過條件：TSM 20d 報酬 - QQQ 20d 報酬 <= max_relative_return
     # （CEILING 方向：過濾 TSM 已過度跑贏 QQQ 的 rally exhaustion regime）
     benchmark_ticker: str = "QQQ"
-    divergence_lookback: int = 10
-    max_relative_return: float = 0.10
+    divergence_lookback: int = 20
+    # Att1 ★ PARTIAL: max_relative_return=+0.15 (loose ceiling)
+    # → Part A 9/100% all TPs zero-var cum +99.90% MDD -6.06%（vs baseline
+    #   12/83.3%/0.86/+74.10%, Sharpe 結構性最優 / cum +35% / WR +17pp / MDD -23%）
+    # → Part B 完全 unchanged 10/80%/0.83 cum +59.78%
+    # → min(A,B)† 0.83 TIE baseline（Part B binding，結構性反向 SLs 限制）
+    # Att2 (lookback=20, max_rel=+0.10) REJECT min 0.65（Part B 退化）
+    # Att3 (lookback=10, max_rel=+0.10) REJECT min 0.31（Part A 退化）
+    max_relative_return: float = 0.15
     use_divergence_filter: bool = True
 
 
