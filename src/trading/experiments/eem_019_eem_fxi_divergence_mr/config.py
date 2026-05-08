@@ -98,18 +98,39 @@ class EEM019Config(ExperimentConfig):
     # === EEM-FXI cross-asset divergence filter（EEM-019 核心新增）===
     # ticker：FXI = iShares China Large-Cap ETF（EEM 內 ~30% 權重的最大單一國家成分）
     fxi_ticker: str = "FXI"
-    # lookback：起步 10d 與 EWZ-009（EWZ-EEM 10d 成功）一致，
-    # 後續 Att 視結果調整至 5d/20d
+    # lookback：起步 10d 與 EWZ-009（EWZ-EEM 10d 成功）一致
     rel_lookback: int = 10
-    # max_rel_return：require EEM_Nd - FXI_Nd <= max_rel_return（ceiling/cap 方向）
-    # 排除「EEM 大幅強於 FXI」的 China-specific 結構性疲弱潛伏訊號
+    # filter_mode："max"（ceiling，require RelDiff <= max_rel_return，
+    #              過濾「EEM 大幅強於 FXI」即 China-specific 疲弱潛伏訊號）
+    #             |"min"（floor，require RelDiff >= min_rel_return，
+    #              過濾「EEM 大幅劣後 FXI」即 broad-EM-specific 疲弱訊號）
     #
-    # 迭代設計：
-    # Att1: max_rel_return=+0.05（modest baseline +5%）→ 完全 non-binding，
+    # 迭代記錄（三次嘗試全部失敗，但獲得結構性 cross-asset 發現）：
+    # Att1: filter_mode=max, max=+0.05（+5% loose ceiling）→ 完全 non-binding，
     #   所有 9 個 baseline 訊號 EEM_10d - FXI_10d ≤ +5%, min(A,B) 0.56 TIE baseline。
-    # Att2: max_rel_return=+0.01（緊邊界 +1.0%）— 嘗試找 surgical sweet spot
-    # Att3: 視 Att2 結果決定（更緊或反向 floor）
+    # Att2: filter_mode=max, max=+0.01（+1.0% tight ceiling）→
+    #   Part A 2/2 100% WR zero-var（過濾 2021-07-08 DiDi SL ✓ + 2 winners）/
+    #   Part B 2/4 50% WR (2025-11-19 SL 仍存活、2024-01-17 + 2025-01-13 winners
+    #   被誤殺) / min(A,B) -0.02 REJECT。
+    #   重要發現：Part A 2021-07-08 DiDi SL RelDiff > +1%（DiDi 監管使 FXI 重挫
+    #   > EEM 廣基修正）；Part B 2025-11-19 SL RelDiff ≤ +1%（broad EM 急跌但
+    #   FXI 同步或更弱使 RelDiff 不極端正向）。CEILING 方向對 Part A/B SLs
+    #   結構性反向（同 TSM-013 + COPX-014 發現）。
+    # Att3: filter_mode=min, min=0.0（require EEM >= FXI 過去 N 日報酬，floor 方向）→
+    #   Part A 3/2W1L 66.7% WR Sharpe 0.34（過濾 2 winners 但保留 2021-07-08 SL）/
+    #   Part B 3/3 100% WR std=0（過濾 2025-11-19 SL ✓）/ min(A,B)† 0.34（沿用
+    #   † 慣例 Part B std=0 結構性零方差，採 Part A Sharpe 為 binding constraint）
+    #   REJECT vs baseline 0.56（-39%）。
+    #   重要發現：Part B 2025-11-19 SL RelDiff < 0 確認（FLOOR 0 過濾成功），
+    #   但 Part A 2021-07-08 DiDi SL RelDiff > 0 仍存活；Part A losers 與 winners
+    #   在 RelDiff 維度部分重疊（2 Part A winners RelDiff < 0 被誤殺）。
+    #   Part A/B SLs 結構性反向確認：CEILING 解 Part A、FLOOR 解 Part B，
+    #   單一 threshold 無法同時改善雙 Part。
+    #   先前 -2% floor 完全 non-binding（所有 baseline 9 訊號 RelDiff >= -2%），
+    #   故採 0% 為實質 binding floor 閾值。
+    filter_mode: str = "min"
     max_rel_return: float = 0.01
+    min_rel_return: float = 0.0
 
     cooldown_days: int = 10
 

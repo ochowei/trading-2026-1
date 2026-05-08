@@ -47,9 +47,15 @@ class EEM019Strategy(ExecutionModelStrategy):
                 f" > {config.atr_ratio_threshold}"
             )
             print(f"  2 日急跌下限: <= {config.twoday_return_floor:.1%}")
-            print(
-                f"  EEM-{config.fxi_ticker} rel: {config.rel_lookback}日報酬差"
-                f" <= {config.max_rel_return:+.2%} (ceiling/cap)"
-            )
+            if config.filter_mode == "max":
+                print(
+                    f"  EEM-{config.fxi_ticker} rel: {config.rel_lookback}日報酬差"
+                    f" <= {config.max_rel_return:+.2%} (ceiling/cap)"
+                )
+            else:
+                print(
+                    f"  EEM-{config.fxi_ticker} rel: {config.rel_lookback}日報酬差"
+                    f" >= {config.min_rel_return:+.2%} (floor)"
+                )
             print(f"  冷卻天數: {config.cooldown_days} 天")
         super()._print_strategy_params(config)

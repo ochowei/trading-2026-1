@@ -133,7 +133,12 @@ class EEM019DivergenceDetector(BaseSignalDetector):
         cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
         cond_vol = df["ATR_Ratio"] > self.config.atr_ratio_threshold
         cond_twoday_floor = df["TwoDayReturn"] <= self.config.twoday_return_floor
-        cond_rel_diff = df["RelDiff"] <= self.config.max_rel_return
+        if self.config.filter_mode == "max":
+            cond_rel_diff = df["RelDiff"] <= self.config.max_rel_return
+        elif self.config.filter_mode == "min":
+            cond_rel_diff = df["RelDiff"] >= self.config.min_rel_return
+        else:
+            raise ValueError(f"Unsupported filter_mode: {self.config.filter_mode}")
 
         df["Signal"] = (
             cond_bb
@@ -163,10 +168,16 @@ class EEM019DivergenceDetector(BaseSignalDetector):
             logger.info("EEM-019: %d signals suppressed by cooldown", len(suppressed))
 
         signal_count = df["Signal"].sum()
+        threshold = (
+            self.config.max_rel_return
+            if self.config.filter_mode == "max"
+            else self.config.min_rel_return
+        )
         logger.info(
-            "EEM-019: Detected %d signals (rel_lookback=%dd, max_rel_return=%.4f)",
+            "EEM-019: Detected %d signals (rel_lookback=%dd, mode=%s, threshold=%.4f)",
             signal_count,
             self.config.rel_lookback,
-            self.config.max_rel_return,
+            self.config.filter_mode,
+            threshold,
         )
         return df
