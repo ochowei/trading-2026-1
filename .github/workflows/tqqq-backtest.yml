@@ -201,6 +201,7 @@ on:
           - "TLT-014: tlt_014_tlt_spy_divergence_mr"
           - "TLT-015: tlt_015_hyg_credit_divergence_mr"
           - "TLT-016: tlt_016_move_multi_window_direction_mr"
+          - "TLT-017: tlt_017_yield_curve_slope_mr"
           - "TSLA-001: tsla_001_extreme_oversold"
           - "TSLA-002: tsla_002_wider_exit"
           - "TSLA-003: tsla_003_tight_retracement"
