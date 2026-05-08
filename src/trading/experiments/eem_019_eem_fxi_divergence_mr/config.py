@@ -105,9 +105,11 @@ class EEM019Config(ExperimentConfig):
     # 排除「EEM 大幅強於 FXI」的 China-specific 結構性疲弱潛伏訊號
     #
     # 迭代設計：
-    # Att1: max_rel_return=+0.05（modest baseline +5%）— 先驗證 filter 方向
-    # Att2/3: 視 Att1 結果決定（收緊至 +3%/+2% 或放寬至 +7%）
-    max_rel_return: float = 0.05
+    # Att1: max_rel_return=+0.05（modest baseline +5%）→ 完全 non-binding，
+    #   所有 9 個 baseline 訊號 EEM_10d - FXI_10d ≤ +5%, min(A,B) 0.56 TIE baseline。
+    # Att2: max_rel_return=+0.01（緊邊界 +1.0%）— 嘗試找 surgical sweet spot
+    # Att3: 視 Att2 結果決定（更緊或反向 floor）
+    max_rel_return: float = 0.01
 
     cooldown_days: int = 10
 
