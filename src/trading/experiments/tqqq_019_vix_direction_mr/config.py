@@ -73,8 +73,10 @@ class TQQQ019Config(TQQQ018Config):
     use_vix_direction_filter: bool = True
     vix_direction_lookback: int = 5
 
-    # Att1 ★: +5.0（保守起點，依 XLU-013/USO-025 sweet spot 範圍）
-    max_vix_direction_change: float = 5.0
+    # Att1: +5.0 過嚴 → REJECT min(A,B) 0.28（過濾 4 Part A + 3 Part B 訊號，
+    #   capitulation 與 VIX spike 結構性共線）
+    # Att2 ★: +15.0 大幅放寬 — 僅期望過濾極端加速期
+    max_vix_direction_change: float = 15.0
 
 
 def create_default_config() -> TQQQ019Config:
