@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-05-08T14:17:17.116962"
+    "execution_time": "2026-05-08T14:31:38.897300"
   },
   "part_a": {
     "ticker": "INDA",
-    "total_signals": 5,
+    "total_signals": 4,
     "wins": 4,
-    "win_rate": 0.8,
-    "avg_return_pct": 1.63,
-    "std_return_pct": 2.94,
-    "cumulative_return_pct": 8.2,
-    "avg_holding_days": 7.4,
-    "max_drawdown_pct": -4.35,
-    "profit_factor": 2.99,
-    "sharpe_ratio": 0.55,
-    "sortino_ratio": 0.89,
-    "calmar_ratio": 0.38,
-    "max_consecutive_losses": 1,
+    "win_rate": 1.0,
+    "avg_return_pct": 3.06,
+    "std_return_pct": 0.75,
+    "cumulative_return_pct": 12.82,
+    "avg_holding_days": 8.2,
+    "max_drawdown_pct": -3.7,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 4.07,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 0.83,
+    "max_consecutive_losses": 0,
     "target_exits": 3,
-    "stop_loss_exits": 1,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
@@ -65,20 +65,9 @@
         "holding_days": 11,
         "exit_type": "target",
         "max_drawdown_pct": 0.08
-      },
-      {
-        "date": "2022-09-16",
-        "entry_date": "2022-09-19",
-        "exit_date": "2022-09-23",
-        "entry": 42.93,
-        "exit": 41.17,
-        "return_pct": -4.1,
-        "holding_days": 4,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -4.35
       }
     ],
-    "filled_count": 5,
+    "filled_count": 4,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
