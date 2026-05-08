@@ -196,7 +196,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 | NVDA | **NVDA-021 Att2** | **NVDA-QQQ 20d Cross-Asset Divergence CEILING Regime-Gated MBPC (NVDA-013 Att3 + NVDA 20d - QQQ 20d <= +3.0%)** | **1.43** | **21 次實驗 ★（NVDA-021 repo 首次 cross-asset divergence regime gate（CEILING 方向）成功移植至高波動 AI mega-cap 個股 + MBPC 框架，雙重邊界擴展首次成功，+160% vs NVDA-013 Att3 0.55；先前 NVDA-013 Att3 0.55 / NVDA-012 Att2 0.51 / NVDA-004 0.47 連續結構性突破）**|
 | IBIT | IBIT-009 Att1 | Gap-Down + **2DD floor <= -3.0%** (Post-Cap Vol-Transition) | 5/5 全勝† | 9 次實驗 ✓（repo 第 5 次 2DD floor 方向成功，首次高波動加密 ETF 驗證，擴展 Post-Cap MR 框架有效 vol 範圍至 3.17%）|
 | TSLA | TSLA-015 Att3 | BB 擠壓突破 + **buffered multi-week SMA regime**（SMA(20)≥0.99×SMA(60)） | 0.53 | 16 次實驗 ✓（TSLA-016 lesson #19 ceiling 拒絕跨資產假設）|
-| TLT | TLT-007 Att2 | 回檔+WR+反轉K線+**BB 寬度 regime 閘門**（<5%）| 0.12/0.65 | 12 次實驗 ✓（TLT-010 2DD/ATR 補充濾波三次失敗；TLT-011 percentile-based dynamic regime 三次失敗；TLT-012 trajectory-based regime 三次失敗，固定絕對閾值 + 單日 snapshot 為結構性最優）|
+| TLT | **TLT-017 Att2** | **Yield-Curve-Slope Inflation-Regime-Gated MR (TLT-014 Att3 + (^TYX-^TNX) 5d slope velocity <= +0.038)** | **4.49†** | **17 次實驗 ★（TLT-017 repo 首次 yield curve slope velocity regime gate 於任何資產，lesson #24 family v8 候選 inflation expectation 維度，repo TLT 史上單一實驗最大幅度突破，+551% vs TLT-014 Att3 baseline 0.69，首次 TLT min(A,B)† > 1.0；先前 TLT-014 Att3 0.69 / TLT-013 Att1 0.14 / TLT-007 Att2 0.12 連續結構性突破）**|
 | EEM | EEM-014 Att2 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor ≤-0.5%**（混合進場+2DD floor 精煉）| 0.56 | 15 次實驗 ✓（EEM-015 三次失敗確認 broad EM 拒絕 INDA-011「2DD floor + 3DD cap」雙維度組合）|
 | EWJ | EWJ-003 Att3 | BB 下軌+回檔上限+WR+ATR（混合進場）| 0.60† | 4 次實驗 ✓ |
 | EWT | EWT-009 Att3 | BB 下軌+回檔上限+WR+ClosePos+ATR+**2DD floor ≤-1.5%**（混合進場+2DD floor 精煉）| 1.11† | 9 次實驗 ✓ |
@@ -932,18 +932,19 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07，USO-028 多時框 DIRECTION combo 變體首次發現 + 同一 IV index 3d/5d 正交時框疊加首次驗證 2026-05-08**）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,USO-028,TLT-016]
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,USO-028,TLT-016,TLT-017]
   validated: 2026-05-09
   data_through: 2025-12-31
   confidence: high
 -->
 
-**v3 變體擴展（FCX-015，2026-05-07）+ v6 多時框 combo（USO-028，2026-05-08）**：lesson #24 family 共有 5 種已驗證變體 + 1 種被拒絕方向：
+**v3 變體擴展（FCX-015，2026-05-07）+ v6 多時框 combo（USO-028，2026-05-08）+ v8 yield curve slope velocity（TLT-017，2026-05-09 ★）**：lesson #24 family 共有 6 種已驗證變體 + 1 種被拒絕方向：
 - **LEVEL CAP**：TLT-013 ^MOVE <= 130（rate-driven asset class）
 - **DIRECTION（rising-vol filter）**：XLU-013 ^MOVE 3d、GLD-015 ^GVZ 10d、USO-025 ^OVX 3d（commodity-safe-haven / commodity event-driven 類別）
 - **BANDS exclude mid（U-shape regime hypothesis）**：XBI-017 ^VIX (17, 22] 排除中等 VIX 帶（biotech sector ETF Pullback MR）
 - **FLOOR（require above-floor）**：FCX-015 ^VIX > 14.0（commodity/mining single stock BB Squeeze Breakout）
 - **MULTI-WINDOW DIRECTION COMBO（v6 候選，USO-028 2026-05-08）★**：USO-028 ^OVX 3d <= +4 + ^OVX 5d <= +6 雙時框疊加，min(A,B) 0.50→**0.64 (+28%)**——同一 IV index 不同時框 DIRECTION 結構性正交，3d 捕捉「acute event window」、5d 捕捉「sustained regime shift window」，可疊加為下一獨立維度。Threshold 5d ≈ 3d × 1.5x。**新跨資產假設（已部分拒絕，見 TLT-016）**：(a) 多時框 IV DIRECTION combo 在 TLT 上**結構性失敗**（cross-strategy port from USO-028 Att1 拒絕，min(A,B) TIE/REJECT，TLT-016 三次嘗試）；(b)「3d acute + 5d sustained」雙時框結構可能成為 commodity event-driven ETF 通用 IV regime gate 範本（XLE / UNG / KOLD + 對應 IV proxy），但**不適用於 rate-driven 資產（TLT 已驗證）**
+- **YIELD CURVE SLOPE VELOCITY（v8 候選，TLT-017 2026-05-09 ★）**：TLT-017 Att2 (^TYX - ^TNX) 5d slope change <= +0.038（% points），min(A,B)† 0.69→**4.49 (+551%)**，repo 首次 yield curve slope velocity regime gate 於任何資產 + 首次 TLT min(A,B)† > 1.0 + 首次 TLT 達成 A/B 累計差 < 30%（11.8%）+ 訊號比 < 50%（4:4 = 0%）。**機制**：捕捉「reflation regime onset」之 acute steepening 急速；30Y-10Y slope velocity 為 forward-looking 通膨預期維度，與 IV-implied vol（^MOVE/^VIX）+ cross-asset divergence（TLT-SPY）結構性正交。**Lookback 維度 selectivity 不對稱**：5d acute > 10d sustained > slope LEVEL（Att1 10d 與 2025-03-27 同值 +0.036 無區分力 / Att3 LEVEL 高帶誤殺 transition winners）。**新跨資產假設（v8 適用候選）**：(a) 預期適用其他 rate-driven assets：XLU 公用事業、REITs、高殖利率股；(b) 適用條件：target asset MR 失敗模式中含「reflation regime onset」訊號 AND yield curve 短期 acute steepening 為其 leading indicator；(c) **不適用於 commodity / equity index** （無 long-end 通膨溢價直接通道）
 - **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架）、**TLT-016 multi-window IV DIRECTION combo 跨策略移植**（rate-driven asset + MR 框架，2026-05-09）
 
 **TLT-016 跨資產發現（v6 適用邊界精煉，2026-05-09）**：

@@ -96,14 +96,28 @@ class TLT017Config(ExperimentConfig):
     # TLT-017 核心新增: yield curve slope velocity (^TYX - ^TNX) regime gate
     long_yield_ticker: str = "^TYX"  # 30Y Treasury yield
     short_yield_ticker: str = "^TNX"  # 10Y Treasury yield
-    slope_lookback: int = 5  # N 日 slope 變化 (Att2: 5d acute steepening)
+    slope_lookback: int = 5  # N 日 slope 變化
     # max_slope_change: slope (^TYX - ^TNX) 在 N 日內的變化必須 <= 此值 (in % points)
     # 意義: 「殖利率曲線在 N 日內 steepening (long-end 通膨溢價擴張) 不可超過此幅度」
-    # Att1: 10d, +0.035 → SUCCESS min(A,B)† 4.49 但 Part B 4→3 (2025-03-27 同值 +0.036
-    #   被誤殺 with 2021-01-06)
-    # Att2: 5d, +0.038 → 嘗試以 5d acute 維度區分 (probe: 2021-01-06 5d=+0.040 vs
-    #   2025-03-27 5d=+0.035, 5d 有區分力可同時保留 Part B winner)
+    #
+    # 迭代紀錄 (3 iterations all completed):
+    # Att1: 10d, +0.035 → SUCCESS min(A,B)† 4.49 但 Part B 4→3 (2025-03-27 slope_10d=
+    #   +0.036 與 2021-01-06 同值, 10d 維度無法區分 Part B winner vs Part A loser)
+    # Att2 ★: 5d, +0.038 → SUCCESS min(A,B)† 4.49, Part B 完全恢復 4/4
+    #   (2021-01-06 slope_5d=+0.040 vs 2025-03-27 +0.035, 5d acute 維度有區分力)
+    # Att3 (alternative dim): slope LEVEL <= +0.700 filter (no velocity) →
+    #   REJECT min(A,B)† 3.94. slope LEVEL 因 2020-11-09 slope=+0.793 (winner)
+    #   與 2021-01-06 slope=+0.779 (loser) 同處於高 LEVEL 帶, 無區分力, 誤殺
+    #   Part A winner. 確認 slope VELOCITY (5d acute) > slope LEVEL 之 selectivity
+    #
+    # Att2 為最終最優, 沿用為 default
     max_slope_change: float = 0.038
+    use_slope_change_filter: bool = True
+
+    # slope LEVEL filter (Att3 測試 alternative dimension, 確認 LEVEL 不如 VELOCITY)
+    # 預設關閉, 保留欄位以記錄 Att3 試驗
+    use_slope_level_filter: bool = False
+    max_slope_level: float = 999.0
 
     # 冷卻期
     cooldown_days: int = 7

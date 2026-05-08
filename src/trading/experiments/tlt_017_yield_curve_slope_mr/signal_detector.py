@@ -136,9 +136,7 @@ class TLT017SignalDetector(BaseSignalDetector):
         cond_bb_regime = df["BB_Width_Ratio"] < self.config.max_bb_width_ratio
         cond_move_level = df["MOVE_Close"] <= self.config.max_move_level
         cond_divergence = df["Rel_Return_N"] >= self.config.min_relative_return
-        cond_slope = df["Slope_Change_N"] <= self.config.max_slope_change
-
-        df["Signal"] = (
+        signal = (
             cond_pullback_min
             & cond_pullback_max
             & cond_wr
@@ -146,8 +144,17 @@ class TLT017SignalDetector(BaseSignalDetector):
             & cond_bb_regime
             & cond_move_level
             & cond_divergence
-            & cond_slope
         )
+
+        if self.config.use_slope_change_filter:
+            cond_slope_change = df["Slope_Change_N"] <= self.config.max_slope_change
+            signal = signal & cond_slope_change
+
+        if self.config.use_slope_level_filter:
+            cond_slope_level = df["Yield_Slope"] <= self.config.max_slope_level
+            signal = signal & cond_slope_level
+
+        df["Signal"] = signal
 
         signal_indices = df.index[df["Signal"]].tolist()
         suppressed: list[pd.Timestamp] = []
