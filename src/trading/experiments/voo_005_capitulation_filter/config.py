@@ -53,11 +53,14 @@ class VOO005Config(ExperimentConfig):
     close_position_threshold: float = 0.4
 
     # 1 日跌幅下限（VOO-005 第一維度，SPY-009 跨資產移植）
-    # Att1/Att2 -0.5%：要求訊號日 1 日跌幅 ≥ 0.5%（過濾弱勢漂移 SLs）
+    # Att1 ★ -0.5%：要求訊號日 1 日跌幅 ≥ 0.5%（過濾弱勢漂移 SLs）
+    # Att2 -0.5%：3d cap 必要性驗證（同 Att1 1d floor）
+    # Att3 -0.7%：穩健性驗證更嚴 floor（移除 2 winners 無新增 filter 收益）
     oneday_return_floor: float = -0.005
 
     # 3 日累計跌幅上限（VOO-005 第二維度，DIA-012 / SPY-009 跨資產移植）
-    # Att1/Att2 -8%：排除 regime-shift 級別 3 日延續下跌（如 2025-04-07 關稅）
+    # Att1 ★ / Att3 -8%：排除 regime-shift 級別 3 日延續下跌（如 2025-04-07 關稅）
+    # Att2 -0.99（停用）：驗證 3d cap 必要性（VOO 在 1d floor 後 3d cap 非綁定保留層）
     threeday_return_cap: float = -0.08
 
     # 冷卻期（同 SPY-009）

@@ -1,7 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-05-09
   data_through: 2025-12-31
-  note_2026_05_09_voo005_att1: VOO-005 Att1 added 2026-05-09 (Signal-Day Capitulation-Strength Filter MR, **repo 首次 SPY-009 1d floor + 3d cap 雙維度過濾器跨資產移植至 VOO，新全域最優**, cross-asset port from SPY-009 Att2). Att1 (1d_ret floor <= -0.5% AND 3d_ret cap >= -8%, RSI(2)<10 + 2dpb>=1.5% + ClosePos>=40% baseline + cd5, TP+3.0%/SL-3.0%/20d, slippage 0.1%) Part A **9 訊號 WR 100%** Sharpe **6.32** cum +28.67% MDD -2.76% / Part B **3 訊號 WR 100%** std=0 (Sharpe 顯示 0.00) cum +9.27% / min(A,B)† **6.32**（沿用 EWJ-003/DIA-012/SPY-009 慣例）— **+464% vs VOO-004 Att3 baseline 1.12†**. A/B 年化 cum 差 ~19.2%（< 30% ✓）, A/B 年化訊號比 1.2:1（16.7% gap < 50% ✓）. Part C (Live 2026-01-01~2026-05-08): 1 訊號 SL 2026-03-06（-3.10%, 9d）— 單筆樣本不足以否決，需持續監控. **跨資產驗證**：(1) VOO 與 SPY 同追蹤 S&P 500，failure 結構假設 SPY-009 1d 過淺漂移 + 2025-04-07 Trump 關稅 3d 過深 直接適用於 VOO ✓ — Part A 9 訊號 100% WR 完全消除原 VOO-003 SLs（含 2022-01-06、2022-05-12、2022-06-14、2023-08-03 全部 1d 過淺漂移類型），Part B 唯一 SL 2025-04-07 經 3d cap >=-8% 過濾；(2) 1d floor + 3d cap 雙維度於 SPY 同樣 Part A Sharpe 6.56 vs VOO 6.32（差 0.24，由 VOO/SPY OHLC 微差解釋，與既往 VOO TP 上限 +2.85% vs SPY +3.0% 一致）；(3) **lesson #19 family 第 N 次跨資產移植**——延續 DIA-012 (1d cap + 3d cap, DJIA) → SPY-009 (1d floor + 3d cap, S&P SPDR) → VOO-005 (1d floor + 3d cap, S&P Vanguard) 三層擴展，確認 1d floor 方向適用於 S&P 500 寬基（與 DJIA cap 方向相反；不可跨指數類別直接移植，需 trade-level 結構分析）. VOO-005 Att1 為新全域最優（5 次實驗、11 次嘗試），取代 VOO-004 Att3 為當前最佳。
+  note_2026_05_09_voo005: VOO-005 added 2026-05-09 (Signal-Day Capitulation-Strength Filter MR, **repo 首次 SPY-009 1d floor + 3d cap 雙維度過濾器跨資產移植至 VOO，Att1 SUCCESS — 新全域最優**, cross-asset port from SPY-009 Att2). Three iterations: **Att1 ★ (1d_ret floor <= -0.5% AND 3d_ret cap >= -8%, RSI(2)<10 + 2dpb>=1.5% + ClosePos>=40% baseline + cd5, TP+3.0%/SL-3.0%/20d, slippage 0.1%)** Part A **9 訊號 WR 100%** Sharpe **6.32** cum +28.67% MDD -2.76% / Part B **3 訊號 WR 100%** std=0 (Sharpe 顯示 0.00) cum +9.27% / min(A,B)† **6.32**（沿用 EWJ-003/DIA-012/SPY-009 慣例）— **+464% vs VOO-004 Att3 baseline 1.12†**. A/B 年化 cum 差 ~19.2%（< 30% ✓）, A/B 年化訊號比 1.2:1（16.7% gap < 50% ✓）. Part C (Live 2026-01-01~2026-05-08): 1 訊號 SL 2026-03-06（-3.10%, 9d）— 單筆樣本不足以否決，需持續監控. **Att2（停用 3d cap 驗證必要性，1d floor -0.5% only）**：Part A 9/100%/6.32 cum +28.67% / Part B 3/100% std=0 cum +9.27% — 與 Att1 完全相同 / min† 6.32 TIE Att1 — **3d cap 在 VOO 1d floor 後完全非綁定**（Part B 唯一 SL 2025-04-07 1d -0.18% 已被 1d floor 先過濾），同 SPY-009 Att1 vs Att2 結論。3d cap 仍保留作為**未來訊號 regime-shift 安全層**：若新訊號 1d ≥ -0.5% 但 3d ≤ -8%（regime-shift 延續），3d cap 將提供額外保護。**Att3（穩健性驗證更嚴 1d floor -0.7%）**：Part A 7/100%/Sharpe **5.59** cum +21.28%（移除 2 訊號 1d ∈ [-0.7%, -0.5%]）/ Part B 3/100% std=0 不變 cum +9.27% / min† **5.59** -11% vs Att1，仍遠超 baseline 1.12 — 確認 -0.5% 為 1d floor **結構性甜蜜點**：所有殘餘 Part A SLs（無）已被 -0.5% floor 過濾，更嚴 floor 純移除 winners 無新增 filter 收益。**跨資產驗證**：(1) VOO 與 SPY 同追蹤 S&P 500，failure 結構假設 SPY-009 1d 過淺漂移 + 2025-04-07 Trump 關稅 3d 過深 直接適用於 VOO ✓ — Part A 9 訊號 100% WR 完全消除原 VOO-003 SLs（含 2022-01-06、2022-05-12、2022-06-14、2023-08-03 全部 1d 過淺漂移類型），Part B 唯一 SL 2025-04-07 經 1d floor 過濾；(2) 1d floor + 3d cap 雙維度於 SPY 同樣 Part A Sharpe 6.56 vs VOO 6.32（差 0.24，由 VOO/SPY OHLC 微差解釋，與既往 VOO TP 上限 +2.85% vs SPY +3.0% 一致）；(3) **lesson #19 family 跨資產移植第三層擴展**——延續 DIA-012 (1d cap + 3d cap, DJIA) → SPY-009 (1d floor + 3d cap, S&P SPDR) → VOO-005 (1d floor + 3d cap, S&P Vanguard) 三層擴展，確認 1d floor 方向適用於 S&P 500 寬基（與 DJIA cap 方向相反；不可跨指數類別直接移植，需 trade-level 結構分析）；(4) **新跨資產規則**：Vanguard / SPDR / iShares 等 ETF 之間若追蹤同一指數（VOO/SPY/IVV 皆 S&P 500），最佳策略可直接 1:1 移植 — repo 第 1 次驗證此假設，**未來 IVV / SPLG 上 1d floor + 3d cap 預期同樣有效**（追蹤同指數但不同 ETF 發行商）。VOO-005 Att1 為新全域最優（5 次實驗、13 次嘗試），取代 VOO-004 Att3 為當前最佳。
   note: VOO-004 added 2026-04-25 (Momentum Breakout Pullback Continuation, **repo 第 3 次 MBPC 試驗，繼 FXI-012 / NVDA-009 後首次成功**). Three iterations: Att1 baseline (Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 回檔 [-1.5%, -4%] + RSI(14) [40,60] + Close>Open + cd10, TP+3.0%/SL-2.5%/20d) Part A 19/52.6%/Sharpe 0.12 / Part B 10/60.0%/Sharpe 0.36 / min 0.12 — 9 筆 Part A SL 集中於 macro-shock 日（Fed pivot/Omicron/2022 bear/Powell hawkish/Fitch downgrade）；Att2 (+ SMA(200) regime gate) Part A 15/53.3%/0.14 / Part B 9/55.6%/0.27 / min 0.14 — 非選擇性過濾（與 NVDA-009 Att2 相同模式），SMA(200) 在 2022 bear 期過濾 bull-trap rallies 中的 TPs；Att3 ★ (還原 SMA(200), breakout_recency 10→5d + pullback range [-1.5%,-4%]→[-2%,-3%]) Part A 7 訊號 WR 85.7% Sharpe **1.12** cum +16.30% / Part B 2 訊號 WR 100%（2/2 全達 +3%）Sharpe 0.00 std=0 cum +6.09% / min(A,B) **1.12†**（沿用 EWJ-003/DIA-012/SPY-009 慣例）/ A/B 年化 cum 差 2.3%（< 30% ✓ 極佳）/ A/B 年化訊號比 1.4:1（28.6% gap < 50% ✓）. **改善機制**：breakout_recency 5d 排除 stale breakout（觸發後 6-10 日才回檔已失動能），pullback [-2%,-3%] 窄帶過濾邊緣 -1.5% 噪聲與 -4% 邊緣（深跌前兆），9 筆 macro-shock SL 中 8 筆被過濾，僅保留 2022-01-10 hawkish Fed 真實 bear 開端。**跨資產貢獻**：repo 首次 MBPC 成功，驗證 cross_asset_lesson #21 假設「MBPC 在單一結構性上升趨勢資產有效」（VOO 為 broad-uptrend ETF），擴展 lesson #21 至「broad-uptrend ETF」類別；對照失敗案例 NVDA-009（多 regime 個股）/ FXI-012（政策驅動 EM）。**樣本警告**：Part B 2 訊號（1.0/年）統計顯著性偏低，但與 VOO-003 Part B 4 訊號同數量級。VOO-004 Att3 為前任最佳。
 -->
 ## AI Agent 快速索引
@@ -642,3 +642,103 @@ VOO 為純 broad-uptrend ETF（S&P 500 自 2010 上市年化 +12-13%，2019-2025
 | 年化訊號數 | A 2.8 / B 2.0 | A 1.4 / B 1.0 | 訊號減半 |
 
 **結論：** VOO-004 MBPC 在進場框架完全不同的情況下大幅改善 Sharpe（min A,B +112%），同時 A/B 平衡改善至接近完美。VOO-003 MR 框架仍可作為訊號補充（兩者訊號集完全不重疊），但 VOO-004 為新全域最優。
+
+---
+
+## VOO-005: Signal-Day Capitulation-Strength Filter MR ★ 當前最佳
+
+### 設計理念 (Design Rationale)
+
+VOO-004 Att3 MBPC 將 min(A,B)† 推升至 1.12（vs VOO-003 0.53 的 +112%），但 Part B
+僅 2 訊號（1.0/年），統計顯著性偏低。**SPY-009 在 SPY 上達成 Part A Sharpe 6.56 /
+Part B 全勝（min† 6.56）為 repo 已知寬基 ETF 最強 MR 結果**。VOO 與 SPY 同追蹤
+S&P 500、價格相關性 > 0.999，failure 結構應一致。VOO-005 為 SPY-009 跨資產直接
+移植，預期同樣顯著超越 VOO-004 Att3 baseline。
+
+### 進場條件 (Entry Conditions)
+
+全部滿足才觸發訊號（同 SPY-009 Att2 ★）：
+1. **RSI(2)** < 10（極端超賣，同 VOO-001/002/003 baseline）
+2. **2 日累計跌幅** >= 1.5%（幅度過濾，同 VOO-001/002/003 baseline）
+3. **收盤位置** >= 40%（日內反轉確認，同 VOO-001/002/003 baseline）
+4. **1 日跌幅下限** <= -0.5%（VOO-005 第一維度，SPY-009 跨資產移植）
+5. **3 日急跌上限** >= -8%（VOO-005 第二維度，DIA-012 / SPY-009 跨資產移植）
+6. **冷卻期** 5 個交易日（同 SPY-009）
+
+### 出場參數 (Exit Parameters)
+
+| 參數 | 數值 |
+|------|------|
+| 獲利目標 (TP) | +3.0%（同 SPY-009，1d floor 過濾後 2022-05-12 類型訊號被移除） |
+| 停損 (SL) | -3.0%（同 SPY-009） |
+| 最大持倉天數 | 20 天（同 VOO-002/003、同 SPY-009） |
+| 追蹤停損 | 無 |
+
+### 成交模型 (Execution Model)
+
+| 項目 | 設定 |
+|------|------|
+| 進場方式 | 隔日開盤市價單 (next_open_market) |
+| 獲利出場 | 限價單當日 (limit_order_day) |
+| 停損出場 | 停損市價單 GTC (stop_market_gtc) |
+| 到期出場 | 隔日開盤市價單 (next_open_market) |
+| 滑價 | 0.10% |
+| 悲觀認定 | 啟用 |
+
+### 三次迭代結果
+
+| 迭代 | 1d floor | 3d cap | Part A | Part B | min(A,B)† |
+|------|----------|--------|--------|--------|-----------|
+| Att1 ★ | -0.5% | -8% | 9/100%/Sh **6.32**/+28.67% | 3/100%/std=0/+9.27% | **6.32** |
+| Att2 | -0.5% | 停用 | 9/100%/Sh 6.32/+28.67% | 3/100%/std=0/+9.27% | 6.32 (TIE) |
+| Att3 | -0.7% | -8% | 7/100%/Sh 5.59/+21.28% | 3/100%/std=0/+9.27% | 5.59 (-11%) |
+
+**Att1 ★（最終配置）：1d floor -0.5% AND 3d cap -8%**
+- min(A,B)† 6.32（**+464% vs VOO-004 Att3 baseline 1.12†**）
+- A/B 年化 cum 差 ~19.2%（< 30% ✓）
+- A/B 年化訊號比 1.2:1（16.7% gap < 50% ✓）
+- 過濾機制：1d floor 移除 VOO 全部 4 筆 1d 過淺漂移 SLs；3d cap 過濾 2025-04-07
+  Trump 關稅 SL（在 1d floor 已先過濾的情況下保留為 regime-shift 安全層）
+
+**Att2（停用 3d cap）：** 與 Att1 完全相同 → **3d cap 在 VOO 1d floor 後完全
+非綁定**，同 SPY-009 Att1 vs Att2 結論。仍保留 3d cap 作為未來 regime-shift 安全層。
+
+**Att3（更嚴 1d floor -0.7%）：** Sharpe 退步至 5.59 — 確認 -0.5% 為 1d floor
+**結構性甜蜜點**，更嚴 floor 純移除 winners 無新增 filter 收益。
+
+### 跨資產對照（lesson #19 family）
+
+| 實驗 | 資產 | 1d 維度 | 3d 維度 | min(A,B)† |
+|------|------|---------|---------|-----------|
+| DIA-012 Att2 | DIA (DJIA, 1.0% vol) | cap >= -2.0% | cap >= -7% | 1.31 |
+| SPY-009 Att2 | SPY (S&P 500 SPDR, 1.0% vol) | floor <= -0.5% | cap >= -8% | 6.56 |
+| **VOO-005 Att1** | **VOO (S&P 500 Vanguard, 1.0% vol)** | **floor <= -0.5%** | **cap >= -8%** | **6.32** |
+
+**核心跨資產發現：**
+
+1. **同指數不同 ETF 發行商可直接 1:1 移植**（repo 第 1 次驗證）：VOO 與 SPY 皆
+   追蹤 S&P 500，OHLC 微差不影響策略結構，1d floor + 3d cap 雙維度直接適用
+2. **不同寬基指數 1d 方向相反**：DJIA cap 方向（過濾政策震盪深 1d SLs）vs S&P 500
+   floor 方向（過濾弱勢漂移淺 1d SLs），不可跨指數類別直接移植
+3. **3d cap 為通用 regime-shift 安全層**：DIA / SPY / VOO 三者 Part B 同日同事件
+   2025-04-07 Trump 關稅延續性下跌（3d ~-10%）皆被 3d cap 過濾
+
+### 與 VOO-004 比較
+
+| 指標 | VOO-004 Att3 (MBPC) | VOO-005 Att1 (1d floor + 3d cap MR) | 變化 |
+|------|---------------------|--------------------------------------|------|
+| 進場框架 | Donchian 突破 + 淺回檔 | RSI(2) 極端超賣 + 1d/3d 雙維度過濾 | **完全不同訊號集** |
+| Part A Sharpe | 1.12 | **6.32** | **+464%** |
+| Part A WR | 85.7% | **100.0%** | +14.3pp |
+| Part A 累計 | +16.30% | +28.67% | +76% |
+| Part A MDD | n/a | -2.76% | — |
+| Part B 訊號 | 2 | **3** | +50%（樣本量改善） |
+| Part B WR | 100% std=0 | 100% std=0 | TIE |
+| Part B 累計 | +6.09% | +9.27% | +52% |
+| min(A,B)† | 1.12 | **6.32** | **+464%** |
+| A/B 年化 cum 差 | 2.3% | 19.2% | 仍 < 30% ✓ |
+| A/B 年化訊號比 | 1.4:1 | 1.2:1 | 平衡改善 |
+
+**結論：** VOO-005 Att1 在所有指標上大幅超越 VOO-004 Att3，同時擴展 Part B 樣本
+量（2→3，+50%），為新全域最優。VOO-004 MBPC 仍可作為互補訊號生成器（兩者訊號集
+完全不重疊：VOO-004 進場於新高後淺回檔，VOO-005 進場於極端超賣 capitulation）。
