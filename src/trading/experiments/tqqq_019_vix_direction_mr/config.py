@@ -75,8 +75,13 @@ class TQQQ019Config(TQQQ018Config):
 
     # Att1: +5.0 過嚴 → REJECT min(A,B) 0.28（過濾 4 Part A + 3 Part B 訊號，
     #   capitulation 與 VIX spike 結構性共線）
-    # Att2 ★: +15.0 大幅放寬 — 僅期望過濾極端加速期
-    max_vix_direction_change: float = 15.0
+    # Att2: +15.0 完全非綁定 → TIE 0.80（與 baseline 完全相同）
+    # Att3 ★ FINAL: +10.0 中間值 — Part B SL 2025-03-06 仍未過濾（VIX 5d <= +10）、
+    #   Part A 流失 1 winner，min(A,B) TIE 0.80 但 Part A 邊際劣化（1.21 → 1.12）
+    #   結論：lesson #24 family DIRECTION cap 在 extreme capitulation framework
+    #   結構性失效（capitulation 與 VIX spike 共線），無單一 threshold 可區分
+    #   winners vs Part B SL
+    max_vix_direction_change: float = 10.0
 
 
 def create_default_config() -> TQQQ019Config:
