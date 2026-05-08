@@ -91,12 +91,15 @@ class GLD016Config(ExperimentConfig):
     max_gvz_direction_change: float = 0.40
 
     # DXY cross-asset divergence filter (GLD-016 核心新增)
-    # Att1 (max_dxy_5d_change=+0.020, surgical Fed-hike SL filter)
-    # Att2 (max_dxy_5d_change=+0.015, threshold tightening)
-    # Att3 (max_dxy_10d_change=+0.026, alternative window — expected failure)
+    # Att1 ★ (max_dxy_5d_change=+0.020) SUCCESS — min(A,B) 0.76→1.55 (+104%)
+    #   Part A 12→11 signals; filtered 2022-04-27 SL (DXY 5d +2.55% > +2.0%)
+    #   Part A WR 83.3%→90.9%, Sharpe 0.76→1.55, cum +21.68%→+26.88%
+    #   Part B 9 signals UNCHANGED; A/B cum diff 6.4% ✓, signal ratio 1.22:1 ✓
+    # Att2 (max_dxy_5d_change=+0.015) — threshold tightening test
+    # Att3 (max_dxy_10d_change=+0.026, switch to 10d) — alternative window
     dxy_ticker: str = "DX-Y.NYB"
     dxy_lookback: int = 5
-    max_dxy_change: float = 0.020
+    max_dxy_change: float = 0.015
 
 
 def create_default_config() -> GLD016Config:
