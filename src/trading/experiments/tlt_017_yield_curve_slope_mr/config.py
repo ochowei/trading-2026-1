@@ -96,12 +96,14 @@ class TLT017Config(ExperimentConfig):
     # TLT-017 核心新增: yield curve slope velocity (^TYX - ^TNX) regime gate
     long_yield_ticker: str = "^TYX"  # 30Y Treasury yield
     short_yield_ticker: str = "^TNX"  # 10Y Treasury yield
-    slope_lookback: int = 10  # N 日 slope 變化
+    slope_lookback: int = 5  # N 日 slope 變化 (Att2: 5d acute steepening)
     # max_slope_change: slope (^TYX - ^TNX) 在 N 日內的變化必須 <= 此值 (in % points)
     # 意義: 「殖利率曲線在 N 日內 steepening (long-end 通膨溢價擴張) 不可超過此幅度」
-    # 預期 surgical filter: 2021-01-06 slope_10d=+0.036 為候選訊號中最強 steepening
-    # Att1 baseline value
-    max_slope_change: float = 0.035
+    # Att1: 10d, +0.035 → SUCCESS min(A,B)† 4.49 但 Part B 4→3 (2025-03-27 同值 +0.036
+    #   被誤殺 with 2021-01-06)
+    # Att2: 5d, +0.038 → 嘗試以 5d acute 維度區分 (probe: 2021-01-06 5d=+0.040 vs
+    #   2025-03-27 5d=+0.035, 5d 有區分力可同時保留 Part B winner)
+    max_slope_change: float = 0.038
 
     # 冷卻期
     cooldown_days: int = 7
