@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-26T00:57:53.386644"
+    "execution_time": "2026-05-07T20:40:42.220019"
   },
   "part_a": {
     "ticker": "EWJ",
@@ -255,7 +255,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-24"
+      "end": "2026-05-07"
     }
   }
 }
