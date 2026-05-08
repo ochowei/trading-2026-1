@@ -1,18 +1,24 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-25
+  last_validated: 2026-05-09
   data_through: 2025-12-31
-  note: VOO-004 added 2026-04-25 (Momentum Breakout Pullback Continuation, **repo 第 3 次 MBPC 試驗，繼 FXI-012 / NVDA-009 後首次成功**). Three iterations: Att1 baseline (Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 回檔 [-1.5%, -4%] + RSI(14) [40,60] + Close>Open + cd10, TP+3.0%/SL-2.5%/20d) Part A 19/52.6%/Sharpe 0.12 / Part B 10/60.0%/Sharpe 0.36 / min 0.12 — 9 筆 Part A SL 集中於 macro-shock 日（Fed pivot/Omicron/2022 bear/Powell hawkish/Fitch downgrade）；Att2 (+ SMA(200) regime gate) Part A 15/53.3%/0.14 / Part B 9/55.6%/0.27 / min 0.14 — 非選擇性過濾（與 NVDA-009 Att2 相同模式），SMA(200) 在 2022 bear 期過濾 bull-trap rallies 中的 TPs；Att3 ★ (還原 SMA(200), breakout_recency 10→5d + pullback range [-1.5%,-4%]→[-2%,-3%]) Part A 7 訊號 WR 85.7% Sharpe **1.12** cum +16.30% / Part B 2 訊號 WR 100%（2/2 全達 +3%）Sharpe 0.00 std=0 cum +6.09% / min(A,B) **1.12†**（沿用 EWJ-003/DIA-012/SPY-009 慣例）/ A/B 年化 cum 差 2.3%（< 30% ✓ 極佳）/ A/B 年化訊號比 1.4:1（28.6% gap < 50% ✓）. **改善機制**：breakout_recency 5d 排除 stale breakout（觸發後 6-10 日才回檔已失動能），pullback [-2%,-3%] 窄帶過濾邊緣 -1.5% 噪聲與 -4% 邊緣（深跌前兆），9 筆 macro-shock SL 中 8 筆被過濾，僅保留 2022-01-10 hawkish Fed 真實 bear 開端。**跨資產貢獻**：repo 首次 MBPC 成功，驗證 cross_asset_lesson #21 假設「MBPC 在單一結構性上升趨勢資產有效」（VOO 為 broad-uptrend ETF），擴展 lesson #21 至「broad-uptrend ETF」類別；對照失敗案例 NVDA-009（多 regime 個股）/ FXI-012（政策驅動 EM）。**樣本警告**：Part B 2 訊號（1.0/年）統計顯著性偏低，但與 VOO-003 Part B 4 訊號同數量級。VOO-004 Att3 為新全域最優（4 次實驗、10 次嘗試）。
+  note_2026_05_09_voo005_att1: VOO-005 Att1 added 2026-05-09 (Signal-Day Capitulation-Strength Filter MR, **repo 首次 SPY-009 1d floor + 3d cap 雙維度過濾器跨資產移植至 VOO，新全域最優**, cross-asset port from SPY-009 Att2). Att1 (1d_ret floor <= -0.5% AND 3d_ret cap >= -8%, RSI(2)<10 + 2dpb>=1.5% + ClosePos>=40% baseline + cd5, TP+3.0%/SL-3.0%/20d, slippage 0.1%) Part A **9 訊號 WR 100%** Sharpe **6.32** cum +28.67% MDD -2.76% / Part B **3 訊號 WR 100%** std=0 (Sharpe 顯示 0.00) cum +9.27% / min(A,B)† **6.32**（沿用 EWJ-003/DIA-012/SPY-009 慣例）— **+464% vs VOO-004 Att3 baseline 1.12†**. A/B 年化 cum 差 ~19.2%（< 30% ✓）, A/B 年化訊號比 1.2:1（16.7% gap < 50% ✓）. Part C (Live 2026-01-01~2026-05-08): 1 訊號 SL 2026-03-06（-3.10%, 9d）— 單筆樣本不足以否決，需持續監控. **跨資產驗證**：(1) VOO 與 SPY 同追蹤 S&P 500，failure 結構假設 SPY-009 1d 過淺漂移 + 2025-04-07 Trump 關稅 3d 過深 直接適用於 VOO ✓ — Part A 9 訊號 100% WR 完全消除原 VOO-003 SLs（含 2022-01-06、2022-05-12、2022-06-14、2023-08-03 全部 1d 過淺漂移類型），Part B 唯一 SL 2025-04-07 經 3d cap >=-8% 過濾；(2) 1d floor + 3d cap 雙維度於 SPY 同樣 Part A Sharpe 6.56 vs VOO 6.32（差 0.24，由 VOO/SPY OHLC 微差解釋，與既往 VOO TP 上限 +2.85% vs SPY +3.0% 一致）；(3) **lesson #19 family 第 N 次跨資產移植**——延續 DIA-012 (1d cap + 3d cap, DJIA) → SPY-009 (1d floor + 3d cap, S&P SPDR) → VOO-005 (1d floor + 3d cap, S&P Vanguard) 三層擴展，確認 1d floor 方向適用於 S&P 500 寬基（與 DJIA cap 方向相反；不可跨指數類別直接移植，需 trade-level 結構分析）. VOO-005 Att1 為新全域最優（5 次實驗、11 次嘗試），取代 VOO-004 Att3 為當前最佳。
+  note: VOO-004 added 2026-04-25 (Momentum Breakout Pullback Continuation, **repo 第 3 次 MBPC 試驗，繼 FXI-012 / NVDA-009 後首次成功**). Three iterations: Att1 baseline (Donchian 20d 近 10 日內新高 + Close>SMA(50) + 5d 回檔 [-1.5%, -4%] + RSI(14) [40,60] + Close>Open + cd10, TP+3.0%/SL-2.5%/20d) Part A 19/52.6%/Sharpe 0.12 / Part B 10/60.0%/Sharpe 0.36 / min 0.12 — 9 筆 Part A SL 集中於 macro-shock 日（Fed pivot/Omicron/2022 bear/Powell hawkish/Fitch downgrade）；Att2 (+ SMA(200) regime gate) Part A 15/53.3%/0.14 / Part B 9/55.6%/0.27 / min 0.14 — 非選擇性過濾（與 NVDA-009 Att2 相同模式），SMA(200) 在 2022 bear 期過濾 bull-trap rallies 中的 TPs；Att3 ★ (還原 SMA(200), breakout_recency 10→5d + pullback range [-1.5%,-4%]→[-2%,-3%]) Part A 7 訊號 WR 85.7% Sharpe **1.12** cum +16.30% / Part B 2 訊號 WR 100%（2/2 全達 +3%）Sharpe 0.00 std=0 cum +6.09% / min(A,B) **1.12†**（沿用 EWJ-003/DIA-012/SPY-009 慣例）/ A/B 年化 cum 差 2.3%（< 30% ✓ 極佳）/ A/B 年化訊號比 1.4:1（28.6% gap < 50% ✓）. **改善機制**：breakout_recency 5d 排除 stale breakout（觸發後 6-10 日才回檔已失動能），pullback [-2%,-3%] 窄帶過濾邊緣 -1.5% 噪聲與 -4% 邊緣（深跌前兆），9 筆 macro-shock SL 中 8 筆被過濾，僅保留 2022-01-10 hawkish Fed 真實 bear 開端。**跨資產貢獻**：repo 首次 MBPC 成功，驗證 cross_asset_lesson #21 假設「MBPC 在單一結構性上升趨勢資產有效」（VOO 為 broad-uptrend ETF），擴展 lesson #21 至「broad-uptrend ETF」類別；對照失敗案例 NVDA-009（多 regime 個股）/ FXI-012（政策驅動 EM）。**樣本警告**：Part B 2 訊號（1.0/年）統計顯著性偏低，但與 VOO-003 Part B 4 訊號同數量級。VOO-004 Att3 為前任最佳。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** VOO-004 Att3（Momentum Breakout Pullback Continuation：Donchian 20d 近 5 日內新高 + Close>SMA(50) + 5d 回檔 [-2%, -3%] + RSI(14) [40,60] + Close>Open + cd10，TP +3.0% / SL -2.5% / 20d）
-- Part A: +16.30%（7 訊號, 85.7% WR, Sharpe **1.12**）, Part B: +6.09%（2 訊號, 100% WR std=0 zero-var, Sharpe 0.00, cum 同 Part A 年化 3.0%/y）
-- min(A,B) **1.12†**（Part A 為約束，沿用 EWJ-003/DIA-012/SPY-009 慣例）, +112% vs VOO-003 0.53
-- A/B 年化 cum 差 2.3%（< 30% ✓ 極佳），A/B 年化訊號比 1.4:1（28.6% gap < 50% ✓）
-- **repo 首次 MBPC 成功**（繼 FXI-012 / NVDA-009 失敗後）
-- 風險：Part B 2 訊號樣本量偏低，2022-01-10 Hawkish Fed 仍有 1 筆 SL
+**當前最佳：** ★ **VOO-005 Att1**（Signal-Day Capitulation-Strength Filter MR：VOO-001/002/003 RSI(2)+2DD+ClosePos baseline + **1 日跌幅下限 <= -0.5% AND 3 日急跌上限 >= -8%**，TP +3.0% / SL -3.0% / 20d / cd5）★ **2026-05-09 新全域最優（5 次實驗、11 次嘗試）**
+- Part A: +28.67%（**9 訊號, 100% WR**, Sharpe **6.32**, MDD -2.76%）
+- Part B: +9.27%（3 訊號, 100% WR, std=0 Sharpe 顯示 0.00, MDD -1.60%）
+- Part C (Live): -3.10%（1 訊號 SL 2026-03-06 -3.10% 9d）
+- min(A,B)†: **6.32**（採 EWJ-003/DIA-012/SPY-009 慣例：Part B std=0 時以 Part A Sharpe 為 min 約束，**+464% vs VOO-004 Att3 baseline 1.12†**）
+- A/B 年化 cum 差 ~19.2%（< 30% ✓），A/B 年化訊號比 1.2:1（16.7% gap < 50% ✓）
+- 關鍵改善：1d floor 過濾 VOO-003 全部 4 筆 Part A SLs（2022-01-06、2022-05-12、2022-06-14、2023-08-03，全 1d 過淺漂移類型），3d cap 過濾 Part B 2025-04-07 Trump 關稅 SL（3d ~-10%）
+- **跨資產貢獻**：repo 首次 SPY-009 跨資產移植至 VOO（同追蹤 S&P 500），驗證 1d floor + 3d cap 雙維度過濾在 S&P 500 寬基上的結構穩健性
 
-**前任最佳（已被超越）：** VOO-003（同 VOO-001/002 進場，寬獲利目標 TP +2.85% / SL -3.0% / 20d）
+**前任最佳：** VOO-004 Att3（Momentum Breakout Pullback Continuation：Donchian 20d 近 5 日內新高 + Close>SMA(50) + 5d 回檔 [-2%, -3%] + RSI(14) [40,60] + Close>Open + cd10，TP +3.0% / SL -2.5% / 20d）
+- Part A: +16.30%（7 訊號, 85.7% WR, Sharpe **1.12**）, Part B: +6.09%（2 訊號, 100% WR std=0, Sharpe 0.00）, min(A,B)† **1.12**
+
+**MR 框架前任最佳：** VOO-003（同 VOO-001/002 進場，寬獲利目標 TP +2.85% / SL -3.0% / 20d）
 - Part A: +22.40%（14訊號, 78.6% WR, Sharpe 0.61, Sortino 1.03）, Part B: +5.42%（4訊號, 75.0% WR, Sharpe 0.53, Sortino 0.88）
 - A/B Sharpe 差距僅 0.08（極佳平衡），A/B WR 差距僅 3.6pp
 - TP +2.85% 為 VOO MR 框架甜蜜點：+2.9% 翻轉 2022-05-12 交易
@@ -42,12 +48,12 @@
 - **VOO-004 進場（MBPC）**：Donchian 20d + breakout_recency 5/10d + pullback [-1.5/-2%, -3/-4%] + SMA(50) + RSI(14)[40,60] + Close>Open + cd10
 - **VOO-004 出場**：TP +3.0% / SL -2.5% / 20d（MBPC 框架；MR 框架仍為 +2.85%/-3.0%/20d）
 
-**全域最優確認（4 次實驗、10 次嘗試）：** VOO-004 Att3 MBPC（Sharpe 1.12†）為當前全域最優；VOO-003 RSI(2) MR（Sharpe 0.53）為 MR 框架最優保留參考。
+**全域最優確認（5 次實驗、11 次嘗試）：** VOO-005 Att1 RSI(2) MR + 1d floor + 3d cap（Sharpe 6.32†）為當前全域最優；VOO-004 Att3 MBPC（Sharpe 1.12†）為前任最佳保留參考；VOO-003 RSI(2) MR（Sharpe 0.53）為 MR 早期框架。
 
 **尚未嘗試的方向：**
-- ~~Donchian Momentum Breakout Pullback Continuation~~ → VOO-004 Att3 驗證為新最佳
+- ~~Donchian Momentum Breakout Pullback Continuation~~ → VOO-004 Att3 驗證為前任最佳
+- ~~SPY-009 1d floor + 3d cap 雙維度過濾~~ → VOO-005 Att1 驗證為新全域最優
 - BB Squeeze 突破（已被 SPY-008 / DIA-006 等驗證在 broad-S&P500 ETF 上效果有限）
-- 進場時加 ATR 過濾（VOO-004 Att3 已透過窄帶 pullback 達到等效精煉）
 - 動量 + RSI 偏空收場（lesson #20b oscillator hook 失敗家族，預期失敗）
 
 **關鍵資產特性：**
@@ -90,7 +96,8 @@
 | VOO-001 | RSI(2) Extreme Oversold | RSI(2) + 2日跌幅 + 收盤位置，固定 TP/SL | 完成 |
 | VOO-002 | RSI(2) Asymmetric Exit | 同 VOO-001 進場，非對稱出場 SL -3.0% / 20d | 完成 |
 | VOO-003 | RSI(2) Wider TP | 同 VOO-001/002 進場，TP +2.85% / SL -3.0% / 20d | 完成（MR 框架最佳） |
-| VOO-004 | Momentum Breakout Pullback | Donchian 突破 + 淺回檔 + 多頭 K 棒延續，TP +3.0% / SL -2.5% / 20d | 完成 ✓ 當前最佳 |
+| VOO-004 | Momentum Breakout Pullback | Donchian 突破 + 淺回檔 + 多頭 K 棒延續，TP +3.0% / SL -2.5% / 20d | 完成（前任最佳） |
+| VOO-005 | Signal-Day Capitulation-Strength Filter MR | RSI(2)+2DD+ClosePos baseline + **1d floor <= -0.5% AND 3d cap >= -8%**，TP +3.0% / SL -3.0% / 20d | 完成 ✓ **當前最佳** |
 
 ---
 
