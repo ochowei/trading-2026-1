@@ -88,14 +88,15 @@ class TLT016Config(ExperimentConfig):
     # TLT-016 核心新增: ^MOVE multi-window direction (cross-strategy port from USO-028)
     use_move_5d_direction_filter: bool = True
     move_5d_lookback: int = 5
-    # Att1: +5.0 → TIE 0.69 (Part A non-binding, Part B 4→3 winners; A/B gap 37%→14.7% ✓)
-    # Att2: -1.7 (surgical cap, between residual EX 5d=-1.46 and Part A TP 2021-08-11 5d=-2.01)
-    max_move_5d_change: float = -1.7
+    # Att1: +5.0 → TIE 0.69 (Part A non-binding; A/B gap 37%→14.7% ✓)
+    # Att2: -1.7 → REJECT sample collapse Part B 4→2, both Parts zero-var
+    # Att3: +5.0 (Att1 base) + 3d cap +3.0 (multi-window combo, USO-028 cross-strategy port)
+    max_move_5d_change: float = 5.0
 
-    # 可選 3d direction (multi-window combo, Att3 候選)
-    use_move_3d_direction_filter: bool = False
+    # Att3: 啟用 3d direction 作為 multi-window combo (USO-028 Att1 cross-strategy port)
+    use_move_3d_direction_filter: bool = True
     move_3d_lookback: int = 3
-    max_move_3d_change: float = 5.0
+    max_move_3d_change: float = 3.0
 
     # 冷卻期
     cooldown_days: int = 7
