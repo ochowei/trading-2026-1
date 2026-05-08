@@ -1,27 +1,38 @@
 {
   "metadata": {
-    "execution_time": "2026-05-08T23:30:41.086088"
+    "execution_time": "2026-05-08T23:31:12.999049"
   },
   "part_a": {
     "ticker": "TLT",
-    "total_signals": 2,
-    "wins": 2,
-    "win_rate": 1.0,
-    "avg_return_pct": 2.5,
-    "std_return_pct": 0.0,
-    "cumulative_return_pct": 5.06,
-    "avg_holding_days": 8.0,
+    "total_signals": 4,
+    "wins": 3,
+    "win_rate": 0.75,
+    "avg_return_pct": 1.0,
+    "std_return_pct": 2.0,
+    "cumulative_return_pct": 3.96,
+    "avg_holding_days": 14.0,
     "max_drawdown_pct": -2.77,
-    "profit_factor": 999.99,
-    "sharpe_ratio": 0.0,
-    "sortino_ratio": 999.99,
-    "calmar_ratio": 0.9,
-    "max_consecutive_losses": 0,
+    "profit_factor": 2.67,
+    "sharpe_ratio": 0.5,
+    "sortino_ratio": 0.84,
+    "calmar_ratio": 0.36,
+    "max_consecutive_losses": 1,
     "target_exits": 2,
     "stop_loss_exits": 0,
-    "time_expiry_exits": 0,
+    "time_expiry_exits": 2,
     "pessimistic_exits": 0,
     "trades": [
+      {
+        "date": "2021-01-06",
+        "entry_date": "2021-01-07",
+        "exit_date": "2021-02-08",
+        "entry": 128.02,
+        "exit": 124.97,
+        "return_pct": -2.38,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -2.47
+      },
       {
         "date": "2021-08-11",
         "entry_date": "2021-08-12",
@@ -32,6 +43,17 @@
         "holding_days": 2,
         "exit_type": "target",
         "max_drawdown_pct": 0.39
+      },
+      {
+        "date": "2021-09-27",
+        "entry_date": "2021-09-28",
+        "exit_date": "2021-10-27",
+        "entry": 123.0,
+        "exit": 124.67,
+        "return_pct": 1.36,
+        "holding_days": 20,
+        "exit_type": "time_expiry",
+        "max_drawdown_pct": -1.97
       },
       {
         "date": "2022-02-07",
@@ -45,7 +67,7 @@
         "max_drawdown_pct": -2.77
       }
     ],
-    "filled_count": 2,
+    "filled_count": 4,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
