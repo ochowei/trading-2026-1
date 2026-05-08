@@ -96,8 +96,9 @@ class TSM014Config(ExperimentConfig):
     benchmark_ticker: str = "QQQ"
     divergence_lookback: int = 20
     max_relative_return: float = 0.15  # CEILING 繼承 TSM-013 Att1
-    # Att1 baseline: min_relative_return = -0.05 (-5%, moderate floor)
-    min_relative_return: float = -0.05
+    # Att1: min_relative_return = -0.05 → TIE 0.83 (FLOOR non-binding，全部 ≥ -5%)
+    # Att2: min_relative_return = +0.05 → 嘗試過濾 Part B 2024-07-16 SL (+4.10%)
+    min_relative_return: float = 0.05
     use_divergence_filter: bool = True
 
 
