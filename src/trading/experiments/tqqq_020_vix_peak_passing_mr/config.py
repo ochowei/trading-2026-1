@@ -84,10 +84,14 @@ class TQQQ020Config(TQQQ018Config):
     use_vix_peak_passing_filter: bool = True
 
     # 1d 變化閾值（今日 VIX - 昨日 VIX）
-    # Att1: 0.0（今日 VIX 不高於昨日，最寬鬆 peak-passing）— 直接測試假設
-    # Att2: -1.0（明確 deceleration，今日至少低 1 點）
-    # Att3: 待定，依前兩次結果調整
-    max_vix_1d_change: float = 0.0
+    # Att1: 0.0 → REJECT min(A,B) -0.07 / Part A 2 訊號 / Part B **0 訊號**
+    #   結構性失敗 — capitulation 訊號日 VIX 必上升（恐慌爆發），1d <= 0 過嚴
+    #   過濾掉幾乎所有訊號，僅留 2 邊緣訊號，驗證「peak-passing 在 signal day
+    #   結構性與 capitulation 矛盾」初步信號
+    # Att2: 3.0 → 適度放寬（允許今日 VIX 較昨日漲不超過 3 點）
+    #   假設：filter「extreme single-day VIX 加速 >+3」訊號，仍允許正常 capitulation
+    # Att3: 待定，依結果調整
+    max_vix_1d_change: float = 3.0
 
 
 def create_default_config() -> TQQQ020Config:
