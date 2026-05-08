@@ -42,6 +42,7 @@ on:
           - "GLD-013: gld_013_vol_transition_mr"
           - "GLD-014: gld_014_capitulation_filter"
           - "GLD-015: gld_015_gvz_implied_vol_mr"
+          - "GLD-016: gld_016_dxy_divergence_mr"
           - "SIVR-001: sivr_001_mean_reversion"
           - "SIVR-002: sivr_002_trailing_stop"
           - "SIVR-003: sivr_003_pullback_wr"

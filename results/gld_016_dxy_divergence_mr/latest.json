@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "execution_time": "2026-05-09T03:20:31.450112"
+    "execution_time": "2026-05-09T03:23:13.738047"
   },
   "part_a": {
     "ticker": "GLD",
-    "total_signals": 12,
+    "total_signals": 11,
     "wins": 10,
-    "win_rate": 0.8333333333333334,
-    "avg_return_pct": 1.67,
-    "std_return_pct": 2.21,
-    "cumulative_return_pct": 21.68,
+    "win_rate": 0.9090909090909091,
+    "avg_return_pct": 2.2,
+    "std_return_pct": 1.42,
+    "cumulative_return_pct": 26.88,
     "avg_holding_days": 11.7,
-    "max_drawdown_pct": -4.59,
-    "profit_factor": 4.7,
-    "sharpe_ratio": 0.76,
-    "sortino_ratio": 1.35,
-    "calmar_ratio": 0.36,
+    "max_drawdown_pct": -2.42,
+    "profit_factor": 19.32,
+    "sharpe_ratio": 1.55,
+    "sortino_ratio": 5.52,
+    "calmar_ratio": 0.91,
     "max_consecutive_losses": 1,
     "target_exits": 8,
-    "stop_loss_exits": 1,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 3,
     "pessimistic_exits": 0,
     "trades": [
@@ -111,17 +111,6 @@
         "max_drawdown_pct": -1.77
       },
       {
-        "date": "2022-04-27",
-        "entry_date": "2022-04-28",
-        "exit_date": "2022-05-13",
-        "entry": 176.1,
-        "exit": 168.88,
-        "return_pct": -4.1,
-        "holding_days": 11,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -4.59
-      },
-      {
         "date": "2023-02-15",
         "entry_date": "2023-02-16",
         "exit_date": "2023-03-13",
@@ -155,7 +144,7 @@
         "max_drawdown_pct": -1.2
       }
     ],
-    "filled_count": 12,
+    "filled_count": 11,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
