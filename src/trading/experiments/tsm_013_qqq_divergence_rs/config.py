@@ -115,7 +115,7 @@ class TSM013Config(ExperimentConfig):
     # （CEILING 方向：過濾 TSM 已過度跑贏 QQQ 的 rally exhaustion regime）
     benchmark_ticker: str = "QQQ"
     divergence_lookback: int = 20
-    max_relative_return: float = 0.15
+    max_relative_return: float = 0.10
     use_divergence_filter: bool = True
 
 
