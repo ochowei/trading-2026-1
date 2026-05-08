@@ -128,8 +128,26 @@ Att1 (max_relative_return = +0.05, +5% loose ceiling)：SUCCESS min(A,B) **0.82*
     Repo 首次 cross-asset divergence regime gate（CEILING）成功移植至高波動 AI mega-cap
     個股 + MBPC 框架。
 
-Att2 (max_relative_return = +0.03, +3% moderate)：待執行
-Att3 (依 Att1/2 結果調整)：待執行
+Att2 ★ (max_relative_return = +0.03, +3% moderate)：SUCCESS min(A,B) **1.43**
+    結果：
+        Part A: 10 訊號, WR **90.0%**, 累計  +85.63%, Sharpe **1.43**
+        Part B:  5 訊號（不變）, WR 80.0%, 累計  +35.99%, Sharpe **1.99**
+        min(A,B): **1.43**（**+74% vs Att1 0.82**, **+160% vs NVDA-013 baseline 0.55**）
+        Part A 訊號 15→10（額外過濾 5）
+        Part A WR 80.0%→**90.0%**（+10pp，repo NVDA Part A WR 歷史新高）
+        Part A SLs 3→**1**（僅殘留 2019-02-20，移除 2020-10-20 + 2023-08-28）
+    A/B 平衡（驗收目標全達）：
+        Part A 年化 cum: (1+0.8563)^(1/5)-1 = 13.21%/yr
+        Part B 年化 cum: (1+0.3599)^(1/2)-1 = 16.61%/yr
+        A/B 年化 cum 差 |13.21-16.61|/16.61 = **20.5% < 30% ✓**
+        A/B 年化訊號比 2.0:2.5 = **0.8:1**（gap 25.0% < 50% ✓）
+    SL 過濾分析：
+        Att1 殘留 2 SLs（2020-10-20、2023-08-28）皆於 +3% 閾值被過濾，唯一殘留
+        SL 為 2019-02-20（NVDA-SMH +1.17% 但 NVDA-QQQ < +3%，filter 邊緣）。
+        Cooldown chain shift 在 Part A 引入新訊號 2019-09-23（取代 2019-09-17）
+        和 2023-04-14（取代 2023-04-05），均為 winners。
+
+Att3 (依 Att2 結果調整)：待執行
 """
 
 from dataclasses import dataclass
@@ -170,12 +188,12 @@ class NVDA021Config(ExperimentConfig):
     # （CEILING 方向：過濾 NVDA 已過度跑贏 QQQ 的 rally exhaustion regime）
     benchmark_ticker: str = "QQQ"
     divergence_lookback: int = 20
-    max_relative_return: float = 0.05  # Att1: +5% 寬鬆 ceiling
+    max_relative_return: float = 0.03  # Att2: +3% moderate ceiling
     use_divergence_filter: bool = True
 
 
 def create_default_config() -> NVDA021Config:
-    """預設配置（Att1：max_relative_return=+0.05, lookback=20d）"""
+    """預設配置（Att2：max_relative_return=+0.03, lookback=20d）"""
     return NVDA021Config(
         name="nvda_021_qqq_divergence_mbpc",
         experiment_id="NVDA-021",
