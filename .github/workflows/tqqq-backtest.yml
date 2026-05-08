@@ -86,6 +86,7 @@ on:
           - "EEM-013: eem_013_macd_histogram_mr"
           - "EEM-014: eem_014_vol_transition_mr"
           - "EEM-015: eem_015_multi_period_cap"
+          - "EEM-016: eem_016_dxy_direction_mr"
           - "EWJ-001: ewj_001_pullback_wr_reversal"
           - "EWJ-002: ewj_002_vol_adaptive_pullback"
           - "EWJ-003: ewj_003_bb_lower_mr"
