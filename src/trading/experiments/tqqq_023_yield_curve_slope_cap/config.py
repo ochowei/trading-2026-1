@@ -101,8 +101,11 @@ class TQQQ023Config(TQQQ018Config):
 
     # slope LEVEL filter (Att3 替代維度)
     # max_slope_level: 殖利率曲線水準上限（^TYX - ^TNX），單位：百分點
-    # Att3 嘗試: slope <= +0.40 (filter 陡峭曲線 regime) — 測試水準維度能否
-    #   區分 2025-03-06 SL（曲線陡峭時刻）vs winners（曲線平坦時刻）
+    # Att3: slope <= +0.40 (filter 陡峭曲線 regime)
+    #   → REJECT min(A,B) 0.66 (-18% vs baseline 0.80)
+    #   Part A 10→2 (std=0 2W), Part B 6→5 (1 winner 誤殺，2025-03-06 SL 仍存活)
+    #   slope LEVEL <= 0.40 在 2025-03-06（曲線非陡峭）非綁定，反向誤殺 Part B
+    #   winner — slope LEVEL 維度與 slope velocity 同樣 reverse-selecting
     use_slope_level_filter: bool = True
     max_slope_level: float = 0.40
 
