@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-09T20:23:08.673249"
+    "execution_time": "2026-05-09T20:24:14.681667"
   },
   "part_a": {
     "ticker": "TSLA",
@@ -152,20 +152,20 @@
   },
   "part_b": {
     "ticker": "TSLA",
-    "total_signals": 5,
-    "wins": 4,
-    "win_rate": 0.8,
-    "avg_return_pct": 6.57,
-    "std_return_pct": 6.86,
-    "cumulative_return_pct": 35.96,
+    "total_signals": 4,
+    "wins": 3,
+    "win_rate": 0.75,
+    "avg_return_pct": 5.71,
+    "std_return_pct": 7.42,
+    "cumulative_return_pct": 23.6,
     "avg_holding_days": 5.2,
     "max_drawdown_pct": -8.69,
-    "profit_factor": 5.6,
-    "sharpe_ratio": 0.96,
-    "sortino_ratio": 2.06,
-    "calmar_ratio": 0.76,
+    "profit_factor": 4.2,
+    "sharpe_ratio": 0.77,
+    "sortino_ratio": 1.6,
+    "calmar_ratio": 0.66,
     "max_consecutive_losses": 1,
-    "target_exits": 4,
+    "target_exits": 3,
     "stop_loss_exits": 1,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
@@ -204,17 +204,6 @@
         "max_drawdown_pct": -1.85
       },
       {
-        "date": "2025-05-12",
-        "entry_date": "2025-05-13",
-        "exit_date": "2025-05-20",
-        "entry": 320.48,
-        "exit": 352.53,
-        "return_pct": 10.0,
-        "holding_days": 5,
-        "exit_type": "target",
-        "max_drawdown_pct": 4.02
-      },
-      {
         "date": "2025-09-11",
         "entry_date": "2025-09-12",
         "exit_date": "2025-09-15",
@@ -226,7 +215,7 @@
         "max_drawdown_pct": 8.33
       }
     ],
-    "filled_count": 5,
+    "filled_count": 4,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

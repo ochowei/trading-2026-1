@@ -109,10 +109,12 @@ class TSLA018Config(ExperimentConfig):
     # === DXY Direction Filter（TSLA-018 核心新增）===
     # ticker: ICE US Dollar Index spot via Yahoo finance "DX-Y.NYB"
     # lookback: 5 日（GLD-016 / COPX-016 sweet spot 一致；5d > 10d selectivity）
-    # max_dxy_change: DXY N 日變化必須 <= 此值（Att1=+2.0% 直接移植 GLD-016 sweet spot）
+    # max_dxy_change: DXY N 日變化必須 <= 此值
+    # Att1 (max=+0.020): TIE baseline，全 15 訊號 DXY 5d ≤ +2.0% non-binding
+    # Att2 (max=+0.010): 收緊測試 TSLA SLs 是否集中於中度 USD 強勢期
     dxy_ticker: str = "DX-Y.NYB"
     dxy_lookback: int = 5
-    max_dxy_change: float = 0.020
+    max_dxy_change: float = 0.010
 
 
 def create_default_config() -> TSLA018Config:
