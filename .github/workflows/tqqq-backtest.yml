@@ -98,6 +98,7 @@ on:
           - "EEM-017: eem_017_eem_efa_divergence_mr"
           - "EEM-018: eem_018_vix_bands_mr"
           - "EEM-019: eem_019_eem_fxi_divergence_mr"
+          - "EEM-020: eem_020_multi_anchor_combo_mr"
           - "EWJ-001: ewj_001_pullback_wr_reversal"
           - "EWJ-002: ewj_002_vol_adaptive_pullback"
           - "EWJ-003: ewj_003_bb_lower_mr"
