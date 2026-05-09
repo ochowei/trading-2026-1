@@ -62,10 +62,10 @@ class TSM019Config(TSMSignalDayFilterConfig):
     vix3m_ticker: str = "^VIX3M"
 
     # CEILING：VIX3M / VIX <= max_vix_term_ratio（999 視為停用）
-    max_vix_term_ratio: float = 999.0  # Att2：CEILING 停用，改試 FLOOR
+    max_vix_term_ratio: float = 999.0  # Att3：CEILING 停用
 
     # FLOOR：VIX3M / VIX >= min_vix_term_ratio（0 視為停用）
-    min_vix_term_ratio: float = 1.115  # Att2：FLOOR 1.115 試圖過濾 Part A SLs (ratio 1.106/1.110)
+    min_vix_term_ratio: float = 1.10  # Att3：FLOOR 放寬至 1.10（lenient ablation）
 
 
 def create_default_config() -> TSM019Config:
