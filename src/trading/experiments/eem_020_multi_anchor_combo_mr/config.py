@@ -100,7 +100,7 @@ class EEM020Config(ExperimentConfig):
     #   14.79、17.58、18.40、18.56、19.00 (SL)、19.19、20.56、23.66 (SL)、25.71
     # vix_max = 23 過濾 1 SL (23.66) + 1 TP (25.71)；vix_max = 22 同上
     vix_ticker: str = "^VIX"
-    vix_max_level: float = 25.0  # Att1 loose: 25 → Att2 23 → Att3 22
+    vix_max_level: float = 23.0  # Att1 loose: 25 → Att2 23 → Att3 22
 
     # === EEM-FXI 10d divergence CEILING filter（EEM-020 核心新增 - 第二維度）===
     # 目標：過濾 Part A 2021-07-08 DiDi SL（RelDiff > +1.0% per EEM-019 Att2 驗證）
@@ -108,7 +108,7 @@ class EEM020Config(ExperimentConfig):
     # Att1 max_rel=+3.0% → Att2 +1.5% → Att3 +1.0%
     fxi_ticker: str = "FXI"
     rel_lookback: int = 10
-    max_rel_return: float = 0.030  # Att1 loose: +3% → Att2 +1.5% → Att3 +1%
+    max_rel_return: float = 0.015  # Att1 loose: +3% → Att2 +1.5% → Att3 +1%
 
     cooldown_days: int = 10
 
