@@ -235,6 +235,7 @@ on:
           - "TSM-012: tsm_012_volume_confirmed_rs_pullback"
           - "TSM-013: tsm_013_qqq_divergence_rs"
           - "TSM-014: tsm_014_qqq_divergence_band"
+          - "TSM-015: tsm_015_aapl_divergence_rs"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
