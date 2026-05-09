@@ -120,7 +120,7 @@ class VGK009Config(ExperimentConfig):
     eurusd_lookback: int = 10
     # min_change: 過濾 EUR/USD 過去 N 日跌幅過深的訊號（EUR 急貶 currency drag）
     # Att1 -2.0%（寬鬆 baseline）, Att2 -1.0%（EWJ-006 sweet spot 鏡像）, Att3 -1.5%（中間 robustness）
-    min_eurusd_change: float = -0.020
+    min_eurusd_change: float = -0.010
 
     # === 冷卻天數（同 VGK-008）===
     cooldown_days: int = 7
