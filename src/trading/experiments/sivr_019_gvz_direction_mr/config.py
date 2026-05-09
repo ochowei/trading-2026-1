@@ -112,13 +112,13 @@ class SIVR019Config(ExperimentConfig):
     three_day_floor: float = -0.01
 
     # ^GVZ Direction-Floor Filter (SIVR-019 NEW)
-    # Att1 ★ default: GVZ_5d_change >= -2.0 (surgical EXP filter)
-    # Att2:           GVZ_5d_change >= -1.5 (robustness test)
-    # Att3:           GVZ_10d_change >= -2.5 (alt lookback)
+    # Att1 ★: GVZ_5d_change >= -2.0 (surgical EXP filter, SUCCESS NO LOSS)
+    # Att2:   GVZ_5d_change >= -1.5 (robustness test, tighter)
+    # Att3:   GVZ_10d_change >= -2.5 (alt lookback ablation)
     gvz_ticker: str = "^GVZ"
     use_gvz_direction_filter: bool = True
     gvz_direction_lookback: int = 5
-    min_gvz_direction_change: float = -2.0
+    min_gvz_direction_change: float = -1.5
 
     # Cooldown (same as SIVR-018)
     cooldown_days: int = 10
