@@ -109,29 +109,42 @@ class XBI018Config(ExperimentConfig):
     vix_high_threshold: float = 22.0
     use_vix_bands: bool = True
 
-    # === XBI-018 核心新增：XBI-XLV cross-asset divergence cap ===
+    # === XBI-018 核心新增：XBI-XLV cross-asset divergence regime gate ===
     # XLV (Health Care Select Sector SPDR) 為 broad healthcare sector parent
     xlv_ticker: str = "XLV"
-    # 短 lookback（NVDA-021 移植維度）
+
+    # 極性：
+    #   "cap"   → 過濾 RS > max_rs_excess（既往 lesson #20 v3 模式）
+    #   "floor" → 過濾 RS < min_rs_excess（**repo 首次 FLOOR 變體**）
+    rs_polarity_short: str = "cap"
+    rs_polarity_long: str = "cap"
+
+    # 短 lookback
     rs_lookback_short: int = 20
-    max_rs_excess_short: float = 0.03  # 20d: XBI - XLV <= +3%
-    # 長 lookback（INDA-012 移植維度，Att2/Att3 啟用）
+    max_rs_excess_short: float = 0.03  # cap 模式：XBI - XLV ≤ +3%
+    min_rs_excess_short: float = -0.02  # floor 模式：XBI - XLV ≥ -2%
+
+    # 長 lookback
     rs_lookback_long: int = 60
-    max_rs_excess_long: float = 0.05  # 60d: XBI - XLV <= +5%
-    # 維度開關：
-    #   Att1（REJECT min 0.52）：use_short=True,  use_long=False
-    #     20d/+3% NVDA-021 港，過濾 winners 但 1 Part B SL 殘留
-    #   Att2：use_short=False, use_long=True
-    #     60d/+5% INDA-012 港，測試中長期 outperformance 維度
-    #   Att3：use_short=True,  use_long=True  （AND combo, EWT-010 移植）
-    use_rs_short: bool = False
-    use_rs_long: bool = True
+    max_rs_excess_long: float = 0.05  # cap 模式：XBI - XLV ≤ +5%
+    min_rs_excess_long: float = -0.04  # floor 模式：XBI - XLV ≥ -4%
+
+    # 維度開關 / 迭代紀錄：
+    #   Att1（REJECT min 0.52）：short cap +3% only, NVDA-021 港
+    #     - 過濾 2 winners 但 1 Part B SL 殘留 → cap 過緊
+    #   Att2（TIE  min 0.64）：long  cap +5% only, INDA-012 港
+    #     - Part A 移除 4 winners，Part B 完全非綁定 → CAP 極性對 XBI 結構性錯誤
+    #   Att3：short FLOOR -2% only（**repo 首次 cross-asset divergence FLOOR 變體**）
+    #     - 假設 Part B SL (2025-03-31) 訊號日 XBI 嚴重 underperform XLV
+    #       → FLOOR -2% 應 surgical filter 此 SL
+    use_rs_short: bool = True
+    use_rs_long: bool = False
 
     cooldown_days: int = 10
 
 
 def create_default_config() -> XBI018Config:
-    """預設配置（Att1：20d lookback, max_rs_excess +3%, 移植 NVDA-021 維度）"""
+    """預設配置（Att3：20d FLOOR -2%，repo 首次 cross-asset divergence FLOOR 變體）"""
     return XBI018Config(
         name="xbi_018_xbi_xlv_divergence_mr",
         experiment_id="XBI-018",
@@ -141,4 +154,9 @@ def create_default_config() -> XBI018Config:
         profit_target=0.035,
         stop_loss=-0.050,
         holding_days=15,
+        rs_polarity_short="floor",
+        rs_polarity_long="cap",
+        use_rs_short=True,
+        use_rs_long=False,
+        min_rs_excess_short=-0.02,
     )

@@ -52,16 +52,26 @@ class XBI018XbiXlvDivergenceMRStrategy(ExecutionModelStrategy):
                 print("  ^VIX BANDS gate: 已停用")
             rs_components = []
             if config.use_rs_short:
-                rs_components.append(
-                    f"{config.rs_lookback_short}d <= {config.max_rs_excess_short:+.1%}"
-                )
+                if config.rs_polarity_short == "cap":
+                    rs_components.append(
+                        f"{config.rs_lookback_short}d ≤ {config.max_rs_excess_short:+.1%}"
+                    )
+                else:
+                    rs_components.append(
+                        f"{config.rs_lookback_short}d ≥ {config.min_rs_excess_short:+.1%}"
+                    )
             if config.use_rs_long:
-                rs_components.append(
-                    f"{config.rs_lookback_long}d <= {config.max_rs_excess_long:+.1%}"
-                )
+                if config.rs_polarity_long == "cap":
+                    rs_components.append(
+                        f"{config.rs_lookback_long}d ≤ {config.max_rs_excess_long:+.1%}"
+                    )
+                else:
+                    rs_components.append(
+                        f"{config.rs_lookback_long}d ≥ {config.min_rs_excess_long:+.1%}"
+                    )
             if rs_components:
-                print(f"  XBI-{config.xlv_ticker} RS cap: " + " AND ".join(rs_components))
+                print(f"  XBI-{config.xlv_ticker} RS gate: " + " AND ".join(rs_components))
             else:
-                print("  XBI-XLV RS cap: 已停用")
+                print("  XBI-XLV RS gate: 已停用")
             print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
         super()._print_strategy_params(config)

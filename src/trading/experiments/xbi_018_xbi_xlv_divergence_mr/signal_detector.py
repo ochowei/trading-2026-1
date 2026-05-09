@@ -134,14 +134,24 @@ class XBI018SignalDetector(BaseSignalDetector):
         else:
             cond_vix_bands = pd.Series(True, index=df.index)
 
-        # === XBI-018 新增：XBI-XLV cross-asset divergence cap ===
+        # === XBI-018 新增：XBI-XLV cross-asset divergence regime gate ===
         if self.config.use_rs_short:
-            cond_rs_short = df["RS_Excess_Short"] <= self.config.max_rs_excess_short
+            if self.config.rs_polarity_short == "cap":
+                cond_rs_short = df["RS_Excess_Short"] <= self.config.max_rs_excess_short
+            elif self.config.rs_polarity_short == "floor":
+                cond_rs_short = df["RS_Excess_Short"] >= self.config.min_rs_excess_short
+            else:
+                raise ValueError(f"未知 rs_polarity_short: {self.config.rs_polarity_short}")
         else:
             cond_rs_short = pd.Series(True, index=df.index)
 
         if self.config.use_rs_long:
-            cond_rs_long = df["RS_Excess_Long"] <= self.config.max_rs_excess_long
+            if self.config.rs_polarity_long == "cap":
+                cond_rs_long = df["RS_Excess_Long"] <= self.config.max_rs_excess_long
+            elif self.config.rs_polarity_long == "floor":
+                cond_rs_long = df["RS_Excess_Long"] >= self.config.min_rs_excess_long
+            else:
+                raise ValueError(f"未知 rs_polarity_long: {self.config.rs_polarity_long}")
         else:
             cond_rs_long = pd.Series(True, index=df.index)
 
@@ -177,11 +187,11 @@ class XBI018SignalDetector(BaseSignalDetector):
 
         signal_count = df["Signal"].sum()
         logger.info(
-            "XBI-018: Detected %d signals (rs_short=%s/%.3f, rs_long=%s/%.3f)",
+            "XBI-018: Detected %d signals (short=%s pol=%s, long=%s pol=%s)",
             signal_count,
             self.config.use_rs_short,
-            self.config.max_rs_excess_short,
+            self.config.rs_polarity_short,
             self.config.use_rs_long,
-            self.config.max_rs_excess_long,
+            self.config.rs_polarity_long,
         )
         return df
