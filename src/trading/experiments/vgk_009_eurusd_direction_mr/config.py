@@ -119,8 +119,9 @@ class VGK009Config(ExperimentConfig):
     # lookback: 10 日（與 EWJ-006 / COPX-016 對齊）
     eurusd_lookback: int = 10
     # min_change: 過濾 EUR/USD 過去 N 日跌幅過深的訊號（EUR 急貶 currency drag）
-    # Att1 -2.0%（寬鬆 baseline）, Att2 -1.0%（EWJ-006 sweet spot 鏡像）, Att3 -1.5%（中間 robustness）
-    min_eurusd_change: float = -0.010
+    # Att1 -2.0%（寬鬆 baseline TIE）, Att2 -1.0%（過嚴 over-filter REJECT）,
+    # Att3 ★ -1.5%（中間 robustness sweet spot，min† = Part A 3.02 +16% baseline）
+    min_eurusd_change: float = -0.015
 
     # === 冷卻天數（同 VGK-008）===
     cooldown_days: int = 7
