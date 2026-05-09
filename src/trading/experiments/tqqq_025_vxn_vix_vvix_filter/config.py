@@ -105,7 +105,12 @@ class TQQQ025Config(TQQQ018Config):
 
     # VVIX direction FLOOR（TQQQ-025 新增維度 2）
     vvix_ticker: str = "^VVIX"
-    use_vvix_direction_filter: bool = False  # Att1 stage off; Att2/Att3 enable
+    # Att1: use_vvix_direction_filter=False (VXN/VIX only)
+    #   → min(A,B)† 1.21 PARTIAL (Part A bind unchanged, Part B std=0 zero-var,
+    #     A/B cum gap 40% > 30% target)
+    # Att2: use_vvix_direction_filter=True, min_vvix_direction_change=-5.0
+    #   → 預期過濾 Part A 2021-09-28 SL (VVIX_5d=-9.70 < -5 FLOOR)
+    use_vvix_direction_filter: bool = True
     vvix_direction_lookback: int = 5
     # ^VVIX N 日累計變化必須 >= min_vvix_direction_change
     # （過濾 VVIX 急速下行 = uncertainty 正在解除但 capitulation 未完成的訊號）
