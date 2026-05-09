@@ -32,8 +32,8 @@ STRATEGIES: list[dict[str, str | bool]] = [
         "has_trailing_stop": False,
     },
     {
-        "experiment_name": "copx_007_vol_adaptive",
-        "label": "COPX-007",
+        "experiment_name": "copx_018_volume_confirmed_mr",
+        "label": "COPX-018",
         "ticker": "COPX",
         "has_trailing_stop": False,
     },
