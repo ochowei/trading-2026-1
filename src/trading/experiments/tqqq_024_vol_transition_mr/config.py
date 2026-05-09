@@ -56,24 +56,25 @@ class TQQQ024Config(ExperimentConfig):
     bb_std: float = 2.0
 
     # 10 日高點回檔範圍 [floor, cap]：要求中度 pullback（過淺無 MR 動能、過深為崩盤）
+    # Att3: 僅 cap（no floor），讓 BB 下軌做主要進場觸發
     pullback_lookback: int = 10
-    pullback_floor: float = -0.08  # 至少 8% 回檔
+    pullback_floor: float = 0.0  # Att3: 不要求最低 pullback
     pullback_cap: float = -0.25  # 最多 25% 回檔（排除 -15% 以上的 extreme crash）
 
-    # Williams %R 深度超賣
+    # Williams %R（Att3: 放寬至 -75，原 -85 太緊配合 BB 下軌結構性極稀）
     wr_period: int = 10
-    wr_threshold: float = -85.0
+    wr_threshold: float = -75.0
 
-    # 收盤強反轉確認
+    # 收盤強反轉確認（Att3: 0.35）
     close_position_threshold: float = 0.35
 
-    # ATR vol-transition gate（signal-day panic 確認）
+    # ATR vol-transition gate（Att3: 1.00 = 等於非綁定，由 2DD floor 主導 capitulation 判定）
     atr_short_period: int = 5
     atr_long_period: int = 20
-    atr_ratio_threshold: float = 1.10  # Att1/Att2 預設；Att3 改為 1.20
+    atr_ratio_threshold: float = 1.00
 
     # 2 日急跌 floor（require true 2-day capitulation depth）
-    twoday_return_floor: float = -0.03  # Att1/Att3 預設；Att2 改為 -0.02
+    twoday_return_floor: float = -0.03  # Att3: 改回 -3%（深度 capitulation 為 quality filter 主軸）
 
     # 冷卻期
     cooldown_days: int = 5

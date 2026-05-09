@@ -1,34 +1,45 @@
 {
   "metadata": {
-    "execution_time": "2026-05-09T22:19:17.869108"
+    "execution_time": "2026-05-09T22:21:28.989727"
   },
   "part_a": {
     "ticker": "TQQQ",
-    "total_signals": 2,
-    "wins": 1,
-    "win_rate": 0.5,
-    "avg_return_pct": -0.04,
-    "std_return_pct": 5.04,
-    "cumulative_return_pct": -0.34,
-    "avg_holding_days": 1.5,
+    "total_signals": 5,
+    "wins": 3,
+    "win_rate": 0.6,
+    "avg_return_pct": 0.96,
+    "std_return_pct": 4.95,
+    "cumulative_return_pct": 4.26,
+    "avg_holding_days": 1.4,
     "max_drawdown_pct": -6.38,
-    "profit_factor": 0.98,
-    "sharpe_ratio": -0.01,
-    "sortino_ratio": -0.01,
-    "calmar_ratio": -0.01,
+    "profit_factor": 1.47,
+    "sharpe_ratio": 0.19,
+    "sortino_ratio": 0.3,
+    "calmar_ratio": 0.15,
     "max_consecutive_losses": 1,
-    "target_exits": 1,
-    "stop_loss_exits": 1,
+    "target_exits": 3,
+    "stop_loss_exits": 2,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
+      {
+        "date": "2019-05-14",
+        "entry_date": "2019-05-15",
+        "exit_date": "2019-05-16",
+        "entry": 6.63,
+        "exit": 6.96,
+        "return_pct": 5.0,
+        "holding_days": 1,
+        "exit_type": "target",
+        "max_drawdown_pct": 5.93
+      },
       {
         "date": "2019-08-02",
         "entry_date": "2019-08-05",
         "exit_date": "2019-08-07",
         "entry": 6.92,
         "exit": 6.57,
-        "return_pct": -5.09,
+        "return_pct": -5.1,
         "holding_days": 2,
         "exit_type": "stop_loss",
         "max_drawdown_pct": -6.38
@@ -43,9 +54,31 @@
         "holding_days": 1,
         "exit_type": "target",
         "max_drawdown_pct": 4.4
+      },
+      {
+        "date": "2021-05-04",
+        "entry_date": "2021-05-05",
+        "exit_date": "2021-05-06",
+        "entry": 24.39,
+        "exit": 23.15,
+        "return_pct": -5.1,
+        "holding_days": 1,
+        "exit_type": "stop_loss",
+        "max_drawdown_pct": -5.24
+      },
+      {
+        "date": "2021-09-20",
+        "entry_date": "2021-09-21",
+        "exit_date": "2021-09-23",
+        "entry": 32.36,
+        "exit": 33.98,
+        "return_pct": 5.0,
+        "holding_days": 2,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.41
       }
     ],
-    "filled_count": 2,
+    "filled_count": 5,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
