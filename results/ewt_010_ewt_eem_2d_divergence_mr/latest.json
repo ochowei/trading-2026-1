@@ -1,38 +1,27 @@
 {
   "metadata": {
-    "execution_time": "2026-05-09T11:14:24.198569"
+    "execution_time": "2026-05-09T11:27:46.045782"
   },
   "part_a": {
     "ticker": "EWT",
-    "total_signals": 9,
+    "total_signals": 8,
     "wins": 8,
-    "win_rate": 0.8888888888888888,
-    "avg_return_pct": 2.66,
-    "std_return_pct": 2.39,
-    "cumulative_return_pct": 26.28,
-    "avg_holding_days": 6.0,
-    "max_drawdown_pct": -4.08,
-    "profit_factor": 6.83,
-    "sharpe_ratio": 1.11,
-    "sortino_ratio": 1.94,
-    "calmar_ratio": 0.65,
-    "max_consecutive_losses": 1,
+    "win_rate": 1.0,
+    "avg_return_pct": 3.5,
+    "std_return_pct": 0.0,
+    "cumulative_return_pct": 31.68,
+    "avg_holding_days": 6.6,
+    "max_drawdown_pct": -3.89,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 0.0,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 0.9,
+    "max_consecutive_losses": 0,
     "target_exits": 8,
-    "stop_loss_exits": 1,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
-      {
-        "date": "2019-05-09",
-        "entry_date": "2019-05-10",
-        "exit_date": "2019-05-13",
-        "entry": 22.7,
-        "exit": 21.77,
-        "return_pct": -4.1,
-        "holding_days": 1,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -4.08
-      },
       {
         "date": "2019-08-02",
         "entry_date": "2019-08-05",
@@ -122,7 +111,7 @@
         "max_drawdown_pct": -0.51
       }
     ],
-    "filled_count": 9,
+    "filled_count": 8,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,
