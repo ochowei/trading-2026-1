@@ -85,15 +85,26 @@ class TQQQ023Config(TQQQ018Config):
     #
     # 迭代紀錄 (3 iterations)：
     # Att1: lookback=5d, max=+0.038 (TLT-017 Att2 sweet spot 直接移植)
-    # Att2: 預留依 Att1 結果調整
-    # Att3: 預留替代維度 (slope LEVEL or 10d window)
+    #   → TIE baseline 0.80
+    #   Part A 10→7 (-3 signals, Sharpe 1.21→0.92, -24%), Part B unchanged 0.80
+    #   2025-03-06 Part B SL slope_change_5d <= +0.038 — filter 非綁定
+    # Att2: lookback=5d, max=+0.020 (tighter, 攻 2025-03-06 surgical filter 嘗試)
+    #   → REJECT min(A,B) 0.49 (-39% vs baseline)
+    #   Part A 10→4 (Sharpe 0.49 cum +12.59%, 過嚴), Part B 6→1 (僅留 2024-04-19)
+    #   2025-03-06 SL 一同被切除但同時誤殺 5 個 Part B winners — slope_change_5d
+    #   reverse-selecting：2025-03-06 SL 在 5d slope velocity 維度與 winners 重疊
+    # Att3: 替代維度（slope LEVEL）— 測試「殖利率曲線水準（陡峭度）」是否與
+    #   slope velocity 正交，能 surgical 過濾 2025-03-06 SL 而保留 winners
     slope_lookback: int = 5
-    max_slope_change: float = 0.038
-    use_slope_change_filter: bool = True
+    max_slope_change: float = 999.0
+    use_slope_change_filter: bool = False
 
-    # slope LEVEL filter (備用替代維度，預設關閉)
-    use_slope_level_filter: bool = False
-    max_slope_level: float = 999.0
+    # slope LEVEL filter (Att3 替代維度)
+    # max_slope_level: 殖利率曲線水準上限（^TYX - ^TNX），單位：百分點
+    # Att3 嘗試: slope <= +0.40 (filter 陡峭曲線 regime) — 測試水準維度能否
+    #   區分 2025-03-06 SL（曲線陡峭時刻）vs winners（曲線平坦時刻）
+    use_slope_level_filter: bool = True
+    max_slope_level: float = 0.40
 
 
 def create_default_config() -> TQQQ023Config:
