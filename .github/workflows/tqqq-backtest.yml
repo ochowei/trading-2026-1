@@ -232,6 +232,7 @@ on:
           - "TSLA-016: tsla_016_breakout_ceiling"
           - "TSLA-017: tsla_017_qqq_divergence_breakout"
           - "TSLA-018: tsla_018_dxy_direction_breakout"
+          - "TSLA-019: tsla_019_vix_bands_breakout"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
           - "TSM-006: tsm_006_momentum_pullback"
