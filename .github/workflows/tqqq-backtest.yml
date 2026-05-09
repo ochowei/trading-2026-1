@@ -32,6 +32,7 @@ on:
           - "TQQQ-021: tqqq_021_move_regime_gate"
           - "TQQQ-022: tqqq_022_qqq_spy_divergence_cap"
           - "TQQQ-023: tqqq_023_yield_curve_slope_cap"
+          - "TQQQ-024: tqqq_024_vol_transition_mr"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
