@@ -241,6 +241,7 @@ on:
           - "TSM-014: tsm_014_qqq_divergence_band"
           - "TSM-015: tsm_015_aapl_divergence_rs"
           - "TSM-016: tsm_016_bb_width_regime_gate"
+          - "TSM-017: tsm_017_earnings_exclusion"
           - "IWM-001: iwm_001_rsi2_reversal"
           - "IWM-002: iwm_002_pullback_wr"
           - "IWM-003: iwm_003_rsi2_optimized"
