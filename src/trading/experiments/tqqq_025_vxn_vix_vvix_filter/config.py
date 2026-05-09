@@ -99,9 +99,17 @@ class TQQQ025Config(TQQQ018Config):
     # VXN/VIX cross-index divergence FLOOR（TQQQ-025 新增維度 1）
     vxn_ticker: str = "^VXN"
     vix_ticker: str = "^VIX"
-    use_vxn_vix_filter: bool = True
+    # Att1: use_vxn_vix_filter=True, min_ratio=1.10 (VVIX off)
+    #   → min(A,B)† 1.21 PARTIAL — Part B 純化 std=0 但 A/B cum gap 40% > 30%
+    # Att2 ★: use_vxn_vix_filter=True + use_vvix_direction_filter=True
+    #   → 雙 Part std=0 全勝, A/B cum gap 29.7% < 30% ✓ SUCCESS (saved as default)
+    # Att3 (ablation): use_vxn_vix_filter=False, VVIX-only
+    #   → Part A 9W std=0 (VVIX 過濾 2021-09-28 SL ✓) / Part B 6 訊號 5W/1L
+    #   2025-03-06 SL 殘存 (VVIX_5d=+6.03 不被 -5 FLOOR 過濾) Sharpe 0.80 TIE baseline
+    #   → 驗證雙維度正交：VXN/VIX 為 Part B SL 必要過濾器，VVIX 為 Part A SL 必要過濾器
+    use_vxn_vix_filter: bool = True  # Att2 ★ default
     # 訊號日 ^VXN / ^VIX 比率必須 >= min_vxn_vix_ratio（過濾 tech 並未跑輸大盤的訊號）
-    min_vxn_vix_ratio: float = 1.10  # Att1/Att2 default
+    min_vxn_vix_ratio: float = 1.10
 
     # VVIX direction FLOOR（TQQQ-025 新增維度 2）
     vvix_ticker: str = "^VVIX"
