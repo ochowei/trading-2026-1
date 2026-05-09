@@ -1,6 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-05-09
+  last_validated: 2026-05-10
   data_through: 2025-12-31
+  note_2026_05_10_tsm020: TSM-020 added 2026-05-10 (TSM-SOXX 20d Cross-Asset Divergence CEILING Regime-Gated RS Momentum Pullback, **repo 首次「sector-internal anchor」變體於任何資產 — SOXX iShares Semiconductor ETF 為 TSM ~9% 權重 sector ETF（vs SMH ~12% 用於 entry RS trigger / QQQ TSM ~0% 直接權重 broad-market anchor / AAPL 主要客戶 anchor）**, cross-strategy port from TSM-013 (TSM-QQQ broad-market CEILING) — 直接回應 TSM-019 AI_CONTEXT 列出之未驗證方向 (a) SOXX 半導體指數 anchor). Three iterations all REJECT/TIE vs TSM-011 Att3 min 0.83. **Att1 PARTIAL** (max_relative_return_soxx=+0.10 loose ceiling) Part A **8/87.5% WR/Sharpe 1.23** cum +59.23% MDD -7.79%（vs baseline 12/83.3%/0.86/+74.10%, **+43% Sharpe / +4.2pp WR / -20% cum**）/ Part B **10/80%/Sharpe 0.83 cum +59.78% 完全 unchanged**（filter 對 Part B 完全非綁定，Part B 全部 10 訊號 TSM-SOXX 20d_div < +10% 通過 ceiling）/ min(A,B) **0.83 TIE baseline**（Part B binding，2024-07-16 SL + 2024-11-04 SL 之 TSM-SOXX 20d_div 皆 < +10%）/ A/B 年化 cum 11.85%/yr vs 26.4%/yr → gap **55% > 30% target ❌** / A/B 年化訊號比 1.6:5.0 = gap 68% > 50% ❌；**Att2 REJECT** (max_relative_return_soxx=+0.05 tight ceiling) Part A **0 signals 結構性過濾**（TSM-SMH RS ≥ +5% 進場條件下 TSM-SOXX 20d_div 結構性 > +5%，因 SMH TSM ~12% 權重對 TSM 漲幅吸收較多使 TSM-SMH < TSM-SOXX 自然關係）/ Part B 2 signals 1W/1L Sharpe **0.06** cum +0.34%（嚴重退化，cooldown chain shift 引入新 trade pattern）/ min(A,B) **0.06 REJECT**（-93% vs baseline 0.83）；**Att3 REJECT** (max_relative_return_soxx=+0.07 medium ceiling 甜蜜點探尋) Part A 4/75.0%/Sharpe **1.06** cum +21.83% MDD -6.73%（**Part A 訊號 12→4 過嚴流失 8 訊號 cum -71%**）/ Part B 5/80%/Sharpe **0.83** cum +26.40% MDD -10.23%（**Part B 訊號 10→5，A/B 年化 cum 4.37%/yr vs 13.2%/yr → gap 67% > 30% ❌、A/B 年化訊號比 0.8:2.5 = gap 68% > 50% ❌**）/ min(A,B) **0.83 TIE baseline 但雙 acceptance criteria 違反 → REJECT**。**核心失敗發現（lesson #20 v3 family v11 邊界擴展，repo 首次 sector-internal anchor 變體於任何資產）**：(1) **Repo 首次「sector-internal anchor」變體於任何資產**——既有 cross-asset divergence regime gate anchor 類別：(a) broad-market benchmark（QQQ/SPY/EEM, TSM-013 ✗ / TLT-014 ✓ / NVDA-021 ✓）、(b) 主要客戶 single-stock（AAPL, TSM-015 ✗）、(c) 同類資產對等（EFA-EEM, EEM-017 ✗）、(d) sub-component anchor（FXI vs EEM, EEM-019 ✗）；TSM-020 加入 (e) sector-ETF anchor（SOXX vs single-stock TSM）為新類別；(2) **TSM-SOXX 維度與 entry RS condition 結構性耦合**——TSM-SMH ≥ +5% RS entry condition 結構性使 TSM-SOXX 20d_div 必然 > +5%（SMH 較 SOXX 對 TSM 吸收效應更強，因 TSM 權重 SMH ~12% > SOXX ~9%），**Att2 +5% threshold 為結構性下界**；sweet spot 介於 +5%（過嚴）與 +10%（loose 不綁定 Part B）之間結構性窄帶 [+7%, +10%]，但於 [+7%, +10%] 區間 Part A SLs 與 Part B SLs 在 TSM-SOXX 維度仍與 winners 分布重疊（同 TSM-013/014 QQQ 維度結論），**單一 sector-ETF 維度結構性無 winner-vs-SL 區分力**；(3) **Part B 2024-07-16 / 2024-11-04 SLs 在 TSM-SOXX 20d_div 維度落於 winners 分布中段**——repo 第 8 次確認 TSM Part B SLs 在「single dimension cross-asset divergence」結構性與 winners 重疊（TSM-013 QQQ / TSM-014 QQQ BAND / TSM-015 AAPL / TSM-016 BB-Width / TSM-017 earnings / TSM-018 ATR BAND / TSM-019 VIX term structure / TSM-020 SOXX，跨 8 維度結構性無解）；(4) **新跨資產規則（lesson #20 v3 family v11 邊界）**：sector-ETF anchor 適用邊界 = 「target stock 為非 sector ETF 大權重成分股（target weight in anchor < 5%）」+「Part A/B SLs 在 sector divergence 維度單向對齊」雙條件；TSM ~9% 權重 SOXX 自我參考稀釋程度可接受但 SLs 在維度內無區分力，違反第二條件；(5) **TSM Part B 0.83 binding constraint 第 8 次結構性無解確認**——TSM-013/014/015/016/017/018/019/020 共 8 次嘗試確認 TSM 為 Sharpe-1.0 結構性難突破資產（已驗證 8 大維度全失敗：QQQ CEILING / QQQ BAND / AAPL anchor / BB-Width / earnings exclusion / ATR BAND / VIX term structure / **SOXX sector anchor**）；剩餘未驗證方向：(a) Multi-customer ensemble (AAPL + MSFT + NVDA voting)，(b) 完全替代 framework (BB Squeeze Breakout / MR / lesson #22 multi-week regime + RS Momentum 組合)，(c) Volume-normalized z-score (rolling z-score 替代 absolute ratio threshold)。TSM 第 20 次實驗、60+ 次嘗試，TSM-011 Att3 仍為 min(A,B) 全域最優。
   note_2026_05_09_tsm019: TSM-019 added 2026-05-09 (VIX Term-Structure (^VIX3M / ^VIX) Regime Gate on RS Momentum Pullback，**repo 首次 VIX term structure 維度（^VIX3M / ^VIX 比率）於任何資產 + lesson #24 family v9 候選 forward-looking IV term structure derivative 維度**, cross-strategy port from existing lesson #24 family LEVEL/DIRECTION variants - 直接回應 TSM-018 AI_CONTEXT 列出之未驗證方向). Three iterations all REJECT/TIE vs TSM-011 Att3 min 0.83. **Att1**（VIX3M/VIX <= 1.15 CEILING lenient）Part A 6/66.7%/Sharpe **0.42** cum +17.44% / Part B 8/75.0%/Sharpe 0.65 cum +36.98% / min(A,B) **0.42 REJECT**（-49% vs baseline）— CEILING 1.15 過濾 deep contango 訊號（Part A winners 多在 1.15-1.24 range 被誤殺：1.168/1.215/1.238/1.174/1.155/1.168/1.190 共 7 winners 過濾），cooldown chain shift 引入 2024-07-11 SL 替換 2024-07-16 SL（淨 SL 不變但時間偏移）。**Att2**（VIX3M/VIX >= 1.115 FLOOR，過濾 Part A SLs 1.106/1.110）Part A **9/88.9% WR/Sharpe 1.11 cum +60.65% MDD -8.42%** (vs baseline 12/83.3%/0.86, **+29% Sharpe / +5.6pp WR / -18% cum 但 MDD 改善**) / Part B **5/80.0%/Sharpe 0.83 cum +26.40%**（**與 baseline 0.83 完全相同**——cooldown chain shift 將 baseline 2024-10-30 SL 過濾後激活 2024-12-27 TP 替換 2024-12-19 TP，淨效果為 5 winners 過濾 + 1 SL 過濾，2024-07-16 SL 仍存活 ratio 1.130 > 1.115）/ min(A,B) **0.83 TIE baseline** / A/B 年化 cum 12.13%/yr vs 13.20%/yr → gap **8.1% < 30% ✓** / A/B 累計差 |60.65-26.40|/60.65 = **56.5% > 30% target ❌**（年化 cum gap 達標但**累計差違反 30% 目標**，因 Part A 5 年期累積 vs Part B 2 年期累積稀釋使絕對累計差超標）/ A/B 訊號比 1.8:2.5 = 1.39:1（gap 28% < 50% ✓）。**Att3**（VIX3M/VIX >= 1.10 FLOOR lenient ablation）Part A 11/72.7%/Sharpe **0.58** cum +44.35%（max consec losses **3**，cooldown chain shift 引入 3 連 SLs）/ Part B 6/66.7%/Sharpe **0.42** cum +17.44% / min(A,B) **0.42 REJECT**（-49% vs baseline）— FLOOR 1.10 對 Part A SLs 1.106/1.110 仍非綁定（1.10 < 1.106/1.110 = 兩 SL 仍存活），同時切除若干 winners 觸發 cooldown chain shift 連鎖負面。**核心失敗發現（lesson #24 family v9 邊界擴展，repo 首次 VIX term structure 於任何資產）**：(1) **Repo 首次 VIX term structure (^VIX3M / ^VIX) 維度於任何資產**——既有 lesson #24 family v1-v8 維度均為 implied vol LEVEL（^VIX/^MOVE/^GVZ/^OVX/^VXN）或 DIRECTION（X 日變化），尚未驗證 term structure（^VIX3M vs ^VIX）；(2) **Att2 partial-success 結構**：trade-level 分析顯示 Part A 2 SLs（2022-11-21 ratio 1.106 / 2022-12-07 ratio 1.110）皆 < 1.115 被乾淨過濾 ✓ 但 cooldown chain shift 引入 2022-11-28 新 SL（chain shift 中性化部分 selectivity，net SL 2→1 改善），Part B 2024-07-16 SL ratio 1.130 > 1.115 結構性逃逸過濾，2024-10-30 SL ratio 1.020 過濾 ✓ 但 cooldown chain shift 引入 2024-12-27 TP 替換原 2024-12-19 TP；(3) **TSM Part A vs Part B SLs 在 VIX3M/VIX 維度結構性反向**：Part A SLs（mid contango 1.106-1.110）vs Part B SLs（雙極端 1.020 + 1.130），單一 FLOOR threshold 結構性無法雙 Part 同步改善——同 TSM-013 (QQQ CEILING) / TSM-014 (QQQ BAND) / TSM-015 (AAPL anchor) / TSM-016 (BB-width) / TSM-017 (earnings) / TSM-018 (ATR BAND) 失敗模式平行；(4) **新跨資產規則（lesson #24 family v9 邊界）**：VIX term structure (^VIX3M / ^VIX) 適用邊界 = 「target 之 SLs 在 term structure 維度為**單向集中分布**（單側極端 contango 或 backwardation）」+「Part A 與 Part B SLs 同向對齊」雙條件；TSM 違反兩條件——SLs 跨 ratio 1.020-1.130 廣泛分布且 Part A/B 反向，term structure 維度結構性無區分力；(5) **TSM Part B 0.83 binding constraint 第 7 次結構性無解確認**——TSM-013/014/015/016/017/018/019 共七次嘗試確認 TSM 為 Sharpe-1.0 結構性難突破資產，剩餘未驗證方向： (a) SOXX 半導體指數 anchor (TSM 為 SOXX 成分股自我參考但仍可試), (b) Multi-customer ensemble (AAPL + MSFT + NVDA voting), (c) 完全替代 framework (BB Squeeze Breakout / MR / lesson #22 multi-week regime + RS Momentum 組合), (d) Volume-normalized z-score (rolling z-score 替代 absolute ratio threshold)。TSM 第 19 次實驗、57+ 次嘗試，TSM-011 Att3 仍為 min(A,B) 全域最優（Att2 為「Part A breakthrough but A/B cum gap 違反 + Part B 不變」第 7 次同模式 partial-success）。
   note_2026_05_09_tsm018: TSM-018 added 2026-05-09 (ATR(5)/ATR(20) BAND Volatility-Acceleration Filter on RS Momentum Pullback，**repo 首次 ATR ratio BAND 變體於 RS Momentum 框架**, cross-strategy port from CIBR-014 / FXI-014 / URA-013 - 直接回應 TSM-017 AI_CONTEXT 列出之未驗證方向 (d) Volatility-Acceleration BAND filter). Three iterations all REJECT vs TSM-011 Att3 min 0.83. **Att1**（atr_ratio ∈ (1.15, 1.40] CIBR-014 直接移植）Part A 6/50.0%/Sharpe **-0.03** cum -2.35% (3 SLs) / Part B 5/80.0%/Sharpe 0.83 cum +26.40% / min(A,B) **-0.03 REJECT**（-104% vs baseline）— BAND 過嚴切除 6 個 Part A 訊號（原 12 → 6），cooldown chain shift（lesson #19）引入 3 個新 SLs（2021-01-22 / 2022-01-13 三筆 ATR ratio 均處於 (1.15, 1.40] 中段）。**Att2**（atr_ratio ∈ (1.00, 1.20] 放寬至 RS Momentum 訊號日典型加速度區間）Part A 4/75.0%/Sharpe **0.65** cum +17.04% / Part B 5/60.0%/Sharpe **0.27** cum +8.74% / min(A,B) **0.27 REJECT**（-67% vs baseline）— Part B 退化嚴重，cooldown chain shift 將原 baseline Part B 兩個 SLs（2024-07-16 / 2024-10-30）替換為 (2024-07-08 / 2024-11-01) 兩個新 SLs，淨效果為 SLs 數量未減反增（baseline 2 → Att2 2，但 winners 5 → 3）。**Att3**（atr_ratio_floor=0.50 非綁定 + ceiling 1.10 CEILING-only 過濾 in-crash acceleration）Part A 6/66.7%/Sharpe **0.65** cum +24.63% / Part B 6/83.3%/Sharpe **0.98** cum +36.52%（**Part B +18% vs baseline 0.83**）/ min(A,B) **0.65 REJECT**（-22% vs baseline）— Part B 改善，但 Part A 退化至 0.65（-24%）；A/B 累計差 32.6% > 30% target ❌。**核心失敗發現（lesson #15 family v3 cross-strategy 邊界擴展，repo 首次 ATR BAND 於 RS Momentum 框架）**：(1) **Repo 首次 ATR ratio BAND 於 RS Momentum 框架失敗**——既有成功案例 CIBR-014 / FXI-014 / URA-013 皆為 MR 框架（capitulation 訊號日 ATR 結構性高 1.15+），TSM RS Momentum Pullback 訊號日為「上升趨勢中淺回檔」ATR ratio 集中於 1.0-1.15 較窄帶，BAND 無區分力；(2) **Part A/B SLs 在 ATR ratio 維度反向**：Part A SLs（2021-01 / 2022-01 / 2023-01 macro shock 拉回）ATR ratio 高（>1.15），Part B SLs（2024-07-16 / 2024-10-30 earnings/macro pullback）ATR ratio 1.10-1.20 中段，**單一 BAND 結構性無法雙 Part 同步改善**——同 TSM-013/014/015/016/017 失敗模式平行；(3) **lesson #19 cooldown chain shift 在 RS Momentum + ATR BAND 組合下結構性放大反向選擇**——Att2 過濾 baseline 兩個 Part B SLs 但 chain shift 引入兩個新 SLs，淨效果零改善；(4) **TSM Part B 0.83 binding constraint 第 6 次結構性無解確認**——TSM-013/014/015/016/017/018 共六次嘗試確認 TSM 為 Sharpe-1.0 結構性難突破資產，未來方向應為 (a) SOXX 半導體指數 anchor, (b) Multi-customer ensemble (AAPL + MSFT + NVDA voting), (c) 完全替代 framework, (d) Volume-normalized z-score（vs absolute ratio threshold）。TSM 第 18 次實驗、54+ 次嘗試，TSM-011 Att3 仍為 min(A,B) 全域最優。
   note_2026_05_09_tsm017: TSM-017 added 2026-05-09 (Earnings-Date Exclusion Filter on RS Momentum Pullback，**repo 首次 earnings-date calendar exclusion filter 於任何資產**, 直接回應 TSM-016 Att3 失敗報告 earnings-week SL cluster 假說 + AI_CONTEXT 列出之未驗證方向). Three iterations all REJECT vs TSM-011 Att3 min 0.83. **Att1**（asymmetric -10/+15 calendar days，25 日總窗口）Part A 7/71.4%/Sharpe **0.42** cum +19.28%（Part A -51% Sharpe）/ Part B 6/83.3%/Sharpe **0.98** cum +36.52%（**Part B +18% Sharpe**）/ min **0.42 REJECT**（-49% vs baseline）— 過寬窗口切除 5 個 Part A 訊號，Part B 過濾 2024-07-16 + 2024-10-30 兩 SLs 但 cooldown chain shift 引入 2024-11-04 SL（+18d post Q3，超出 +15 窗口）。**Att2**（bilateral ±5 calendar days，11 日窗口）Part A 10/80.0%/Sharpe **0.71** cum +49.26%（-17% vs baseline）/ Part B 7/85.7%/Sharpe **1.11** cum +47.44%（**+34% vs baseline 0.83**）/ min **0.71 REJECT**（-14% vs baseline）— 2024-07-16 SL 過濾後激活 2024-06-27 TP（淨 +1 winner Part B），但 2024-10-30 SL 替換為 2024-10-23 SL（同樣 SL，淨 wash）。**Att3**（bilateral ±2 calendar days，5 日窗口，最緊邊界）Part A 11/81.8%/Sharpe **0.78** cum +61.20%（-9% vs baseline）/ Part B 7/85.7%/Sharpe **1.11** cum +47.44%（同 Att2，+34% vs baseline）/ min **0.78 REJECT**（-6% vs baseline）— Part A 僅損失 1 訊號（最佳保留），但 A/B 年化幾何 cum 差 |10.0%-21.4%|/21.4% = **53% > 30% target ❌**（Part B 受限於 2 年 sample 高度集中於 2024-2025 bull regime 使年化稀釋）。**核心失敗發現（lesson #20b 失敗家族擴展，repo 首次 earnings-date exclusion filter 於任何資產）**：(1) **時間維度 filter 與價格/成交量 filter 正交但仍受日期重疊限制**——TSM Part B 殘餘 SLs（2024-07-16 -2d / 2024-10-30 +13d）與 winners（2024-04-16 -2d / 2025-01-13 -3d / 2023-01-19 +7d）在 earnings-relative 日期維度結構性重疊，**不存在單一窗口配置同時過濾全部 SLs 並保留全部 winners**：對稱 ±2 過濾 2024-07-16 SL ✓ 與 2024-04-16 winner ✗（1:1 wash）；非對稱 -2/+14 過濾兩 SLs ✓ 但同時誤殺兩 winners ✗（2:2 wash）；後置 only +14 過濾 2024-10-30 SL ✓ 但誤殺 2023-01-19 winner ✗（1:1 wash）。(2) **Part A 退化機制**：Part A 包含多個 earnings-adjacent winners（2020-2023 期間半導體 cycle 拉抬 + earnings momentum continuation），任何時間窗口擴大皆切除 Part A winners 多於 Part A SLs（baseline Part A 只有 2 SLs，2022-11-21 / 2022-12-07 均不在 earnings 附近）。(3) **Part B 改善 +34% 為「earnings-week SL cluster」確認**——TSM-016 Att3 假設成立：Part B SLs 集中於 earnings ±15 日帶；但同時 Part B winners（2024-04-16 / 2025-01-13）亦集中於 earnings 前 2-3 日，**winner/SL 在時間維度為共生分布**而非可分離 cluster。(4) **新跨資產規則（lesson #6 邊界 + lesson #20b 擴展）**：earnings-date exclusion filter 適用邊界 = 「target 之 earnings-adjacent 訊號分布 winner-SL 比例顯著高於 non-earnings 訊號分布」。TSM 違反該條件——半導體個股 earnings momentum 與 earnings risk 兩股力量平衡。預期適用候選：fundamentals-driven 個股（financial / consumer / healthcare），earnings 為 dominant catalyst 使 winner/SL 比例顯著偏移；不適用於：cyclical individual stocks（半導體 / energy / commodity）earnings 為次要 catalyst。(5) **TSM Part B 0.83 binding constraint 第 5 次結構性無解確認**——TSM-013/014/015/016/017 共五次嘗試確認 TSM 為 Sharpe-1.0 結構性難突破資產，未來方向應為 (a) SOXX 半導體指數 anchor（注意 TSM 為成分股自我參考）, (b) Multi-customer ensemble (AAPL + MSFT + NVDA voting), (c) 完全替代 framework（lesson #22 multi-week regime + RS Momentum 組合），(d) Volatility-Acceleration BAND filter（CIBR-014/FXI-014 路徑）。TSM 第 17 次實驗、51+ 次嘗試，TSM-011 Att3 仍為 min(A,B) 全域最優。
@@ -24,7 +25,14 @@
 
 **前任最佳：** TSM-008（RS 出場優化：同 TSM-007 進場，TP+8%/SL-7%/25天）— Part A Sharpe 0.79/Part B 0.83，min(A,B) 0.79，A/B 訊號數 12/10，A/B gap 0.04（極佳平衡）
 
-**最新實驗：** TSM-019（VIX Term-Structure (^VIX3M / ^VIX) Regime Gate on RS Momentum Pullback：**repo 首次 VIX term structure 維度（^VIX3M / ^VIX 比率）於任何資產 + lesson #24 family v9 候選 forward-looking IV term structure derivative 維度**，直接回應 TSM-018 AI_CONTEXT 列出之未驗證方向）— **三次迭代 Att2 PARTIAL（Part A breakthrough min 0.83 TIE baseline 但 A/B 累計差 56.5% 違反 30% target）**。
+**最新實驗：** TSM-020（TSM-SOXX 20d Cross-Asset Divergence CEILING Regime-Gated RS Momentum Pullback：**repo 首次「sector-internal anchor」變體於任何資產 — SOXX iShares Semiconductor ETF 為 TSM ~9% 權重 sector ETF**，直接回應 TSM-019 AI_CONTEXT 列出之未驗證方向 (a) SOXX 半導體指數 anchor）— **三次迭代全部 REJECT/TIE vs TSM-011 Att3 min 0.83**。
+- **Att1 PARTIAL**（max_relative_return_soxx=+0.10 loose ceiling）：Part A **8/87.5% WR/Sharpe 1.23** cum +59.23% MDD -7.79%（vs baseline 12/83.3%/0.86，**+43% Sharpe / +4.2pp WR**）/ Part B **10/80%/Sharpe 0.83 cum +59.78% 完全 unchanged**（filter 對 Part B 完全非綁定）/ min(A,B) **0.83 TIE baseline**（Part B binding，2024-07-16 SL + 2024-11-04 SL 之 TSM-SOXX 20d_div 皆 < +10%）/ A/B 年化 cum 11.85%/yr vs 26.4%/yr → gap **55% > 30% target ❌** / A/B 年化訊號比 1.6:5.0 = gap **68% > 50% ❌**
+- Att2（max_relative_return_soxx=+0.05 tight ceiling）：min(A,B) **0.06 REJECT**（-93% vs baseline）— Part A **0 訊號 結構性過濾**（TSM-SMH RS ≥ +5% 進場條件下 TSM-SOXX 20d_div 結構性 > +5%，因 SMH TSM ~12% 權重對 TSM 漲幅吸收較多使 TSM-SMH < TSM-SOXX）/ Part B 2/1W1L/Sharpe 0.06（嚴重退化）
+- Att3（max_relative_return_soxx=+0.07 medium ceiling 甜蜜點探尋）：min(A,B) **0.83 TIE baseline 但雙 acceptance criteria 違反 → REJECT**。Part A 4/75.0%/Sharpe 1.06 cum +21.83%（Part A 訊號 12→4 過嚴流失 8 訊號）/ Part B 5/80%/Sharpe 0.83 cum +26.40%（Part B 訊號 10→5 -50%）/ A/B 年化 cum 4.37%/yr vs 13.2%/yr → gap **67% > 30% ❌** / A/B 年化訊號比 0.8:2.5 = gap **68% > 50% ❌**
+- **核心失敗發現（lesson #20 v3 family v11 邊界擴展，repo 首次 sector-internal anchor 變體於任何資產）**：(1) **Repo 首次「sector-internal anchor」變體**——既有 cross-asset divergence anchor 類別五大類（broad-market / 主要客戶 / 同類資產對等 / sub-component / sector-ETF）皆已驗證；(2) **TSM-SOXX 維度與 entry RS condition 結構性耦合**——TSM-SMH RS ≥ +5% entry condition 結構性使 TSM-SOXX 20d_div 必然 > +5%（SMH TSM ~12% > SOXX ~9% 權重），sweet spot 區間 [+7%, +10%] 結構性窄帶，但於該區間 SLs 與 winners 在 TSM-SOXX 維度仍重疊；(3) **Part B 2024-07-16 / 2024-11-04 SLs 在 TSM-SOXX 維度落於 winners 分布中段**——repo 第 8 次確認 TSM Part B SLs 在「single dimension cross-asset divergence」結構性與 winners 重疊（跨 8 維度 QQQ/QQQ-BAND/AAPL/BB-Width/earnings/ATR-BAND/VIX-term-structure/SOXX 結構性無解）
+- **TSM Part B 0.83 binding constraint 第 8 次結構性無解確認**（TSM-013/014/015/016/017/018/019/020 共八次嘗試）：剩餘未驗證方向 (a) Multi-customer ensemble (AAPL + MSFT + NVDA voting), (b) 完全替代 framework (BB Squeeze Breakout / MR / lesson #22 multi-week regime + RS Momentum 組合), (c) Volume-normalized z-score (rolling z-score 替代 absolute ratio threshold)
+
+**前次實驗：** TSM-019（VIX Term-Structure (^VIX3M / ^VIX) Regime Gate on RS Momentum Pullback：**repo 首次 VIX term structure 維度（^VIX3M / ^VIX 比率）於任何資產 + lesson #24 family v9 候選 forward-looking IV term structure derivative 維度**，直接回應 TSM-018 AI_CONTEXT 列出之未驗證方向）— **三次迭代 Att2 PARTIAL（Part A breakthrough min 0.83 TIE baseline 但 A/B 累計差 56.5% 違反 30% target）**。
 - Att1（VIX3M/VIX <= 1.15 CEILING lenient）：min(A,B) **0.42 REJECT**（-49% vs baseline）— Part A 6/66.7%/0.42 cum +17.44% / Part B 8/75.0%/0.65 cum +36.98%。CEILING 1.15 過度過濾 Part A winners（1.15-1.24 deep contango range 含 7 winners）+ cooldown chain shift 將 2024-07-16 SL 替換為 2024-07-11 SL（淨 SL 不變但時間偏移）
 - **Att2 ★ PARTIAL**（VIX3M/VIX >= 1.115 FLOOR，過濾 Part A SLs ratio 1.106/1.110）：Part A 9/**88.9% WR/Sharpe 1.11** cum +60.65% MDD -8.42%（vs baseline 12/83.3%/0.86，**+29% Sharpe / +5.6pp WR**）/ Part B 5/80.0%/Sharpe **0.83** cum +26.40%（**與 baseline 0.83 完全相同**）/ min(A,B) **0.83 TIE baseline** / A/B 年化 cum 12.13%/yr vs 13.20%/yr → gap **8.1% < 30% ✓** / **A/B 累計差 56.5% > 30% target ❌**（Part A 5 年期累積 vs Part B 2 年期累積稀釋）/ A/B 訊號比 1.39:1（gap 28% < 50% ✓）。FLOOR 1.115 乾淨過濾 Part A 2 SLs（2022-11-21 / 2022-12-07）但 cooldown chain shift 引入 2022-11-28 新 SL（淨 SL 2→1）；Part B 2024-10-30 SL（1.020）過濾 ✓ 但 2024-07-16 SL（1.130 > 1.115）結構性逃逸
 - Att3（VIX3M/VIX >= 1.10 FLOOR lenient ablation）：min(A,B) **0.42 REJECT**（-49% vs baseline）— Part A 11/72.7%/0.58 cum +44.35%（**max consec losses 3**，cooldown chain shift 引入 3 連 SLs）/ Part B 6/66.7%/0.42 cum +17.44%。FLOOR 1.10 對 Part A SLs 1.106/1.110 仍非綁定（兩 SL 仍存活）+ 切除若干 winners 觸發 cooldown chain shift 連鎖負面
@@ -1499,7 +1507,93 @@ TSM-019 三次迭代 Att1/Att3 REJECT、Att2 PARTIAL（Part A 突破 +29% Sharpe
 - ~~Volume Confirmation Filter~~（TSM-012 三次失敗）
 - ~~Cross-Asset Divergence (QQQ/AAPL anchor)~~（TSM-013/014/015 三次失敗）
 - ~~BB-Width Regime Gate~~（TSM-016 PARTIAL 但 A/B cum gap 違反）
+- ~~Sector-internal anchor (SOXX)~~（TSM-020 三次嘗試 Att1 PARTIAL TIE baseline 但 A/B cum/signal gap 雙違反）
 
 TSM 第 19 次實驗、57+ 次嘗試。
 
 TSM 第 18 次實驗、54+ 次嘗試。
+
+---
+
+## TSM-020: TSM-SOXX Cross-Asset Divergence CEILING Regime-Gated RS Momentum Pullback (3 次嘗試全部 REJECT/TIE)
+
+**目標**：直接回應 TSM-019 AI_CONTEXT 列出之未驗證方向 (a) SOXX 半導體指數 anchor，將 sector-internal divergence regime gate 加入 TSM-011 Att3 RS Momentum Pullback + 5d ceiling 框架。**Repo 首次「sector-internal anchor」變體於任何資產**——既有 cross-asset divergence regime gate anchor 類別五大類已驗證：(a) broad-market benchmark（QQQ/SPY/EEM）、(b) 主要客戶 single-stock（AAPL）、(c) 同類資產對等（EFA-EEM）、(d) sub-component anchor（FXI vs EEM）；TSM-020 加入 (e) sector-ETF anchor（SOXX vs single-stock TSM）為新類別。
+
+### 設計理念
+
+SOXX iShares Semiconductor ETF 為 TSM ~9% 權重的 sector ETF（vs SMH ~12% 權重作為 entry RS trigger / QQQ TSM ~0% 直接權重 broad-market anchor / AAPL 主要客戶 anchor）。SOXX 較 SMH 為更分散的半導體 sector 籃（top 10 holdings ~60% 權重 vs SMH ~75%），預期提供「TSM vs 半導體 sector internal positioning」維度。
+
+**核心假設**：當 TSM 過去 20 日報酬顯著超越 SOXX，TSM 已脫離 broad semi-sector regime 進入 stock-specific rally exhaustion 狀態，RS momentum 訊號品質下降。
+
+**Trade-level 預分析**（TSM-011 baseline 22 訊號 TSM-SOXX 20d_div 分布）：
+- TSM-SMH RS ≥ +5% entry condition 結構性使 TSM-SOXX 20d_div 必然 > +5%（SMH TSM ~12% > SOXX ~9% 權重，SMH 對 TSM 漲幅吸收較多 → TSM-SMH < TSM-SOXX 自然關係）
+- 訊號分布大致集中於 [+5%, +15%] 區間
+- Part B SLs（2024-07-16, 2024-11-04）TSM-SOXX 20d_div < +10% 落於 winners 分布中段
+
+### 進場條件（沿用 TSM-011 Att3 + 新增第 6 條）
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| 1 | 相對強度 | TSM 20日報酬 - SMH 20日報酬 ≥ 5% | 板塊內超額表現 |
+| 2 | 短期回調 | 5日高點回撤 3-7% | 暫時整理 |
+| 3 | 趨勢確認 | Close > SMA(50) | 上升趨勢 |
+| 4 | 5d return CEILING | 訊號日 5 日報酬 ≤ +10.5% | rally exhaustion 過濾 |
+| **6** | **TSM-SOXX divergence CEILING** | **TSM 20日 - SOXX 20日 ≤ max_relative_return_soxx** | **sector-internal rally exhaustion regime gate** |
+| 冷卻 | 訊號間隔 | ≥ 10 交易日 | 避免重複訊號 |
+
+### 三次迭代結果
+
+| 指標 | TSM-011 Att3 (baseline) | Att1 CEIL≤+0.10 | Att2 CEIL≤+0.05 | Att3 CEIL≤+0.07 |
+|------|-------------------------|------------------|------------------|------------------|
+| **Part A Sharpe** | 0.86 | **1.23 (+43%)** | 0.00 (over-filter) | 1.06 (+23%) |
+| **Part B Sharpe** | 0.83 | **0.83 (=)** | 0.06 (-93%) | 0.83 (=) |
+| **min(A,B)** | **0.83** | **0.83 TIE** | 0.06 REJECT | **0.83 TIE** |
+| Part A 訊號數 | 12 | 8 | **0 (結構性過濾)** | 4 |
+| Part B 訊號數 | 10 | 10 | 2 | 5 |
+| Part A WR | 83.3% | **87.5%** | n/a | 75.0% |
+| Part B WR | 80.0% | 80.0% | 50.0% | 80.0% |
+| Part A cum | +74.10% | +59.23% | n/a | +21.83% |
+| Part B cum | +59.78% | +59.78% | +0.34% | +26.40% |
+| Part A MDD | -7.89% | -7.79% | n/a | -6.73% |
+| A/B 年化 cum gap | 19.3% | **55% > 30% ❌** | n/a | **67% > 30% ❌** |
+| A/B 年化訊號比 | 1.2:1 | 0.32:1 (gap 68% ❌) | n/a | 0.32:1 (gap 68% ❌) |
+
+**Att1 為三次中最佳結構但僅 TIE baseline**，A/B 累計差與訊號比雙違反。
+
+### Att1 PARTIAL 分析（CEILING ≤ +0.10）
+
+- Part A 從 12 訊號過濾至 8（移除 4 訊號），WR 83.3% → 87.5%（+4.2pp），Sharpe 0.86 → **1.23**（+43% 改善）
+- Part B 完全 unchanged：所有 10 訊號 TSM-SOXX 20d_div < +10% 通過 ceiling
+- Part B 殘餘 2 SLs（2024-07-16 / 2024-11-04）TSM-SOXX 20d_div 落於 winners 分布中段，CEILING +10% 對 Part B 完全非綁定
+- A/B 年化 cum 差 55%（vs baseline 19.3%）違反 30% target；A/B 年化訊號比 0.32:1 違反 50% target
+- **與 TSM-013 Att1 (QQQ +15%) 結構性平行**：repo 第 4 次「Part A breakthrough but Part B unchanged」失敗模式（TSM-013 / TSM-016 / TSM-019 / TSM-020）
+
+### Att2 REJECT 分析（CEILING ≤ +0.05）
+
+- Part A 0 訊號 — TSM-SMH RS ≥ +5% entry condition 結構性使 TSM-SOXX 20d_div 必然 > +5%（SMH TSM ~12% > SOXX ~9% 權重，SMH 對 TSM 漲幅吸收較多）
+- +5% 為結構性下界，CEILING +5% 與 entry RS condition 互斥
+- Part B 2 訊號 1W/1L Sharpe 0.06（cooldown chain shift 引入新 trade pattern）
+
+### Att3 REJECT 分析（CEILING ≤ +0.07）
+
+- Part A 訊號 12→4（過嚴流失 8 訊號 cum -71%），但 Sharpe 1.06 局部改善
+- Part B 訊號 10→5（-50%），Sharpe 0.83 unchanged（5 訊號縮放後比例保持）
+- A/B 年化 cum gap 67% 與訊號比 gap 68% 雙違反 acceptance criteria
+- **+7% 為 sweet spot 探尋失敗確認**：[+5%, +10%] 區間內 SLs 與 winners 在 TSM-SOXX 維度結構性重疊，無單一 threshold 可選擇性過濾 SLs
+
+### 核心失敗發現（lesson #20 v3 family v11 邊界擴展，repo 首次 sector-internal anchor 變體）
+
+1. **Repo 首次「sector-internal anchor」變體於任何資產**——cross-asset divergence regime gate anchor 五大類驗證完整：broad-market（QQQ/SPY/EEM）、major-customer（AAPL）、broad-vs-broad（EFA）、broad-vs-sub-component（EEM-FXI）、**sub-component-vs-sector（TSM-SOXX）**
+2. **TSM-SOXX 維度與 entry RS condition 結構性耦合**——TSM-SMH RS ≥ +5% entry condition 結構性使 TSM-SOXX 20d_div 必然 > +5%，sweet spot 區間 [+7%, +10%] 為結構性窄帶，但於該區間 SLs 與 winners 重疊
+3. **Part B 2024-07-16 / 2024-11-04 SLs 在 TSM-SOXX 20d_div 維度落於 winners 分布中段**——repo 第 8 次確認 TSM Part B SLs 在「single dimension cross-asset divergence」結構性與 winners 重疊（跨 8 維度 QQQ/QQQ-BAND/AAPL/BB-Width/earnings/ATR-BAND/VIX-term-structure/SOXX 結構性無解）
+4. **新跨資產規則（lesson #20 v3 family v11 邊界）**：sector-ETF anchor 適用邊界 = 「target stock 為非 sector ETF 大權重成分股（target weight in anchor < 5%）」+「Part A/B SLs 在 sector divergence 維度單向對齊」雙條件；TSM ~9% 權重 SOXX 雖自我參考稀釋程度可接受，但 SLs 在維度內無區分力，違反第二條件
+5. **TSM Part B 0.83 binding constraint 第 8 次結構性無解確認**——TSM-013/014/015/016/017/018/019/020 共 8 次嘗試確認 TSM 為 Sharpe-1.0 結構性難突破資產
+
+### 候選未驗證方向（剩餘三項）
+
+- (a) **Multi-customer ensemble** (AAPL + MSFT + NVDA voting) — 多客戶 anchor stack，需 anchor 維度兩兩具獨立 selectivity
+- (b) **完全替代 framework**（BB Squeeze Breakout / MR / lesson #22 multi-week regime + RS Momentum 組合）— 跳脫 RS Momentum Pullback 結構
+- (c) **Volume-normalized z-score** (rolling z-score 替代 absolute ratio threshold) — 解決 A/B regime asymmetry
+
+TSM 第 20 次實驗、60+ 次嘗試。
+
