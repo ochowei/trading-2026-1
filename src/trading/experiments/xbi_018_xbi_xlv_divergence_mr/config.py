@@ -119,11 +119,13 @@ class XBI018Config(ExperimentConfig):
     rs_lookback_long: int = 60
     max_rs_excess_long: float = 0.05  # 60d: XBI - XLV <= +5%
     # 維度開關：
-    #   Att1：use_short=True,  use_long=False
+    #   Att1（REJECT min 0.52）：use_short=True,  use_long=False
+    #     20d/+3% NVDA-021 港，過濾 winners 但 1 Part B SL 殘留
     #   Att2：use_short=False, use_long=True
+    #     60d/+5% INDA-012 港，測試中長期 outperformance 維度
     #   Att3：use_short=True,  use_long=True  （AND combo, EWT-010 移植）
-    use_rs_short: bool = True
-    use_rs_long: bool = False
+    use_rs_short: bool = False
+    use_rs_long: bool = True
 
     cooldown_days: int = 10
 
