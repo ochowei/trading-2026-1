@@ -30,6 +30,7 @@ on:
           - "TQQQ-019: tqqq_019_vix_direction_mr"
           - "TQQQ-020: tqqq_020_vix_peak_passing_mr"
           - "TQQQ-021: tqqq_021_move_regime_gate"
+          - "TQQQ-022: tqqq_022_qqq_spy_divergence_cap"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
