@@ -110,11 +110,14 @@ class TSLA018Config(ExperimentConfig):
     # ticker: ICE US Dollar Index spot via Yahoo finance "DX-Y.NYB"
     # lookback: 5 日（GLD-016 / COPX-016 sweet spot 一致；5d > 10d selectivity）
     # max_dxy_change: DXY N 日變化必須 <= 此值
-    # Att1 (max=+0.020): TIE baseline，全 15 訊號 DXY 5d ≤ +2.0% non-binding
-    # Att2 (max=+0.010): 收緊測試 TSLA SLs 是否集中於中度 USD 強勢期
+    # Att1 (max=+0.020, 5d): TIE baseline，全 15 訊號 DXY 5d ≤ +2.0% non-binding
+    # Att2 (max=+0.010, 5d): REJECT min 0.77 — reverse selection 移除 2025-05-12
+    #   winner 但保留 2024-09-23 SL（USD weakening 期間發生）
+    # Att3 (max=+0.025, 10d): 替代窗口測試（5d → 10d），驗證更長 lookback 是否
+    #   能捕捉 sustained USD-weakening regime（2024-09-23 SL 之 DXY 10d 預期負向）
     dxy_ticker: str = "DX-Y.NYB"
-    dxy_lookback: int = 5
-    max_dxy_change: float = 0.010
+    dxy_lookback: int = 10
+    max_dxy_change: float = 0.025
 
 
 def create_default_config() -> TSLA018Config:
