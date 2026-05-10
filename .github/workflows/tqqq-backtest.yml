@@ -353,6 +353,7 @@ on:
           - "COPX-016: copx_016_dxy_direction_breakout"
           - "COPX-017: copx_017_yield_curve_slope_mr"
           - "COPX-018: copx_018_volume_confirmed_mr"
+          - "COPX-019: copx_019_copper_direction_mr"
           - "URA-001: ura_001_pullback_wr"
           - "URA-002: ura_002_asymmetric_narrow"
           - "URA-003: ura_003_pullback_rsi2"
