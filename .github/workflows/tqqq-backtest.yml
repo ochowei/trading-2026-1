@@ -307,6 +307,7 @@ on:
           - "XBI-016: xbi_016_macro_confirmed_mr"
           - "XBI-017: xbi_017_vix_bands_mr"
           - "XBI-018: xbi_018_xbi_xlv_divergence_mr"
+          - "XBI-019: xbi_019_xlv_trend_mr"
           - "XLU-001: xlu_001_pullback_wr_reversal"
           - "XLU-002: xlu_002_capped_pullback_wr"
           - "XLU-003: xlu_003_tight_pullback_wr"
