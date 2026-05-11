@@ -1,0 +1,56 @@
+"""
+EEM-016: DXY Direction Filter on Vol-Transition MR Strategy
+
+延伸 EEM-014 Att2 框架，新增「DXY direction filter」（USD 強弱 regime gate）。
+出場使用固定 TP/SL，成交模型採用隔日開盤市價進場。
+"""
+
+from trading.core.base_config import ExperimentConfig
+from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.execution_strategy import ExecutionModelStrategy
+from trading.experiments.eem_016_dxy_direction_mr.config import (
+    EEM016Config,
+    create_default_config,
+)
+from trading.experiments.eem_016_dxy_direction_mr.signal_detector import (
+    EEM016DXYDirectionDetector,
+)
+
+
+class EEM016Strategy(ExecutionModelStrategy):
+    """EEM-016: DXY Direction-Gated Vol-Transition MR"""
+
+    slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+
+    def create_config(self) -> ExperimentConfig:
+        return create_default_config()
+
+    def create_detector(self) -> BaseSignalDetector:
+        return EEM016DXYDirectionDetector(create_default_config())
+
+    def _print_strategy_params(self, config: ExperimentConfig) -> None:
+        if isinstance(config, EEM016Config):
+            print(f"  Bollinger Bands: BB({config.bb_period}, {config.bb_std}) 下軌觸及")
+            print(
+                f"  回檔上限: {config.pullback_lookback}日高點回檔"
+                f" >= {config.pullback_cap:.0%}（崩盤隔離）"
+            )
+            print(f"  Williams %R: WR({config.wr_period}) <= {config.wr_threshold}")
+            print(f"  Close Position: >= {config.close_position_threshold:.0%}")
+            print(
+                f"  ATR 過濾: ATR({config.atr_short_period})/ATR({config.atr_long_period})"
+                f" > {config.atr_ratio_threshold}"
+            )
+            print(f"  2 日報酬下限: <= {config.twoday_return_floor:.2%}（同 EEM-014 Att2 甜蜜點）")
+            if config.filter_mode == "max":
+                print(
+                    f"  DXY 方向 (cap): {config.dxy_lookback}日報酬"
+                    f" <= {config.max_dxy_change:.2%}（{config.dxy_ticker}）"
+                )
+            else:
+                print(
+                    f"  DXY 方向 (floor): {config.dxy_lookback}日報酬"
+                    f" >= {config.min_dxy_change:.2%}（{config.dxy_ticker}）"
+                )
+            print(f"  冷卻天數 (Cooldown): {config.cooldown_days} 天")
+        super()._print_strategy_params(config)

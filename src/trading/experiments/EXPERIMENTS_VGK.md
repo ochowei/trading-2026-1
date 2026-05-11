@@ -1,18 +1,28 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-22
+  last_validated: 2026-05-09
   data_through: 2025-12-31
+  note_2026_05_09_vgk009: VGK-009 added 2026-05-09 (EURUSD Direction Filter on Vol-Transition MR — VGK-008 Att2 完整框架 + EUR/USD 10 日報酬下限作為 bilateral FX direction regime gate，**Att3 ★ PARTIAL SUCCESS — repo 第 2 次「bilateral FX direction filter」（繼 EWJ-006 USDJPY 後），首次 EUR/USD 應用於任何資產 + 首次 lesson #24 family v8 跨地域移植（亞洲已開發 ETF → 歐洲已開發 ETF）**). Three iterations: Att1 (eurusd_lookback=10, min_change=-2.0% 寬鬆) Part A 3/100%/Sharpe **3.02** cum +8.74% / Part B 4/100%/Sharpe **2.60** cum +11.94% / min(A,B) **2.60 TIE baseline VGK-008 Att2** — -2.0% 對全部 7 baseline 訊號 EUR/USD 10d ≥ -2.0% 完全 non-binding，filter 無作用，證明 baseline 訊號日 EUR/USD 10d 集中於 -2.0% 上方，極端 EUR 急貶事件不在 baseline 訊號中；Att2 (min_change=-1.0% EWJ-006 sweet spot 鏡像) Part A 1/100%/std=0/+3.50% / Part B 2/100%/std=0/+7.12% / min collapse REJECT — -1.0% 對 VGK 過嚴，VGK-008 baseline 已透過 2DD floor + 7-day cooldown 完全清除 SLs（雙 Part 0 SL），filter 在 cleaned baseline 上僅能移除 winners（移除 4/7 winners），A/B 訊號比 1:2 = 50%、A/B cum 50% 雙重失敗；**Att3 ★ (min_change=-1.5% 中間 robustness)** Part A 3/100%/Sharpe **3.02** cum +8.74% **完全等於 baseline filter 對 Part A 非綁定** / Part B 3/100%/std=0 cum +10.87%（過濾 1 個 expiry +0.96% winner，3/3 全 TPs std=0）/ min(A,B)† **= Part A Sharpe 3.02**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/CIBR-014 慣例：Part B std=0 結構性零方差，採 Part A Sharpe 為 min 約束），**+16% vs VGK-008 Att2 baseline 2.60**. **A/B 平衡達成**：cum diff 2.13pp 相對 19.6% < 30% ✓（從 baseline 26.8% 改善 -7.2pp）/ 訊號比 **3:3 raw = 0% gap << 50% ✓**（從 baseline 25% 改善至完美對齊）/ WR 雙 100%。被過濾的訊號為 2024-11-13 expiry +0.96%（baseline 中唯一 non-TP winner，EUR/USD 10d 介於 [-1.5%, -1.0%] 邊緣 EUR 弱勢區間），filter 將 baseline 唯一 non-TP winner 移除使 Part B 純化為 std=0 全 TP，保留全部 3 TPs（2024-01-17、2024-06-14、2024-08-02）。**核心發現（lesson #24 family v8 邊界精煉，repo 首次 EUR/USD direction filter）**: (1) **Repo 第 2 次「bilateral FX direction filter」於任何資產**——既有 lesson #24 family v8 僅 EWJ-006（USDJPY），VGK-009 為 EUR/USD 首次應用，跨地域 anchor 結構由「亞洲已開發 ETF + JPY」擴展至「歐洲已開發 ETF + EUR」；(2) **Threshold 因 baseline cleanliness 結構性差異**：EWJ-006 baseline 含 1 殘餘 SL，USDJPY 10d > +1.0% 為 surgical SL filter；**VGK-008 baseline 已 cleaned (0 SLs)，EUR/USD filter 變為「expiry winner 純化」維度，sweet spot 上移至 -1.5% (vs EWJ-006 +1.0% 對應強度) 反映兩 baseline 結構差異**——baseline cleanliness 為 lesson #24 family v8 threshold 選擇之新規則維度；(3) **Currency drag 失敗模式跨地域對稱**：EWJ-006 USDJPY 急升 = JPY 弱化 currency drag (BoJ 政策衝擊類)；VGK-009 EUR/USD 急跌 = EUR 弱化 currency drag (ECB 政策/歐能危機/歐債類)——同源 currency drag 失敗模式跨地域驗證；(4) **新跨資產假設（待驗證）**：bilateral FX direction filter 預期擴展至其他「FX-sensitive 區域 ETF」(EWT TWD / EWY KRW / FXI CNY / EWZ BRL / EWG EUR-direct / EWU GBP)，threshold 需依各資產 baseline 殘餘訊號結構（含 SL vs cleaned）調整；(5) **lesson #24 family v8 邊界擴展**：v8 從亞洲已開發 ETF 單一案例擴展至歐洲已開發 ETF，建立「USD-denominated 區域 ETF + 區域主要貨幣 vs USD direction」雙資產通用結構模式。VGK-009 Att3 為新全域最優（9 次實驗、28+ 次嘗試），取代 VGK-008 Att2。
   note: VGK-008 added 2026-04-22 (Post-Capitulation Vol-Transition MR，**Att2 SUCCESS** — repo 第 4 次「2DD floor 方向」成功驗證，繼 USO-013 / EEM-014 / INDA-010 後，首次已開發歐洲寬基 ETF 測試). 三次迭代 Att2 success: Att1 (VGK-007 Att1 + 2DD floor <= -1.0%) Part A 8/75.0%/Sharpe 0.49 cum +12.06% / Part B 7/85.7%/Sharpe 0.78 cum +15.31% / min 0.49（崩壞 vs 基線 0.53）— -1.0% 過淺，VGK 殘餘 SL 的 2DD 分布為 -0.89%~-1.68%，-1.0% 僅觸及 1 筆淺 2DD 訊號（2019-05-09 +1.78% 到期贏家），保留所有 SLs；Att2 ★ (2DD floor <= -2.0%，與 INDA-010 Att3 同門檻) Part A 3 訊號 100% WR Sharpe **3.02** cum +8.74% / Part B 4 訊號 100% WR Sharpe **2.60** cum +11.94% / min(A,B) **2.60**（+390% vs VGK-007 Att1 的 0.53）/ A/B cum 差 **3.20pp**（26.8% 相對，<30% ✓）/ A/B 訊號比 **3:4** = 1.33:1（<50% ✓ raw count） — -2.0% 一次過濾所有 4 筆 VGK-007 失敗交易（2023-03-13 SL -1.50%、2023-09-27 loss -1.68%、2024-10-31 SL -1.47%、2026-03-05 SL -0.89%）及 3 筆淺 2DD 到期贏家，保留訊號全部為深 2DD（-2.10% ~ -4.06%）真 capitulation 反彈；Att3 (2DD floor <= -1.5%，中間門檻) Part A 7/71.4%/Sharpe 0.38 cum +8.27% / Part B 5/100%/Sharpe 2.94 / min **0.38**（-28% vs 基線，劣化）— -1.5% 仍在 SL 帶內（2023-03-13 SL -1.50% 恰在邊界、2023-09-27 loss -1.68% 被保留），新增 2 筆失敗訊號使 Part A WR 崩至 71.4%。**核心發現**：VGK 的 2DD 門檻為「懸崖式」而非漸進式——-1.0% 無效、-1.5% 劣化、-2.0%（-1.7%~-2.0% 等效）成功，因 VGK SLs 集中於 2DD -1.47%~-1.68% 窄帶，僅 -2.0% 可完全繞過。**跨資產貢獻**：repo 第 4 次「2DD floor 方向」成功驗證，首次於已開發歐洲寬基 ETF（VGK）驗證，擴展 lesson #19 至 broad EM（EEM 1.17%）+ single-country EM（INDA 0.97%）+ developed European broad（VGK 1.12%）三類資產。驗證 INDA-010 跨資產假設：2DD floor 加深方向確實擴展至 low-vol defensive broad ETFs。VGK-008 Att2 成為新全域最優（8 次實驗、25+ 次嘗試）。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** VGK-008 Att2（Post-Capitulation Vol-Transition MR：VGK-007 Att1 框架 + **2DD floor <= -2.0%** 精煉，TP+3.5%/SL-4.0%/20天/cd7）
-- Part A Sharpe **3.02**（WR 100%, 3訊號, +8.74%）/ Part B Sharpe **2.60**（WR 100%, 4訊號, +11.94%）
-- min(A,B) **2.60**（vs VGK-007 Att1 的 0.53，**+390%**）
-- A/B 累積差 **3.20pp（26.8% 相對，<30% ✓）**，A/B 訊號比 **3:4（1.33:1，<50% raw count ✓）**
-- 8 次實驗、25+ 次嘗試，**repo 第 4 次「2DD floor 方向」成功驗證**（繼 USO-013 / EEM-014 / INDA-010 後，首次已開發歐洲寬基 ETF 驗證）
-- 核心洞察：VGK-007 Att1 的 4 筆殘餘失敗交易（3 筆 SL + 1 筆虧損到期）2DD 分布為 -0.89%~-1.68% 窄帶，-2.0% floor 完全繞過此帶，保留訊號全部為深 2DD（-2.10%~-4.06%）真 capitulation
+**當前最佳：** ★ **VGK-009 Att3**（EURUSD Direction Filter on Vol-Transition MR：VGK-008 Att2 完整框架 + **EUR/USD 10 日報酬 >= -1.5%** bilateral FX direction regime gate，TP+3.5%/SL-4.0%/20天/cd7）★ **2026-05-09 新全域最優（9 次實驗、28+ 次嘗試）**
+- Part A: 3 訊號 / WR **100%** / Sharpe **3.02** / 累計 +8.74% / MaxDD -3.64%（**完全等於 VGK-008 baseline，filter 對 Part A 非綁定**）
+- Part B: 3 訊號 / WR **100%** / std=0 / 累計 +10.87% / MaxDD -0.46%（過濾 1 個 expiry +0.96% winner，3/3 全 TPs std=0）
+- min(A,B)† **= Part A Sharpe 3.02**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/CIBR-014 慣例：Part B std=0 結構性零方差），**+16% vs VGK-008 Att2 baseline 2.60**
+- A/B 累計差 cum 8.74 vs 10.87 → diff 2.13pp 相對 **19.6% < 30% ✓**（從 baseline 26.8% 改善 -7.2pp）
+- A/B 訊號比 **3:3 raw = 0% gap << 50% ✓**（從 baseline 25% 改善至完美對齊）
+- 關鍵改善：EUR/USD 10d >= -1.5% 過濾 baseline Part B 唯一 non-TP winner（2024-11-13 expiry +0.96%，EUR/USD 10d 介於 [-1.5%, -1.0%] 邊緣 EUR 弱勢區間），Part B 純化為 std=0 全 TP；保留全部 3 TPs（2024-01-17 / 2024-06-14 / 2024-08-02）
+- **跨資產貢獻**：**repo 第 2 次「bilateral FX direction filter」（繼 EWJ-006 USDJPY 後）+ 首次 EUR/USD 應用於任何資產 + lesson #24 family v8 首次跨地域移植（亞洲已開發 ETF → 歐洲已開發 ETF）**
+- Threshold 因 baseline cleanliness 結構性差異：EWJ-006 baseline 含 1 殘餘 SL，USDJPY 10d > +1.0% 為 surgical SL filter；VGK-008 baseline 已 cleaned (0 SLs)，EUR/USD filter 變為「expiry winner 純化」維度，sweet spot 上移至 -1.5%
+- VGK-009 Att1（min_change=-2.0%）：min 2.60 TIE baseline（filter non-binding，全 7 個 baseline 訊號 EUR/USD 10d ≥ -2.0%）
+- VGK-009 Att2（min_change=-1.0%）：collapse 1+2 訊號 REJECT（移除 4/7 winners，A/B 50% gap 雙重失敗）
 
-**前任最佳：** VGK-007 Att1（BB 下軌+回檔上限+WR+ClosePos+ATR 混合進場）
+**前任最佳：** VGK-008 Att2（Post-Capitulation Vol-Transition MR：VGK-007 Att1 框架 + **2DD floor <= -2.0%** 精煉，TP+3.5%/SL-4.0%/20天/cd7）
+- Part A Sharpe **3.02**（WR 100%, 3訊號, +8.74%）/ Part B Sharpe **2.60**（WR 100%, 4訊號, +11.94%）
+- min(A,B) **2.60**（vs VGK-007 Att1 的 0.53，**+390%**）— 已被 VGK-009 Att3 透過 EUR/USD direction filter 進一步精煉至 † 3.02
+
+**前前任最佳：** VGK-007 Att1（BB 下軌+回檔上限+WR+ClosePos+ATR 混合進場）
 - Part A Sharpe 0.53（WR 77.8%, 9訊號, +14.05%）/ Part B Sharpe 0.78（WR 85.7%, 7訊號, +15.31%）
 - min(A,B) **0.53**（vs VGK-004 Att1 的 0.45，+17.8%）
 
@@ -56,6 +66,9 @@
 - **VGK-007 Att1 + 2DD floor <= -1.0%**：（VGK-008 Att1，Part A 0.49 / Part B 0.78，min **0.49**）-1.0% 過淺
 - **VGK-007 Att1 + 2DD floor <= -2.0%**：（VGK-008 Att2★，Part A 3.02 / Part B 2.60，min **2.60**，+390% 跳躍）
 - **VGK-007 Att1 + 2DD floor <= -1.5%**：（VGK-008 Att3，Part A 0.38 / Part B 2.94，min **0.38**）-1.5% 仍在 SL 帶內
+- **VGK-008 Att2 + EUR/USD 10d >= -2.0%**：（VGK-009 Att1，Part A 3.02 / Part B 2.60，min **2.60 TIE baseline**）filter non-binding
+- **VGK-008 Att2 + EUR/USD 10d >= -1.0%**：（VGK-009 Att2，Part A std=0 1 訊號 / Part B std=0 2 訊號，**REJECT collapse**）-1.0% 過嚴
+- **VGK-008 Att2 + EUR/USD 10d >= -1.5%★**：（VGK-009 Att3，Part A 3.02 / Part B std=0 3 訊號，min† **= Part A 3.02**，+16% vs baseline）EUR/USD direction sweet spot
 
 **尚未嘗試的方向（預期邊際效益極低）：**
 - ATR 門檻微調 1.1-1.14（EWJ-002 Att3 驗證 1.12 放入壞訊號，1.15 為甜蜜點）

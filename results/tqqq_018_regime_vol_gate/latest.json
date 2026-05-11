@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-28T09:05:31.930678"
+    "execution_time": "2026-05-10T04:19:52.212437"
   },
   "part_a": {
     "ticker": "TQQQ",
@@ -300,7 +300,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-27"
+      "end": "2026-05-08"
     }
   }
 }

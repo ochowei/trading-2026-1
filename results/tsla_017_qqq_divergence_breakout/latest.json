@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-07T12:51:48.264183"
+    "execution_time": "2026-05-09T23:19:32.011682"
   },
   "part_a": {
     "ticker": "TSLA",
@@ -277,7 +277,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-05-06"
+      "end": "2026-05-08"
     }
   }
 }

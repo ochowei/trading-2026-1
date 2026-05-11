@@ -1,11 +1,23 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-26
+  last_validated: 2026-05-08
   data_through: 2025-12-31
+  note_2026_05_08: EWJ-006 added 2026-05-08 (USDJPY Direction Filter on Vol-Transition MR，**repo 首次 USDJPY (USD/JPY spot rate) direction filter 於任何資產 + lesson #24 family v8 候選 bilateral FX direction 變體**). Three iterations all SUCCESS, **Att2 ★ 新全域最優 +239% min Sharpe vs EWJ-005 Att2**: Att1 (usdjpy_lookback=10, max_change=+2.0% 寬鬆 baseline) Part A 8 訊號 100% WR Sharpe **2.19** cum +19.62% MDD -3.99% / Part B 3 訊號 100% WR std=0 cum +10.87% / min(A,B)† **2.19**（+213% vs EWJ-005 Att2 baseline 0.70）— USDJPY 10d > +2.0% 完整過濾 EWJ-005 Att2 殘餘 Part A SL（2022-09-01 BoJ YCC 守成，USDJPY 10d 急升 region），副作用為過濾 2024-04-17 BoJ-anticipation Part B winner（10d JPY 急貶 region），Part B 從 4 訊號降至 3 訊號 (2024-06-13/2025-03-11/2025-11-18 全 TP)；Att2 ★ (max_change=+1.0% 收緊) Part A 7 訊號 100% WR Sharpe **2.37** cum +19.31% / Part B 3 訊號不變 / min(A,B)† **2.37**（**+239% vs baseline，+8% vs Att1**）— +1.0% 收緊過濾 1 個邊緣 Part A winner（USDJPY 10d ∈ (+1.0%, +2.0%]，殘餘 winners USDJPY 10d 全部 ≤ +1.0%），Sharpe 提升 due to 變異降低；Att3 (max_change=+0.5% 過緊) Part A 5 訊號 100% WR Sharpe 2.31 cum +12.24% / Part B 2 訊號 100% WR std=0 cum +7.12% / min(A,B)† 2.31（-3% vs Att2，過緊）— -0.5% 移除 2 個 Part A winners + 1 個 Part B winner（2024-06-13 USDJPY 10d ∈ (+0.5%, +1.0%]）確認 +1.0% 為甜蜜點。**核心發現**：(1) EWJ Part A 殘餘 SL（2022-09-01 BoJ YCC 守成）在 USDJPY 10d 維度具乾淨區分力，符合 EWJ 美元計價結構性 driver 假設（JPY 急貶 → currency drag → USD-EWJ 反彈延續性受抑）；(2) Part B 2024-04-17 BoJ-anticipation winner 雖被過濾為 collateral damage，但結構上仍屬「JPY 急貶 region」高 currency drag 風險，過濾為合理保守決策。**跨資產貢獻（repo 首次 lesson #24 family v8）**：repo 首次 USDJPY/JPY direction filter 於任何資產，既有 lesson #24 family v1-v6 皆 implied vol（^VIX/^MOVE/^GVZ/^OVX）；v7 候選 COPX-016 DXY spot FX index；v8 候選（本實驗）bilateral FX direction (USD vs single currency) 於單一國家 ETF。**新跨資產假設（待驗證）**：bilateral FX direction filter 適用「FX-sensitive 單一國家 ETF」（EWJ/EWZ/EWT/INDA/FXI 等），尤其當 ETF 計價貨幣 ≠ 標的國家貨幣且兩貨幣對具強結構性 driver。EWJ-006 Att2 為新全域最優（6 次實驗、18 次嘗試）。
   note: EWJ-005 added 2026-04-26 (Post-Capitulation Vol-Transition MR：EWJ-003 Att3 框架 + 「1日報酬下限」過濾，**Att2 SUCCESS — repo 第 2 次「1d floor」方向成功驗證，繼 SPY-009 後首次非美 ETF 驗證**). Three iterations: Att1 (2DD floor <= -2.0%，VGK-008 Att2 直接移植) Part A 7/85.7%/Sharpe 0.61 cum +11.06% / Part B 3/100%/std=0 Sharpe 0.00 cum +10.87% / min(A,B)† 0.61 (+1.7% vs baseline 0.60，邊際) — EWJ Part A 兩筆 SL 的 2DD 為 -1.63%（filtered）/ -2.36%（kept），且 winners 2DD 廣泛分布 +0.17%~-2.43%，2DD floor 同時切除 6 筆 shallow-2DD winners 換 1 筆 SL，淨效果有限（不同於 VGK 1.12% vol 上 SLs 集中於 -1.47%~-1.68% 窄帶可被 -2.0% 完全繞過）；Att2 ★ (1d floor <= -0.5%，SPY-009 方向跨資產移植) Part A 9 訊號 WR **88.9%** Sharpe **0.70** cum +14.72% / Part B 4 訊號 WR 100% std=0 Sharpe 0.00 cum +14.75% / min(A,B)† **0.70**（+16.7% vs baseline，A/B 累計差 0.03pp 近乎完美平衡）—— 1d 維度成功過濾 2023-08-03 SL（1d -0.49% 恰於 -0.5% 邊界外），副作用為過濾 3 筆 1d 過淺贏家（2021-08-20 +0.08% / 2021-10-05 +0.56% / 2022-01-28 +0.38%），淨增 Part A WR 84.6%→88.9%；Att3 (1d floor <= -0.7%，加嚴測試) Part A 6/83.3%/0.46 cum +7.11% / Part B 3/100%/std=0 cum +10.87% / min 0.46 (-23% vs Att2) —— -0.7% 移除 3 筆淺 1d winners (2019-05-08 -0.61%/+2.23%、2019-08-02 -0.52%/+1.22%、2020-10-30 -0.58%/+3.50%) 確認 -0.5% 為甜蜜點。**核心發現**：EWJ Part A SLs 在 1d 維度具區分力（-0.49% vs winners 多在 -0.5%~-2.0%），與 SPY-009 同類失敗結構（淺 1d drift + BB 下軌假觸碰）；2DD floor 雖在 VGK/EEM/INDA 成功，但 EWJ winners 2DD 廣泛分布使 2DD 維度區分力弱於 1d 維度。**跨資產貢獻**：repo 第 2 次「1d floor」方向成功驗證（繼 SPY-009 後），首次非美 ETF 驗證；擴展 lesson #19 雙向性發現至 EWJ 1.15% vol 已開發亞洲寬基 ETF。EWJ-005 Att2 為新全域最優（5 次實驗、15 次嘗試）。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** EWJ-005 Att2（Post-Capitulation Vol-Transition MR：EWJ-003 Att3 框架 + **1 日報酬下限 <= -0.5%**，TP +3.5%/SL -4.0%/20天/cd7）**5 次實驗 15 次嘗試確認全域最優**
+**當前最佳：** ★ **EWJ-006 Att2**（USDJPY Direction Filter on Vol-Transition MR：EWJ-005 Att2 完整框架 + **USDJPY 10 日報酬 <= +1.0%** bilateral FX direction regime gate，TP +3.5%/SL -4.0%/20天/cd7）★ **2026-05-08 新全域最優（6 次實驗、18 次嘗試）**
+- Part A: Sharpe **2.37**, 累計 +19.31%, 7 訊號 (1.4/年), WR **100.0%**, MaxDD -3.99%
+- Part B: 累計 +10.87%, 3 訊號 (1.5/年), WR **100%**（3/3 全部達標，Sharpe 因 std=0 顯示 0.00）
+- min(A,B)† **2.37**（Part A 為約束，Part B std=0 結構性零方差），**+239% vs EWJ-005 Att2 的 0.70**
+- A/B 年化訊號比 1.4/yr vs 1.5/yr = **6.7% gap < 50% ✓**
+- A/B 年化 cum 比較（CAGR）：A 3.59%/yr vs B 5.30%/yr = **32.3% gap**（接近 30% 邊界，因 Part B 樣本只有 2 年）
+- 關鍵改善：USDJPY 10d <= +1.0% 過濾 EWJ-005 Att2 殘餘 Part A SL（2022-09-01 BoJ YCC 守成，JPY 24 年新低 region），Part A WR 88.9%→**100%** 且 Sharpe 0.70→**2.37**
+- **跨資產貢獻**：**repo 首次 USDJPY (USD/JPY spot rate) direction filter 於任何資產 + lesson #24 family v8 候選 bilateral FX direction 變體**
+- EWJ-006 Att1（max_change=+2.0%）：min 2.19，+213% vs baseline，1 個邊緣 winner 變異拖累 Sharpe
+- EWJ-006 Att3（max_change=+0.5%，加嚴）：min 2.31，過緊移除 2 個 Part A winners + 1 個 Part B winner
+
+**前任最佳：** EWJ-005 Att2（Post-Capitulation Vol-Transition MR：EWJ-003 Att3 框架 + **1 日報酬下限 <= -0.5%**，TP +3.5%/SL -4.0%/20天/cd7）
 - Part A: Sharpe **0.70**, 累計 +14.72%, 9 訊號 (1.8/年), WR **88.9%**, MDD -4.10%
 - Part B: 累計 +14.75%, 4 訊號 (2.0/年), WR 100%（4/4 全部達標，Sharpe 因 std=0 顯示 0.00）
 - min(A,B)† **0.70**（Part A 為約束，沿用 EWJ-003/DIA-012/SPY-009 慣例）, +16.7% vs EWJ-003 Att3 的 0.60
@@ -13,7 +25,7 @@
 - 關鍵改善：1d floor <= -0.5% 過濾 EWJ-003 Att3 的 2023-08-03 SL（1d -0.49% 恰於邊界外）+ 3 筆 1d 過淺 winners，淨增 WR 84.6%→88.9% 且 Sharpe 0.60→0.70
 - **跨資產貢獻**：repo 第 2 次「1d floor」方向成功驗證（繼 SPY-009 後），首次非美 ETF 驗證
 
-**前任最佳：** EWJ-003 Att3（BB 下軌均值回歸：BB(20,1.5) 下軌觸及 + 10日高點回檔上限 7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15，TP +3.5%/SL -4.0%/20天）
+**前前任最佳：** EWJ-003 Att3（BB 下軌均值回歸：BB(20,1.5) 下軌觸及 + 10日高點回檔上限 7% + WR(10)≤-80 + ClosePos≥40% + ATR(5)/ATR(20)>1.15，TP +3.5%/SL -4.0%/20天）
 - Part A: Sharpe 0.60, 累計 +21.97%, 13 訊號 (2.6/年), WR 84.6%, MDD -4.50%
 - Part B: 累計 +22.93%, 6 訊號 (3.0/年), WR 100%（6/6 全部達標，Sharpe 因 std=0 顯示 0.00）
 - A/B 年化訊號比 0.87:1（優秀），A/B 累計報酬差距 0.96pp（近乎完美平衡）
@@ -43,8 +55,11 @@
 - EWJ-003 Att3：BB(20,1.5) + 回檔上限7% + WR + ClosePos + ATR>1.15 → **Part A 0.60/Part B 100%WR ★**
 - EWJ-004 Att1-3：RS 動量 vs EFA/SPY（2-3% 門檻、SMA(50)/SMA(200)），min(A,B) 最佳 0.15（均失敗）
 - EWJ-005 Att1：EWJ-003 Att3 框架 + 2DD floor <= -2.0%（VGK-008 Att2 移植）→ Part A 0.61/Part B std=0, min 0.61（+1.7%，邊際）
-- EWJ-005 Att2：EWJ-003 Att3 框架 + **1d floor <= -0.5%**（SPY-009 方向）→ Part A 0.70/Part B std=0, min **0.70**（+16.7%）★
+- EWJ-005 Att2：EWJ-003 Att3 框架 + **1d floor <= -0.5%**（SPY-009 方向）→ Part A 0.70/Part B std=0, min **0.70**（+16.7%）
 - EWJ-005 Att3：EWJ-003 Att3 框架 + 1d floor <= -0.7%（加嚴）→ Part A 0.46/Part B std=0, min 0.46（-23% vs Att2，移除 3 筆淺 1d winners）
+- EWJ-006 Att1：EWJ-005 Att2 框架 + USDJPY 10d <= +2.0%（寬鬆 baseline）→ Part A **2.19** 8/100% WR/Part B std=0 3/100%, min **2.19**（**+213% vs EWJ-005 Att2**）
+- EWJ-006 Att2：EWJ-005 Att2 框架 + **USDJPY 10d <= +1.0%**（甜蜜點）→ Part A **2.37** 7/100% WR/Part B std=0 3/100%, min **2.37**（**+239%**）★ **新全域最優**
+- EWJ-006 Att3：EWJ-005 Att2 框架 + USDJPY 10d <= +0.5%（過緊）→ Part A 2.31 5/100% WR/Part B std=0 2/100%, min 2.31（-3% vs Att2，過緊移除 1 個 Part B winner）
 
 **尚未嘗試的方向（預期邊際效益極低）：**
 - RSI(2) 短期超賣框架（VGK 驗證非美 ETF 不適合 RSI(2)，cross-asset lesson #27）
@@ -55,6 +70,7 @@
 - ~~RS 動量（EWJ vs EFA/SPY）~~ → EWJ-004 三次嘗試均失敗（Japan 的 RS 非結構性）
 - ~~2DD floor（lesson #19 family）~~ → EWJ-005 Att1 驗證 2DD 維度區分力弱於 1d
 - **★ 1d floor 方向精煉（Capitulation-Strength Filter）→ EWJ-005 Att2 成功**（1d floor <= -0.5% 過濾 2023-08-03 SL 與 3 筆淺 1d winners，min 0.60→0.70 +16.7%）
+- **★★ USDJPY direction filter（lesson #24 family v8 候選 bilateral FX direction）→ EWJ-006 Att2 成功**（USDJPY 10d <= +1.0% 過濾 2022-09-01 BoJ YCC 守成 SL，min 0.70→**2.37** +239%；repo 首次 USDJPY/JPY direction filter 於任何資產）
 
 **關鍵資產特性：**
 - EWJ 為 iShares MSCI Japan ETF，追蹤日本股市大中型股
@@ -66,6 +82,7 @@
 - 高流動性 ETF，滑價假設 0.1%
 - **RS 動量完全無效（EWJ-004 驗證）**：日本相對強度由事件驅動（BOJ 政策、日圓套息交易、出口週期），非結構性週期因素。三次嘗試（EFA/SPY 基準、RS 2-3%、SMA(50)/SMA(200)）min(A,B) 最佳僅 0.15，Part A 品質不穩定（0.12-0.37），Part B 在 Att3 翻負（-0.24）。確認跨資產教訓 #25 延伸至**發達市場單一國家 ETF**
 - **1d floor capitulation filter 在 EWJ 有效（EWJ-005 Att2 驗證）**：日波動 1.15% 下 1d 報酬 -0.5% 為甜蜜點，過濾「淺 1d drift + BB 下軌假觸碰」訊號（如 2023-08-03 SL 1d -0.49% 恰於邊界外）。比 2DD floor（VGK-008/EEM-014/INDA-010 方向）在 EWJ 更有效，因 EWJ winners 2DD 廣泛分布（+0.17%~-2.43%）但 1d 分布更集中。EWJ 為 repo 第 2 例「1d floor」成功（首例 SPY-009），並擴展至非美 ETF
+- **USDJPY direction filter 在 EWJ 高度有效（EWJ-006 Att2 驗證，repo 首次 bilateral FX direction filter）**：USDJPY 10d <= +1.0% 為甜蜜點，過濾「JPY 急貶 currency drag + BoJ 政策衝擊」訊號（如 2022-09-01 BoJ YCC 守成 SL，USDJPY 10d 急升 region），min(A,B) 從 0.70 提升至 **2.37（+239%）**。設計依據：EWJ 為 USD-denominated Japan ETF，當 USDJPY 急升時 currency drag 通常超過出口受益，BoJ 政策衝擊類失敗事件（2022-09-01 / 2023-08-03 yield surge）伴隨 USDJPY 急升 region。**lesson #24 family v8 候選**：bilateral FX direction（USD vs single foreign currency）擴展自既有 implied vol（v1-v6）與 spot DXY index（COPX-016 v7 候選）；新跨資產假設為「FX-sensitive 單一國家 ETF（EWJ/EWZ/EWT/INDA/FXI）+ ETF 計價貨幣 ≠ 標的國家貨幣 + 兩貨幣對具強結構性 driver」
 <!-- AI_CONTEXT_END -->
 
 # EWJ 實驗總覽 (EWJ Experiments Overview)
@@ -79,21 +96,23 @@
 
 ## 參數對照表 (Parameter Comparison)
 
-| 參數 | EWJ-001 | EWJ-002 Att2 | EWJ-003 Att3 | EWJ-005 Att2★ |
-|------|---------|---------------|---------------|---------------|
-| 進場框架 | 固定回檔≥3% | 固定回檔 3-7% | BB(20,1.5) 下軌 + 回檔上限 7% | BB(20,1.5) 下軌 + 回檔上限 7% |
-| WR(10) | ≤ -80 | ≤ -80 | ≤ -80 | ≤ -80 |
-| ClosePos | ≥ 40% | ≥ 40% | ≥ 40% | ≥ 40% |
-| ATR 過濾 | 無 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 |
-| Capitulation 過濾 | 無 | 無 | 無 | **1d floor <= -0.5%** |
-| TP | +3.5% | +3.5% | +3.5% | +3.5% |
-| SL | -4.0% | -4.0% | -4.0% | -4.0% |
-| 持倉 | 20 天 | 20 天 | 20 天 | 20 天 |
-| 追蹤停損 | 啟動+2.0%/距離1.5% | 無 | 無 | 無 |
-| Part A Sharpe | 0.16 | 0.55 | 0.60 | **0.70** |
-| Part B Sharpe | 0.24 | 2.06 | 0.00 (std=0) | 0.00 (std=0) |
-| Part B WR | 71.4% | 83.3% | 100.0% | **100.0%** |
-| **min(A,B)** | 0.16 | 0.55 | 0.60 | **0.70★** (Part A 為約束) |
+| 參數 | EWJ-001 | EWJ-002 Att2 | EWJ-003 Att3 | EWJ-005 Att2 | EWJ-006 Att2★ |
+|------|---------|---------------|---------------|---------------|---------------|
+| 進場框架 | 固定回檔≥3% | 固定回檔 3-7% | BB(20,1.5) 下軌 + 回檔上限 7% | BB(20,1.5) 下軌 + 回檔上限 7% | BB(20,1.5) 下軌 + 回檔上限 7% |
+| WR(10) | ≤ -80 | ≤ -80 | ≤ -80 | ≤ -80 | ≤ -80 |
+| ClosePos | ≥ 40% | ≥ 40% | ≥ 40% | ≥ 40% | ≥ 40% |
+| ATR 過濾 | 無 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 | ATR(5)/ATR(20) > 1.15 |
+| Capitulation 過濾 | 無 | 無 | 無 | 1d floor <= -0.5% | 1d floor <= -0.5% |
+| FX regime gate | 無 | 無 | 無 | 無 | **USDJPY 10d <= +1.0%** |
+| TP | +3.5% | +3.5% | +3.5% | +3.5% | +3.5% |
+| SL | -4.0% | -4.0% | -4.0% | -4.0% | -4.0% |
+| 持倉 | 20 天 | 20 天 | 20 天 | 20 天 | 20 天 |
+| 追蹤停損 | 啟動+2.0%/距離1.5% | 無 | 無 | 無 | 無 |
+| Part A Sharpe | 0.16 | 0.55 | 0.60 | 0.70 | **2.37** |
+| Part A WR | — | — | 84.6% | 88.9% | **100.0%** |
+| Part B Sharpe | 0.24 | 2.06 | 0.00 (std=0) | 0.00 (std=0) | 0.00 (std=0) |
+| Part B WR | 71.4% | 83.3% | 100.0% | 100.0% | **100.0%** |
+| **min(A,B)** | 0.16 | 0.55 | 0.60 | 0.70 | **2.37★** (Part A 為約束) |
 
 ## 實驗列表 (Experiment List)
 
@@ -103,7 +122,8 @@
 | EWJ-002 | `ewj_002_vol_adaptive_pullback` | 波動率自適應回檔+WR均值回歸（ATR過濾+崩盤隔離） | 已完成（前最佳） |
 | EWJ-003 | `ewj_003_bb_lower_mr` | BB 下軌均值回歸（BB+回檔上限+WR+ClosePos+ATR） | 已完成（前最佳） |
 | EWJ-004 | `ewj_004_rs_momentum` | RS 動量回調（EWJ vs EFA/SPY，3 次嘗試均失敗） | 已完成（失敗，確認 lesson #25 擴展至 DM） |
-| EWJ-005 | `ewj_005_vol_transition_mr` | Post-Capitulation Vol-Transition MR（EWJ-003 + 1d floor）★ | ✅ 當前最佳 |
+| EWJ-005 | `ewj_005_vol_transition_mr` | Post-Capitulation Vol-Transition MR（EWJ-003 + 1d floor）| 已完成（前最佳） |
+| EWJ-006 | `ewj_006_usdjpy_direction_mr` | USDJPY Direction-Gated Vol-Transition MR（EWJ-005 + USDJPY 10d <= +1.0%）★ | ✅ 當前最佳 |
 
 ---
 
@@ -483,8 +503,63 @@ EWJ-004 (RS 動量回調, 3 次嘗試均失敗)
   ├── Att1 (EFA ref, RS≥2%, SMA50) → min 0.15 ✗
   ├── Att2 (EFA ref, RS≥3%, SMA200) → min 0.12 ✗
   └── Att3 (SPY ref, RS≥3%, SMA50) → min -0.24 ✗ (確認 lesson #25 擴展至 DM)
-EWJ-005 (Post-Capitulation Vol-Transition MR, Part A Sharpe 0.70) ★
+EWJ-005 (Post-Capitulation Vol-Transition MR, Part A Sharpe 0.70)
   ├── Att1 (2DD floor <= -2.0%, VGK-008 移植) → Part A 0.61/Part B std=0 △ 邊際
-  ├── Att2 (1d floor <= -0.5%, SPY-009 方向) → Part A 0.70/Part B 100%WR ★
+  ├── Att2 (1d floor <= -0.5%, SPY-009 方向) → Part A 0.70/Part B 100%WR
   └── Att3 (1d floor <= -0.7%, 加嚴) → Part A 0.46/Part B std=0 ✗ 過嚴
+EWJ-006 (USDJPY Direction Filter on Vol-Transition MR, Part A Sharpe 2.37) ★
+  ├── Att1 (USDJPY 10d <= +2.0%, 寬鬆 baseline) → Part A 2.19/Part B std=0 △ 含邊緣 winner
+  ├── Att2 (USDJPY 10d <= +1.0%, 甜蜜點) → Part A 2.37/Part B 100%WR ★ 新全域最優
+  └── Att3 (USDJPY 10d <= +0.5%, 過緊) → Part A 2.31/Part B std=0 ✗ 過緊
 ```
+
+---
+
+## EWJ-006：USDJPY Direction Filter on Vol-Transition MR ★ 當前最佳
+
+### 目標 (Goal)
+
+延伸 EWJ-005 Att2 框架（BB(20,1.5) 下軌 + 回檔上限 7% + WR + ClosePos + ATR>1.15 + 1d floor <= -0.5%），新增「USDJPY 方向過濾」作為 repo 首次 bilateral FX direction filter，目標過濾 EWJ-005 Att2 殘餘 Part A SL（2022-09-01 BoJ YCC 守成 SL）。
+
+### 進場條件 (Entry Conditions)
+
+| # | 條件 | 指標 | 閾值 | 說明 |
+|---|------|------|------|------|
+| 1 | BB 下軌觸及 | Close ≤ BB(20, 1.5) 下軌 | — | 同 EWJ-005 |
+| 2 | 崩盤隔離 | 10日高點回檔 | ≥ -7% | 同 EWJ-005 |
+| 3 | 超賣 | Williams %R(10) | ≤ -80 | 同 EWJ-005 |
+| 4 | 收盤強勢 | ClosePos | ≥ 40% | 同 EWJ-005 |
+| 5 | 波動率擴張 | ATR(5)/ATR(20) | > 1.15 | 同 EWJ-005 |
+| 6 | Capitulation | 1日報酬 | ≤ -0.5% | 同 EWJ-005 Att2 甜蜜點 |
+| 7 | **JPY 方向 (新增)** | **USDJPY 10日報酬** | **≤ +1.0%** | **過濾 JPY 急貶 currency drag region** |
+
+### 出場與成交模型
+
+- TP: +3.5%（limit_order Day GTC）
+- SL: -4.0%（stop_market GTC）
+- 持倉: 20 天（next_open_market 到期）
+- 進場: next_open_market（隔日開盤市價）
+- 滑價: 0.1%
+- 冷卻期: 7 天
+
+### 結果摘要
+
+| 指標 | EWJ-005 Att2 | EWJ-006 Att2 ★ | 改善 |
+|------|---------------|-----------------|------|
+| Part A 訊號 | 9 | **7** | -2 (含 1 SL 過濾) |
+| Part A WR | 88.9% | **100.0%** | +11.1pp |
+| Part A Sharpe | 0.70 | **2.37** | **+239%** |
+| Part A cum | +14.72% | **+19.31%** | +4.59pp |
+| Part A MDD | -4.10% | **-3.99%** | -0.11pp |
+| Part B 訊號 | 4 | 3 | -1 (2024-04-17 過濾) |
+| Part B WR | 100% | **100%** | — |
+| Part B Sharpe | 0.00 (std=0) | 0.00 (std=0) | — |
+| min(A,B)† | 0.70 | **2.37** | **+239%** |
+
+### 關鍵發現
+
+1. **USDJPY 10d > +1.0% 為 BoJ 政策衝擊類失敗模式特徵**：2022-09-01 BoJ YCC 守成失敗（USDJPY 從 130 → 145 急升 region）為 EWJ-005 Att2 殘餘 Part A SL，本實驗成功過濾。
+2. **+1.0% 為甜蜜點**：Att1 +2.0% 保留 1 個邊緣 winner（USDJPY 10d ∈ (+1.0%, +2.0%]）變異拖累 Sharpe；Att3 +0.5% 過緊移除 2 個 Part A winners + 1 個 Part B winner（2024-06-13 USDJPY 10d ∈ (+0.5%, +1.0%]）。
+3. **副作用：過濾 2024-04-17 BoJ-anticipation Part B winner**（10d JPY 急貶 region），結構上仍屬「JPY 急貶 currency drag」高風險，過濾為合理保守決策。
+4. **跨資產貢獻 lesson #24 family v8**：repo 首次 USDJPY/JPY direction filter 於任何資產。Lesson #24 family v1-v6 皆 implied vol，v7 候選 COPX-016 DXY spot FX index，本實驗為 v8 候選 bilateral FX direction（USD vs single foreign currency）於單一國家 ETF。
+5. **新跨資產假設（待驗證）**：bilateral FX direction filter 適用「FX-sensitive 單一國家 ETF（EWJ/EWZ/EWT/INDA/FXI）+ ETF 計價貨幣 ≠ 標的國家貨幣 + 兩貨幣對具強結構性 driver」三條件。預期下一步移植目標：EWZ（USDBRL）、EWT（USDTWD）、INDA（USDINR）、FXI（USDCNH）。

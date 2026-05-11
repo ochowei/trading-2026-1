@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-27T13:07:32.176203"
+    "execution_time": "2026-05-09T11:14:24.198569"
   },
   "part_a": {
     "ticker": "EWT",
@@ -244,7 +244,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-24"
+      "end": "2026-05-08"
     }
   }
 }

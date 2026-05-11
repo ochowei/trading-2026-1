@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-04-30T00:55:50.988658"
+    "execution_time": "2026-05-08T16:20:44.412654"
   },
   "part_a": {
     "ticker": "NVDA",
@@ -475,7 +475,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-29"
+      "end": "2026-05-07"
     }
   }
 }

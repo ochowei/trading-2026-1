@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-07T20:40:42.220019"
+    "execution_time": "2026-05-08T12:29:47.325341"
   },
   "part_a": {
     "ticker": "EWJ",
@@ -70,7 +70,7 @@
         "date": "2021-07-19",
         "entry_date": "2021-07-20",
         "exit_date": "2021-08-18",
-        "entry": 59.45,
+        "entry": 59.46,
         "exit": 60.2,
         "return_pct": 1.26,
         "holding_days": 20,

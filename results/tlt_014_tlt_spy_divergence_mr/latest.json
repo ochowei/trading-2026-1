@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-02T10:51:47.510617"
+    "execution_time": "2026-05-09T00:20:05.998020"
   },
   "part_a": {
     "ticker": "TLT",
@@ -223,7 +223,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-05-01"
+      "end": "2026-05-08"
     }
   }
 }

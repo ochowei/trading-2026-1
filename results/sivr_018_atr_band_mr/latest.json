@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-01T09:07:57.309151"
+    "execution_time": "2026-05-10T00:17:35.066960"
   },
   "part_a": {
     "ticker": "SIVR",
@@ -200,7 +200,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-04-30"
+      "end": "2026-05-08"
     }
   }
 }
