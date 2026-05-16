@@ -88,8 +88,10 @@ class EWT010Config(ExperimentConfig):
     divergence_lookback: int = 2
     # mode: "ceiling" → EWT_Nd − EEM_Nd <= divergence_threshold
     #       "floor"   → EWT_Nd − EEM_Nd >= divergence_threshold
-    divergence_mode: str = "floor"
-    divergence_threshold: float = -0.01  # Att2：FLOOR ≥ -1.0%
+    divergence_mode: str = "ceiling"
+    # 預設 = Att1（documented-failure，最乾淨 separator 嘗試；
+    # 沿用 SIVR-019/GLD-016 latest.json = Att1 慣例）
+    divergence_threshold: float = 0.0  # Att1 預設：2d CEILING ≤ 0.0%
 
 
 def create_default_config() -> EWT010Config:
