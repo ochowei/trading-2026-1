@@ -930,9 +930,9 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07，**EWJ-006 / EWZ-008 確立第 (c) 適用條件「殘餘 binding SL 須為 vol-regime 可區分」+ ^VIX 首次應用於非美已開發單一國家股票 ETF 失敗 2026-05-16，TSM-012 第 (c) 條件跨策略擴展（^VXN 首次任何資產 + lesson #24 首次移植至 RS 動量框架，半導體 ADR geopolitical-idiosyncratic 失敗）2026-05-16****）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07，**EWJ-006 / EWZ-008 確立第 (c) 適用條件「殘餘 binding SL 須為 vol-regime 可區分」+ ^VIX 首次應用於非美已開發單一國家股票 ETF 失敗 2026-05-16，TSM-012 第 (c) 條件跨策略擴展（^VXN 首次任何資產 + lesson #24 首次移植至 RS 動量框架，半導體 ADR geopolitical-idiosyncratic 失敗）2026-05-16，**CIBR-016 BANDS 變體第 2 次跨資產驗證首次失敗 + BANDS 變體適用前置條件確立（殘餘 SL 須呈 VIX U-shape 且未被 realized-return/vol 維度先行隔離）2026-05-16******）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,EWZ-008,EWJ-006,TSM-012]
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,EWZ-008,EWJ-006,TSM-012,CIBR-016]
   validated: 2026-05-16
   data_through: 2025-12-31
   confidence: high
@@ -941,15 +941,17 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 **v3 變體擴展（FCX-015，2026-05-07）**：lesson #24 family 共有 4 種已驗證變體 + 1 種被拒絕方向：
 - **LEVEL CAP**：TLT-013 ^MOVE <= 130（rate-driven asset class）
 - **DIRECTION（rising-vol filter）**：XLU-013 ^MOVE 3d、GLD-015 ^GVZ 10d、USO-025 ^OVX 3d（commodity-safe-haven / commodity event-driven 類別）
-- **BANDS exclude mid（U-shape regime hypothesis）**：XBI-017 ^VIX (17, 22] 排除中等 VIX 帶（biotech sector ETF Pullback MR）
+- **BANDS exclude mid（U-shape regime hypothesis）**：XBI-017 ^VIX (17, 22] 排除中等 VIX 帶（biotech sector ETF Pullback MR）✓ — **方向資產相依，非通用**（CIBR-016 ^VIX BANDS 跨資產移植失敗，見下方擴展）
 - **FLOOR（require above-floor）**：FCX-015 ^VIX > 14.0（commodity/mining single stock BB Squeeze Breakout）
-- **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架）
+- **FAILED**：NVDA-018 ^VXN（high-vol AI single stock + MBPC 框架，LEVEL/DIRECTION 首次失敗）；**CIBR-016 ^VIX BANDS（cybersecurity sector ETF + MR，BANDS 變體首次失敗）**
 
 **FCX-015 跨資產發現（反向 VIX 分布結構）**：
 - **FCX BB Squeeze breakout SLs 集中 low-VIX calm regime**（VIX <= 14），與 **XBI Pullback MR SLs 集中 mid-VIX complacency creep**（VIX 17-22）為**結構性反向** VIX 分布
 - 跨策略 lesson #24 移植**不可直接套用 sweet spot threshold**——需先做 trade-level signal-day VIX 分布分析
 - FCX-015 Att1（XBI-017 BANDS 17-22 直接移植）失敗 min(A,B) 0.41，過濾 3 TPs 而 0 SLs；Att2 反向 FLOOR 14.0 成功 min(A,B)† 1.43（+123%），A/B cum gap 從 52.5% 收斂至 7.1%（FCX 商品超級週期結構性邊界首次突破）
 - **新跨資產假設（待驗證）**：VIX FLOOR 變體可能適用於其他高 vol mining/commodity 突破策略（COPX 銅礦 ETF、SOXL 半導體 leveraged ETF），閾值依該資產 SL VIX 分布調整
+
+**CIBR-016 擴展（2026-05-16，repo 第 2 次 BANDS 變體跨資產驗證、首次 BANDS 失敗，BANDS 變體適用前置條件確立）**：將 XBI-017 Att1 ^VIX BANDS (17, 22] 移植至 CIBR（網路安全 sector ETF 1.53% vol）之 CIBR-008 Att2 SL-bearing MR base。**強制前置 trade-level pre-analysis（建構前執行，決定性）**：CIBR-008 Att2（current data）唯一殘餘 Part A SL = 2020-02-24（VIX 25.03，COVID onset，1d -3.54%）；Part A winners VIX {20.56, 24.59, 25.56, 26.52, 38.02}；Part B（全勝）VIX {15.34, 18.40, 20.38, 23.39, 24.69}。唯一 SL VIX 25.03 與 Part A winners 24.59 / 25.56 **完全交錯（≤0.5pt 間隙）**——**不存在任何 BANDS 門檻對能外科式隔離 SL 而保留鄰近 winners**，XBI-017 U-shape 假說（SL 集中中等 VIX、winners 兩極端）**結構性不複製**。三次迭代全部 FAIL/REJECT vs CIBR-014 Att2† 4.08：**Att1**（17/22 XBI-017 直接移植）Part A 5/80.0%/Sharpe **0.65** / Part B 3/100%/zero-var / min(A,B) **0.65**（-18% vs CIBR-008 base 0.79）—— SL（VIX 25.03 > 22）通過未過濾，反向誤殺中等 VIX winners（方向相反）；**Att2**（24.7/25.4 post-hoc bracket SL）min(A,B)† 名目 **4.38 BUT REJECT**——0.7pt 單點 notch 手工置於 COVID-SL VIX 值周圍，零 regime 理論依據（24.7 vs 25.4 同一 elevated regime）、僅濾 n=1 trade、與 CIBR-014 Att2 principled 1d-cap 冗餘（已移除同一 SL），依嚴謹標準 REJECT（EEM-016 Att3 慣例）；**Att3**（25.1/25.8，Att2 notch +0.4pt ablation）min(A,B) **0.65**——0.4pt threshold 移位即崩潰 **-86%**，決定性確認 Att2 為 knife-edge 單點 post-hoc overfit，CIBR 不存在泛化 ^VIX-BANDS regime 結構。**核心結論（lesson #24 BANDS 變體適用前置條件）**：(1) **forward-looking ^VIX BANDS U-shape 方向資產相依**——與 EEM-014「2DD filter 方向資產相依、SL 與 winners 維度交錯則失敗」failure family **同構**，與 FCX-015「VIX 分布結構反向」發現互補（XBI mid-VIX SL / FCX low-VIX SL / CIBR moderate-high-VIX SL 與 winners 交錯，三資產 VIX 分布結構互異）；(2) **BANDS 變體適用前置條件（須同時滿足）**：(a) 殘餘 binding SLs 在 signal-day VIX 維度構成真實 U-shape（SL 集中單一中段帶、winners 在兩極端）**且** (b) 該 SLs 未被既有 realized-return / realized-vol 維度先行隔離；CIBR 雙重違反——唯一 SL 為 COVID-onset moderate-high VIX 且與 winners 交錯（違反 a），且已被 CIBR-014 Att2 principled 1d-cap 涵蓋（違反 b）；(3) **BANDS 維度在 SL/winners 交錯時可被濫用為 post-hoc 單點 notch**（Att2），與 XBI-017 principled 寬 U-shape (17,22) 對比鮮明——未來 BANDS 跨資產移植**必須前置 trade-level 確認殘餘 SL 與 winners 在 VIX 維度可分離且呈 U-shape**，否則為 documented-failure。CIBR-016 為 lesson #24 family 跨資產失敗第 2 例（前作 NVDA-018 LEVEL/DIRECTION），**首次 BANDS 變體失敗**。CIBR-014 Att2 維持全域最優。
 
 當資產的 backward-looking BB-width regime gate（lesson #6 規則 #5 + #23）已達結構性 ceiling，**forward-looking implied volatility derivatives**（option-implied vol indices）為下一個有效維度。
 

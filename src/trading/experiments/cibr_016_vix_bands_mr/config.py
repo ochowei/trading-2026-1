@@ -108,12 +108,22 @@ class CIBR016Config(ExperimentConfig):
 
     # === ^VIX BANDS regime gate（CIBR-016 核心新增，XBI-017 跨資產移植）===
     # 訊號通過條件：VIX <= vix_low_threshold OR VIX > vix_high_threshold
-    # Att3（穩健性 ablation：Att2 notch 上移 +0.4pt → (25.1, 25.8]
-    #  預判 SL VIX 25.03 ≤ 25.1 → 不過濾（SL 重回）；winner 2022-09-01
-    #  VIX 25.56 ∈ (25.1,25.8] → 誤殺。雙向崩潰，確認 knife-edge 無泛化）
+    # 迭代紀錄（3 次全部 FAIL/REJECT vs CIBR-014 Att2† 4.08；預設保留 Att1）：
+    #   Att1 ★（vix_low=17.0, vix_high=22.0，XBI-017 Att1 直接移植）：
+    #     Part A 5/80.0%/0.65 cum +10.05% / Part B 3/100%/zero-var /
+    #     min(A,B) 0.65（-18% vs CIBR-008 base 0.79）。SL 2020-02-24
+    #     (VIX 25.03 > 22) 通過未過濾（SL 保留）；中等 VIX winners 誤殺。
+    #   Att2（vix_low=24.7, vix_high=25.4，post-hoc bracket SL）：
+    #     Part A 5/100%/zero-var cum +18.77% / Part B 5/100%/4.38 /
+    #     min(A,B)† 名目 4.38 BUT REJECT——0.7pt notch 手工置於單一 SL
+    #     VIX 25.03 周圍，零 regime 理論、僅濾 n=1 trade、與 CIBR-014
+    #     Att2 1d-cap 冗餘。
+    #   Att3（vix_low=25.1, vix_high=25.8，Att2 notch +0.4pt ablation）：
+    #     Part A 5/80.0%/0.65 / min(A,B) 0.65——0.4pt 移位即崩潰 -86%，
+    #     確認 Att2 為 knife-edge 單點 overfit，無泛化 VIX-BANDS 結構。
     vix_ticker: str = "^VIX"
-    vix_low_threshold: float = 25.1
-    vix_high_threshold: float = 25.8
+    vix_low_threshold: float = 17.0
+    vix_high_threshold: float = 22.0
     use_vix_bands: bool = True
 
     cooldown_days: int = 8
