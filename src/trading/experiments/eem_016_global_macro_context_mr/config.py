@@ -83,13 +83,15 @@ class EEM016Config(ExperimentConfig):
     # SPY (SPDR S&P 500 ETF) 為 developed-market 寬基 risk-on/off anchor。
     macro_ticker: str = "SPY"
     # lookback：Att1=10（對齊 IWM-015）；Att2=20（測試替代視窗）；Att3=10
-    macro_lookback: int = 20
+    macro_lookback: int = 10
     # SPY N 日絕對報酬上限：require SPY 亦處於 drawdown（同步 broad risk-off）。
     #   - Att1（lookback 10, thr 0.0）：TIE 0.56 — Part A zero-var（切除 DiDi
     #     孤立性 SL），Part B 完全不變（非綁定）。
-    #   - Att2（lookback 20, thr 0.0）：替代視窗 ablation（待回測填入）。
-    #   - Att3（lookback 10, thr -0.025）：收緊 threshold（待回測填入）。
-    macro_return_threshold: float = 0.0
+    #   - Att2（lookback 20, thr 0.0）：FAILED 0.34 — 20d 誤過濾 2024-01-17
+    #     winner 且 SL 仍未切除。
+    #   - Att3（lookback 10, thr -0.025）：收緊 threshold，測試 both-parts
+    #     zero-var via attrition（待回測填入）。
+    macro_return_threshold: float = -0.025
 
 
 def create_default_config() -> EEM016Config:
