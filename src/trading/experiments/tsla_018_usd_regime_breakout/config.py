@@ -175,7 +175,7 @@ class TSLA018Config(ExperimentConfig):
     usd_benchmark: str = "UUP"
     usd_lookback: int = 20
     use_usd_ceiling: bool = True
-    max_usd_return: float = 0.00  # Att1 sweet-spot probe
+    max_usd_return: float = 0.015  # Att2 robustness probe (Att1=0.00)
     use_usd_divergence_floor: bool = False
     min_tsla_minus_usd: float = -999.0  # Att3 啟用
 
