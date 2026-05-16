@@ -334,6 +334,7 @@ on:
           - "URA-011: ura_011_volume_capitulation_mr"
           - "URA-012: ura_012_atr_band_mr"
           - "URA-013: ura_013_multi_period_cap_mr"
+          - "URA-014: ura_014_postparabola_regime_mr"
           - "VGK-001: vgk_001_rsi2_mean_reversion"
           - "VGK-002: vgk_002_vol_adaptive_pullback"
           - "VGK-002-RSI2: vgk_002_vol_adaptive_rsi2"

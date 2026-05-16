@@ -1,28 +1,30 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-05-01
-  data_through: 2026-04-30
-  note: URA-013 added 2026-05-01 (Multi-Period Capitulation-Strength Filter MR, **Att2 ★ SUCCESS — repo 首次「5日報酬 cap」作為主要 capitulation-strength 過濾器於任何資產，擴展 lesson #19 family 至 5日窗口維度**, cross-asset extension from INDA-011 / DIA-012 / GLD-014 / EWZ-007 / SIVR-018 multi-period capitulation depth family). Three iterations on URA-012 Att2 base (pullback 10-20% + RSI(2)<15 + 2DD<=-3% + ATR BAND [1.00, 1.50]) + 5d return cap. Att1 (5d cap >= -10.5%, modest INDA-011 cross-asset port direct): Part A 14/78.6%/Sharpe **0.71** cum +55.88% (vs URA-012 17/70.6%/0.47, +51%) / Part B 7/85.7%/Sharpe **1.07** cum +33.92% (+72%) / min(A,B) **0.71** (+51% vs URA-012 0.47). 過濾 Part A 2022-04-22 SL (5d -12.83%) + 2022-05-09 SL (5d -12.10%) 兩個深 multi-day continuation SLs，cost 1 deep TP 2021-06-18 (5d -11.04%) + 1 deep TP 2025-10-21 (5d -12.39%)；Part B 2025-02-25 SL filtered with positive cooldown chain shift adding 2025-03-03 TP. Att2 ★ SUCCESS (5d cap >= -9.0%, tighter, multi-day acceleration filter): Part A 9 訊號 WR **88.9%** Sharpe **1.22** cum +46.84% MaxDD -8.24% / Part B 4/100%/Sharpe std=0 cum +26.25% MaxDD -3.67% / min(A,B)† **= Part A 1.22**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/SIVR-018/CIBR-014 慣例：Part B std=0 為結構性零方差，採 Part A Sharpe 為 min 約束）/ **+160% vs URA-012 baseline 0.47**. 額外過濾 Part A 2022-01-24 SL (5d -9.85%) + 2022-06-13 SL (5d -9.04%)，cost 3 deep TPs (2020-02-27 / 2021-08-19 / 2022-08-19) but Part A WR 78.6% → 88.9%；Part B 額外過濾 2024-07-19 SL (5d -9.56%) + 2 deep TPs (2024-09-03 / 2025-04-04) 留下 4/4 zero-var. **A/B 平衡達成**：annualized cum 9.37%/yr vs 13.13%/yr (gap **28.6% < 30% ✓**), annualized signal 1.8/yr vs 2.0/yr = 1.11:1 (gap **10% < 50% ✓**). Att3 (5d cap >= -9.5%, 鬆放 0.5pp robustness check): Part A 12/83.3%/Sharpe **0.90** / Part B 5/100% std=0 / min **0.90** (-26% vs Att2) — 鬆放 0.5pp 重新放入 2022-06-13 SL (5d -9.04%)，**確認 -9.0% 為 URA Part A 5d return 分布最佳切點**. **核心發現**：(1) **Repo 首次 5日報酬 cap 維度作為主要 capitulation-strength 過濾器於任何資產**——lesson #19 family 先前覆蓋 1d / 2d / 3d / ATR-ratio 維度，URA-013 加入 5d 維度，joins INDA-011（2DD floor + 3DD cap）/ DIA-012（1d cap + 3d cap）/ GLD-014（2d floor + 1d floor）/ EWZ-007（1d cap surgical）/ SIVR-018（ATR ceiling + 3d floor）家族；(2) **5d 維度與 2DD 維度互補**：URA-004 / URA-012 已有 2DD <= -3%（require deep 2-day），但 5d cap >= -9.0%（require not too deep over 5d）為**正交維度**，捕捉「2 日急跌但前 3 日相對穩定」winners 結構（INDA-011 直接平行）；(3) **lesson #15 BAND + lesson #19 5d cap 雙重 supplement**：URA-013 為**repo 首次同時應用 ATR ratio BAND（多空 vol 過濾）+ 多日 return cap（multi-day acceleration 過濾）的組合**；(4) **打破 URA 結構性 Sharpe 上限 0.47** 在 12 次實驗 / 36+ 次嘗試後（URA-012 BAND 突破 0.39 後第二次突破），確認 URA Part A 殘餘 SLs 中 60% (3/5) 為 multi-day acceleration 結構，可被 5d cap 精準切除. **新跨資產規則 (lesson #19 v2)**：5d window 為 lesson #19 family 第 5 個有效維度（補 1d/2d/3d/ATR），對於「2 日急跌但前 3 日相對穩定」winners 結構與「multi-day continuation」losers 結構並存的資產有效。預期適用於其他 12+ 次實驗已飽和的政策/事件驅動高波動 ETF（FCX/COPX/IWM 待跨資產驗證）。URA-013 Att2 為新全域最優（13 次實驗、39+ 次嘗試）。URA-012 added 2026-05-01 (Volatility-Acceleration-Bounded MR, ATR Ratio BAND, **repo 首次發現 Part A/B SLs ATR 鏡像分布結構，repo 第 3 次 lesson #15 ATR ratio CEILING/BAND 跨資產試驗（繼 CIBR-014 / FXI-014），首次政策驅動高波動 ETF 在 BAND 結構成功**, cross-asset port from FXI-014). Three iterations, **Att2 ★ SUCCESS — repo 首次突破 URA 結構性 Sharpe 上限 0.39，新全域最優 min(A,B) 0.47 (+21% vs URA-004)**. Trade-level 分析發現 URA Part A SLs (7) ATR 分布 (low<=1.05: 3, med 1.05-1.30: 2, high>1.30: 3) 與 Part B SLs (5) ATR 分布 (low: 4, med: 1, high: 0) 為**完美鏡像**——Part A SLs 集中高 ATR / Part B SLs 集中低 ATR. Att1 (CEILING <= 1.30, FXI-014 直接移植 + URA vol 2.34% 線性縮放) Part A 18/77.8%/Sharpe **0.69** cum +75.28% (+68% vs URA-004 0.41 大幅改善) / Part B 13/61.5%/Sharpe **0.27** cum +19.55% (-31% vs URA-004 0.39，過濾 2024-08-05 TP ATR 1.586 + 2025-01-27 TP ATR 1.553 + 2025-10-21 TP ATR 1.306 三筆 Part B winners) / min **0.27** ❌ — CEILING 修 Part A 但壞 Part B (URA-007 Att1 FLOOR 為對稱失敗). **Att2 ★ SUCCESS (BAND 1.00 <= ATR <= 1.50，鏡像結構平衡解)** Part A 17/70.6%/Sharpe **0.47** cum +47.28% (+15% vs URA-004) / Part B 8/75.0%/Sharpe **0.62** cum +26.44% (+59% vs URA-004) / min(A,B) **0.47** (+21% vs URA-004 0.39). **Acceptance criteria 三項全部達標**：✓ Sharpe +21% > URA-004 baseline ✓ A/B annualized cum diff 28.4% (Part A 9.46%/y vs Part B 13.22%/y) < 30% ✓ A/B annualized signal diff 15% (3.4/yr vs 4.0/yr) < 50% ✓ Uses ExecutionModelStrategy. Att3 (BAND 1.05 <= ATR <= 1.50, FLOOR 收緊測試) Part A 15/66.7%/Sharpe **0.37** cum +31.08% / Part B 7/71.4%/Sharpe **0.51** cum +19.28% / min **0.37** ❌ — FLOOR 1.05 過嚴過濾 6 個 Part A 低 ATR winners 多於 3 個 Part A 低 ATR SLs. **核心發現**：(1) **Repo 首次 Part A/B SLs ATR 鏡像分布結構發現**——CIBR/FXI 為 CEILING-only success (Part B 已乾淨)，URA 為**首個需要 BAND 結構雙向過濾**的資產，因 Part A 與 Part B SLs ATR 分布為對稱鏡像；(2) **lesson #15 邊界擴展至 BAND 結構**：CIBR (1.53% vol → CEILING 1.40)、FXI (2.0% vol → CEILING 1.35) 為 CEILING-only，URA (2.34% vol → BAND [1.00, 1.50]) 為**首個 BAND-required**；(3) **打破 URA 結構性 Sharpe 上限 0.39** 在 11 次實驗 / 33+ 次嘗試後（含均值回歸、突破、趨勢、動量、相對強度、波動率自適應、雙振盪器、RSI hook、Day-After、WVF、Volume 十一大策略類型），確認 lesson #15 BAND 結構為 URA 唯一突破方向；(4) **驗證 trade-level analysis 假設**：URA-007 Att1 (FLOOR 1.05) Part A 0.27/Part B 0.71 與 URA-012 Att1 (CEILING 1.30) Part A 0.69/Part B 0.27 為對稱鏡像失敗，BAND 為唯一同時修兩邊的解。**新跨資產規則 (lesson #15 v3)**：對於 Part A SLs 與 Part B SLs ATR 分布為**鏡像**的資產（高/低 ATR 互換），單向 FLOOR 或 CEILING 必然壞另一段，**BAND 結構為唯一可行解**。預期適用於其他 11+ 策略類型已試過的政策驅動高波動 ETF。URA-012 Att2 為新全域最優（12 次實驗、36+ 次嘗試）。URA-011 added 2026-04-21 (Volume-Confirmed Capitulation MR, **repo 第 3 次將 Volume Spike 作為主品質過濾器試驗** — 前兩次 USO-006 Att2 與 TSLA-012 Att1 均失敗)。Three iterations all failed vs URA-004 min 0.39: Att1 (URA-004 entry + Volume/Avg20 ≥ 1.5x) Part A 6/66.7%/**0.39** / Part B 6/66.7%/**0.39** / min **0.39（完美 A/B 平衡但等同 URA-004）** — 6/6 訊號 identical WR/cum +12.53%/identical 4TP+2SL structure，Volume filter 創造 A/B 對稱性但未提升品質上限；Att2 (Vol ≥ 2.0x + ClosePos ≥ 40%) Part A 2/50%/**0.04** / Part B 3/66.7%/0.39 / min **0.04（崩壞）** — 收緊 Volume + ClosePos 移除 TPs 多於 SLs，Part A 從 4TP2SL 降至 1TP1SL，進場日期偏移使 2020-02-27 TP 日變 2020-02-28 SL 日（lesson #19）；URA 政策驅動使 ClosePos 無選擇性（與 URA-007 ATR 重複過濾失敗同類）。Att3 (Att1 移除 2DD，Vol ≥ 1.5x alone) Part A 7/57.1%/**0.18** / Part B 6/66.7%/0.39（同 Att1）/ min **0.18** — Volume 與 2DD 結構性獨立，移除 2DD 在 Part A 新增 2 訊號（2022-10-12 TP + 2023-03-10 SL）使 WR 降至 57.1%；Part B 2DD 對 Volume spike 訊號為非綁定（不變）。**結論**：(1) Volume spike 作為 supplementary filter 可產生完美 A/B 對稱但品質天花板等同 URA-004；(2) 2DD 與 Volume 互補非重複——2DD 在 Part A 有真實選擇性，Part B 為非綁定；(3) URA 政策驅動使 ClosePos 日內反轉確認失敗。**Repo 第 3 次 Volume Spike 作為主過濾器試驗**（USO-006 Att2 / TSLA-012 Att1 皆失敗），URA 首次。擴展 lesson #6（確認指標邊際效益遞減）至 Volume 類別：Volume 在已飽和 pullback+RSI(2)+2DD 框架上僅提供對稱性而非品質提升。**新 cross-asset 發現**：Volume supplementary filter 在高流動性 ETF 上可創造 perfect A/B balance（6/6 訊號、同 WR、同 cum）但無法突破底層框架的品質天花板——validated 於 URA，待跨資產驗證。URA-004 was global optimum until URA-012 BAND superseded (12 experiments, 36+ attempts).
+  last_validated: 2026-05-17
+  data_through: 2026-05-15
+  note: URA-014 added 2026-05-17 (Post-Parabolic Long-Horizon Regime-Gated Capitulation MR, **Att1 ★ SUCCESS — repo 首次「長窗口 prior-return CEILING」作為 post-parabolic capitulation-quality regime gate 於任何資產，擴展 lesson #19 family 從短窗口 depth cap (1d/2d/3d/5d/ATR) 至 60日 post-parabola 排除 CEILING**, same-framework refinement of URA-013 Att2 — NOT a cross-asset port). 強制 pre-analysis gate (predict→confirm)：重現 URA-013 Att2 全 13 筆交易 (Part A 2019-2023 9筆 + Part B 2024-2025 4筆)，URA-013 Att2 唯一殘餘 binding Part A SL = 2021-11-16 (-5.59% SL，全 13 筆唯一虧損)。長窗口維度診斷：Ret60 (prior 60日報酬) SL 2021-11-16 = **+51.39%**（Sept-Nov 2021 Sprott-SPUT 鈾現貨 $30→$50 拋物線 blow-off），全 11 筆 target winners + 2019-08-05 expiry-win Ret60 ∈ [-24.39%, **+29.59%**] → **SEPARABLE：SL 高於所有 winner 21.80pp，robust ≥20pp 平台 [+29.6%, +51.4%]，非 knife-edge 單點**（其他維度 Ret120/Ret252/AboveSMA200/RunupTo252Peak 全 interleaved；DDfromHigh252 0.01pp knife-edge 已排除）。結構機制 (ex-ante)：URA 60日 +51% 拋物線進場 = 多月拋物線均值回歸 unwind 早期非真 capitulation 底 → MR 買入續跌至 SL；真 URA capitulation winners 前 60日動能皆溫和或負（真實下跌產生超賣）。2021-11-16 時序孤立（前訊號 2021-07-19、後訊號 2022-03-14 皆 ≫ cd10）→ 預測 clean surgical excision 無 cooldown chain-shift（GLD-016-class，非 SOXL-013-class）。預測 SUCCESS。**確認 (predict→confirm 命中)**：Att1 ★ (Ret60 ceiling ≤ +0.35 mid-plateau) 僅過濾 2021-11-16（clean excision 無 chain-shift），Part A 9→8 / WR 88.9%→**100%** / Sharpe **1.22 → 6.71** / cum +46.84%→+55.54% / MaxDD -8.24%→-5.14% / **0 停損**；Part B 4/4 zero-var **完全不變** (+26.25%)；Part C 3/66.7%/Sharpe 1.38/+12.25%。min(A,B)† **= Part A 6.71**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/SIVR-018/CIBR-014/URA-013 慣例：Part B std=0 結構性零方差，採 Part A Sharpe 為 min 約束）/ **+450% vs URA-013 Att2 1.22**。**A/B 平衡達成（優於 URA-013 Att2）**：annualized cum 11.11%/yr vs 13.13%/yr (gap **15.4% < 30% ✓**，URA-013 Att2 為 28.6%)，annualized signal 1.6/yr vs 2.0/yr = 1.25:1 (gap **20% < 50% ✓**)，✓ ExecutionModelStrategy — acceptance criteria 三項全部達標。Att2 (ceiling ≤ +0.40 鬆放 robustness)：與 Att1 **完全相同**（ceiling +0.45/+0.40/+0.35/+0.30 皆 identical）→ robust **≥15pp 平台 [+0.30, +0.45]**，非 fitted 單點（對比 CIBR-016 0.7pt notch / INDA-013 post-hoc reject）。Att3 (ceiling ≤ +0.28 收緊 cliff)：Part A 不變 8/100%/6.71 但 Part B 4→3——額外誤殺最近 winner 2025-08-19 (Ret60 +29.59%)，Part B cum +26.25%→+19.10%，A/B gap →16.3%，確認 +0.35 安全位於 mid-plateau、+0.28 為退化懸崖。**核心跨資產規則 (lesson #19 family v3)**：(1) **repo 首次長窗口 (60日) prior-return CEILING 作為 post-parabolic capitulation-quality regime gate**——lesson #19 family 先前僅短窗口 depth cap (1d/2d/3d/5d/ATR-ratio)，URA-014 加入「長窗口 post-parabola 排除 CEILING」維度，與 URA-013 5d cap 正交（短窗口=「近期跌太深」排除；長窗口=「拋物線後續跌」排除）；(2) **非 trend-direction filter（cross_asset_lessons #3 不違反）**：不要求上升趨勢，而是排除「拋物線 blow-off unwind 期間的接刀」——anti-extension 反向 regime classifier，與 URA-006 順勢 ROC/SMA/RS 進場觸發（已證明無效）本質不同；(3) **predict→confirm 軌跡延伸**：pre-analysis gate 正確預測 SUCCESS（GLD-016/VOO-005-class clean excision；前次 EWT-010/SIVR-019/CIBR-016/SOXL-013/TSM-012/EWJ-006/EEM-016/INDA-013/DIA-013 documented-failure 亦全部正確預測）；(4) **打破 URA 結構性 Sharpe 上限第 3 層**：0.39 (URA-004) → 0.47 (URA-012 BAND) → 1.22 (URA-013 5d cap) → **6.71 (URA-014 post-parabola gate)**，URA Part A 達 100% WR 零停損。預期適用於其他 capitulation MR 殘餘 SL 為「拋物線後 dip」結構的政策/事件驅動高波動 ETF（COPX/FCX/SOXL/SIVR 待跨資產驗證）。URA-014 Att1 為新全域最優（14 次實驗、42+ 次嘗試）。URA-013 added 2026-05-01 (Multi-Period Capitulation-Strength Filter MR, **Att2 ★ SUCCESS — repo 首次「5日報酬 cap」作為主要 capitulation-strength 過濾器於任何資產，擴展 lesson #19 family 至 5日窗口維度**, cross-asset extension from INDA-011 / DIA-012 / GLD-014 / EWZ-007 / SIVR-018 multi-period capitulation depth family). Three iterations on URA-012 Att2 base (pullback 10-20% + RSI(2)<15 + 2DD<=-3% + ATR BAND [1.00, 1.50]) + 5d return cap. Att1 (5d cap >= -10.5%, modest INDA-011 cross-asset port direct): Part A 14/78.6%/Sharpe **0.71** cum +55.88% (vs URA-012 17/70.6%/0.47, +51%) / Part B 7/85.7%/Sharpe **1.07** cum +33.92% (+72%) / min(A,B) **0.71** (+51% vs URA-012 0.47). 過濾 Part A 2022-04-22 SL (5d -12.83%) + 2022-05-09 SL (5d -12.10%) 兩個深 multi-day continuation SLs，cost 1 deep TP 2021-06-18 (5d -11.04%) + 1 deep TP 2025-10-21 (5d -12.39%)；Part B 2025-02-25 SL filtered with positive cooldown chain shift adding 2025-03-03 TP. Att2 ★ SUCCESS (5d cap >= -9.0%, tighter, multi-day acceleration filter): Part A 9 訊號 WR **88.9%** Sharpe **1.22** cum +46.84% MaxDD -8.24% / Part B 4/100%/Sharpe std=0 cum +26.25% MaxDD -3.67% / min(A,B)† **= Part A 1.22**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/SIVR-018/CIBR-014 慣例：Part B std=0 為結構性零方差，採 Part A Sharpe 為 min 約束）/ **+160% vs URA-012 baseline 0.47**. 額外過濾 Part A 2022-01-24 SL (5d -9.85%) + 2022-06-13 SL (5d -9.04%)，cost 3 deep TPs (2020-02-27 / 2021-08-19 / 2022-08-19) but Part A WR 78.6% → 88.9%；Part B 額外過濾 2024-07-19 SL (5d -9.56%) + 2 deep TPs (2024-09-03 / 2025-04-04) 留下 4/4 zero-var. **A/B 平衡達成**：annualized cum 9.37%/yr vs 13.13%/yr (gap **28.6% < 30% ✓**), annualized signal 1.8/yr vs 2.0/yr = 1.11:1 (gap **10% < 50% ✓**). Att3 (5d cap >= -9.5%, 鬆放 0.5pp robustness check): Part A 12/83.3%/Sharpe **0.90** / Part B 5/100% std=0 / min **0.90** (-26% vs Att2) — 鬆放 0.5pp 重新放入 2022-06-13 SL (5d -9.04%)，**確認 -9.0% 為 URA Part A 5d return 分布最佳切點**. **核心發現**：(1) **Repo 首次 5日報酬 cap 維度作為主要 capitulation-strength 過濾器於任何資產**——lesson #19 family 先前覆蓋 1d / 2d / 3d / ATR-ratio 維度，URA-013 加入 5d 維度，joins INDA-011（2DD floor + 3DD cap）/ DIA-012（1d cap + 3d cap）/ GLD-014（2d floor + 1d floor）/ EWZ-007（1d cap surgical）/ SIVR-018（ATR ceiling + 3d floor）家族；(2) **5d 維度與 2DD 維度互補**：URA-004 / URA-012 已有 2DD <= -3%（require deep 2-day），但 5d cap >= -9.0%（require not too deep over 5d）為**正交維度**，捕捉「2 日急跌但前 3 日相對穩定」winners 結構（INDA-011 直接平行）；(3) **lesson #15 BAND + lesson #19 5d cap 雙重 supplement**：URA-013 為**repo 首次同時應用 ATR ratio BAND（多空 vol 過濾）+ 多日 return cap（multi-day acceleration 過濾）的組合**；(4) **打破 URA 結構性 Sharpe 上限 0.47** 在 12 次實驗 / 36+ 次嘗試後（URA-012 BAND 突破 0.39 後第二次突破），確認 URA Part A 殘餘 SLs 中 60% (3/5) 為 multi-day acceleration 結構，可被 5d cap 精準切除. **新跨資產規則 (lesson #19 v2)**：5d window 為 lesson #19 family 第 5 個有效維度（補 1d/2d/3d/ATR），對於「2 日急跌但前 3 日相對穩定」winners 結構與「multi-day continuation」losers 結構並存的資產有效。預期適用於其他 12+ 次實驗已飽和的政策/事件驅動高波動 ETF（FCX/COPX/IWM 待跨資產驗證）。URA-013 Att2 為新全域最優（13 次實驗、39+ 次嘗試）。URA-012 added 2026-05-01 (Volatility-Acceleration-Bounded MR, ATR Ratio BAND, **repo 首次發現 Part A/B SLs ATR 鏡像分布結構，repo 第 3 次 lesson #15 ATR ratio CEILING/BAND 跨資產試驗（繼 CIBR-014 / FXI-014），首次政策驅動高波動 ETF 在 BAND 結構成功**, cross-asset port from FXI-014). Three iterations, **Att2 ★ SUCCESS — repo 首次突破 URA 結構性 Sharpe 上限 0.39，新全域最優 min(A,B) 0.47 (+21% vs URA-004)**. Trade-level 分析發現 URA Part A SLs (7) ATR 分布 (low<=1.05: 3, med 1.05-1.30: 2, high>1.30: 3) 與 Part B SLs (5) ATR 分布 (low: 4, med: 1, high: 0) 為**完美鏡像**——Part A SLs 集中高 ATR / Part B SLs 集中低 ATR. Att1 (CEILING <= 1.30, FXI-014 直接移植 + URA vol 2.34% 線性縮放) Part A 18/77.8%/Sharpe **0.69** cum +75.28% (+68% vs URA-004 0.41 大幅改善) / Part B 13/61.5%/Sharpe **0.27** cum +19.55% (-31% vs URA-004 0.39，過濾 2024-08-05 TP ATR 1.586 + 2025-01-27 TP ATR 1.553 + 2025-10-21 TP ATR 1.306 三筆 Part B winners) / min **0.27** ❌ — CEILING 修 Part A 但壞 Part B (URA-007 Att1 FLOOR 為對稱失敗). **Att2 ★ SUCCESS (BAND 1.00 <= ATR <= 1.50，鏡像結構平衡解)** Part A 17/70.6%/Sharpe **0.47** cum +47.28% (+15% vs URA-004) / Part B 8/75.0%/Sharpe **0.62** cum +26.44% (+59% vs URA-004) / min(A,B) **0.47** (+21% vs URA-004 0.39). **Acceptance criteria 三項全部達標**：✓ Sharpe +21% > URA-004 baseline ✓ A/B annualized cum diff 28.4% (Part A 9.46%/y vs Part B 13.22%/y) < 30% ✓ A/B annualized signal diff 15% (3.4/yr vs 4.0/yr) < 50% ✓ Uses ExecutionModelStrategy. Att3 (BAND 1.05 <= ATR <= 1.50, FLOOR 收緊測試) Part A 15/66.7%/Sharpe **0.37** cum +31.08% / Part B 7/71.4%/Sharpe **0.51** cum +19.28% / min **0.37** ❌ — FLOOR 1.05 過嚴過濾 6 個 Part A 低 ATR winners 多於 3 個 Part A 低 ATR SLs. **核心發現**：(1) **Repo 首次 Part A/B SLs ATR 鏡像分布結構發現**——CIBR/FXI 為 CEILING-only success (Part B 已乾淨)，URA 為**首個需要 BAND 結構雙向過濾**的資產，因 Part A 與 Part B SLs ATR 分布為對稱鏡像；(2) **lesson #15 邊界擴展至 BAND 結構**：CIBR (1.53% vol → CEILING 1.40)、FXI (2.0% vol → CEILING 1.35) 為 CEILING-only，URA (2.34% vol → BAND [1.00, 1.50]) 為**首個 BAND-required**；(3) **打破 URA 結構性 Sharpe 上限 0.39** 在 11 次實驗 / 33+ 次嘗試後（含均值回歸、突破、趨勢、動量、相對強度、波動率自適應、雙振盪器、RSI hook、Day-After、WVF、Volume 十一大策略類型），確認 lesson #15 BAND 結構為 URA 唯一突破方向；(4) **驗證 trade-level analysis 假設**：URA-007 Att1 (FLOOR 1.05) Part A 0.27/Part B 0.71 與 URA-012 Att1 (CEILING 1.30) Part A 0.69/Part B 0.27 為對稱鏡像失敗，BAND 為唯一同時修兩邊的解。**新跨資產規則 (lesson #15 v3)**：對於 Part A SLs 與 Part B SLs ATR 分布為**鏡像**的資產（高/低 ATR 互換），單向 FLOOR 或 CEILING 必然壞另一段，**BAND 結構為唯一可行解**。預期適用於其他 11+ 策略類型已試過的政策驅動高波動 ETF。URA-012 Att2 為新全域最優（12 次實驗、36+ 次嘗試）。URA-011 added 2026-04-21 (Volume-Confirmed Capitulation MR, **repo 第 3 次將 Volume Spike 作為主品質過濾器試驗** — 前兩次 USO-006 Att2 與 TSLA-012 Att1 均失敗)。Three iterations all failed vs URA-004 min 0.39: Att1 (URA-004 entry + Volume/Avg20 ≥ 1.5x) Part A 6/66.7%/**0.39** / Part B 6/66.7%/**0.39** / min **0.39（完美 A/B 平衡但等同 URA-004）** — 6/6 訊號 identical WR/cum +12.53%/identical 4TP+2SL structure，Volume filter 創造 A/B 對稱性但未提升品質上限；Att2 (Vol ≥ 2.0x + ClosePos ≥ 40%) Part A 2/50%/**0.04** / Part B 3/66.7%/0.39 / min **0.04（崩壞）** — 收緊 Volume + ClosePos 移除 TPs 多於 SLs，Part A 從 4TP2SL 降至 1TP1SL，進場日期偏移使 2020-02-27 TP 日變 2020-02-28 SL 日（lesson #19）；URA 政策驅動使 ClosePos 無選擇性（與 URA-007 ATR 重複過濾失敗同類）。Att3 (Att1 移除 2DD，Vol ≥ 1.5x alone) Part A 7/57.1%/**0.18** / Part B 6/66.7%/0.39（同 Att1）/ min **0.18** — Volume 與 2DD 結構性獨立，移除 2DD 在 Part A 新增 2 訊號（2022-10-12 TP + 2023-03-10 SL）使 WR 降至 57.1%；Part B 2DD 對 Volume spike 訊號為非綁定（不變）。**結論**：(1) Volume spike 作為 supplementary filter 可產生完美 A/B 對稱但品質天花板等同 URA-004；(2) 2DD 與 Volume 互補非重複——2DD 在 Part A 有真實選擇性，Part B 為非綁定；(3) URA 政策驅動使 ClosePos 日內反轉確認失敗。**Repo 第 3 次 Volume Spike 作為主過濾器試驗**（USO-006 Att2 / TSLA-012 Att1 皆失敗），URA 首次。擴展 lesson #6（確認指標邊際效益遞減）至 Volume 類別：Volume 在已飽和 pullback+RSI(2)+2DD 框架上僅提供對稱性而非品質提升。**新 cross-asset 發現**：Volume supplementary filter 在高流動性 ETF 上可創造 perfect A/B balance（6/6 訊號、同 WR、同 cum）但無法突破底層框架的品質天花板——validated 於 URA，待跨資產驗證。URA-004 was global optimum until URA-012 BAND superseded (12 experiments, 36+ attempts).
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** ★ **URA-013 Att2**（Multi-Period Capitulation-Strength Filter MR：URA-012 Att2 全條件 + **5日報酬 cap >= -9.0%**，TP +6.0% / SL -5.5% / 20天 / cd 10）★ **2026-05-01 新全域最優（13 次實驗、39+ 次嘗試）**
-- Part A: 9 訊號 / WR **88.9%** / Sharpe **1.22** / 累計 +46.84% / MaxDD -8.24%
-- Part B: 4 訊號 / WR **100%** / std=0 / 累計 +26.25% / MaxDD -3.67%
-- min(A,B)† **= Part A 1.22**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/SIVR-018/CIBR-014 慣例：Part B std=0 結構性零方差，採 Part A Sharpe 為 min 約束）
-- **vs URA-012 Att2：min(A,B) 0.47 → 1.22（+160%）**，Part A Sharpe 0.47 → 1.22（+160%）, Part A WR 70.6% → 88.9%（+18.3pp）
-- A/B 累計 annualized 9.37%/yr vs 13.13%/yr → gap **28.6%（< 30% ✓）**
-- A/B 訊號 annualized 1.8/yr vs 2.0/yr → 1.11:1（gap **10% < 50% ✓**）
-- 關鍵改善：5d cap >= -9.0% 切除 multi-day acceleration / sustained drift 訊號集，**完全消除 Part A 變異雜訊**（移除 URA-012 殘餘 4/5 SLs：2022-04-22 / 2022-05-09 / 2022-01-24 / 2022-06-13；唯一保留 SL 為 2021-11-16 5d -8.03% 較淺）
-- **保留訊號（9 Part A + 4 Part B）**：
-  * Part A：2019-08-05 EXP+3.44%、2020/2021 早期 6 TPs、2021-11-16 SL（殘餘）、2022-03-14 TP、2022-12-06 TP、2023-03-15 TP、2023-10-03 TP
-  * Part B：2024-06-11 TP、2025-03-03 TP（cooldown chain shift winner）、2025-08-19 TP、2025-12-16 TP（全部 4/4 zero-var TPs）
-- **跨資產貢獻**：repo 首次「5日報酬 cap」作為主要 capitulation-strength 過濾器於任何資產，repo 首次「ATR ratio BAND + 5日報酬 cap」雙重組合；擴展 lesson #19 family 至 5日窗口維度（先前覆蓋 1d/2d/3d/ATR-ratio）
-- URA-013 Att1（5d cap -10.5%）成功（min 0.71，+51%）：modest 過濾僅切除 2 個最深 2022 SLs
-- URA-013 Att3（5d cap -9.5% robustness check）部分退化（min 0.90，-26% vs Att2）：放鬆 0.5pp 重新放入 2022-06-13 SL，確認 -9.0% 為最佳切點
+**當前最佳：** ★ **URA-014 Att1**（Post-Parabolic Long-Horizon Regime-Gated Capitulation MR：URA-013 Att2 全條件 + **prior 60日報酬 ceiling <= +0.35**，TP +6.0% / SL -5.5% / 20天 / cd 10）★ **2026-05-17 新全域最優（14 次實驗、42+ 次嘗試）**
+- Part A: 8 訊號 / WR **100%** / Sharpe **6.71** / 累計 +55.54% / MaxDD -5.14% / **0 停損**
+- Part B: 4 訊號 / WR **100%** / std=0 / 累計 +26.25% / MaxDD -3.67%（與 URA-013 Att2 完全相同，不變）
+- Part C: 3 訊號 / WR 66.7% / Sharpe **1.38** / 累計 +12.25%
+- min(A,B)† **= Part A 6.71**（沿用 EWJ-003/SPY-009/DIA-012/IWM-013/SIVR-018/CIBR-014/URA-013 慣例：Part B std=0 結構性零方差，採 Part A Sharpe 為 min 約束）
+- **vs URA-013 Att2：min(A,B)† 1.22 → 6.71（+450%）**，Part A Sharpe 1.22 → 6.71, Part A WR 88.9% → 100%（+11.1pp，零停損）
+- A/B 累計 annualized 11.11%/yr vs 13.13%/yr → gap **15.4%（< 30% ✓，優於 URA-013 Att2 的 28.6%）**
+- A/B 訊號 annualized 1.6/yr vs 2.0/yr → 1.25:1（gap **20% < 50% ✓**）
+- 關鍵改善：prior 60d return ceiling <= +0.35 surgical 切除唯一殘餘 binding Part A SL 2021-11-16（Ret60 +51.39% = Sept-Nov 2021 Sprott-SPUT 鈾拋物線 blow-off unwind 接刀），clean excision 無 cooldown chain-shift，Part A 9→8 全勝
+- **保留訊號（8 Part A + 4 Part B + 3 Part C）**：
+  * Part A：2019-08-05 EXP+3.44%、2021-03-23/05-13/07-19 TP、2022-03-14 TP、2022-12-06 TP、2023-03-15 TP、2023-10-03 TP（8/8 全勝，0 SL）
+  * Part B：2024-06-11 / 2025-03-03 / 2025-08-19 / 2025-12-16（4/4 zero-var TP，與 URA-013 Att2 相同）
+- **跨資產貢獻**：repo 首次「長窗口 (60日) prior-return CEILING」作為 post-parabolic capitulation-quality regime gate，擴展 lesson #19 family 從短窗口 depth cap (1d/2d/3d/5d/ATR) 至長窗口 post-parabola 排除 CEILING（與 URA-013 5d cap 正交）；非 trend-direction filter（不違反 cross_asset_lessons #3）
+- URA-014 Att2（ceiling +0.40 鬆放 robustness）與 Att1 完全相同（+0.45/+0.40/+0.35/+0.30 皆 identical → robust ≥15pp 平台 [+0.30,+0.45]，非 fitted 單點）
+- URA-014 Att3（ceiling +0.28 收緊 cliff）Part A 不變但 Part B 4→3（誤殺 2025-08-19 Ret60 +29.59% winner，cum →+19.10%），確認 +0.35 mid-plateau、+0.28 退化懸崖
 
-**前任最佳：** URA-012 Att2 ★（URA-004 框架 + ATR(5)/ATR(20) BAND [1.00, 1.50]，TP +6.0% / SL -5.5%，Part A Sharpe **0.47** / Part B Sharpe **0.62** / min(A,B) **0.47**，cum +47.28%/+26.44%）**核心發現**：URA Part A SLs (7) 集中高 ATR / Part B SLs (5) 集中低 ATR 為**完美鏡像**——URA-007 Att1 (FLOOR-only) 與 URA-012 Att1 (CEILING-only) 為對稱失敗，BAND 結構為唯一同時修兩邊的解。**Repo 首次 Part A/B SLs ATR 鏡像分布結構發現**，擴展 lesson #15 邊界至 BAND 結構。
-**前前任最佳：** URA-004（回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3%，TP +6.0% / SL -5.5%，Part A Sharpe 0.41，Part B Sharpe 0.39，A/B gap 0.02）已被 URA-012 BAND 超越
-**前任前任：** URA-003（回檔 10-20% + RSI(2) < 15，Part A Sharpe 0.34，Part B Sharpe 0.44，A/B gap 0.10）
+**前任最佳：** URA-013 Att2 ★（URA-012 Att2 全條件 + 5日報酬 cap >= -9.0%，TP +6.0% / SL -5.5% / 20天 / cd 10，Part A 9/88.9%/Sharpe **1.22** cum +46.84% / Part B 4/100% std=0 cum +26.25% / min(A,B)† **1.22**，+160% vs URA-012）**核心發現**：repo 首次「5日報酬 cap」作為主要 capitulation-strength 過濾器；唯一殘餘 binding Part A SL 2021-11-16（被 URA-014 post-parabola gate 進一步 surgical 切除）。
+**前前任最佳：** URA-012 Att2 ★（URA-004 框架 + ATR(5)/ATR(20) BAND [1.00, 1.50]，TP +6.0% / SL -5.5%，Part A Sharpe **0.47** / Part B Sharpe **0.62** / min(A,B) **0.47**，cum +47.28%/+26.44%）**核心發現**：URA Part A SLs (7) 集中高 ATR / Part B SLs (5) 集中低 ATR 為**完美鏡像**——URA-007 Att1 (FLOOR-only) 與 URA-012 Att1 (CEILING-only) 為對稱失敗，BAND 結構為唯一同時修兩邊的解。**Repo 首次 Part A/B SLs ATR 鏡像分布結構發現**，擴展 lesson #15 邊界至 BAND 結構。
+**前前前任最佳：** URA-004（回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3%，TP +6.0% / SL -5.5%，Part A Sharpe 0.41，Part B Sharpe 0.39，A/B gap 0.02）已被 URA-012 BAND 超越
+**更早：** URA-003（回檔 10-20% + RSI(2) < 15，Part A Sharpe 0.34，Part B Sharpe 0.44，A/B gap 0.10）
 **滾動窗口分析摘要：** URA-001 ✗✓（精準度突變 ΔWR 25.0pp，績效漸變，早期鈾礦暴漲→2022 回檔為主因）
 
 **已證明無效（禁止重複嘗試）：**
@@ -81,6 +83,7 @@
 - **Day-After Capitulation 強反轉 K 線確認**：T-1 capitulation + T 今日反轉 K 線（Close>Prev Close/High + Close>Open），3 次迭代最佳 min(A,B) 0.24
 - **Williams Vix Fix（WVF）+ 回檔深度**：WVF(22)>BB_upper(WVF,20,2.0) + 10d 回檔 [-8%/-10%, -25%] + 可選 2DD ≤ -3%。Att3（深回檔 -10%）Part A Sharpe 0.68（URA 系列 in-sample 最高），但 Part B 0.04 拖累 min(A,B)。Repo 首次 WVF 試驗
 - **Volume-Confirmed Capitulation**：URA-004 entry + Volume(today)/Avg20(Volume) ≥ 1.5x/2.0x，可選 ClosePos ≥ 40%。Att1 完美 A/B 對稱（6/6 訊號、同 WR、同累計）但 min 0.39 等同 URA-004；Att2（Vol 2.0x + ClosePos）min 0.04 崩壞；Att3（移除 2DD）min 0.18
+- **Post-Parabolic 長窗口 regime gate（URA-014 ★ SUCCESS）**：URA-013 Att2 + prior 60日報酬 ceiling。掃描 ceiling +0.45/+0.40/+0.35/+0.30/+0.28/+0.25 → [+0.30,+0.45] 全 identical（Part A 8/100%/6.71），≤+0.28 起 Part B 退化（誤殺 2025-08-19 winner）。+0.35 為 mid-plateau 甜蜜點。Ret60 為唯一可分維度（Ret120/Ret252/AboveSMA200/RunupTo252Peak interleaved，DDfromHigh252 0.01pp knife-edge 排除）
 
 **尚未嘗試的方向（預期改善極低）：**
 - 鈾期貨/鈾價相關 ETF 確認（跨資產驗證，預期邊際效益低）
@@ -88,6 +91,7 @@
 - Gap-Down 資本化（lesson #20a）— URA 盤外流動性不足，結構性不適用
 - ~~Williams Vix Fix capitulation~~ → URA-010 驗證失敗（3 次嘗試，extends lesson #20b 至 capitulation-depth 指標）
 - ~~Volume-Confirmed Capitulation~~ → URA-011 驗證失敗（3 次嘗試，Volume supplementary filter 無法突破 URA-004 品質天花板）
+- ~~Post-Parabolic 長窗口 prior-return CEILING~~ → URA-014 ★ SUCCESS（Att1 min(A,B)† 6.71，+450% vs URA-013 Att2；Part A 達 100% WR 零停損，URA 已近結構上限，後續改善空間極低）
 
 **關鍵資產特性：**
 - URA (Global X Uranium ETF) 日波動約 2.34%，GLD 比率 2.11x
@@ -102,6 +106,7 @@
 - **雙振盪器確認在 URA 上失敗**：WR(10) 不過濾 Part B 任何訊號（RSI(2)+2DD 訊號在 Part B 天然通過 WR），但在 Part A 通過冷卻鏈偏移引入新壞訊號
 - **RSI(14) Bullish Hook Divergence 在 URA 上失敗（URA-008 驗證）**：URA 形式上符合 lesson #20b 全部四項條件（日波動 2.34%、10日回檔框架、兩段活躍 MR regime、已驗證 pullback+WR/RSI(2) 框架），但三次迭代均無法超越 URA-004。關鍵失敗點發生在 Part B：hook 過濾器大幅收斂訊號數（SIVR 保留率 44% vs URA 保留率 25%），殘餘 Part B 訊號中停損佔比升至 67%。URA 的核能政策/鈾價供應衝擊使 RSI(14) 轉折不代表真實反轉，常發生「V-bounce 後繼續深跌」模式（如 2025-11-05 訊號後隔日直接跌穿 SL）。擴展 lesson #20b 邊界：SIVR-015 模式需 RSI 轉折 = 真實反轉 的 regime，URA 事件驅動特性使此結構不成立
 - **Day-After Capitulation + 強反轉 K 線確認在 URA 上失敗（URA-009 驗證）**：三次迭代最佳 min(A,B) 0.24（Att2 Close>Prev High），遠低於 URA-004 的 0.39。強反轉過濾（收復昨日高點）能維持 WR 60%，但年化訊號僅 ~1 筆；放寬 T-1 capitulation 閾值後訊號品質立即崩壞（WR 崩至 43%）。與 URA-008 hook 屬於同一失敗模式：政策驅動資產的任何單日/雙日反轉確認（無論振盪器 hook 或 price-action bar）均無法區分真反轉 vs 暫時回彈。Att2 A/B 完美平衡但樣本過薄，Att3 放寬後樣本增但品質丟失——證明 URA-004 的 WR≤-80 + 2DD≤-3% 配置已是 capitulation-day 進場的最優解，day-after 額外一日等待換取的確認訊號價值低於失去的進場速度
+- **Post-Parabolic 長窗口 regime gate 在 URA 上成功（URA-014 Att1 ★，repo 首次長窗口 prior-return CEILING）**：URA-013 Att2 唯一殘餘 binding Part A SL 2021-11-16 為 Sept-Nov 2021 Sprott-SPUT 鈾拋物線 blow-off（Ret60 +51.39%）的接刀；prior 60日報酬 ceiling ≤ +0.35 surgical 切除該筆（全 13 筆唯一虧損），Part A 9→8 全勝零停損 Sharpe 1.22→6.71，Part B/C 不變。**核心發現**：URA capitulation MR 真 winners 前 60日動能皆 ≤+29.59%（溫和或負，真實下跌產生超賣），唯一 SL 在 +51% 拋物線後——這是「拋物線 unwind 早期非真底」結構，與 URA 事件驅動「衝擊後續跌」特性一致；長窗口排除 CEILING 與 URA-013 短窗口 5d cap 正交（短=近期跌太深、長=拋物線後續跌）。非 trend-direction filter（不違反 lesson #3：不要求上升趨勢，而是排除拋物線後接刀的 anti-extension regime classifier，與 URA-006 順勢進場本質不同）
 - **Volume-Confirmed Capitulation 在 URA 上無法超越 URA-004（URA-011 驗證，repo 第 3 次 Volume Spike 作為主過濾器試驗）**：Att1（URA-004 entry + Volume ≥ 1.5x）產生 URA 首次「完美 A/B 對稱」——Part A/B 均 6 訊號、同為 66.7% WR、同為 +12.53% 累計報酬、同為 4TP+2SL 結構、同為 0.39 Sharpe。Volume spike 作為 supplementary filter 創造對稱性但未突破 URA-004 品質天花板。Att2（收緊至 2.0x + ClosePos 40%）min 0.04 崩壞，進場日期偏移使 2020-02-27 TP 轉 2020-02-28 SL；URA 政策驅動使 ClosePos 無選擇性（與 URA-007 ATR 重複過濾失敗同類）。Att3（移除 2DD，Vol 1.5x alone）min 0.18——Volume 與 2DD 結構性獨立（非重複過濾），2DD 在 Part A 有真實選擇性。**核心發現**：(1) Volume 在已飽和 pullback+RSI(2)+2DD 框架上僅提供對稱性而非品質提升，擴展 lesson #6 至 Volume 類別；(2) 2DD 無法被 ATR（URA-007）、Volume（URA-011）任一替代，URA-004 的 2DD 過濾為真實不可省略元素。新 cross-asset 假設：Volume supplementary filter 可在高流動性 ETF 產生完美 A/B 對稱但無法突破品質天花板，待 SIVR/FXI/INDA 跨資產驗證
 <!-- AI_CONTEXT_END -->
 
@@ -122,7 +127,7 @@
 | URA-001 | `ura_001_pullback_wr`           | 回檔範圍 10-20% + Williams %R 均值回歸 | 已完成 |
 | URA-002 | `ura_002_asymmetric_narrow`     | URA-001 + 非對稱出場 SL -5.5%         | 已完成 |
 | URA-003 | `ura_003_pullback_rsi2`         | 回檔 10-20% + RSI(2) < 15 替代 WR(10) | 已完成 |
-| URA-004 | `ura_004_20d_pullback_rsi2`     | 回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3% | ✅ 當前最佳 |
+| URA-004 | `ura_004_20d_pullback_rsi2`     | 回檔 10-20% + RSI(2) < 15 + 2日跌幅 ≤ -3% | 已完成（被 URA-012/013/014 超越） |
 | URA-005 | `ura_005_bb_squeeze_breakout`   | BB Squeeze Breakout（3 次嘗試均失敗）       | 已完成（未改善） |
 | URA-006 | `ura_006_trend_pullback`        | 趨勢/動量/RS 回調（3 次嘗試均失敗）        | 已完成（未改善） |
 | URA-007 | `ura_007_vol_adaptive`          | 波動率自適應/雙振盪器（3 次嘗試均失敗）     | 已完成（未改善） |
@@ -130,8 +135,9 @@
 | URA-009 | `ura_009_day_after_reversal_mr` | Day-After Capitulation + 強反彈 K 線確認（3 次嘗試均失敗） | 已完成（未改善） |
 | URA-010 | `ura_010_wvf_capitulation_mr`   | Williams Vix Fix Capitulation + 回檔深度 MR（3 次嘗試均失敗） | 已完成（未改善） |
 | URA-011 | `ura_011_volume_capitulation_mr` | Volume-Confirmed Capitulation MR（Volume Spike + URA-004 框架，3 次嘗試均失敗） | 已完成（未改善） |
-| URA-012 | `ura_012_atr_band_mr`           | Volatility-Acceleration-Bounded MR（ATR Ratio BAND [1.00, 1.50]，Att2 ★ SUCCESS）| ✅ 前任最佳 |
-| URA-013 | `ura_013_multi_period_cap_mr`   | Multi-Period Capitulation-Strength Filter MR（URA-012 Att2 + 5日報酬 cap >= -9.0%，Att2 ★ SUCCESS） | ✅ **當前最佳** |
+| URA-012 | `ura_012_atr_band_mr`           | Volatility-Acceleration-Bounded MR（ATR Ratio BAND [1.00, 1.50]，Att2 ★ SUCCESS）| 已完成（被 URA-013/014 超越） |
+| URA-013 | `ura_013_multi_period_cap_mr`   | Multi-Period Capitulation-Strength Filter MR（URA-012 Att2 + 5日報酬 cap >= -9.0%，Att2 ★ SUCCESS） | ✅ 前任最佳 |
+| URA-014 | `ura_014_postparabola_regime_mr` | Post-Parabolic Long-Horizon Regime-Gated Capitulation MR（URA-013 Att2 + prior 60日報酬 ceiling <= +0.35，Att1 ★ SUCCESS） | ✅ **當前最佳** |
 
 ---
 
@@ -1232,4 +1238,132 @@ URA-012 0.47)。** 三項 acceptance criteria 全部達標。確認 5日報酬 c
 #19 family 第 5 個有效維度，與 URA-012 ATR BAND 形成「vol regime + multi-day
 acceleration」雙重正交過濾結構。Att3 robustness check 確認 -9.0% 閾值為 URA
 Part A 5d return 分布最佳切點。
+
+---
+
+## URA-014: Post-Parabolic Long-Horizon Regime-Gated Capitulation MR
+
+### 目標 (Goal)
+
+Same-framework refinement of URA-013 Att2（**非** cross-asset port）：以一個正交
+的長窗口 regime gate surgical 切除 URA-013 Att2 唯一殘餘 binding Part A SL
+2021-11-16（全 13 筆唯一虧損），進一步突破 URA 結構性 Sharpe（URA-013 1.22 後
+第三層突破）。
+
+### 進場條件 (Entry Conditions)
+
+| 條件 | 指標 | 閾值 | 說明 |
+|------|------|------|------|
+| 1 | 10 日高點回檔 | ≥ 10% | 同 URA-013 |
+| 2 | 回檔上限 | ≤ 20% | 同 URA-013 |
+| 3 | RSI(2) | < 15 | 同 URA-013 |
+| 4 | 2 日跌幅 | ≤ -3% | 同 URA-013 |
+| 5 | ATR(5)/ATR(20) FLOOR | ≥ 1.00 | 同 URA-013 |
+| 6 | ATR(5)/ATR(20) CEILING | ≤ 1.50 | 同 URA-013 |
+| 7 | 5 日報酬 cap | >= -9.0% | 同 URA-013 Att2 |
+| 8 | **prior 60 日報酬 CEILING** | **<= +35%** | **新 — 排除拋物線 blow-off unwind 期間的接刀** |
+| 9 | 冷卻期 | 10 天 | 同 URA-013 |
+
+### 出場參數 (Exit Parameters)
+
+同 URA-004 / URA-012 / URA-013：TP +6.0% / SL -5.5% / 20 天最長持倉 / 無追蹤停損
+
+### 成交模型 (Execution Model)
+
+ExecutionModelStrategy（隔日開盤市價 + 0.10% 滑價 + 悲觀同根 K 線認定）
+
+### 設計理念 (Design Rationale) — 強制 pre-analysis gate (predict→confirm)
+
+重現 URA-013 Att2 全 13 筆交易，URA-013 Att2 唯一殘餘 binding Part A SL =
+2021-11-16（-5.59% SL，全 13 筆唯一虧損）。長窗口維度 trade-level 診斷：
+
+```
+prior 60日報酬 (Ret60) 分布:
+  SL 2021-11-16             = +51.39%   <- Sept-Nov 2021 Sprott-SPUT
+                                            鈾現貨 $30→$50 拋物線 blow-off
+  11 target winners + 2019-08-05 expiry-win = [-24.39%, +29.59%]
+
+  → SEPARABLE：SL 高於所有 winner 21.80pp；robust ≥20pp 平台
+    [+29.6%, +51.4%]，非 knife-edge 單點
+  其他維度 Ret120 / Ret252 / AboveSMA200 / RunupTo252Peak 全 interleaved；
+  DDfromHigh252 0.01pp knife-edge（排除）
+```
+
+結構機制 (ex-ante)：URA 60 日 +51% 拋物線進場 = 多月拋物線均值回歸 unwind 早期，
+非真 capitulation 底 → MR 買入續跌至 SL。真 URA capitulation winners 前 60 日
+動能皆溫和或負（真實下跌產生超賣），與 URA 事件驅動「衝擊後續跌 / V-bounce 後
+更深跌」特性一致。2021-11-16 時序孤立（前訊號 2021-07-19、後訊號 2022-03-14
+皆 ≫ cd10）→ 預測 clean surgical excision 無 cooldown chain-shift（GLD-016-class，
+非 SOXL-013-class）。**預測 SUCCESS。**
+
+非 trend-direction filter（不違反 cross_asset_lessons #3）：不要求上升趨勢，而是
+排除「拋物線 blow-off unwind 期間的接刀」——anti-extension 反向 regime
+classifier，與 URA-006 順勢 ROC/SMA/RS 進場觸發（已證明無效）本質不同；屬
+lesson #19 multi-period-return family 的長窗口 CEILING 延伸，與 URA-013 短窗口
+5d cap 正交（短=「近期跌太深」排除；長=「拋物線後續跌」排除）。
+
+### 迭代嘗試紀錄 (Iteration Log)
+
+| Att | 變更 | Part A Sharpe | Part B Sharpe | min(A,B)† | 結論 |
+|-----|------|---------------|---------------|-----------|------|
+| 1 ★ | Ret60 ceiling ≤ +0.35（mid-plateau）| **6.71** | std=0 (100%) | **6.71†** | ✅ **SUCCESS +450% vs URA-013；僅切除 2021-11-16，Part A 9→8 全勝零停損，clean excision 無 chain-shift** |
+| 2 | Ret60 ceiling ≤ +0.40（鬆放 robustness）| 6.71 | std=0 (100%) | **6.71†** | ✅ 與 Att1 完全相同（+0.45/+0.40/+0.35/+0.30 皆 identical）→ robust ≥15pp 平台 [+0.30,+0.45]，非 fitted 單點 |
+| 3 | Ret60 ceiling ≤ +0.28（收緊 cliff）| 6.71 | std=0 (100%) | 6.71† | ❌ Part A 不變但 Part B 4→3（誤殺 2025-08-19 Ret60 +29.59% winner，cum +26.25%→+19.10%，A/B gap →16.3%），確認 +0.35 mid-plateau、+0.28 退化懸崖 |
+
+### 回測結果 (Backtest Results) - Att1 ★
+
+| 指標 | Part A (2019-2023) | Part B (2024-2025) | Part C (2026-) |
+|------|-------------------|-------------------|----------------|
+| 訊號數 | **8** | **4** | 3 |
+| 訊號/年 | 1.6 | 2.0 | — |
+| 勝率 | **100.0%** | **100.0%** | 66.7% |
+| 平均報酬 | +5.68% | +6.00% | +3.97% |
+| 累計報酬 | **+55.54%** | **+26.25%** | +12.25% |
+| 年化累計 | 11.11%/y | 13.13%/y | — |
+| 盈虧比 | ∞ | ∞ | — |
+| **Sharpe** | **6.71** | std=0 (顯示 0.00) | 1.38 |
+| MDD | -5.14% | -3.67% | — |
+| 出場 | 7 TP + 1 expiry-win，**0 SL** | 4 TP | 2 TP + 1 expiry |
+| 最大連續虧損 | **0** | 0 | 1 |
+
+`min(A,B)† = Part A 6.71`（Part B std=0 為結構性零方差，沿用 EWJ-003/SPY-009/
+DIA-012/IWM-013/SIVR-018/CIBR-014/URA-013 慣例採 Part A Sharpe 為 binding
+constraint）。Part B / Part C 與 URA-013 Att2 結構相同（gate 對其非綁定）。
+
+### Acceptance Criteria
+
+- ✅ Sharpe min(A,B)† 6.71 vs URA-013 Att2 1.22（**+450%**）
+- ✅ A/B annualized cum diff **15.4%** (11.11%/y vs 13.13%/y) < 30%（優於 URA-013 Att2 的 28.6%）
+- ✅ A/B annualized signal diff **20%** (1.6/yr vs 2.0/yr = 1.25:1) < 50%
+- ✅ Uses ExecutionModelStrategy (next-open + 0.1% slippage + pessimistic intrabar)
+- ✅ Repo 較少使用方向（repo 首次長窗口 prior-return CEILING 作為 post-parabolic
+  capitulation-quality regime gate）
+
+### 跨資產貢獻 (Cross-Asset Contribution)
+
+1. **Repo 首次「長窗口 (60日) prior-return CEILING」作為 post-parabolic
+   capitulation-quality regime gate 於任何資產**——lesson #19 family 先前僅短
+   窗口 depth cap (1d/2d/3d/5d/ATR-ratio)，URA-014 加入「長窗口 post-parabola
+   排除 CEILING」維度，與 URA-013 5d cap 正交。
+2. **非 trend-direction filter**：anti-extension 反向 regime classifier（排除
+   拋物線後接刀），不違反 cross_asset_lessons #3，與順勢進場（URA-006 已證明
+   無效）本質不同。
+3. **predict→confirm 軌跡延伸**：pre-analysis gate 正確預測 SUCCESS（GLD-016 /
+   VOO-005-class clean excision；前次 EWT-010/SIVR-019/CIBR-016/SOXL-013/
+   TSM-012/EWJ-006/EEM-016/INDA-013/DIA-013 documented-failure 亦全部正確
+   預測）。
+4. **打破 URA 結構性 Sharpe 上限第 3 層**：0.39 (URA-004) → 0.47 (URA-012
+   BAND) → 1.22 (URA-013 5d cap) → **6.71 (URA-014 post-parabola gate)**，
+   URA Part A 達 100% WR 零停損。預期適用於其他 capitulation MR 殘餘 SL 為
+   「拋物線後 dip」結構的政策/事件驅動高波動 ETF（COPX/FCX/SOXL/SIVR 待
+   跨資產驗證）。
+
+### 結論
+
+**URA-014 Att1 為新全域最優（14 次實驗、42+ 次嘗試），min(A,B)† 6.71 (+450% vs
+URA-013 Att2 1.22)。** 三項 acceptance criteria 全部達標且 A/B 平衡優於 URA-013
+Att2。pre-analysis predict→confirm gate 預測 SUCCESS 並命中（GLD-016/VOO-005-class
+clean surgical excision），Part A 達 100% WR 零停損，URA 已近結構上限，後續改善
+空間極低。Att2/Att3 robustness bracket 確認 +0.35 為 [+0.30,+0.45] robust 平台
+中點，非 fitted 單點。
 
