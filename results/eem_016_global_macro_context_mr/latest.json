@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-16T17:24:54.858042"
+    "execution_time": "2026-05-16T17:29:38.026421"
   },
   "part_a": {
     "ticker": "EEM",
@@ -64,35 +64,24 @@
   },
   "part_b": {
     "ticker": "EEM",
-    "total_signals": 4,
-    "wins": 3,
-    "win_rate": 0.75,
-    "avg_return_pct": 1.48,
-    "std_return_pct": 2.64,
-    "cumulative_return_pct": 5.89,
-    "avg_holding_days": 6.8,
+    "total_signals": 3,
+    "wins": 2,
+    "win_rate": 0.6666666666666666,
+    "avg_return_pct": 0.97,
+    "std_return_pct": 2.88,
+    "cumulative_return_pct": 2.8,
+    "avg_holding_days": 4.7,
     "max_drawdown_pct": -3.86,
-    "profit_factor": 2.9,
-    "sharpe_ratio": 0.56,
-    "sortino_ratio": 0.95,
-    "calmar_ratio": 0.38,
+    "profit_factor": 1.94,
+    "sharpe_ratio": 0.34,
+    "sortino_ratio": 0.54,
+    "calmar_ratio": 0.25,
     "max_consecutive_losses": 1,
-    "target_exits": 3,
+    "target_exits": 2,
     "stop_loss_exits": 1,
     "time_expiry_exits": 0,
     "pessimistic_exits": 0,
     "trades": [
-      {
-        "date": "2024-01-17",
-        "entry_date": "2024-01-18",
-        "exit_date": "2024-02-06",
-        "entry": 36.25,
-        "exit": 37.33,
-        "return_pct": 3.0,
-        "holding_days": 13,
-        "exit_type": "target",
-        "max_drawdown_pct": -0.26
-      },
       {
         "date": "2024-04-16",
         "entry_date": "2024-04-17",
@@ -127,7 +116,7 @@
         "max_drawdown_pct": -3.86
       }
     ],
-    "filled_count": 4,
+    "filled_count": 3,
     "unfilled_count": 0,
     "unfilled_signals": [],
     "fill_rate": 1.0,

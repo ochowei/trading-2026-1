@@ -82,11 +82,13 @@ class EEM016Config(ExperimentConfig):
     # === EEM-016 核心新增：SPY 寬基 macro-context confirmation gate ===
     # SPY (SPDR S&P 500 ETF) 為 developed-market 寬基 risk-on/off anchor。
     macro_ticker: str = "SPY"
-    # lookback：對齊 IWM-015 的 10 日視窗作為起點
-    macro_lookback: int = 10
+    # lookback：Att1=10（對齊 IWM-015）；Att2=20（測試替代視窗）；Att3=10
+    macro_lookback: int = 20
     # SPY N 日絕對報酬上限：require SPY 亦處於 drawdown（同步 broad risk-off）。
-    #   - Att1: 0.0（SPY 10d <= 0，發達市場亦走弱）— 起點，觀察 trade-level 分布
-    #   - Att2/Att3: 依 trade-level 分布調整（待回測填入最終值）
+    #   - Att1（lookback 10, thr 0.0）：TIE 0.56 — Part A zero-var（切除 DiDi
+    #     孤立性 SL），Part B 完全不變（非綁定）。
+    #   - Att2（lookback 20, thr 0.0）：替代視窗 ablation（待回測填入）。
+    #   - Att3（lookback 10, thr -0.025）：收緊 threshold（待回測填入）。
     macro_return_threshold: float = 0.0
 
 
