@@ -61,6 +61,7 @@ on:
           - "SIVR-016: sivr_016_wvf_capitulation_mr"
           - "SIVR-017: sivr_017_mfi_capitulation_mr"
           - "SIVR-018: sivr_018_atr_band_mr"
+          - "SIVR-019: sivr_019_usd_regime_mr"
           - "FCX-001: fcx_001_extreme_oversold"
           - "DIA-001: dia_001_pullback_wr_reversal"
           - "DIA-002: dia_002_rsi2_reversal"
