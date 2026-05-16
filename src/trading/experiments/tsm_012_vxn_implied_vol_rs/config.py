@@ -63,8 +63,11 @@ class TSMVXNImpliedVolRSConfig(ExperimentConfig):
 
     # ^VXN forward-looking implied-vol DIRECTION regime gate
     vxn_ticker: str = "^VXN"
-    vxn_lookback: int = 3  # ^VXN 變化回看天數（Att1=5 / Att2=3 / Att3=10）
-    vxn_change_max: float = 0.5  # ^VXN N 日變化上限（>= 999 視為停用）
+    # 三次迭代全部 FAILED（Att1 5d/+1.0 min 0.64 / Att2 3d/+0.5 min 0.20 /
+    # Att3 10d/+2.0 min -0.09，全部 < TSM-011 Att3 baseline 0.83）。
+    # 保留 Att1（least-bad，canonical sweet-spot anchor）為文件化預設值。
+    vxn_lookback: int = 5  # ^VXN 變化回看天數（Att1=5 / Att2=3 / Att3=10）
+    vxn_change_max: float = 1.0  # ^VXN N 日變化上限（>= 999 視為停用）
 
 
 def create_default_config() -> TSMVXNImpliedVolRSConfig:
