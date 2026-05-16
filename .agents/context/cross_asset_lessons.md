@@ -926,10 +926,10 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 
 ---
 
-## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07**）
+## 24. Forward-Looking Implied Volatility Derivative 為 Backward-Looking Regime Gate 飽和後的下一維度（^MOVE 對 TLT 首次驗證 2026-05-01，**XLU-013 第 2 次跨資產驗證 + DIRECTION 維度首次發現 2026-05-02，GLD-015 第 3 次跨資產驗證 + ^GVZ 首次任何資產 + commodity-safe-haven 類別 DIRECTION 10d binding 首次發現 2026-05-02，USO-025 第 4 次跨資產驗證 + ^OVX 首次任何資產 + commodity event-driven 類別 DIRECTION 3d binding 首次發現 2026-05-03，NVDA-018 第 5 次跨資產驗證首次失敗 + 適用邊界雙重條件確立（asset class + strategy framework）2026-05-06，XBI-017 BANDS 變體首次發現 2026-05-04，FCX-015 FLOOR 變體首次發現 + 反向 VIX 分布結構發現 2026-05-07，**EWJ-006 / EWZ-008 確立第 (c) 適用條件「殘餘 binding SL 須為 vol-regime 可區分」+ ^VIX 首次應用於非美已開發單一國家股票 ETF 失敗 2026-05-16****）
 <!-- freshness:
-  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015]
-  validated: 2026-05-07
+  derived_from: [TLT-013,XLU-013,GLD-015,USO-025,NVDA-018,XBI-017,FCX-015,EWZ-008,EWJ-006]
+  validated: 2026-05-16
   data_through: 2025-12-31
   confidence: high
 -->
@@ -1044,6 +1044,33 @@ Drawdown(T-N) <= -X%（N≈5 trading days，X≈1%）
 - **(b) Capitulation MR framework 條件**：
   - ✅ MR / dip-buying 進場（IV stress 為 entry signal 反向過濾器）
   - ❌ MBPC / breakout / trend-continuation（IV 與動量延續訊號相關性弱）
+
+**Lesson #24 v6 適用邊界精煉（EWJ-006 / EWZ-008 確立 2026-05-16，新增第 (c) 條件）**：
+即使 (a) single-driver IV + (b) MR 框架兩條件滿足，仍需 **(c) 殘餘 binding SL
+集中於 vol-regime 可區分的失敗模式**，否則 IV gate 無乾淨 separator 而結構性失效。
+- **EWJ-006（^VIX × 已開發單一國家股票 ETF + MR）→ FAILED/REJECT**：repo 首次
+  ^VIX 應用於非美已開發單一國家寬基股票 ETF。EWJ-005 Att2（min(A,B)† 0.70）唯一
+  殘餘 Part A SL 2022-09-01（Powell Jackson Hole 鷹派後）之 ^VIX（level 25.56 /
+  3d -0.65 / 5d +3.78 / 10d +6.00）在 12 筆 winners 之 ^VIX 分布**每一維度
+  （level / 3d / 5d / 10d，cap 或 floor）皆居中交錯，無乾淨 separator**。
+  三次迭代：Att1（3d DIR <= +5.0 sweet-spot port）min 0.60（-14%，誤殺 winners
+  保留 SL，因 SL 之 3d=-0.65 vol 持平/微降方向錯誤）；Att2（3d DIR <= +3.0）
+  min 0.42（-40%）；Att3（LEVEL CAP <= 25.0）nominal 雙零方差 **BUT REJECT**
+  ——僅靠整片切除 ^VIX > 25 高波動 regime 過濾 SL，連帶切 3 筆 +3.5% TP winners
+  + 1 Part B winner（訊號 9→5/-44%、4→3/-25%），違反 lesson #14 + EEM-016
+  非外科式 attrition REJECT 標準。**EWJ 殘餘失敗為 idiosyncratic 日本特有
+  （BoJ 政策 / 日圓套息平倉 / 出口週期）而非 global implied-vol regime
+  outlier**，與 EWJ-004「日本 RS 為事件驅動非結構性」結論平行。
+- **EWZ-008（^VIX × EM 商品/政治雙驅動單一國家 ETF + MR）→ FAILED**：殘餘 2 SLs
+  之 ^VIX DIRECTION 非綁定、LEVEL 亦無乾淨切點，EM 殘餘 SL 結構分散（同 (c) 違反）。
+- **整合規則**：條件 (c) 為 (a)(b) 之外的獨立必要條件——IV gate 僅在「殘餘
+  binding SL 為 vol-regime outlier（IV 維度上與 winners 可分離）」時有效。
+  對「殘餘 SL 為 asset-idiosyncratic / country-specific 事件驅動」（EWJ 日本、
+  EWZ 巴西商品/政治、EEM-016 中美貿易超額 beta）結構性失效——此類資產的 binding
+  失敗源自資產特有風險而非 broad implied-vol regime，IV index 無法反映。
+  **跨資產篩選步驟**：套用 lesson #24 前必先 trade-level 驗證殘餘 binding SL
+  之 IV（level + 多 lookback direction）是否為 winners 分布之 outlier，
+  居中交錯者直接判定結構性失敗、不浪費迭代。
 
 ---
 
