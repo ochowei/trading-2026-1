@@ -353,6 +353,7 @@ on:
           - "INDA-009: inda_009_cci_oversold_mr"
           - "INDA-010: inda_010_vol_transition_mr"
           - "INDA-011: inda_011_multi_period_capitulation"
+          - "INDA-012: inda_012_dxy_direction_mr"
 
 jobs:
   backtest:
