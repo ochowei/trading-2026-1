@@ -184,6 +184,7 @@ on:
           - "USO-026: uso_026_xle_divergence_mr"
           - "USO-027: uso_027_multi_period_cap_mr"
           - "USO-028: uso_028_ovx_5d_direction_mr"
+          - "USO-029: uso_029_trend_pullback_continuation"
           - "SPY-001: spy_001_pullback_wr"
           - "SPY-002: spy_002_no_trailing"
           - "SPY-003: spy_003_optimized_wr"
