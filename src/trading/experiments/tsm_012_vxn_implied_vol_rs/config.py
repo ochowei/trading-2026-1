@@ -63,8 +63,8 @@ class TSMVXNImpliedVolRSConfig(ExperimentConfig):
 
     # ^VXN forward-looking implied-vol DIRECTION regime gate
     vxn_ticker: str = "^VXN"
-    vxn_lookback: int = 5  # ^VXN 變化回看天數（Att1=5 / Att2=3 / Att3=10）
-    vxn_change_max: float = 1.0  # ^VXN N 日變化上限（>= 999 視為停用）
+    vxn_lookback: int = 3  # ^VXN 變化回看天數（Att1=5 / Att2=3 / Att3=10）
+    vxn_change_max: float = 0.5  # ^VXN N 日變化上限（>= 999 視為停用）
 
 
 def create_default_config() -> TSMVXNImpliedVolRSConfig:
