@@ -108,10 +108,12 @@ class CIBR016Config(ExperimentConfig):
 
     # === ^VIX BANDS regime gate（CIBR-016 核心新增，XBI-017 跨資產移植）===
     # 訊號通過條件：VIX <= vix_low_threshold OR VIX > vix_high_threshold
-    # Att2（post-hoc 嘗試 bracket 唯一 SL；SL VIX 25.03 ∈ (24.7, 25.4]）
+    # Att3（穩健性 ablation：Att2 notch 上移 +0.4pt → (25.1, 25.8]
+    #  預判 SL VIX 25.03 ≤ 25.1 → 不過濾（SL 重回）；winner 2022-09-01
+    #  VIX 25.56 ∈ (25.1,25.8] → 誤殺。雙向崩潰，確認 knife-edge 無泛化）
     vix_ticker: str = "^VIX"
-    vix_low_threshold: float = 24.7
-    vix_high_threshold: float = 25.4
+    vix_low_threshold: float = 25.1
+    vix_high_threshold: float = 25.8
     use_vix_bands: bool = True
 
     cooldown_days: int = 8
