@@ -130,6 +130,7 @@ on:
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "DIA-012: dia_012_oneday_capitulation_filter"
           - "DIA-013: dia_013_trend_regime_pullback"
+          - "DIA-014: dia_014_iwm_divergence_mr"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
           - "FCX-004: fcx_004_bb_squeeze_breakout"
