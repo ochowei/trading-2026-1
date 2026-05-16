@@ -174,10 +174,10 @@ class TSLA018Config(ExperimentConfig):
     #   >= min_tsla_minus_usd（相對背離 FLOOR，TLT-014/GLD-016 Att2 形式）
     usd_benchmark: str = "UUP"
     usd_lookback: int = 20
-    use_usd_ceiling: bool = True
-    max_usd_return: float = 0.015  # Att2 robustness probe (Att1=0.00)
-    use_usd_divergence_floor: bool = False
-    min_tsla_minus_usd: float = -999.0  # Att3 啟用
+    use_usd_ceiling: bool = False
+    max_usd_return: float = 0.015  # Att1=0.00 / Att2=0.015 (ceiling 已測畢)
+    use_usd_divergence_floor: bool = True
+    min_tsla_minus_usd: float = 0.0  # Att3：相對背離 FLOOR（GLD-016 Att2 形式）
 
 
 def create_default_config() -> TSLA018Config:
