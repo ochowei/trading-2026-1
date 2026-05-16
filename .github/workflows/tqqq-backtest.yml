@@ -339,6 +339,7 @@ on:
           - "CIBR-013: cibr_013_higher_low_confirmation_mr"
           - "CIBR-014: cibr_014_multi_period_capitulation_mr"
           - "CIBR-015: cibr_015_momentum_pullback"
+          - "CIBR-016: cibr_016_vol_level_gate_mr"
           - "COPX-001: copx_001_pullback_wr"
           - "COPX-002: copx_002_deep_drawdown"
           - "COPX-003: copx_003_exit_optimized"
