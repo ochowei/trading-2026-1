@@ -117,6 +117,7 @@ on:
           - "EWT-008: ewt_008_bb_lower_pullback_cap"
           - "EWT-009: ewt_009_vol_transition_mr"
           - "EWT-010: ewt_010_ewt_eem_2d_divergence_mr"
+          - "EWT-011: ewt_011_vol_gated_rs_momentum"
           - "EWZ-001: ewz_001_pullback_wr"
           - "EWZ-002: ewz_002_vol_adaptive_pullback"
           - "EWZ-003: ewz_003_bb_squeeze_breakout"
