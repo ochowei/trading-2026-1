@@ -1,27 +1,38 @@
 {
   "metadata": {
-    "execution_time": "2026-05-17T03:26:12.242777"
+    "execution_time": "2026-05-17T03:29:38.861508"
   },
   "part_a": {
     "ticker": "INDA",
     "total_signals": 4,
-    "wins": 3,
-    "win_rate": 0.75,
-    "avg_return_pct": 1.17,
-    "std_return_pct": 3.12,
-    "cumulative_return_pct": 4.54,
-    "avg_holding_days": 8.5,
-    "max_drawdown_pct": -4.35,
-    "profit_factor": 2.14,
-    "sharpe_ratio": 0.37,
-    "sortino_ratio": 0.57,
-    "calmar_ratio": 0.27,
-    "max_consecutive_losses": 1,
-    "target_exits": 2,
-    "stop_loss_exits": 1,
+    "wins": 4,
+    "win_rate": 1.0,
+    "avg_return_pct": 3.06,
+    "std_return_pct": 0.75,
+    "cumulative_return_pct": 12.82,
+    "avg_holding_days": 8.2,
+    "max_drawdown_pct": -3.7,
+    "profit_factor": 999.99,
+    "sharpe_ratio": 4.07,
+    "sortino_ratio": 999.99,
+    "calmar_ratio": 0.83,
+    "max_consecutive_losses": 0,
+    "target_exits": 3,
+    "stop_loss_exits": 0,
     "time_expiry_exits": 1,
     "pessimistic_exits": 0,
     "trades": [
+      {
+        "date": "2020-10-29",
+        "entry_date": "2020-10-30",
+        "exit_date": "2020-11-04",
+        "entry": 31.43,
+        "exit": 32.53,
+        "return_pct": 3.5,
+        "holding_days": 3,
+        "exit_type": "target",
+        "max_drawdown_pct": -1.22
+      },
       {
         "date": "2020-12-21",
         "entry_date": "2020-12-22",
@@ -54,17 +65,6 @@
         "holding_days": 11,
         "exit_type": "target",
         "max_drawdown_pct": 0.08
-      },
-      {
-        "date": "2022-09-16",
-        "entry_date": "2022-09-19",
-        "exit_date": "2022-09-23",
-        "entry": 42.93,
-        "exit": 41.17,
-        "return_pct": -4.1,
-        "holding_days": 4,
-        "exit_type": "stop_loss",
-        "max_drawdown_pct": -4.35
       }
     ],
     "filled_count": 4,

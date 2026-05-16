@@ -68,10 +68,76 @@ non-separable residual SL」家族。
 ========================================================================
 三次迭代（成交模型 0.1% slippage，隔日開盤市價進場，悲觀認定）：
 ========================================================================
-[RESULTS_PLACEHOLDER — 由 run-experiment 回填]
+baseline INDA-011 Att3：Part A 5/80.0%/Sharpe 0.55/cum +8.20%
+（殘餘 SL 2022-09-16 -4.10%）；Part B 2/100%/std=0/cum +7.12%；
+min(A,B)† 0.55。
 
-預設配置 = Att1（^MOVE 3d ceiling <= +5.0，XLU-013 直接類比，
-結構性最佳辯護變體）。
+Att1（FAIL）：^MOVE 3d change CEILING <= +5.0（XLU-013 直接類比）
+  Part A 5/80.0%/Sharpe 0.55/cum +8.20%（與 baseline 完全相同）
+  Part B 2→1/100%/cum +7.12%→+3.50%
+  min(A,B)† 0.55 = Part A TIE 但 Part B winner 流失
+  失敗分析：SL 2022-09-16 ^MOVE 3d = -3.9 點（債券隱含波動率 3 日內
+  下降而非跳升）→ SL 通過 ceiling 未被過濾，Part A 完全不變；ceiling
+  反而移除 Part B winner 2024-06-04（^MOVE 3d = +9.0 > +5.0）。
+  **XLU-013 rate-shock-jump CEILING 假設於 INDA 被資料 REFUTED**：
+  INDA 殘餘 SL 為利率/CPI 衝擊但 signal-day 債券隱含波動率「下降」，
+  與 duration-shock ETF（TLT/XLU）「上升即失敗 regime」方向相反。
+
+Att2（FAIL）：^VIX 3d change CEILING <= +3.0（風險通道探針）
+  Part A 5→4/75.0%/Sharpe 0.37/cum +4.54%
+  Part B 2/100%/cum +7.12%（不變）
+  min(A,B)† 0.37（-33% vs baseline 0.55）
+  失敗分析：SL 2022-09-16 ^VIX 3d = -1.0（mid-pack，與 winners
+  -3.9..+5.1 完全交錯）→ 通過 ceiling 存活；ceiling 反而移除 genuine
+  winner 2020-10-29（^VIX 3d = +5.1）。^VIX 於 INDA 殘餘 SL 全維度
+  （level/1d/3d/5d/10d）皆 mid-pack，風險通道結構性無區分力——
+  2022-09-16 為有序的 post-hot-CPI quad-witching 下跌，signal-day
+  ^VIX 持平非跳升。
+
+Att3（nominal †4.07 BUT REJECT）：^MOVE 3d change FLOOR >= -2.5
+  Part A 5→4/100.0%/Sharpe 4.07/cum +12.82%（外科式僅移除 SL
+  2022-09-16，保留全部 4 winners）
+  Part B 2/100%/std=0/cum +7.12%（不變）
+  min(A,B)† 名目 4.07（+640% vs 0.55）BUT **REJECT**
+  穩健性：floor ∈ [-3.5, -1.5] 結果完全相同（≥2pt 寬平台，非
+  knife-edge）。
+  REJECT 理由：
+  (a) **A/B 累計差 |12.82-7.12|/12.82 = 44.5% >> 30% ❌**（年化幾何
+      30.2% 亦 > 30%）——over-filter 移除 -4.10% SL 使 Part A cum
+      虛增至 +12.82% 而 Part B 持平，A/B gap 突破門檻，與 INDA-012
+      Att2（61.2% REJECT）/ COPX-015 Att2 / EEM-016 同類 over-filter
+      人為產物判例。
+  (b) post-hoc 單點切割（n=7）：^MOVE 3d FLOOR 方向與 INDA-012
+      記錄之 rate-shock-jump 機制「相反」，無 ex-ante 結構機制解釋
+      「債券隱含波動率 3 日下降」為何預測 INDA dip-buy 失敗；僅因
+      恰好隔離 7 點分布中唯一最負的 SL。依 lesson #6 反例 9 /
+      EEM-016 嚴謹標準，無真實結構 discriminator 之單點分離應 REJECT
+      （即使 in-band robust）。
+  (c) 結構性辯護變體（Att1 ^MOVE ceiling = rate-shock 假設、Att2
+      ^VIX 風險通道）皆 FAIL，確認無 forward-looking implied-vol
+      regime 訊號可區分 INDA 殘餘 SL。
+
+========================================================================
+結論：INDA-013 三次迭代全部 FAIL / REJECT，INDA-011 Att3（min 0.55）
+維持全域最優；PRE-ANALYSIS 預測 CONFIRMED（predict→confirm 軌跡完整）
+========================================================================
+根因：INDA-011 Att3 殘餘 2022-09-16 SL 為印度 idiosyncratic Fed-shock
+日，其宏觀 context 簽名跨 DXY（INDA-012 已證實）+ ^MOVE + ^VIX
+（本實驗證實）三維度皆與 winners 結構性交錯，無 forward-looking
+implied-vol / 貨幣 regime gate 具區分力。
+
+跨資產貢獻（負面結果，repo 邊界發現）：
+- **lesson #24 family 首次應用於單一國家 EM 股票 ETF**
+- INDA 加入 TSM-012 / EWJ-006 / EEM-016「idiosyncratic non-separable
+  residual SL」失敗家族（macro-context regime gate 無區分力）
+- 擴展 lesson #24 family DIRECTION 邊界：rate-shock-jump CEILING
+  假設（TLT/XLU duration-shock）不適用「殘餘 SL 為 CPI 衝擊且
+  signal-day 債券隱含波動率下降」之單一國家 EM 股票 ETF
+- 平行 lesson #6 反例 9 / INDA-012 / COPX-014「winners/losers 維度
+  重疊無 surgical 切點」失敗家族
+
+預設配置保留 Att3（^MOVE 3d floor -2.5）作為文件化 nominal-best
+（REJECT），沿用 INDA-012 保留 nominal-best 慣例。
 """
 
 from dataclasses import dataclass
@@ -108,18 +174,20 @@ class INDA013Config(ExperimentConfig):
     #   Att1 (^MOVE, 3d, ceiling, +5.0): XLU-013 rate-shock-jump 類比
     #   Att2 (^VIX , 3d, ceiling, +3.0): 風險通道
     #   Att3 (^MOVE, 3d, floor , -2.5): 唯一名目分離器（post-hoc, REJECT）
-    iv_ticker: str = "^VIX"
+    # 預設保留 Att3 作為文件化 nominal-best（REJECT），沿用 INDA-012
+    # 保留 nominal-best 慣例。
+    iv_ticker: str = "^MOVE"
     iv_lookback: int = 3
-    iv_mode: str = "ceiling"
-    iv_threshold: float = 3.0
+    iv_mode: str = "floor"
+    iv_threshold: float = -2.5
 
 
 def create_default_config() -> INDA013Config:
-    """建立預設配置（Att1：^MOVE 3d ceiling <= +5.0）"""
+    """建立預設配置（Att3 nominal-best REJECT：^MOVE 3d floor >= -2.5）"""
     return INDA013Config(
         name="inda_013_implied_vol_regime_mr",
         experiment_id="INDA-013",
-        display_name="INDA Implied-Vol Regime-Gated MR (^MOVE/^VIX, lesson #24)",
+        display_name="INDA Implied-Vol Regime-Gated MR (FAILED, INDA-011 維持最優)",
         tickers=["INDA"],
         data_start="2012-01-01",
         profit_target=0.035,
