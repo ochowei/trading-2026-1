@@ -109,7 +109,7 @@ class DIA013Config(ExperimentConfig):
     macro_ticker: str = "QQQ"
     macro_lookback: int = 10
     # Att1 -0.015（IWM-015 canonical）/ Att2 -0.005 / Att3 -0.030
-    macro_max_return: float = -0.005
+    macro_max_return: float = -0.030
 
 
 def create_default_config() -> DIA013Config:
