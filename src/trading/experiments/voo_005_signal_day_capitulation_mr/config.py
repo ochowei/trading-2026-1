@@ -90,7 +90,7 @@ class VOO005Config(ExperimentConfig):
     # 1 日跌幅下限（VOO-005 第一維度，SPY-009 跨資產移植）
     # Att1/Att2 -0.5%：要求訊號日 1 日跌幅 >= 0.5%（過濾 3 PA SLs + 1 PB SL）
     # Att3 -0.7%：穩健性驗證更嚴 floor
-    oneday_return_floor: float = -0.005
+    oneday_return_floor: float = -0.005  # Att2 ★ 最終配置
 
     # 3 日累計跌幅上限（VOO-005 第二維度，DIA-012 / SPY-009 跨資產移植）
     # Att1 停用（-0.99）；Att2 ★ -8%；Att3 -8%
