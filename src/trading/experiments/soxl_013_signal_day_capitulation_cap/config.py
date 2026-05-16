@@ -92,7 +92,8 @@ class SOXL013Config(ExperimentConfig):
 
     # SOXL-013 新增：3 日報酬 CAP（lesson #19 family，方向經預分析校正）
     # 訊號日 3 日累計報酬必須 >= cap（不可深於上限 = 排除 regime-shift 深跌）
-    # Att1/Att3 ★ -0.25；Att2 robustness -0.27 / -0.23
+    # Att1 ★ -0.25 (≡ Att2 -0.27, robust band [-27%,-25%], min(A,B) 0.65)；
+    # Att3 -0.22 (boundary: 過深於最深贏家 3d -23.83% → 殺贏家退化)
     threeday_return_cap: float = -0.25
 
     # 訊號冷卻（同 SOXL-006）
