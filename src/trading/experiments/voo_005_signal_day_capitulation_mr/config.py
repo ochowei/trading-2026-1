@@ -94,7 +94,7 @@ class VOO005Config(ExperimentConfig):
 
     # 3 日累計跌幅上限（VOO-005 第二維度，DIA-012 / SPY-009 跨資產移植）
     # Att1 停用（-0.99）；Att2 ★ -8%；Att3 -8%
-    threeday_return_cap: float = -0.99
+    threeday_return_cap: float = -0.08
 
     # 冷卻期（同 VOO-003）
     cooldown_days: int = 5
