@@ -220,6 +220,7 @@ on:
           - "TSLA-015: tsla_015_regime_breakout"
           - "TSLA-016: tsla_016_breakout_ceiling"
           - "TSLA-017: tsla_017_qqq_divergence_breakout"
+          - "TSLA-018: tsla_018_usd_regime_breakout"
           - "TSM-004: tsm_004_smh_confirm"
           - "TSM-005: tsm_005_bb_squeeze_breakout"
           - "TSM-006: tsm_006_momentum_pullback"
