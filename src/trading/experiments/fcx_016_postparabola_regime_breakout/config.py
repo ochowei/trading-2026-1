@@ -131,11 +131,11 @@ class FCX016Config(ExperimentConfig):
     # Att2: +0.45（looser，SL 通過不被過濾）
     # Att3: +0.15（tighter cliff）
     runup_lookback: int = 60
-    runup_ceiling: float = 0.21
+    runup_ceiling: float = 0.45
 
 
 def create_default_config() -> FCX016Config:
-    """建立預設配置（Att1：runup_ceiling +0.21）"""
+    """建立預設配置（Att2：runup_ceiling +0.45）"""
     return FCX016Config(
         name="fcx_016_postparabola_regime_breakout",
         experiment_id="FCX-016",
