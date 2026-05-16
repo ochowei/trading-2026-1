@@ -35,6 +35,7 @@ on:
           - "TQQQ-024: tqqq_024_vol_transition_mr"
           - "TQQQ-025: tqqq_025_vxn_vix_vvix_filter"
           - "TQQQ-026: tqqq_026_sqqq_pair_divergence"
+          - "TQQQ-027: tqqq_027_qqq_single_day_reversal"
           - "GLD-001: gld_001_mean_reversion"
           - "GLD-002: gld_002_optimized_exit"
           - "GLD-003: gld_003_trailing_stop"
