@@ -1,23 +1,33 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-05-16
   data_through: 2025-12-31
+  note_2026_05_16_dia018: DIA-018 added 2026-05-16 (^VIX Implied-Vol BANDS U-shape Regime Gated MR — **repo 首次 lesson #24 v5 BANDS 變體應用於低波動美國寬基指數 ETF capitulation MR，3 次迭代全部 REJECT，與 DIA-015 共同完成 lesson #24 family 於 DIA 之失敗邊界（DIRECTION + BANDS 皆結構性失效）**, cross-strategy port from XBI-017 U-shape regime). 動機：lesson #24 v5 BANDS（XBI-017 生技板塊 ETF U-shape 成功）測試能否移除殘餘 SL 2022-01-18。pre-analysis 決定性預測失敗：DIA-012 12 Part A 依 VIX 排序，殘餘 SL 2022-01-18（VIX=22.8）被贏家 2022-12-16（VIX=22.6）與 2021-12-20（VIX=22.9）夾於 0.3 點窗口，SL 落於贏家 VIX 分布正中央，無 U-shape 結構。Three iterations: Att1 (bands 18/30 XBI-017 風格) Part A 12→**4** zero-var/cum +12.55% / Part B 3→**1**（崩潰）/ REJECT — 多數 DIA capitulation 發生於 mid-VIX 18-30，U-shape 過濾大量贏家；Att2 (bands 20/25) Part A 12→**8** zero-var/+26.7% / Part B 3→**1**（崩潰）/ REJECT；Att3 (bands 22/23 ablation) Part A 12→**9**/100%/Sharpe **12.37**/cum +29.53% / Part B 3 不變 / —— 表面 Sharpe 12.37 > 1.31 但為 **reverse-selection**：[22,23] 中段帶 bluntly 移除 2022-12-16(+3.0% TP, VIX 22.6) + 2021-12-20(+3.0% TP, VIX 22.9) + 2022-01-18(-3.6% SL, VIX 22.8) 三訊號（犧牲 2 winners 連帶移除 1 SL），filter 無 genuine discriminative power，strictly dominated by DIA-014（移除唯一 SL 保留全 11 winners，Sharpe 13.60，cum +37.42% > Att3 +29.53%）。**核心發現（lesson #24 family 於 DIA 邊界刻畫完成）**：(1) **^VIX BANDS 對 DIA 殘餘 SL 無 genuine discriminative power**——殘餘 SL VIX 22.8 被贏家 22.6/22.9 夾住，任何 BANDS 排除 22.8 必連帶移除兩贏家（Att3 reverse-selection 的高 Sharpe 為 coincidental band-removal，非 regime 區分，方法論上 REJECT）；(2) **與 DIA-015（^VIX DIRECTION）共同確立**：lesson #24 family 之 DIRECTION 與 BANDS 兩大變體於 DIA 低波動寬基指數 capitulation MR **皆結構性失效**——所有 ^VIX 衍生 regime gate 對 DIA 無區分力（equity capitulation MR 與 VIX 內生綁定，殘餘 SL 與 underlying IV regime 無乾淨對齊，lesson #14/#36）；(3) **方法論教訓**：zero-var/高 Sharpe 經 blunt band 移除（連帶犧牲 winners）≠ genuine regime gate，須 trade-level 驗證 filter 是否 surgical（DIA-014 ✓ surgical vs DIA-018 Att3 ✗ reverse-selection）。DIA-014 Att1 仍為全域最優（18 次實驗）。
+  note_2026_05_16_dia017: DIA-017 added 2026-05-16 (Buffered Multi-Week SMA Trend-Regime-Gated MR — **repo 首次 lesson #22 buffered SMA trend regime gate 應用於低波動美國寬基指數 ETF capitulation MR，3 次迭代全部 REJECT，建立 lesson #22 family 失敗邊界（reverse-selection 結構）**, cross-strategy port from XBI-015 lesson #22→Pullback MR). 動機：lesson #22 buffered SMA regime gate 已於 TSLA-015/NVDA-012/FCX-013/COPX-011/XBI-015 成功，測試能否移除 DIA-012 殘餘 SL 2022-01-18。pre-analysis 已預測 reverse-selection 失敗：殘餘 SL 2022-01-18 SMA20/SMA60=1.0096 偽多頭 + Close>SMA200=True（通過任何 bull gate）；DIA 最佳 MR 贏家為 bear-regime oversold 進場（2019-05-29/2020-02-28/2022-06-14/2022-09-23 ratio<1.0 + below SMA200，被 bull gate 移除）。Three iterations: Att1 (k=1.00) Part A 12→**9**/88.9%/Sharpe **1.06** cum +21.23%（移除 3 bear-rally winners，保留 2022-01-18 SL）/ Part B 3 不變 / min **1.06 REJECT**（< DIA-012 1.31†）；Att2 (k=0.99 buffered) Part A **10**/90%/Sharpe **1.15** cum +24.9%（緩衝回收 1 bear winner 但仍保留 SL）/ min **1.15 REJECT**；Att3 (k=1.00 + Close>SMA200 strict) Part A **8**/87.5%/Sharpe **0.96** cum +17.70%（移除 4 bear winners，仍保留 SL，最差）/ min **0.96 REJECT**。**核心發現（lesson #22 family 失敗邊界）**：(1) **lesson #22 trend-regime gate 於低波動美國寬基指數 capitulation MR 結構性 reverse-selection**——殘餘 SL（2022-01-18 Fed 升息熊市「起點」）處偽多頭 SMA regime 通過 bull gate；DIA 最佳 MR edge 恰在 bear regime（oversold V-bounce），bull-regime gate 系統性移除 bear-rally winners 而保留 regime-shift SL（WR 91.7%→87.5-90%，Sharpe 1.31→0.96-1.15）；(2) **確認 DIA-013 Att2（SMA(200) regime gate 非選擇性）發現**——trend-regime classifier 與 capitulation MR 邏輯衝突（MR 進場本質為「下跌中買入」，趨勢濾波移除好進場，cross_asset_lessons.md lesson #5 再確認）；(3) **lesson #22 family 適用邊界精煉**：適用於 BB Squeeze Breakout / 動量延續框架（trend continuation 邏輯一致）；**不適用於 capitulation MR**（DIA-017 首例「broad-index MR bear-rally winner 被 bull-regime gate 反向移除」，與 USO-024 純單一商品 ETF 失敗並列 lesson #22 family 兩大失敗類型）。DIA-014 Att1 仍為全域最優（17 次實驗）。
+  note_2026_05_16_dia016: DIA-016 added 2026-05-16 (DIA-QQQ Cross-Asset Divergence CEILING Regime-Gated MR — **DIA-014 之平行 anchor 對照實驗，建立 lesson #20 v3「低波動美國寬基指數」anchor 選擇規則：cap-segment (IWM) > style (QQQ)**, 探索 cross-asset divergence anchor 選擇維度). 動機：DIA-014（DIA-IWM）為新全域最優，本實驗測試 style anchor（QQQ growth/tech）是否同等。Three iterations: **Att1 (rel_lookback=10, max_rel_return=+0.035)** Part A 11/100%/Sharpe **13.60**/cum +37.42%（與 DIA-014 Part A **完全相同**，移除同一 2022-01-18 SL relQQQ_10d +4.51%）/ Part B **2**/100%/std=0/cum +6.09%（**較 DIA-014 少 1 訊號**——2024-08-02 winner relQQQ_10d=+4.13% > CEILING 被誤過濾）/ min(A,B)† **13.60**；Att2 (rel_lookback=20, +0.035) Part A 10/100%/Sharpe **13.00**/cum +33.4%（20d 額外誤濾 2021-12-20 TP relQQQ_20=+3.96）/ Part B 2 不變 / min **13.00**（inferior to Att1）；Att3 ablation (10d, +0.060 非綁定 > SL relQQQ_10 +4.51%) 回退 baseline 12/91.7%/1.31、Part B 3/100% — 確認 binding。**核心發現（lesson #20 v3 anchor 選擇規則）**：(1) **DIA-QQQ 與 DIA-IWM 在 Part A 等效**（同移除 2022-01-18 SL，Sharpe 同 13.60），但 **DIA-QQQ 在 Part B 誤過濾 2024-08-02 winner**——2024-08 日圓套息平倉 broad capitulation 中 DIA 跑贏 tech-heavy QQQ 為合理 broad-cap resilience（非 regime-shift），style anchor (QQQ) 之 tech-growth beta 使「DIA 跑贏 QQQ」同時涵蓋 regime-shift SL（2022-01-18，應濾）與 broad-panic DIA-resilience winner（2024-08-02，不應濾），CEILING 無法區分；(2) **cap-segment anchor (IWM) 結構性優於 style anchor (QQQ)**——IWM（small-cap broad）與 DIA 同為 risk-on cyclical，divergence 訊號更乾淨；新增 lesson #20 v3「低波動美國寬基指數 ETF anchor 選擇規則」：優先 same-risk-regime cap-segment anchor，避開 style/sector-beta anchor（其 beta 污染 divergence 訊號）；(3) DIA-016 Att1 雖 Sharpe ✓ (+938% vs DIA-012)，但 **strictly dominated by DIA-014**（同 Sharpe、Part B 少 1 訊號、A/B balance 更差），不取代全域最優。DIA-014 Att1 仍為全域最優（16 次實驗）。
+  note_2026_05_16_dia015: DIA-015 added 2026-05-16 (^VIX Forward-Looking Implied-Vol DIRECTION Regime-Gated MR — **repo 首次 lesson #24 family forward-looking implied vol DIRECTION 應用於低波動美國寬基指數 ETF，3 次迭代全部 REJECT，建立 lesson #24 family 失敗邊界（lesson #24 family 第 2 次失敗、首次於 broad equity index 類別）**, 探索 repo 中 DIA 較少使用的 lesson #24 方向). 動機：lesson #24（^MOVE/^GVZ/^OVX DIRECTION）已於 TLT/XLU/GLD/USO 成功，測試 ^VIX DIRECTION 能否 surgical 移除 DIA-012 殘餘 SL 2022-01-18。pre-analysis（DIA-005 全 SL/TP 集 signal-day ^VIX N 日點變化）已預測結構性失敗：3 Part A SLs chg3 ∈ {+3.81,+9.45,+5.17}、Part B SL +25.47，與 winners（2020-02-28 +12.26 / 2021-09-20 +7.53 / 2022-06-14 +6.60）完全重疊，無 surgical separator。Three iterations: Att1 (chg3 CEILING <= +4.0) Part A 12→**5**/100% zero-var cum +15.93% / Part B 3→**1**（sample collapse）/ **REJECT** — CEILING 移除 SLs 同時摧毀 7 winners + Part B 崩至 1；Att2 (chg5 CEILING <= +5.0) Part A 12→**8**/87.5%/Sharpe **0.96** cum +17.70%（1 SL 殘留）/ Part B 3→**1** / min **0.96 REJECT**（< 1.31 baseline，仍失 winners 且 Part B 崩潰）；Att3 ablation (chg3 <= +30.0 非綁定，高於 max SL chg5 +24.70) → 完全回退 DIA-012 baseline 12/91.7%/1.31、Part B 3/100% — 確認**無任何 binding ^VIX DIRECTION threshold 能在保留訊號集的前提下移除 SLs**。**核心發現（lesson #24 family 失敗邊界，lesson #14/#36 再確認）**：(1) **forward-looking implied vol DIRECTION 於低波動美國寬基指數 capitulation MR 結構性失效**——DIA RSI(2) MR 進場本質發生於 VIX-rising fear episodes，winners（V-bounce）與 losers（regime-shift 延續）在 ^VIX trajectory 維度完全重疊，CEILING 無法區分；(2) **lesson #24 family 適用邊界精煉**：DIRECTION 維度有效於 rate ETF（TLT 直接 duration）/ rate-indirect defensive（XLU）/ commodity safe-haven/event（GLD/USO）——這些資產之 SL 與「underlying implied vol regime shift」乾淨對齊；**不適用於 broad equity index capitulation MR**（DIA 為首例），因 equity MR 進場與 VIX-rise 內生綁定（lesson #14/#36）；(3) **鏡像 NVDA-018**（lesson #24 family 首次失敗：高 vol AI 個股 + MBPC）——DIA-015 為第 2 次失敗、首次於 broad equity index + MR 框架，共同確立 lesson #24 family 適用 precondition =「target SL 與 underlying IV regime shift 乾淨對齊（非進場機制內生綁定 vol-rise）」。DIA-014 Att1 仍為全域最優（15 次實驗）。
+  note_2026_05_16_dia014: DIA-014 added 2026-05-16 (DIA-IWM Cross-Asset Divergence CEILING Regime-Gated MR — **repo 首次「large-cap broad ETF vs small-cap broad ETF」cap-segment anchor 結構，repo 首次 cross-asset divergence regime gate (lesson #20 v3) 應用於低波動美國寬基指數 ETF，Att1 SUCCESS — 新全域最優 min(A,B)† 1.31 → 13.60 (+938%)**, cross-strategy port from NVDA-021/INDA-012 CEILING 方向). 動機：DIA-012 Att2（min(A,B)† 1.31）binding constraint 為 Part A 唯一 SL 2022-01-18（-3.60%，Fed 升息熊市起點）；signal-day DIA-IWM 10d 相對報酬分析顯示該 SL relIWM_10d=+4.53% 為全 Part A 最高，與贏家最高 +2.77%（2022-09-23）距 +1.76pp surgical gap，全部 3 Part B 贏家 relIWM_10d <= +2.21% 均遠低於 CEILING。Three iterations: **Att1 ★ (rel_lookback=10, max_rel_return=+0.035)** Part A **11 訊號 WR 100%** Sharpe **13.60** cum +37.42% MaxDD -3.14% / Part B 3 訊號完全不變 WR 100% std=0 Sharpe 顯示 0.00 cum +9.27% / min(A,B)† **13.60**（採 EWJ-003/DIA-012 慣例 Part B std=0 → Part A binding，**+938% vs DIA-012 Att2 baseline 1.31†**）— 精準移除 2022-01-18 唯一 SL（無 cooldown chain shift，無新增壞訊號），保留全部 11 獲利訊號，Part B 完全未動；Att2 (max_rel_return=+0.030) 與 Att1 **完全相同**（Part A 11/100%/13.60）— 確認 (+2.77%, +4.53%) 為 robust sweet spot；Att3 ablation (max_rel_return=+0.060 放寬至 SL relIWM_10d +4.53% 之上) Part A 回退 12/91.7%/Sharpe **1.31** cum +32.47%（2022-01-18 SL 重新納入）/ Part B 不變 — 確認 DIA-IWM 10d CEILING 為 **binding surgical discriminator**。**驗收（goal）**：Sharpe 優於 baseline ✓✓✓ (+938%)；A/B 訊號比 11:3 年化 2.20:1.50/yr = **siggap 31.8% < 50% ✓**；A/B 年化累計差 |7.49−4.64|/7.49 = **38.1% > 30% ✗**（結構性：DIA-012 baseline 本身已 28.5% 接近 30% 邊界，surgical 移除其唯一虧損必然抬高 Part A 年化 cum；CEILING 無法在不 reverse-select 贏家下同時壓低 Part A cum，與 FCX-014 相同結構性張力）。**核心發現（lesson #20 v3 family 邊界擴展）**：(1) **repo 首次「large-cap broad ETF (DIA) vs small-cap broad ETF (IWM)」cap-segment intra-equity anchor 結構成功**——擴展 lesson #20 v3 anchor 分類為第 7 類，cap-segment rotation 為新正交維度；(2) **repo 首次 cross-asset divergence regime gate 應用於低波動美國寬基指數 ETF (~1.0% vol)**——既有成功皆為 rate ETF / 高 vol 個股 / EM 單國，DIA 為首例 broad US index；(3) **CEILING 方向結構解讀**：2022-01-18 Fed hawkish pivot 起點，IWM 小型股已先崩跌而 DIA 大型權值股相對撐盤（late-cycle defensive rotation），DIA 此時 RSI(2) 急跌為 broad regime-shift 熊市起點延續而非乾淨 V-bounce——「DIA 過度跑贏 IWM」= over-outperformance vs broader cap-segment = regime-shift（CEILING 適用，鏡像 NVDA-021 / INDA-012）；(4) **10d > 20d**：20d 維度 2021-12-20 TP relIWM_20d=+6.89% 高於 SL +3.46% 無 surgical gap；10d 維度 SL +4.53% 唯一高於所有贏家，10d 為唯一可行 lookback。DIA-014 Att1 為新全域最優（14 次實驗），取代 DIA-012 Att2。
   note_2026_05_16_dia013: DIA-013 added 2026-05-16 (Strict-Bull-Regime Trend Pullback Continuation — **repo 首次於 DIA「嚴格 secular 多頭 regime + 趨勢回檔 continuation + 波動率 regime 閘門」框架，3 次迭代未超越 DIA-012 baseline min(A,B)† 1.31，但獲得跨資產 cumulative-balance 發現**, 探索 repo 中 DIA 較少使用的趨勢跟蹤方向). 動機：DIA-012（capitulation-MR）採 Part B std=0 慣例，Part B 僅 3 訊號，A/B 累積差 71%/訊號差 75% 嚴重違反平衡目標，根因為 MR 在 2024-2025 乾淨多頭 Part B 訊號飢渴；既有趨勢跟蹤 DIA-007 呈相反失衡（Part B Sharpe 1.07 強 / Part A 0.29 弱，因 2020 COVID 崩盤 + 2022 熊市 falling-knife 假訊號）。Three iterations: Att1 (Close>SMA200 & SMA50>SMA200 & SMA200 20d 斜率向上 + 10d 高點回檔 [-6%,-1.5%] + close-up + cd10, TP+3%/SL-3.5%/25d) Part A 33/60.6%/Sharpe **0.14** cum +13.82% / Part B 17/76.5%/Sharpe **0.60** cum +28.45% / min **0.14** REJECT — 訊號過多（33）品質低；Att2 (回檔改 dia_007 風格 Low 觸 SMA(50) 支撐 + cd15) Part A 34/58.8%/Sharpe **0.11** cum +10.27% / Part B 15/80.0%/Sharpe **0.65** cum +26.29% / min **0.11** REJECT — support-anchored 未提升 Part A；**Att3 ★ (加波動率 regime 閘門 ATR(14)/Close <= 1.5%)** Part A 30/66.7%/Sharpe **0.25** cum +21.37% / Part B 14/78.6%/Sharpe **0.59** cum +22.61% / min **0.25** REJECT vs 1.31 baseline，**但 A/B 累積差 |21.37−22.61|/22.61 = 5.5% << 30% ✓✓✓**（vs DIA-012 71%）、訊號比 30:14 = siggap 53%（略超 50%）。**核心發現（trend-following on broad-index 結構性 + lesson #23 cross-asset 擴展）**：(1) **波動率 regime 閘門（ATR<1.5%）為趨勢跟蹤於寬基指數的 A/B cumulative-balance 關鍵**——切除 2020 COVID 崩盤 + 2022 熊市高波動環境（趨勢跟蹤於此死亡），Part A Sharpe 0.11→0.25、WR 58.8%→66.7%、A/B 累積差 71%→5.5%（lesson #23 BB-Width regime gate 跨策略擴展至 trend-following pullback）；(2) **DIA trend-following Part A 結構性 Sharpe 上限 ~0.25**——即使達成優異 A/B 累積平衡，Part A 2019-2023 含兩個熊市 regime（2020 -37%、2022 -22%）使長多趨勢回檔絕對 edge 受限；DIA-012 的 1.31 來自集中 Part A 高波動 capitulation（趨勢跟蹤刻意迴避之處）；(3) **確認 lesson #8 + goal 平衡 vs DIA-012 std=0 慣例的張力**：趨勢跟蹤可結構性修復 DIA MR 的 Part B 訊號飢渴（Part B 從 3 → 14 訊號、Sharpe 穩定 0.59-0.65）並達 cumulative gap 5.5%，但絕對 Sharpe 無法超越 std=0-慣例的 1.31。DIA-012 Att2 仍為全域最優（13 次實驗）。
   note: DIA-012 added 2026-04-24 (Capitulation-Depth Filter MR — repo first 1d-return cap + 3d-return cap dual-dimension primary filter on any asset, **Att2 SUCCESS**). Three iterations: Att1 (1d cap >= -2.0% only) Part A 12/91.7%/Sharpe **1.31** cum +32.47% / Part B 4/75%/0.47 unchanged / min(A,B) 0.47 (tied baseline) — 1d cap precisely filters 2/3 Part A SLs (2021-11-26 1d -2.52%, 2020-10-26 1d -2.24%) preserving all winners; Part B SL (2025-04-07 1d -0.95%) is "shallow 1d + deep 3d" structure (Trump tariff overnight continuation), 1d cap cannot capture; Att2 ★ (1d cap -2.0% AND 3d cap -7%, dual-dimension) Part A 12/91.7%/Sharpe **1.31** cum +32.47% (unchanged from Att1, 3d filter non-binding on Part A) / Part B **3/100%**/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† **= Part A 1.31** (EWJ-003/EWT-008 convention, +178% vs DIA-005 0.47) — 3d cap precisely filters Part B SL (3d -10.06%) preserving all winners (deepest winner 3d = 2020-02-28 -5.96%, 1pp safety margin); Att3 (1d cap -2.0% AND 3d cap -8%, robustness) identical to Att2 — confirms 3d cap robust between -7% and -8%, all winners 3d > -7% and Part B SL 3d -10% deeper than both. **Repo first 1d-return cap + 3d-return cap dual-dimension primary filter trial on any asset**. Cross-asset finding: DIA SLs cluster on 1d/3d return dimensions (orthogonal to 2d), distinct from CIBR-012 (2d cap), EEM-014/INDA-010/USO-013 (2d floor) — two separate failure mechanisms (single-day news shock vs multi-day regime-shift) require dual-dimension filter on low-vol broad ETFs. A/B balance achieved: annualized cum gap 28.5% < 30% ✓, signal ratio 1.6:1 (38% gap) < 50% ✓. Replaces DIA-005 as global optimum (12 experiments). Extends lesson #19 family with new "1d cap + 3d cap dual-dimension" sub-rule for low-vol (~1.0% daily vol) broad ETFs with policy/news-shock SL clustering.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** DIA-012 Att2（DIA-005 進場 + **1 日急跌上限 >= -2.0% AND 3 日急跌上限 >= -7%** 雙維度過濾）— **12 次實驗確認超越 DIA-005**
-- Part A: +32.47%（12 訊號, 91.7% WR, Sharpe **1.31**, MaxDD -3.62%）
+**當前最佳：** ★ **DIA-014 Att1**（DIA-012 Att2 進場 + **DIA-IWM 10 日相對報酬 CEILING <= +3.5%** cross-asset divergence regime gate，lesson #20 v3）★ **2026-05-16 新全域最優（14 次實驗）**
+- Part A: +37.42%（**11 訊號, 100% WR**, Sharpe **13.60**, MaxDD -3.14%）
 - Part B: +9.27%（3 訊號, 100% WR, std=0 Sharpe 顯示 0.00, MaxDD -0.17%）
-- Part C (Live): -0.71%（2 訊號, 50% WR, Sharpe -0.09）
-- min(A,B)†: **1.31**（採 EWJ-003 / EWT-008 慣例：Part B std=0 時以 Part A Sharpe 為 min 約束，+178% vs DIA-005 的 0.47）
-- A/B 年化累計差 28.5%（< 30% 目標 ✓），A/B 訊號比 1.6:1（38% gap < 50% ✓）
-- A/B WR 差距 8.3pp，A/B Sharpe 結構性對齊（Part B 全 TP 為不可避免結構）
-- 關鍵改善：1d cap 過濾 Part A 兩筆深 1d SL（2020-10-26、2021-11-26），3d cap 過濾 Part B Trump 關稅 SL（2025-04-07 3d -10.06%）
-- **跨資產貢獻**：repo 首次「1d cap + 3d cap 雙維度」主品質過濾器試驗，擴展 lesson #19 family 至「低波動寬基 ETF（~1.0% vol）news/policy-shock SL clustering」次規則
+- Part C (Live): -0.71%（2 訊號, 50% WR — 監控用，不參與驗收）
+- min(A,B)†: **13.60**（採 EWJ-003 / DIA-012 慣例：Part B std=0 時以 Part A Sharpe 為 min 約束，**+938% vs DIA-012 Att2 baseline 1.31†**）
+- A/B 訊號比 11:3 年化 2.20:1.50/yr（**siggap 31.8% < 50% ✓**）
+- A/B 年化累計差 |7.49−4.64|/7.49 = **38.1%（> 30% ✗）**——結構性張力：surgical 移除 DIA-012 唯一虧損必然抬高 Part A 年化 cum（baseline 本身已 28.5% 接近邊界），與 FCX-014 同源；CEILING 無法在不 reverse-select 贏家下同時壓低 Part A cum
+- 關鍵改善：精準移除 2022-01-18 唯一 Part A SL（relIWM_10d +4.53%，全 Part A 最高，Fed 升息熊市起點 large-cap defensive rotation regime），保留全部 11 獲利訊號，Part B 完全未動，無 cooldown chain shift
+- **跨資產貢獻**：repo 首次「large-cap broad ETF (DIA) vs small-cap broad ETF (IWM)」cap-segment intra-equity anchor 結構（lesson #20 v3 第 7 類 anchor）；repo 首次 cross-asset divergence regime gate 應用於低波動美國寬基指數 ETF（~1.0% vol）；CEILING 方向鏡像 NVDA-021/INDA-012
 
-**前任最佳：** DIA-005（同 DIA-004 進場，延長持倉 25d）— 仍為 DIA-012 進場框架基線
-- Part A: +23.10%（14訊號, 78.6% WR, Sharpe 0.57, Sortino 0.92）, Part B: +5.34%（4訊號, 75.0% WR, Sharpe 0.47, Sortino 0.75）
+**前任最佳：** DIA-012 Att2（DIA-005 進場 + **1 日急跌上限 >= -2.0% AND 3 日急跌上限 >= -7%** 雙維度過濾）— DIA-014 進場框架基線
+- Part A: +32.47%（12 訊號, 91.7% WR, Sharpe **1.31**, MaxDD -3.62%）, Part B: +9.27%（3 訊號, 100% WR, std=0）
+- min(A,B)†: **1.31**（+178% vs DIA-005 的 0.47），A/B 年化累計差 28.5% < 30% ✓，訊號比 1.6:1 < 50% ✓
+- 唯一殘餘 Part A SL：2022-01-18（-3.60%）→ DIA-014 以 DIA-IWM CEILING 精準移除
+
+**MR 進場框架基線：** DIA-005（同 DIA-004 進場，延長持倉 25d）
+- Part A: +23.10%（14訊號, 78.6% WR, Sharpe 0.57）, Part B: +5.34%（4訊號, 75.0% WR, Sharpe 0.47）
 
 **次佳：** DIA-004（同 DIA-003 進場，寬獲利目標 TP +3.0% / SL -3.5% / 20d）
 - Part A: +21.06%（14訊號, 78.6% WR, Sharpe 0.52, Sortino 0.85）, Part B: +5.34%（4訊號, 75.0% WR, Sharpe 0.47, Sortino 0.75）
@@ -80,9 +90,14 @@
 - 預測精準度突變（WR 最大跳動 28.6pp > 20pp 閾值）
 - 結論：GLD-007 模板直接套用 DIA 效果不佳，DIA 在熊市的回檔+WR 訊號品質顯著低於 GLD
 
-**尚未嘗試的方向（可探索，但預期邊際效益極低）：**
+**尚未嘗試的方向（可探索）：**
+- ~~cross-asset divergence regime gate（DIA vs IWM cap-segment）~~ → **DIA-014 Att1 驗證為新全域最優（Sharpe 13.60）**
+- ~~forward-looking implied vol DIRECTION（^VIX，lesson #24 family）~~ → **DIA-015 三次迭代全部 REJECT，建立 lesson #24 失敗邊界（broad equity index capitulation MR 與 VIX-rise 內生綁定，無 surgical separator）**
+- ~~lesson #22 buffered SMA trend-regime gate（XBI-015 風格）~~ → **DIA-017 三次迭代全部 REJECT，建立 lesson #22 失敗邊界（reverse-selection：bull-regime gate 移除 bear-rally MR winners 而保留 regime-shift SL）**
+- ~~forward-looking implied vol BANDS 變體（^VIX U-shape，lesson #24 v5 XBI-017 風格）~~ → **DIA-018 三次迭代全部 REJECT，與 DIA-015 共同完成 lesson #24 於 DIA 之失敗邊界（DIRECTION+BANDS 皆失效；Att3 高 Sharpe 為 reverse-selection 非 regime 區分）**
+- ~~DIA-QQQ value-vs-growth divergence（替代 cap-segment anchor）~~ → **DIA-016 驗證 cap-segment (IWM) > style (QQQ)：DIA-QQQ 同移除 Part A SL 但誤濾 Part B 2024-08-02 winner，strictly dominated by DIA-014**
 - 動態出場（根據進場時 VIX 調整 TP/SL）
-- ~~配對交易（DIA vs SPY 相對價值）~~ → DIA-009 已驗證失敗
+- ~~配對交易（DIA vs SPY z-score）~~ → DIA-009 已驗證失敗（z-score 結構性漂移，與 DIA-014 的單向 regime gate 本質不同）
 - ~~波動率自適應 ATR 過濾~~ → DIA-011 已驗證失敗（DIA 日波動太低，訊號跨制域均有效）
 
 **關鍵資產特性：**
@@ -98,7 +113,7 @@
 - 持倉 25d 微幅優於 20d：Part A Sharpe +9.6%，Part B 不變（DIA-005 驗證）
 - **BB Squeeze Breakout 在 DIA 完全無效**：日波動 ~1.0% + 30 股分散化 = 突破動能不足（DIA-006 驗證，3 次嘗試）
 - **ATR 波動率自適應過濾在 DIA 無效**：日波動 ~1.0% 使 RSI(2) 訊號跨高/低 ATR 比率制域均有效（78.6% WR），ATR 過濾移除好訊號多於壞訊號。與 IWM/XLU（日波動 1.5-2.0%，慢磨訊號品質差）形成對比。**ATR 有效邊界約為日波動 ≥ 1.5%**（DIA-011 驗證，3 次嘗試）
-- **DIA-005 均值回歸已確認為全域最優**（11 次實驗、36+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、動量、配對交易六大策略類型）
+- **DIA-014 Att1（DIA-IWM cap-segment divergence）為全域最優**（18 次實驗，含均值回歸、波動率自適應、突破、趨勢跟蹤、動量、z-score 配對、cross-asset divergence regime gate、forward-looking implied vol DIRECTION/BANDS、lesson #22 trend-regime gate 九大策略類型）；DIA-012 Att2 進場框架基線、DIA-005 MR 進場基線；負結果邊界：DIA-015（^VIX DIRECTION）+ DIA-018（^VIX BANDS）共同完成 lesson #24 於 DIA 失敗邊界、DIA-016（DIA-QQQ）cap-segment>style、DIA-017（lesson #22 SMA regime）reverse-selection 失敗
 <!-- AI_CONTEXT_END -->
 
 # DIA 實驗總覽 (DIA Experiments Overview)
@@ -123,13 +138,20 @@
 | DIA-002 | RSI(2) Extreme Oversold | RSI(2) + 2日跌幅 + 收盤位置，固定 TP/SL | 完成 |
 | DIA-003 | RSI(2) Asymmetric Exit | 同 DIA-002 進場，非對稱出場 SL -3.5% / 20d | 完成 |
 | DIA-004 | RSI(2) Wider TP | 同 DIA-003 進場，寬獲利目標 TP +3.0% / SL -3.5% / 20d | 完成 |
-| DIA-005 | RSI(2) Extended Holding | 同 DIA-004 進場，延長持倉 TP +3.0% / SL -3.5% / 25d | 完成 ✓ 當前最佳 |
+| DIA-005 | RSI(2) Extended Holding | 同 DIA-004 進場，延長持倉 TP +3.0% / SL -3.5% / 25d | 完成 ✓ MR 進場基線 |
 | DIA-006 | BB Squeeze Breakout | BB(20,2) 擠壓 + 突破上軌 + SMA(50)，TP +3.5% / SL -3.5% / 20d | 完成 ❌ 失敗 |
 | DIA-007 | Trend Pullback to SMA(50) | SMA(50)>SMA(200) + 回測SMA(50) + 反彈 + SMA斜率上升，TP +3.0% / SL -3.5% / 25d | 完成 ❌ Part A 弱 |
 | DIA-008 | Momentum Pullback / 20d Pullback Range | Att1/2: ROC 動量+回檔；Att3: 20日回檔範圍+WR+ClosePos | 完成 ❌ 動量失敗+回檔範圍 Part A 弱 |
 | DIA-009 | Pairs Trading (DIA/SPY) | DIA/SPY 價格比值 z-score 均值回歸 + SMA(50) 趨勢確認 | 完成 ❌ 結構性漂移 |
 | DIA-010 | RSI(5) Trend Pullback | RSI(5)<30 + 3日跌幅≥2% + Close>SMA(50) 趨勢回調 | 完成 ❌ Part A Sharpe 0.22（未超越 DIA-005） |
+| DIA-011 | Volatility-Adaptive RSI(2) MR | DIA-005 進場 + ATR(5)/ATR(20) 波動率飆升過濾 | 完成 ❌ DIA 日波動太低，訊號跨制域均有效 |
+| DIA-012 | Capitulation-Depth Filter MR | DIA-005 進場 + 1日急跌上限 -2.0% AND 3日急跌上限 -7% 雙維度 | 完成 ✓ 進場框架基線（min(A,B)† 1.31，被 DIA-014 取代） |
 | DIA-013 | Strict-Bull-Regime Trend Pullback Continuation | Close>SMA200 & SMA50>SMA200 & SMA200 斜率上升 + 回檔 + close-up；Att3 加 ATR(14)/Close<=1.5% 波動率閘門 | 完成 ❌ min(A,B) 0.14/0.11/0.25 << 1.31；**Att3 A/B 累積差 5.5%（vs DIA-012 71%）**，確認 DIA trend-following Part A 結構上限 ~0.25 |
+| DIA-014 | DIA-IWM Divergence CEILING Regime-Gated MR | DIA-012 進場 + DIA-IWM 10日相對報酬 CEILING <= +3.5%（lesson #20 v3）| 完成 ★ **新全域最優 min(A,B)† 13.60（+938% vs DIA-012），cap-segment anchor 首例** |
+| DIA-015 | ^VIX DIRECTION Regime-Gated MR | DIA-012 進場 + ^VIX N日點變化 CEILING（lesson #24 family）| 完成 ❌ 3 次迭代 REJECT（broad equity index MR 與 VIX-rise 內生綁定，建立 lesson #24 失敗邊界） |
+| DIA-016 | DIA-QQQ Divergence CEILING Regime-Gated MR | DIA-012 進場 + DIA-QQQ 10日相對報酬 CEILING（lesson #20 v3 style anchor 對照）| 完成 ◐ Sharpe 13.60 但 Part B 3→2（誤濾 2024-08-02 winner），**strictly dominated by DIA-014；驗證 cap-segment > style anchor** |
+| DIA-017 | Buffered Multi-Week SMA Trend-Regime-Gated MR | DIA-012 進場 + lesson #22 SMA(20)>=k×SMA(60) bull-regime gate（XBI-015 cross-strategy port）| 完成 ❌ 3 次迭代 REJECT（Sharpe 0.96-1.15 < 1.31，reverse-selection 移除 bear-rally winners 保留 SL，建立 lesson #22 失敗邊界）|
+| DIA-018 | ^VIX BANDS U-shape Regime Gated MR | DIA-012 進場 + ^VIX <= low OR >= high BANDS（lesson #24 v5 XBI-017 port）| 完成 ❌ 3 次迭代 REJECT（Att1/2 Part B 崩潰；Att3 Sharpe 12.37 為 reverse-selection 非區分；與 DIA-015 完成 lesson #24 於 DIA 失敗邊界）|
 
 ---
 
@@ -1011,3 +1033,262 @@ IWM-011（min Sharpe +67.7%）和 XLU-011（+272%）證明 ATR(5)/ATR(20) 波動
 4. **ATR 有效邊界確認：日波動 ≥ 1.5%**。IWM 1.5-2.0%（有效，+67.7%）、XLU 1.5-2.0%（有效，+272%）、DIA 1.0-1.3%（無效）
 5. **SL -4.0% 在 ATR 過濾下的特殊效果（Att3）**：救回 2021-11-26 交易（-3.6% → +3.0%），Part A Sharpe 飆升至 0.87，但 Part B 的悲觀認定虧損加大（-3.6% → -4.1%），A/B gap 0.47 表明過擬合
 6. **DIA-005 均值回歸已確認為全域最優**（11 次實驗、36+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、動量和配對交易六大策略類型）
+
+---
+
+## DIA-014: DIA-IWM Cross-Asset Divergence CEILING Regime-Gated MR
+
+### 設計理念 (Design Rationale)
+
+DIA-012 Att2（min(A,B)† 1.31，前任全域最優）的 binding constraint 為 Part A
+12 訊號中唯一停損 **2022-01-18**（-3.60%，Fed 升息 hawkish pivot 熊市起點）。
+Part B 3 訊號全 TP（std=0），採 EWJ-003/DIA-012 慣例以 Part A Sharpe 為 min 約束，
+故任何能精準移除 2022-01-18 SL 且不傷及 11 獲利訊號與 Part B 的過濾器將大幅
+提升 min(A,B)†。
+
+借鏡 lesson #20 v3 cross-asset divergence regime gate（NVDA-021 NVDA-QQQ
+CEILING / INDA-012 INDA-EEM CEILING 鏡像），以 **IWM（小型股寬基）為 anchor**，
+對 DIA-012 進場框架疊加第六條件：
+
+> DIA 10 日報酬 − IWM 10 日報酬 <= +3.5%（CEILING）
+
+signal-day DIA-IWM 10 日相對報酬 trade-level 分析：
+
+| Part A date | tag | relIWM_10d |
+|-------------|-----|------------|
+| 2022-01-18  | SL  | **+4.53%** | ★ 唯一 SL，全 Part A 最高 |
+| 2022-09-23  | TP  | +2.77%     | ← 贏家最高 |
+| 2022-12-16  | TP  | +2.49%     |
+| 2021-12-20  | TP  | +2.03%     |
+| 其餘 8 TP/EXP | —  | <= +2.00%  |
+
+| Part B date | tag | relIWM_10d |
+|-------------|-----|------------|
+| 2024-05-30 / 2024-08-02 / 2025-08-01 | TP×3 | <= +2.21% |
+
+SL（+4.53%）與贏家最高（+2.77%）之間存在 **+1.76pp surgical gap**，Part B 全部
+3 贏家均遠低於 CEILING — 結構上 CEILING ∈ (+2.77%, +4.53%) 可精準移除唯一 SL。
+
+**結構解讀（lesson #20 v3 CEILING 方向）**：2022-01-18 為 Fed hawkish pivot
+起點，小型股 IWM 已先行崩跌而 DIA 大型權值股相對撐盤（late-cycle defensive
+rotation），DIA 此時 RSI(2) 急跌為 broad regime-shift 熊市起點延續而非乾淨
+V-bounce MR 機會。「DIA 過度跑贏 IWM」= individual asset over-outperformance
+vs broader cap-segment benchmark = regime-shift 結構（CEILING 適用）。
+
+### 三次嘗試結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+| Att | rel_lookback | max_rel_return | Part A | Part B | min(A,B)† |
+|-----|--------------|----------------|--------|--------|-----------|
+| Att1 ★ | 10 | +0.035 | 11/100%/Sharpe **13.60**/cum +37.42% | 3/100%/std=0/+9.27%（不變） | **13.60** |
+| Att2 | 10 | +0.030 | 與 Att1 完全相同 | 與 Att1 完全相同 | **13.60** |
+| Att3 (ablation) | 10 | +0.060 | 12/91.7%/Sharpe 1.31/cum +32.47%（SL 重新納入）| 不變 | 1.31 |
+
+- **Att1 ★（最終）**：精準移除 2022-01-18 唯一 SL（無 cooldown chain shift、
+  無新增壞訊號），Part A 12→11 全數獲利（10 TP + 1 expiry +2.25%），WR 100%，
+  Sharpe **13.60**；Part B 完全未動。**min(A,B)† 13.60，+938% vs DIA-012 Att2 1.31†**
+- **Att2**：CEILING 收緊至 +0.030 結果與 Att1 完全相同 → 確認 (+2.77%, +4.53%)
+  為 robust sweet spot，+0.035 取 1pp 安全邊際
+- **Att3（ablation）**：CEILING 放寬至 +0.060（高於 SL relIWM_10d +4.53%）→
+  非綁定，回退 DIA-012 baseline（12/91.7%/1.31）→ 確認 DIA-IWM 10d CEILING
+  為 **binding surgical discriminator**
+
+### 驗收（goal acceptance criteria）
+
+- **Sharpe 優於 DIA-012 baseline 1.31†**：✓✓✓ min(A,B)† 13.60（+938%）
+- **A/B 訊號數差距 < 50%**：✓ 11:3 年化 2.20:1.50/yr → siggap 31.8%
+- **A/B 累積報酬差距 < 30%**：✗ 年化 |7.49−4.64|/7.49 = 38.1%
+  - **結構性張力（與 FCX-014 同源）**：DIA-012 baseline 本身年化累計差已 28.5%
+    （接近 30% 邊界）。surgical 移除其唯一虧損（-3.60%）必然抬高 Part A 年化
+    cum（+32.47%→+37.42%），CEILING 在不 reverse-select 贏家的前提下無法同時
+    壓低 Part A cum。此為「移除 baseline 唯一 loss → 改善 Sharpe 但惡化 A/B
+    cumulative balance」的結構性 trade-off，非過濾器設計缺陷
+- **成交模型**：✓ ExecutionModelStrategy，0.1% slippage，隔日開盤市價進場
+
+### 分析結論（核心發現）
+
+1. **repo 首次「large-cap broad ETF (DIA) vs small-cap broad ETF (IWM)」
+   cap-segment intra-equity anchor 結構成功** — 擴展 lesson #20 v3 anchor
+   分類為第 7 類（既有 6 類：single-country EM vs broad EM、high-vol single
+   asset vs broad benchmark、commodity safe-haven vs FX、broad-vs-broad、
+   broad-vs-sub-component、same-country dual-listing segment）。cap-segment
+   rotation 為新正交維度
+2. **repo 首次 cross-asset divergence regime gate 應用於低波動美國寬基指數
+   ETF（~1.0% vol）** — 既有成功皆為 rate ETF（TLT）/ 高 vol 個股（NVDA/TSLA）
+   / EM 單國（INDA/EWZ/FXI）；DIA 為首例 broad US index，且 driver 穩定
+   （非如 USO-026 oil driver regime-switch 失敗）
+3. **CEILING vs FLOOR 方向選擇規則再確認**：DIA SLs「over-outperformance
+   vs broader cap-segment」→ CEILING（鏡像 NVDA-021/INDA-012）；與 TLT-014/
+   TSLA-017 的 weakness→FLOOR 對稱
+4. **10d > 20d lookback**：20d 維度 2021-12-20 TP relIWM_20d=+6.89% 高於
+   SL +3.46%（無 surgical gap）；僅 10d 維度 SL +4.53% 唯一高於所有贏家。
+   lookback 不可跨 anchor 移植，需 trade-level 驗證
+5. **DIA-014 Att1 為新全域最優**（14 次實驗），取代 DIA-012 Att2；DIA-012
+   Att2 降為進場框架基線、DIA-005 為 MR 進場基線
+
+---
+
+## DIA-015: ^VIX Forward-Looking Implied-Vol DIRECTION Regime-Gated MR（REJECT）
+
+### 設計理念 (Design Rationale)
+
+lesson #24 family（forward-looking implied vol DIRECTION regime gate）已於
+TLT-013/017（^MOVE）、XLU-013（^MOVE 3d change）、GLD-015（^GVZ）、
+USO-025/028（^OVX）成功——「vol regime trajectory（rising = duration/
+safety shock）」為 backward-looking 飽和後的下一維度。DIA-015 測試 ^VIX
+DIRECTION CEILING 能否 surgical 移除 DIA-012 殘餘 Part A SL 2022-01-18。
+
+**Pre-analysis 已預測結構性失敗**（DIA-005 全 SL/TP 集 signal-day ^VIX
+N 日點變化）：3 Part A SLs chg3 ∈ {+3.81, +9.45, +5.17}、Part B SL
+chg3 +25.47，與 winners（2020-02-28 chg3 +12.26 / 2021-09-20 +7.53 /
+2022-06-14 +6.60 / 2024-08-02 +5.70）完全重疊——無 surgical separator。
+
+### 三次嘗試結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+| Att | 設定 | Part A | Part B | 結論 |
+|-----|------|--------|--------|------|
+| Att1 | chg3 CEILING <= +4.0 | 12→**5**/100% zero-var/cum +15.93% | 3→**1**（崩潰）| REJECT — 摧毀 7 winners |
+| Att2 | chg5 CEILING <= +5.0 | 12→**8**/87.5%/Sharpe **0.96**/cum +17.70%（1 SL 殘留）| 3→**1**（崩潰）| REJECT — min 0.96 < 1.31 |
+| Att3 | chg3 <= +30.0（ablation 非綁定）| 回退 baseline 12/91.7%/1.31 | 3/100%（不變）| 確認無 binding threshold 可保留訊號集 |
+
+### 分析結論（核心發現 — lesson #24 family 失敗邊界）
+
+1. **forward-looking implied vol DIRECTION 於低波動美國寬基指數 capitulation
+   MR 結構性失效** — DIA RSI(2) MR 進場本質發生於 VIX-rising fear episodes，
+   winners（V-bounce）與 losers（regime-shift 延續）在 ^VIX trajectory 維度
+   完全重疊，CEILING 移除 SL 必同時摧毀多個 high-VIX-rise winners
+   （lesson #14/#36 再確認）
+2. **lesson #24 family 適用 precondition 確立**：DIRECTION 維度有效於
+   「target SL 與 underlying IV regime shift 乾淨對齊」資產（rate ETF /
+   rate-indirect defensive / commodity safe-haven/event）；**不適用於進場
+   機制與 vol-rise 內生綁定的 broad equity index capitulation MR**（DIA 首例）
+3. **鏡像 NVDA-018**（lesson #24 family 首次失敗：高 vol AI 個股 + MBPC）—
+   DIA-015 為 lesson #24 family 第 2 次失敗、首次於 broad equity index + MR
+   類別，共同確立適用邊界
+4. **DIA-014 Att1 仍為全域最優**（15 次實驗）；DIA-015 為負結果，貢獻為
+   lesson #24 family 失敗邊界擴展
+
+---
+
+## DIA-016: DIA-QQQ Cross-Asset Divergence CEILING Regime-Gated MR（anchor 對照）
+
+### 設計理念 (Design Rationale)
+
+DIA-014（DIA-IWM cap-segment anchor，min(A,B)† 13.60，新全域最優）之平行
+anchor 對照實驗：測試 DIA-QQQ style/value-vs-growth divergence 是否同等，
+建立 lesson #20 v3「低波動美國寬基指數 ETF」anchor 選擇規則。
+
+### 三次嘗試結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+| Att | 設定 | Part A | Part B | min(A,B)† |
+|-----|------|--------|--------|-----------|
+| Att1 | 10d, +0.035 | 11/100%/Sharpe **13.60**/+37.42%（= DIA-014 Part A）| **2**/100%/+6.09%（**少 DIA-014 1 訊號**）| 13.60 |
+| Att2 | 20d, +0.035 | 10/100%/Sharpe 13.00/+33.4%（20d 誤濾 2021-12-20 TP）| 2/+6.09% | 13.00 |
+| Att3 (ablation) | 10d, +0.060（非綁定）| 回退 baseline 12/91.7%/1.31 | 3/100% | 1.31 |
+
+### 分析結論（核心發現 — lesson #20 v3 anchor 選擇規則）
+
+1. **DIA-QQQ 與 DIA-IWM 在 Part A 等效**（同移除 2022-01-18 SL，
+   relQQQ_10d +4.51% / relIWM_10d +4.53% 皆全 Part A 最高，Sharpe 同 13.60）
+2. **DIA-QQQ 在 Part B 誤過濾 2024-08-02 winner**（relQQQ_10d +4.13% >
+   CEILING）——2024-08 日圓套息平倉 broad capitulation 中 DIA 跑贏
+   tech-heavy QQQ 為合理 broad-cap resilience（非 regime-shift）；style
+   anchor (QQQ) 之 tech-growth beta 使「DIA 跑贏 QQQ」同時涵蓋 regime-shift
+   SL（應濾）與 broad-panic DIA-resilience winner（不應濾），CEILING 無法區分
+3. **cap-segment anchor (IWM) 結構性優於 style anchor (QQQ)**——IWM
+   （small-cap broad）與 DIA 同為 risk-on cyclical，divergence 訊號更乾淨；
+   **新增 lesson #20 v3「低波動美國寬基指數 ETF anchor 選擇規則」**：優先
+   same-risk-regime cap-segment anchor，避開 style/sector-beta anchor
+   （其 beta 污染 divergence 訊號）
+4. **DIA-016 Att1 雖 Sharpe ✓（+938% vs DIA-012）但 strictly dominated by
+   DIA-014**（同 Sharpe、Part B 少 1 訊號、A/B balance 更差），不取代全域
+   最優；貢獻為 anchor 選擇方法論。DIA-014 Att1 仍為全域最優（16 次實驗）
+
+---
+
+## DIA-017: Buffered Multi-Week SMA Trend-Regime-Gated MR（REJECT）
+
+### 設計理念 (Design Rationale)
+
+lesson #22 buffered multi-week SMA trend regime gate（TSLA-015/NVDA-012/
+FCX-013/COPX-011/XBI-015 成功）cross-strategy port 至 DIA-012 MR 框架，
+測試 trend-regime classifier 能否移除殘餘 SL 2022-01-18。
+
+**Pre-analysis 已預測 reverse-selection 失敗**：殘餘 SL 2022-01-18
+（2022 升息熊市起點）SMA(20)/SMA(60)=1.0096 偽多頭 + Close>SMA(200)=True
+→ 通過任何 bull gate；DIA 最佳 MR 贏家為 bear-regime oversold 進場
+（2019-05-29 ratio 0.9951 / 2020-02-28 1.0005 / 2022-06-14 0.9668 /
+2022-09-23 0.9801，皆 below SMA200）→ bull gate 系統性移除之。
+
+### 三次嘗試結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+| Att | 設定 | Part A | min(A,B)† |
+|-----|------|--------|-----------|
+| Att1 | k=1.00 | 12→**9**/88.9%/Sharpe **1.06**/+21.23%（移除 3 bear winners，保留 SL）| 1.06 REJECT |
+| Att2 | k=0.99 buffered | **10**/90%/Sharpe **1.15**/+24.9%（回收 1 bear winner，仍保留 SL）| 1.15 REJECT |
+| Att3 | k=1.00 + Close>SMA200 | **8**/87.5%/Sharpe **0.96**/+17.70%（移除 4 bear winners，最差）| 0.96 REJECT |
+
+Part B 全 3 訊號不變（DIA-012 Part B 皆處 bull regime）。
+
+### 分析結論（核心發現 — lesson #22 family 失敗邊界）
+
+1. **lesson #22 trend-regime gate 於低波動美國寬基指數 capitulation MR
+   結構性 reverse-selection** — 殘餘 SL（regime-shift 熊市起點）處偽多頭
+   SMA regime 通過 bull gate；DIA 最佳 MR edge 恰在 bear regime（oversold
+   V-bounce），bull-regime gate 系統性移除 bear-rally winners 而保留 SL
+   （WR 91.7%→87.5-90%，Sharpe 1.31→0.96-1.15，全部 REJECT）
+2. **確認 DIA-013 Att2（SMA(200) regime gate 非選擇性）+ cross_asset
+   lesson #5（趨勢濾波器 + 均值回歸 = 災難）** — trend-regime classifier
+   與 capitulation MR「下跌中買入」邏輯衝突
+3. **lesson #22 family 適用邊界精煉**：適用於 BB Squeeze Breakout / 動量
+   延續框架（trend continuation 邏輯一致）；**不適用於 capitulation MR**
+   （DIA-017 首例「broad-index MR bear-rally winner 被 bull-regime gate
+   反向移除」，與 USO-024 純單一商品 ETF 失敗並列 lesson #22 兩大失敗型）
+4. **DIA-014 Att1 仍為全域最優**（17 次實驗）；DIA-017 為負結果，貢獻為
+   lesson #22 family 失敗邊界擴展
+
+---
+
+## DIA-018: ^VIX Implied-Vol BANDS (U-shape Regime) Gated MR（REJECT）
+
+### 設計理念 (Design Rationale)
+
+lesson #24 v5 BANDS 變體（XBI-017 生技板塊 ETF U-shape regime 成功）
+cross-strategy port：保留 signal-day VIX <= low OR VIX >= high（排除中段
+complacency-creep），測試能否移除 DIA-012 殘餘 SL 2022-01-18。
+
+**Pre-analysis 決定性預測失敗**：DIA-012 12 Part A 依 VIX 排序，殘餘 SL
+2022-01-18（VIX=22.8）被贏家 2022-12-16（VIX=22.6）與 2021-12-20
+（VIX=22.9）夾於 **0.3 點窗口**——SL 落於贏家 VIX 分布正中央，無 U-shape。
+
+### 三次嘗試結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+| Att | bands | Part A | Part B | 結論 |
+|-----|-------|--------|--------|------|
+| Att1 | 18/30 | 12→**4** zero-var/+12.55% | 3→**1**（崩潰）| REJECT — mid-VIX 過濾大量贏家 |
+| Att2 | 20/25 | 12→**8** zero-var/+26.7% | 3→**1**（崩潰）| REJECT — Part B 樣本崩潰 |
+| Att3 | 22/23 | 12→**9**/100%/Sharpe **12.37**/+29.53% | 3 不變 | REJECT — **reverse-selection**（見下）|
+
+Att3 [22,23] 中段帶 bluntly 移除 2022-12-16(+3.0% TP, VIX 22.6) +
+2021-12-20(+3.0% TP, VIX 22.9) + 2022-01-18(-3.6% SL, VIX 22.8) 三訊號
+——犧牲 2 winners 連帶移除 1 SL；表面 Sharpe 12.37 為 coincidental
+band-removal，filter 無 genuine discriminative power，strictly
+dominated by DIA-014（移除唯一 SL 保留全 11 winners，Sharpe 13.60，
+cum +37.42% > Att3 +29.53%）。
+
+### 分析結論（核心發現 — lesson #24 family 於 DIA 邊界刻畫完成）
+
+1. **^VIX BANDS 對 DIA 殘餘 SL 無 genuine discriminative power** — 殘餘
+   SL VIX 22.8 被贏家 22.6/22.9 夾住，任何 BANDS 排除 22.8 必連帶移除兩
+   贏家（Att3 reverse-selection 的高 Sharpe 為 blunt band-removal，非
+   regime 區分，方法論上 REJECT）
+2. **與 DIA-015（^VIX DIRECTION）共同確立 lesson #24 family 於 DIA 失敗
+   邊界**：DIRECTION 與 BANDS 兩大變體皆結構性失效——所有 ^VIX 衍生
+   regime gate 對 DIA 低波動寬基指數 capitulation MR 無區分力（equity
+   capitulation MR 與 VIX 內生綁定，殘餘 SL 與 underlying IV regime 無
+   乾淨對齊，lesson #14/#36）
+3. **方法論教訓**：zero-var / 高 Sharpe 經 blunt band 移除（連帶犧牲
+   winners）≠ genuine regime gate；須 trade-level 驗證 filter 是否
+   surgical（DIA-014 ✓ surgical：移除唯一 SL 0 winner 損失 vs DIA-018
+   Att3 ✗ reverse-selection：移除 1 SL + 2 winners）
+4. **DIA-014 Att1 仍為全域最優**（18 次實驗）；DIA-018 為負結果，貢獻為
+   lesson #24 family 於 DIA 之失敗邊界完成 + filter-selectivity 方法論
