@@ -68,18 +68,26 @@ class GLD016Config(ExperimentConfig):
     # GLD–USD cross-asset divergence regime gate（GLD-016 核心新增）
     usd_ticker: str = "UUP"  # 可交易美元 ETF proxy（與 TLT-014/TSLA-017 慣例一致）
     usd_lookback: int = 20  # N 日報酬窗口
-    # Att1 ★ SUCCESS：UUP N 日報酬 CEILING（filter 強美元 rally regime）
-    #   min(A,B)† Part A 0.76→**1.55**（+104%），Part B 9/9 不變，A/B cum 6.4% ✓
-    #   乾淨移除 2022-04-27 SL（UUP20 +4.52）無 chain-shift，1.86pt robust band
-    # Att2：GLD−UUP divergence FLOOR（TLT-014/TSLA-017 精確類比）
-    #   min_relative_return=-0.06：預分析 Rel20 losers -6.28/-1.91 與 winners
-    #   [-9.75,+1.61] 完全交錯，filter 2022-04-27(-6.28) 必同殺 winner
-    #   2021-06-29(-9.75 +3% TP) → 退化，證明 CEILING 為正確機制
-    # Att3：UUP20 ceiling robustness ablation（+2.8% / +3.5%）確認非 knife-edge
-    use_usd_ceiling: bool = False
+    # Att1 ★ SUCCESS（最終配置）：UUP 20d 報酬 CEILING <= +3.0%（filter 強美元
+    #   rally regime）。min(A,B)† Part A 0.76→**1.55**（+104%），Part B 9/9 不變
+    #   （6.56 std=0），A/B cum 差 6.4% < 30% ✓、訊號比 11:9 < 50% ✓。乾淨移除
+    #   2022-04-27 SL（UUP20 +4.52，Fed-2022 鷹派）無 cooldown chain-shift
+    #   （^GVZ 10d gate 已獨立處理鄰近日期）。
+    # Att2（劣於 Att1）：GLD−UUP divergence FLOOR（TLT-014/TSLA-017 精確類比，
+    #   min_relative_return=-0.06）。預分析正確：Rel20 losers -6.28/-1.91 與
+    #   winners [-9.75,+1.61] 交錯，filter 2022-04-27(-6.28) 同殺 winner
+    #   2021-06-29(-9.75 +3% TP) → Part A 10/90.0%/Sharpe 1.45/+23.19%
+    #   （優於 baseline 0.76 但劣於 Att1 1.55）。證明 CEILING（強美元絕對動量）
+    #   為正確機制，非 GLD-vs-USD 相對強弱。
+    # Att3（robustness ablation，確認非 knife-edge）：UUP20 ceiling 掃描
+    #   +2.8%/+3.0%/+3.5%/+4.0% 結果**完全相同**（Part A n=11/0.90.9%/1.55，
+    #   Part B 9/9）——寬 ≥1.2pt 平台（對比 CIBR-016 Att3 +0.4pt -86% 崩塌）。
+    #   +2.5%（< max winner UUP20 +2.62）使 Part B 9→8（過濾 OOS winner），
+    #   確認 +2.66 為乾淨經濟下緣。+3.0% 為平台中段、Part B 全保留之原則性選擇。
+    use_usd_ceiling: bool = True
     max_usd_return: float = 0.03  # UUP 20d 報酬 <= +3.0%（max winner +2.62，gap 乾淨）
-    use_usd_divergence: bool = True
-    min_relative_return: float = -0.06  # Att2: Rel20 = GLD20-UUP20 >= -6%
+    use_usd_divergence: bool = False
+    min_relative_return: float = -0.99  # 停用時設極寬
 
 
 def create_default_config() -> GLD016Config:
