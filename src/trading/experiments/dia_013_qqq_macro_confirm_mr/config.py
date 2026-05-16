@@ -108,8 +108,9 @@ class DIA013Config(ExperimentConfig):
     # ── DIA-013 新增：QQQ 跨資產宏觀確認閘門（移植 IWM-015）──
     macro_ticker: str = "QQQ"
     macro_lookback: int = 10
-    # Att1 -0.015（IWM-015 canonical）/ Att2 -0.005 / Att3 -0.030
-    macro_max_return: float = -0.030
+    # Att1 -0.015（IWM-015 canonical，documented primary）/ Att2 -0.005 / Att3 -0.030
+    # 三次迭代全 FAIL（documented-failure）；config 保留 Att1 canonical 值供文件對照
+    macro_max_return: float = -0.015
 
 
 def create_default_config() -> DIA013Config:

@@ -214,7 +214,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 ## 10. 反覆失敗的做法（禁止清單）
 <!-- freshness:
-  validated: 2026-04-17
+  validated: 2026-05-17
   data_through: 2025-12-31
   confidence: high
 -->
@@ -268,6 +268,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 35. **板塊指數確認（SMH）對個股（TSM）** — 弱化版過濾器只移除好訊號
 36. **跨資產相對表現過濾在 RSI(2) 框架** — 極端超賣時市場同步下跌，無區分力
 36b. **廣基 ETF RS 動量（EEM vs SPY）** — 宏觀/政治事件（關稅、貿易戰、中國政策）驅動而非結構性因素，三次嘗試 Part B 均為負值（EEM-006 驗證）
+36c. **QQQ broad-market macro-confirmation gate 不可推廣至大型股寬基指數 ETF** — IWM-015 Att1 ★ SUCCESS（min(A,B) 2.80）的「要求 QQQ 10d 已 broad correction 才放行 capitulation 訊號」閘門對**小型股 idiosyncratic ETF（IWM Russell 2000）**高效（IWM 個股事件加總雜訊使部分 sharp dip 為孤立小型股利空，QQQ 確認過濾之）。**DIA-013 三次嘗試（QQQ10d ≤ -1.5%/-0.5%/-3.0%）全 FAIL**：min(A,B)† 1.31→1.00/1.18/0.89，隨閘門收緊單調退化。失敗根因：**DIA 為大型股寬基指數 ETF，其 RSI(2) capitulation dips 與 QQQ 高度同向（ρ_DIA,QQQ≈0.85-0.9），dips 本身即 broad-market dips**；DIA-012 Att2 殘存唯一 Part A 綁定 SL 2022-01-18（2022 Fed 升息開端 value/growth 輪動）signal-day QQQ10d = -7.75%（深負），在全閾值皆通過閘門從未被移除，閘門僅誤殺淺跌 winners（2020-01-27 QQQ10d -0.15 / 2021-12-20 -1.30 等）+ Part B winners → 方向性反轉。**整合規則：macro-confirmation gate（cross-asset broad-risk-off 確認）的有效前提是 base asset 帶有「非 broad」的 idiosyncratic dip 雜訊（小型股 / 集中型板塊 ETF）可供過濾；大型股寬基指數 ETF（DIA/SPY/VOO 類）的 dips 本身即 market dips，閘門非區分性且方向反轉，不可移植。** Rel(DIA−QQQ) divergence 亦不可用（positive-ρ value/growth style spread 非 driver-pure single-factor inverse → divergence regime gate family v4 failure class；且 SL vs Part B winner 僅 0.38pp knife-edge 單點 notch）。DIA 殘存 SL 為 EWJ-006/EEM-016/INDA-013「idiosyncratic non-separable single residual SL」family 之大型股寬基 isomorph（DIA-013 驗證，3 次嘗試，data_through 2025-12-31，validated 2026-05-17）
 37. **跨資產利率指標（TLT）過濾利率敏感 ETF（XLU）** — 響應速度和方式不同
 38. **回檔回看窗口不可跨資產移植** — 20日在 GLD/COPX 有效，在 SIVR/URA/IBIT/INDA 失敗（IBIT-005 Att1：10日→20日 Part B 0.37→-0.38；INDA-003 Att3：20日回看 A/B 訊號比 2.75:1 嚴重失衡）
 

@@ -1,7 +1,8 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-24
+  last_validated: 2026-05-17
   data_through: 2025-12-31
-  note: DIA-012 added 2026-04-24 (Capitulation-Depth Filter MR — repo first 1d-return cap + 3d-return cap dual-dimension primary filter on any asset, **Att2 SUCCESS**). Three iterations: Att1 (1d cap >= -2.0% only) Part A 12/91.7%/Sharpe **1.31** cum +32.47% / Part B 4/75%/0.47 unchanged / min(A,B) 0.47 (tied baseline) — 1d cap precisely filters 2/3 Part A SLs (2021-11-26 1d -2.52%, 2020-10-26 1d -2.24%) preserving all winners; Part B SL (2025-04-07 1d -0.95%) is "shallow 1d + deep 3d" structure (Trump tariff overnight continuation), 1d cap cannot capture; Att2 ★ (1d cap -2.0% AND 3d cap -7%, dual-dimension) Part A 12/91.7%/Sharpe **1.31** cum +32.47% (unchanged from Att1, 3d filter non-binding on Part A) / Part B **3/100%**/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† **= Part A 1.31** (EWJ-003/EWT-008 convention, +178% vs DIA-005 0.47) — 3d cap precisely filters Part B SL (3d -10.06%) preserving all winners (deepest winner 3d = 2020-02-28 -5.96%, 1pp safety margin); Att3 (1d cap -2.0% AND 3d cap -8%, robustness) identical to Att2 — confirms 3d cap robust between -7% and -8%, all winners 3d > -7% and Part B SL 3d -10% deeper than both. **Repo first 1d-return cap + 3d-return cap dual-dimension primary filter trial on any asset**. Cross-asset finding: DIA SLs cluster on 1d/3d return dimensions (orthogonal to 2d), distinct from CIBR-012 (2d cap), EEM-014/INDA-010/USO-013 (2d floor) — two separate failure mechanisms (single-day news shock vs multi-day regime-shift) require dual-dimension filter on low-vol broad ETFs. A/B balance achieved: annualized cum gap 28.5% < 30% ✓, signal ratio 1.6:1 (38% gap) < 50% ✓. Replaces DIA-005 as global optimum (12 experiments). Extends lesson #19 family with new "1d cap + 3d cap dual-dimension" sub-rule for low-vol (~1.0% daily vol) broad ETFs with policy/news-shock SL clustering.
+  note: DIA-013 added 2026-05-17 (QQQ 10d broad-market macro-confirmation gate, IWM-015 Att1 ★ SUCCESS 直接移植到 DIA-012 Att2 base — **3 iterations ALL FAIL, documented-failure**). Att1 (QQQ10d≤-1.5% canonical) min(A,B)† Part A 1.31→**1.00** (-24%), Part A 12→8 / Part B 3→1; Att2 (≤-0.5% loose) **1.18** (-10%), 12→10 / 3→2; Att3 (≤-3.0% strict) **0.89** (-32%), 12→7 / 3→1 / Part C 0. **pre-analysis gate FIRST 全程正確預測 (track record 維持)**: 殘存唯一 Part A 綁定 SL 2022-01-18 (2022 Fed 升息開端 value/growth 輪動，淺磨) signal-day QQQ10d = -7.75% (深負，QQQ 該期科技股崩跌)，在 [-0.5,-1.5,-3.0] 全閾值皆 ≤ 閾值 → **通過閘門從未被移除**；閘門僅單調誤殺淺跌 winners (2020-01-27 QQQ10d -0.15 / 2021-12-20 -1.30 / 2019-12-03 -0.82 / 2023-05-04 EXP -0.03) + Part B winners (2024-05-30 -0.30 / 2025-08-01 -1.31)，min(A,B) 隨閘門收緊單調退化。**NEW cross-asset rule (lesson #36 extension + macro-confirmation family boundary):** IWM-015 QQQ broad-market macro-confirmation gate (對小型股 idiosyncratic IWM ★ SUCCESS min 2.80) **不可推廣至大型股寬基指數 ETF (DIA)** — 閘門需 base asset 帶「非 broad」idiosyncratic dip 雜訊 (小型股/板塊) 才有區分力；DIA 大型股寬基 RSI(2) capitulation dips 本身即 broad-market dips (ρ_DIA,QQQ≈0.85-0.9)，閘門非區分性且方向反轉 (保留深 QQQ-down 的 Fed-onset SL、誤殺淺跌 winners)，DIA 殘存 SL 為 EWJ-006/EEM-016/INDA-013 "idiosyncratic non-separable single residual SL" family 之大型股寬基 isomorph。Rel10d(DIA−QQQ) divergence 亦不可用 (SL +4.51 vs Part B winner 2024-08-02 +4.13 僅 0.38pp knife-edge 單點 notch；DIA−QQQ 為 positive-ρ style spread 非 driver-pure inverse → divergence regime gate family v4 failure class)。DIA-012 Att2 (min 1.31) 仍為全域最優 (13 DIA 實驗)。
+  note_prev: DIA-012 added 2026-04-24 (Capitulation-Depth Filter MR — repo first 1d-return cap + 3d-return cap dual-dimension primary filter on any asset, **Att2 SUCCESS**). Three iterations: Att1 (1d cap >= -2.0% only) Part A 12/91.7%/Sharpe **1.31** cum +32.47% / Part B 4/75%/0.47 unchanged / min(A,B) 0.47 (tied baseline) — 1d cap precisely filters 2/3 Part A SLs (2021-11-26 1d -2.52%, 2020-10-26 1d -2.24%) preserving all winners; Part B SL (2025-04-07 1d -0.95%) is "shallow 1d + deep 3d" structure (Trump tariff overnight continuation), 1d cap cannot capture; Att2 ★ (1d cap -2.0% AND 3d cap -7%, dual-dimension) Part A 12/91.7%/Sharpe **1.31** cum +32.47% (unchanged from Att1, 3d filter non-binding on Part A) / Part B **3/100%**/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† **= Part A 1.31** (EWJ-003/EWT-008 convention, +178% vs DIA-005 0.47) — 3d cap precisely filters Part B SL (3d -10.06%) preserving all winners (deepest winner 3d = 2020-02-28 -5.96%, 1pp safety margin); Att3 (1d cap -2.0% AND 3d cap -8%, robustness) identical to Att2 — confirms 3d cap robust between -7% and -8%, all winners 3d > -7% and Part B SL 3d -10% deeper than both. **Repo first 1d-return cap + 3d-return cap dual-dimension primary filter trial on any asset**. Cross-asset finding: DIA SLs cluster on 1d/3d return dimensions (orthogonal to 2d), distinct from CIBR-012 (2d cap), EEM-014/INDA-010/USO-013 (2d floor) — two separate failure mechanisms (single-day news shock vs multi-day regime-shift) require dual-dimension filter on low-vol broad ETFs. A/B balance achieved: annualized cum gap 28.5% < 30% ✓, signal ratio 1.6:1 (38% gap) < 50% ✓. Replaces DIA-005 as global optimum (12 experiments). Extends lesson #19 family with new "1d cap + 3d cap dual-dimension" sub-rule for low-vol (~1.0% daily vol) broad ETFs with policy/news-shock SL clustering.
 -->
 ## AI Agent 快速索引
 
@@ -39,6 +40,7 @@
 - **RSI(5) 趨勢回調（DIA-010，3 次嘗試）**：與 DIA-007 不同的趨勢回調進場方式（RSI(5)<30 + 3日跌幅≥2% vs SMA proximity）。Att1 波動收縮突破 20日新高 Part A Sharpe 0.03/Part B 0.33（48/20訊號，假突破過多）；Att2 嚴格收縮 50日新高+BB百分位 Part A 0.35/Part B -0.54（過擬合）；Att3 Close>SMA(50)+RSI(5)<30+3日跌幅≥2% Part A 0.22/Part B 1.42（僅 4 筆 Part B 訊號，樣本不足）。再次確認非均值回歸策略在 DIA 上無法超越 DIA-005
 - **波動率自適應 ATR 過濾（DIA-011，3 次嘗試）**：DIA-005 進場 + ATR(5)/ATR(20) 波動率飆升過濾（IWM-011/XLU-011 移植）。Att1 ATR>1.1/SL-3.5% Part A 0.45/Part B 0.47, min 0.45（移除 5 贏 1 輸，Part A 劣化）；Att2 ATR>1.05/SL-3.5% Part A 0.32/Part B 0.47, min 0.32（引入 1 壞訊號）；Att3 ATR>1.1/SL-4.0% Part A 0.87/Part B 0.40, min 0.40（SL-4.0% 救回 1 筆 Part A 但 Part B 虧損加大，A/B gap 0.47）。**DIA 日波動 ~1.0% 使 RSI(2) 訊號跨波動率制域均有效，ATR 過濾無法區分好壞訊號**（與 IWM/XLU 形成對比——IWM/XLU 日波動 1.5-2.0% 存在明確的慢磨/急跌訊號品質差異）
 - **DIA-012 Att1（單 1d cap）**：DIA-005 進場 + 1 日急跌上限 >= -2.0%，Part A 12/91.7%/Sharpe 1.31 cum +32.47%（+130% Part A 改善），但 Part B 不變（4/75%/Sharpe 0.47），min(A,B) 0.47（與基線持平）。Part B 唯一 SL（2025-04-07 Trump 關稅）為「shallow 1d + deep 3d」結構，1d cap 無法捕捉，需新增 3d 維度（見 Att2）
+- **QQQ 10d broad-market macro-confirmation gate（DIA-013，3 次嘗試，2026-05-17）**：DIA-012 Att2 base + QQQ 10 日報酬 <= 閾值（IWM-015 Att1 ★ SUCCESS min 2.80 直接移植）。Att1 ≤-1.5%（canonical）min(A,B)† 1.31→**1.00**（Part A 12→8/87.5%、Part B 3→1）；Att2 ≤-0.5%（loose）**1.18**（12→10/90%、3→2）；Att3 ≤-3.0%（strict）**0.89**（12→7/85.7%、3→1、Part C 0）。三閾值全 FAIL，min(A,B) 隨閘門收緊單調退化。**失敗根因**：殘存唯一 Part A 綁定 SL 2022-01-18（2022 Fed 升息開端 value/growth 輪動）signal-day QQQ10d = -7.75%（深負），在全閾值皆通過閘門從未被移除，閘門僅誤殺淺跌 winners。**DIA 大型股寬基 RSI(2) dips 與 QQQ 高度同向（ρ≈0.85-0.9），macro-confirmation gate 非區分性且方向反轉**——閘門需 base asset 帶「非 broad」idiosyncratic 雜訊（小型股 IWM）才有效，不可推廣至大型股寬基指數 ETF（lesson #36 extension）
 
 **已掃描的參數空間：**
 - DIA-001 進場：pullback ≥3% + WR(10) ≤-80 + close position ≥40% + 追蹤停損
@@ -71,6 +73,10 @@
 - DIA-012 Att1（單 1d cap）：min(A,B) 0.47 持平基線，Part A Sharpe 0.57→1.31 但 Part B 無變化
 - DIA-012 Att2 ★（雙維度 1d+3d）：min(A,B)† 1.31，Part A 1.31 / Part B std=0 全 TP（採 EWJ-003 慣例）
 - DIA-012 Att3（穩健性 3d cap -8%）：與 Att2 完全相同（贏家 3d 安全邊際 1pp）
+- **DIA-013 進場**：DIA-012 Att2 base + QQQ 10 日報酬 <= macro_max_return（QQQ_Close 由 strategy.run() 合併）
+- DIA-013 Att1：macro_max_return -0.015（IWM-015 canonical）→ min(A,B)† 1.00 FAIL
+- DIA-013 Att2：macro_max_return -0.005（loose）→ min(A,B)† 1.18 FAIL
+- DIA-013 Att3：macro_max_return -0.030（strict）→ min(A,B)† 0.89 FAIL
 
 **滾動窗口分析摘要（2026-03-28，DIA-001）：**
 - 12 窗口中 7 個負累計報酬（vs GLD-007 全 12 窗口正報酬）
@@ -82,6 +88,9 @@
 - 動態出場（根據進場時 VIX 調整 TP/SL）
 - ~~配對交易（DIA vs SPY 相對價值）~~ → DIA-009 已驗證失敗
 - ~~波動率自適應 ATR 過濾~~ → DIA-011 已驗證失敗（DIA 日波動太低，訊號跨制域均有效）
+- ~~QQQ broad-market macro-confirmation gate（IWM-015 移植）~~ → DIA-013 已驗證失敗（大型股寬基 dips 與 QQQ 同向，閘門非區分性反轉）
+- ~~DIA−QQQ / DIA−SPY divergence regime gate~~ → DIA-013 pre-analysis 排除（positive-ρ style spread 非 driver-pure inverse，family v4 failure class + knife-edge 單點 notch）
+- **DIA-012 Att2 殘存唯一 Part A SL 2022-01-18（Fed-onset value/growth 輪動淺磨）為 idiosyncratic non-separable single residual SL（QQQ/Rel/VIX/MOVE 全 interleaved），DIA 已近結構性天花板**
 
 **關鍵資產特性：**
 - SPDR Dow Jones Industrial Average ETF，追蹤道瓊工業平均指數（30 檔大型股）
@@ -96,7 +105,8 @@
 - 持倉 25d 微幅優於 20d：Part A Sharpe +9.6%，Part B 不變（DIA-005 驗證）
 - **BB Squeeze Breakout 在 DIA 完全無效**：日波動 ~1.0% + 30 股分散化 = 突破動能不足（DIA-006 驗證，3 次嘗試）
 - **ATR 波動率自適應過濾在 DIA 無效**：日波動 ~1.0% 使 RSI(2) 訊號跨高/低 ATR 比率制域均有效（78.6% WR），ATR 過濾移除好訊號多於壞訊號。與 IWM/XLU（日波動 1.5-2.0%，慢磨訊號品質差）形成對比。**ATR 有效邊界約為日波動 ≥ 1.5%**（DIA-011 驗證，3 次嘗試）
-- **DIA-005 均值回歸已確認為全域最優**（11 次實驗、36+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、動量、配對交易六大策略類型）
+- **QQQ macro-confirmation gate 在 DIA 無效（DIA-013 驗證，3 次嘗試）**：DIA 大型股寬基 RSI(2) capitulation dips 與 QQQ 高度同向（ρ≈0.85-0.9），dips 本身即 broad-market dips，IWM-015 閘門（需 base asset 帶非-broad idiosyncratic 雜訊才有區分力）在 DIA 上非區分性且方向反轉（保留深 QQQ-down 的 Fed-onset SL、誤殺淺跌 winners）。**macro-confirmation gate 有效前提：base asset 須帶 idiosyncratic（非 broad）dip 雜訊（小型股 IWM / 板塊 ETF），不可推廣至大型股寬基指數 ETF（DIA）**
+- **DIA-012 Att2 均值回歸已確認為全域最優**（13 次實驗、42+ 次嘗試，含均值回歸、波動率自適應、突破、趨勢跟蹤、動量、配對交易、capitulation-depth filter、cross-asset macro-confirmation 八大策略類型）
 <!-- AI_CONTEXT_END -->
 
 # DIA 實驗總覽 (DIA Experiments Overview)
@@ -121,12 +131,15 @@
 | DIA-002 | RSI(2) Extreme Oversold | RSI(2) + 2日跌幅 + 收盤位置，固定 TP/SL | 完成 |
 | DIA-003 | RSI(2) Asymmetric Exit | 同 DIA-002 進場，非對稱出場 SL -3.5% / 20d | 完成 |
 | DIA-004 | RSI(2) Wider TP | 同 DIA-003 進場，寬獲利目標 TP +3.0% / SL -3.5% / 20d | 完成 |
-| DIA-005 | RSI(2) Extended Holding | 同 DIA-004 進場，延長持倉 TP +3.0% / SL -3.5% / 25d | 完成 ✓ 當前最佳 |
+| DIA-005 | RSI(2) Extended Holding | 同 DIA-004 進場，延長持倉 TP +3.0% / SL -3.5% / 25d | 完成（DIA-012 進場框架基線） |
 | DIA-006 | BB Squeeze Breakout | BB(20,2) 擠壓 + 突破上軌 + SMA(50)，TP +3.5% / SL -3.5% / 20d | 完成 ❌ 失敗 |
 | DIA-007 | Trend Pullback to SMA(50) | SMA(50)>SMA(200) + 回測SMA(50) + 反彈 + SMA斜率上升，TP +3.0% / SL -3.5% / 25d | 完成 ❌ Part A 弱 |
 | DIA-008 | Momentum Pullback / 20d Pullback Range | Att1/2: ROC 動量+回檔；Att3: 20日回檔範圍+WR+ClosePos | 完成 ❌ 動量失敗+回檔範圍 Part A 弱 |
 | DIA-009 | Pairs Trading (DIA/SPY) | DIA/SPY 價格比值 z-score 均值回歸 + SMA(50) 趨勢確認 | 完成 ❌ 結構性漂移 |
 | DIA-010 | RSI(5) Trend Pullback | RSI(5)<30 + 3日跌幅≥2% + Close>SMA(50) 趨勢回調 | 完成 ❌ Part A Sharpe 0.22（未超越 DIA-005） |
+| DIA-011 | Volatility-Adaptive RSI(2) | DIA-005 進場 + ATR(5)/ATR(20) 波動率飆升過濾 | 完成 ❌ DIA 日波動太低，ATR 無區分力 |
+| DIA-012 | Capitulation-Depth Filter MR | DIA-005 進場 + 1d cap≥-2% AND 3d cap≥-7% 雙維度 | 完成 ✓ **當前最佳** min(A,B)† 1.31 |
+| DIA-013 | QQQ Macro-Confirmation Gate MR | DIA-012 Att2 + QQQ 10d 報酬 ≤ 閾值（IWM-015 移植） | 完成 ❌ 3 次嘗試全 FAIL，閘門對大型股寬基非區分性反轉 |
 
 ---
 

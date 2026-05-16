@@ -116,6 +116,7 @@ on:
           - "EWZ-009: ewz_009_ewz_eem_divergence_mr"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "DIA-012: dia_012_oneday_capitulation_filter"
+          - "DIA-013: dia_013_qqq_macro_confirm_mr"
           - "FCX-002: fcx_002_pullback_wr"
           - "FCX-003: fcx_003_optimized_exit"
           - "FCX-004: fcx_004_bb_squeeze_breakout"
