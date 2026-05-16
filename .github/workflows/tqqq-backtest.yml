@@ -152,6 +152,7 @@ on:
           - "SOXL-010: soxl_010_sector_rs_momentum"
           - "SOXL-011: soxl_011_soxx_atr_adaptive"
           - "SOXL-012: soxl_012_regime_vol_gate"
+          - "SOXL-013: soxl_013_signal_day_capitulation_cap"
           - "USO-001: uso_001_pullback_wr"
           - "USO-005: uso_005_symmetric_tight"
           - "USO-007: uso_007_sharp_pullback"
