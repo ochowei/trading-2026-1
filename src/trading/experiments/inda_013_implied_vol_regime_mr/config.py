@@ -108,10 +108,10 @@ class INDA013Config(ExperimentConfig):
     #   Att1 (^MOVE, 3d, ceiling, +5.0): XLU-013 rate-shock-jump 類比
     #   Att2 (^VIX , 3d, ceiling, +3.0): 風險通道
     #   Att3 (^MOVE, 3d, floor , -2.5): 唯一名目分離器（post-hoc, REJECT）
-    iv_ticker: str = "^MOVE"
+    iv_ticker: str = "^VIX"
     iv_lookback: int = 3
     iv_mode: str = "ceiling"
-    iv_threshold: float = 5.0
+    iv_threshold: float = 3.0
 
 
 def create_default_config() -> INDA013Config:
