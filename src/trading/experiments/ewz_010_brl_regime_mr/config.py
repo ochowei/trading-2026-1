@@ -127,10 +127,10 @@ class EWZ010Config(ExperimentConfig):
     # Att3：EWZ−BRL relative divergence FLOOR（Rel20 = EWZ20 − BRL20 ≥
     #   min_relative_return）。EWZ vol ≫ BRL vol → Rel ≈ EWZ 動量、零
     #   區分力 → 預測 FAIL。
-    use_brl_ceiling: bool = True
-    max_brl_return: float = 0.02  # Att2：BRL 20d CEILING ≤ +2.0%（收緊）
-    use_brl_divergence: bool = False
-    min_relative_return: float = -0.12  # Att3 值（停用時保留供參考）
+    use_brl_ceiling: bool = False
+    max_brl_return: float = 0.04  # Att1 值（停用時保留供參考）
+    use_brl_divergence: bool = True
+    min_relative_return: float = -0.12  # Att3：EWZ−BRL 20d divergence FLOOR ≥ -12.0%
 
 
 def create_default_config() -> EWZ010Config:
