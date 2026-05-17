@@ -114,6 +114,7 @@ on:
           - "EWZ-007: ewz_007_vol_transition_mr"
           - "EWZ-008: ewz_008_vix_implied_vol_mr"
           - "EWZ-009: ewz_009_ewz_eem_divergence_mr"
+          - "EWZ-010: ewz_010_brl_regime_mr"
           - "DIA-011: dia_011_vol_adaptive_rsi2"
           - "DIA-012: dia_012_oneday_capitulation_filter"
           - "DIA-013: dia_013_qqq_macro_confirm_mr"
