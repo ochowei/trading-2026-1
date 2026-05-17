@@ -1,6 +1,7 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-30
+  last_validated: 2026-05-17
   data_through: 2025-12-31
+  note_2026_05_17_fxi015: FXI-015 added 2026-05-17 (FXI–CNY (Yuan) Currency-Regime-Gated MR, **documented-failure; cross-asset currency regime gate family v4 第 4 個 driver-impure 失敗 subclass = POLICY-DRIVEN SINGLE-COUNTRY EM EQUITY vs OWN-COUNTRY CURRENCY (CNY/CNH)；延伸禁忌 #36e**, predict→confirm 預分析完全命中). base = FXI-014 Att2 全域最優（min(A,B) 1.01，binding=Part A 1.01 / Part B 1.61，殘餘 3 Part A SL = 2021-11-03 Didi/教培監管 / 2022-03-02 COVID封城 / 2023-02-06 reopening退潮）+ 第 7 條件 FXI–CNY regime gate（GLD-016 GLD–USD 形式；CNY=X 在岸人民幣，USDCNH=X/CNH=X yfinance 無資料，CNY 為標準 proxy basis<1%）。**強制 predict→confirm 預分析（先做）決定性命中**：重現 FXI-014 Att2 全 21+5 筆交易，3 筆 binding Part A SL **全發生於人民幣「走強/持平」regime**（CNY20 ∈ [-1.56,-0.72]，CNY=X 下跌=人民幣升值），與 Part A 18 winners（CNY20 ∈ [-2.24,+5.75]，含弱人民幣大贏家 2022-05-10 +5.75 / 2022-09-29 +4.17）**完全交錯**，無 ≥15pp robust plateau → 預測 documented-failure。三次迭代全 CONFIRMED vs baseline min 1.01：Att1（CNY 20d CEILING ≤+1.0%，弱人民幣 risk-off 直覺假設）Part A 21→13/85.7→76.9%/1.01→**0.63**（-38%）/ Part B 5→4/75%/1.37 / min **0.63** FAIL — 3 筆 firm-yuan SL 通過 ceiling（非綁定）反外科式誤殺 8 筆弱人民幣 winners（TSLA-018 Att2 / SIVR-019 Att1 同構，直覺反證）；Att2（CEILING 收緊 ≤+0.0%）Part A 21→11/72.7%/**0.49** / Part B 5→**1**/0.0%/**0.00** cum -0.64%（Part B 崩潰）/ min **0.00** catastrophic — 仍不隔離 firm-yuan SL 反連殺所有持平/弱人民幣 winners（EWT-010 Att2 同構，inverted）；Att3（FXI−CNY relative divergence FLOOR Rel20 ≥-6%，TLT-014/GLD-016 Att2/TSLA-018 Att3 精確類比）Part A 21→9/77.8%/**0.71** / Part B 5→2/50%/0.68 / min **0.68**（-33%）FAIL — FXI vol(~2.0%)≫CNY vol(~0.2%) 使 Rel≈FXI 動量、零獨立 CNY 區分力（SIVR-019 Att2 / TSLA-018 Att3 同構）。**核心跨資產規則（延伸禁忌 #36e / family v4 driver-purity 前置條件）**：country-specific 貨幣（CNY/CNH）regime gate 亦不可移植至政策驅動單一國家 EM 股票 ETF——成功前提 = 資產主驅動須「即」該貨幣（gold↔USD，GLD-016 SUCCESS）；policy-driven EM equity 即便改用本國貨幣亦 driver-impure，殘餘 binding SL 為監管/地緣股市事件、與在地貨幣 regime 結構性解耦且**反向**（SL 皆 firm-yuan，弱人民幣反為最佳 winners）。FXI 加入 EWJ-006/EEM-016/INDA-012/INDA-013/TSM-012/TSLA-018「idiosyncratic non-separable single residual SL」family，為 family v4 第 4 個 driver-impure subclass（區別於 EWT-010 component-vs-parent、SIVR-019 industrial-metal、TSLA-018 high-vol growth-stock-vs-USD）。空遠端 artifact `fxi_016_usdcnh_direction_mr` 為 false lead（branch-divergence caveat 再確認）。predict→confirm 軌跡 3 SUCCESS（GLD-016/VOO-005/URA-014）+ 12 documented-failure 全部命中。FXI-014 Att2 仍為 FXI 全域最優（15 次實驗、48+ 次嘗試）。
   note: FXI-014 added 2026-04-30 (Volatility-Acceleration-Bounded MR, **repo 第 2 次 ATR ratio CEILING 跨資產移植成功（繼 CIBR-014 後首次政策驅動 EM 單國 ETF 驗證）**, cross-asset port from CIBR-014 Att2). Three iterations, **Att2 ★ SUCCESS — repo 首次突破 FXI 結構性 Sharpe 上限 0.38**, new global optimum min(A,B) **1.01** (+166% vs FXI-005 0.38). Att1 (ATR ratio CEILING <= 1.40, CIBR-014 reference threshold direct port) Part A 22 signals WR 81.8% Sharpe **0.83** cum +102.80% / Part B 5/80%/Sharpe 1.61 cum +20.59% (unchanged from baseline) / min **0.83** (+118% vs FXI-005). Trade-level analysis revealed 5 of FXI-005's 8 Part A SLs cluster at ATR ratio ≥ 1.41-1.54 (in-crash acceleration phase) while all Part B winners ≤ 1.25 — CEILING 1.40 surgically filters 2020-01-23/2020-09-08/2021-02-24/2021-07-08 SLs + 2 weak expiries (2019-05-09 -0.70%, 2019-08-07 +4.23%). **Cooldown chain shift positive**: filtering 2019-05-09/08-07 expiries releases cooldown for 2019-05-17 expiry (+4.13%) and 2019-08-12 TP (+5.50%) to fire — net +5.13pp Part A cum gain from chain shift alone. **Att2 ★ SUCCESS (CEILING <= 1.35 tightened)** Part A 21/85.7%/Sharpe **1.01** cum +113.68% / Part B 5/80%/Sharpe 1.61 cum +20.59% / min **1.01** (+22% vs Att1, +166% vs baseline). 1.35 additionally filters 2020-03-09 SL (ATR 1.38 COVID continuation crash -5.09%) while preserving 2020-05-22 TP (ATR 1.30) and 2023-10-05 TP (ATR 1.32). A/B signal annualized 4.2/yr vs 2.5/yr (1.68:1 ratio, 40.5% gap < 50% ✓); A/B annualized cum 16.38%/y vs 9.82%/y (40.0% gap, slightly above 30% target but Sharpe of OOS 1.61 > IS 1.01 demonstrates no overfitting — Part A improvement comes from structural acceleration-phase filtering, not regime-specific tuning). Att3 (CEILING <= 1.30 ablation) Part A 19/84.2%/Sharpe **0.93** cum +91.98% / Part B unchanged / min **0.93** (-8% vs Att2) — confirms 1.30 over-tightens by filtering 2020-05-22 (ATR 1.3048) + 2023-10-05 (ATR 1.3247) winners alongside zero additional SL benefit (residual 3 SLs all ATR < 1.20). **Core findings (lesson #15 BAND boundary expansion)**: (1) ATR ratio CEILING extends from CIBR (1.53% vol, threshold 1.40) to FXI (2.0% vol, threshold 1.35) — slightly tighter ceiling on higher-vol policy-driven asset suggests acceleration signals span wider ATR range; (2) FLOOR + CEILING BAND structure validates cross-asset for "lesson #15 ATR>1.15 separates panic from slow-grind" → "ATR > X marks in-crash acceleration phase" symmetric failure mode; (3) **Repo first breakthrough of FXI's 0.38 structural Sharpe ceiling** after 13 prior experiments / 42+ attempts (BB Squeeze, RSI(5), BB Lower MR, RS momentum, Stoch, Failed Breakdown, Gap-Down Capitulation, CRSI, MBPC, BB-width regime gate all failed); (4) **First successful refinement of FXI-005 framework via signal-day secondary filter** — refutes prior implication that all secondary filters fail on policy-driven EM (lesson #6 had multiple FXI examples). FXI-014 Att2 becomes new global optimum (14 experiments, 45+ attempts). FXI-013 added 2026-04-22 (Volatility-Regime-Gated MR, **repo first BB-width regime gate trial on FXI** — cross-asset port from TLT-007 Att2). Three iterations all failed vs FXI-005 min 0.38: Att1 (FXI-005 full framework + BB(20,2) width/Close < 8%, TP+5.5%/SL-5.0%/20d/cd10) Part A 5 signals WR 60% cum +5.76% Sharpe **0.24** / Part B 1 signal time-expiry -0.64% Sharpe 0.00 / min **0.00** — BB 8% over-tight (FXI 2% vol vs TLT 1% means ratio doubles), only 2019-2020 early signals pass, 2021-2023 multi-regime crisis periods all blocked; Att2 (widen BB to 12%) Part A 16 signals WR 50% cum +5.67% Sharpe **0.09** / Part B 3 signals WR 66.7% cum +8.35% Sharpe 1.08 / min **0.09** — BB 12% too loose (FXI 2021/2022/2023 regimes have BB 7-11%), admits 7 SLs (2020-03/09, 2021-02/07/11, 2023-02) from regime-transition shocks, also loses 2 FXI-005 Part B winners; Att3 (BB 10% + dynamic 252d BB-width percentile < 50%) Part A 8 signals WR 50% Sharpe **0.04** / Part B 2 signals WR 50% Sharpe 0.68 / min **0.04** — percentile filter over-penalizes Part B 2025-01-13 TP winner (ranked >50% despite calm spot BB). **Core finding**: FXI vs TLT structural difference — TLT 2022 hiking cycle is **single extreme vol regime episode** (BB width persistently >5% carveoutable by fixed threshold); FXI 2019-2023 has **multiple overlapping mid-vol regimes** (trade war, COVID, regulatory crackdown, pandemic policy, weak recovery) with BB width distributions (7-12%) overlapping across good/bad signals — fixed AND dynamic BB thresholds both fail. **Repo first BB-width regime gate trial** on policy-driven EM ETF. Extends lesson #52 (all short-horizon reversal structures reject on policy-driven EM) to include **volatility-regime classifier** as another failed direction — not just entry-mechanism changes but also regime-filter approaches fail on multi-regime-overlapping assets. Cross-asset rule: BB-width regime gate requires asset to have **single extreme vol episode** cleanly separable; fails on assets with **multi-regime overlap** (FXI validated, pending INDA/FXI-family assets). FXI's 11th failed strategy type. FXI-005 remains global optimum (13 experiments, 42+ attempts). FXI-012 added 2026-04-21 (Momentum Breakout Pullback Continuation, **repo first absolute momentum continuation trial on FXI** — distinct from FXI-007 RS momentum). Three iterations all failed vs FXI-005 min 0.38: Att1 (Donchian 20d new high within last 5d + Close>SMA50 + 5d shallow pullback [-2%,-5%] + RSI(14) [40,60] + cd 10, TP+4%/SL-3.5%/15d) Part A 26 signals WR 42.3% cum -9.96% Sharpe **-0.09** / Part B 12 signals WR 58.3% cum +9.42% Sharpe 0.24 — Part A 2019-2023 China bear market false breakouts dominate (15/26 SLs, 1-7 day fast stops); Att2 (add SMA(20)>SMA(50) golden cross + tighten RSI [45,58]) Part A 16 WR 43.8% Sharpe -0.11 / Part B 10 WR **70.0%** Sharpe **0.55** (+129% vs Att1, exceeds FXI-005 Part A Sharpe 0.38) — golden cross boosts Part B but **cannot filter Part A bear-rally false breakouts** (2019 trade war rallies / 2021 regulatory crackdown precursor / 2023 weak recovery all had short-term golden cross); Att3 (+ SMA(50) slope positive: today > 60d ago, remove golden cross) Part A 8 WR 37.5% Sharpe **-0.21** / Part B 9 WR 55.6% Sharpe 0.26 / min -0.21 — **counterintuitive**: SMA slope filter worsens BOTH parts — FXI's best momentum continuation signals occur during regime-transition periods (2022 Q4 reopening, 2024 Q3 stimulus early phase) when SMA(50) slope still negative but about to turn; by time slope turns positive, best entry is missed. **Three iterations reveal**: absolute momentum continuation (Donchian + pullback) **structurally fails on policy-driven single-country EM ETFs** — China policy shocks cluster in regime-transition periods where ALL trend filters (Close>SMA, SMA crossover, SMA slope) are lagging indicators. Extends lesson #25 (RS momentum failure) and lesson #52 (all reversal structures rejected) with new finding: **absolute momentum continuation also rejected**. FXI suffers dual structural rejection — neither reversal (mean-revert) structures nor continuation (trend-follow) structures generalize. FXI's 10th failed strategy type. FXI-005 remains global optimum (12 experiments, 36+ attempts). FXI-011 added 2026-04-20 (Connor's RSI Mean Reversion: composite oscillator RSI(3)+Streak_RSI(2)+PercentRank(1d return,100d), first repo trial of CRSI). Three iterations all failed vs FXI-005 min 0.38: Att1 (CRSI≤10 + PB 4-12% + ClosePos + ATR + cd10) Part A 6 signals 50% WR Sharpe 0.01 / Part B 2/2 100% WR Sharpe 4.14 — CRSI≤10 stacked on PB+ATR over-restrictive, retains only 23% of FXI-005 signal flow with 50% WR; Att2 (CRSI≤20 + PB 4-12% + ClosePos, drop ATR) Part A 16 signals 56.2% WR Sharpe 0.12 / Part B 4/4 100% WR Sharpe 5.36 — CRSI removed 8 wins but only 2 losses (CRSI dis-favors 1-day flush wins that FXI-005 captures via WR); Att3 (FXI-005 framework + CRSI≤25 as additional filter) Part A 18 signals 55.6% WR Sharpe 0.17 / Part B 3/3 100% WR Sharpe 4.74 — wins reduced 17→10 (41% drop) vs signals 26→18 (31% drop), confirming CRSI penalizes single-day flushes (high RSI(3), short streak length). Core failure: FXI's profitable MR signals are sharp 1-2 day flushes with rapid intraday recovery; CRSI's three components all penalize this profile (RSI(3) bounces back fast, streak only -1/-2, %Rank not extreme). Extends lesson #6 boundary: CRSI as additional MR filter on policy-driven EM ETFs penalizes the very signals MR rewards. FXI's 9th failed strategy type (after BB Squeeze, RSI(5), BB Lower MR, RS momentum, Stoch, Failed Breakdown, Gap-Down Capitulation, plus FXI-001 baseline). FXI-005 remains global optimum (11 experiments, 33+ attempts). FXI-010 added 2026-04-18 (Gap-Down Capitulation + Intraday Reversal MR, ported from IBIT-006 Att2 framework). Three iterations all failed to beat FXI-005 min 0.38: Att1 (gap≤-1.5%, tight exit TP+3.5%/SL-3%) Part A -0.33 / Part B -0.51 (22 signals 31.8% WR, FXI gap-down often continues, not capitulates); Att2 (gap≤-2.5% + close>midpoint + deep pullback + FXI-005 wide exit) Part A 0.04 / Part B 0.00 (too few signals 5/1); Att3 (gap as regime filter: recent 5d contains gap≤-2% + FXI-005 entry) Part A 0.34 / Part B 0.00 (22/2 signals, Part B zero variance, 2024-2025 policy event scarcity). Extends lesson #52 to gap-down capitulation structure: policy-driven EM rejects gap-down capitulation (both as entry trigger and regime filter), unlike IBIT where BTC 24/7 continuous price discovery creates genuine capitulation. FXI-009 added 2026-04-17 (Failed Breakdown Reversal / Turtle Soup, 3 iterations all failed to beat FXI-005 min 0.38; best Att1 0.00, Att2 -0.11, Att3 Part A 0 signals). Confirms short-horizon structure-break + reclaim patterns DO NOT work on policy-driven single-country EM ETFs. Extends lesson #52 to failed-breakdown / Turtle Soup variant. FXI-008 added 2026-04-17 (Stochastic Oscillator MR, 3 iterations all failed; best Att3 dual-osc 0.37). A/B signal imbalance (5:1) is structural and cannot be fixed via entry-mechanism changes alone.
 -->
 ## AI Agent 快速索引
@@ -128,6 +129,8 @@
 - ~~Connor's RSI (CRSI) 均值回歸~~ → FXI-011 三次迭代均失敗（CRSI 三組件全部懲罰 1-2 日急跌+盤中反彈的高品質訊號）
 - ~~動量連續（Donchian 新高 + 淺回檔）~~ → FXI-012 三次迭代均失敗（Att1 基線 min -0.09、Att2 黃金排列 min -0.11、Att3 SMA slope min -0.21）。擴展 lesson #25 絕對動量亦失敗 + lesson #52 新增趨勢延續結構禁忌
 - ~~Volatility-Regime-Gated MR（BB 寬度 regime 閘門，移植 TLT-007）~~ → FXI-013 三次迭代均失敗（Att1 BB<8% min 0.00、Att2 BB<12% min 0.09、Att3 BB<10%+動態百分位 min 0.04）。多 regime 重疊使 BB 寬度分佈無區分力，新 cross-asset 規則：BB 寬度 regime 閘門需**單一極端 vol episode**（TLT 2022）可一刀切除；**多段中等 vol regime 重疊**（FXI 政策驅動 EM）結構性失效
+- ~~FXI–CNY 貨幣 regime gate（family v4，移植 GLD-016 GLD–USD）~~ → FXI-015 三次迭代均失敗（Att1 CNY 20d CEILING≤+1.0% min 0.63、Att2 CEILING≤+0.0% min 0.00 catastrophic、Att3 FXI−CNY divergence FLOOR≥-6% min 0.68）。3 筆 binding Part A SL 為監管/地緣股市事件、發生於 firm-yuan regime、與在地貨幣解耦且反向，無 ≥15pp robust plateau。延伸禁忌 #36e：country-specific 貨幣 regime gate 不可移植至政策驅動單一國家 EM 股票 ETF
+- ~~空遠端 artifact `fxi_016_usdcnh_direction_mr`（USD/CNH direction）~~ → false lead（branch-divergence caveat），FXI-015 已驗證 CNY/CNH 貨幣維度結構性失效
 - SL -4.75%（介於 -4.5% 和 -5.0% 之間，可能是更精確甜蜜點）
 
 **關鍵資產特性：**
@@ -172,6 +175,7 @@
 | FXI-012 | `fxi_012_momentum_pullback`    | Donchian 動量突破 + 淺回檔連續進場（repo 首次絕對動量試驗，3 次迭代均失敗）| 已完成（失敗，擴展 lesson #25 絕對動量亦失敗 + lesson #52 新增趨勢延續結構禁忌）|
 | FXI-013 | `fxi_013_regime_vol_gate_mr`   | Volatility-Regime-Gated MR（BB 寬度 regime 閘門，repo 首次跨資產移植 TLT-007 至政策驅動 EM，3 次迭代均失敗）| 已完成（失敗，新 cross-asset 規則：BB 寬度 regime 閘門需**單一極端 vol episode** 可一刀切除，**多段中等 vol regime 重疊**結構性失效）|
 | FXI-014 | `fxi_014_atr_band_mr`          | Volatility-Acceleration-Bounded MR（ATR ratio BAND：FLOOR 1.05 + CEILING 1.35，CIBR-014 跨資產移植，**Att2 ★ SUCCESS min(A,B) 1.01 +166% vs FXI-005**）| ✅ **當前最佳** |
+| FXI-015 | `fxi_015_cny_regime_mr`        | FXI–CNY (Yuan) Currency-Regime-Gated MR（family v4，移植 GLD-016 GLD–USD 形式至政策驅動 EM，3 次迭代均失敗）| 已完成（documented-failure，predict→confirm 命中；延伸禁忌 #36e：country-specific 貨幣 regime gate 不可移植至政策驅動單一國家 EM 股票 ETF）|
 
 ---
 
@@ -1288,3 +1292,94 @@ Cooldown chain shift 額外釋放 2 筆 winners，淨改善顯著。
 - **EEM**（1.17% vol，broad EM）：EEM-014 已使用 ATR FLOOR 成功，可疊加 CEILING
 
 FXI-014 Att2 為 FXI 第 14 次實驗（45+ 嘗試），新全域最優。
+
+---
+
+## FXI-015: FXI–CNY (Yuan) Currency-Regime-Gated Mean Reversion
+
+**目標**：測試 cross-asset currency regime gate family v4（GLD-016 GLD–USD
+形式）能否以 **country-specific 貨幣（CNY=X 在岸人民幣）** 救政策驅動單一
+國家 EM 股票 ETF——直覺假設「弱人民幣（CNY=X 上升）= 中國資本外流 /
+risk-off → FXI 走弱」。base = FXI-014 Att2 全域最優 + 第 7 條件 FXI–CNY
+regime gate。**結果：documented-failure，predict→confirm 預測完全命中。**
+
+### 強制 predict→confirm 預分析（先做，重現 FXI-014 Att2 全 21+5 筆交易）
+
+CNY=X = USD/CNY（USDCNH=X / CNH=X 於 yfinance 無資料，CNY 為標準人民幣
+regime proxy，與 CNH basis <1%）。+ve N 日報酬 = 人民幣貶值 = China risk-off。
+
+| binding Part A SL | exit | ret%  | CNY10 | CNY20 | CNY30 | Rel20=FXI20−CNY20 |
+|-------------------|------|-------|-------|-------|-------|-------------------|
+| 2021-11-03 Didi/教培監管餘波 | SL | -5.09 | +0.27 | **-0.72** | -1.04 | +6.66 |
+| 2022-03-02 COVID 封城/俄烏    | SL | -5.10 | -0.70 | **-0.75** | -0.55 | -8.73 |
+| 2023-02-06 reopening 退潮    | SL | -5.10 | -0.12 | **-1.56** | -2.68 | -0.30 |
+
+3 筆 binding SL **全發生於人民幣「走強/持平」regime**（CNY20 ∈
+[-1.56,-0.72]，CNY=X 下跌 = 人民幣升值），其為**中國政策/監管股市事件衝擊**，
+與貨幣 regime 結構性解耦且**反向**。Part A 18 winners CNY20 ∈ [-2.24,+5.75]
+（含弱人民幣大贏家 2022-05-10 +5.75 / 2022-09-29 +4.17 皆 +5.50% TP）、
+Rel20 ∈ [-18.27,+6.96]。3 SL 的 CNY10/20/30 與 winners **完全交錯**，無單一
+CEILING/FLOOR/BAND 可隔離 3 SL 而不誤殺 ≥3 winners，**無 ≥15pp robust
+plateau** → 預測 DOCUMENTED-FAILURE。
+
+### 出場參數（與 FXI-014 Att2 相同）
+
+- TP +5.5% / SL -5.0% / 持倉 20d / 冷卻 10d / slippage 0.1% / 悲觀認定 /
+  ExecutionModelStrategy 隔日開盤進場
+
+### 迭代記錄（三次迭代全 CONFIRMED documented-failure）
+
+#### Att1（CNY 20d 報酬 CEILING ≤ +1.0%，filter 弱人民幣 risk-off regime）
+
+- **結果：Part A 21→13 / WR 85.7→76.9% / Sharpe 1.01→0.63 / cum
+  +113.68%→+41.06% ; Part B 5→4 / 75% / 1.61→1.37 ; min(A,B) 0.63（-38%）FAIL**
+- 3 筆 binding SL 全 firm-yuan、通過 ≤+1.0% CEILING（gate 對 SL **非綁定**）；
+  CEILING 反外科式誤殺 8 筆弱人民幣 winners（2022-05-10 +5.75 / 2022-09-29
+  +4.17 / 2019-08-12 +2.64 等 +5.50% TP）→ WR/Sharpe 雙降。直覺「弱人民幣
+  =risk-off」被反證。**TSLA-018 Att2 / SIVR-019 Att1 同構**。
+
+#### Att2（CNY 20d CEILING 收緊至 ≤ +0.0%）
+
+- **結果：Part A 21→11 / WR 85.7→72.7% / Sharpe 1.01→0.49 / cum
+  +113.68%→+26.75% ; Part B 5→1 / WR 80→0.0% / Sharpe 1.61→0.00 / cum
+  →-0.64% ; min(A,B) 0.00 catastrophic FAIL**
+- 收緊仍無法隔離 3 筆 firm-yuan SL（CNY20 ∈ [-1.56,-0.72] 仍通過 ≤0.0），
+  反連殺所有「持平/弱人民幣」winners——Part B 4 winners（2024-01-22 CNY20
+  +0.56 / 2025-01-13 +1.15 / 2025-04-04 +0.23）全移除，僅剩 1 筆 2025-11-21
+  -0.64% 到期 → Part B inverted catastrophic。**EWT-010 Att2 同構**。
+
+#### Att3（FXI−CNY relative divergence FLOOR Rel20 ≥ -6.0%）
+
+- TLT-014 / GLD-016 Att2 / TSLA-018 Att3 精確類比，停用 CEILING
+- **結果：Part A 21→9 / WR 85.7→77.8% / Sharpe 1.01→0.71 / cum
+  +113.68%→+31.01% ; Part B 5→2 / WR 80→50% / Sharpe 1.61→0.68 / cum
+  →+2.70% ; min(A,B) 0.68（-33%）FAIL**
+- FXI vol（~2.0%）≫ CNY vol（~0.2%）使 Rel20 ≈ FXI 20d 動量，divergence 對
+  CNY 維度**零獨立區分力**——FLOOR 退化為「FXI 20d 不過度負」濾波，無差別
+  移除深回檔訊號（多為 winners），3 SL 仍部分倖存（2021-11-03 Rel20 +6.66 /
+  2023-02-06 -0.30 通過 FLOOR）。**SIVR-019 Att2 / TSLA-018 Att3 同構**。
+
+### 跨資產發現（延伸禁忌 #36e / family v4 driver-purity 前置條件）
+
+- **country-specific 貨幣（CNY/CNH）regime gate 亦不可移植至政策驅動單一
+  國家 EM 股票 ETF**：FXI 殘餘 binding SL 為監管/地緣股市事件（2021-11
+  Didi/教培、2022-03 COVID 封城、2023-02 reopening 退潮），與在地貨幣 regime
+  結構性解耦且**反向**（SL 皆 firm-yuan，弱人民幣反為最佳 winners）
+- **精煉 currency regime gate driver-purity 前置條件**：成功前提是資產主驅動
+  須「即」該貨幣（gold↔USD，GLD-016 SUCCESS）；policy-driven EM equity 即便
+  改用本國貨幣亦 **driver-impure**——貨幣為滯後 co-symptom 而非驅動因子
+- FXI 加入 **EWJ-006/EEM-016/INDA-012/INDA-013/TSM-012/TSLA-018
+  「idiosyncratic non-separable single residual SL」family**，為**政策驅動
+  China 股票 vs 在地貨幣**新 driver subclass（區別於 EWT-010
+  component-vs-parent、SIVR-019 industrial-metal、TSLA-018 high-vol growth
+  stock-vs-USD）
+- **RS-entry ≠ divergence/currency-gate 再確認**：FXI-007 FXI–EEM RS 動量
+  進場失敗（lesson #25）；FXI-015 FXI–CNY 貨幣 regime gate 亦失敗，但機制
+  不同（前者 RS 進場觸發、後者品質 regime gate）
+- 空遠端 artifact `fxi_016_usdcnh_direction_mr` 方向為 false lead（branch-
+  divergence caveat 再確認，同 EWT-010 / TSLA-018）
+- predict→confirm 軌跡 3 SUCCESS（GLD-016/VOO-005/URA-014）+ 12
+  documented-failure 全部命中
+
+FXI-015 為 FXI 第 15 次實驗（48+ 嘗試），documented-failure；**FXI-014 Att2
+仍為 FXI 全域最優**。

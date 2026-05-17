@@ -109,13 +109,10 @@ class FXI015Config(ExperimentConfig):
     # Att3：FXI−CNY relative divergence FLOOR（Rel20 = FXI20 − CNY20 ≥
     #   min_relative_return）。FXI vol ≫ CNY vol → Rel ≈ FXI 動量、零
     #   區分力 → TIE。
-    use_cny_ceiling: bool = False
-    max_cny_return: float = 0.0
-    use_cny_divergence: bool = True
-    # Att3：FXI−CNY relative divergence FLOOR（Rel20 = FXI20 − CNY20 ≥
-    #   -6.0%，GLD-016 Att2 / TLT-014 精確類比）。FXI vol ≫ CNY vol →
-    #   Rel ≈ FXI 動量、零獨立 CNY 區分力 → 預測 TIE/degrade。
-    min_relative_return: float = -0.06
+    use_cny_ceiling: bool = True
+    max_cny_return: float = 0.01  # Att1（最終 default）：CNY 20d ≤ +1.0%
+    use_cny_divergence: bool = False
+    min_relative_return: float = -0.06  # Att3 值（停用時保留供參考）
 
 
 def create_default_config() -> FXI015Config:
