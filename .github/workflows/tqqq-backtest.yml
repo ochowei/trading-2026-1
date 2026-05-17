@@ -295,6 +295,7 @@ on:
           - "XLU-011: xlu_011_vol_adaptive_mr"
           - "XLU-012: xlu_012_vol_transition_mr"
           - "XLU-013: xlu_013_move_implied_vol_mr"
+          - "XLU-014: xlu_014_tnx_rate_direction_mr"
           - "CIBR-001: cibr_001_pullback_wr"
           - "CIBR-002: cibr_002_vol_adaptive_mr"
           - "CIBR-003: cibr_003_bb_squeeze_breakout"
