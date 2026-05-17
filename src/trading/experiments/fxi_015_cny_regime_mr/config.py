@@ -110,7 +110,7 @@ class FXI015Config(ExperimentConfig):
     #   min_relative_return）。FXI vol ≫ CNY vol → Rel ≈ FXI 動量、零
     #   區分力 → TIE。
     use_cny_ceiling: bool = True
-    max_cny_return: float = 0.01  # CNY 20d 報酬 ≤ +1.0%（弱人民幣 CEILING）
+    max_cny_return: float = 0.0  # Att2：CNY 20d 報酬 ≤ +0.0%（收緊 CEILING）
     use_cny_divergence: bool = False
     min_relative_return: float = -0.99  # 停用時設極寬
 
