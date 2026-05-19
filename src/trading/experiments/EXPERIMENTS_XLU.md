@@ -1,12 +1,13 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-05-02
+  last_validated: 2026-05-17
   data_through: 2025-12-31
+  note_2026_05_17_xlu014: XLU-014 added 2026-05-17 (^TNX Realized-Rate-Momentum DIRECTION Regime-Gated MR, **documented-failure；zero-variance-trap family 第 4 次確認（繼 TLT-014 Att3 / XLU-013 / XBI-017）；確認 XLU-013 Att2/Att3 結構性 NON-IMPROVABLE；延伸 lesson #24 family DIRECTION 邊界 + 禁忌 #36f / #37**, predict→confirm 預分析完全命中). base = XLU-013 Att2/Att3 全域最優（min(A,B) **1.59**，binding=Part B Sharpe 1.59）+ 第 7 條件 ^TNX（10y yield realized-rate-momentum）3d DIRECTION CEILING / XLU 5d capitulation-depth FLOOR。**強制 predict→confirm 預分析（先做）決定性命中**：執行模型實測 XLU-013 Att2/Att3 全 6+4 筆——Part A = 5 × (+3.00% TP) + 1 × (2019-11-08 +1.88% expiry) micro-var、**Part B（binding）= 3 × (+3.00% TP, 2024-06-14/2024-11-06/2025-03-05) + 1 × (2024-01-18 −0.20% 近乎持平 time-EXPIRY，非停損)**，**binding Part 全 winners 皆相同 +3.00% TP + 單筆極溫和 time-expiry**（TLT-014 Att3 −2.38% mild-expiry zero-var trap 精確 isomorph，比 TLT-014 更溫和）。殘餘 binding Part B expiry 2024-01-18 vs 3 Part B winners 逐維度：^MOVE level(107.2 ∈ [100.2,117.6])/3d(+0.67 ∈ [-11.27,+2.97])/5d / ^VIX level(14.13)/3d(+11.26 ≈ winner 2025-03-05 +11.72) / ^TNX level(4.14 vs 4.21 gap **0.07pp** knife-edge) / ^TNX 5d/20d / XLU 20d(-3.43 vs -3.24 gap 0.19pp) / SPY 20d / RV20 **全部維度交錯、無 ≥15pp robust plateau**；僅 2 個 post-hoc 單點 notch：^TNX 3d(expiry +4.91 vs winner-max +1.49 gap 3.42pp) / XLU 5d(expiry -5.27 vs -2.89 gap 2.38pp) → 預測 documented-failure（zero-variance trap：外科式移除 expiry → Part B 純 3×+3.00% TP std=0 退化；非外科式 → 同殺相同-TP winner 崩潰）。三次迭代全 CONFIRMED vs baseline min 1.59：Att1（^TNX 3d % change CEILING ≤+3.0%，rate-shock 直覺）Part A 3/100%/Sharpe **0.00** zero-var cum +9.27% / Part B 3/100%/**0.00** zero-var cum +9.27% / min **0.00**（-100%）**雙 zero-var degenerate REJECT**（† 慣例不適用雙退化，XBI-018 Att2 / EWZ-010 Att2 / XLU-012 Att1/Att2 同構）— surgical 移除 2024-01-18 expiry（TNX3d +4.91 >+3.0）但 binding Part B 純 3×+3.00% TP std=0；Att2（CEILING 收緊 ≤+1.0% 強制結構測試）Part A 2/100%/**0.00** / Part B **3→2**/100%/**0.00** cum +9.27%→**+6.09%**（-34%）/ 訊號 4→2 / min **≈0.00** catastrophic — 同殺 winner 2024-11-06（TNX3d +1.49 >+1.0），EWT-010 Att2 / FXI-015 Att2 inverted-catastrophic 同構；Att3（XLU 5d return FLOOR ≥-4.0%，正交 capitulation-depth ablation，^TNX gate 停用）Part A 6/100%/Sharpe **6.74**（baseline 保留，FLOOR 對 Part A 非綁定）/ Part B 3/100%/**0.00** zero-var cum +9.27% / min **0.00** FAIL — 正交維度同樣 surgical 移除 2024-01-18（XLU5d -5.27 <-4.0）→ Part B 純 3×+3.00% TP std=0，**最乾淨 zero-var-trap 證明**（即使完美外科式僅移除單筆殘餘、Part A 6.74 完整保留，binding Part B 仍因 std=0 退化，min 無法 >1.59）。**核心跨資產規則**：(1) **zero-variance trap 第 4 個資產確認**（繼 TLT-014 Att3 / XLU-013 / XBI-017）：binding Part 全 winners 同一 TP + 單筆極溫和 time-expiry（非 SL，無 regime-failure signature 可 gating），任何正交 filter 外科式移除 expiry 必致 std=0 退化、非外科式必同殺相同-TP winner → documented-failure 結構性必然；(2) **XLU-013 Att2/Att3 確認結構性 NON-IMPROVABLE**（與 XBI-018 確認 XBI-017 / TLT-014 Att3 平行，repo 第 3 個「best 已驗證不可改善」資產）；(3) 延伸禁忌 #37：realized rate momentum（^TNX 3d）對 rate-indirect ETF（XLU）MR 殘餘無 driver-pure 區分力，跨「forward-looking implied bond vol（^MOVE，XLU-013 有效）」與「backward-looking realized rate momentum（^TNX，XLU-014 無效）」邊界完整界定；(4) XLU 殘餘 binding Part B time-expiry 2024-01-18 為 benign slow-MR timeout（非 idiosyncratic SL family，純 zero-var-trap 結構）。predict→confirm 軌跡 3 SUCCESS（GLD-016/VOO-005/URA-014）+ **16 documented-failure 全部命中**（XLU-014 為第 16）。XLU-013 Att2/Att3 仍為 XLU 全域最優（14 次實驗、41+ 次嘗試，XLU-014 驗證，3 次嘗試，data_through 2025-12-31，validated 2026-05-17）。
   note: XLU-013 added 2026-05-02 (MOVE Implied-Vol Forward-Looking Regime-Gated MR, **Att2/Att3 SUCCESS — repo 第 2 次 lesson #24 forward-looking implied vol regime gate 跨資產驗證（繼 TLT-013 後），首次 ^MOVE DIRECTION 維度發現於任何資產**, cross-asset port from TLT-013 Att1). Three iterations: Att1 (max_move_level=130 直接移植 TLT-013 sweet spot) Part A 7/85.7%/Sharpe **0.75**（與 XLU-012 baseline 完全相同）/ Part B 4/75.0%/Sharpe **1.59**（與 baseline 同，2024-11-04 TP 被 MOVE 136.2>130 過濾但 cooldown chain shift 接續 2024-11-06 TP）/ min **0.75**（0% 改善）— XLU 殘餘 SL（2021-09-20 FOMC taper signaling）當日 MOVE=59.6（極低 calm 區），LEVEL cap 結構非綁定；Att2 ★ (max_move_level=130 + use_move_direction_filter=True, lookback=3, max_move_change=+5.0) Part A 6 訊號 WR **100%** Sharpe **6.74** cum +18.11% / Part B 4 訊號 WR 75.0% Sharpe 1.59 cum +9.05%（與 baseline 完全相同）/ min(A,B) **1.59**（**+112% vs XLU-012 baseline 0.75**，全域最優）/ A/B 年化幾何報酬差距 23.5%（< 30% ✓）/ A/B 訊號比 1.2/yr vs 2.0/yr = 40%（< 50% ✓）/ Sharpe 計算 micro-variance（2019-11-08 Expiry +1.88% + 5 TPs +3.00%）—— 2021-09-20 SL 當日 MOVE 3d change=+5.65（恰於 +5 邊界外）為 isolated discriminator，所有 Part A TPs 3d change ∈ [-23.6, +4.03]；Att3 ablation (max_move_level=999 disabled, direction filter only) 結果與 Att2 **完全相同** — 確認 ^MOVE LEVEL cap 對 XLU **結構性冗餘**，DIRECTION (3d change) 為唯一 binding dimension. **核心發現**：(1) **lesson #24 v2 候選 — forward-looking implied vol DIRECTION 維度首次驗證**：與 TLT-013 LEVEL 維度結構性正交，repo 首次驗證 implied vol 第二維度；(2) **TLT vs XLU 維度選擇取決於資產與 rate 的耦合程度**：TLT 直接追蹤 30y treasury price → MOVE LEVEL cap 130 binding（TLT-013）；XLU 透過 yield-spread + flight-to-defensive 間接相關 → MOVE DIRECTION (3d change) binding，LEVEL 與 utility flow 解耦；(3) **2021-09-20 SL 失敗結構**：FOMC 政策訊號日 bond vol 跳升（rising direction）造成 duration shock + safety bid 同時崩壞，3d change 維度識別「Fed 政策訊號日 bond vol regime 開端」失敗模式。**跨資產假設（待驗證）**：lesson #24 v2 適用於 rate-indirect ETF（XLRE / XLF / KRE 真實銀行/REIT/金融板塊），閾值需依資產與 bond market 耦合強度調整。XLU-013 Att2/Att3 為新全域最優（13 次實驗、38+ 次嘗試）。
   note_2026_04_27_xlu_012: XLU-012 added 2026-04-27 (Post-Capitulation Vol-Transition MR — Att3 SUCCESS，repo 第 4 次「ATR-vol-filtered MR + TP 突破型擴張」方向發現). Three iterations: Att1 (XLU-011 框架 + 2DD cap >= -2.5% CIBR-012 方向 + TP +2.5%) Part A 7/85.7%/0.67 同 baseline / Part B 3/100% **zero-var 0.00** / min **0.00** — 2DD cap 在 XLU 結構性失敗；Att2 (Att1 + TP +3.0%) Part A 0.75 / Part B zero-var 0.00 / min 0.00；Att3 ★ (移除 2DD 過濾、保留 TP +3.0%) min(A,B) **0.75**（+12% vs XLU-011 0.67）。**核心發現**：MR 框架疊加 ATR 動能濾波後，TP 上限可從 +2.5% 擴張至 +3.0%（突破型甜蜜點）；2DD 區間過濾對 XLU 1.08% vol 利率敏感 ETF 結構性失效。
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** XLU-013 Att2/Att3（XLU-012 Att3 完整框架 + **^MOVE 3d change <= +5.0** forward-looking implied vol DIRECTION filter，TP +3.0%/SL -4.0%/20 天/cd 7d，Part A Sharpe **6.74**（100% WR, 6 訊號 micro-variance）/ Part B Sharpe **1.59** / min(A,B) **1.59**，**+112% vs XLU-012 baseline 0.75**）★ **2026-05-02 新全域最優（13 次實驗、38+ 次嘗試）**
+**當前最佳：** XLU-013 Att2/Att3（XLU-012 Att3 完整框架 + **^MOVE 3d change <= +5.0** forward-looking implied vol DIRECTION filter，TP +3.0%/SL -4.0%/20 天/cd 7d，Part A Sharpe **6.74**（100% WR, 6 訊號 micro-variance）/ Part B Sharpe **1.59** / min(A,B) **1.59**，**+112% vs XLU-012 baseline 0.75**）★ **2026-05-02 新全域最優（XLU-014 後 14 次實驗、41+ 次嘗試；XLU-014 ^TNX rate-momentum / XLU-depth gate documented-failure 確認 XLU-013 結構性 NON-IMPROVABLE，見禁忌 #36f / #37、lesson #24）**
 - Part A: Sharpe **6.74**, 累計 +18.11%, 6 訊號 (1.2/年), WR **100%**, MDD -0.90%（filter XLU-012 唯一 SL 2021-09-20 FOMC taper signaling，保留 5 TPs +3.0% + 1 Expiry +1.88%）
 - Part B: Sharpe **1.59**, 累計 +9.05%, 4 訊號 (2.0/年), WR 75.0%（與 XLU-012 baseline 完全相同，2024-11-04 TP cooldown chain shift 至 2024-11-06）
 - min(A,B) **1.59**, A/B 年化幾何報酬差距 23.5% (< 30% ✓), A/B 訊號比 1.2:2.0 = 40% (< 50% ✓)
@@ -105,6 +106,11 @@
 - ATR 比率 1.13-1.14（ATR 1.12 已引入壞訊號，1.15 已是甜蜜點邊界）
 - TP +3.5% 或更寬（Att3 中 TP +3.0% 已使 2019-11-08 訊號退化為 expiry +1.88%，再加寬將惡化此筆）
 - 2DD floor / 2DD cap 任何方向（XLU-012 Att1/Att2 驗證 2DD 維度對 XLU winners/losers 無區分力）
+- **任何正交 regime gate 隔離 XLU-013 Part B 殘餘 2024-01-18 time-expiry（XLU-014 驗證 — zero-variance trap，結構性 documented-failure）**：XLU-013 binding Part B = 3×+3.00% TP + 單筆 −0.20% 近乎持平 time-expiry，外科式移除必致 std=0 退化、非外科式必同殺相同-TP winner。^TNX 3d rate-momentum CEILING（Att1 ≤+3.0 雙 zero-var / Att2 ≤+1.0 catastrophic）+ XLU 5d capitulation-depth FLOOR（Att3 ≥-4.0 同退化）三維皆 CONFIRMED。**XLU-013 Att2/Att3 結構性 NON-IMPROVABLE，XLU 探索終止**
+
+**已證明無效（XLU-014 documented-failure，禁忌 #36f / #37 延伸）：**
+- ^TNX（10y yield）3d realized-rate-momentum DIRECTION CEILING（≤+3.0% / ≤+1.0%）：rate-indirect ETF（XLU）MR 殘餘對 realized rate momentum 無 driver-pure 區分力（禁忌 #37 延伸）；且觸發 zero-variance trap
+- XLU 自身 5d return capitulation-depth FLOOR（≥-4.0%）：正交維度同樣僅 surgical 移除單筆 benign time-expiry → Part B std=0 退化（最乾淨 zero-var-trap 證明）
 
 **關鍵資產特性：**
 - XLU（Utilities Select Sector SPDR Fund）：美國公用事業類股 ETF
@@ -154,6 +160,7 @@
 | XLU-011 | `xlu_011_vol_adaptive_mr` | 波動率自適應均值回歸（ATR ratio > 1.15，品質+數量平衡） | 前任最佳 |
 | XLU-012 | `xlu_012_vol_transition_mr` | Post-Capitulation Vol-Transition MR（XLU-011 框架 + TP +3.0%，移除 2DD 過濾） | 前任最佳 |
 | XLU-013 | `xlu_013_move_implied_vol_mr` | MOVE Implied-Vol Forward-Looking Regime-Gated MR（XLU-012 + ^MOVE 3d change <= +5.0 direction filter，repo 第 2 次 lesson #24 跨資產驗證、首次 ^MOVE DIRECTION 維度） | ★ 當前最佳 |
+| XLU-014 | `xlu_014_tnx_rate_direction_mr` | ^TNX Realized-Rate-Momentum DIRECTION Regime-Gated MR（XLU-013 + ^TNX 3d CEILING / XLU 5d FLOOR，**documented-failure；zero-variance-trap 第 4 次確認，XLU-013 結構性 NON-IMPROVABLE**） | 已完成（documented-failure） |
 
 ---
 
@@ -506,6 +513,12 @@ XLU-001 (回檔+WR+反轉K線，固定 TP 2.5%/SL 4.0%)
 XLU-004 (BB Squeeze Breakout，獨立突破策略路線) ★ 突破策略最佳
 XLU-005 (趨勢回檔 / 跨資產配對，3 次嘗試均失敗) ✗
 XLU-006 (RSI(2) 寬停損 / 60日跌幅 / TLT 利率過濾，3 次嘗試均失敗) ✗
+XLU-003 (均值回歸主線)
+  └── XLU-010 (ATR ratio > 1.2 波動率飆升過濾)
+        └── XLU-011 (ATR ratio > 1.15 品質+數量平衡) 前任最佳
+              └── XLU-012 Att3 (移除 2DD + TP +3.0%) 前任最佳
+                    └── XLU-013 Att2/Att3 (+ ^MOVE 3d DIRECTION ≤ +5.0) ★ 全域最優 min(A,B) 1.59
+                          └── XLU-014 (+ ^TNX 3d rate-momentum / XLU 5d depth gate，**zero-variance-trap documented-failure，XLU-013 結構性 NON-IMPROVABLE**) ✗
 
 ---
 
@@ -1112,3 +1125,115 @@ safety bid 同時崩壞）。
 XLU-013 為新全域最優（13 次實驗、38+ 次嘗試，含均值回歸、突破、KC squeeze、
 配對、動量回調、ATR 過濾、2DD 過濾、forward-looking implied vol regime gate
 共 8 大策略類型）。
+
+---
+
+## XLU-014: ^TNX Realized-Rate-Momentum DIRECTION Regime-Gated MR（documented-failure）
+
+> **狀態：predict→confirm documented-failure。** zero-variance-trap family 第 4 次確認
+> （繼 TLT-014 Att3 / XLU-013 / XBI-017），確認 XLU-013 Att2/Att3 結構性
+> **NON-IMPROVABLE**。延伸 lesson #24 family DIRECTION 邊界 + 禁忌 #36f / #37。
+
+### 動機
+
+XLU-013 Att2/Att3 為全域最優（min(A,B) **1.59**，binding = Part B Sharpe 1.59）。
+唯一可改善的 lever = surgically 隔離 Part B 殘餘 "loser" 以提升 binding Sharpe。
+
+### 強制 predict→confirm 預分析（先做，決定性命中）
+
+執行模型重現 XLU-013 Att2/Att3 全 6+4 筆交易：
+
+- **Part A** = 5 × (+3.00% TP) + 1 × (2019-11-08 +1.88% expiry) — micro-variance
+- **Part B（binding）**：
+
+  | 訊號日 | 出場 |
+  |--------|------|
+  | 2024-06-14 | +3.00% TP |
+  | 2024-11-06 | +3.00% TP |
+  | 2025-03-05 | +3.00% TP |
+  | **2024-01-18** | **−0.20% 近乎持平 time-EXPIRY（唯一殘餘，非停損）** |
+
+binding Part B 結構 =「3 筆 winners 全為相同 +3.00% TP + 單筆極溫和 time-expiry」
+——**TLT-014 Att3（單筆 −2.38% mild-expiry + Part B 全 +3.50% 同 TP）精確
+isomorph**，且 XLU-014 殘餘（−0.20%）比 TLT-014 Att3 更溫和（純 benign slow-MR
+timeout，無任何 regime-failure signature 可供 gating）。
+
+殘餘 expiry 2024-01-18 vs 3 筆 +3.00% TP winners 逐維度 separability：
+
+| 維度 | LOSER 2024-01-18 | WIN 範圍 | 可分？ |
+|------|------------------|----------|--------|
+| ^MOVE level | 107.2 | [100.2, 117.6] | 交錯 ✗ |
+| ^MOVE 3d | +0.67 | [-11.27, +2.97] | 交錯 ✗ |
+| ^MOVE 5d | -2.20 | [-10.06, +9.08] | 交錯 ✗ |
+| ^VIX level | 14.13 | [12.66, 21.93] | 交錯 ✗ |
+| ^VIX 3d | +11.26 | [-25.64, +11.72] | 交錯（winner +11.72 ≈ 同）✗ |
+| ^TNX level | 4.14 | [4.21, 4.43] | gap **0.07pp** knife-edge ✗ |
+| ^TNX 3d % | **+4.91** | [-4.34, +1.49] | 單點 notch，gap 3.42pp，**無 ≥15pp plateau** |
+| ^TNX 5d | +2.83 | [-4.90, +3.75] | 交錯 ✗ |
+| ^TNX 20d | +4.81 | [-5.50, +8.83] | 交錯 ✗ |
+| XLU 5d | **-5.27** | [-2.89, 0.00] | 單點 notch，gap 2.38pp，**無 ≥15pp plateau** |
+| XLU 20d | -3.43 | [-3.24, -0.15] | gap 0.19pp knife-edge ✗ |
+| SPY 20d | +0.96 | [-3.11, +2.67] | 交錯 ✗ |
+| RV20 | 0.99 | [0.89, 1.20] | 交錯 ✗ |
+
+**預測：documented-failure（zero-variance trap）** — 唯二名目分離維度
+（^TNX 3d / XLU 5d）皆 post-hoc 單點 notch 無 robust plateau；外科式移除 expiry
+→ binding Part B 純 3×+3.00% TP std=0 退化；非外科式 → 同殺相同-TP winner 崩潰。
+
+### 三次迭代結果（成交模型 0.1% slippage，隔日開盤市價進場）
+
+| 嘗試 | gate | Part A | Part B | min(A,B) | 判定 |
+|------|------|--------|--------|----------|------|
+| baseline (XLU-013 Att2/Att3) | — | 6/100%/6.74 | 4/75%/**1.59** | **1.59** | ★ 全域最優 |
+| **Att1** | ^TNX 3d % CEILING ≤+3.0% | 3/100%/**0.00** zero-var cum +9.27% | 3/100%/**0.00** zero-var cum +9.27% | **0.00** (-100%) | **雙 zero-var degenerate REJECT** |
+| **Att2** | ^TNX 3d % CEILING ≤+1.0% | 2/100%/**0.00** | **3→2**/100%/**0.00** cum +6.09%(-34%) | **≈0.00** | **catastrophic**（同殺 winner 2024-11-06）|
+| **Att3** | XLU 5d return FLOOR ≥-4.0%（^TNX 停用，正交 ablation）| 6/100%/**6.74**（baseline 保留）| 3/100%/**0.00** zero-var cum +9.27% | **0.00** | **FAIL（最乾淨 zero-var-trap 證明）**|
+
+**Att1 失敗分析**：^TNX 3d %change CEILING ≤+3.0% surgically 移除 2024-01-18
+expiry（TNX3d +4.91 >+3.0），但 binding Part B 僅存 3 筆相同 +3.00% TP →
+報酬 std=0 → Sharpe 0.00 退化；Part A 同步退化（移除其 expiry 變異源）→
+**雙 zero-var degenerate**（† 慣例不適用雙退化，XBI-018 Att2 / EWZ-010 Att2 /
+XLU-012 Att1/Att2 同構）。
+
+**Att2 失敗分析**：CEILING 收緊 ≤+1.0% 強制結構測試 — 同殺 winner 2024-11-06
+（TNX3d +1.49 >+1.0），Part B 3→2、訊號 4→2、cum +9.27%→+6.09%（-34%），
+仍 std=0。EWT-010 Att2 / FXI-015 Att2 inverted-catastrophic 同構。
+
+**Att3 失敗分析（最乾淨 zero-var-trap 證明）**：改用正交維度（XLU 自身 5d
+capitulation-depth FLOOR ≥-4.0%，^TNX gate 停用）同樣 surgical 移除 2024-01-18
+（XLU5d -5.27 <-4.0）。Part A 完整保留 Sharpe 6.74（FLOOR 對 Part A 非綁定），
+**但 binding Part B 仍因純 3×+3.00% TP std=0 → Sharpe 0.00 → min(A,B) 0.00**。
+即使完美外科式僅移除單筆殘餘且不傷 Part A，binding Part 仍無法產生 >1.59 的
+min——zero-variance trap 結構性鐵證，跨「realized rate momentum」與「own-asset
+depth」雙正交維度皆不可分。
+
+### 跨資產貢獻
+
+1. **zero-variance trap family 第 4 個資產確認**（繼 TLT-014 Att3 / XLU-013 /
+   XBI-017）：binding Part 全 winners 同一 TP + 單筆極溫和 time-expiry（非 SL，
+   無 regime-failure signature 可 gating），任何正交 filter 外科式移除 → std=0
+   退化、非外科式 → 同殺相同-TP winner → documented-failure 結構性必然。
+   **診斷法**：建構前先由執行模型 trade log 檢視 binding Part 是否為
+   「uniform-TP + 單筆 mild expiry」（+3.00%-uniform-TP tell）。
+2. **XLU-013 Att2/Att3 確認結構性 NON-IMPROVABLE**——repo 第 3 個「最佳已驗證
+   不可改善」資產（與 XBI-018 確認 XBI-017 / TLT-014 Att3 平行）。XLU 探索終止。
+3. **延伸禁忌 #37 + lesson #24 family DIRECTION 邊界**：rate-indirect ETF（XLU）
+   MR 殘餘對 backward-looking realized rate momentum（^TNX 3d）無 driver-pure
+   區分力；XLU 的 implied-vol DIRECTION 維度邊界完整界定 = forward-looking
+   implied bond vol（^MOVE 3d，XLU-013 ✓）/ backward-looking realized rate
+   momentum（^TNX 3d，XLU-014 ✗）。
+4. predict→confirm 軌跡 3 SUCCESS（GLD-016/VOO-005/URA-014）+ **16
+   documented-failure 全部命中**（XLU-014 為第 16）。
+
+### 最終配置（Att1，預設）
+
+- 進場：同 XLU-013 Att2/Att3（10 日回檔 3.5-7% + WR(10) ≤ -80 + ClosePos ≥ 40%
+  + ATR(5)/ATR(20) > 1.15 + ^MOVE 3d change ≤ +5.0；LEVEL cap disabled）
+- 出場：TP +3.0% / SL -4.0% / 20 天 / cooldown 7 天
+- ^TNX 過濾（XLU-014 新增）：^TNX 3d % change CEILING ≤ +3.0%（Att1 預設；
+  Att2 = ≤+1.0%；Att3 = use_tnx_direction_filter=False +
+  use_xlu_depth_filter=True，XLU 5d return FLOOR ≥ -4.0%）
+
+XLU-013 Att2/Att3 仍為 XLU 全域最優（14 次實驗、41+ 次嘗試）。XLU-014
+為 XLU 第 9 大策略類型（cross-asset realized-rate-momentum / own-asset
+capitulation-depth regime gate）的 documented-failure，**XLU 探索終止**。

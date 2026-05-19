@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-10T06:20:07.680231"
+    "execution_time": "2026-05-16T19:17:50.026927"
   },
   "part_a": {
     "ticker": "TSM",
@@ -377,7 +377,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-05-08"
+      "end": "2026-05-15"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-02T04:56:56.445005"
+    "execution_time": "2026-05-17T12:14:04.113914"
   },
   "part_a": {
     "ticker": "XLU",
@@ -222,7 +222,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-05-01"
+      "end": "2026-05-15"
     }
   }
 }
