@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "execution_time": "2026-05-04T10:52:28.433673"
+    "execution_time": "2026-05-17T11:19:24.476264"
   },
   "part_a": {
     "ticker": "XBI",
@@ -299,7 +299,7 @@
     },
     "backtest_period": {
       "start": "2026-01-01",
-      "end": "2026-05-01"
+      "end": "2026-05-15"
     }
   }
 }

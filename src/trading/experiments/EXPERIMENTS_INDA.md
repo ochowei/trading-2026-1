@@ -3,6 +3,8 @@
   data_through: 2025-12-31
   note_2026_05_16_inda013: INDA-013 added 2026-05-16 (Broad-EM Macro-Context-Confirmed Vol-Transition MR — inda_010 框架 + **EEM broad-EM macro context confirmation gate**，**Att1 SUCCESS vs 真實穩健 baseline inda_010：min(A,B) 0.30 → 0.38 (+27%)，雙 Part 真實變異**, lesson #25 family 從 QQQ→IWM 擴展至 EEM→INDA single-country EM). 動機：INDA 文件最優 INDA-012 採 std=0 退化（Part A 4 訊號 / Part B 2 訊號，共 6 訊號）；INDA 真實穩健最優為 inda_010 Post-Capitulation Vol-Transition MR（Part A 11/73%/Sharpe **0.30** binding cum +10.51%，Part B 4/75%/1.48 cum +10.41%，**雙 Part 真實變異 + cumgap 僅 ~1%**，min 0.30）。inda_010 Part A 3 筆 loser：2020-02-03（COVID 早期到期 -4.4%）、2022-09-16（升息熊市 SL -4.1%）、2023-01-27（Adani-Hindenburg 做空報告，India-idiosyncratic 危機到期 -3.6%）。Three iterations: **Att1 ★ SUCCESS (eem_lookback=10, max_eem_return=0.0)** Part A 9/77.8%/Sharpe **0.38** cum +10.78% / Part B 4/75%/Sharpe **1.48** cum +10.41%（**完全保留 inda_010 baseline**）/ min(A,B) **0.38**（**+27% vs inda_010 robust 0.30**）/ cumgap |10.78−10.41|/10.78 = **3.4% << 30% ✓✓✓** / 年化 siggap ~10% << 50% ✓ —— EEM 10d gate 外科移除 **2023-01-27 Adani India-idiosyncratic loser**（EEM 同期未走弱 → 非系統性 risk-off → 過濾），保留 2 個 systemic loser（2020-02-03 COVID、2022-09-16 升息，EEM 同步走弱故結構性保留）+ 全部 winners + 全部 Part B；Att2 (max=-0.02) 過嚴移除 2 Part A winners 同時保留 2 systemic losers，Sharpe 0.38→**0.16** REJECT；Att3 (lookback=5) 短窗噪音較大移除 2 winners，Sharpe 0.38→**0.23** REJECT，確認 10d/0.0 為結構性甜蜜點。**核心發現（lesson #25 broad-market macro context confirmation 邊界擴展）**：(1) **repo 首次以 EEM 為 broad-EM context anchor 確認 single-country EM capitulation MR**——lesson #25（QQQ 對 IWM 已驗證）從 broad-equity→sub-segment 擴展至 broad-EM→single-country-EM；(2) **single-country EM capitulation 的關鍵失敗模式為 idiosyncratic continuation**——country-specific 危機（Adani 做空、政策衝擊）下 capitulation V-bounce 結構性失效，因無 broad EM 系統性買盤支撐；broad-EM 同步走弱（系統性 risk-off）時 MR 成功率高；(3) **EEM gate 對 systemic loser 結構性非綁定**——2020-02-03/2022-09-16 為系統性事件（EEM 同步走弱）故保留，這是維度的正確行為（systemic capitulation 仍為有效 MR 機會，只是這 2 筆碰巧失敗）；(4) **統計穩健性**：EEM 10d return 對相關訊號遠離閾值邊界（Adani 訊號 EEM 明顯為正），無 CIBR-016 式 knife-edge instability，結果跨重跑穩定。**新跨資產假設（待驗證）**：broad-母體 macro context confirmation 可能擴展至其他 single-country EM（EWZ/EWT/FXI vs EEM）、sector sub-segment（XBI vs XLV、CIBR vs XLK）。INDA-013 Att1 為 INDA 真實穩健新最優（13 次實驗、40+ 次嘗試），INDA-012 std=0 退化結構降為文件參考。
   note_2026_05_08_inda_012: INDA-012 added 2026-05-08 (INDA-EEM 60d Relative Strength Divergence Filter on Multi-Period Capitulation MR, **Att1 SUCCESS — repo 第 7 次 lesson #20 v3 cross-asset divergence regime gate 應用、repo 首次 60d lookback RS divergence 維度於任何資產、repo 第 2 次 EM single-country ETF + EEM benchmark anchor 配對（繼 EWZ-009 後）**, extends INDA-011 Att3 framework). Three iterations all SUCCESS / 完全相同結果（robustness 跨 lookback 與 threshold 確認）：Att1 ★ (rs_lookback=60, max_rs_excess=+0.05) Part A 4 訊號 WR **100%** Sharpe **4.07** cum +12.82% MaxDD -3.70% / Part B 2 訊號 WR **100%** std=0 Sharpe 0.00 cum +7.12%（**完全等於 INDA-011 Att3 baseline，2 winners 全部保留**）/ min(A,B)† **4.07**（**+640% vs INDA-011 Att3 baseline 0.55，repo 首次突破 INDA 結構性 0.55 ceiling 至 4.07**）/ A/B 年化幾何 cum 差 |2.45-3.50|/3.50 = **30.0%**（恰於 30% 邊界，由 Part A 4 訊號全 winners 整年化造成）/ A/B 年化訊號比 0.8/yr vs 1.0/yr = **gap 20% < 50% ✓**。Att2 (rs_lookback=60, max_rs_excess=+0.10, loose 邊界) Part A/B 完全相同 Att1 結果 — 確認 sweet spot 範圍 [+5%, +10%] 對 60d lookback 高度穩健（SL RS_60d=+15.28% 為唯一 outlier，threshold 在此範圍內均完整過濾且不觸及其他訊號）。Att3 (rs_lookback=20, max_rs_excess=+0.03, 短 lookback 替代維度) Part A/B 完全相同 Att1 結果 — 確認 SL 在 20d 維度（RS_20d=+4.62%）亦為 outlier，跨 lookback 維度皆有效。**核心發現（lesson #20 v3 cross-asset divergence v2 邊界擴展）**: (1) **Repo 首次 60d lookback RS divergence 維度於任何資產**——既有 lesson #20 v3 應用皆 ≤ 20d lookback（TLT-014/TSLA-017 20d、EWZ-009 10d、COPX-014 20d、USO-026 20d、NVDA-016 20d），INDA-012 為首次中長期 lookback 試驗；(2) **INDA 失敗模式為「INDA 過去 60 日領漲後 country-specific 走弱」更長 horizon regime divergence**——與 EWZ「短期 country-specific 急跌」（EWZ-009 10d）structural 不同，故 lookback 跨資產差異化為 lesson #20 v3 family v2 新規則；(3) **Trade-level 維度分析**：2022-09-16 SL（Fed CPI shock，前 60 日 INDA 領 EEM +15.28% 為唯一 outlier）為 country-specific weakness 訊號，全部 4 Part A TPs RS_60d ∈ [-5.92%, +2.07%] + 1 small profit exp +1.72% + 全部 2 Part B TPs ∈ [-5.18%, -3.58%] 皆深度負或微正，single dimension surgical sweet spot 異常乾淨；(4) **Robustness 跨 dimension 三重確認**：60d/+5%、60d/+10%、20d/+3% 三組合皆產生相同訊號集（4 wins + 2 wins）——SL 為「mid-long term INDA-EEM divergence outlier」結構性訊號，非 dimension-fragile artifact；(5) **A/B 累計差 30.0% 恰於邊界**：Part A 從 5/80% 提升至 4/100% 整 winners 化使年化 cum 從 1.65%/yr 升至 2.45%/yr，但 Part B 維持 3.50%/yr 不變，使比例變化恰落於 30% 邊界（acceptance criteria 邊際達標）。**新跨資產假設（待驗證）**：60d RS divergence 可能適用其他「中長期累積相對強度後 country/sector-specific 走弱」失敗結構資產——其他 EM single-country ETFs（FXI 中國政策驅動 cooling 不一定適合 / EWT 半導體驅動可能適合）、sector ETFs（XBI/CIBR/COPX 板塊內 RS divergence 可能 mirror）。INDA-012 Att1 為新全域最優（12 次實驗、37+ 次嘗試）。INDA-011 added 2026-04-29 (Multi-Period Capitulation-Strength Filter MR，**Att3 SUCCESS — repo 首次「3DD cap」作為主要 capitulation-strength 過濾器於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合**, extends INDA-010 Att3 framework). Three iterations: Att1 (3DD floor <= -3.5%, require multi-day deep decline) Part A 3/66.7%/Sharpe **-0.09** cum -1.08% / Part B 1/100% std=0 Sharpe 0.00 cum +3.50% / min **-0.09** — 方向錯誤，floor 系統性過濾 8 winners（多數 winners 3DD 介於 -2% ~ -3.5% 中等深度），保留 2020-02-03 COVID LOSS 與 2022-05-06 near-zero exp。確認 INDA winners 並非「多日深跌 capitulation」結構，方向錯誤；Att2 (3DD cap >= -3.5%, require 3DD 不太深) Part A 8/75.0%/Sharpe 0.46 cum +11.71%（+53% vs INDA-010 Att3 0.30）/ Part B 3/66.7%/Sharpe 1.19 cum +6.67%（損失 2024-08-05 Yen carry winner，3DD <= -3.5%）/ min **0.46** — Part A Sharpe 大幅提升但 A/B 平衡破壞：cum 差 |11.71-6.67|/max = 43% > 30% ❌、訊號比 8/3 = 2.67:1 (62.5% gap > 50% ❌)。cap -3.5% 過濾 1 TP (2019-05-09 deep 3DD) + 1 LOSS (2020-02-03 COVID) + 1 near-zero (2022-05-06)；Att3 ★ (3DD cap >= -3.0%, 更嚴 cap) Part A 5 訊號 WR **80.0%** Sharpe **0.55** cum +8.20% / Part B 2 訊號 WR **100%** std=0 Sharpe 0.00 cum +7.12% / min(A,B)† **0.55**（沿用 EWJ-003/EWT-008/SPY-009/DIA-012/IWM-013 慣例：Part B std=0 為結構性零方差，採 Part A Sharpe 為 min 約束）/ +83% vs INDA-010 Att3 的 0.30 ★。A/B 平衡達成：累計差 |8.20-7.12|/max = **13.2%**（< 30% ✓ 大幅優於 Att2 的 43%）、年化訊號比 **1.0/yr vs 1.0/yr = 1.0:1**（0% gap < 50% ✓）。**核心發現**：(1) cap -3.0% 進一步過濾「moderate 3DD」訊號保留 winners-dominated 訊號集，Part A 從 11→5 訊號但 WR 從 72.7% 升至 80.0%，**完全消除 Part A 變異雜訊**（移除全部 3 LOSS + 2 near-zero exp）；(2) Part B 從 4→2 訊號（移除 2024-08-05 Yen carry 與 2025-01-13 -0.42% expiry），保留 2 筆 100% WR 結構性零方差；(3) **INDA winners 結構**：「moderate 1-2 日急跌（2DD <= -2%）但前一日相對穩定（3DD > -3.0%）」，losers 結構為「多日累積疲弱（3DD <= -3.0%）」；3DD cap 對 capitulation depth 的「上限門檻」精準切除多日持續疲弱訊號。**跨資產貢獻**：repo 首次「3DD cap」作為主要 capitulation-strength 過濾器於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合（深度下限 + 持續性上限）。擴展 lesson #19 family 至「multi-period capitulation depth」維度組合，與 DIA-012「1d cap + 3d cap」（單日震盪 + 多日 regime shift）、GLD-014「2d floor + 1d floor」（雙維度 capitulation depth）並列為三種 lesson #19 family 多維度變體。**新跨資產假設（待驗證）**：「2DD floor + 3DD cap」雙重門檻可能適用其他 single-country EM 或 broad EM ETF（EEM/EWZ/EWT/INDA），其失敗模式為「multi-day acceleration / sustained drift」而非「single-day flush」。INDA-011 Att3 為新全域最優（11 次實驗、34+ 次嘗試）。INDA-010 added 2026-04-21 (Post-Capitulation Vol-Transition MR，**Att3 SUCCESS** — repo 第 3 次 2DD floor 方向成功驗證，繼 USO-013 / EEM-014 後 single-country EM ETF 首次). Three iterations Att3 success: Att1 (INDA-005 Att3 框架 + 2DD cap >= -3.0% CIBR 方向) Part A 10/60.0%/0.08 / Part B 5/60.0%/0.21 / min **0.08** — CIBR 方向失敗，過濾 3 個 Part A TPs + 1 Part B TP 保留所有 SLs（INDA 的 TP 集中於中等 2DD -2%~-3%，非深 2DD）；Att2 (放寬 cap 至 -4.0%) Part A 11/63.6%/0.17 / Part B 7/57.1%/0.31 / min **0.17** — 仍失敗：2020-02-03 COVID signal-day 2DD 僅 -2.5%~-3.0%（pre-crash 早期進場，真正 -4.4% 下跌在進場後），cap 方向無法捕捉；Att3 ★ (改用 2DD floor 加深至 <= -2.0%，停用 cap) Part A 11 訊號 WR 72.7% Sharpe **0.30** cum +10.51% / Part B 4 訊號 WR 75.0% Sharpe **1.48** cum +10.41% / min(A,B) **0.30**（+30% vs INDA-005 Att3 的 0.23）/ A/B cum 差 **0.10pp**（vs 基線 3.22pp，幾乎消除）/ A/B 年化訊號比 2.2/yr vs 2.0/yr = 1.1:1（優秀）. **過濾動態**：Att3 加深 floor 至 -2.0% 同時過濾「pre-crash early-in-decline 訊號」（如 2019-07-31 貿易戰 SL）與「post-peak slow-melt drift 訊號」（如 2025-02-18 後峰 SL）、近零到期（如 2024-01-23, 2025-01-13 expiry）、2024-10-04 淺 2DD 損失，僅代價為 2023-03-15 淺 2DD TP 被過濾。**跨資產貢獻**：repo 第 3 次「2DD floor 加深方向」成功驗證（繼 USO-013、EEM-014 後），single-country EM ETF 首次；擴展 lesson #19：2DD floor 方向在 broad EM（EEM 1.17%）與 single-country EM（INDA 0.97%）上皆成功，顯示 EM ETF 失敗模式結構相似——均為 shallow 2DD drift 而非 deep 2DD crash acceleration。擴展 lesson #20b：突破 INDA 0.23 天花板證明 2DD 深度濾波可繞過 oscillator hook 失敗家族在 post-peak slow-melt regime 的限制。INDA-009 added 2026-04-20 (CCI Oversold Reversal MR, repo first CCI trial). Three iterations all failed vs INDA-005 Att3 min 0.23: Att1 (CCI≤-100 baseline + Close>Open) Part A 21/61.9%/0.09 / Part B 9/44.4%/-0.46 — CCI turn-up fires repeatedly during 2024-2025 INDA post-peak slow-melt decline, 4/9 immediate SLs; Att2 (CCI≤-150 + ClosePos≥40%) Part A 9/55.6%/0.05 / Part B 3/66.7%/-0.03 — tightening reduces signals Part A 21→9, Part B 9→3, but filters out more winners than losers (Part A Sharpe drops 0.09→0.05), 1.5 signals/yr too sparse; Att3 (CCI≤-100 + ClosePos + Pullback≥2.5%) Part A 17/58.8%/0.06 / Part B 9/44.4%/-0.46 — core insight: Part B signals all already carry ≥2.5% pullback (decline regime), making pullback floor filter zero-effect on Part B while removing 4 Part A signals. Repo first CCI trial — extends lesson #20b failure family (V-bounce ≠ genuine reversal): CCI turn-up from oversold shares the oscillator-hook failure mode of RSI Bullish Hook Divergence on post-peak persistent decline regimes (INDA 2024-2025 parallel to URA policy-driven, TLT rate-driven). Cross-asset hypothesis: CCI turn-up effective preconditions may require both Part A/B in active MR regime (not post-peak slow-melt). INDA-010 Att3 becomes new global optimum (10 experiments, 31+ attempts).
+  note_2026_05_16_inda014: INDA-014 added 2026-05-16 (DXY Direction Filter on Multi-Period Capitulation MR, **3 次迭代全部 FAIL，repo 首次 DXY direction filter 於單一國家 EM 股票 ETF**, lesson #24 family DIRECTION 變體，cross-asset port from COPX-016 Att3). 在 INDA-011 Att3（min(A,B)† 0.55）框架上疊加「DXY N 日報酬 <= max_dxy_change」USD 強度方向過濾，目標移除 Part A 殘餘 1 筆 SL（2022-09-16 Fed CPI shock）。三次迭代全部 FAIL/REJECT：Att1 (DXY 10d ≤ +1.0%) min 0.37 FAIL；Att2 (DXY 5d ≤ +0.5%) †3.56 REJECT（A/B cum gap 61.2%>30%）；Att3 (DXY 5d ≤ +0.8%) min 0.37 FAIL，證實無 sweet spot。REJECT COPX-016「DXY direction → EM ETFs INDA」假設；USD→商品傳導 ≠ USD→單一國家 EM 股票傳導。INDA-011 Att3 維持全域最優（14 次實驗、43+ 次嘗試）。
+  note_2026_05_17_inda015: INDA-015 added 2026-05-17 (Forward-Looking Implied-Vol Regime-Gated MR, **3 次迭代全部 FAIL/REJECT，repo 首次 lesson #24 family（^MOVE/^VIX forward-looking implied vol）於單一國家 EM 股票 ETF**, cross-asset port from XLU-013 ^MOVE 3d DIRECTION / XBI-017 ^VIX). 在 INDA-011 Att3（min(A,B)† 0.55）框架上疊加 forward-looking implied-vol regime gate，目標 surgical 過濾 Part A 唯一殘餘 SL 2022-09-16（Fed CPI shock，-4.10%）。**強制 pre-analysis gate（predict→confirm）**：SL 2022-09-16 在 ^MOVE LEVEL / ^MOVE 3d CEILING / ^VIX 全維度皆 non-separable，**預測 DOCUMENTED-FAILURE**。三次迭代全部 FAIL/REJECT：Att1 (^MOVE 3d ceiling ≤ +5.0) min† 0.55 TIE 但 Part B winner 流失 FAIL；Att2 (^VIX 3d ceiling ≤ +3.0) min 0.37 FAIL；Att3 (^MOVE 3d floor ≥ -2.5) †4.07 REJECT（A/B cum gap 44.5%>30%，post-hoc 單點切割）。確認 INDA 殘餘 2022-09-16 SL 跨 DXY（INDA-014）+ ^MOVE + ^VIX 三維度皆 idiosyncratic non-separable；INDA 加入 TSM-012/EWJ-006/EEM-016「idiosyncratic non-separable residual SL」失敗家族。INDA-011 Att3 維持全域最優（15 次實驗、46+ 次嘗試）。
 -->
 ## AI Agent 快速索引
 
@@ -57,6 +59,11 @@
   - Att2 (加嚴 CCI≤-150 + ClosePos≥40%)：Part A 9 訊號 WR 55.6% Sharpe 0.05 / Part B 3 訊號 WR 66.7% Sharpe **-0.03**，min(A,B) -0.03（樣本過薄 1.5/yr、A/B 比 3.0:1）
   - Att3 (放寬 CCI≤-100 + ClosePos + Pullback≥2.5%)：Part A 17/58.8%/0.06 / Part B 9/44.4%/**-0.46**，min(A,B) -0.46（Pullback 下限對 Part B 零效果——下跌 regime 中訊號本就在深 pullback 中）
   - 失敗根因：INDA 2024-2025 Part B 處於後峰持續下跌 regime，CCI 長期停留超賣區，每次迷你反彈觸發 turn-up 後續跌停損。CCI 加嚴無法改善（過濾贏家多於輸家），pullback 下限無作用（冗餘條件）。**確認 lesson #20b oscillator hook 失敗家族擴展至 CCI 指標**：與 RSI Bullish Hook Divergence（URA-008/TLT-006）、Day-After Capitulation（URA-009/TLT-006）同屬「V-bounce ≠ genuine reversal」失敗模式
+- **DXY Direction Filter on Multi-Period Capitulation MR（INDA-012 Att1~3，repo 首次 DXY direction filter 於單一國家 EM 股票 ETF，三次迭代全部失敗）**
+  - Att1 (DXY 10d ≤ +1.0%)：Part A 4/75.0%/Sharpe **0.37** cum +4.54% / Part B 1/100% std=0 / min **0.37**（-33% vs 0.55）— +1.0% cap 砍掉 winners 2022-06-16（DXY10d +1.83%）+ Part B 2024-11-13（+2.39%），SL 2022-09-16（DXY10d +0.06%）存活，方向反效果
+  - Att2 (DXY 5d ≤ +0.5%)：Part A 3/100%/Sharpe **3.56** cum +9.01% / Part B 1/100% std=0 / min(A,B)† 名目 3.56 **BUT REJECT** — 移除 SL（DXY5d +0.70%）但同時移除 winner 2020-10-29（+1.09%）+ Part B 2→1，A/B 累計差 |9.01-3.50|/max = **61.2% >> 30% ❌**，Part B 1 訊號統計不足（COPX-015 Att2 判例），Sharpe 為 over-filter 人為產物
+  - Att3 (DXY 5d ≤ +0.8%)：Part A 4/75.0%/Sharpe **0.37** cum +4.54% / Part B 1/100% std=0 / min **0.37** — 放寬重新放回 SL（DXY5d +0.70% ≤ +0.8%）同時仍移除 winners，**證實無 sweet spot**
+  - 失敗根因：2022-09-16 SL（Fed CPI shock）經利率/風險通道傳導非 USD 通道，signal-day DXY 3d/5d/10d = -0.05%/+0.70%/+0.06% 全位於 winners 分布正中央；多筆 INDA winners 反而發生於 USD 走強期。**REJECT COPX-016 開放跨資產假設「DXY direction → EM ETFs INDA」於單一國家 EM 股票 ETF MR 框架**——USD→商品 傳導（COPX 有效）≠ USD→單一國家 EM 股票 傳導。擴展 lesson #24 family DIRECTION 邊界 + 平行 lesson #6 / COPX-014「winners/losers 重疊無 surgical 切點」失敗家族
 
 **已掃描的參數空間：**
 - INDA-001 基礎版：回檔 ≥3% + WR ≤-80 + ClosePos ≥40% + 追蹤停損（TP +3.0%/SL -3.5%）→ min 0.03
@@ -89,6 +96,13 @@
 - INDA-012 Att1：INDA-011 Att3 + **INDA-EEM 60d RS cap >= -5.0%**（過濾 2022-09-16 SL，repo 首次 60d RS divergence 維度）→ **min(A,B)† 4.07（+640%）★ 新全域最優**
 - INDA-012 Att2：rs_lookback=60, max_rs_excess=+10%（loose）→ 與 Att1 完全相同結果（robustness 確認）
 - INDA-012 Att3：rs_lookback=20, max_rs_excess=+3%（短 lookback）→ 與 Att1 完全相同結果（dimension robustness 確認）
+- INDA-011 Att3：INDA-010 Att3 + **3DD cap >= -3.0%**（更嚴 cap）→ **min(A,B)† 0.55（+83%）★ 新全域最優**
+- INDA-014 Att1：INDA-011 Att3 + DXY 10d ≤ +1.0% → min 0.37（FAIL，砍 winners 保留 SL）
+- INDA-014 Att2：INDA-011 Att3 + DXY 5d ≤ +0.5% → †3.56 nominal BUT REJECT（A/B cum gap 61.2%>30% + Part B 1 訊號）
+- INDA-014 Att3：INDA-011 Att3 + DXY 5d ≤ +0.8% → min 0.37（FAIL，證實無 sweet spot）
+- INDA-015 Att1：INDA-011 Att3 + ^MOVE 3d change ≤ +5.0（XLU-013 ceiling 類比）→ min† 0.55 = Part A TIE 但 Part B 2→1（FAIL，SL ^MOVE 3d=-3.9 通過 ceiling，誤殺 winner 2024-06-04）
+- INDA-015 Att2：INDA-011 Att3 + ^VIX 3d change ≤ +3.0（風險通道）→ min 0.37（FAIL，SL ^VIX 3d=-1.0 mid-pack 存活，誤殺 winner 2020-10-29）
+- INDA-015 Att3：INDA-011 Att3 + ^MOVE 3d change ≥ -2.5（floor）→ †4.07 nominal BUT REJECT（外科式移除 SL 但 A/B cum gap 44.5%>30% + post-hoc 單點切割 n=7，方向與 rate-shock 機制相反；floor∈[-3.5,-1.5] robust 仍 REJECT）
 
 **尚未嘗試的方向（參數空間已飽和，預期邊際效益極低）：**
 - ~~RSI(2)~~ → INDA-004 Att1 驗證失敗
@@ -107,6 +121,8 @@
 - ~~3DD floor（require 多日深跌）~~ → INDA-011 Att1 驗證失敗（-3.5% 過濾 winners > losers，方向錯誤）
 - **★★ 3DD cap（require 3DD 不太深，repo 首次「3DD cap」於任何資產，repo 首次「2DD floor + 3DD cap」雙維度組合）→ INDA-011 Att3 成功**（3DD cap >= -3.0% 切除「multi-day acceleration / sustained drift」訊號集，完全消除 Part A 變異雜訊，min 0.30→0.55，+83%）
 - **★★★ INDA-EEM 60d RS Divergence（repo 首次 60d lookback RS divergence 維度，repo 第 7 次 lesson #20 v3 cross-asset divergence regime gate 應用）→ INDA-012 Att1 成功**（INDA-EEM 60 日報酬差 cap +5% 過濾 2022-09-16 殘餘 SL，min 0.55→4.07，+640%；三次迭代 60d/+5%、60d/+10%、20d/+3% 完全相同結果）
+- ~~DXY direction filter（lesson #24 family DIRECTION，USD 強度過濾）~~ → INDA-014 驗證失敗（3 次嘗試 3d/5d/10d；2022-09-16 SL 為 CPI/利率衝擊型，DXY 變動位於 winners 分布正中央，無 surgical 切點；REJECT COPX-016「DXY → EM ETFs INDA」假設於單一國家 EM 股票 ETF）
+- ~~^MOVE / ^VIX forward-looking implied-vol regime gate（lesson #24 family，repo 首次於單一國家 EM 股票 ETF）~~ → INDA-015 驗證失敗（3 次嘗試：Att1 ^MOVE 3d ceiling +5.0 / Att2 ^VIX 3d ceiling +3.0 / Att3 ^MOVE 3d floor -2.5）。2022-09-16 SL 在 ^MOVE LEVEL/CEILING 與 ^VIX 全維度皆與 winners 結構性交錯，僅 ^MOVE 3d FLOOR 為 post-hoc n=7 單點分離器（A/B cum gap 44.5%>30%，方向與 rate-shock-jump 機制相反，REJECT）。**確認 INDA 殘餘 2022-09-16 SL 跨 DXY + ^MOVE + ^VIX 三維度皆 idiosyncratic non-separable**；INDA 加入 TSM-012/EWJ-006/EEM-016「idiosyncratic non-separable residual SL」失敗家族
 - SL -4.5%（更寬 SL）— 可能允許止損交易恢復，但風險增加止損虧損額
 
 **關鍵資產特性：**
@@ -151,6 +167,9 @@
 | INDA-011  | `inda_011_multi_period_capitulation` | Multi-Period Capitulation-Strength Filter MR（3DD cap，repo 首次「2DD floor + 3DD cap」雙維度組合，3 次嘗試） | 已完成（前任最佳）|
 | INDA-012  | `inda_012_inda_eem_rs60d_divergence_mr` | INDA-EEM 60d RS Divergence Filter on Multi-Period Capitulation MR（repo 首次 60d RS divergence 維度，3 次嘗試完全相同結果）— 文件最優但 Part B std=0 退化（共 6 訊號）| 已完成 |
 | INDA-013  | `inda_013_broad_em_confirmed_mr` | Broad-EM Macro-Context-Confirmed Vol-Transition MR（inda_010 + EEM 10d 報酬 <= 0 broad-EM 確認閘門，lesson #25 EEM→INDA 擴展）★ **真實穩健最優 min(A,B) 0.38 (+27% vs inda_010 0.30)，雙 Part 真實變異，cumgap 3.4%** | 已完成 |
+| INDA-011  | `inda_011_multi_period_capitulation` | Multi-Period Capitulation-Strength Filter MR（3DD cap，repo 首次「2DD floor + 3DD cap」雙維度組合，3 次嘗試） ★ | 已完成（當前最佳）|
+| INDA-014  | `inda_014_dxy_direction_mr`    | DXY Direction Filter on Multi-Period Capitulation MR（lesson #24 family DIRECTION，repo 首次 DXY direction filter 於單一國家 EM 股票 ETF，3 次嘗試） | 已完成（失敗）|
+| INDA-015  | `inda_015_implied_vol_regime_mr` | Forward-Looking Implied-Vol Regime-Gated MR（lesson #24 family ^MOVE/^VIX，repo 首次 implied-vol regime gate 於單一國家 EM 股票 ETF，3 次嘗試） | 已完成（失敗）|
 
 ---
 
@@ -1214,3 +1233,174 @@ EEM (iShares MSCI Emerging Markets ETF) 為 broad EM benchmark anchor。
 **新跨資產假設（待驗證）**：60d RS divergence 可能適用其他「中長期累積相對強度後 country/sector-specific 走弱」失敗結構資產——其他 EM single-country ETFs（EWT 半導體驅動可能適合）、sector ETFs（XBI/CIBR/COPX 板塊內 RS divergence 可能 mirror）。
 
 **INDA-012 Att1 成為新 INDA 全域最優**（12 次實驗、37+ 次嘗試）
+---
+
+## INDA-014：DXY Direction Filter on Multi-Period Capitulation MR（3 次嘗試全部失敗）
+
+### 目標 (Goal)
+
+在 INDA-011 Att3（min(A,B)† 0.55）框架之上疊加「DXY N 日報酬方向過濾」
+（lesson #24 family DIRECTION 變體），嘗試移除 Part A 殘餘 1 筆 SL
+（2022-09-16 Fed CPI shock）以突破 0.55。**repo 首次 DXY direction
+filter 於單一國家 EM 股票 ETF**，驗證 COPX-016 開放跨資產假設
+「DXY direction → EM ETFs（FXI/EEM/INDA/EWZ）」。
+
+### 設計依據 (Rationale)
+
+INDA 失敗模式「post-peak slow-melt drift」之結構性 driver 為盧比匯率 +
+FII 外資流，假設與 USD 強度相關。DXY 為 spot FX index（非 implied vol），
+不違反 lesson #5（exogenous macro，非 INDA 自身價格趨勢濾波）、亦不違反
+lesson #14（採 change-based DIRECTION，非 level-based）。
+
+### baseline 訊號 DXY 變動診斷
+
+| 日期 | 結果 | DXY3d | DXY5d | DXY10d |
+|------|------|-------|-------|--------|
+| 2020-10-29 | WIN | +0.98% | +1.09% | +0.11% |
+| 2020-12-21 | WIN | -0.45% | -0.74% | -0.83% |
+| 2021-12-06 | WIN | +0.25% | -0.05% | +0.23% |
+| 2022-06-16 | WIN | -1.38% | +0.40% | +1.83% |
+| **2022-09-16** | **SL** | **-0.05%** | **+0.70%** | **+0.06%** |
+| 2024-06-04 (B) | WIN | -0.58% | -0.48% | -0.44% |
+| 2024-11-13 (B) | WIN | +1.41% | +1.32% | +2.39% |
+
+**核心障礙**：2022-09-16 SL 的 DXY 變動在 3d/5d/10d 三種 lookback 皆位於
+winners 分布正中央，無單一 cap/floor 閾值可隔離。
+
+### 三次迭代結果 (Results)
+
+| Att | 參數 | Part A | Part B | min(A,B) | 判定 |
+|-----|------|--------|--------|----------|------|
+| Att1 | DXY 10d ≤ +1.0% | 4/75.0%/Sharpe **0.37**/cum +4.54% | 1/100%/std=0/+3.50% | **0.37** | FAIL (-33%) |
+| Att2 | DXY 5d ≤ +0.5% | 3/100%/Sharpe **3.56**/cum +9.01% | 1/100%/std=0/+3.50% | †3.56 | **REJECT** |
+| Att3 | DXY 5d ≤ +0.8% | 4/75.0%/Sharpe **0.37**/cum +4.54% | 1/100%/std=0/+3.50% | **0.37** | FAIL (-33%) |
+
+### 失敗分析 (Failure Analysis)
+
+- **Att1（FAIL）**：+1.0% cap 移除 DXY10d > +1.0% 訊號 → 砍掉 winners
+  2022-06-16（+1.83%）與 Part B 2024-11-13（+2.39%），但 SL 2022-09-16
+  （DXY10d +0.06%）存活。方向反效果。
+- **Att2（REJECT）**：+0.5% cap 移除 SL（DXY5d +0.70%）但同時移除 winner
+  2020-10-29（+1.09%）並使 Part B 2→1。A/B 累計差 |9.01-3.50|/max =
+  **61.2% >> 30% ❌**；Part B 1 訊號統計顯著性嚴重不足（沿用 COPX-015
+  Att2 REJECT 判例）；Sharpe 3.56 為 over-filter 人為產物。
+- **Att3（FAIL）**：放寬至 +0.8% 重新放回 SL（DXY5d +0.70% ≤ +0.8%），
+  同時仍移除 winners → **證實無 sweet spot**：能移除 SL 的閾值帶必同時
+  移除 winners；能保留 winners 的閾值帶必同時保留 SL。
+
+### 跨資產貢獻 (Cross-Asset Contribution)
+
+- **REJECT COPX-016 開放跨資產假設**「DXY direction → EM ETFs INDA」
+  於單一國家 EM 股票 ETF 之 MR 框架
+- **USD→商品 傳導**（COPX：銅以 USD 計價，強 USD 結構性壓抑 → DXY
+  direction 有效）**≠ USD→單一國家 EM 股票 傳導**（INDA：capitulation
+  SL 為 Fed CPI / 利率 / 風險衝擊驅動，經利率/風險通道而非 USD 通道；
+  V-bounce 反而常於 USD 走強期發生）
+- 擴展 **lesson #24 family DIRECTION 邊界**：DXY direction filter 需資產
+  失敗模式為「USD 傳導」；INDA CPI / 利率衝擊型 SL 非此類
+- 平行 **lesson #6**（邊際確認指標重疊無區分力）與 **COPX-014**
+  （winners/losers Rel 重疊無 surgical 切點）失敗家族
+
+### Acceptance Criteria 達成情況（全部 FAIL）
+
+- ✗ Sharpe > 基線：Att1/Att3 min 0.37 < 0.55；Att2 †3.56 為 over-filter
+  人為產物且 REJECT（A/B cum gap + Part B 樣本不足）
+- ✗ A/B 累積報酬差距 < 30%：Att2 61.2% ❌
+- ~ A/B 訊號數差距 < 50%：年化訊號比尚可但因 Sharpe / 平衡未達標無意義
+- ✓ 使用成交模型（隔日開盤市價，0.1% 滑價，悲觀認定）
+- ✓ Repo 較少使用方向（lesson #24 family DIRECTION，repo 首次 DXY 於
+  單一國家 EM 股票 ETF）
+
+**INDA-011 Att3 維持 INDA 全域最優（12 次實驗、37+ 次嘗試）**
+
+---
+
+## INDA-015：Forward-Looking Implied-Vol Regime-Gated MR（3 次嘗試全部失敗/REJECT）
+
+### 目標 (Goal)
+
+在 INDA-011 Att3（min(A,B)† 0.55）框架之上疊加 lesson #24 family
+forward-looking implied-vol regime gate（^MOVE 利率通道 / ^VIX 風險
+通道），surgical 過濾 Part A 唯一殘餘 SL 2022-09-16（Fed CPI shock，
+-4.10%）以突破 0.55。**repo 首次 lesson #24 implied-vol regime gate
+於單一國家 EM 股票 ETF**。INDA-014 已記錄該 SL「經利率/風險通道傳導，
+非 USD 通道」，INDA-015 為該根因的合理下一步：直接量測利率（^MOVE）
+與風險（^VIX）通道的隱含波動率。
+
+### 設計依據 (Rationale)
+
+^MOVE / ^VIX 為 exogenous macro implied-vol（不違反 lesson #5，非 INDA
+自身價格趨勢濾波）；採 N 日 change-based DIRECTION（不違反 lesson #14
+level-based）。直接類比 XLU-013（^MOVE 3d DIRECTION，rate-indirect ETF
++112%）與 XBI-017（^VIX，+578% Part A）成功案例。
+
+### 強制 PRE-ANALYSIS GATE（predict→confirm）
+
+signal-day 隱含波動率診斷（絕對點數）：
+
+| 日期 | 結果 | MOVE_lvl | MOVE3d | MOVE5d | MOVE10d | VIX_lvl | VIX3d |
+|------|------|----------|--------|--------|---------|---------|-------|
+| 2020-10-29 | WIN | 61.3 | +2.3 | +1.6 | +5.7 | 37.6 | +5.1 |
+| 2020-12-21 | WIN | 46.7 | -0.3 | -2.6 | -3.0 | 25.2 | +2.7 |
+| 2021-12-06 | WIN | 87.9 | +4.9 | -1.5 | +14.5 | 27.2 | -3.9 |
+| 2022-06-16 | WIN | 138.1 | -1.1 | +32.8 | +38.8 | 33.0 | -1.1 |
+| **2022-09-16** | **SL** | **124.9** | **-3.9** | **+3.4** | **-1.6** | **26.3** | **-1.0** |
+| 2024-06-04 (B) | WIN | 100.1 | +9.0 | +10.4 | +12.0 | 13.2 | -1.3 |
+| 2024-11-13 (B) | WIN | 102.1 | -2.0 | -28.3 | -29.8 | 14.0 | -0.9 |
+
+**預測 DOCUMENTED-FAILURE**：^MOVE LEVEL 不可分（SL 124.9 < winner
+2022-06-16 = 138.1）；^MOVE 3d CEILING 被 REFUTED（SL 3d=-3.9 為最負，
+債券隱含波動率「下降」非跳升，與 XLU-013 duration-shock 方向相反）；
+^VIX 全維度 mid-pack 與 winners 交錯；唯一名目分離器 ^MOVE 3d FLOOR
+為 post-hoc 單點切割（n=7）。
+
+### 三次迭代結果 (Results)
+
+| Att | 參數 | Part A | Part B | min(A,B) | 判定 |
+|-----|------|--------|--------|----------|------|
+| Att1 | ^MOVE 3d change ≤ +5.0 | 5/80.0%/Sharpe **0.55**/+8.20%（≡baseline）| 2→1/100%/+3.50% | †0.55 TIE | FAIL |
+| Att2 | ^VIX 3d change ≤ +3.0 | 4/75.0%/Sharpe **0.37**/+4.54% | 2/100%/std=0/+7.12% | **0.37** | FAIL (-33%) |
+| Att3 | ^MOVE 3d change ≥ -2.5 | 4/100.0%/Sharpe **4.07**/+12.82% | 2/100%/std=0/+7.12% | †4.07 | **REJECT** |
+
+### 失敗分析 (Failure Analysis)
+
+- **Att1（FAIL）**：SL 2022-09-16 ^MOVE 3d=-3.9（債券隱含波動率下降）
+  通過 ceiling 未被過濾 → Part A 與 baseline 完全相同；ceiling 反而
+  移除 Part B winner 2024-06-04（^MOVE 3d=+9.0 > +5.0）。**XLU-013
+  rate-shock-jump CEILING 假設於 INDA 被資料 REFUTED**。
+- **Att2（FAIL）**：SL ^VIX 3d=-1.0 mid-pack（winners -3.9..+5.1）存活；
+  ceiling 反而移除 genuine winner 2020-10-29（^VIX 3d=+5.1）。^VIX
+  全維度對 INDA 殘餘 SL 結構性無區分力。
+- **Att3（REJECT，平行 INDA-014 Att2）**：^MOVE 3d FLOOR -2.5 外科式
+  僅移除 SL（3d=-3.9）保留全部 4 winners → Part A 4/100%/4.07。但
+  (a) **A/B 累計差 |12.82-7.12|/12.82 = 44.5% >> 30% ❌**（年化幾何
+  30.2% 亦 >30%）over-filter 人為產物（移除 -4.10% SL 虛增 Part A
+  cum），沿用 INDA-014 Att2（61.2%）/ COPX-015 Att2 / EEM-016 REJECT
+  判例；(b) ^MOVE 3d FLOOR 方向與 INDA-014 記錄之 rate-shock-jump
+  機制「相反」，無 ex-ante 結構機制，僅因恰好隔離 7 點分布唯一最負
+  SL，依 lesson #6 反例 9 / EEM-016 標準 REJECT；(c) floor∈[-3.5,-1.5]
+  雖 ≥2pt 寬平台 robust，仍不改 post-hoc 單點本質。
+
+### 跨資產貢獻 (Cross-Asset Contribution)
+
+- **lesson #24 family 首次應用於單一國家 EM 股票 ETF**（負面結果）
+- 確認 INDA 殘餘 2022-09-16 SL 跨 **DXY（INDA-014）+ ^MOVE + ^VIX**
+  三維度皆 idiosyncratic non-separable；INDA 加入 **TSM-012 / EWJ-006
+  / EEM-016「idiosyncratic non-separable residual SL」失敗家族**
+- 擴展 **lesson #24 family DIRECTION 邊界**：rate-shock-jump CEILING
+  （TLT/XLU duration-shock）不適用「殘餘 SL 為 CPI 衝擊且 signal-day
+  債券隱含波動率下降」之單一國家 EM 股票 ETF
+- 平行 **lesson #6 反例 9 / INDA-014 / COPX-014**「winners/losers
+  維度重疊無 surgical 切點」失敗家族
+
+### Acceptance Criteria 達成情況（全部 FAIL/REJECT）
+
+- ✗ Sharpe > 基線：Att1 †0.55 TIE（Part B winner 流失）；Att2 0.37
+  < 0.55；Att3 †4.07 為 over-filter 人為產物且 REJECT
+- ✗ A/B 累積報酬差距 < 30%：Att3 44.5% ❌
+- ✓ 使用成交模型（隔日開盤市價，0.1% 滑價，悲觀認定）
+- ✓ Repo 較少使用方向（lesson #24 family，repo 首次 ^MOVE/^VIX
+  implied-vol regime gate 於單一國家 EM 股票 ETF）
+- ✓ PRE-ANALYSIS predict→confirm：預測 DOCUMENTED-FAILURE 完全命中
+
+**INDA-011 Att3 維持 INDA 全域最優（13 次實驗、40+ 次嘗試）**

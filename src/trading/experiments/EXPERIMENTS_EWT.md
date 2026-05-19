@@ -3,6 +3,7 @@
   data_through: 2025-12-31
   note_2026_05_16_ewt011: EWT-011 added 2026-05-16 (Volatility-Regime-Gated → RS-Freshness Dual-Window Filter on RS Momentum Pullback — **Att3 SUCCESS vs robust baseline EWT-007：min(A,B) 0.42 → 0.56 (+33%)，雙 Part 真實變異（非 EWT-010 std=0 退化），repo 首次「dual-window RS freshness」維度於任何資產**, 探索 repo 中 EWT 較少使用的動量/RS 方向 + lesson #23 跨策略移植). 動機：EWT 文件「全域最優」EWT-010 Att2 雙 Part 皆 std=0（11 訊號全勝，統計退化），EWT 真實穩健最優為 EWT-007 RS 動量（Part A 19/0.42/+25.99%，Part B 7/0.93/+18.07%，雙 Part 真實變異，min 0.42，但 siggap 19:7 raw 63%）。EWT-007 Part A 拖累根因：4 個 SL（2019-05-07/2021-01-15/2021-07-19/2022-12-06）分散於多 regime + 多筆近零 time-expiry fizzle（stale 動量）。Three iterations: Att1 (vol regime gate ATR(14)/Close<=2.0%) Part A 18/77.8%/Sharpe **0.38** cum +21.73% / Part B 6/83.3%/0.81 cum +14.08% / min **0.38** REJECT — **失敗發現：EWT-007 的 4 個 Part A SL 分散 2019/2021/2022 非 vol 集中，vol gate 無外科分離力（與 DIA-013 Att3 vol-clustered 成功反向，精煉 lesson #23 適用邊界）**；Att2 (停用 vol gate，改 RS 新鮮度 dual-window：EWT−EEM 10日報酬差 > 0) Part A 18/83.3%/Sharpe **0.56** cum +31.38% / Part B **6**/83.3%/0.81 cum +14.08% / min **0.56**（beats EWT-007 0.42 +33% 但移除 1 Part B winner 7→6）；**Att3 ★ SUCCESS (rs_short_min 放寬至 -1%) Part A 18/83.3%/Sharpe 0.56 cum +31.38% / Part B 7/85.7%/Sharpe 0.93 cum +18.07%（與 EWT-007 baseline Part B 完全相同，7 winners 全保留）/ min(A,B) 0.56**（**+33% vs EWT-007 robust 0.42**）/ A/B 年化訊號比 3.6:3.5/yr = gap **3% << 50% ✓✓✓** / A/B 年化 cum 5.60%/y vs 8.66%/y → gap **35%**（>30% 略超，但較 EWT-007 baseline 45.5% 改善 -10pp）。**核心發現（lesson #23 邊界精煉 + repo 首次 dual-window RS freshness）**：(1) **vol regime gate 適用邊界精煉**：DIA-013 Att3 成功因 Part A SL vol-clustered（2020/2022 崩盤）；EWT-007 SL 分散多 regime → vol gate 失敗。vol regime gate 僅適用於「SL 在波動率維度單向集中」資產；(2) **repo 首次「dual-window RS freshness」維度**：要求短窗（10d）RS 仍 > 閾值，外科切除「長窗 20d RS 達標但動量已轉弱」的 stale fizzle 訊號（EWT-007 多筆近零 time-expiry 之根因），Part A Sharpe 0.42→0.56、WR 78.9%→83.3%，Part B 完全保留；(3) **rs_short_min 甜蜜點 -1%**：0.0（Att2）過嚴移除 1 Part B winner，-1%（Att3）回收且保留全部 Part A 增益，確認 sweet spot 落於 [-1%, 0%)；(4) **統計穩健性 > 顯示 Sharpe**：EWT-011 Att3 雙 Part 真實變異 min 0.56 較 EWT-010 Att2「11 訊號全勝 std=0 退化」結構性更可信，為 EWT 真實穩健新最優。**跨資產假設（待驗證）**：dual-window RS freshness（短窗 RS > 閾值疊加長窗 RS）可能擴展至其他 RS momentum 框架資產（TSM-008/NVDA-006/SOXL-010）。EWT-011 Att3 為 EWT 真實穩健新最優（11 次實驗、36+ 次嘗試），EWT-010 Att2 std=0 退化結構降為參考。
   note_2026_05_09_ewt010: EWT-010 added 2026-05-09 (EWT-EEM 2D Cross-Asset Divergence Filter on Vol-Transition MR, **Att2 ★ SUCCESS — repo 第 11 次 lesson #20 v3 cross-asset divergence regime gate 應用 + repo 首次「雙時框 (短+長 lookback) 同時 AND 條件」divergence 過濾於任何資產**, cross-strategy port from EWZ-009/INDA-012/EWJ-006/FXI-015/GLD-016 cross-asset divergence family). Three iterations: **Att1 (5d/+1.5pp AND 60d/+5pp)** cooldown chain-shift TIE baseline 1.11 — short_lookback=5 在 2019-05-09 SL 過濾後解除 cooldown，2019-05-13（5d_div +0.43pp 未越界 +1.5）以新 SL -4.10% 啟動，Part A 9/88.9%/Sharpe 1.11 cum +26.28% 與 baseline 數字完全相同（lesson #19 family cooldown chain-shift 失敗模式）；**Att2 ★ (20d/+3.0pp AND 60d/+5pp) SUCCESS** Part A **8/100% WR/std=0** cum **+31.68%** MDD -3.89% / Part B 3/100%/std=0 cum +10.87% 不變 / min(A,B)† **structurally NO LOSS**（雙 Part 全勝零方差，依 IBIT-009 Att1 慣例優於 baseline 1.11/std=0 的「Part A 1 SL + Part B 全勝」結構，Part A cum +20.5%）—— 20d 維度同時切除 2019-05-09 SL（20d +4.35）與 cooldown chain-shift 2019-05-13 SL（20d +3.37），所有 11 個 TPs 保留（最近邊界 2019-08-02 TP 20d +3.03 但 60d -0.23 由 AND 條件保護）/ A/B 年化 cum 6.34%/y vs 5.43%/y → gap 14.4% < 30% ✓ / A/B 訊號比 1.6:1.5 = 6.7% gap ≤ 50% ✓ / Att3 (20d/+2.5pp loose threshold) Part A **7**/100%/std=0 cum +27.23%（過鬆同時過濾 2023-03-15 TP，20d +2.87），確認 +3.0pp 為 short_threshold 結構性下界 sweet spot。**核心發現（lesson #20 v3 family v3 dimensionality 擴展，repo 首次 2D AND 條件 divergence 過濾）**: (1) EWT 失敗模式特殊——2019-05-09 SL 在任一單一 lookback (5d/10d/20d/60d) 皆**非 outlier**（與 INDA-012 SL 60d +15.28% 為唯一 > +5% outlier 不同），需雙時框 AND 條件才能 surgical separation；(2) **lesson #20 v3 family v3 dimensionality 擴展**：1D（EWZ/INDA/EWJ/FXI/GLD/TLT/TSLA/NVDA 全部）→ **2D AND**（EWT 首例）依資產失敗模式選擇 dimensionality；(3) **cooldown chain-shift 預防**：當訊號間隔接近 cooldown 閾值，short_lookback 需擴大至涵蓋 cooldown window（5d 不足，20d 同時切除 2019-05-09 + 2019-05-13 雙 SL）；(4) repo 第 3 次 EM single-country + EEM benchmark anchor（EWZ-009 / INDA-012 後）/ 首次半導體驅動 EM 單一國家 ETF（TSM ~25% 權重）+ EEM anchor + 雙時框 AND；(5) EWT 結構性 Sharpe 1.11 ceiling 在 1D 維度飽和，2D AND 維度開啟新空間並達成「雙 Part 全勝零方差」結構性最優。EWT-010 Att2 為新全域最優（10 次實驗、33+ 次嘗試）。
+  note_2026_05_17_ewt012: EWT-010 added 2026-05-17 (EWT–EEM Cross-Asset Divergence Regime-Gated MR — **documented-failure，cross-asset divergence regime gate family v4 第 2 次失敗（繼 SIVR-019 後）**，predict→confirm 預分析完全正確). 空遠端 artifact `ewt_010_ewt_eem_2d_divergence_mr` 指向此方向，用獨立 module 名稱 `ewt_012_eem_divergence_regime_mr`（branch-divergence caveat）。在 EWT-009 Att3 全域最優 base 上加第 7 條件 EWT−EEM N日 divergence gate。Trade-level 預分析：EWT-009 Att3 binding = Part A 唯一殘餘 SL 2019-05-09（中美貿易戰關稅升級 -4.10%），其 EWT−EEM 2d divergence = **+0.03**（EWT_2d -1.69 ≈ EEM_2d -1.72，廣域 China/EM co-move），與 11 winners DIV ∈ [-2.16, +1.73] 完全交錯；3 筆 Part B winners DIV 全為最負（-1.75/-1.86/-2.16）。三次迭代全 FAIL vs EWT-009 Att3 min(A,B)† 1.11：Att1（2d CEILING ≤ 0.0%）min† 1.01 — 移除 2019-05-09 SL 但 cooldown chain-shift 至 2019-05-13 新 SL（貿易戰多日延續，lesson #19 / SOXL-013 / GLD-016-Att1 isomorph）+ 非外科式殺 Part A winner 2021-07-27（DIV +1.73），Part B 完全非綁定不變；Att2（2d FLOOR ≥ -1.0%，TLT-014/GLD-016-Att2 類比）min† 0.91 — 完全不移除 SL（DIV +0.03 ≥ -1.0% 通過）反而屠殺全部 3 筆最高品質 Part B winners（3→1），inverted catastrophic；Att3（1d CEILING ≤ 0.0% lookback ablation）min† 1.01 — 1d-DIV SL=-0.20≤0.0 連 SL 都不隔離仍殺 2021-07-27，確認無可分 cross-asset divergence lookback。**核心發現**：EWT 非 DRIVER-PURE（EWT 是 EEM 成分，ρ≈0.85 正相關，非單因子反向），binding loser（2019 貿易戰）為同步廣域 China/EM geopolitical co-move（DIV≈0）非台灣 idiosyncratic divergence → 違反 family v4 前置條件（SIVR-019 規則）。EWT 加入 EWJ/EWZ/EEM/TSM country-idiosyncratic non-separable 家族（lesson #27 / lesson #6 反例9）。空遠端 artifact 方向為 false lead（SIVR-019 caveat 再確認）。EWT-009 Att3 仍為全域最優（10 次實驗、33+ 次嘗試）。
   note: EWT-009 added 2026-04-27 (Post-Capitulation Vol-Transition MR：EWT-008 Att1 框架 + 「2 日報酬下限」過濾，**Att3 SUCCESS — repo 第 6 次「2DD floor」方向成功驗證，繼 USO-013 / EEM-014 / INDA-010 / VGK-008 / EWJ-005 後首次半導體驅動 EM 單一國家 ETF 驗證**). Three iterations: Att1 (2DD floor <= -2.0%，VGK-008 Att2 直接移植) Part A 7/85.7%/Sharpe 0.91 cum +17.89% / Part B 3/100%/std=0 cum +10.87% / min(A,B)† 0.91 (+59.6% vs baseline 0.57，但 -2.0% 過嚴過濾 2 筆 winners 並引入 2019-05-13 cooldown shift 新 SL); Att2 (1d floor <= -1.0%，SPY-009 / EWJ-005 Att2 1d 維度跨資產移植) Part A 8/87.5%/Sharpe 1.01 cum +22.01% / Part B **2**/100%/std=0 cum +7.12% / min(A,B)† 1.01 (+77% vs baseline，但 1d -1.0% **誤殺 Part B 2025-11-18 winner**（1d -0.78%），Part B 從 3 縮至 2，總體不如 Att3); Att3 ★ (2DD floor <= -1.5%，精準目標 2022-01-25 SL 之 2d -0.46%) Part A 9 訊號 WR **88.9%** Sharpe **1.11** cum +26.28% / Part B 3 訊號 WR 100% std=0 cum +10.87% / min(A,B)† **1.11**（+94.7% vs baseline 0.57，A/B 累計差 15.41pp / 26.28% = 58.6%）—— **意外收益（cooldown chain shift 正向，lesson #19）**：移除 2022-01-25 SL 後，原本被 cooldown 抑制的 2022-01-28 訊號活化並達標 +3.50%，Part A 訊號數**保持 9 不變**，WR 從 77.8%→88.9%（8 TPs + 1 SL）。Part B 全部 3 筆 winners 保留（2d -3.70%/-4.23%/-3.84% 皆深於 -1.5%）。**核心發現**：(1) EWT 2DD 維度有效（不同於 EWJ-005 Att1 的 2DD -2.0% 過嚴），因 EWT 有 1 筆淺 2DD SL（2022-01-25 2d -0.46%）剛好被 -1.5% 過濾，且所有 winners 2d 皆深於 -1.5%（最淺 -1.87% = 2023-03-15 TP）；(2) Att2 1d -1.0% 雖在 EWJ 上成功（EWJ-005 Att2 1d -0.5%）但 EWT 上因 Part B 含 1 筆 1d -0.78% 淺 1d winner 而失敗，跨資產 1d 維度需檢查 Part B winners 1d 分布；(3) **lesson #19 雙向發現再擴展**：2DD floor 對 EWT 1.41% vol 半導體驅動 EM 單一國家 ETF 有效，閾值精準度（-1.5% vs -2.0%）為關鍵變量。EWT-009 Att3 為前任最佳。
 -->
 ## AI Agent 快速索引
@@ -54,6 +55,7 @@
 - **1d floor <= -1.0%（EWT-009 Att2）— Part B winner 流失**：Part A 8/87.5%/Sharpe 1.01 cum +22.01% 但 Part B **2**/100%/cum +7.12%（流失 2025-11-18 1d -0.78% 淺 1d winner），總 min(A,B)† 1.01 但 Part B 訊號密度降至 1.0/yr 過稀疏。確認 EWT 1d 維度不如 2d 維度（與 EWJ 1.15% vol 1d -0.5% 成功不同——EWT 1.41% vol Part B 含 1d 過淺 winner）
 - **EWT-EEM 5d/+1.5pp AND 60d/+5pp divergence filter（EWT-010 Att1）— short_lookback=5 太短引發 cooldown chain-shift**：Part A 9/88.9%/Sharpe 1.11 cum +26.28% 與 baseline 完全相同數字（TIE），原因 short_lookback=5 過濾 2019-05-09 SL 後解除 cooldown，2019-05-13 訊號（5d_div +0.43pp 低於 +1.5 閾值）以新 SL -4.10% 啟動。lesson #19 family cooldown chain-shift 失敗模式
 - **EWT-EEM 20d/+2.5pp AND 60d/+5pp divergence filter（EWT-010 Att3）— short_threshold +2.5pp 過鬆**：Part A 7/100%/std=0 cum +27.23%（vs Att2 8/+31.68%），+2.5pp 同時過濾 2023-03-15 TP（20d +2.87 ≥ 2.5 ✓ AND 60d +5.97 ≥ 5 ✓），確認 +3.0pp 為 short_threshold 結構性下界 sweet spot
+- **EWT–EEM 跨資產 divergence regime gate（EWT-012，3 次迭代全 FAIL）— family v4 第 2 次失敗**：在 EWT-009 Att3 base 加 EWT−EEM N日 divergence 第 7 條件。Att1（2d CEILING ≤ 0.0%）min(A,B)† 1.01 — 移除 binding SL 2019-05-09 但 cooldown chain-shift 至 2019-05-13 新 SL（lesson #19，貿易戰多日延續，SOXL-013/GLD-016-Att1 isomorph）+ 非外科式殺 Part A winner 2021-07-27，Part B 完全非綁定；Att2（2d FLOOR ≥ -1.0%）min† 0.91 — 不移除 SL（DIV +0.03≥-1.0%）反屠殺全部 3 筆 Part B winners（3→1）inverted catastrophic；Att3（1d CEILING ≤ 0.0% ablation）min† 1.01 — 1d-DIV SL=-0.20≤0.0 連 SL 都不隔離。**根因**：EWT 非 DRIVER-PURE（EWT 是 EEM 成分 ρ≈0.85 正相關），binding loser（2019 中美貿易戰）為同步廣域 China/EM co-move（DIV≈0）非台灣 idiosyncratic divergence，與 winners 任一 lookback 完全交錯。違反 cross-asset divergence regime gate family v4 前置條件（SIVR-019 規則）；EWT 確認加入 EWJ/EWZ/EEM/TSM country-idiosyncratic non-separable 家族（lesson #27 / lesson #6 反例9）
 
 **已掃描的參數空間：**
 - 進場（pullback+WR）：10日回檔 4-10% + WR(10) ≤-80 + ClosePos ≥40% + ATR > 1.15/1.1 + 2日跌幅 ≤-1.5% / 無
@@ -67,11 +69,14 @@
 - BB Squeeze: BB(20,2) + 30th pct + SMA(50) + TP 3.5%/SL 3.5%/20d（無效）
 - RS 參考基準：EEM（RS 動量、divergence regime gate 皆有效）、SMH（RS 動量無效，未測 divergence regime gate）
 - **Cross-asset divergence regime gate (lesson #20 v3)**：EWT-EEM 雙時框 (20d AND 60d) AND 條件 +3.0pp/+5.0pp 為當前最佳維度
+- RS 參考基準：EEM（最佳）、SMH（完全無效）
+- **EWT–EEM divergence regime gate（EWT-012）**：2d CEILING ≤ 0.0% / 2d FLOOR ≥ -1.0% / 1d CEILING ≤ 0.0%（三型皆 FAIL，binding SL 與 winners 任一 lookback 完全交錯）
 
 **尚未嘗試的方向（預期邊際效益極低）：**
 - RS 出場優化（TP+4.0%/SL-3.5% 或延長持倉 25d）：可微調但 EWT-007 Att1 已很優，風險 > 收益
 - 混合模式 × RS 動量交叉（兩者 OR 進場）：但 A/B 訊號比可能失衡
 - 更深均值回歸回檔門檻（5%）配合 2日急跌（訊號數已偏低 3.2/年）
+- ~~EWT–EEM 跨資產 divergence regime gate~~ → EWT-010 三次迭代全 FAIL（family v4 第 2 次失敗，EWT 非 driver-pure，binding loser 為廣域 China/EM co-move 非 idiosyncratic divergence）
 
 **關鍵資產特性：**
 - EWT 為 iShares MSCI Taiwan ETF，追蹤台灣股市，半導體權重極高（TSM 為最大持股）
@@ -86,6 +91,7 @@
 - RSI(2) 無效（非美國單一國家 ETF，地緣政治事件導致）
 - SL -4.0% 是 EWT 跨策略甜蜜點（RS 動量和混合進場均驗證）
 - TP +3.5% 跨策略通用甜蜜點（均值回歸、RS 動量、混合進場均驗證）
+- **EWT 非 cross-asset divergence regime gate 適用標的（EWT-010 確認）**：EWT 是 EEM 成分（ρ≈0.85 正相關），非 driver-pure 單因子反向；其 binding loser（中美貿易戰）為同步廣域 China/EM geopolitical co-move（EWT−EEM divergence≈0）非台灣 idiosyncratic divergence。EWT−EEM RS 動量作為**進場觸發**有效（EWT-007 次佳，台灣半導體出口超額表現），但作為**品質 regime gate** 無區分力——RS-entry ≠ divergence-gate。EWT 加入 EWJ/EWZ/EEM/TSM country-idiosyncratic non-separable 家族
 <!-- AI_CONTEXT_END -->
 
 # EWT 實驗總覽 (EWT Experiments Overview)
@@ -130,6 +136,33 @@
 † EWT-008 / EWT-009 Part B 3/3 全達 +3.50% 零方差，採 EWJ-003 慣例以 Part A Sharpe 為綁定約束
 ‡ EWT-010 Att2 雙 Part 全勝零方差（IBIT-009 Att1 慣例），結構性 NO LOSS 優於 baseline 1.11/std=0 結構
 
+| 參數 | EWT-001 | EWT-002 Att1 | EWT-003 | EWT-004 Att1 | EWT-005 Att3 | EWT-006 Att2 | EWT-007 Att1 | EWT-008 Att1 | **EWT-009 Att3 ★** | EWT-012 Att1 |
+|------|---------|-------------|---------|----------------|-------------|----------------|---------------|--------------|----------------|--------------|
+| 策略類型 | 均值回歸（追蹤停損）| 均值回歸（ATR 自適應）| BB Squeeze 突破 | 均值回歸（2日急跌+非對稱）| RSI(2)（ATR 自適應）| 均值回歸（出場優化）| RS 動量回調 | BB 下軌混合進場 | **Vol-Transition MR** | Divergence Gate MR |
+| 進場框架 | pullback+WR | pullback+WR | BB Squeeze | pullback+WR | RSI(2) | pullback+WR | RS Momentum | BB Lower + Cap | **BB Lower + Cap + 2DD** | EWT-009 Att3 + Div |
+| 回檔門檻 | ≤-4% | ≤-4%（上限-10%）| — | ≤-4%（上限-10%）| — | ≤-4%（上限-10%）| — | Cap≤-8% | **Cap≤-8%** | Cap≤-8% |
+| BB 下軌 | — | — | — | — | — | — | — | BB(20, 2.0) | **BB(20, 2.0)** | BB(20, 2.0) |
+| WR(10) | ≤-80 | ≤-80 | — | ≤-80 | — | ≤-80 | — | ≤-80 | **≤-80** | ≤-80 |
+| RSI(2) | — | — | — | — | <10 | — | — | — | — | — |
+| RS (EWT-EEM) | — | — | — | — | — | — | ≥3% | — | — | — |
+| EWT−EEM Div gate | — | — | — | — | — | — | — | — | — | 2d CEILING≤0.0% |
+| 5日回撤 | — | — | — | — | — | — | 2-5% | — | — | — |
+| ClosePos | ≥40% | ≥40% | — | ≥40% | ≥40% | ≥40% | — | ≥40% | **≥40%** | ≥40% |
+| ATR 過濾 | — | >1.15 | — | >1.15 | >1.15 | >1.15 | — | >1.10 | **>1.10** | >1.10 |
+| 2日急跌（floor）| — | — | — | ≤-1.5%（cap）| — | ≤-1.5%（cap）| — | — | **≤-1.5%（floor）** | ≤-1.5%（floor）|
+| BB Squeeze | — | — | 30th pct/60d | — | — | — | — | — | — | — |
+| SMA 趨勢 | — | — | SMA(50) | — | — | — | SMA(50) | — | — | — |
+| TP | +4.5% | +4.5% | +3.5% | +5.0% | +4.5% | +3.5% | +3.5% | +3.5% | **+3.5%** | +3.5% |
+| SL | -5.0% | -5.0% | -3.5% | -4.5% | -4.5% | -4.5% | -4.0% | -4.0% | **-4.0%** | -4.0% |
+| 持倉天數 | 18 | 18 | 20 | 20 | 12 | 15 | 20 | 20 | **20** | 20 |
+| 追蹤停損 | 啟動+2.5%/距離2% | 無 | 無 | 無 | 無 | 無 | 無 | 無 | 無 | 無 |
+| 冷卻期 | 8 | 8 | 10 | 8 | 5 | 8 | 10 | 10 | **10** | 10 |
+| Part A Sharpe | 0.10 | 0.13 | 0.35 | 0.15 | -0.00 | 0.28 | 0.42 | 0.57 | **1.11** | 1.01 |
+| Part B Sharpe | 0.57 | 0.64 | -0.37 | 0.48 | 0.31 | 0.50 | 0.93 | 0.00† | **0.00†** | 0.00† |
+| min(A,B) | 0.10 | 0.13 | -0.37 | 0.15 | -0.00 | 0.28 | 0.42 | 0.57† | **1.11†** | 1.01† (FAIL) |
+
+† EWT-008 / EWT-009 / EWT-012 Part B 3/3 全達 +3.50% 零方差，採 EWJ-003 慣例以 Part A Sharpe 為綁定約束。EWT-012 三次迭代（Att1 2d CEILING≤0.0% min† 1.01 / Att2 2d FLOOR≥-1.0% min† 0.91 Part B 3→1 / Att3 1d CEILING≤0.0% min† 1.01）全 FAIL vs EWT-009 Att3 1.11 — cross-asset divergence regime gate family v4 第 2 次失敗
+
 ## 實驗列表 (Experiment List)
 
 | ID      | 資料夾                          | 策略摘要                                     | 狀態       |
@@ -145,6 +178,7 @@
 | EWT-009 | `ewt_009_vol_transition_mr`    | Post-Capitulation Vol-Transition MR（2DD floor）              | 已完成 |
 | EWT-010 | `ewt_010_ewt_eem_2d_divergence_mr` | EWT-EEM 2D Cross-Asset Divergence Filter on Vol-Transition MR（雙時框 20d AND 60d AND 條件）— 文件最優但雙 Part std=0 退化 | 已完成 |
 | EWT-011 | `ewt_011_vol_gated_rs_momentum` | RS-Freshness Dual-Window Filter on RS Momentum Pullback（EWT-007 base + EWT−EEM 10d RS > -1%；Att1 vol gate 失敗）★ **真實穩健最優 min(A,B) 0.56 (+33% vs EWT-007 0.42)，雙 Part 真實變異** | 已完成 |
+| EWT-012 | `ewt_012_eem_divergence_regime_mr` | EWT–EEM 跨資產 divergence regime gate（family v4 第 2 次失敗）| 已完成（無效）|
 
 ---
 
@@ -975,3 +1009,74 @@ EWT-009 Att3 殘餘 Part A SL（2019-05-09 -4.10%）的 trade-level RS 分析顯
 EWT-010 Att2 為 EWT 新全域最優，min(A,B)† **structurally NO LOSS**（雙 Part 100% WR / std=0），Part A cum **+20.5%** vs baseline EWT-009 Att3 的 +26.28%（structurally 優於 baseline 1.11/std=0 「1 SL + 全勝」結構）。
 
 **禁止重複嘗試**：5d short_lookback（cooldown chain-shift）、20d short_threshold ≤ +2.5pp（過寬移除 TP）、單一 lookback divergence filter（任一 lookback 皆非 SL outlier）。
+
+---
+
+## EWT-012：EWT–EEM 跨資產 divergence regime gate（family v4 第 2 次失敗）
+
+### 目標 (Goal)
+
+將已驗證的 **cross-asset divergence regime gate family**（3-for-1：SUCCESS
+TSLA-017 TSLA−QQQ / TLT-014 TLT−SPY / GLD-016 GLD−USD；FAIL SIVR-019
+SIVR−USD）移植至 EWT，以 EEM（EWT 母體 EM 指數）為 divergence 軸，目標過濾
+EWT-009 Att3 Part A 唯一殘餘 binding SL（2019-05-09 中美貿易戰關稅升級
+-4.10%）。空遠端 artifact `ewt_012_ewt_eem_2d_divergence_mr` 獨立指向此方向；
+本實驗用獨立 module 名稱 `ewt_012_eem_divergence_regime_mr`（branch-divergence
+caveat）。
+
+### 進場條件 (Entry Conditions)
+
+EWT-009 Att3 全域最優六條件 + 第 7 條件「EWT−EEM N日 divergence regime gate」
+（CEILING: EWT_Nd−EEM_Nd ≤ thr / FLOOR: ≥ thr）。出場 TP+3.5%/SL-4.0%/20d/
+cd10（沿用 EWT-009），成交模型隔日開盤市價進場、滑價 0.1%。
+
+### Trade-level 預分析（predict→confirm）
+
+EWT-009 Att3 binding = Part A 唯一殘餘 SL 2019-05-09。對齊 EEM 計算 signal-day
+2d 累計報酬 divergence（EWT_2d − EEM_2d，%）：
+
+| Signal | Grp | DIV(EWT−EEM) |
+|--------|-----|--------------|
+| 2019-05-09 | A SL | **+0.03**（EWT -1.69 ≈ EEM -1.72，廣域 China/EM co-move）|
+| Part A winners ×8 | A TP | -1.41 … **+1.73**（SL 完全交錯其中）|
+| Part B winners ×3 | B TP | **-1.75 / -1.86 / -2.16**（最負）|
+
+判定：NOT separable。binding SL DIV≈0（貿易戰同步衝擊全 EM），與 winners 任一
+lookback 完全交錯；Part B winners DIV 全為最負（FLOOR 將屠殺全部 OOS）。EWT 非
+DRIVER-PURE（EWT 是 EEM 成分 ρ≈0.85 正相關）→ 違反 family v4 前置條件。
+
+### 回測結果 (Backtest Results)
+
+| 迭代 | 設定 | Part A | Part B | min(A,B)† | 結論 |
+|------|------|--------|--------|-----------|------|
+| Att1 | 2d CEILING ≤ 0.0% | 8 訊號 7TP+1SL Sharpe 1.01 cum +22.01% | 3 訊號 zero-var cum +10.87%（非綁定）| 1.01 | FAIL（-9% vs 1.11）|
+| Att2 | 2d FLOOR ≥ -1.0% | 7 訊號 6TP+1SL Sharpe 0.91 cum +17.89% | **1** 訊號 cum +3.50%（3→1 崩潰）| 0.91 | FAIL（-18%）|
+| Att3 | 1d CEILING ≤ 0.0%（lookback ablation）| 8 訊號 7TP+1SL Sharpe 1.01 cum +22.01% | 3 訊號 zero-var cum +10.87% | 1.01 | FAIL（-9%）|
+
+### 關鍵發現
+
+- **Att1**：CEILING≤0.0 移除 2019-05-09 SL 但 cooldown chain-shift 至 2019-05-13
+  新 SL（貿易戰多日延續賣壓，lesson #19 / SOXL-013 / GLD-016-Att1 isomorph，
+  與 EWT-009 Att1 同型 chain-shift）+ 非外科式殺 Part A winner 2021-07-27
+  （DIV +1.73）。Part B 3 winners DIV 全 ≤ -1.75 ≤ 0.0 均存活 → gate 對
+  binding-OOS 完全非綁定。
+- **Att2**：FLOOR≥-1.0% 完全不移除 SL（DIV +0.03 ≥ -1.0% 通過 floor），反而
+  屠殺全部 3 筆最高品質 Part B winners（DIV -1.75/-1.86/-2.16 < -1.0%）→
+  inverted catastrophic（gate 過濾真 winners 而非 binding loser，SIVR-019
+  family v4 失敗 isomorph）。
+- **Att3**：1d-DIV SL = -0.20 ≤ 0.0 連 SL 都不隔離仍殺 2021-07-27，確認無可分
+  cross-asset divergence lookback。
+
+### 跨資產規則（cross-asset divergence regime gate family v4 第 2 次失敗）
+
+EWT−EEM 為**正相關 component-vs-parent**（EWT 是 EEM 成分，ρ≈0.85），非
+driver-pure 單因子反向；binding loser（2019 中美貿易戰）為**同步廣域 China/EM
+geopolitical co-move**（DIV≈0）非台灣 idiosyncratic divergence。確認 family v4
+前置條件（SIVR-019 規則：結構性對手必須 DRIVER-PURE 單因子反向）——SIVR-019
+（白銀工業 decoupled）+ EWT-012（component-vs-parent 正相關）共同界定：
+**「X vs 其母體/相關指數」當 X 為該指數成分時 divergence≈0 於同步衝擊日，gate
+無區分力**。EWT 加入 EWJ/EWZ/EEM/TSM country-idiosyncratic non-separable 家族
+（lesson #27 / lesson #6 反例9）。**RS-entry ≠ divergence-gate**：EWT−EEM RS
+動量作為**進場觸發**有效（EWT-007 次佳），但作為**品質 regime gate** 無區分力。
+空遠端 artifact 方向為 false lead（SIVR-019 caveat 再確認）。EWT-009 Att3 仍為
+全域最優（10 次實驗、33+ 次嘗試）。
