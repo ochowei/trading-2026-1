@@ -198,3 +198,4 @@ uv run trading compare tqqq_001_capitulation my_strategy
 
 - [TQQQ 實驗總覽](src/trading/experiments/EXPERIMENTS_TQQQ.md)
 - [GLD 實驗總覽](src/trading/experiments/EXPERIMENTS_GLD.md)
+- [AI Agent 實驗記憶體架構建議](src/trading/docs_experiment_memory_architecture.md)

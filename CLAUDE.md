@@ -104,6 +104,7 @@ src/trading/
 │   ├── data_fetcher.py          # yfinance 多線程資料抓取
 │   ├── freshness.py             # 知識新鮮度檢查（data_through 過期掃描）
 │   └── results.py               # 結果儲存（JSON）與跨實驗比較
+├── docs_experiment_memory_architecture.md  # AI Agent 實驗記憶體分層架構建議
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
     └── <name>/                  # config.py + signal_detector.py + strategy.py + __init__.py
@@ -112,6 +113,7 @@ src/trading/
 ## 按需參考（不需要時不用讀）
 
 - 建立新實驗教學 → [README.md](README.md)
+- AI Agent 實驗記憶體架構建議 → [src/trading/docs_experiment_memory_architecture.md](src/trading/docs_experiment_memory_architecture.md)
 - TQQQ 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TQQQ.md](src/trading/experiments/EXPERIMENTS_TQQQ.md)
 - GLD 實驗總覽 → [src/trading/experiments/EXPERIMENTS_GLD.md](src/trading/experiments/EXPERIMENTS_GLD.md)
 - SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
