@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trading: Validate Experiment"
+  short_description: "Validate code, results, and docs for one experiment"
+  default_prompt: "Use $trading-validate-experiment to comprehensively validate one trading experiment."

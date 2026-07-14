@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trading: New Experiment"
+  short_description: "Create the next experiment for an existing asset"
+  default_prompt: "Use $trading-new-experiment to create the next experiment for an existing asset."

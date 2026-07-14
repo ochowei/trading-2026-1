@@ -1,4 +1,0 @@
-interface:
-  display_name: "Launch New Asset"
-  short_description: "Create the first experiment for a new trading asset"
-  default_prompt: "Use $launch-new-asset to create the first experiment for a new asset."

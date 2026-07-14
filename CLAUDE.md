@@ -85,6 +85,10 @@ uv run trading freshness
 .agents/
 ├── context/
 │   ├── cross_asset_lessons.md   # 跨資產共通教訓（波動率分類、禁忌、參數縮放）
+├── skills/                           # Repo 專屬 Codex skills，統一使用 trading- 前綴
+│   └── trading-*/
+│       ├── SKILL.md
+│       └── agents/openai.yaml
 └── rules/
     └── execution-model.md       # 成交模型完整規格
 

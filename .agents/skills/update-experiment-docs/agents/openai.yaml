@@ -1,4 +1,0 @@
-interface:
-  display_name: "Update Experiment Docs"
-  short_description: "Sync experiment documentation with backtest results"
-  default_prompt: "Use $update-experiment-docs to synchronize experiment documentation with results."
