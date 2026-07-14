@@ -1,65 +1,69 @@
-# Trading Experiment Workflows Skill Design
+# Trading Experiment Workflow Skills Design
 
 ## Goal
 
-Convert the eight workflows in `.claude/commands/` into one project-local Codex skill without changing their trading rules, qualification thresholds, validation order, or required outputs.
+Convert the eight workflows in `.claude/commands/` into eight independently discoverable project-local Codex skills without changing their trading rules, qualification thresholds, validation order, or required outputs.
 
 ## Location and branch
 
 - Branch: `codex/convert-claude-commands-skill`
-- Skill: `.agents/skills/trading-experiment-workflows/`
-- The skill remains version-controlled with this repository and is not installed globally.
+- Skills root: `.agents/skills/`
+- Pull request: `#146`
+- The skills remain version-controlled with this repository and are not installed globally.
 
 ## Structure
 
-Use a small router in `SKILL.md` and keep each workflow in a separate file under `references/`:
+Create one skill folder per original command:
 
 ```text
-.agents/skills/trading-experiment-workflows/
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-└── references/
-    ├── evaluate-best.md
-    ├── launch-new-asset.md
-    ├── new-experiment.md
-    ├── pre-experiment-research.md
-    ├── rebuild-followup.md
-    ├── run-experiment.md
-    ├── update-experiment-docs.md
-    └── validate-experiment.md
+.agents/skills/
+├── evaluate-best/
+├── launch-new-asset/
+├── new-experiment/
+├── pre-experiment-research/
+├── rebuild-followup/
+├── run-experiment/
+├── update-experiment-docs/
+└── validate-experiment/
 ```
 
-`SKILL.md` identifies the requested operation, reads only the matching reference, and follows `CLAUDE.md` as the authoritative project rule source. A workflow may load another reference when it explicitly delegates to that workflow, such as rebuilding followup using evaluate-best.
+Each folder contains a self-contained `SKILL.md` and `agents/openai.yaml`. Put the converted workflow directly in its `SKILL.md`; each workflow is below the 500-line limit and needs no extra reference layer. Remove the `trading-experiment-workflows` router so the catalog contains exactly the eight actionable entries.
 
-The repository-root `.agents/skills` location is required for Codex's project-skill discovery. Forward tests must invoke the skill from a fresh session without supplying its filesystem path.
+Cross-workflow delegation uses explicit skill names:
+
+- `rebuild-followup` invokes `$evaluate-best` sequentially for each ticker.
+- `run-experiment` invokes `$update-experiment-docs` only after user confirmation.
+- `launch-new-asset` directs existing assets to `$new-experiment`.
 
 ## Conversion rules
 
-Preserve the source command's ordered steps, stopping conditions, thresholds, output fields, and mutation boundaries. Adapt only Claude-command-specific mechanics:
+Preserve each source command's ordered steps, stopping conditions, thresholds, output fields, confirmation gates, and mutation boundaries. Apply only these Codex adaptations:
 
 - Interpret the user's natural-language request instead of `$ARGUMENTS`.
 - Resolve experiment IDs and module names using repository files or `uv run trading list`.
-- Replace slash-command or Skill-tool invocation with a direct link to the corresponding reference workflow.
-- Resolve an asset document as `src/trading/experiments/EXPERIMENTS_<TICKER>.md` rather than limiting support to a hard-coded four-asset map.
-- Keep sequential execution where shared files could conflict, especially `rebuild-followup`.
-- Do not duplicate the full project rules from `CLAUDE.md`; instruct Codex to read it first.
+- Replace Claude slash-command and Skill-tool calls with explicit `$skill-name` delegation.
+- Resolve asset documents as `src/trading/experiments/EXPERIMENTS_<TICKER>.md` rather than using a four-asset hard-coded map.
+- Keep sequential execution where workflows share files, especially `rebuild-followup`.
+- Require reading `CLAUDE.md` before executing every workflow.
 
 ## Triggering and interface
 
-Name the skill `trading-experiment-workflows`. Its description will cover research, creation, launch, execution, validation, documentation updates, best-strategy evaluation, and followup rebuilding for this repository. `agents/openai.yaml` will expose a concise display name, description, and default prompt generated from the completed skill.
+Each skill name matches the original command filename, such as `evaluate-best` and `rebuild-followup`. Each description contains only that workflow's triggering conditions so explicit `$skill-name` invocation and narrow implicit matching both work. Each `agents/openai.yaml` provides a matching display name, short description, and default prompt.
+
+Codex uses `$evaluate-best`-style skill invocation. These are not Claude-style `/evaluate-best` slash commands.
 
 ## Validation
 
 Follow skill-authoring RED/GREEN verification:
 
-1. Run a baseline routing scenario without exposing the new skill and record missing project-specific behavior.
-2. Initialize the skill using `skill-creator` tooling.
-3. Run `quick_validate.py` on the completed folder.
-4. Check that every source command maps to exactly one reference and that no Claude-only `$ARGUMENTS` or slash-command invocation remains.
-5. Forward-test representative read-only and mutating scenarios with the new skill available, without allowing the test to modify live project files.
-6. Inspect the final diff and repository status.
+1. Use the user's observed catalog state and a fresh-session catalog check to establish RED: `$evaluate-best` and `$rebuild-followup` are absent while only the router exists.
+2. Convert, validate, and catalog-test one skill at a time before creating the next.
+3. Run `quick_validate.py` on all eight skill folders.
+4. Assert that `.agents/skills` contains exactly the eight expected project skills and no `trading-experiment-workflows` router.
+5. Check that every source command maps to one `SKILL.md` and no `$ARGUMENTS`, Claude slash invocation, or Skill-tool syntax remains.
+6. Forward-test `$evaluate-best`, `$rebuild-followup`, and one implicit natural-language request in fresh sessions without supplying filesystem paths or allowing project mutations.
+7. Run project lint/format checks, inspect the final diff, and obtain independent review before pushing to PR #146.
 
 ## Scope
 
-This change creates only the Codex skill and its design documentation. It does not delete or edit `.claude/commands/`, alter trading code, run backtests, or change experiment documentation.
+This revision changes only repository Codex skills and their design/plan documentation. It keeps `.claude/commands/` unchanged, does not alter trading code, does not run backtests, and does not change experiment documentation.
