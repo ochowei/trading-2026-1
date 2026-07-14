@@ -126,7 +126,7 @@ git commit -m "feat: add Codex trading experiment workflows skill"
 Run `quick_validate.py` in an environment containing PyYAML. If the project environment lacks PyYAML, use an ephemeral `uvx --with pyyaml` invocation without changing project dependencies:
 
 ```bash
-UV_CACHE_DIR=/tmp/uv-cache uvx --with pyyaml python \
+UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uvx --with pyyaml python \
   /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .codex/skills/trading-experiment-workflows
 ```
@@ -137,7 +137,7 @@ Expected: `Skill is valid!`
 
 ```bash
 test "$(find .codex/skills/trading-experiment-workflows/references -type f -name '*.md' | wc -l | tr -d ' ')" = "8"
-! rg -n '\$ARGUMENTS|Skill tool|/evaluate-best|/new-experiment' .codex/skills/trading-experiment-workflows
+! rg -n '\$ARGUMENTS|Skill tool|(^|[[:space:]`(])/(evaluate-best|new-experiment|run-experiment|update-experiment-docs)' .codex/skills/trading-experiment-workflows
 git diff --check HEAD^ HEAD
 ```
 
