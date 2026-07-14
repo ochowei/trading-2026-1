@@ -7,7 +7,7 @@ Convert the eight workflows in `.claude/commands/` into one project-local Codex 
 ## Location and branch
 
 - Branch: `codex/convert-claude-commands-skill`
-- Skill: `.codex/skills/trading-experiment-workflows/`
+- Skill: `.agents/skills/trading-experiment-workflows/`
 - The skill remains version-controlled with this repository and is not installed globally.
 
 ## Structure
@@ -15,7 +15,7 @@ Convert the eight workflows in `.claude/commands/` into one project-local Codex 
 Use a small router in `SKILL.md` and keep each workflow in a separate file under `references/`:
 
 ```text
-.codex/skills/trading-experiment-workflows/
+.agents/skills/trading-experiment-workflows/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
@@ -31,6 +31,8 @@ Use a small router in `SKILL.md` and keep each workflow in a separate file under
 ```
 
 `SKILL.md` identifies the requested operation, reads only the matching reference, and follows `CLAUDE.md` as the authoritative project rule source. A workflow may load another reference when it explicitly delegates to that workflow, such as rebuilding followup using evaluate-best.
+
+The repository-root `.agents/skills` location is required for Codex's project-skill discovery. Forward tests must invoke the skill from a fresh session without supplying its filesystem path.
 
 ## Conversion rules
 

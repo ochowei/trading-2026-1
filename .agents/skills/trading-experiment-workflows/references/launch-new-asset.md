@@ -9,7 +9,7 @@ Infer the asset ticker and brief strategy description from the user's request (f
 - [Pre-flight validation](#phase-0-pre-flight-validation-mandatory--do-not-skip)
 - [Volatility analysis and template selection](#phase-1-volatility-analysis--template-selection-mandatory)
 - [Create experiment code](#phase-2-create-4-code-files)
-- [Create the asset document](#phase-3-create-experiments_tickermd-new-asset--mandatory)
+- [Create the asset document](#phase-3-create-the-asset-experiment-document-new-asset--mandatory)
 - [Update existing files](#phase-4-update-existing-files-mandatory-checklist)
 - [Validate](#phase-5-validation-mandatory)
 - [Summarize](#phase-6-final-summary)
@@ -169,7 +169,7 @@ register("<module_name>")(<StrategyClass>)
 
 ---
 
-## Phase 3: Create EXPERIMENTS_<TICKER>.md (NEW ASSET — MANDATORY)
+## Phase 3: Create the Asset Experiment Document (NEW ASSET — MANDATORY)
 
 Create `src/trading/experiments/EXPERIMENTS_<TICKER>.md` using EXPERIMENTS_FCX.md as the structural template.
 
