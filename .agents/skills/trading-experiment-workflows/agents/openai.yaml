@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trading Experiment Workflows"
+  short_description: "Run this repository’s trading experiment workflows"
+  default_prompt: "Use $trading-experiment-workflows to manage a trading experiment workflow in this repository."
