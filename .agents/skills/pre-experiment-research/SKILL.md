@@ -1,4 +1,11 @@
+---
+name: pre-experiment-research
+description: Use when gathering read-only asset context, prior results, prohibited approaches, parameter coverage, and freshness before experiment design.
+---
+
 # Research Before an Experiment
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the asset ticker from the user's request. If it is absent or unclear, ask which ticker to research before proceeding.
 

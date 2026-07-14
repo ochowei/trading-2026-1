@@ -29,7 +29,7 @@
 | `pre-experiment-research` | Pre-Experiment Research | Research an asset before designing an experiment | Use when gathering read-only asset context, prior results, prohibited approaches, parameter coverage, and freshness before experiment design. |
 | `rebuild-followup` | Rebuild Trading Followup | Rebuild followup strategies across every experiment asset | Use when rebuilding the entire `STRATEGIES` list in `src/trading/followup.py` across all assets. |
 | `run-experiment` | Run Trading Experiment | Run and summarize a trading experiment backtest | Use when running one trading experiment, analyzing rolling stability, and summarizing its latest results. |
-| `update-experiment-docs` | Update Experiment Docs | Sync experiment documentation with backtest results | Use when synchronizing `EXPERIMENTS_<TICKER>.md` and AI context with existing backtest results. |
+| `update-experiment-docs` | Update Experiment Docs | Sync experiment documentation with backtest results | Use when synchronizing an asset's experiment overview document and AI context with existing backtest results. |
 | `validate-experiment` | Validate Trading Experiment | Validate code, results, and docs for one experiment | Use when comprehensively validating one experiment's code style, registration, backtest, metrics, documentation, and execution model. |
 
 ---
@@ -169,9 +169,9 @@ test "$(find .agents/skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr 
 expected='evaluate-best launch-new-asset new-experiment pre-experiment-research rebuild-followup run-experiment update-experiment-docs validate-experiment'
 actual="$(find .agents/skills -mindepth 2 -maxdepth 2 -name SKILL.md -exec dirname {} \; | xargs -n1 basename | sort | tr '\n' ' ' | sed 's/ $//')"
 test "$actual" = "$expected"
-! rg -n '\$ARGUMENTS|Skill tool|(^|[[:space:]`(])/(evaluate-best|new-experiment|run-experiment|update-experiment-docs)' .agents/skills
+! rg -n '\$ARGUMENTS|Skill tool|(^|[[:space:]`(])/(evaluate-best|launch-new-asset|new-experiment|pre-experiment-research|rebuild-followup|run-experiment|update-experiment-docs|validate-experiment)([[:space:]`]|$)' .agents/skills
 git diff --quiet origin/main -- .claude/commands
-git diff --check origin/main..HEAD
+git diff --check origin/main
 ```
 
 Expected: all commands exit `0` and the syntax scan prints no matches.
@@ -184,23 +184,31 @@ Without searching the filesystem, report whether these exact skills are present 
 
 Expected: the four standalone skills are present and `trading-experiment-workflows` is absent.
 
-- [ ] **Step 3: Run explicit and implicit forward tests without writes**
+- [ ] **Step 3: Run the explicit evaluate-best forward test without writes**
 
-Explicit:
+```text
+Use $evaluate-best to explain how you would rank GLD experiments and decide whether the winner belongs in followup. This is an evaluation: do not modify files or run backtests.
+```
+
+Expected: it states the ranking order, all six qualification gates, existing-results behavior, and the rule that `followup.py` changes only when the best experiment qualifies.
+
+- [ ] **Step 4: Run the explicit rebuild-followup forward test without writes**
 
 ```text
 Use $rebuild-followup to explain the required rebuild order and qualification gates. This is an evaluation: do not modify files or run backtests.
 ```
 
-Implicit:
+Expected: it delegates sequentially to `$evaluate-best` and includes final lint, format, followup execution, strategy-count, and changes-versus-previous validation.
+
+- [ ] **Step 5: Run the implicit research forward test without writes**
 
 ```text
 Prepare the read-only pre-experiment research brief for GLD in this repository. State the selected skill and do not modify files.
 ```
 
-Expected: explicit invocation delegates sequentially to `$evaluate-best`; implicit invocation selects `pre-experiment-research` and returns all eight brief sections.
+Expected: implicit invocation selects `pre-experiment-research` and returns all eight brief sections without modifying files.
 
-- [ ] **Step 4: Run project verification and review**
+- [ ] **Step 6: Run project verification and review**
 
 ```bash
 UV_CACHE_DIR=/tmp/uv-cache uv run ruff check src/

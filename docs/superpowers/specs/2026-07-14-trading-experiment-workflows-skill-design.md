@@ -48,7 +48,7 @@ Preserve each source command's ordered steps, stopping conditions, thresholds, o
 
 ## Triggering and interface
 
-Each skill name matches the original command filename, such as `evaluate-best` and `rebuild-followup`. Each description contains only that workflow's triggering conditions so explicit `$skill-name` invocation and narrow implicit matching both work. Each `agents/openai.yaml` provides a matching display name, short description, and default prompt.
+Each skill name matches the original command filename, such as `evaluate-best` and `rebuild-followup`. Each description contains only that workflow's triggering conditions, without angle-bracket placeholders, so explicit `$skill-name` invocation and narrow implicit matching both work. Each `agents/openai.yaml` provides a matching display name, short description, and default prompt.
 
 Codex uses `$evaluate-best`-style skill invocation. These are not Claude-style `/evaluate-best` slash commands.
 

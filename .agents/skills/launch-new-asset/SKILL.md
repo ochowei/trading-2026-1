@@ -1,4 +1,11 @@
+---
+name: launch-new-asset
+description: Use when creating the first experiment and experiment documentation for a ticker that has no existing experiments.
+---
+
 # Launch a New Asset
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the asset ticker and brief strategy description from the user's request (for example, "SLV pullback_wr" or "COPX extreme_oversold"). If either is unclear, ask for the missing information before proceeding.
 
@@ -26,7 +33,7 @@ Also check that NO `EXPERIMENTS_<TICKER>.md` file exists:
 ls src/trading/experiments/EXPERIMENTS_<TICKER>.md
 ```
 
-**If either exists, STOP. This asset already has experiments. Use the [new-experiment workflow](new-experiment.md) instead.**
+**If either exists, STOP. This asset already has experiments. Use `$new-experiment` instead.**
 
 ### 0b. Read cross-asset lessons
 - Read `.agents/context/cross_asset_lessons.md` — especially:
@@ -361,7 +368,7 @@ Present a summary to the user:
 - A/B ratio: X:1
 
 ### Next Steps
-- Review results and iterate entry parameters if needed using the [new-experiment workflow](new-experiment.md)
+- Review results and iterate entry parameters if needed using `$new-experiment`
 - Consider directions listed in EXPERIMENTS_<TICKER>.md roadmap
 ```
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rebuild Trading Followup"
+  short_description: "Rebuild followup strategies across every experiment asset"
+  default_prompt: "Use $rebuild-followup to rebuild followup strategies for all assets."

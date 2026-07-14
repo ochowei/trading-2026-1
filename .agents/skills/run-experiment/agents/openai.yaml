@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run Trading Experiment"
+  short_description: "Run and summarize a trading experiment backtest"
+  default_prompt: "Use $run-experiment to run and summarize one trading experiment."

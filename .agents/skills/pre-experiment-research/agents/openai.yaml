@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pre-Experiment Research"
+  short_description: "Research an asset before designing an experiment"
+  default_prompt: "Use $pre-experiment-research to prepare a read-only asset research brief."

@@ -1,4 +1,11 @@
+---
+name: new-experiment
+description: Use when creating the next numbered trading experiment for an asset that already has experiments.
+---
+
 # Create a New Experiment
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the asset ticker and brief strategy description from the user's request (for example, "GLD bollinger_squeeze" or "TQQQ volume_climax"). If either is unclear, ask for the missing information before proceeding.
 
