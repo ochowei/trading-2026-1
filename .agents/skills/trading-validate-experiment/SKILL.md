@@ -1,4 +1,11 @@
+---
+name: trading-validate-experiment
+description: Use when comprehensively validating one experiment's code style, registration, backtest, metrics, documentation, and execution model.
+---
+
 # Validate an Experiment
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the experiment from the user's request. If it is absent, ask which experiment to validate. Accept either:
 - Module name (e.g., `gld_007_pullback_wr_reversal`)

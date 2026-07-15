@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trading: Pre-Experiment Research"
+  short_description: "Research an asset before designing an experiment"
+  default_prompt: "Use $trading-pre-experiment-research to prepare a read-only asset research brief."

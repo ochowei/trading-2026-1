@@ -1,4 +1,11 @@
+---
+name: trading-run-experiment
+description: Use when running one trading experiment, analyzing rolling stability, and summarizing its latest results.
+---
+
 # Run an Experiment
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the experiment from the user's request. If it is absent, ask which experiment to run. Accept either:
 - Module name (e.g., `gld_007_pullback_wr_reversal`)
@@ -58,7 +65,7 @@ After showing the summary, ask:
 
 > "要更新 EXPERIMENTS_*.md 的結果表格嗎？(Update documentation with these results? y/n)"
 
-If the user says yes, read and execute the full [update-experiment-docs workflow](update-experiment-docs.md) for this experiment:
+If the user says yes, invoke `$trading-update-experiment-docs` for this experiment:
 1. Update results tables in EXPERIMENTS_*.md
 2. Update AI_CONTEXT block
 3. Update freshness dates

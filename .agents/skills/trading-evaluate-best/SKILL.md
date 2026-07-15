@@ -1,4 +1,11 @@
+---
+name: trading-evaluate-best
+description: Use when ranking experiments for one asset, checking followup qualification, or updating that asset's entry in `src/trading/followup.py`.
+---
+
 # Evaluate the Best Experiment
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the asset ticker from the user's request. If it is absent, ask which ticker to evaluate. Accept ticker symbols such as `TQQQ`, `GLD`, or `SPY`.
 
@@ -152,7 +159,7 @@ If the best experiment qualifies, check `src/trading/followup.py`:
 
 ### 7c. If not qualified
 - Inform the user which thresholds were not met
-- Suggest designing a new experiment using the [new-experiment workflow](new-experiment.md)
+- Suggest designing a new experiment with `$trading-new-experiment`
 - Do NOT modify followup.py
 
 ---

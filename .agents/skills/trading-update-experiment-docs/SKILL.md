@@ -1,4 +1,11 @@
+---
+name: trading-update-experiment-docs
+description: Use when synchronizing an asset's experiment overview document and AI context with existing backtest results.
+---
+
 # Update Experiment Documentation
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Infer the experiment from the user's request. If it is absent, ask which experiment to update. Accept `all` to update every experiment that has results.
 
@@ -46,7 +53,7 @@ Match the existing table format exactly — different EXPERIMENTS_*.md files may
 
 ### Step 3.5: Update rolling window analysis summary (漸變性評估)
 
-If `trading analyze` was already run in the same session through the [run-experiment workflow](run-experiment.md), use those results. Otherwise, run:
+If `trading analyze` was already run in the same session through `$trading-run-experiment`, use those results. Otherwise, run:
 
 ```bash
 uv run trading analyze <experiment_name>

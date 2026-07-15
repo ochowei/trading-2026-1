@@ -1,0 +1,4 @@
+interface:
+  display_name: "Trading: Evaluate Best"
+  short_description: "Rank one asset’s experiments for trading followup"
+  default_prompt: "Use $trading-evaluate-best to rank one asset’s experiments and update followup when qualified."

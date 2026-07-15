@@ -1,4 +1,11 @@
+---
+name: trading-rebuild-followup
+description: Use when rebuilding the entire `STRATEGIES` list in `src/trading/followup.py` across all assets.
+---
+
 # Rebuild Followup
+
+Read `CLAUDE.md` completely before starting this workflow.
 
 Always process all assets; ignore any narrower ticker target in the request.
 
@@ -59,13 +66,13 @@ COPX, DIA, FCX, GLD, IBIT, IWM, NVDA, SIVR, SOXL, SPY, TLT, TQQQ, TSLA, TSM, URA
 
 ## Step 4: Evaluate each asset
 
-For each ticker in alphabetical order, read and execute the [evaluate-best workflow](evaluate-best.md) with that ticker as its target.
+For each ticker in alphabetical order, invoke `$trading-evaluate-best` with that ticker as its target.
 
 **Important**: Process tickers **one at a time, sequentially**. Do NOT process them in parallel — each invocation may modify `src/trading/followup.py` and they must not conflict.
 
 After each invocation completes, record the outcome:
-- **Qualified**: evaluate-best added the experiment to STRATEGIES → record experiment name, Part B WR, Part B cumulative return
-- **Not qualified**: evaluate-best did not add the experiment → record reason (which thresholds failed)
+- **Qualified**: trading-evaluate-best added the experiment to STRATEGIES → record experiment name, Part B WR, Part B cumulative return
+- **Not qualified**: trading-evaluate-best did not add the experiment → record reason (which thresholds failed)
 - **No experiments**: the asset had no experiments (handle gracefully)
 
 Display progress after each asset:
