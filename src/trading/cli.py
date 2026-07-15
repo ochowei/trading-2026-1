@@ -1,7 +1,7 @@
 """
 統一 CLI 入口 (Unified CLI Entry Point)
-支援 list / run / compare 子命令。
-Supports list / run / compare subcommands.
+支援實驗、跟單與分析子命令。
+Supports experiment, followup, and analysis subcommands.
 """
 
 import argparse
@@ -80,8 +80,29 @@ def cmd_sync_docs(args: argparse.Namespace) -> None:
     compare_docs_and_results()
 
 
-def main() -> None:
-    """CLI 主程式 (CLI main)"""
+def cmd_followup_backtest(args: argparse.Namespace) -> None:
+    """Backtest the current followup strategy portfolio."""
+    from trading.followup_backtest import render_followup_backtest, run_followup_backtest
+
+    result = run_followup_backtest(days=args.days)
+    render_followup_backtest(result)
+    if not result.strategies or result.all_failed:
+        raise SystemExit(1)
+
+
+def positive_int(value: str) -> int:
+    """Parse a strictly positive integer for argparse."""
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a positive integer") from exc
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return parsed
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI parser independently from command dispatch."""
     parser = argparse.ArgumentParser(
         description="量化交易實驗框架 (Quantitative Trading Experiment Framework)",
         prog="trading",
@@ -98,6 +119,18 @@ def main() -> None:
 
     # followup
     sub.add_parser("followup", help="產生跟單訊號報告 (Generate Firstrade trading signals)")
+
+    # followup-backtest
+    followup_backtest_p = sub.add_parser(
+        "followup-backtest",
+        help="回測目前跟單策略組合 (Backtest current followup portfolio)",
+    )
+    followup_backtest_p.add_argument(
+        "--days",
+        type=positive_int,
+        default=126,
+        help="完整交易日數 (Completed trading sessions, default: 126)",
+    )
 
     # compare
     cmp_p = sub.add_parser("compare", help="比較實驗結果 (Compare experiment results)")
@@ -129,7 +162,14 @@ def main() -> None:
     # freshness
     sub.add_parser("freshness", help="檢查知識新鮮度 (Check knowledge freshness)")
 
-    args = parser.parse_args()
+    return parser
+
+
+def main(argv: list[str] | None = None) -> None:
+    """CLI 主程式 (CLI main)"""
+    parser = build_parser()
+
+    args = parser.parse_args(argv)
 
     if args.command == "list":
         cmd_list(args)
@@ -139,6 +179,8 @@ def main() -> None:
         from trading.followup import run_followup
 
         run_followup()
+    elif args.command == "followup-backtest":
+        cmd_followup_backtest(args)
     elif args.command == "compare":
         cmd_compare(args)
     elif args.command == "analyze":

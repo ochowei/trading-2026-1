@@ -32,13 +32,17 @@ class TrailingStopBacktester:
         self.trail_activation_pct = trail_activation_pct
         self.trail_distance_pct = trail_distance_pct
 
-    def run(self, df: pd.DataFrame) -> dict:
+    def run(self, df: pd.DataFrame, *, preserve_open_positions: bool = False) -> dict:
         signal_indices = df.index[df["Signal"]].tolist()
 
         if not signal_indices:
-            return self._empty_result()
+            result = self._empty_result()
+            if preserve_open_positions:
+                result.update({"open_positions": [], "open_count": 0})
+            return result
 
         trades: list[dict] = []
+        open_positions: list[dict] = []
         unfilled_signals: list[dict] = []
         consecutive_losses = 0
         max_consecutive_losses = 0
@@ -146,6 +150,28 @@ class TrailingStopBacktester:
                     exit_price = raw_exit_price * (1 - self.slippage_pct)
                     trade_return = (exit_price - entry_price) / entry_price
                     exit_type = "time_expiry"
+                elif preserve_open_positions:
+                    mark_price = float(df.iloc[-1]["Close"])
+                    open_positions.append(
+                        {
+                            "status": "open",
+                            "date": signal_date.strftime("%Y-%m-%d"),
+                            "entry_date": entry_date.strftime("%Y-%m-%d"),
+                            "entry": round(float(entry_price), 6),
+                            "target_price": round(float(target_price), 6),
+                            "initial_stop": round(float(initial_stop_price), 6),
+                            "current_stop": round(float(current_stop), 6),
+                            "holding_days": max(0, len(df.loc[df.index > entry_date])),
+                            "valuation_date": df.index[-1].strftime("%Y-%m-%d"),
+                            "mark_price": round(mark_price, 6),
+                            "unrealized_return_pct": round((mark_price / entry_price - 1) * 100, 6),
+                            "trail_activated": trail_activated,
+                            "highest_price": round(float(highest_price), 6),
+                            "trail_activation_pct": self.trail_activation_pct,
+                            "trail_distance_pct": self.trail_distance_pct,
+                        }
+                    )
+                    continue
                 else:
                     if not hold_df.empty:
                         exit_date = hold_df.index[-1]
@@ -184,6 +210,9 @@ class TrailingStopBacktester:
             result["unfilled_count"] = len(unfilled_signals)
             result["filled_count"] = 0
             result["fill_rate"] = 0.0
+            if preserve_open_positions:
+                result["open_positions"] = open_positions
+                result["open_count"] = len(open_positions)
             return result
 
         returns = [t["return_pct"] for t in trades]
@@ -235,7 +264,7 @@ class TrailingStopBacktester:
             f"累計報酬 {cumulative_return:.1f}%"
         )
 
-        return {
+        result = {
             "ticker": ticker_str,
             "total_signals": total,
             "wins": wins,
@@ -273,6 +302,10 @@ class TrailingStopBacktester:
                 },
             },
         }
+        if preserve_open_positions:
+            result["open_positions"] = open_positions
+            result["open_count"] = len(open_positions)
+        return result
 
     def _empty_result(self) -> dict:
         ticker_str = ", ".join(self.config.tickers)
