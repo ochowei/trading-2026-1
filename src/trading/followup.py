@@ -188,7 +188,7 @@ LOOKBACK_TRADING_DAYS = 60
 _NY_TZ = ZoneInfo("America/New_York")
 
 
-def _drop_incomplete_bar(df: pd.DataFrame) -> pd.DataFrame:
+def _drop_incomplete_bar(df: pd.DataFrame, *, now_et: datetime | None = None) -> pd.DataFrame:
     """若最後一根 bar 為盤中未收盤的當日資料，則丟棄。
 
     判斷條件：最後 bar 日期 == 美東今天 且 美東時間尚未過 16:30（收盤後 30 分鐘緩衝）。
@@ -197,7 +197,7 @@ def _drop_incomplete_bar(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
 
-    now_et = datetime.now(_NY_TZ)
+    now_et = now_et or datetime.now(_NY_TZ)
     today_et = now_et.date()
     last_bar_date = df.index[-1].date()
 

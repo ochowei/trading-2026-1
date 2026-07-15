@@ -8,6 +8,26 @@ Quantitative trading experiment framework — manage unlimited trading strategy 
 
 開發指令與專案架構請參考 [CLAUDE.md](CLAUDE.md)。
 
+## Followup Backtest
+
+```bash
+uv run trading followup-backtest             # 最近 126 個完整交易日
+uv run trading followup-backtest --days 180  # 最近 180 個完整交易日
+```
+
+此指令會在執行時直接讀取 `src/trading/followup.py` 的最新 `STRATEGIES`，不維護第二份策略清單。
+回測以 USD 100,000 作為標準化初始資金，平均分配至固定策略袖套；允許 fractional shares，
+袖套之間不借款、不重新平衡，下載失敗的策略配置保留為現金。
+
+訊號與成交完全沿用各實驗目前選用的 backtester，包括隔日開盤成交、滑價、停利、停損、
+到期出場、悲觀日內成交判定及追蹤停損。期末未平倉部位以最後一個完整交易日的 adjusted
+close 做 mark-to-market；未實現損益會影響 equity return、Sharpe 與最大回撤，但不計入已完成
+交易的勝率或平均單筆報酬。核心結果包含每日 equity curve 的結構化資料，可供後續繪圖。
+
+`--days` 僅接受正整數。單一 ticker 失敗時會列出錯誤並繼續其他策略；若全部策略失敗，
+CLI 以非零狀態結束。現有 `uv run trading followup` 仍固定使用最近 60 個交易日並產生
+Firstrade 下單報告。
+
 ## 如何設計新實驗 (How to Design a New Experiment)
 
 新增一個實驗只需 **3 個檔案**（config / signal_detector / strategy）。框架使用 `pkgutil` 自動發現實驗，無需手動註冊。以下是完整步驟：

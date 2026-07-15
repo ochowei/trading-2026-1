@@ -52,7 +52,7 @@ class ExecutionModelBacktester:
         self.config = config
         self.slippage_pct = slippage_pct
 
-    def run(self, df: pd.DataFrame) -> dict:
+    def run(self, df: pd.DataFrame, *, preserve_open_positions: bool = False) -> dict:
         """
         執行成交模型回測 (Run backtest with execution model)
 
@@ -65,9 +65,13 @@ class ExecutionModelBacktester:
         signal_indices = df.index[df["Signal"]].tolist()
 
         if not signal_indices:
-            return self._empty_result()
+            result = self._empty_result()
+            if preserve_open_positions:
+                result.update({"open_positions": [], "open_count": 0})
+            return result
 
         trades: list[dict] = []
+        open_positions: list[dict] = []
         unfilled_signals: list[dict] = []
         consecutive_losses = 0
         max_consecutive_losses = 0
@@ -168,6 +172,25 @@ class ExecutionModelBacktester:
                     exit_price = raw_exit_price * (1 - self.slippage_pct)
                     trade_return = (exit_price - entry_price) / entry_price
                     exit_type = "time_expiry"
+                elif preserve_open_positions:
+                    valuation_date = df.index[-1]
+                    mark_price = float(df.iloc[-1]["Close"])
+                    open_positions.append(
+                        {
+                            "status": "open",
+                            "date": signal_date.strftime("%Y-%m-%d"),
+                            "entry_date": entry_date.strftime("%Y-%m-%d"),
+                            "entry": round(float(entry_price), 6),
+                            "target_price": round(float(target_price), 6),
+                            "initial_stop": round(float(stop_price), 6),
+                            "current_stop": round(float(stop_price), 6),
+                            "holding_days": max(0, len(df.loc[df.index > entry_date])),
+                            "valuation_date": valuation_date.strftime("%Y-%m-%d"),
+                            "mark_price": round(mark_price, 6),
+                            "unrealized_return_pct": round((mark_price / entry_price - 1) * 100, 6),
+                        }
+                    )
+                    continue
                 else:
                     # 到期後無資料 → 以最後收盤價出場（備用）
                     if not hold_df.empty:
@@ -210,6 +233,9 @@ class ExecutionModelBacktester:
             result["unfilled_count"] = len(unfilled_signals)
             result["filled_count"] = 0
             result["fill_rate"] = 0.0
+            if preserve_open_positions:
+                result["open_positions"] = open_positions
+                result["open_count"] = len(open_positions)
             return result
 
         returns = [t["return_pct"] for t in trades]
@@ -265,7 +291,7 @@ class ExecutionModelBacktester:
             f"WR {wins / total:.1%}, cumulative {cumulative_return:.1f}%)"
         )
 
-        return {
+        result = {
             "ticker": ticker_str,
             "total_signals": total,
             "wins": wins,
@@ -300,6 +326,10 @@ class ExecutionModelBacktester:
                 "pessimistic_execution": True,
             },
         }
+        if preserve_open_positions:
+            result["open_positions"] = open_positions
+            result["open_count"] = len(open_positions)
+        return result
 
     def _empty_result(self) -> dict:
         ticker_str = ", ".join(self.config.tickers)
