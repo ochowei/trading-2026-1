@@ -6,6 +6,7 @@ import math
 import sys
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from datetime import date as date_type
 from datetime import datetime
 from typing import Any, TextIO
 
@@ -99,6 +100,7 @@ class FollowupBacktestResult:
     strategies: list[StrategyBacktestResult]
     portfolio: PortfolioBacktestResult | None
     warnings: list[str] = field(default_factory=list)
+    requested_start: pd.Timestamp | None = None
 
     @property
     def all_failed(self) -> bool:
@@ -360,9 +362,35 @@ def _make_strategy_result(
     )
 
 
+def _normalize_start(
+    start: date_type | datetime | pd.Timestamp | str | None,
+) -> pd.Timestamp | None:
+    """Normalize a supported start value to a timezone-naive calendar date."""
+    if start is None:
+        return None
+    if isinstance(start, str):
+        try:
+            parsed = date_type.fromisoformat(start)
+        except ValueError as exc:
+            raise ValueError("start must be a date in YYYY-MM-DD format") from exc
+        if parsed.isoformat() != start:
+            raise ValueError("start must be a date in YYYY-MM-DD format")
+        timestamp = pd.Timestamp(parsed)
+    elif isinstance(start, (date_type, datetime, pd.Timestamp)):
+        timestamp = pd.Timestamp(start)
+    else:
+        raise ValueError("start must be a date in YYYY-MM-DD format")
+    if pd.isna(timestamp):
+        raise ValueError("start must be a date in YYYY-MM-DD format")
+    if timestamp.tzinfo is not None:
+        timestamp = timestamp.tz_localize(None)
+    return timestamp.normalize()
+
+
 def run_followup_backtest(
     days: int = DEFAULT_DAYS,
     *,
+    start: date_type | datetime | pd.Timestamp | str | None = None,
     strategy_definitions: Sequence[dict[str, str | bool]] | None = None,
     get_experiment_fn: Callable[[str], Any] | None = None,
     fetcher_factory: Callable[..., DataFetcher] = DataFetcher,
@@ -371,6 +399,7 @@ def run_followup_backtest(
     """Evaluate current followup strategies and return structured sleeve/portfolio results."""
     if days <= 0:
         raise ValueError("days must be a positive integer")
+    requested_start = _normalize_start(start)
     if strategy_definitions is None:
         from trading import followup
 
@@ -384,6 +413,7 @@ def run_followup_backtest(
             strategies=[],
             portfolio=None,
             warnings=["No followup strategies configured"],
+            requested_start=requested_start,
         )
 
     loader = get_experiment_fn or get_experiment
@@ -431,16 +461,60 @@ def run_followup_backtest(
     sleeve_cash = INITIAL_CAPITAL / len(inputs)
     if reference is None:
         results = [_make_strategy_result(item, days, sleeve_cash) for item in inputs]
-        return FollowupBacktestResult(days, (), results, None)
+        return FollowupBacktestResult(
+            requested_days=days,
+            calendar=(),
+            strategies=results,
+            portfolio=None,
+            requested_start=requested_start,
+        )
 
     available_dates = reference.frame.index
-    calendar = tuple(pd.Timestamp(date) for date in available_dates[-days:])
     warnings: list[str] = []
-    if len(calendar) < days:
+    earliest_available = _normalize_start(pd.Timestamp(available_dates[0]))
+    latest_available = _normalize_start(pd.Timestamp(available_dates[-1]))
+    if requested_start is None:
+        selected_dates = available_dates[-days:]
+    else:
+        if requested_start < earliest_available:
+            warnings.append(
+                f"Requested start {requested_start:%Y-%m-%d} precedes earliest available "
+                f"completed session {earliest_available:%Y-%m-%d}; using "
+                f"{earliest_available:%Y-%m-%d}"
+            )
+        eligible_dates = [
+            value
+            for value in available_dates
+            if _normalize_start(pd.Timestamp(value)) >= requested_start
+        ]
+        selected_dates = eligible_dates[:days]
+    calendar = tuple(pd.Timestamp(value) for value in selected_dates)
+    if not calendar:
+        results = [_make_strategy_result(item, days, sleeve_cash) for item in inputs]
         warnings.append(
-            f"Requested {days} completed sessions; available {len(calendar)} "
-            f"from {calendar[0]:%Y-%m-%d} to {calendar[-1]:%Y-%m-%d}"
+            f"Requested start {requested_start:%Y-%m-%d} is after the last available "
+            f"completed session {latest_available:%Y-%m-%d}"
         )
+        return FollowupBacktestResult(
+            requested_days=days,
+            calendar=(),
+            strategies=results,
+            portfolio=None,
+            warnings=warnings,
+            requested_start=requested_start,
+        )
+    if len(calendar) < days:
+        if requested_start is None:
+            warnings.append(
+                f"Requested {days} completed sessions; available {len(calendar)} "
+                f"from {calendar[0]:%Y-%m-%d} to {calendar[-1]:%Y-%m-%d}"
+            )
+        else:
+            warnings.append(
+                f"Requested {days} completed sessions from "
+                f"{requested_start:%Y-%m-%d}; available {len(calendar)} "
+                f"from {calendar[0]:%Y-%m-%d} to {calendar[-1]:%Y-%m-%d}"
+            )
 
     results: list[StrategyBacktestResult] = []
     calendar_index = pd.DatetimeIndex(calendar)
@@ -502,7 +576,14 @@ def run_followup_backtest(
         results.append(result)
 
     portfolio = build_portfolio_result(calendar, results, sleeve_cash)
-    return FollowupBacktestResult(days, calendar, results, portfolio, warnings)
+    return FollowupBacktestResult(
+        requested_days=days,
+        calendar=calendar,
+        strategies=results,
+        portfolio=portfolio,
+        warnings=warnings,
+        requested_start=requested_start,
+    )
 
 
 def _format_percent(value: float | None, *, signed: bool = False) -> str:
@@ -526,6 +607,8 @@ def render_followup_backtest(
     output = output or sys.stdout
     print("\nFOLLOWUP BACKTEST REPORT", file=output)
     print(f"Requested completed sessions: {result.requested_days}", file=output)
+    if result.requested_start is not None:
+        print(f"Requested start: {result.requested_start:%Y-%m-%d}", file=output)
     if result.calendar:
         print(
             f"Actual period: {result.calendar[0]:%Y-%m-%d} ~ "

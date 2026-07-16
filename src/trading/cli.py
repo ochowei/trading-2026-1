@@ -7,6 +7,7 @@ Supports experiment, followup, and analysis subcommands.
 import argparse
 import logging
 import sys
+from datetime import date
 
 from trading.core.results import compare_experiments, save_result
 from trading.experiments import get_experiment, list_experiments
@@ -84,9 +85,9 @@ def cmd_followup_backtest(args: argparse.Namespace) -> None:
     """Backtest the current followup strategy portfolio."""
     from trading.followup_backtest import render_followup_backtest, run_followup_backtest
 
-    result = run_followup_backtest(days=args.days)
+    result = run_followup_backtest(days=args.days, start=args.start)
     render_followup_backtest(result)
-    if not result.strategies or result.all_failed:
+    if not result.strategies or result.all_failed or result.portfolio is None:
         raise SystemExit(1)
 
 
@@ -98,6 +99,17 @@ def positive_int(value: str) -> int:
         raise argparse.ArgumentTypeError("must be a positive integer") from exc
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be a positive integer")
+    return parsed
+
+
+def iso_date(value: str) -> date:
+    """Parse a strict ISO calendar date for argparse."""
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a date in YYYY-MM-DD format") from exc
+    if parsed.isoformat() != value:
+        raise argparse.ArgumentTypeError("must be a date in YYYY-MM-DD format")
     return parsed
 
 
@@ -130,6 +142,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=positive_int,
         default=126,
         help="完整交易日數 (Completed trading sessions, default: 126)",
+    )
+    followup_backtest_p.add_argument(
+        "--start",
+        type=iso_date,
+        help="開始日期 YYYY-MM-DD；非交易日順延 (Optional start date)",
     )
 
     # compare

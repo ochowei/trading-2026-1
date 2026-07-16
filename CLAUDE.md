@@ -81,6 +81,9 @@ uv run trading followup-backtest
 # 自訂完整交易日數
 uv run trading followup-backtest --days 180
 
+# 從指定日期當天或之後第一個完整交易日起，回測 126 個交易日
+uv run trading followup-backtest --start 2025-01-01 --days 126
+
 # 檢查知識新鮮度
 uv run trading freshness
 ```
