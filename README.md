@@ -13,6 +13,7 @@ Quantitative trading experiment framework — manage unlimited trading strategy 
 ```bash
 uv run trading followup-backtest             # 最近 126 個完整交易日
 uv run trading followup-backtest --days 180  # 最近 180 個完整交易日
+uv run trading followup-backtest --start 2025-01-01 --days 126  # 指定起日後 126 個交易日
 ```
 
 此指令會在執行時直接讀取 `src/trading/followup.py` 的最新 `STRATEGIES`，不維護第二份策略清單。
@@ -24,9 +25,11 @@ uv run trading followup-backtest --days 180  # 最近 180 個完整交易日
 close 做 mark-to-market；未實現損益會影響 equity return、Sharpe 與最大回撤，但不計入已完成
 交易的勝率或平均單筆報酬。核心結果包含每日 equity curve 的結構化資料，可供後續繪圖。
 
-`--days` 僅接受正整數。單一 ticker 失敗時會列出錯誤並繼續其他策略；若全部策略失敗，
-CLI 以非零狀態結束。現有 `uv run trading followup` 仍固定使用最近 60 個交易日並產生
-Firstrade 下單報告。
+`--days` 僅接受正整數。選用的 `--start` 必須是 `YYYY-MM-DD`；若落在週末、休市日或
+缺少資料的日期，會從之後第一個完整交易日開始。起日之後不足指定交易日數時，報告會
+使用實際可用區間並顯示警告。單一 ticker 失敗時會列出錯誤並繼續其他策略；若無法建立
+任何回測區間，CLI 以非零狀態結束。現有 `uv run trading followup` 仍固定使用最近 60 個
+交易日並產生 Firstrade 下單報告。
 
 ## 如何設計新實驗 (How to Design a New Experiment)
 
