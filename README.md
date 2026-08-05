@@ -8,6 +8,43 @@ Quantitative trading experiment framework — manage unlimited trading strategy 
 
 開發指令與專案架構請參考 [CLAUDE.md](CLAUDE.md)。
 
+## CSV Market Data
+
+現有 `DataFetcher(start=...).fetch_all([...])` 呼叫面保持不變，但主要 ticker 資料現在會先通過
+Yahoo Finance provider boundary，再發布至 `.cache/market-data/`。第一版只接受 Yahoo Finance
+`1d`、`auto_adjust=True` 的 adjusted OHLCV；不支援 SQLite、Parquet、raw prices 或 intraday。
+既有合法 `period` 值（`1d`、`5d`、月／年區間、`ytd`、`max`）會在 normalized cache frame
+上切片；未知 period 在任何網路存取前 fail closed。
+
+每個 series 使用 filesystem-safe ticker encoding，儲存一份 deterministic CSV 與一份 metadata
+sidecar。讀取時會驗證 checksum、schema、日期唯一且遞增、required values 為非 NaN／有限值、OHLC 關係、非負
+volume 與精確 XNYS session coverage（包含歷史特殊休市及 early close，拒絕缺少或額外非交易日）。完全相同的 duplicate 可去重；conflicting duplicate 或
+其他 invalid rows 不會被靜默刪除或發布。損壞的 active cache 會移至
+`.cache/market-data-quarantine/`，並嘗試 full rebuild；無法取得有效 replacement 時 fail closed。
+
+```bash
+uv run trading data status SPY                         # 唯讀；不下載、不 refresh
+uv run trading data refresh SPY --start 2020-01-01   # incremental + overlap
+uv run trading data refresh SPY --full                # full history refresh
+uv run trading data refresh SPY --end 2026-08-04      # 明確 inclusive cutoff
+```
+
+`status` 顯示 active cache 的 valid/stale/corrupt/missing/busy 狀態、data cutoff、incremental/full
+refresh timestamps 與 checksum。
+refresh 使用 per-series bounded file lock、temporary files、publish 前 validation 與 atomic replace；
+同一 ticker 的 concurrent refresh（包含 explicit incremental refresh）會在取得 lock 後重新確認
+cache generation，只下載並發布一次完整有效的 cache。`--full` 只建立 Phase 1 的完整刷新
+標記，供未來 snapshot 流程使用；它不可搭配 `--start`，且任何 refresh 都不可讓 active cutoff
+倒退。本階段尚未建立 immutable blob 或 snapshot store。
+
+新的共用模型可預先宣告 primary/auxiliary `MarketDataRequirement`、`AvailabilityPolicy` 與
+`SignalDecisionTime`，並建立 defensive-copy 的 read-only `MarketDataBundle`。Auxiliary daily series
+只能從 bundle 取得依 declared policy 與 Signal Decision Time 完成的 backward as-of alignment，
+不能直接讀取 raw same-session frame；不知道精確發布時間時至少延遲一個 primary session，超過宣告的
+maximum observation lag 會 fail closed。Bundle 由同一 `MarketDataService` 解析全部 declarations，
+缺少 history/session coverage 或重複 declaration 會在 detector 執行前失敗。完整技術契約見
+[docs/market-data.md](docs/market-data.md)。
+
 ## Followup Backtest
 
 ```bash

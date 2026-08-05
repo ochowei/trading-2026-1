@@ -86,6 +86,15 @@ uv run trading followup-backtest --start 2025-01-01 --days 126
 
 # 檢查知識新鮮度
 uv run trading freshness
+
+# 唯讀檢查單一 Yahoo adjusted daily series 的 CSV cache 狀態
+uv run trading data status SPY
+
+# 明確執行日常 incremental refresh（包含保守 overlap）
+uv run trading data refresh SPY --start 2020-01-01
+
+# 完整歷史 refresh；只標記 cache 已完整刷新，不建立 Phase 2 snapshot
+uv run trading data refresh SPY --full
 ```
 
 ## 架構速覽
@@ -110,6 +119,7 @@ pm/                              # 人類 PM 專用文件（AI Agent 禁止編�
 
 docs/
 ├── adr/                         # 架構決策紀錄（ADR）
+├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -126,11 +136,20 @@ src/trading/
 │   ├── execution_backtester.py  # 成交模型回測引擎（滑價/悲觀認定/隔日開盤）
 │   ├── base_strategy.py         # BaseStrategy（fetch → 指標 → 訊號 → 回測 → 報表）
 │   ├── execution_strategy.py    # ExecutionModelStrategy（成交模型報表）
-│   ├── data_fetcher.py          # yfinance 多線程資料抓取
+│   ├── data_fetcher.py          # 相容層：多 ticker 存取 validated CSV market data
 │   ├── performance_analyzer.py  # 滾動窗口績效與漸變性分析
 │   ├── freshness.py             # 知識新鮮度檢查（data_through 過期掃描）
 │   ├── results.py               # 結果儲存（JSON）與跨實驗比較
 │   └── sync_docs.py             # Markdown 結果與 latest.json 同步檢查
+├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
+│   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
+│   ├── models.py                # Series/requirement/policy/decision/metadata value types
+│   ├── provider.py              # 外部 provider protocol 與 Yahoo adapter
+│   ├── calendar.py              # XNYS sessions、特殊休市與 actual-close cutoff
+│   ├── validation.py            # OHLCV/schema/session fail-closed validation
+│   ├── cache.py                 # Lock、canonical CSV、sidecar、atomic publish、quarantine
+│   ├── service.py               # Fresh reuse、incremental/full refresh orchestration
+│   └── bundle.py                # Read-only bundle 與 backward as-of auxiliary alignment
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
     ├── EXPERIMENTS_<TICKER>.md  # 各資產實驗總覽與 AI_CONTEXT

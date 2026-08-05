@@ -9,8 +9,10 @@ import logging
 import sys
 from datetime import date
 
+from trading.core.data_fetcher import create_default_market_data_service
 from trading.core.results import compare_experiments, save_result
 from trading.experiments import get_experiment, list_experiments
+from trading.market_data import MarketDataSeries
 
 # 設定日誌格式 (Configure logging format)
 logging.basicConfig(
@@ -89,6 +91,36 @@ def cmd_followup_backtest(args: argparse.Namespace) -> None:
     render_followup_backtest(result)
     if not result.strategies or result.all_failed or result.portfolio is None:
         raise SystemExit(1)
+
+
+def cmd_data_status(args: argparse.Namespace) -> None:
+    """Inspect one active cache series without network access or writes."""
+    service = create_default_market_data_service()
+    series = MarketDataSeries.yahoo_adjusted_daily(args.symbol)
+    inspection = service.status(series)
+    print(f"{series.symbol}: {inspection.state}")
+    if inspection.metadata is not None:
+        metadata = inspection.metadata
+        print(f"  data cutoff: {metadata.data_cutoff.isoformat()}")
+        print(f"  last incremental refresh: {metadata.last_incremental_refresh or '-'}")
+        print(f"  last complete refresh: {metadata.last_complete_refresh or '-'}")
+        print(f"  checksum: {metadata.checksum}")
+    for error in inspection.errors:
+        print(f"  error: {error}")
+
+
+def cmd_data_refresh(args: argparse.Namespace) -> None:
+    """Explicitly refresh and publish one validated cache series."""
+    if args.full and args.start is not None:
+        raise SystemExit(
+            "--start cannot be used with --full; full refresh always downloads complete history"
+        )
+    service = create_default_market_data_service()
+    series = MarketDataSeries.yahoo_adjusted_daily(args.symbol)
+    mode = "full" if args.full else "incremental"
+    frame = service.refresh(series, mode=mode, start=args.start, end=args.end)
+    cutoff = frame.index[-1].strftime("%Y-%m-%d")
+    print(f"{series.symbol}: {mode} refresh published {len(frame)} rows through {cutoff}")
 
 
 def positive_int(value: str) -> int:
@@ -179,6 +211,21 @@ def build_parser() -> argparse.ArgumentParser:
     # freshness
     sub.add_parser("freshness", help="檢查知識新鮮度 (Check knowledge freshness)")
 
+    # data
+    data_p = sub.add_parser("data", help="Inspect or refresh the CSV market-data cache")
+    data_sub = data_p.add_subparsers(dest="data_command", required=True)
+    data_status_p = data_sub.add_parser("status", help="Read-only cache status")
+    data_status_p.add_argument("symbol", help="Yahoo Finance ticker symbol")
+    data_refresh_p = data_sub.add_parser("refresh", help="Explicit cache refresh")
+    data_refresh_p.add_argument("symbol", help="Yahoo Finance ticker symbol")
+    data_refresh_p.add_argument(
+        "--full",
+        action="store_true",
+        help="Download full history and mark the series snapshot-eligible",
+    )
+    data_refresh_p.add_argument("--start", type=iso_date, help="Optional history start YYYY-MM-DD")
+    data_refresh_p.add_argument("--end", type=iso_date, help="Optional inclusive cutoff YYYY-MM-DD")
+
     return parser
 
 
@@ -208,6 +255,10 @@ def main(argv: list[str] | None = None) -> None:
         from trading.core.freshness import check_freshness
 
         check_freshness()
+    elif args.command == "data" and args.data_command == "status":
+        cmd_data_status(args)
+    elif args.command == "data" and args.data_command == "refresh":
+        cmd_data_refresh(args)
     else:
         # 無子命令時顯示幫助 (Show help when no subcommand)
         parser.print_help()
