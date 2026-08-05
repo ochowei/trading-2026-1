@@ -99,3 +99,9 @@ uv run trading qualification status --path state/qualification-registry.json
 
 Phase 6 does not submit orders, update followup strategy state, authorize activation, or perform the
 Phase 7 controlled cutover.
+
+Phase 7 consumes this evidence only through a separate verified activation boundary. A generic
+followup lifecycle transition cannot create Active status; promotion must identify the exact Shadow
+registration and activation-evaluation event, current valid-result fingerprint, and passing
+data-access parity evidence. See
+[controlled-followup-cutover.md](controlled-followup-cutover.md).

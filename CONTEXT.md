@@ -245,8 +245,20 @@ The frozen distribution of expected strategy behavior derived from historical fo
 _Avoid_: Fixed loss count, live-tuned threshold, confidence interval chosen after a breach
 
 **Retiring Strategy**:
-A formerly active strategy that may manage its existing actual position to closure but cannot propose a new position.
+A formerly active strategy that remains the owner of its ledger-linked actual position and may manage that position to verified flat closure but cannot propose a new position.
 _Avoid_: Active strategy, rejected experiment
+
+**No-New-Entry Mode**:
+A reversible followup operating state that blocks every new position while preserving verified ledger history and management of existing actual positions.
+_Avoid_: Shutdown, ledger reset, strategy rejection
+
+**Followup Lifecycle Registry**:
+The append-only authority that records each followup strategy's operational status and the global no-new-entry state used by order authorization.
+_Avoid_: Followup report, qualification registry, strategy list
+
+**Followup Data Bundle Identity**:
+The deterministic SHA-256 identity of the validated primary frame, every declared and availability-aligned auxiliary frame, the data cutoff, and the alignment policy used for one followup evaluation.
+_Avoid_: Data cutoff, result snapshot ID, cache checksum
 
 **Skipped Signal**:
 A detected strategy signal that is recorded but not submitted for execution because its strategy sleeve cannot accept a new position under the active position policy.

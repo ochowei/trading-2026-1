@@ -183,6 +183,35 @@ next BUY until cancellation is recorded. Ledger exports include an adjacent hidd
 the CSV and checkpoint must be transferred together for import. See
 [docs/manual-execution-ledger.md](docs/manual-execution-ledger.md) for event and broker-export details.
 
+## Controlled followup cutover
+
+Phase 7 adds a private append-only followup lifecycle registry. Cutover initialization requires a
+verified ledger whose universe matches the selected followup fleet and a current broker
+reconciliation. Every selected definition starts `legacy_active`, and all new entries start paused.
+Confirmed-position exits continue from ledger state.
+
+```bash
+uv run trading followup-state init
+uv run trading followup-state status
+uv run trading followup-state pause --reason "operator rollback"
+uv run trading followup-state resume --reason "controlled activation window"
+uv run trading followup --lifecycle-path state/followup-lifecycle.json
+```
+
+A BUY requires one Active Strategy, a valid identified result, the latest completed XNYS data
+bundle and its deterministic identity, verified and reconciled ledger state, the current allocation
+epoch, and a stable proposal.
+Legacy Active, Retiring, Shadow, Paused, stale, or unreconciled strategies remain blocked even after
+the global pause is removed. Migration compares indicator, signal, and trade parity on an identical
+snapshot; selected auxiliary detectors use declared shared-provider data and fail closed instead of
+downloading or disabling filters. Active promotion verifies the exact parity digest, Shadow and
+activation events, and current valid result rather than accepting a generic status edit. A confirmed
+position remains attached to the user-verified cutover owner or proposal strategy until verified
+flat retirement with no outstanding entry. BUY append revalidates rollback state and sleeve
+occupancy under a coordination lock shared with lifecycle changes and ledger appends. Unlinked open
+positions require `followup-state init --position-owner TICKER=EXPERIMENT`. See
+[docs/controlled-followup-cutover.md](docs/controlled-followup-cutover.md).
+
 ## Followup Backtest
 
 ```bash

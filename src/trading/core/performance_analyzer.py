@@ -12,6 +12,7 @@ import pandas as pd
 
 from trading.core.base_strategy import BaseStrategy
 from trading.core.data_fetcher import DataFetcher
+from trading.core.followup_data import DeclaredAuxiliaryData, build_followup_data_bundle
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +41,24 @@ class PerformanceAnalyzer:
         print(f"{separator}\n")
 
         # Step 1: Fetch data
-        data = fetcher.fetch_all(config.tickers)
+        auxiliary_symbols = (
+            detector.auxiliary_symbols() if isinstance(detector, DeclaredAuxiliaryData) else ()
+        )
+        data = fetcher.fetch_all([*config.tickers, *auxiliary_symbols])
         primary_ticker = config.tickers[0]
         if primary_ticker not in data:
             logger.error(f"無法取得 {primary_ticker} 數據")
             return
 
-        df = data[primary_ticker]
+        bundle = build_followup_data_bundle(
+            primary_symbol=primary_ticker,
+            primary_frame=data[primary_ticker],
+            auxiliary_symbols=auxiliary_symbols,
+            frames={symbol: data[symbol] for symbol in auxiliary_symbols if symbol in data},
+        )
+        if isinstance(detector, DeclaredAuxiliaryData):
+            detector.bind_auxiliary_data(bundle)
+        df = bundle.primary
 
         # Step 2: Compute indicators on full dataset (once)
         df = detector.compute_indicators(df)

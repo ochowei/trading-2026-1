@@ -51,16 +51,18 @@ TRANSFER_EVENT_TYPES = frozenset({"deposit", "withdrawal"})
 EVENT_TYPES = frozenset(
     {
         "initialization",
+        "allocation_epoch",
         *PROPOSAL_EVENT_TYPES,
         *CASH_EVENT_TYPES,
         "manual_adjustment",
         "correction",
     }
 )
-RECORDABLE_EVENT_TYPES = EVENT_TYPES - {"initialization"}
+RECORDABLE_EVENT_TYPES = EVENT_TYPES - {"initialization", "allocation_epoch"}
 EVENT_CLASSIFICATIONS = {
     **{event_type: "proposal" for event_type in PROPOSAL_EVENT_TYPES},
     **{event_type: "managed" for event_type in CASH_EVENT_TYPES},
+    "allocation_epoch": "managed",
 }
 LEDGER_COLUMNS = (
     "schema_version",
@@ -184,6 +186,73 @@ class LedgerInitialization:
                 symbol: decimal_text(amount) for symbol, amount in self.initial_sleeve_capital
             },
             "managed_capital": decimal_text(self.managed_capital),
+            "universe": list(self.universe),
+        }
+
+
+@dataclass(frozen=True)
+class LedgerAllocationEpoch:
+    """One explicit flat-ledger universe and sleeve-capital assignment."""
+
+    allocation_epoch: str
+    sleeve_capital_items: tuple[tuple[str, Decimal], ...]
+    reserve_cash: Decimal
+    occurred_at: datetime
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        allocation_epoch: str,
+        sleeve_capital: Mapping[str, Decimal | int | str],
+        reserve_cash: Decimal | int | str = Decimal("0"),
+        occurred_at: datetime,
+    ) -> LedgerAllocationEpoch:
+        epoch = allocation_epoch.strip()
+        if not epoch:
+            raise ValueError("allocation_epoch must not be empty")
+        if occurred_at.tzinfo is None or occurred_at.utcoffset() is None:
+            raise ValueError("occurred_at must be timezone-aware")
+        normalized: dict[str, Decimal] = {}
+        for raw_symbol, raw_amount in sleeve_capital.items():
+            if not isinstance(raw_symbol, str) or not raw_symbol.strip():
+                raise ValueError("sleeve symbols must be non-empty strings")
+            symbol = raw_symbol.strip().upper()
+            if symbol in normalized:
+                raise ValueError(f"duplicate normalized sleeve symbol: {symbol}")
+            amount = to_decimal(raw_amount, f"sleeve capital {symbol}", allow_negative=False)
+            if amount <= 0:
+                raise ValueError("sleeve capital must be greater than zero")
+            normalized[symbol] = amount
+        if not normalized:
+            raise ValueError("allocation epoch requires at least one sleeve")
+        reserve = to_decimal(reserve_cash, "reserve_cash", allow_negative=False)
+        return cls(
+            allocation_epoch=epoch,
+            sleeve_capital_items=tuple(sorted(normalized.items())),
+            reserve_cash=reserve,
+            occurred_at=occurred_at.astimezone(UTC),
+        )
+
+    @property
+    def sleeve_capital(self) -> dict[str, Decimal]:
+        return dict(self.sleeve_capital_items)
+
+    @property
+    def universe(self) -> tuple[str, ...]:
+        return tuple(symbol for symbol, _ in self.sleeve_capital_items)
+
+    @property
+    def total_cash(self) -> Decimal:
+        return self.reserve_cash + sum(self.sleeve_capital.values(), Decimal("0"))
+
+    def metadata(self) -> dict[str, object]:
+        return {
+            "allocation_epoch": self.allocation_epoch,
+            "reserve_cash": decimal_text(self.reserve_cash),
+            "sleeve_capital": {
+                symbol: decimal_text(amount) for symbol, amount in self.sleeve_capital_items
+            },
             "universe": list(self.universe),
         }
 
@@ -365,6 +434,7 @@ class LedgerProposal:
 
     terms: ProposalTerms
     submission_event_id: str
+    authorization: dict[str, object] = field(default_factory=dict)
     filled_quantity: Decimal = Decimal("0")
     fill_event_ids: list[str] = field(default_factory=list)
     cancelled: bool = False
@@ -410,6 +480,7 @@ class LedgerReplay:
     """Deterministic read model produced only after chain and invariant checks."""
 
     initialization: LedgerInitialization
+    allocation_epochs: tuple[LedgerAllocationEpoch, ...]
     events: tuple[LedgerEvent, ...]
     sleeve_cash: dict[str, Decimal]
     reserve_cash: Decimal
@@ -424,11 +495,11 @@ class LedgerReplay:
 
     @property
     def universe(self) -> tuple[str, ...]:
-        return self.initialization.universe
+        return self.allocation_epochs[-1].universe
 
     @property
     def allocation_epoch(self) -> str:
-        return self.initialization.allocation_epoch
+        return self.allocation_epochs[-1].allocation_epoch
 
     @property
     def cash(self) -> Decimal:
@@ -645,6 +716,52 @@ def _initialization_from_event(event: LedgerEvent) -> LedgerInitialization:
     if initialization != expected:
         raise LedgerIntegrityError("initialization metadata violates allocation invariants")
     return initialization
+
+
+def _allocation_from_event(event: LedgerEvent) -> LedgerAllocationEpoch:
+    try:
+        payload = _metadata_object(event)
+        raw_sleeves = payload["sleeve_capital"]
+        if not isinstance(raw_sleeves, dict):
+            raise TypeError("sleeve_capital must be an object")
+        allocation = LedgerAllocationEpoch.create(
+            allocation_epoch=str(payload["allocation_epoch"]),
+            sleeve_capital=raw_sleeves,
+            reserve_cash=payload["reserve_cash"],
+            occurred_at=event.occurred_at,
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise LedgerIntegrityError("allocation epoch metadata is invalid") from exc
+    if payload.get("universe") != list(allocation.universe):
+        raise LedgerIntegrityError("allocation epoch universe is not canonical")
+    if event.event_id != f"allocation-epoch:{allocation.allocation_epoch}":
+        raise LedgerIntegrityError("allocation epoch event ID does not match its identity")
+    if event.allocation_epoch != allocation.allocation_epoch:
+        raise LedgerIntegrityError("allocation epoch field does not match metadata")
+    if event.amount != decimal_text(allocation.total_cash):
+        raise LedgerIntegrityError("allocation epoch amount does not match assigned cash")
+    if event.classification != "managed":
+        raise LedgerIntegrityError("allocation epoch must be classified as managed")
+    if any(
+        getattr(event, field_name)
+        for field_name in (
+            "sleeve_id",
+            "instrument",
+            "proposal_id",
+            "position_id",
+            "side",
+            "quantity",
+            "price",
+            "fee",
+            "order_type",
+            "signal_date",
+            "trading_date",
+            "correction_of",
+            "external_id",
+        )
+    ):
+        raise LedgerIntegrityError("allocation epoch event contains unexpected fields")
+    return allocation
 
 
 @dataclass
@@ -911,6 +1028,8 @@ def _effective_events(events: Sequence[LedgerEvent]) -> list[LedgerEvent]:
             raise LedgerIntegrityError("correction must be appended after its target")
         if target.event_type == "correction":
             raise LedgerIntegrityError("a correction cannot target another correction")
+        if target.event_type == "submission":
+            raise LedgerIntegrityError("submission terms and authorization cannot be corrected")
         if event.correction_of in seen_targets:
             raise LedgerIntegrityError("an event cannot have multiple corrections")
         payload = _metadata_object(event).get("replacement")
@@ -962,26 +1081,26 @@ def replay_events(events: Sequence[LedgerEvent]) -> LedgerReplay:
     _verify_chain(events)
     initialization = _initialization_from_event(events[0])
     for event in events[1:]:
-        if event.allocation_epoch != initialization.allocation_epoch:
-            raise LedgerIntegrityError(
-                f"event allocation epoch does not match initialization: {event.event_id}"
-            )
         if event.currency != initialization.currency:
             raise LedgerIntegrityError(
                 f"event currency does not match initialization: {event.event_id}"
             )
     effective_events = _effective_events(events)
     for event in effective_events[1:]:
-        if event.allocation_epoch != initialization.allocation_epoch:
-            raise LedgerIntegrityError(
-                f"corrected event allocation epoch does not match initialization: {event.event_id}"
-            )
         if event.currency != initialization.currency:
             raise LedgerIntegrityError(
                 f"corrected event currency does not match initialization: {event.event_id}"
             )
     sleeve_cash = initialization.sleeve_capital
     reserve_cash = [initialization.initial_reserve_cash]
+    allocation_epochs = [
+        LedgerAllocationEpoch.create(
+            allocation_epoch=initialization.allocation_epoch,
+            sleeve_capital=initialization.sleeve_capital,
+            reserve_cash=initialization.initial_reserve_cash,
+            occurred_at=initialization.initialized_at,
+        )
+    ]
     positions: dict[tuple[str, str], _MutablePosition] = {}
     proposals: dict[str, LedgerProposal] = {}
     for event in effective_events[1:]:
@@ -990,21 +1109,49 @@ def replay_events(events: Sequence[LedgerEvent]) -> LedgerReplay:
             raise LedgerIntegrityError(
                 f"{event.event_type} event has invalid classification: {event.event_id}"
             )
+        if event.event_type == "allocation_epoch":
+            if positions:
+                raise LedgerIntegrityError("allocation epoch requires a flat ledger")
+            if any(proposal.is_outstanding for proposal in proposals.values()):
+                raise LedgerIntegrityError("allocation epoch cannot strand outstanding proposals")
+            allocation = _allocation_from_event(event)
+            if any(
+                prior.allocation_epoch == allocation.allocation_epoch for prior in allocation_epochs
+            ):
+                raise LedgerIntegrityError("allocation epoch identity is duplicated")
+            current_cash = reserve_cash[0] + sum(sleeve_cash.values(), Decimal("0"))
+            if allocation.total_cash != current_cash:
+                raise LedgerIntegrityError("allocation epoch must preserve current ledger cash")
+            allocation_epochs.append(allocation)
+            sleeve_cash = allocation.sleeve_capital
+            reserve_cash[0] = allocation.reserve_cash
+            continue
+
+        current_allocation = allocation_epochs[-1]
+        if event.allocation_epoch != current_allocation.allocation_epoch:
+            raise LedgerIntegrityError(f"event allocation epoch is not current: {event.event_id}")
         if event.event_type == "submission":
-            if event.allocation_epoch != initialization.allocation_epoch:
+            if event.allocation_epoch != current_allocation.allocation_epoch:
                 raise LedgerIntegrityError(
-                    "submission allocation epoch does not match initialization"
+                    "submission allocation epoch does not match current allocation"
                 )
-            payload = _metadata_object(event).get("proposal_terms")
+            metadata = _metadata_object(event)
+            payload = metadata.get("proposal_terms")
             if not isinstance(payload, dict):
                 raise LedgerIntegrityError("submission must contain proposal_terms")
+            authorization = metadata.get("authorization", {})
+            if not isinstance(authorization, dict) or any(
+                not isinstance(key, str) or not isinstance(value, (str, bool))
+                for key, value in authorization.items()
+            ):
+                raise LedgerIntegrityError("submission authorization evidence is invalid")
             try:
                 terms = ProposalTerms.from_payload(payload)
             except ValueError as exc:
                 raise LedgerIntegrityError("submission proposal terms are invalid") from exc
-            if terms.allocation_epoch != initialization.allocation_epoch:
+            if terms.allocation_epoch != current_allocation.allocation_epoch:
                 raise LedgerIntegrityError(
-                    "proposal allocation epoch does not match initialization"
+                    "proposal allocation epoch does not match current allocation"
                 )
             if terms.proposal_id != event.proposal_id:
                 raise LedgerIntegrityError("submission proposal ID does not match its terms")
@@ -1024,7 +1171,21 @@ def replay_events(events: Sequence[LedgerEvent]) -> LedgerReplay:
                 raise LedgerIntegrityError("submission terms do not match their event fields")
             if event.proposal_id in proposals:
                 raise LedgerIntegrityError("duplicate proposal submission")
-            proposals[event.proposal_id] = LedgerProposal(terms, event.event_id)
+            if terms.action == "BUY" and any(
+                proposal.is_outstanding
+                and proposal.terms.action == "BUY"
+                and proposal.terms.sleeve_id == terms.sleeve_id
+                and proposal.terms.instrument == terms.instrument
+                for proposal in proposals.values()
+            ):
+                raise LedgerIntegrityError(
+                    "a sleeve cannot have overlapping outstanding entry proposals"
+                )
+            proposals[event.proposal_id] = LedgerProposal(
+                terms,
+                event.event_id,
+                authorization=dict(authorization),
+            )
         elif event.event_type in FILL_EVENT_TYPES:
             proposal = proposals.get(event.proposal_id)
             if proposal is None:
@@ -1133,6 +1294,7 @@ def replay_events(events: Sequence[LedgerEvent]) -> LedgerReplay:
             "deposit",
             "withdrawal",
             "manual_adjustment",
+            "allocation_epoch",
         }
         and not (
             event.event_type == "manual_adjustment" and event.classification == "unrelated_manual"
@@ -1143,6 +1305,7 @@ def replay_events(events: Sequence[LedgerEvent]) -> LedgerReplay:
     ).hexdigest()
     return LedgerReplay(
         initialization=initialization,
+        allocation_epochs=tuple(allocation_epochs),
         events=tuple(events),
         sleeve_cash=sleeve_cash,
         reserve_cash=reserve_cash[0],
@@ -1201,9 +1364,68 @@ class ManualLedgerStore:
         *,
         occurred_at: datetime | None = None,
         event_id: str | None = None,
+        authorization: Mapping[str, str | bool] | None = None,
+        expected_accounting_hash: str | None = None,
+        reconciliation_path: Path | None = None,
+        require_current_reconciliation: bool = False,
+        submission_validator: Callable[[], None] | None = None,
+        coordination_lock_path: Path | None = None,
     ) -> LedgerEvent:
         """Append one proposal submission, idempotently by deterministic proposal ID."""
         replay = self.verify()
+
+        def validate_authorization(current: LedgerReplay) -> None:
+            if (
+                expected_accounting_hash is not None
+                and current.accounting_hash != expected_accounting_hash
+            ):
+                raise LedgerConflictError(
+                    "ledger accounting identity changed before proposal submission"
+                )
+            if require_current_reconciliation and (
+                reconciliation_path is None
+                or not self.reconciliation_is_current(reconciliation_path)
+            ):
+                raise LedgerConflictError(
+                    "broker reconciliation is not current at proposal submission"
+                )
+            if submission_validator is not None:
+                submission_validator()
+            current_existing = current.proposals.get(proposal.proposal_id)
+            if current_existing is not None:
+                if not (
+                    current_existing.terms.same_terms(proposal)
+                    or current_existing.matches_active_remainder(proposal)
+                ):
+                    raise ProposalConflictError(
+                        f"proposal {proposal.proposal_id} already exists with different terms"
+                    )
+                if proposal.action == "BUY" and current_existing.authorization.get(
+                    "strategy_id"
+                ) != dict(authorization or {}).get("strategy_id"):
+                    raise ProposalConflictError(
+                        f"proposal {proposal.proposal_id} belongs to a different strategy"
+                    )
+                return
+            if proposal.sleeve_id not in current.universe:
+                raise LedgerConflictError(
+                    f"proposal references unknown sleeve: {proposal.sleeve_id}"
+                )
+            if proposal.allocation_epoch != current.allocation_epoch:
+                raise LedgerConflictError(
+                    "proposal allocation epoch does not match the ledger allocation epoch"
+                )
+            if proposal.action == "BUY":
+                if (proposal.sleeve_id, proposal.instrument) in current.positions:
+                    raise LedgerConflictError("strategy sleeve already has an actual position")
+                if current.outstanding_entries(
+                    sleeve_id=proposal.sleeve_id,
+                    instrument=proposal.instrument,
+                ):
+                    raise LedgerConflictError(
+                        "strategy sleeve already has an outstanding entry proposal"
+                    )
+
         existing = replay.proposals.get(proposal.proposal_id)
         if existing is not None:
             if not (
@@ -1212,6 +1434,10 @@ class ManualLedgerStore:
                 raise ProposalConflictError(
                     f"proposal {proposal.proposal_id} already exists with different terms"
                 )
+            self._validate_replay_under_lock(
+                validate_authorization,
+                coordination_lock_path=coordination_lock_path,
+            )
             return next(
                 event for event in replay.events if event.event_id == existing.submission_event_id
             )
@@ -1238,9 +1464,69 @@ class ManualLedgerStore:
             order_type=proposal.order_type,
             signal_date=proposal.signal_date.isoformat(),
             trading_date=proposal.trading_date.isoformat(),
-            metadata=_metadata_text({"proposal_terms": proposal.payload()}),
+            metadata=_metadata_text(
+                {
+                    "authorization": dict(authorization or {}),
+                    "proposal_terms": proposal.payload(),
+                }
+            ),
         )
-        return self._append_event(event)
+        return self._append_event(
+            event,
+            replay_validator=validate_authorization,
+            coordination_lock_path=coordination_lock_path,
+        )
+
+    def start_allocation_epoch(
+        self,
+        allocation_epoch: str,
+        *,
+        sleeve_capital: Mapping[str, Decimal | int | str],
+        reserve_cash: Decimal | int | str = Decimal("0"),
+        occurred_at: datetime | None = None,
+    ) -> LedgerReplay:
+        """Append an explicit flat-ledger universe and sleeve-capital reassignment."""
+        replay = self.verify()
+        allocation = LedgerAllocationEpoch.create(
+            allocation_epoch=allocation_epoch,
+            sleeve_capital=sleeve_capital,
+            reserve_cash=reserve_cash,
+            occurred_at=occurred_at or self.now(),
+        )
+        existing = next(
+            (
+                epoch
+                for epoch in replay.allocation_epochs
+                if epoch.allocation_epoch == allocation.allocation_epoch
+            ),
+            None,
+        )
+        if existing is not None:
+            if existing == allocation:
+                return replay
+            raise LedgerConflictError(
+                f"allocation epoch already exists with different terms: {allocation.allocation_epoch}"
+            )
+        if replay.positions:
+            raise LedgerConflictError("allocation epoch requires all actual positions to be flat")
+        if any(proposal.is_outstanding for proposal in replay.proposals.values()):
+            raise LedgerConflictError("allocation epoch cannot strand outstanding proposals")
+        if allocation.total_cash != replay.cash:
+            raise LedgerConflictError(
+                "allocation epoch assigned capital must equal current ledger cash"
+            )
+        event = LedgerEvent(
+            event_id=f"allocation-epoch:{allocation.allocation_epoch}",
+            event_type="allocation_epoch",
+            occurred_at=allocation.occurred_at,
+            allocation_epoch=allocation.allocation_epoch,
+            classification="managed",
+            amount=decimal_text(allocation.total_cash),
+            currency=replay.initialization.currency,
+            metadata=_metadata_text(allocation.metadata()),
+        )
+        self._append_event(event)
+        return self.verify()
 
     def record_fill(
         self,
@@ -1401,8 +1687,14 @@ class ManualLedgerStore:
         target = next((event for event in replay.events if event.event_id == target_event_id), None)
         if target is None:
             raise LedgerConflictError(f"correction target does not exist: {target_event_id}")
-        if target.event_type in {"initialization", "correction"}:
-            raise LedgerConflictError("initialization and correction events cannot be corrected")
+        if target.event_type in {"initialization", "allocation_epoch", "correction"}:
+            raise LedgerConflictError(
+                "initialization, allocation epoch, and correction events cannot be corrected"
+            )
+        if target.event_type == "submission":
+            raise LedgerConflictError(
+                "submission terms and authorization cannot be corrected; cancel and replace"
+            )
         existing_correction = next(
             (event for event in replay.events if event.correction_of == target_event_id), None
         )
@@ -1555,11 +1847,26 @@ class ManualLedgerStore:
             _write_checkpoint(self.checkpoint_path, canonical_ledger_bytes(events), events)
         return replay
 
-    def _append_event(self, event: LedgerEvent) -> LedgerEvent:
-        with self._locked():
+    def _append_event(
+        self,
+        event: LedgerEvent,
+        *,
+        replay_validator: Callable[[LedgerReplay], None] | None = None,
+        coordination_lock_path: Path | None = None,
+    ) -> LedgerEvent:
+        coordination = locked_file(
+            Path(coordination_lock_path)
+            if coordination_lock_path is not None
+            else self.path.parent / ".manual-trading-coordination.lock",
+            self.lock_timeout_seconds,
+        )
+        with coordination, self._locked():
             content = self.path.read_bytes()
             events = list(parse_ledger_bytes(content))
             _verify_checkpoint(self.checkpoint_path, content, events)
+            current_replay = replay_events(events)
+            if replay_validator is not None:
+                replay_validator(current_replay)
             existing = next((item for item in events if item.event_id == event.event_id), None)
             if existing is not None:
                 if _same_event_content(existing, event):
@@ -1589,6 +1896,24 @@ class ManualLedgerStore:
             _atomic_write(self.path, next_content, replace=True)
             _write_checkpoint(self.checkpoint_path, next_content, candidate_events)
             return appended
+
+    def _validate_replay_under_lock(
+        self,
+        validator: Callable[[LedgerReplay], None],
+        *,
+        coordination_lock_path: Path | None = None,
+    ) -> None:
+        coordination = locked_file(
+            Path(coordination_lock_path)
+            if coordination_lock_path is not None
+            else self.path.parent / ".manual-trading-coordination.lock",
+            self.lock_timeout_seconds,
+        )
+        with coordination, self._locked():
+            content = self.path.read_bytes()
+            events = list(parse_ledger_bytes(content))
+            _verify_checkpoint(self.checkpoint_path, content, events)
+            validator(replay_events(events))
 
     def read_events(self) -> tuple[LedgerEvent, ...]:
         """Read and verify the append-only history without changing it."""

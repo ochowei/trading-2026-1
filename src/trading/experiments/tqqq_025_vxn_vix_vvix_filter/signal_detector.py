@@ -16,9 +16,9 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_018_regime_vol_gate.signal_detector import (
     TQQQ018SignalDetector,
 )
@@ -27,60 +27,26 @@ from trading.experiments.tqqq_025_vxn_vix_vvix_filter.config import TQQQ025Confi
 logger = logging.getLogger(__name__)
 
 
-class TQQQ025SignalDetector(BaseSignalDetector):
+class TQQQ025SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TQQQ-025：TQQQ-018 框架 + ^VXN/^VIX 比率 + ^VVIX 方向 filter"""
 
     def __init__(self, config: TQQQ025Config):
         self.config = config
         self._base_detector = TQQQ018SignalDetector(config)
 
-    def _fetch_close_series(self, ticker: str, start_date: str) -> pd.Series | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df["Close"]
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vxn_ticker, self.config.vix_ticker, self.config.vvix_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = self._base_detector.compute_indicators(df)
 
         cfg = self.config
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
-        vxn_close = self._fetch_close_series(cfg.vxn_ticker, start_date)
-        vix_close = self._fetch_close_series(cfg.vix_ticker, start_date)
-        vvix_close = self._fetch_close_series(cfg.vvix_ticker, start_date)
-
-        if vxn_close is None or vix_close is None:
-            logger.error(
-                "無法取得 %s 或 %s 數據，VXN/VIX 過濾停用",
-                cfg.vxn_ticker,
-                cfg.vix_ticker,
-            )
-            df["VXN_VIX_Ratio"] = float("nan")
-        else:
-            vxn_aligned = vxn_close.reindex(df.index, method="ffill")
-            vix_aligned = vix_close.reindex(df.index, method="ffill")
-            df["VXN_VIX_Ratio"] = vxn_aligned / vix_aligned
-
-        if vvix_close is None:
-            logger.error("無法取得 %s 數據，VVIX 方向過濾停用", cfg.vvix_ticker)
-            df["VVIX_Close"] = float("nan")
-            df["VVIX_Direction_Change"] = 0.0
-        else:
-            vvix_aligned = vvix_close.reindex(df.index, method="ffill")
-            df["VVIX_Close"] = vvix_aligned
-            df["VVIX_Direction_Change"] = vvix_aligned.diff(cfg.vvix_direction_lookback)
+        vxn_close = self.require_auxiliary(cfg.vxn_ticker, df.index)["Close"]
+        vix_close = self.require_auxiliary(cfg.vix_ticker, df.index)["Close"]
+        vvix_close = self.require_auxiliary(cfg.vvix_ticker, df.index)["Close"]
+        df["VXN_VIX_Ratio"] = vxn_close / vix_close
+        df["VVIX_Close"] = vvix_close
+        df["VVIX_Direction_Change"] = vvix_close.diff(cfg.vvix_direction_lookback)
 
         return df
 

@@ -240,6 +240,9 @@ manual-reconciliation*.json
 qualification-registry*.json
 .*qualification-registry*.lock
 .*qualification-registry*.head.json
+followup-lifecycle*.json
+.*followup-lifecycle*.lock
+.*followup-lifecycle*.head.json
 secrets/
 credentials.json
 credentials.yaml
