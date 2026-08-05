@@ -14,6 +14,14 @@ from pathlib import Path
 
 from trading.core.data_fetcher import create_default_market_data_service
 from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.core.followup_cutover import (
+    FollowupActivationProof,
+    FollowupActivationVerifier,
+    FollowupLifecycleRegistry,
+    FollowupShadowProof,
+    FollowupShadowVerifier,
+    FollowupStrategy,
+)
 from trading.core.manual_ledger import (
     CASH_EVENT_TYPES,
     FILL_EVENT_TYPES,
@@ -54,6 +62,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
 DEFAULT_QUALIFICATION_REGISTRY_PATH = Path("state/qualification-registry.json")
+DEFAULT_FOLLOWUP_LIFECYCLE_PATH = Path("state/followup-lifecycle.json")
 
 
 def create_default_research_data_store() -> ResearchDataStore:
@@ -323,6 +332,199 @@ def cmd_followup_backtest(args: argparse.Namespace) -> None:
         raise SystemExit(1)
 
 
+def cmd_followup_state(args: argparse.Namespace) -> None:
+    """Manage the local controlled-cutover lifecycle without placing orders."""
+    from trading.followup import STRATEGIES
+
+    try:
+        registry = FollowupLifecycleRegistry(args.path)
+        if args.followup_state_command == "init":
+            store = ManualLedgerStore(args.ledger_path)
+            replay = store.verify()
+            strategies = tuple(
+                FollowupStrategy(
+                    str(item["ticker"]),
+                    str(item["experiment_name"]),
+                )
+                for item in STRATEGIES
+            )
+            expected_universe = {strategy.ticker for strategy in strategies}
+            if set(replay.universe) != expected_universe:
+                raise ValueError("ledger universe does not match the followup universe")
+            if not store.reconciliation_is_current(args.reconciliation_path):
+                raise ValueError("broker reconciliation is missing, failed, or stale")
+            explicit_owners: dict[str, FollowupStrategy] = {}
+            for assignment in args.position_owner or ():
+                ticker, separator, experiment = assignment.partition("=")
+                ticker = ticker.strip().upper()
+                experiment = experiment.strip()
+                if separator != "=" or not ticker or not experiment:
+                    raise ValueError("position owner must use TICKER=EXPERIMENT")
+                explicit_owners[ticker] = FollowupStrategy(ticker, experiment)
+            position_owners: dict[str, FollowupStrategy] = {}
+            for (ticker, _instrument), position in replay.positions.items():
+                proposal = replay.proposals.get(position.entry_proposal_id)
+                recorded_owner = (
+                    proposal.authorization.get("strategy_id") if proposal is not None else None
+                )
+                if isinstance(recorded_owner, str) and recorded_owner.strip():
+                    position_owners[ticker] = FollowupStrategy(ticker, recorded_owner)
+                elif ticker in explicit_owners:
+                    position_owners[ticker] = explicit_owners[ticker]
+                else:
+                    raise ValueError(
+                        f"open position {ticker} requires --position-owner {ticker}=EXPERIMENT"
+                    )
+            lifecycle_strategies = tuple(
+                sorted(
+                    {*strategies, *position_owners.values()},
+                    key=lambda item: (item.ticker, item.experiment_name),
+                )
+            )
+            state = registry.initialize_cutover(
+                lifecycle_strategies,
+                occurred_at=args.timestamp or datetime.now(UTC),
+                position_owners=position_owners,
+            )
+            print(
+                "controlled followup cutover initialized: "
+                f"{len(state.strategies)} Legacy Active strategies; new entries paused"
+            )
+            return
+        if args.followup_state_command == "status":
+            state = registry.read()
+            mode = "paused" if state.no_new_entry else "eligible Active strategies only"
+            print(f"new entries: {mode}")
+            for strategy, lifecycle in state.strategies:
+                print(f"{strategy.ticker}/{strategy.experiment_name}: {lifecycle.value}")
+            return
+        if args.followup_state_command in {"pause", "resume"}:
+            state = registry.set_no_new_entry(
+                args.followup_state_command == "pause",
+                occurred_at=args.timestamp or datetime.now(UTC),
+                reason=args.reason,
+            )
+            mode = "paused" if state.no_new_entry else "eligible Active strategies only"
+            print(f"new entries: {mode}")
+            return
+        if args.followup_state_command == "activate":
+            strategy = FollowupStrategy(args.ticker, args.experiment)
+
+            def current_result_fingerprint(item: FollowupStrategy) -> str:
+                record = inspect_result(
+                    item.experiment_name,
+                    current_definition_fingerprint=resolve_current_definition_fingerprint(
+                        item.experiment_name
+                    ),
+                )
+                if record is None or record.validity.status.value != "valid":
+                    raise ValueError("current persisted result is not valid")
+                fingerprint = record.result.payload.get("definition_fingerprint")
+                if not isinstance(fingerprint, str):
+                    raise ValueError("current valid result fingerprint is missing")
+                return fingerprint
+
+            verifier = FollowupActivationVerifier(
+                qualification_registry=QualificationRegistry(args.qualification_path),
+                lifecycle_registry=registry,
+                current_result_fingerprint_resolver=current_result_fingerprint,
+            )
+            writer = FollowupLifecycleRegistry(args.path, activation_verifier=verifier)
+            state = writer.activate_strategy(
+                strategy,
+                proof=FollowupActivationProof(
+                    shadow_id=args.shadow_id,
+                    qualification_event_id=args.qualification_event_id,
+                    result_fingerprint=args.result_fingerprint,
+                    parity_digest=args.parity_digest,
+                ),
+                occurred_at=args.timestamp or datetime.now(UTC),
+                reason=args.reason,
+            )
+            lifecycle = state.status_for(strategy.ticker, strategy.experiment_name)
+            print(f"{strategy.ticker}/{strategy.experiment_name}: {lifecycle.value}")
+            return
+        if args.followup_state_command == "shadow":
+            strategy = FollowupStrategy(args.ticker, args.experiment)
+
+            def current_result_fingerprint(item: FollowupStrategy) -> str:
+                record = inspect_result(
+                    item.experiment_name,
+                    current_definition_fingerprint=resolve_current_definition_fingerprint(
+                        item.experiment_name
+                    ),
+                )
+                if record is None or record.validity.status.value != "valid":
+                    raise ValueError("current persisted result is not valid")
+                fingerprint = record.result.payload.get("definition_fingerprint")
+                if not isinstance(fingerprint, str):
+                    raise ValueError("current valid result fingerprint is missing")
+                return fingerprint
+
+            verifier = FollowupShadowVerifier(
+                qualification_registry=QualificationRegistry(args.qualification_path),
+                lifecycle_registry=registry,
+                current_result_fingerprint_resolver=current_result_fingerprint,
+            )
+            writer = FollowupLifecycleRegistry(args.path, shadow_verifier=verifier)
+            state = writer.register_shadow_strategy(
+                strategy,
+                proof=FollowupShadowProof(
+                    shadow_id=args.shadow_id,
+                    registration_event_id=args.registration_event_id,
+                    historical_screen_event_id=args.historical_screen_event_id,
+                    result_fingerprint=args.result_fingerprint,
+                    parity_digest=args.parity_digest,
+                ),
+                occurred_at=args.timestamp or datetime.now(UTC),
+                reason=args.reason,
+            )
+            print(f"{strategy.ticker}/{strategy.experiment_name}: shadow")
+            return
+        if args.followup_state_command in {"retire", "complete-retirement"}:
+            strategy = FollowupStrategy(args.ticker, args.experiment)
+            store = ManualLedgerStore(args.ledger_path)
+            if not store.reconciliation_is_current(args.reconciliation_path):
+                raise ValueError("broker reconciliation is missing, failed, or stale")
+
+            def has_actual_position(item: FollowupStrategy) -> bool:
+                replay = store.verify()
+                return (item.ticker, item.ticker) in replay.positions
+
+            def has_outstanding_entry(item: FollowupStrategy) -> bool:
+                replay = store.verify()
+                return bool(
+                    replay.outstanding_entries(
+                        sleeve_id=item.ticker,
+                        instrument=item.ticker,
+                    )
+                )
+
+            writer = FollowupLifecycleRegistry(
+                args.path,
+                actual_position_resolver=has_actual_position,
+                outstanding_entry_resolver=has_outstanding_entry,
+                ledger_head_resolver=lambda: store.verify().head_hash,
+            )
+            operation = (
+                writer.retire_strategy
+                if args.followup_state_command == "retire"
+                else writer.complete_retirement
+            )
+            state = operation(
+                strategy,
+                occurred_at=args.timestamp or datetime.now(UTC),
+                reason=args.reason,
+            )
+            lifecycle = state.status_for(strategy.ticker, strategy.experiment_name)
+            print(f"{strategy.ticker}/{strategy.experiment_name}: {lifecycle.value}")
+            return
+        raise ValueError(f"unsupported followup-state command: {args.followup_state_command}")
+    except (LedgerError, OSError, TypeError, ValueError) as exc:
+        print(f"followup-state error: {exc}")
+        raise SystemExit(1) from exc
+
+
 def cmd_ledger(args: argparse.Namespace) -> None:
     """Manage the local dry-run manual execution ledger."""
     try:
@@ -352,6 +554,29 @@ def cmd_ledger(args: argparse.Namespace) -> None:
             print(f"  cash: {replay.cash}")
             print(f"  positions: {len(replay.positions)}")
             print(f"  proposals: {len(replay.proposals)}")
+            return
+        if args.ledger_command == "allocate":
+            if not args.allocation_epoch or not args.sleeve_capital:
+                raise ValueError("ledger allocate requires --allocation-epoch and --sleeve-capital")
+            sleeve_capital: dict[str, str] = {}
+            for assignment in args.sleeve_capital or ():
+                symbol, separator, amount = assignment.partition("=")
+                symbol = symbol.strip().upper()
+                if separator != "=" or not symbol or not amount.strip():
+                    raise ValueError("sleeve capital must use SYMBOL=DECIMAL")
+                if symbol in sleeve_capital:
+                    raise ValueError(f"duplicate sleeve capital assignment: {symbol}")
+                sleeve_capital[symbol] = amount.strip()
+            replay = store.start_allocation_epoch(
+                args.allocation_epoch,
+                sleeve_capital=sleeve_capital,
+                reserve_cash=args.reserve_cash,
+                occurred_at=args.timestamp or datetime.now(UTC),
+            )
+            print(
+                f"allocation epoch started: {replay.allocation_epoch} "
+                f"(universe={','.join(replay.universe)})"
+            )
             return
         if args.ledger_command == "record":
             event = _record_ledger_event(store, args)
@@ -709,6 +934,108 @@ def build_parser() -> argparse.ArgumentParser:
     )
     followup_p.add_argument("--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
     followup_p.add_argument("--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH)
+    followup_p.add_argument(
+        "--lifecycle-path",
+        type=Path,
+        default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH,
+    )
+
+    followup_state_p = sub.add_parser(
+        "followup-state",
+        help="Manage controlled followup cutover lifecycle",
+    )
+    followup_state_sub = followup_state_p.add_subparsers(
+        dest="followup_state_command",
+        required=True,
+    )
+    followup_state_init_p = followup_state_sub.add_parser(
+        "init",
+        help="Initialize Legacy Active state from a reconciled ledger",
+    )
+    followup_state_init_p.add_argument("--path", type=Path, default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH)
+    followup_state_init_p.add_argument(
+        "--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH
+    )
+    followup_state_init_p.add_argument(
+        "--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH
+    )
+    followup_state_init_p.add_argument("--timestamp", type=iso_datetime)
+    followup_state_init_p.add_argument(
+        "--position-owner",
+        action="append",
+        default=[],
+        help="User-verified owner for an unlinked open position: TICKER=EXPERIMENT",
+    )
+    followup_state_status_p = followup_state_sub.add_parser(
+        "status",
+        help="Read verified strategy lifecycle state",
+    )
+    followup_state_status_p.add_argument(
+        "--path", type=Path, default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH
+    )
+    for mode in ("pause", "resume"):
+        mode_parser = followup_state_sub.add_parser(
+            mode,
+            help=f"{mode.title()} global new-entry authorization",
+        )
+        mode_parser.add_argument("--path", type=Path, default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH)
+        mode_parser.add_argument("--reason", required=True)
+        mode_parser.add_argument("--timestamp", type=iso_datetime)
+    followup_state_activate_p = followup_state_sub.add_parser(
+        "activate",
+        help="Activate only after verified parity and prospective qualification",
+    )
+    followup_state_activate_p.add_argument(
+        "--path", type=Path, default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH
+    )
+    followup_state_activate_p.add_argument(
+        "--qualification-path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    followup_state_activate_p.add_argument("--ticker", required=True)
+    followup_state_activate_p.add_argument("--experiment", required=True)
+    followup_state_activate_p.add_argument("--shadow-id", required=True)
+    followup_state_activate_p.add_argument("--qualification-event-id", required=True)
+    followup_state_activate_p.add_argument("--result-fingerprint", required=True)
+    followup_state_activate_p.add_argument("--parity-digest", required=True)
+    followup_state_activate_p.add_argument("--reason", required=True)
+    followup_state_activate_p.add_argument("--timestamp", type=iso_datetime)
+    followup_state_shadow_p = followup_state_sub.add_parser(
+        "shadow",
+        help="Register Shadow only from verified parity and Historical Screen evidence",
+    )
+    followup_state_shadow_p.add_argument(
+        "--path", type=Path, default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH
+    )
+    followup_state_shadow_p.add_argument(
+        "--qualification-path", type=Path, default=DEFAULT_QUALIFICATION_REGISTRY_PATH
+    )
+    followup_state_shadow_p.add_argument("--ticker", required=True)
+    followup_state_shadow_p.add_argument("--experiment", required=True)
+    followup_state_shadow_p.add_argument("--shadow-id", required=True)
+    followup_state_shadow_p.add_argument("--registration-event-id", required=True)
+    followup_state_shadow_p.add_argument("--historical-screen-event-id", required=True)
+    followup_state_shadow_p.add_argument("--result-fingerprint", required=True)
+    followup_state_shadow_p.add_argument("--parity-digest", required=True)
+    followup_state_shadow_p.add_argument("--reason", required=True)
+    followup_state_shadow_p.add_argument("--timestamp", type=iso_datetime)
+    for operation in ("retire", "complete-retirement"):
+        retirement_parser = followup_state_sub.add_parser(
+            operation,
+            help="Start retirement or complete it after verified flat ledger state",
+        )
+        retirement_parser.add_argument("--path", type=Path, default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH)
+        retirement_parser.add_argument(
+            "--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH
+        )
+        retirement_parser.add_argument(
+            "--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH
+        )
+        retirement_parser.add_argument("--ticker", required=True)
+        retirement_parser.add_argument("--experiment", required=True)
+        retirement_parser.add_argument("--reason", required=True)
+        retirement_parser.add_argument("--timestamp", type=iso_datetime)
 
     # followup-backtest
     followup_backtest_p = sub.add_parser(
@@ -802,6 +1129,15 @@ def build_parser() -> argparse.ArgumentParser:
     ledger_init_p.add_argument("--timestamp", type=iso_datetime)
     ledger_verify_p = ledger_sub.add_parser("verify", help="Verify chain and replay invariants")
     ledger_verify_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_allocate_p = ledger_sub.add_parser(
+        "allocate",
+        help="Start an explicit flat-ledger allocation epoch",
+    )
+    ledger_allocate_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_allocate_p.add_argument("--allocation-epoch")
+    ledger_allocate_p.add_argument("--sleeve-capital", nargs="+")
+    ledger_allocate_p.add_argument("--reserve-cash", default="0")
+    ledger_allocate_p.add_argument("--timestamp", type=iso_datetime)
     ledger_record_p = ledger_sub.add_parser("record", help="Append one ledger event")
     ledger_record_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
     ledger_record_p.add_argument("--event-type", choices=sorted(RECORDABLE_EVENT_TYPES))
@@ -930,13 +1266,17 @@ def main(argv: list[str] | None = None) -> None:
         if (
             args.ledger_path == DEFAULT_MANUAL_LEDGER_PATH
             and args.reconciliation_path == DEFAULT_RECONCILIATION_PATH
+            and args.lifecycle_path == DEFAULT_FOLLOWUP_LIFECYCLE_PATH
         ):
             run_followup()
         else:
             run_followup(
                 ledger_path=args.ledger_path,
                 reconciliation_path=args.reconciliation_path,
+                lifecycle_path=args.lifecycle_path,
             )
+    elif args.command == "followup-state":
+        cmd_followup_state(args)
     elif args.command == "followup-backtest":
         cmd_followup_backtest(args)
     elif args.command == "compare":

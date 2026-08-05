@@ -10,8 +10,11 @@ Runs best strategies per ticker with 60-day lookback and generates Firstrade ord
 - User places orders on Firstrade before T-day market open
 """
 
+import json
 import logging
+from collections.abc import Callable
 from contextlib import redirect_stdout
+from dataclasses import replace
 from datetime import datetime, timedelta
 from decimal import Decimal
 from io import StringIO
@@ -21,10 +24,33 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 from trading.core.data_fetcher import DataFetcher
+from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.core.followup_cutover import (
+    FollowupAuthorizationContext,
+    FollowupLifecycleRegistry,
+    FollowupLifecycleState,
+    FollowupStrategy,
+    StrategyLifecycle,
+    authorize_followup_order,
+    build_followup_status_report,
+)
+from trading.core.followup_data import (
+    AuxiliaryDataRequiredError,
+    DeclaredAuxiliaryData,
+    build_followup_data_bundle,
+)
 from trading.core.followup_proposals import build_manual_proposal_terms
-from trading.core.manual_ledger import LedgerError, LedgerReplay, ManualLedgerStore
+from trading.core.manual_ledger import (
+    LedgerConflictError,
+    LedgerError,
+    LedgerReplay,
+    ManualLedgerStore,
+)
 from trading.core.proposals import ProposalConflictError, ProposalTerms
+from trading.core.results import inspect_result
 from trading.experiments import get_experiment
+from trading.market_data import PrimaryUSSessionCalendar
+from trading.research_data.result_schema import ResultValidityStatus
 
 logger = logging.getLogger(__name__)
 
@@ -191,6 +217,7 @@ STRATEGIES: list[dict[str, str | bool]] = [
 LOOKBACK_TRADING_DAYS = 60
 DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
+DEFAULT_FOLLOWUP_LIFECYCLE_PATH = Path("state/followup-lifecycle.json")
 
 _NY_TZ = ZoneInfo("America/New_York")
 
@@ -224,6 +251,7 @@ def run_followup(
     *,
     ledger_path: Path = DEFAULT_MANUAL_LEDGER_PATH,
     reconciliation_path: Path = DEFAULT_RECONCILIATION_PATH,
+    lifecycle_path: Path = DEFAULT_FOLLOWUP_LIFECYCLE_PATH,
 ) -> None:
     """主入口：產生跟單訊號報告 (Main entry: generate followup signal report)"""
     today = pd.Timestamp.now().normalize()
@@ -231,6 +259,7 @@ def run_followup(
     ledger_store = ManualLedgerStore(ledger_path)
     ledger_replay: LedgerReplay | None = None
     ledger_gate_reason: str | None = None
+    broker_reconciled = False
     try:
         ledger_replay = ledger_store.verify()
     except LedgerError as exc:
@@ -245,6 +274,15 @@ def run_followup(
             )
         elif not ledger_store.reconciliation_is_current(reconciliation_path):
             ledger_gate_reason = "broker reconciliation is missing, failed, or stale"
+        else:
+            broker_reconciled = True
+
+    lifecycle_state: FollowupLifecycleState | None = None
+    lifecycle_error: str | None = None
+    try:
+        lifecycle_state = FollowupLifecycleRegistry(lifecycle_path).read()
+    except (OSError, TypeError, ValueError) as exc:
+        lifecycle_error = str(exc)
 
     print(f"\n{separator}")
     print(f"  TRADING FOLLOWUP REPORT — {today.strftime('%Y-%m-%d')}")
@@ -257,12 +295,81 @@ def run_followup(
         print(f"  [BUY BLOCKED] {ledger_gate_reason}")
     else:
         print("  Ledger verified and broker-reconciled; proposals remain dry-run manual orders.")
+    if lifecycle_state is None:
+        print(f"  [NO NEW ENTRY] lifecycle registry unavailable: {lifecycle_error}")
+    elif lifecycle_state.no_new_entry:
+        print("  [NO NEW ENTRY] controlled cutover entry pause is enabled.")
 
     # 先執行策略並收集各段輸出，讓下單清單可置頂顯示
     strategy_sections: list[str] = []
     all_orders: list[dict] = []
 
-    for strategy_info in STRATEGIES:
+    for selected_strategy_info in STRATEGIES:
+        strategy_info = _strategy_info_for_actual_position(
+            selected_strategy_info,
+            ledger_replay,
+            lifecycle_state,
+        )
+        if strategy_info is None:
+            ticker = str(selected_strategy_info["ticker"]).upper()
+            strategy_sections.append(
+                f"\n  [BLOCKED] {ticker} actual-position strategy ownership is unverified\n"
+            )
+            continue
+        identity = FollowupStrategy(
+            str(strategy_info["ticker"]),
+            str(strategy_info["experiment_name"]),
+        )
+        lifecycle = StrategyLifecycle.PAUSED
+        if lifecycle_state is not None:
+            try:
+                lifecycle = lifecycle_state.status_for(
+                    identity.ticker,
+                    identity.experiment_name,
+                )
+            except KeyError:
+                lifecycle = StrategyLifecycle.PAUSED
+        result_valid, result_identity, result_fingerprint = _result_authorization(
+            identity.experiment_name
+        )
+        activation_proof = (
+            lifecycle_state.activation_proof_for(identity.ticker, identity.experiment_name)
+            if lifecycle_state is not None
+            else None
+        )
+        active_proof_current = (
+            activation_proof is not None
+            and activation_proof.result_fingerprint == result_fingerprint
+        )
+
+        def revalidate_buy_authorization(
+            strategy_identity: FollowupStrategy = identity,
+            expected_result_identity: str = result_identity,
+        ) -> None:
+            current_state = FollowupLifecycleRegistry(lifecycle_path).read()
+            if current_state.no_new_entry:
+                raise LedgerConflictError("no-new-entry mode changed before submission")
+            if (
+                current_state.status_for(
+                    strategy_identity.ticker, strategy_identity.experiment_name
+                )
+                is not StrategyLifecycle.ACTIVE
+            ):
+                raise LedgerConflictError("strategy is no longer Active")
+            current_proof = current_state.activation_proof_for(
+                strategy_identity.ticker, strategy_identity.experiment_name
+            )
+            current_valid, current_identity, current_fingerprint = _result_authorization(
+                strategy_identity.experiment_name
+            )
+            if (
+                not current_valid
+                or current_identity != expected_result_identity
+                or current_proof is None
+                or current_proof.result_fingerprint != current_fingerprint
+            ):
+                raise LedgerConflictError("Active proof or valid result changed before submission")
+
         section_buffer = StringIO()
         with redirect_stdout(section_buffer):
             orders = _run_single_strategy(
@@ -271,6 +378,19 @@ def run_followup(
                 ledger_store=ledger_store,
                 ledger_replay=ledger_replay,
                 allow_new_entries=ledger_gate_reason is None and ledger_replay is not None,
+                lifecycle=lifecycle,
+                no_new_entry=(
+                    lifecycle_state.no_new_entry if lifecycle_state is not None else True
+                ),
+                result_valid=result_valid,
+                result_identity=result_identity,
+                active_proof_current=active_proof_current,
+                broker_reconciled=broker_reconciled,
+                reconciliation_path=reconciliation_path,
+                buy_submission_validator=revalidate_buy_authorization,
+                coordination_lock_path=FollowupLifecycleRegistry(
+                    lifecycle_path
+                ).coordination_lock_path,
             )
         strategy_sections.append(section_buffer.getvalue())
         all_orders.extend(orders)
@@ -287,6 +407,48 @@ def run_followup(
     print(f"{separator}\n")
 
 
+def _strategy_info_for_actual_position(
+    selected_strategy_info: dict,
+    ledger_replay: LedgerReplay | None,
+    lifecycle_state: FollowupLifecycleState | None,
+) -> dict | None:
+    """Keep a confirmed position attached to the definition that opened it."""
+    if ledger_replay is None:
+        return selected_strategy_info
+    ticker = str(selected_strategy_info["ticker"]).upper()
+    position = ledger_replay.positions.get((ticker, ticker))
+    if position is None or not position.entry_proposal_id:
+        if position is None:
+            return selected_strategy_info
+        owner = lifecycle_state.position_owner_for(ticker) if lifecycle_state is not None else None
+        if owner is None:
+            return None
+        return _owned_strategy_info(ticker, owner.experiment_name, selected_strategy_info)
+    proposal = ledger_replay.proposals.get(position.entry_proposal_id)
+    if proposal is None:
+        return None
+    owner = proposal.authorization.get("strategy_id")
+    if not isinstance(owner, str) or not owner.strip():
+        lifecycle_owner = (
+            lifecycle_state.position_owner_for(ticker) if lifecycle_state is not None else None
+        )
+        if lifecycle_owner is None:
+            return None
+        owner = lifecycle_owner.experiment_name
+    return _owned_strategy_info(ticker, owner, selected_strategy_info)
+
+
+def _owned_strategy_info(ticker: str, owner: str, selected_strategy_info: dict) -> dict:
+    if owner == selected_strategy_info.get("experiment_name"):
+        return selected_strategy_info
+    return {
+        "ticker": ticker,
+        "experiment_name": owner,
+        "label": f"RETIRING {owner}",
+        "has_trailing_stop": False,
+    }
+
+
 def _estimate_next_trading_day(last_data_date: pd.Timestamp) -> pd.Timestamp:
     """估算下一個交易日（跳過週末）"""
     next_day = last_data_date + timedelta(days=1)
@@ -296,6 +458,37 @@ def _estimate_next_trading_day(last_data_date: pd.Timestamp) -> pd.Timestamp:
     return next_day
 
 
+def _result_authorization(experiment_name: str) -> tuple[bool, str, str]:
+    """Return validity plus the exact persisted-result evidence identity."""
+    try:
+        record = inspect_result(
+            experiment_name,
+            current_definition_fingerprint=resolve_current_definition_fingerprint(experiment_name),
+        )
+    except Exception:  # noqa: BLE001 - followup authorization must fail closed
+        logger.exception("Failed to verify result for %s", experiment_name)
+        return False, "", ""
+    if record is None or record.validity.status is not ResultValidityStatus.VALID:
+        return False, "", ""
+    payload = record.result.payload
+    snapshot_id = payload.get("data_snapshot_id")
+    fingerprint = payload.get("definition_fingerprint")
+    if not isinstance(snapshot_id, str) or not isinstance(fingerprint, str):
+        return False, "", ""
+    return True, f"{record.path}:{snapshot_id}:{fingerprint}", fingerprint
+
+
+def _is_followup_data_fresh(latest_date: pd.Timestamp) -> bool:
+    """Require the exact latest completed XNYS session for new-entry authorization."""
+    try:
+        required = PrimaryUSSessionCalendar().latest_completed_session(
+            datetime.now(ZoneInfo("UTC"))
+        )
+        return latest_date.date() == required
+    except (TypeError, ValueError):
+        return False
+
+
 def _run_single_strategy(
     strategy_info: dict,
     today: pd.Timestamp,
@@ -303,12 +496,20 @@ def _run_single_strategy(
     ledger_store: ManualLedgerStore | None = None,
     ledger_replay: LedgerReplay | None = None,
     allow_new_entries: bool = False,
+    lifecycle: StrategyLifecycle = StrategyLifecycle.PAUSED,
+    no_new_entry: bool = True,
+    result_valid: bool = False,
+    result_identity: str = "",
+    active_proof_current: bool = False,
+    broker_reconciled: bool = False,
+    reconciliation_path: Path | None = None,
+    buy_submission_validator: Callable[[], None] | None = None,
+    coordination_lock_path: Path | None = None,
 ) -> list[dict]:
     """執行單一策略並輸出報告，回傳待執行委託清單"""
     experiment_name = strategy_info["experiment_name"]
     label = strategy_info["label"]
     ticker = strategy_info["ticker"]
-    has_trailing_stop = strategy_info["has_trailing_stop"]
 
     separator = "=" * 80
     thin_sep = "-" * 80
@@ -322,11 +523,18 @@ def _run_single_strategy(
     config = strategy.create_config()
     detector = strategy.create_detector()
     backtester = strategy.create_backtester(config)
+    has_trailing_stop = bool(strategy_info.get("has_trailing_stop")) or (
+        hasattr(config, "trail_activation_pct") and hasattr(config, "trail_distance_pct")
+    )
+    execution_strategy_info = {**strategy_info, "has_trailing_stop": has_trailing_stop}
 
     # 2. 抓取資料（往前抓 365 天確保指標暖身）
     data_start = (today - timedelta(days=365)).strftime("%Y-%m-%d")
     fetcher = DataFetcher(start=data_start)
-    data = fetcher.fetch_all([ticker])
+    auxiliary_symbols = (
+        detector.auxiliary_symbols() if isinstance(detector, DeclaredAuxiliaryData) else ()
+    )
+    data = fetcher.fetch_all([ticker, *auxiliary_symbols])
 
     if ticker not in data:
         print(f"\n  [ERROR] 無法取得 {ticker} 資料 (Failed to fetch {ticker} data)\n")
@@ -334,6 +542,59 @@ def _run_single_strategy(
 
     df = data[ticker]
     df = _drop_incomplete_bar(df)
+    try:
+        data_bundle = build_followup_data_bundle(
+            primary_symbol=str(ticker),
+            primary_frame=df,
+            auxiliary_symbols=auxiliary_symbols,
+            frames={symbol: data[symbol] for symbol in auxiliary_symbols if symbol in data},
+        )
+        if isinstance(detector, DeclaredAuxiliaryData):
+            detector.bind_auxiliary_data(data_bundle)
+    except AuxiliaryDataRequiredError as exc:
+        print(f"\n  [ERROR] declared market-data bundle unavailable: {exc}\n")
+        ticker_text = str(ticker).upper()
+        position = (
+            ledger_replay.positions.get((ticker_text, ticker_text))
+            if ledger_replay is not None
+            else None
+        )
+        if position is None or ledger_store is None or df.empty:
+            return []
+        df = df.copy()
+        df["Signal"] = False
+        latest_date = df.index[-1]
+        return _print_manual_strategy_orders(
+            execution_strategy_info,
+            config,
+            ledger_store,
+            ledger_replay,
+            latest_date=latest_date,
+            latest_close=Decimal(str(df.iloc[-1]["Close"])),
+            t_day=_estimate_next_trading_day(latest_date),
+            today=today,
+            frame=df,
+            allow_new_entries=False,
+            authorization_context=FollowupAuthorizationContext(
+                lifecycle=lifecycle,
+                no_new_entry=True,
+                result_valid=result_valid,
+                result_identity=result_identity,
+                active_proof_current=False,
+                data_fresh=False,
+                data_cutoff=latest_date.date().isoformat(),
+                data_bundle_identity="",
+                ledger_verified=True,
+                ledger_accounting_hash=ledger_replay.accounting_hash,
+                broker_reconciled=broker_reconciled,
+                proposal_epoch_current=True,
+                has_actual_position=True,
+            ),
+            reconciliation_path=reconciliation_path,
+            coordination_lock_path=coordination_lock_path,
+        )
+    df = data_bundle.primary
+    data_bundle_identity = data_bundle.identity
     logger.info(f"Fetched {len(df)} rows for {ticker}")
 
     # 3. 計算指標 (Compute indicators on full data)
@@ -369,6 +630,29 @@ def _run_single_strategy(
     latest_date = df_full_signals.index[-1]
     latest_close = Decimal(str(df_full_signals.iloc[-1]["Close"]))
     signal_today = bool(df_full_signals.loc[latest_date, "Signal"])
+    ticker_text = str(ticker).upper()
+    actual_position = (
+        ledger_replay is not None and (ticker_text, ticker_text) in ledger_replay.positions
+    )
+    authorization_context = FollowupAuthorizationContext(
+        lifecycle=lifecycle,
+        no_new_entry=no_new_entry,
+        result_valid=result_valid,
+        result_identity=result_identity,
+        active_proof_current=active_proof_current,
+        data_fresh=_is_followup_data_fresh(latest_date),
+        data_cutoff=latest_date.date().isoformat(),
+        data_bundle_identity=data_bundle_identity,
+        ledger_verified=ledger_replay is not None,
+        ledger_accounting_hash=(ledger_replay.accounting_hash if ledger_replay is not None else ""),
+        broker_reconciled=broker_reconciled,
+        proposal_epoch_current=ledger_replay is not None,
+        has_actual_position=actual_position,
+    )
+    status = build_followup_status_report(
+        FollowupStrategy(ticker_text, str(experiment_name)),
+        authorization_context,
+    )
 
     # T 日 = 資料最後一天的下一個交易日
     t_day = _estimate_next_trading_day(latest_date)
@@ -378,6 +662,8 @@ def _run_single_strategy(
     print(f"  最新資料日期 (Latest data): {latest_date.strftime('%Y-%m-%d')}")
     print(f"  T 日 (Next trading day):    {t_day_str}")
     print(f"  {ticker} 收盤價 (Close):     ${latest_close:.2f}")
+    print(f"  Phase 7 state:              {status.state}")
+    print(f"  BUY authorization:          {status.buy_reason}")
     print(f"{thin_sep}")
 
     # 收集委託 (Collect orders)
@@ -386,7 +672,7 @@ def _run_single_strategy(
     if ledger_replay is not None and ledger_store is not None:
         orders.extend(
             _print_manual_strategy_orders(
-                strategy_info,
+                execution_strategy_info,
                 config,
                 ledger_store,
                 ledger_replay,
@@ -396,6 +682,10 @@ def _run_single_strategy(
                 today=today,
                 frame=df_full_signals,
                 allow_new_entries=allow_new_entries,
+                authorization_context=authorization_context,
+                reconciliation_path=reconciliation_path,
+                buy_submission_validator=buy_submission_validator,
+                coordination_lock_path=coordination_lock_path,
             )
         )
     elif signal_today:
@@ -425,6 +715,10 @@ def _print_manual_strategy_orders(
     today: pd.Timestamp,
     frame: pd.DataFrame,
     allow_new_entries: bool,
+    authorization_context: FollowupAuthorizationContext | None = None,
+    reconciliation_path: Path | None = None,
+    buy_submission_validator: Callable[[], None] | None = None,
+    coordination_lock_path: Path | None = None,
 ) -> list[dict]:
     """Render and persist idempotent proposals from actual ledger state only."""
     ticker = str(strategy_info["ticker"]).upper()
@@ -440,6 +734,29 @@ def _print_manual_strategy_orders(
         print(f"    已持倉:     {held_trading_days} 交易日")
     else:
         held_trading_days = 0
+
+    if authorization_context is None:
+        authorization_context = FollowupAuthorizationContext(
+            lifecycle=StrategyLifecycle.ACTIVE,
+            no_new_entry=not allow_new_entries,
+            result_valid=True,
+            result_identity="legacy-compatibility-result",
+            active_proof_current=True,
+            data_fresh=True,
+            data_cutoff=latest_date.date().isoformat(),
+            data_bundle_identity="legacy-compatibility-bundle",
+            ledger_verified=True,
+            ledger_accounting_hash=ledger_replay.accounting_hash,
+            broker_reconciled=allow_new_entries,
+            proposal_epoch_current=True,
+            has_actual_position=position is not None,
+        )
+    else:
+        authorization_context = replace(
+            authorization_context,
+            has_actual_position=position is not None,
+            proposal_epoch_current=True,
+        )
 
     estimated_entry = Decimal(str(latest_close)) * (Decimal("1") + Decimal("0.001"))
     trailing_high: Decimal | None = None
@@ -481,15 +798,37 @@ def _print_manual_strategy_orders(
 
     orders: list[dict] = []
     for term in terms:
-        if term.action == "BUY" and not allow_new_entries:
-            print(f"\n  [BUY BLOCKED] {term.proposal_id}: ledger/broker gate 未通過")
+        decision = authorize_followup_order(term.action, authorization_context)
+        if not decision.authorized:
+            print(f"\n  [{term.action} BLOCKED] {term.proposal_id}: {decision.reason}")
             continue
+        authorization = authorization_context.authorization_payload(
+            strategy_id=str(strategy_info.get("experiment_name", "")),
+            allocation_epoch=term.allocation_epoch,
+        )
         try:
-            ledger_store.record_submission(term, occurred_at=ledger_store.now())
-        except ProposalConflictError as exc:
+            submission = ledger_store.record_submission(
+                term,
+                occurred_at=ledger_store.now(),
+                authorization=authorization,
+                expected_accounting_hash=authorization_context.ledger_accounting_hash,
+                reconciliation_path=reconciliation_path,
+                require_current_reconciliation=(
+                    term.action == "BUY" and reconciliation_path is not None
+                ),
+                submission_validator=(buy_submission_validator if term.action == "BUY" else None),
+                coordination_lock_path=(coordination_lock_path if term.action == "BUY" else None),
+            )
+        except (LedgerError, ProposalConflictError) as exc:
             print(f"\n  [CONFLICT] {exc}")
             continue
-        order = _proposal_to_order(term, ticker)
+        order = _proposal_to_order(
+            term,
+            ticker,
+            strategy_info=strategy_info,
+            authorization_context=authorization_context,
+            persisted_authorization=json.loads(submission.metadata).get("authorization"),
+        )
         orders.append(order)
         print(
             f"\n  {term.action} proposal {term.proposal_id}: "
@@ -507,7 +846,14 @@ def _print_manual_strategy_orders(
     return orders
 
 
-def _proposal_to_order(term: ProposalTerms, ticker: str) -> dict:
+def _proposal_to_order(
+    term: ProposalTerms,
+    ticker: str,
+    *,
+    strategy_info: dict | None = None,
+    authorization_context: FollowupAuthorizationContext | None = None,
+    persisted_authorization: object = None,
+) -> dict:
     price_display = "市價" if term.price is None else f"${_decimal_display(term.price)}"
     note = {
         "entry": "新訊號買入 proposal",
@@ -515,7 +861,7 @@ def _proposal_to_order(term: ProposalTerms, ticker: str) -> dict:
         "stop": "confirmed position 停損",
         "expiry": "confirmed position 到期出場",
     }.get(term.role, term.role)
-    return {
+    order = {
         "date": term.trading_date.isoformat(),
         "timing": "開盤前",
         "ticker": ticker,
@@ -528,6 +874,17 @@ def _proposal_to_order(term: ProposalTerms, ticker: str) -> dict:
         "quantity": term.quantity,
         "proposal_id": term.proposal_id,
     }
+    if strategy_info is not None and authorization_context is not None:
+        evidence = (
+            persisted_authorization
+            if isinstance(persisted_authorization, dict)
+            else authorization_context.authorization_payload(
+                strategy_id=str(strategy_info.get("experiment_name", "")),
+                allocation_epoch=term.allocation_epoch,
+            )
+        )
+        order.update(evidence)
+    return order
 
 
 def _decimal_display(value: Decimal) -> str:

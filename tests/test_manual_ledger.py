@@ -484,6 +484,53 @@ def test_submission_is_idempotent_but_changed_terms_conflict(tmp_path) -> None:
         store.record_submission(changed)
 
 
+def test_outstanding_entry_blocks_a_different_concurrent_submission(tmp_path) -> None:
+    store = ManualLedgerStore(tmp_path / "ledger.csv")
+    store.initialize(
+        LedgerInitialization.create(
+            managed_capital="1000",
+            universe=("SPY",),
+            initialized_at=datetime(2026, 8, 5, 12, 0, tzinfo=UTC),
+        )
+    )
+    first = ProposalTerms.create(
+        sleeve_id="SPY",
+        instrument="SPY",
+        allocation_epoch="epoch-0001",
+        signal_date=date(2026, 8, 5),
+        trading_date=date(2026, 8, 6),
+        action="BUY",
+        position_id="new:2026-08-05",
+        role="entry",
+        quantity="5",
+        order_type="MARKET",
+        price="10",
+    )
+    second = ProposalTerms.create(
+        sleeve_id="SPY",
+        instrument="SPY",
+        allocation_epoch="epoch-0001",
+        signal_date=date(2026, 8, 6),
+        trading_date=date(2026, 8, 7),
+        action="BUY",
+        position_id="new:2026-08-06",
+        role="entry",
+        quantity="5",
+        order_type="MARKET",
+        price="10",
+    )
+    store.record_submission(first, authorization={"strategy_id": "spy-old"})
+
+    with pytest.raises(LedgerConflictError, match="outstanding entry"):
+        store.record_submission(second, authorization={"strategy_id": "spy-new"})
+
+    with pytest.raises(LedgerConflictError, match="cannot be corrected"):
+        store.record_correction(
+            f"submission:{first.proposal_id}",
+            {"metadata": '{"authorization":{"strategy_id":"spy-new"}}'},
+        )
+
+
 def test_duplicate_broker_event_is_idempotent_and_changed_duplicate_conflicts(tmp_path) -> None:
     store = ManualLedgerStore(tmp_path / "ledger.csv")
     store.initialize(
@@ -598,3 +645,158 @@ def test_import_rejects_an_export_with_truncated_tail_history(tmp_path) -> None:
         ManualLedgerStore(imported_path).import_ledger(backup_path)
 
     assert not imported_path.exists()
+
+
+def test_allocation_epoch_reassigns_flat_cash_and_preserves_history(make_manual_ledger) -> None:
+    store = make_manual_ledger(managed_capital="1000", universe=("SPY", "QQQ"))
+
+    replay = store.start_allocation_epoch(
+        "epoch-0002",
+        sleeve_capital={"SPY": Decimal("400"), "IWM": Decimal("500")},
+        reserve_cash=Decimal("100"),
+        occurred_at=datetime(2026, 8, 6, 12, 0, tzinfo=UTC),
+    )
+
+    assert replay.allocation_epoch == "epoch-0002"
+    assert replay.universe == ("IWM", "SPY")
+    assert replay.sleeve_cash == {"IWM": Decimal("500"), "SPY": Decimal("400")}
+    assert replay.reserve_cash == Decimal("100")
+    assert replay.cash == Decimal("1000")
+    assert tuple(epoch.allocation_epoch for epoch in replay.allocation_epochs) == (
+        "epoch-0001",
+        "epoch-0002",
+    )
+    assert replay.events[0].event_type == "initialization"
+    assert replay.events[-1].event_type == "allocation_epoch"
+
+
+def test_allocation_epoch_retry_is_idempotent_and_changed_terms_conflict(
+    make_manual_ledger,
+) -> None:
+    store = make_manual_ledger()
+    occurred_at = datetime(2026, 8, 6, 12, 0, tzinfo=UTC)
+    first = store.start_allocation_epoch(
+        "epoch-0002",
+        sleeve_capital={"SPY": Decimal("900")},
+        reserve_cash=Decimal("100"),
+        occurred_at=occurred_at,
+    )
+    retry = store.start_allocation_epoch(
+        "epoch-0002",
+        sleeve_capital={"SPY": Decimal("900")},
+        reserve_cash=Decimal("100"),
+        occurred_at=occurred_at,
+    )
+
+    assert retry.head_hash == first.head_hash
+    assert len(retry.events) == 2
+    with pytest.raises(LedgerConflictError, match="allocation epoch already exists"):
+        store.start_allocation_epoch(
+            "epoch-0002",
+            sleeve_capital={"SPY": Decimal("800")},
+            reserve_cash=Decimal("200"),
+            occurred_at=occurred_at,
+        )
+
+
+def test_allocation_epoch_requires_exact_flat_unencumbered_cash(make_manual_ledger) -> None:
+    store = make_manual_ledger()
+    proposal = ProposalTerms.create(
+        sleeve_id="SPY",
+        instrument="SPY",
+        allocation_epoch="epoch-0001",
+        signal_date=date(2026, 8, 5),
+        trading_date=date(2026, 8, 6),
+        action="BUY",
+        position_id="new:2026-08-05",
+        role="entry",
+        quantity=Decimal("1"),
+        order_type="MARKET",
+        price=Decimal("100"),
+    )
+    store.record_submission(proposal, occurred_at=datetime(2026, 8, 6, 12, 0, tzinfo=UTC))
+
+    with pytest.raises(LedgerConflictError, match="outstanding proposals"):
+        store.start_allocation_epoch(
+            "epoch-0002",
+            sleeve_capital={"SPY": Decimal("1000")},
+            occurred_at=datetime(2026, 8, 6, 13, 0, tzinfo=UTC),
+        )
+
+
+def test_allocation_epoch_rejects_capital_creation_or_float_inputs(make_manual_ledger) -> None:
+    store = make_manual_ledger()
+
+    with pytest.raises(LedgerConflictError, match="must equal current ledger cash"):
+        store.start_allocation_epoch(
+            "epoch-0002",
+            sleeve_capital={"SPY": Decimal("1001")},
+            occurred_at=datetime(2026, 8, 6, 12, 0, tzinfo=UTC),
+        )
+    with pytest.raises(TypeError, match="Decimal, integer, or decimal string"):
+        store.start_allocation_epoch(
+            "epoch-0002",
+            sleeve_capital={"SPY": 1000.0},
+            occurred_at=datetime(2026, 8, 6, 12, 0, tzinfo=UTC),
+        )
+
+
+def test_new_proposals_must_use_the_current_allocation_epoch(make_manual_ledger) -> None:
+    store = make_manual_ledger()
+    store.start_allocation_epoch(
+        "epoch-0002",
+        sleeve_capital={"SPY": Decimal("1000")},
+        occurred_at=datetime(2026, 8, 6, 12, 0, tzinfo=UTC),
+    )
+    stale = ProposalTerms.create(
+        sleeve_id="SPY",
+        instrument="SPY",
+        allocation_epoch="epoch-0001",
+        signal_date=date(2026, 8, 6),
+        trading_date=date(2026, 8, 7),
+        action="BUY",
+        position_id="new:2026-08-06",
+        role="entry",
+        quantity=Decimal("1"),
+        order_type="MARKET",
+        price=Decimal("100"),
+    )
+
+    with pytest.raises(LedgerConflictError, match="ledger allocation epoch"):
+        store.record_submission(stale)
+
+
+def test_authorized_submission_rechecks_ledger_and_reconciliation_under_append_lock(
+    make_manual_ledger,
+    tmp_path,
+) -> None:
+    store = make_manual_ledger()
+    proposal = ProposalTerms.create(
+        sleeve_id="SPY",
+        instrument="SPY",
+        allocation_epoch="epoch-0001",
+        signal_date=date(2026, 8, 6),
+        trading_date=date(2026, 8, 7),
+        action="BUY",
+        position_id="new:2026-08-06",
+        role="entry",
+        quantity=Decimal("1"),
+        order_type="MARKET",
+        price=Decimal("100"),
+    )
+
+    with pytest.raises(LedgerConflictError, match="accounting identity changed"):
+        store.record_submission(
+            proposal,
+            expected_accounting_hash="0" * 64,
+            reconciliation_path=tmp_path / "missing-reconciliation.json",
+            require_current_reconciliation=True,
+        )
+
+    with pytest.raises(LedgerConflictError, match="reconciliation is not current"):
+        store.record_submission(
+            proposal,
+            expected_accounting_hash=store.verify().accounting_hash,
+            reconciliation_path=tmp_path / "missing-reconciliation.json",
+            require_current_reconciliation=True,
+        )

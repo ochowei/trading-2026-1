@@ -15,36 +15,22 @@ GLD DXY Cross-Asset Divergence Filter on GVZ-Gated MR 訊號偵測器 (GLD-016)
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.gld_016_dxy_divergence_mr.config import GLD016Config
 
 logger = logging.getLogger(__name__)
 
 
-class GLD016SignalDetector(BaseSignalDetector):
+class GLD016SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """GLD-016：GLD-015 Att2 框架 + DXY cross-asset divergence regime gate"""
 
     def __init__(self, config: GLD016Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.gvz_ticker, self.config.dxy_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -65,23 +51,11 @@ class GLD016SignalDetector(BaseSignalDetector):
         df["Return_1d"] = df["Close"].pct_change(1)
         df["Return_2d"] = df["Close"].pct_change(2)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
+        gvz_close = self.require_auxiliary(self.config.gvz_ticker, df.index)["Close"]
+        df["GVZ_Change_10d"] = gvz_close.diff(self.config.gvz_direction_lookback)
 
-        gvz_df = self._fetch_external(self.config.gvz_ticker, start_date)
-        if gvz_df is None or gvz_df.empty:
-            logger.error("無法取得 %s 數據，^GVZ 過濾停用", self.config.gvz_ticker)
-            df["GVZ_Change_10d"] = 0.0
-        else:
-            gvz_close = gvz_df["Close"].reindex(df.index, method="ffill")
-            df["GVZ_Change_10d"] = gvz_close.diff(self.config.gvz_direction_lookback)
-
-        dxy_df = self._fetch_external(self.config.dxy_ticker, start_date)
-        if dxy_df is None or dxy_df.empty:
-            logger.error("無法取得 %s 數據，DXY 過濾停用", self.config.dxy_ticker)
-            df["DXY_PctChange_Nd"] = 0.0
-        else:
-            dxy_close = dxy_df["Close"].reindex(df.index, method="ffill")
-            df["DXY_PctChange_Nd"] = dxy_close.pct_change(self.config.dxy_lookback)
+        dxy_close = self.require_auxiliary(self.config.dxy_ticker, df.index)["Close"]
+        df["DXY_PctChange_Nd"] = dxy_close.pct_change(self.config.dxy_lookback)
 
         return df
 

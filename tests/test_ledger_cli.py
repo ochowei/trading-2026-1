@@ -1,7 +1,7 @@
 import pytest
 
 from trading.cli import build_parser, main
-from trading.core.manual_ledger import BROKER_COLUMNS, ManualLedgerStore
+from trading.core.manual_ledger import BROKER_COLUMNS, RECORDABLE_EVENT_TYPES, ManualLedgerStore
 
 
 def test_ledger_parser_exposes_all_phase_five_operations(tmp_path) -> None:
@@ -23,8 +23,9 @@ def test_ledger_parser_exposes_all_phase_five_operations(tmp_path) -> None:
     assert args.ledger_command == "init"
     assert args.universe == ["SPY", "QQQ"]
 
-    for command in ("verify", "record", "reconcile", "export", "import"):
+    for command in ("verify", "record", "reconcile", "export", "import", "allocate"):
         assert build_parser().parse_args(["ledger", command]).ledger_command == command
+    assert "allocation_epoch" not in RECORDABLE_EVENT_TYPES
 
 
 def test_ledger_cli_init_verify_and_export_import_are_local_and_deterministic(
@@ -107,3 +108,45 @@ def test_ledger_cli_record_and_reconcile_fail_closed_on_mismatch(tmp_path, capsy
     assert exc_info.value.code == 1
     assert report.exists()
     assert "failed" in capsys.readouterr().out
+
+
+def test_ledger_cli_starts_explicit_allocation_epoch(tmp_path, capsys) -> None:
+    path = tmp_path / "ledger.csv"
+    main(
+        [
+            "ledger",
+            "init",
+            "--path",
+            str(path),
+            "--managed-capital",
+            "1000",
+            "--universe",
+            "SPY",
+            "--timestamp",
+            "2026-08-05T12:00:00Z",
+        ]
+    )
+
+    main(
+        [
+            "ledger",
+            "allocate",
+            "--path",
+            str(path),
+            "--allocation-epoch",
+            "epoch-0002",
+            "--sleeve-capital",
+            "SPY=400",
+            "QQQ=500",
+            "--reserve-cash",
+            "100",
+            "--timestamp",
+            "2026-08-06T12:00:00Z",
+        ]
+    )
+
+    replay = ManualLedgerStore(path).verify()
+    assert replay.allocation_epoch == "epoch-0002"
+    assert replay.sleeve_cash == {"QQQ": 500, "SPY": 400}
+    assert replay.reserve_cash == 100
+    assert "allocation epoch started" in capsys.readouterr().out

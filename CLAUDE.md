@@ -84,12 +84,21 @@ uv run trading ledger init --managed-capital 100000 --universe \
   TLT TQQQ TSLA TSM URA USO VGK VOO XBI XLU
 uv run trading ledger verify
 uv run trading ledger record --event-type deposit --amount 1000
+uv run trading ledger allocate --allocation-epoch epoch-0002 \
+  --sleeve-capital SPY=50000 QQQ=40000 --reserve-cash 10000
 uv run trading ledger reconcile --broker-export broker-imports/account.csv
 uv run trading ledger export backup/manual-execution-ledger.csv
 uv run trading ledger import backup/manual-execution-ledger.csv --path state/manual-execution-ledger.csv
 
 # 唯讀檢查 Phase 6 Historical / Shadow lifecycle（不執行、不授權 live trading）
 uv run trading qualification status
+
+# Phase 7 controlled cutover（預設 no-new-entry；仍為 dry-run）
+uv run trading followup-state init
+uv run trading followup-state status
+uv run trading followup-state pause --reason "operator rollback"
+# Active promotion additionally requires exact Shadow, activation, result, and parity identities.
+uv run trading followup-state activate --help
 
 # 回測目前跟單策略組合（預設最近 126 個完整交易日）
 uv run trading followup-backtest
@@ -172,6 +181,7 @@ docs/
 ├── canonical-sleeve-execution.md # Phase 4 sleeve capital、cost scenarios、metrics 與 parity
 ├── manual-execution-ledger.md   # Phase 5 ledger domain、integrity、reconciliation 與 CLI 契約
 ├── historical-qualification-and-shadow.md # Phase 6 folds、benchmarks、Shadow lifecycle 與 registry
+├── controlled-followup-cutover.md # Phase 7 lifecycle、authorization、parity、rollback 與 epochs
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -203,6 +213,8 @@ src/trading/
 │   ├── manual_ledger.py         # Ledger domain、hash chain、replay 與 persistence boundary
 │   ├── proposals.py             # Decimal proposal terms 與 deterministic proposal IDs
 │   ├── followup_proposals.py    # 從 verified ledger 建立 dry-run entry/exit proposal terms
+│   ├── followup_cutover.py      # Phase 7 lifecycle registry、authorization、parity 與 reporting
+│   ├── followup_data.py         # Phase 7 declared auxiliary data、alignment 與 bundle identity
 │   └── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
@@ -236,6 +248,10 @@ broker-import, and credential files are local-only and must remain outside Git.
 Phase 6 historical qualification, benchmark, selection-adjustment, Shadow, and local registry
 contracts are documented in
 [docs/historical-qualification-and-shadow.md](docs/historical-qualification-and-shadow.md).
+
+Phase 7 controlled-cutover lifecycle, no-new-entry rollback, Active authorization, migration parity,
+and allocation-epoch contracts are documented in
+[docs/controlled-followup-cutover.md](docs/controlled-followup-cutover.md).
 
 ## 按需參考（不需要時不用讀）
 

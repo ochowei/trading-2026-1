@@ -13,6 +13,7 @@ from trading.core.base_backtester import BaseBacktester
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
 from trading.core.data_fetcher import DataFetcher
+from trading.core.followup_data import DeclaredAuxiliaryData, build_followup_data_bundle
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,11 @@ class BaseStrategy(ABC):
 
         # Step 1: 下載數據 (Fetch data)
         logger.info(f"Step 1/3: 下載數據 (Fetching data for {config.tickers})...")
-        data = fetcher.fetch_all(config.tickers)
+        auxiliary_symbols = (
+            detector.auxiliary_symbols() if isinstance(detector, DeclaredAuxiliaryData) else ()
+        )
+        requested_symbols = list(dict.fromkeys([*config.tickers, *auxiliary_symbols]))
+        data = fetcher.fetch_all(requested_symbols)
 
         # 處理每個標的（目前大多數策略只有一個）
         # Process each ticker (most strategies have just one)
@@ -71,6 +76,15 @@ class BaseStrategy(ABC):
             return {"part_a": empty, "part_b": empty, "part_c": empty}
 
         df = data[primary_ticker]
+        data_bundle = build_followup_data_bundle(
+            primary_symbol=primary_ticker,
+            primary_frame=df,
+            auxiliary_symbols=auxiliary_symbols,
+            frames={symbol: data[symbol] for symbol in auxiliary_symbols if symbol in data},
+        )
+        if isinstance(detector, DeclaredAuxiliaryData):
+            detector.bind_auxiliary_data(data_bundle)
+        df = data_bundle.primary
         print(
             f"  原始資料期間: {df.index[0].strftime('%Y-%m-%d')} ~ {df.index[-1].strftime('%Y-%m-%d')}"
         )

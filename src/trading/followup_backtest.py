@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 
 from trading.core.data_fetcher import DataFetcher
+from trading.core.followup_data import DeclaredAuxiliaryData, build_followup_data_bundle
 from trading.core.sleeve_engine import (
     DEFAULT_BASE_COST_POLICY,
     DEFAULT_STRESS_COST_POLICY,
@@ -498,25 +499,37 @@ def run_followup_backtest(
         inputs.append(item)
 
     loaded = [item for item in inputs if item.error is None]
-    data: dict[str, pd.DataFrame] = {}
-    if loaded:
-        tickers = list(dict.fromkeys(item.ticker for item in loaded))
-        for ticker in tickers:
-            ticker_start = min(
-                str(item.config.data_start) for item in loaded if item.ticker == ticker
-            )
-            fetched = fetcher_factory(start=ticker_start).fetch_all([ticker])
-            if ticker in fetched:
-                data[ticker] = fetched[ticker]
-
     for item in loaded:
-        if item.ticker not in data:
+        auxiliary_symbols = (
+            item.detector.auxiliary_symbols()
+            if isinstance(item.detector, DeclaredAuxiliaryData)
+            else ()
+        )
+        fetched = fetcher_factory(start=str(item.config.data_start)).fetch_all(
+            [item.ticker, *auxiliary_symbols]
+        )
+        if item.ticker not in fetched:
             item.error = f"Failed to fetch {item.ticker} data"
             continue
-        frame = data[item.ticker].loc[str(item.config.data_start) :].copy()
+        frame = fetched[item.ticker].loc[str(item.config.data_start) :].copy()
         item.frame = _drop_incomplete_bar(frame, now_et=now_et)
         if item.frame.empty:
             item.error = f"Failed to fetch {item.ticker} data"
+            continue
+        try:
+            bundle = build_followup_data_bundle(
+                primary_symbol=item.ticker,
+                primary_frame=item.frame,
+                auxiliary_symbols=auxiliary_symbols,
+                frames={
+                    symbol: fetched[symbol] for symbol in auxiliary_symbols if symbol in fetched
+                },
+            )
+            if isinstance(item.detector, DeclaredAuxiliaryData):
+                item.detector.bind_auxiliary_data(bundle)
+            item.frame = bundle.primary
+        except Exception as exc:
+            item.error = f"{item.experiment_name}: declared data bundle failed: {exc}"
 
     reference = next(
         (item for item in inputs if item.error is None and item.frame is not None), None
