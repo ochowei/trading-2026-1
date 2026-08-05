@@ -1,0 +1,3 @@
+# Qualify signals against cash, family, and matched random entry
+
+Experiment qualification compares a candidate with cash for absolute capital preservation, a preregistered family baseline for claimed strategy improvement, and an exposure-matched random-entry distribution that preserves instrument, trade count, entry seasonality, and holding duration while removing signal timing. Buy-and-hold remains descriptive rather than a primary gate for sparse event strategies. This distinguishes positive market exposure, incremental family improvement, and genuine timing information instead of treating any one comparison as all three.

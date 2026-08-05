@@ -1,0 +1,3 @@
+# Verify the manual ledger as a hash-chained event record
+
+The manual execution ledger is explicitly initialized with managed capital, universe, and allocation epoch, and each appended event links to the previous event digest. Followup verifies chain continuity and accounting invariants before proposing new entries, integrity failure triggers a reconciliation hard guard, corrections append rather than rewrite history, and explicit local export and import provide backup without storing credentials or committing the ledger to Git. This preserves a human-readable CSV while making unauthorized or accidental history edits detectable.

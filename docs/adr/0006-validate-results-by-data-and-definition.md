@@ -1,0 +1,3 @@
+# Validate research results by data coverage and definition
+
+A persisted research result is valid for a decision only when its snapshot covers the required market-data period and its research-definition fingerprint matches the strategy and execution definition being evaluated. Comparisons may display data-stale or definition-stale results with explicit labels, but experiment ranking, documentation synchronization, and followup qualification reject them until rerun. This prevents an existing `latest.json` from being treated as current after either the market data or the executable research definition has changed.

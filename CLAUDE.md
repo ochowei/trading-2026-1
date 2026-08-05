@@ -91,6 +91,8 @@ uv run trading freshness
 ## 架構速覽
 
 ```
+CONTEXT.md                       # 量化研究領域術語與統一語言
+
 .agents/
 ├── context/
 │   ├── cross_asset_lessons.md   # 跨資產共通教訓（波動率分類、禁忌、參數縮放）
@@ -105,6 +107,10 @@ uv run trading freshness
 pm/                              # 人類 PM 專用文件（AI Agent 禁止編輯）
 ├── HUMAN_PM_MEMO.md             # 關注標的、策略想法、執行模型備忘、更新紀錄
 └── USE_CASES.md                 # 人類使用情境與常用操作索引
+
+docs/
+├── adr/                         # 架構決策紀錄（ADR）
+└── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
 tests/                           # 共用引擎與 followup 行為測試

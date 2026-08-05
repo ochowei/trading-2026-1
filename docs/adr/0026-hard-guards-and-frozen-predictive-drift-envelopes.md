@@ -1,0 +1,3 @@
+# Combine hard guards with frozen predictive drift envelopes
+
+Data integrity, ledger reconciliation, execution safety, and preregistered stress-risk breaches pause new entries immediately, while other live drift is measured against a block-bootstrap predictive envelope frozen from historical folds and shadow evidence before activation. Observations in the lower twenty percent enter watch, lower-five-percent or persistent watch conditions pause, insufficient samples remain explicitly inconclusive, and active thresholds cannot be retuned. This distinguishes immediate safety failures from noisy performance variation without making every ordinary loss a stop condition.

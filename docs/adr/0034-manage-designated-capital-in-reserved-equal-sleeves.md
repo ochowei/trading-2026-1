@@ -1,0 +1,3 @@
+# Manage designated capital in reserved equal sleeves
+
+Followup controls only user-designated managed capital rather than the full brokerage account, and reserves an equal isolated sleeve for every instrument slot in the declared followup universe. Inactive or shadow sleeves remain cash, newly activated strategies use only their reserved sleeve capital, and deposits, withdrawals, fees, fills, and adjustments enter the execution ledger; reconciliation failure between broker reality and the ledger blocks new entries. This keeps unrelated assets out of scope and avoids reallocating other strategies when activation timing differs.

@@ -1,0 +1,3 @@
+# Apply explicit thresholds to historical stability screens
+
+A historical stability screen requires at least five annual folds and twenty completed capital-constrained trades, with at least three folds containing trades, at least sixty percent of traded folds producing positive equity return, positive aggregate return, aggregate profit factor above 1.1, no stress-drawdown breach, and no fold contributing more than half of total profit or trades. Zero-signal folds remain visible for frequency-drift assessment, and any failed threshold blocks shadow qualification without manual exception. This prevents one favorable regime or a thin aggregate from masquerading as temporal robustness.

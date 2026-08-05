@@ -1,0 +1,3 @@
+# Use equal sleeves as the canonical allocation benchmark
+
+The first unified research and followup model assigns equal initial capital to isolated strategy sleeves, invests only a sleeve's own available cash, permits fractional quantities, and neither borrows nor rebalances across sleeves. Volatility-weighted allocation remains a distinct future policy with separately reported results rather than replacing or contaminating the canonical strategy benchmark. This favors interpretable signal comparison before adding estimation error, covariance assumptions, and operational complexity to portfolio sizing.

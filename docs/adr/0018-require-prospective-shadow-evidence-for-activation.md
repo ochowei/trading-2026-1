@@ -1,0 +1,3 @@
+# Require prospective shadow evidence for activation
+
+Historical walk-forward validation can qualify an existing experiment only as a shadow strategy because the repository's repeatedly inspected historical periods cannot become unseen again. A shadow strategy freezes its research definition, records paper proposals and simulated executions only on later prospective observations, and restarts under a new identity after any outcome-relevant definition change; only prospective evidence can authorize active trading. This accepts a period without new live entries to prevent retrospective stability checks from being mistaken for uncontaminated validation.

@@ -1,0 +1,3 @@
+# Control live drift with healthy, watch, and paused states
+
+Active strategies are monitored against preregistered performance, signal, execution, and portfolio expectations and move among healthy, watch, and paused states. A non-critical drift indication enters watch under heightened monitoring, while critical or persistent drift pauses new entries without abandoning existing-position management; recovery requires a preregistered checkpoint rather than a manual override or parameter change. This separates risk containment from strategy retirement and prevents post-hoc selection of whichever alert best explains recent losses.

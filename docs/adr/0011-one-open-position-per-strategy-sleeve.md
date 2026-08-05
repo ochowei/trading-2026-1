@@ -1,0 +1,3 @@
+# Allow one open position per strategy sleeve
+
+Research evaluation, walk-forward analysis, portfolio backtesting, and followup order generation use one shared position policy: each strategy sleeve may hold at most one open position, and signals arriving while that position is open are recorded as skipped rather than pyramided or simulated independently. Raw signals remain available for diagnostics, while any future pyramiding behavior requires a distinct explicit position policy. This removes the performance mismatch between independently compounded research signals and the capital-constrained manual followup workflow.

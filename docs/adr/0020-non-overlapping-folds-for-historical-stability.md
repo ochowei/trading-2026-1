@@ -1,0 +1,3 @@
+# Use non-overlapping annual folds for historical stability
+
+Historical shadow qualification uses at least three years of initial development history followed by at least five valid, non-overlapping one-year evaluation folds. Indicators may warm up from earlier observations, trades belong to the fold containing their signal and are followed through exit, and fold boundaries apply a purge or embargo matching execution and holding dependencies; each fold reports its own capital-constrained equity and risk outcomes, and a preregistered fold-failure limit cannot be hidden by aggregate performance. Overlapping rolling windows remain diagnostic only because repeated trades do not create repeated validation evidence.
