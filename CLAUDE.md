@@ -66,8 +66,11 @@ uv sync
 # 列出所有實驗
 uv run trading list
 
-# 執行指定實驗
-uv run trading run <experiment_name>
+# 執行 snapshot-aware 實驗（formal online；只有成功才更新 latest.json）
+uv run trading run <experiment_name> --snapshot results/example/run.snapshot.json
+
+# 尚未完成 Phase 9 migration 的實驗必須明確選擇 legacy persisted run
+uv run trading run <experiment_name> --legacy
 
 # 比較實驗結果
 uv run trading compare <exp1> <exp2>
@@ -93,8 +96,25 @@ uv run trading data status SPY
 # 明確執行日常 incremental refresh（包含保守 overlap）
 uv run trading data refresh SPY --start 2020-01-01
 
-# 完整歷史 refresh；只標記 cache 已完整刷新，不建立 Phase 2 snapshot
+# 完整歷史 refresh；建立 snapshot 前必須執行
 uv run trading data refresh SPY --full
+
+# 完整刷新 primary/auxiliary 並寫入可追蹤的 data snapshot manifest
+uv run trading data snapshot SPY --aux '^VIX' --history-start 2020-01-01 \
+  --decision 2026-08-04 --manifest results/example/data.snapshot.json
+
+# 唯讀驗證 manifest、data blob 與 definition blob
+uv run trading data verify results/example/data.snapshot.json
+
+# 匯出／匯入 portable snapshot bundle
+uv run trading data export results/example/run.snapshot.json backup.snapshot.zip
+uv run trading data import backup.snapshot.zip --manifest results/example/imported.snapshot.json
+
+# Reference-aware GC 預設掃描完整 results/ 且為 dry-run
+uv run trading data gc --grace-days 7
+
+# Diagnostic run 不改變 results 或 registry state
+uv run trading run <experiment_name> --ephemeral
 ```
 
 ## 架構速覽
@@ -120,6 +140,7 @@ pm/                              # 人類 PM 專用文件（AI Agent 禁止編�
 docs/
 ├── adr/                         # 架構決策紀錄（ADR）
 ├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
+├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -150,6 +171,13 @@ src/trading/
 │   ├── cache.py                 # Lock、canonical CSV、sidecar、atomic publish、quarantine
 │   ├── service.py               # Fresh reuse、incremental/full refresh orchestration
 │   └── bundle.py                # Read-only bundle 與 backward as-of auxiliary alignment
+├── research_data/               # Phase 2 immutable reproducibility evidence
+│   ├── artifacts.py             # 共用 immutable publish/checksum/semantic verification
+│   ├── manifest_codec.py        # 嚴格型別、canonical manifest codec 與 snapshot identity
+│   ├── models.py                # Blob/manifest/definition/run/GC immutable values
+│   ├── store.py                 # Snapshot orchestration、portable bundles、verification、GC
+│   ├── definitions.py           # Semantic fingerprint 與 dirty-worktree definition blobs
+│   └── runs.py                  # Online/offline/ephemeral publication boundaries
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
     ├── EXPERIMENTS_<TICKER>.md  # 各資產實驗總覽與 AI_CONTEXT
