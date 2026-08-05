@@ -23,7 +23,18 @@ Infer the experiment from the user's request. If it is absent, ask which experim
 
 ### Step 1: Read results
 
-Read `results/<experiment_name>/latest.json` to get the actual backtest results.
+Before reading metrics, compute the latest result's current validity without refreshing it:
+
+```bash
+uv run trading result status <experiment_name>
+```
+
+Continue only when the status is exactly `valid`. If it is `data-stale`, `definition-stale`,
+`legacy`, or `unreproducible`, report the blocking status and stop without editing experiment
+documentation, AI context, freshness dates, or cross-asset lessons. Refresh is allowed only through
+the user's explicit `trading result evaluate <TICKER>` workflow.
+
+After that gate, read `results/<experiment_name>/latest.json` to get the actual backtest results.
 
 If the file does not exist, inform the user they need to run the experiment first:
 ```bash
@@ -116,6 +127,7 @@ Check that the updated markdown tables match the latest.json values.
 
 ## Rules
 
+- **NEVER update documentation from a result whose computed status is not `valid`**
 - **NEVER fabricate results** — only use values from `latest.json`
 - **ALWAYS preserve** the existing markdown table format (don't restructure tables)
 - **ALWAYS update** the AI_CONTEXT block when updating results

@@ -1,86 +1,128 @@
-"""
-結果管理模組 (Results Management)
-儲存、載入與比較實驗結果。
-Save, load, and compare experiment results.
-"""
+"""Persisted-result access, validity diagnostics, and read-only comparison."""
+
+from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+import uuid
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
+
+from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.research_data.models import DefinitionBlobRef
+from trading.research_data.result_schema import (
+    ResearchResult,
+    ResultSchemaError,
+    ResultValidity,
+    ResultValidityStatus,
+    load_result,
+)
+from trading.research_data.store import ResearchDataStore
 
 logger = logging.getLogger(__name__)
 
 RESULTS_DIR = Path("results")
 
 
+@dataclass(frozen=True, slots=True)
+class ResultStatusRecord:
+    """One latest result and its read-only validity view."""
+
+    experiment_name: str
+    path: Path
+    result: ResearchResult
+
+    @property
+    def validity(self) -> ResultValidity:
+        return self.result.validity
+
+
 def save_result(experiment_name: str, result: dict) -> Path:
+    """Persist an explicitly legacy run as historical evidence only.
+
+    The legacy compatibility path deliberately never advances ``latest.json``. Only the
+    Phase 2/3 coordinator can publish a current latest result.
     """
-    儲存回測結果 (Save backtest result)
-
-    存為 results/{experiment_name}/latest.json 及帶時間戳的備份。
-    Saves to results/{experiment_name}/latest.json and a timestamped copy.
-    """
-    d = RESULTS_DIR / experiment_name
-    d.mkdir(parents=True, exist_ok=True)
-
-    latest_path = d / "latest.json"
-
-    # 儲存最新的 latest.json (Save the latest result)
-    latest_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
-
-    # 帶時間戳的備份 (Timestamped copy)
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    ts_path = d / f"{ts}.json"
-    ts_path.write_text(json.dumps(result, indent=2, ensure_ascii=False))
-
-    # 清理舊的時間戳備份，只保留最近的 10 個 (Clean up old timestamped backups, keep max 10)
-    import re
-
-    ts_files = []
-    for f in d.iterdir():
-        if f.is_file() and re.match(r"^\d{8}_\d{6}\.json$", f.name):
-            ts_files.append(f)
-
-    ts_files.sort(key=lambda x: x.name)
-    if len(ts_files) > 10:
-        for f in ts_files[:-10]:
-            try:
-                f.unlink()
-            except Exception as e:
-                logger.warning(f"無法刪除舊結果檔案 {f}: {e}")
-
-    logger.info(
-        f"[Results] 結果已存至 {latest_path} 與 {ts_path} (Result saved to {latest_path} and {ts_path})"
-    )
-    return latest_path
+    directory = RESULTS_DIR / experiment_name
+    directory.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
+    path = directory / f"legacy_{timestamp}_{uuid.uuid4().hex}.json"
+    path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    logger.info("[Results] legacy result saved to %s", path)
+    return path
 
 
 def load_latest(experiment_name: str) -> dict | None:
-    """載入最新結果 (Load latest result for an experiment)"""
+    """Load the unmodified latest JSON for backward-compatible callers."""
     path = RESULTS_DIR / experiment_name / "latest.json"
-    if path.exists():
-        return json.loads(path.read_text())
-    return None
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def compare_experiments(names: list[str]) -> None:
-    """
-    比較多個實驗的最新結果 (Compare latest results across experiments)
-    """
+def inspect_result(
+    experiment_name: str,
+    *,
+    results_dir: Path | None = None,
+    store: ResearchDataStore | None = None,
+    current_definition_fingerprint: str | DefinitionBlobRef | None = None,
+    now: datetime | None = None,
+) -> ResultStatusRecord | None:
+    """Inspect one latest result without refresh, execution, or publication."""
+    path = Path(results_dir or RESULTS_DIR) / experiment_name / "latest.json"
+    if not path.exists():
+        return None
+    try:
+        result = load_result(
+            path,
+            store=store or ResearchDataStore(Path(".research-data/blobs")),
+            current_definition_fingerprint=current_definition_fingerprint,
+            now=now,
+        )
+    except ResultSchemaError as exc:
+        result = ResearchResult(
+            payload={},
+            validity=ResultValidity(ResultValidityStatus.UNREPRODUCIBLE, (str(exc),)),
+        )
+    return ResultStatusRecord(experiment_name=experiment_name, path=path, result=result)
+
+
+def compare_experiments(
+    names: list[str],
+    *,
+    results_dir: Path | None = None,
+    store: ResearchDataStore | None = None,
+    definition_resolver: Callable[[str], str | DefinitionBlobRef | None] | None = None,
+    now: datetime | None = None,
+) -> None:
+    """Compare latest results while displaying validity and never refreshing them."""
     separator = "=" * 80
     thin_sep = "-" * 80
 
     from trading.experiments import get_experiment
 
-    loaded = {}
-    display_ids = {}
+    current_definition_resolver = definition_resolver or resolve_current_definition_fingerprint
+
+    loaded: dict[str, ResultStatusRecord] = {}
+    display_ids: dict[str, str] = {}
     for name in names:
-        result = load_latest(name)
-        if result is None:
+        current_definition = current_definition_resolver(name)
+        record = inspect_result(
+            name,
+            results_dir=results_dir or RESULTS_DIR,
+            store=store,
+            current_definition_fingerprint=current_definition,
+            now=now,
+        )
+        if record is None:
             print(f"  警告: {name} 無結果可載入 (Warning: no results for {name})")
             continue
-        loaded[name] = result
+        loaded[name] = record
+        print(f"  {name}: Validity: {record.validity.status.value}")
+        for reason in record.validity.reasons:
+            print(f"    reason: {reason}")
         try:
             strategy = get_experiment(name)
             config = strategy.create_config()
@@ -93,10 +135,9 @@ def compare_experiments(names: list[str]) -> None:
         return
 
     print(f"\n{separator}")
-    print("  跨實驗績效比較 (Cross-Experiment Comparison)")
+    print("  跨實驗績效比較 (Cross-Experiment Performance Comparison)")
     print(f"{separator}")
 
-    # 比較每個 part
     for part_key, part_label in [
         ("part_a", "Part A (In-Sample)"),
         ("part_b", "Part B (Out-of-Sample)"),
@@ -105,29 +146,29 @@ def compare_experiments(names: list[str]) -> None:
         print(f"\n  {part_label}")
         print(f"  {thin_sep}")
 
-        header = f"  {'指標 (Metric)':<36}"
+        header = f"  {'Metric':<36}"
         for name in loaded:
             header += f" {display_ids.get(name, name[:12]):>12}"
         print(header)
         print(f"  {'-' * 72}")
 
         rows = [
-            ("總訊號數 (Total signals)", "total_signals", "d"),
-            ("勝率 (Win rate)", "win_rate", ".1%"),
-            ("平均報酬 (Avg return %)", "avg_return_pct", ".2f"),
-            ("累計報酬 (Cumulative %)", "cumulative_return_pct", ".2f"),
-            ("盈虧比 (Profit factor)", "profit_factor", ".2f"),
-            ("夏普比率 (Sharpe ratio)", "sharpe_ratio", ".2f"),
-            ("索提諾比率 (Sortino ratio)", "sortino_ratio", ".2f"),
-            ("卡瑪比率 (Calmar ratio)", "calmar_ratio", ".2f"),
+            ("Total signals", "total_signals", "d"),
+            ("Win rate", "win_rate", ".1%"),
+            ("Avg return %", "avg_return_pct", ".2f"),
+            ("Cumulative %", "cumulative_return_pct", ".2f"),
+            ("Profit factor", "profit_factor", ".2f"),
+            ("Sharpe ratio", "sharpe_ratio", ".2f"),
+            ("Sortino ratio", "sortino_ratio", ".2f"),
+            ("Calmar ratio", "calmar_ratio", ".2f"),
         ]
 
         for label, key, fmt in rows:
             line = f"  {label:<36}"
-            for name in loaded:
-                part = loaded[name].get(part_key, {})
-                val = part.get(key, 0)
-                line += f" {f'{val:{fmt}}':>12}"
+            for record in loaded.values():
+                part = record.result.payload.get(part_key, {})
+                value = part.get(key, 0) if isinstance(part, dict) else 0
+                line += f" {f'{value:{fmt}}':>12}"
             print(line)
 
     print()

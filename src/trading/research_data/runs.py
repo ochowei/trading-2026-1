@@ -19,7 +19,12 @@ from trading.market_data import (
     SessionCalendar,
 )
 from trading.research_data.models import DefinitionBlobRef
+from trading.research_data.result_schema import (
+    build_result_payload,
+    declares_incomplete_result,
+)
 from trading.research_data.store import ResearchDataStore
+from trading.research_data.trial_registry import ExperimentTrialRegistry
 
 
 class RunMode(StrEnum):
@@ -32,6 +37,10 @@ class RunMode(StrEnum):
 
 class RunEvidenceError(RuntimeError):
     """A formal run lacks complete immutable data or definition evidence."""
+
+
+class RunExecutionError(RuntimeError):
+    """A runner failed or returned a result explicitly marked incomplete."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,11 +63,20 @@ class ResearchRunCoordinator:
         results_root: Path,
         now: Callable[[], datetime] | None = None,
         calendar: SessionCalendar | None = None,
+        trial_registry: ExperimentTrialRegistry | None = None,
+        experiment_family: str | None = None,
+        hypothesis: str = "",
     ) -> None:
         self.store = store
         self.results_root = Path(results_root)
         self.now = now or (lambda: datetime.now(UTC))
         self.calendar = calendar or PrimaryUSSessionCalendar()
+        self.trial_registry = trial_registry or ExperimentTrialRegistry(
+            self.results_root / "trial_registry.json",
+            now=self.now,
+        )
+        self.experiment_family = experiment_family
+        self.hypothesis = hypothesis
 
     def execute(
         self,
@@ -86,7 +104,7 @@ class ResearchRunCoordinator:
                 )
             if current_definition != snapshot.manifest.definition:
                 raise RunEvidenceError(
-                    "current research definition does not match snapshot evidence"
+                    "current exact research definition does not match snapshot evidence"
                 )
         current_time: datetime | None = None
         if run_mode is RunMode.ONLINE:
@@ -99,23 +117,72 @@ class ResearchRunCoordinator:
                     f"online run has stale snapshot {snapshot.manifest.decision_time.session}; "
                     f"latest completed session is {required_session}"
                 )
-        produced = runner(snapshot.bundle)
-        if not isinstance(produced, dict):
-            raise TypeError("research runner must return a result dictionary")
-        result = copy.deepcopy(produced)
-        raw_metadata = result.setdefault("metadata", {})
-        if not isinstance(raw_metadata, dict):
-            raise TypeError("research result metadata must be an object")
-        raw_metadata["reproducibility"] = {
-            "snapshot_id": snapshot.manifest.snapshot_id,
-            "snapshot_manifest": str(Path(manifest_path)),
-            "definition_fingerprint": (
-                snapshot.manifest.definition.fingerprint
-                if snapshot.manifest.definition is not None
-                else None
-            ),
-            "run_mode": run_mode.value,
-        }
+        formal = run_mode is not RunMode.EPHEMERAL
+        definition = snapshot.manifest.definition
+        experiment_family = self.experiment_family
+        run_id = uuid.uuid4().hex
+        if formal:
+            if not isinstance(experiment_family, str) or not experiment_family.strip():
+                raise RunEvidenceError("formal research runs require a declared experiment family")
+            if definition is None:  # pragma: no cover - checked above
+                raise RunEvidenceError("persisted research runs require definition evidence")
+            self.trial_registry.register_trial(
+                experiment_family,
+                definition.fingerprint,
+                experiment_name=experiment_name,
+                hypothesis=self.hypothesis,
+            )
+
+        def retain_failure(
+            error: Exception,
+            *,
+            observation_id: str = run_id,
+            result_path: Path | None = None,
+        ) -> None:
+            if not formal:
+                return
+            if definition is None or experiment_family is None:  # pragma: no cover - guarded above
+                raise RunEvidenceError("formal failure lacks trial identity")
+            self._record_failure(
+                experiment_family=experiment_family,
+                definition_fingerprint=definition.fingerprint,
+                snapshot_id=snapshot.manifest.snapshot_id,
+                run_mode=run_mode,
+                observation_id=observation_id,
+                result_path=result_path,
+                error=error,
+            )
+
+        try:
+            produced = runner(snapshot.bundle)
+            if not isinstance(produced, dict):
+                raise TypeError("research runner must return a result dictionary")
+            result = copy.deepcopy(produced)
+            if declares_incomplete_result(result):
+                raise RunExecutionError("research runner returned a failed or partial result")
+            raw_metadata = result.setdefault("metadata", {})
+            if not isinstance(raw_metadata, dict):
+                raise TypeError("research result metadata must be an object")
+            raw_metadata["reproducibility"] = {
+                "snapshot_id": snapshot.manifest.snapshot_id,
+                "snapshot_manifest": str(Path(manifest_path)),
+                "definition_snapshot_id": definition.digest if definition else None,
+                "definition_fingerprint": definition.fingerprint if definition else None,
+                "run_mode": run_mode.value,
+            }
+            if definition is not None:
+                result = build_result_payload(
+                    result,
+                    manifest=snapshot.manifest,
+                    manifest_path=manifest_path,
+                    run_mode=run_mode.value,
+                )
+            elif formal:
+                raise RunEvidenceError("persisted research runs require definition evidence")
+        except Exception as exc:
+            retain_failure(exc)
+            raise
+
         if run_mode is RunMode.EPHEMERAL:
             return ResearchRunOutcome(result, run_mode, None, None)
 
@@ -126,16 +193,81 @@ class ResearchRunCoordinator:
         directory.mkdir(parents=True, exist_ok=True)
         stamp = current_time.astimezone(UTC).strftime("%Y%m%d_%H%M%S_%f")
         historical = directory / f"{stamp}_{run_mode.value}_{uuid.uuid4().hex}.json"
-        content = (json.dumps(result, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode(
-            "utf-8"
-        )
-        _atomic_write(historical, content)
+        try:
+            content = (
+                json.dumps(result, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
+            ).encode("utf-8")
+            _atomic_write(historical, content)
+        except Exception as exc:
+            retain_failure(exc, result_path=historical)
+            raise
+        if formal and definition is not None and experiment_family is not None:
+            self._record_success(
+                experiment_family=experiment_family,
+                definition_fingerprint=definition.fingerprint,
+                snapshot_id=snapshot.manifest.snapshot_id,
+                run_mode=run_mode,
+                observation_id=run_id,
+                result_path=historical,
+            )
         if run_mode is RunMode.OFFLINE:
             return ResearchRunOutcome(result, run_mode, historical, None)
 
         latest = directory / "latest.json"
-        _atomic_write(latest, content)
+        try:
+            _atomic_write(latest, content)
+        except Exception as exc:
+            retain_failure(
+                exc,
+                observation_id=f"{run_id}:latest",
+                result_path=historical,
+            )
+            raise
         return ResearchRunOutcome(result, run_mode, historical, latest)
+
+    def _record_success(
+        self,
+        *,
+        experiment_family: str,
+        definition_fingerprint: str,
+        snapshot_id: str,
+        run_mode: RunMode,
+        observation_id: str,
+        result_path: Path,
+    ) -> None:
+        self.trial_registry.record_observation(
+            experiment_family,
+            definition_fingerprint,
+            snapshot_id=snapshot_id,
+            result_path=result_path,
+            run_mode=run_mode.value,
+            outcome_status="succeeded",
+            validity_status="valid",
+            observation_id=observation_id,
+        )
+
+    def _record_failure(
+        self,
+        *,
+        experiment_family: str,
+        definition_fingerprint: str,
+        snapshot_id: str,
+        run_mode: RunMode,
+        observation_id: str,
+        result_path: Path | None = None,
+        error: Exception,
+    ) -> None:
+        """Keep failed formal attempts while allowing ephemeral failures to disappear."""
+        self.trial_registry.record_observation(
+            experiment_family,
+            definition_fingerprint,
+            snapshot_id=snapshot_id,
+            result_path=result_path,
+            run_mode=run_mode.value,
+            outcome_status="failed",
+            failure_reason=f"{type(error).__name__}: {error}",
+            observation_id=observation_id,
+        )
 
 
 def _atomic_write(path: Path, content: bytes) -> None:

@@ -48,6 +48,26 @@ def test_definition_capture_requires_reconstructable_git_context(tmp_path) -> No
         )
 
 
+def test_definition_preview_computes_identity_without_publishing_a_blob(tmp_path) -> None:
+    initialize_repository(tmp_path)
+    sources = {}
+    for role in ("strategy", "detector", "backtester"):
+        source = tmp_path / f"{role}.py"
+        source.write_text(f"class {role.title()}:\n    pass\n", encoding="utf-8")
+        sources[role] = source
+    store = ResearchDefinitionStore(tmp_path / "research-data", publish=False)
+
+    preview = store.capture(
+        resolved_config={"ticker": "SPY"},
+        sources=sources,
+        execution_engine_version="execution-v1",
+        dependency_versions={"pandas": "2.3.1"},
+    )
+
+    assert len(preview.fingerprint) == 64
+    assert not store.definition_blob_path(preview.blob.digest).exists()
+
+
 def test_semantic_fingerprint_ignores_formatting_but_changes_with_threshold(tmp_path) -> None:
     initialize_repository(tmp_path)
     source = tmp_path / "detector.py"
@@ -85,6 +105,188 @@ def test_semantic_fingerprint_ignores_formatting_but_changes_with_threshold(tmp_
     assert formatting_only.fingerprint == first.fingerprint
     assert formatting_only.blob.digest != first.blob.digest
     assert changed_threshold.fingerprint != first.fingerprint
+
+
+def test_semantic_fingerprint_ignores_reporting_only_method_changes(tmp_path) -> None:
+    initialize_repository(tmp_path)
+    detector = tmp_path / "detector.py"
+    strategy = tmp_path / "strategy.py"
+    backtester = tmp_path / "backtester.py"
+    detector.write_text("def signal(value):\n    return value > 0.20\n", encoding="utf-8")
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return value\n"
+        "\n"
+        "    def render_report(self, value):\n"
+        "        return f'report {value}'\n",
+        encoding="utf-8",
+    )
+    backtester.write_text("class Backtester:\n    pass\n", encoding="utf-8")
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    common = {
+        "resolved_config": {"ticker": "SPY"},
+        "sources": {
+            "strategy": strategy,
+            "detector": detector,
+            "backtester": backtester,
+        },
+        "reporting_only_symbols": {"strategy": ("render_report",)},
+        "execution_engine_version": "execution-v1",
+        "dependency_versions": {"pandas": "2.3.1"},
+    }
+
+    first = store.capture(**common)
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return value\n"
+        "\n"
+        "    def render_report(self, value):\n"
+        "        return f'changed display {value}'\n",
+        encoding="utf-8",
+    )
+    reporting_only = store.capture(**common)
+
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return value + 1\n"
+        "\n"
+        "    def render_report(self, value):\n"
+        "        return f'changed display {value}'\n",
+        encoding="utf-8",
+    )
+    behavior_changed = store.capture(**common)
+
+    assert reporting_only.fingerprint == first.fingerprint
+    assert reporting_only.blob.digest != first.blob.digest
+    assert behavior_changed.fingerprint != first.fingerprint
+
+
+def test_reporting_named_method_remains_semantic_without_explicit_declaration(tmp_path) -> None:
+    initialize_repository(tmp_path)
+    sources = {}
+    for role in ("strategy", "detector", "backtester"):
+        source = tmp_path / f"{role}.py"
+        source.write_text(
+            "def render_report(value):\n    return value\n"
+            if role == "strategy"
+            else "class Component:\n    pass\n",
+            encoding="utf-8",
+        )
+        sources[role] = source
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    common = {
+        "resolved_config": {"ticker": "SPY"},
+        "sources": sources,
+        "execution_engine_version": "execution-v1",
+        "dependency_versions": {"pandas": "2.3.1"},
+    }
+
+    first = store.capture(**common)
+    sources["strategy"].write_text(
+        "def render_report(value):\n    return value + 1\n", encoding="utf-8"
+    )
+    changed = store.capture(**common)
+
+    assert changed.fingerprint != first.fingerprint
+
+
+def test_declared_reporting_method_remains_semantic_when_outcome_code_references_it(
+    tmp_path,
+) -> None:
+    initialize_repository(tmp_path)
+    strategy = tmp_path / "strategy.py"
+    detector = tmp_path / "detector.py"
+    backtester = tmp_path / "backtester.py"
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return self.render_report(value)\n"
+        "\n"
+        "    def render_report(self, value):\n"
+        "        return value\n",
+        encoding="utf-8",
+    )
+    detector.write_text("class Detector:\n    pass\n", encoding="utf-8")
+    backtester.write_text("class Backtester:\n    pass\n", encoding="utf-8")
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    common = {
+        "resolved_config": {"ticker": "SPY"},
+        "sources": {
+            "strategy": strategy,
+            "detector": detector,
+            "backtester": backtester,
+        },
+        "reporting_only_symbols": {"strategy": ("render_report",)},
+        "execution_engine_version": "execution-v1",
+        "dependency_versions": {"pandas": "2.3.1"},
+    }
+
+    first = store.capture(**common)
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return self.render_report(value)\n"
+        "\n"
+        "    def render_report(self, value):\n"
+        "        return value + 1\n",
+        encoding="utf-8",
+    )
+    changed = store.capture(**common)
+
+    assert changed.fingerprint != first.fingerprint
+
+
+def test_transitive_declared_reporting_dependency_remains_semantic(tmp_path) -> None:
+    initialize_repository(tmp_path)
+    strategy = tmp_path / "strategy.py"
+    detector = tmp_path / "detector.py"
+    backtester = tmp_path / "backtester.py"
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return self.report(value)\n"
+        "\n"
+        "    def report(self, value):\n"
+        "        return self.format_report(value)\n"
+        "\n"
+        "    def format_report(self, value):\n"
+        "        return value\n",
+        encoding="utf-8",
+    )
+    detector.write_text("class Detector:\n    pass\n", encoding="utf-8")
+    backtester.write_text("class Backtester:\n    pass\n", encoding="utf-8")
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    common = {
+        "resolved_config": {"ticker": "SPY"},
+        "sources": {
+            "strategy": strategy,
+            "detector": detector,
+            "backtester": backtester,
+        },
+        "reporting_only_symbols": {"strategy": ("report", "format_report")},
+        "execution_engine_version": "execution-v1",
+        "dependency_versions": {"pandas": "2.3.1"},
+    }
+
+    first = store.capture(**common)
+    strategy.write_text(
+        "class Strategy:\n"
+        "    def execute(self, value):\n"
+        "        return self.report(value)\n"
+        "\n"
+        "    def report(self, value):\n"
+        "        return self.format_report(value)\n"
+        "\n"
+        "    def format_report(self, value):\n"
+        "        return value + 1\n",
+        encoding="utf-8",
+    )
+    changed = store.capture(**common)
+
+    assert changed.fingerprint != first.fingerprint
 
 
 def test_engine_and_dependency_identity_change_semantic_fingerprint(tmp_path) -> None:

@@ -12,7 +12,8 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from trading.core.data_fetcher import create_default_market_data_service
-from trading.core.results import compare_experiments, save_result
+from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.core.results import compare_experiments, inspect_result, save_result
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
     AvailabilityPolicy,
@@ -21,6 +22,8 @@ from trading.market_data import (
     SignalDecisionTime,
 )
 from trading.research_data import (
+    ExperimentTrialDeclaration,
+    ExperimentTrialRegistry,
     ResearchDataStore,
     ResearchDefinitionSnapshot,
     ResearchDefinitionStore,
@@ -82,7 +85,12 @@ def cmd_run(args: argparse.Namespace) -> None:
         if formal_manifest is not None or default_formal:
             run_with_bundle = getattr(strategy, "run_with_bundle", None)
             capture_definition = getattr(strategy, "capture_research_definition", None)
-            if not callable(run_with_bundle) or not callable(capture_definition):
+            declare_trial = getattr(strategy, "declare_experiment_trial", None)
+            if (
+                not callable(run_with_bundle)
+                or not callable(capture_definition)
+                or not callable(declare_trial)
+            ):
                 if default_formal:
                     raise SystemExit(
                         "persisted runs require a snapshot-aware prepared manifest or "
@@ -90,13 +98,17 @@ def cmd_run(args: argparse.Namespace) -> None:
                     )
                 raise SystemExit(
                     f"{name} is not snapshot-aware; formal execution requires "
-                    "run_with_bundle and capture_research_definition"
+                    "run_with_bundle, capture_research_definition, and "
+                    "declare_experiment_trial"
                 )
             definition = capture_definition(create_default_research_definition_store())
             if not isinstance(definition, ResearchDefinitionSnapshot):
                 raise SystemExit(
                     "capture_research_definition must return ResearchDefinitionSnapshot"
                 )
+            trial = declare_trial()
+            if not isinstance(trial, ExperimentTrialDeclaration):
+                raise SystemExit("declare_experiment_trial must return ExperimentTrialDeclaration")
             research_store = create_default_research_data_store()
             if default_formal:
                 formal_manifest = research_store.latest_manifest_for_definition(
@@ -106,6 +118,8 @@ def cmd_run(args: argparse.Namespace) -> None:
             coordinator = ResearchRunCoordinator(
                 store=research_store,
                 results_root=Path("results"),
+                experiment_family=trial.family,
+                hypothesis=trial.hypothesis,
             )
             coordinator.execute(
                 name,
@@ -128,6 +142,69 @@ def cmd_run(args: argparse.Namespace) -> None:
 def cmd_compare(args: argparse.Namespace) -> None:
     """比較實驗結果 (Compare experiment results)"""
     compare_experiments(args.experiments)
+
+
+def cmd_result_status(args: argparse.Namespace) -> None:
+    """Show persisted-result validity without refreshing or executing anything."""
+    from trading.core import results as result_module
+
+    if args.all:
+        names = (
+            sorted(
+                path.name
+                for path in result_module.RESULTS_DIR.iterdir()
+                if path.is_dir() and (path / "latest.json").exists()
+            )
+            if result_module.RESULTS_DIR.exists()
+            else []
+        )
+    elif args.experiment:
+        names = [args.experiment]
+    else:
+        raise SystemExit("result status requires an experiment name or --all")
+
+    store = create_default_research_data_store()
+    for name in names:
+        record = inspect_result(
+            name,
+            results_dir=result_module.RESULTS_DIR,
+            store=store,
+            current_definition_fingerprint=resolve_current_definition_fingerprint(name),
+        )
+        if record is None:
+            print(f"{name}: no latest result")
+            continue
+        print(f"{name}: {record.validity.status.value}")
+        if record.result.payload:
+            payload = record.result.payload
+            print(f"  schema version: {payload.get('schema_version', 'legacy')}")
+            print(f"  data cutoff: {payload.get('data_cutoff', '-')}")
+            print(f"  definition fingerprint: {payload.get('definition_fingerprint', '-')}")
+        for reason in record.validity.reasons:
+            print(f"  reason: {reason}")
+
+
+def cmd_result_registry_seed(args: argparse.Namespace) -> None:
+    """Explicitly seed legacy experiment inventory entries in the trial registry."""
+    from trading.core import results as result_module
+
+    registry = ExperimentTrialRegistry(result_module.RESULTS_DIR / "trial_registry.json")
+    identities = registry.seed_legacy(list_experiments())
+    print(
+        f"seeded {len(identities)} legacy trial entries; selection history is explicitly incomplete"
+    )
+
+
+def cmd_result(args: argparse.Namespace) -> None:
+    """Dispatch result diagnostics and explicit evaluation workflows."""
+    if args.result_command == "status":
+        cmd_result_status(args)
+    elif args.result_command == "registry" and args.registry_command == "seed":
+        cmd_result_registry_seed(args)
+    elif args.result_command == "evaluate":
+        from trading.core.evaluation import evaluate_asset_from_cli
+
+        evaluate_asset_from_cli(args.asset)
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
@@ -350,7 +427,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_mode.add_argument(
         "--legacy",
         action="store_true",
-        help="Explicitly persist an unmigrated result without Phase 2 evidence",
+        help="Explicitly persist an unmigrated historical result; never advance latest.json",
     )
 
     # followup
@@ -378,6 +455,21 @@ def build_parser() -> argparse.ArgumentParser:
     cmp_p.add_argument(
         "experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)"
     )
+
+    # result diagnostics and explicit evaluation
+    result_p = sub.add_parser("result", help="Result validity and trial-history operations")
+    result_sub = result_p.add_subparsers(dest="result_command", required=True)
+    status_p = result_sub.add_parser("status", help="Read-only result validity diagnostics")
+    status_p.add_argument("experiment", nargs="?", help="Experiment name")
+    status_p.add_argument("--all", action="store_true", help="Inspect every latest result")
+    evaluate_p = result_sub.add_parser(
+        "evaluate",
+        help="Explicitly refresh stale candidates and produce a complete asset ranking",
+    )
+    evaluate_p.add_argument("asset", help="Asset ticker, for example SPY")
+    registry_p = result_sub.add_parser("registry", help="Experiment trial registry operations")
+    registry_sub = registry_p.add_subparsers(dest="registry_command", required=True)
+    registry_sub.add_parser("seed", help="Seed discoverable legacy experiments")
 
     # analyze
     analyze_p = sub.add_parser(
@@ -503,6 +595,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_followup_backtest(args)
     elif args.command == "compare":
         cmd_compare(args)
+    elif args.command == "result":
+        cmd_result(args)
     elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "sync-docs":
