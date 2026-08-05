@@ -129,6 +129,30 @@ Failed formal attempts remain in the append-only `results/trial_registry.json`, 
 family and semantic definition fingerprint. The result and trial-history contract is documented in
 [docs/result-validity-and-trial-history.md](docs/result-validity-and-trial-history.md).
 
+## Historical qualification and prospective Shadow
+
+Phase 6 replaces fixed Part A/B/C qualification with five or more non-overlapping annual folds,
+complete signal-date-attributed exits, purge/embargo, base and stress gates, three benchmark layers,
+and family-wise block-bootstrap adjustment across every registered family trial. Historical evidence
+can grant only `shadow-eligible`.
+
+A formally registered Shadow starts prospective evidence after its frozen registration time. Paper
+proposals have deterministic IDs and completed trades use canonical simulated fills; neither creates
+an actual position. Activation evaluation requires the frozen checkpoint, at least 252 completed
+sessions and 12 completed trades, positive base/stress performance, stress compliance, and no
+critical drift. It returns only `activation-eligible` and always keeps live authorization false.
+
+```bash
+uv run trading qualification status  # read-only; no network or result writes
+```
+
+Qualification lifecycle events are stored atomically in a hash-chained, ignored local
+`state/qualification-registry.json` plus a private head checkpoint. Exact retries are idempotent;
+conflicting content, changed or truncated history, or unverifiable frozen definitions fail closed.
+A definition change starts a new Shadow
+identity without carrying earlier prospective evidence. See
+[docs/historical-qualification-and-shadow.md](docs/historical-qualification-and-shadow.md).
+
 ## Manual execution ledger
 
 Phase 5 keeps actual followup state in an ignored, local, append-only CSV ledger. It is dry-run only;

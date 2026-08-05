@@ -7,10 +7,18 @@ import json
 import math
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
+from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from pathlib import Path
 
+from trading.core.accounting import parse_timestamp
+from trading.core.qualification import (
+    HISTORICAL_QUALIFICATION_GATE_NAMES,
+    SHADOW_ACTIVATION_GATE_NAMES,
+    HistoricalScreenThresholds,
+    validate_historical_thresholds,
+)
 from trading.core.sleeve_engine import (
     CANONICAL_SLEEVE_ENGINE_VERSION,
     compute_daily_equity_metrics,
@@ -125,6 +133,9 @@ def build_result_payload(
             "run_mode": run_mode,
         }
     )
+    qualification_error = _qualification_evidence_error(payload)
+    if qualification_error is not None:
+        raise ResultSchemaError(qualification_error)
     return payload
 
 
@@ -209,6 +220,9 @@ def classify_result(
     canonical_error = _canonical_sleeve_evidence_error(payload.get("canonical_sleeve_evidence"))
     if canonical_error is not None:
         return ResultValidity(ResultValidityStatus.UNREPRODUCIBLE, (canonical_error,))
+    qualification_error = _qualification_evidence_error(payload)
+    if qualification_error is not None:
+        return ResultValidity(ResultValidityStatus.UNREPRODUCIBLE, (qualification_error,))
     if store is None:
         return ResultValidity(
             ResultValidityStatus.UNREPRODUCIBLE,
@@ -348,6 +362,784 @@ def _canonical_sleeve_evidence_error(value: object) -> str | None:
     }
     if not parity_fields.issubset(parity):
         return "canonical sleeve parity is incomplete"
+    return None
+
+
+def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
+    development = payload.get("development_summary", {})
+    folds = payload.get("historical_stability_folds", [])
+    shadow = payload.get("shadow_evidence", {})
+    live = payload.get("live_evidence", {})
+    if not isinstance(development, Mapping):
+        return "development summary must be an object"
+    if not isinstance(folds, list):
+        return "historical stability folds must be a list"
+    if not isinstance(shadow, Mapping):
+        return "shadow evidence must be an object"
+    if not isinstance(live, Mapping):
+        return "live evidence must be an object"
+    if live:
+        return "Phase 6 qualification results cannot contain live evidence"
+
+    screen = development.get("historical_screen")
+    if isinstance(screen, Mapping) and screen.get("disposition") == "active":
+        return "historical qualification cannot grant Active status"
+    if folds:
+        plan = development.get("historical_plan")
+        if not isinstance(plan, Mapping) or not isinstance(screen, Mapping):
+            return "historical stability evidence requires its frozen plan and screen"
+        if len(folds) < 5:
+            return "historical qualification requires at least five folds"
+        required_plan_fields = {
+            "plan_id",
+            "definition_fingerprint",
+            "created_at",
+            "development_years",
+            "evaluation_sessions",
+            "folds",
+            "maximum_holding_sessions",
+            "execution_lag_sessions",
+            "dependency_sessions",
+            "embargo_sessions",
+            "thresholds",
+            "benchmarks",
+            "selection_adjustment",
+            "cost_policies",
+            "stress_drawdown_limit",
+        }
+        if not required_plan_fields.issubset(plan):
+            return "historical qualification plan is incomplete"
+        thresholds = plan.get("thresholds")
+        plan_benchmarks = plan.get("benchmarks")
+        selection_policy = plan.get("selection_adjustment")
+        evaluation_sessions = plan.get("evaluation_sessions")
+        if (
+            not isinstance(thresholds, Mapping)
+            or not {
+                "minimum_development_years",
+                "minimum_evaluation_folds",
+                "minimum_completed_trades",
+                "minimum_traded_folds",
+                "minimum_positive_fold_rate",
+                "minimum_cumulative_return",
+                "minimum_profit_factor",
+                "minimum_stress_cumulative_return",
+                "minimum_stress_profit_factor",
+                "maximum_fold_concentration",
+                "selection_confidence",
+            }.issubset(thresholds)
+            or not isinstance(plan_benchmarks, Mapping)
+            or not {"family_baseline_trial_id", "random_seed", "random_samples"}.issubset(
+                plan_benchmarks
+            )
+            or not isinstance(selection_policy, Mapping)
+            or not {"repetitions", "block_sessions"}.issubset(selection_policy)
+            or not isinstance(evaluation_sessions, list)
+            or not evaluation_sessions
+        ):
+            return "historical qualification plan policy is incomplete"
+        try:
+            validate_historical_thresholds(
+                HistoricalScreenThresholds(
+                    minimum_development_years=int(thresholds["minimum_development_years"]),
+                    minimum_evaluation_folds=int(thresholds["minimum_evaluation_folds"]),
+                    minimum_completed_trades=int(thresholds["minimum_completed_trades"]),
+                    minimum_traded_folds=int(thresholds["minimum_traded_folds"]),
+                    minimum_positive_fold_rate=Decimal(
+                        str(thresholds["minimum_positive_fold_rate"])
+                    ),
+                    minimum_cumulative_return=Decimal(str(thresholds["minimum_cumulative_return"])),
+                    minimum_profit_factor=Decimal(str(thresholds["minimum_profit_factor"])),
+                    minimum_stress_cumulative_return=Decimal(
+                        str(thresholds["minimum_stress_cumulative_return"])
+                    ),
+                    minimum_stress_profit_factor=Decimal(
+                        str(thresholds["minimum_stress_profit_factor"])
+                    ),
+                    maximum_fold_concentration=Decimal(
+                        str(thresholds["maximum_fold_concentration"])
+                    ),
+                    selection_confidence=Decimal(str(thresholds["selection_confidence"])),
+                )
+            )
+        except (TypeError, ValueError, InvalidOperation) as exc:
+            return f"historical qualification thresholds are invalid: {exc}"
+        development_years = plan.get("development_years")
+        try:
+            created_at = parse_timestamp(str(plan.get("created_at")))
+            maximum_holding = int(plan.get("maximum_holding_sessions"))
+            execution_lag = int(plan.get("execution_lag_sessions"))
+            dependency_sessions = int(plan.get("dependency_sessions"))
+            embargo_sessions = int(plan.get("embargo_sessions"))
+        except (TypeError, ValueError):
+            return "historical qualification dependencies are invalid"
+        if (
+            not isinstance(development_years, list)
+            or len(development_years) < 3
+            or not all(isinstance(year, int) for year in development_years)
+            or development_years != list(range(development_years[0], development_years[-1] + 1))
+            or min(maximum_holding, execution_lag, dependency_sessions, embargo_sessions) < 0
+            or dependency_sessions < maximum_holding + execution_lag
+            or embargo_sessions < execution_lag
+        ):
+            return "historical qualification dependencies are incomplete"
+        required_fold_fields = {
+            "fold_id",
+            "evaluation_year",
+            "signal_count",
+            "candidate_count",
+            "completed_trades",
+            "cumulative_return",
+            "stress_cumulative_return",
+            "stress_max_drawdown",
+            "gross_profit",
+            "gross_loss",
+            "stress_gross_profit",
+            "stress_gross_loss",
+        }
+        for fold in folds:
+            if not isinstance(fold, Mapping) or not required_fold_fields.issubset(fold):
+                return "historical stability fold evidence is incomplete"
+            if any(
+                not _finite_metric(fold.get(name))
+                for name in required_fold_fields - {"fold_id", "evaluation_year"}
+            ):
+                return "historical stability fold metrics must be finite"
+        plan_folds = plan.get("folds")
+        if not isinstance(plan_folds, list):
+            return "historical qualification plan folds are missing"
+        planned_ids = tuple(item.get("fold_id") for item in plan_folds if isinstance(item, Mapping))
+        evidence_ids = tuple(fold.get("fold_id") for fold in folds)
+        if len(planned_ids) != len(plan_folds) or evidence_ids != planned_ids:
+            return "historical stability folds differ from the frozen qualification plan"
+        try:
+            first_outcome = date.fromisoformat(str(plan_folds[0].get("outcome_start")))
+        except (AttributeError, ValueError):
+            return "historical qualification fold dates are invalid"
+        if created_at.date() >= first_outcome:
+            return "historical qualification plan was not frozen before outcomes"
+        plan_cost_error = _cost_policies_error(plan.get("cost_policies"))
+        if plan_cost_error is not None:
+            return plan_cost_error
+        required_screen_fields = {
+            "plan_id",
+            "aggregate",
+            "benchmarks",
+            "selection_adjustment",
+            "gates",
+            "passed",
+            "disposition",
+        }
+        if not required_screen_fields.issubset(screen):
+            return "historical screen evidence is incomplete"
+        screen_gates = screen.get("gates")
+        if (
+            not isinstance(screen_gates, list)
+            or tuple(gate.get("name") for gate in screen_gates if isinstance(gate, Mapping))
+            != HISTORICAL_QUALIFICATION_GATE_NAMES
+        ):
+            return "historical screen gates are incomplete"
+        if any(not isinstance(gate, Mapping) for gate in screen_gates):
+            return "historical screen gates are malformed"
+        gates_passed = all(gate.get("passed") is True for gate in screen_gates)
+        if screen.get("passed") is not gates_passed:
+            return "historical screen pass state conflicts with its gates"
+        if (screen.get("disposition") == "shadow-eligible") is not gates_passed:
+            return "historical screen disposition conflicts with its gates"
+        aggregate = screen.get("aggregate")
+        benchmarks = screen.get("benchmarks")
+        selection = screen.get("selection_adjustment")
+        aggregate_fields = {
+            "completed_trades",
+            "traded_folds",
+            "positive_traded_fold_rate",
+            "cumulative_return",
+            "profit_factor",
+            "stress_cumulative_return",
+            "stress_profit_factor",
+            "stress_max_drawdown",
+            "trade_fold_concentration",
+            "profit_fold_concentration",
+        }
+        if (
+            not isinstance(aggregate, Mapping)
+            or not aggregate_fields.issubset(aggregate)
+            or not isinstance(benchmarks, Mapping)
+            or not isinstance(selection, Mapping)
+            or not {"cash_return", "family_baseline_return", "random_entry_samples"}.issubset(
+                benchmarks
+            )
+            or not {
+                "selected_trial_id",
+                "included_trial_ids",
+                "observed_mean_excess_return",
+                "adjusted_confidence",
+                "repetitions",
+                "block_sessions",
+                "passed",
+            }.issubset(selection)
+        ):
+            return "historical screen benchmark or selection evidence is incomplete"
+        if any(
+            not _finite_metric(aggregate.get(name))
+            for name in aggregate_fields - {"profit_factor", "stress_profit_factor"}
+        ) or any(
+            not _finite_or_infinite_factor(aggregate.get(name))
+            for name in ("profit_factor", "stress_profit_factor")
+        ):
+            return "historical screen aggregate metrics are invalid"
+        historical_truth_error = _historical_screen_truth_error(
+            plan=plan,
+            screen=screen,
+            folds=folds,
+        )
+        if historical_truth_error is not None:
+            return historical_truth_error
+
+    if shadow:
+        registration = shadow.get("registration")
+        evidence = shadow.get("evidence")
+        activation = shadow.get("activation")
+        if not all(isinstance(item, Mapping) for item in (registration, evidence, activation)):
+            return "shadow evidence requires registration, evidence, and activation objects"
+        if activation and activation.get("authorized_for_live_orders") is not False:
+            return "Phase 6 Shadow evidence cannot authorize live orders"
+        if registration.get("status") != "shadow":
+            return "qualification result requires a Shadow registration"
+        required_registration_fields = {
+            "shadow_id",
+            "trial_id",
+            "historical_plan_id",
+            "definition_fingerprint",
+            "definition_snapshot_id",
+            "definition_snapshot_byte_count",
+            "prospective_start",
+            "recorded_at",
+            "activation_checkpoint",
+            "status",
+            "cost_policies",
+            "activation_policy",
+        }
+        if not required_registration_fields.issubset(registration):
+            return "Shadow registration evidence is incomplete"
+        if (
+            not isinstance(registration.get("definition_snapshot_id"), str)
+            or not isinstance(registration.get("definition_snapshot_byte_count"), int)
+            or registration.get("definition_snapshot_byte_count", 0) <= 0
+        ):
+            return "Shadow definition snapshot identity is invalid"
+        registration_cost_error = _cost_policies_error(registration.get("cost_policies"))
+        if registration_cost_error is not None:
+            return registration_cost_error
+        activation_policy = registration.get("activation_policy")
+        if not isinstance(activation_policy, Mapping) or not {
+            "minimum_completed_sessions",
+            "minimum_completed_trades",
+            "minimum_cumulative_return",
+            "minimum_profit_factor",
+            "minimum_stress_cumulative_return",
+            "minimum_stress_profit_factor",
+            "stress_drawdown_limit",
+        }.issubset(activation_policy):
+            return "Shadow activation policy is incomplete"
+        try:
+            prospective_time = parse_timestamp(str(registration.get("prospective_start")))
+            recorded_time = parse_timestamp(str(registration.get("recorded_at")))
+            activation_checkpoint = date.fromisoformat(
+                str(registration.get("activation_checkpoint"))
+            )
+        except ValueError:
+            return "Shadow registration dates are invalid"
+        if recorded_time != prospective_time:
+            return "Shadow prospective start does not match formal registration time"
+        if activation_checkpoint <= prospective_time.date():
+            return "Shadow activation checkpoint is not prospective"
+        plan = development.get("historical_plan")
+        screen = development.get("historical_screen")
+        if not folds or not isinstance(plan, Mapping) or not isinstance(screen, Mapping):
+            return "Shadow registration requires passing historical qualification evidence"
+        if screen.get("passed") is not True or screen.get("disposition") != "shadow-eligible":
+            return "Shadow registration requires a passing historical screen"
+        screen_gates = screen.get("gates")
+        if (
+            not isinstance(screen_gates, list)
+            or not screen_gates
+            or any(
+                not isinstance(gate, Mapping) or gate.get("passed") is not True
+                for gate in screen_gates
+            )
+        ):
+            return "Shadow registration requires all historical gates to pass"
+        plan_id = plan.get("plan_id")
+        selection = screen.get("selection_adjustment")
+        if (
+            screen.get("plan_id") != plan_id
+            or registration.get("historical_plan_id") != plan_id
+            or not isinstance(selection, Mapping)
+            or registration.get("trial_id") != selection.get("selected_trial_id")
+        ):
+            return "Shadow registration does not match historical qualification lineage"
+        if registration.get("cost_policies") != plan.get("cost_policies"):
+            return "Shadow cost policies do not match the frozen historical plan"
+        shadow_id = registration.get("shadow_id")
+        if evidence and evidence.get("shadow_id") != shadow_id:
+            return "shadow prospective evidence identity does not match registration"
+        if activation and activation.get("shadow_id") != shadow_id:
+            return "shadow activation identity does not match registration"
+        definition_fingerprint = registration.get("definition_fingerprint")
+        if definition_fingerprint != payload.get("definition_fingerprint"):
+            return "shadow definition fingerprint does not match result"
+        if evidence and evidence.get("definition_fingerprint") != definition_fingerprint:
+            return "shadow evidence changed its frozen definition"
+        if evidence:
+            required_evidence_fields = {
+                "shadow_id",
+                "definition_fingerprint",
+                "as_of",
+                "data_cutoff",
+                "completed_sessions",
+                "paper_proposals",
+                "simulated_fills",
+                "cumulative_return",
+                "profit_factor",
+                "stress_cumulative_return",
+                "stress_profit_factor",
+                "stress_max_drawdown",
+                "critical_drift",
+            }
+            if not required_evidence_fields.issubset(evidence):
+                return "Shadow prospective evidence is incomplete"
+            if any(
+                not _finite_metric(evidence.get(name))
+                for name in (
+                    "cumulative_return",
+                    "stress_cumulative_return",
+                    "stress_max_drawdown",
+                )
+            ) or any(
+                not _finite_or_infinite_factor(evidence.get(name))
+                for name in ("profit_factor", "stress_profit_factor")
+            ):
+                return "Shadow prospective metrics are invalid"
+            if (
+                not isinstance(evidence.get("paper_proposals"), list)
+                or not isinstance(evidence.get("simulated_fills"), list)
+                or not isinstance(evidence.get("critical_drift"), bool)
+            ):
+                return "Shadow prospective execution evidence is malformed"
+            execution_error = _shadow_execution_evidence_error(
+                registration=registration,
+                evidence=evidence,
+            )
+            if execution_error is not None:
+                return execution_error
+            as_of = evidence.get("as_of")
+            try:
+                evidence_date = date.fromisoformat(str(as_of))
+                data_cutoff = date.fromisoformat(str(evidence.get("data_cutoff")))
+            except ValueError:
+                return "shadow prospective evidence dates are invalid"
+            if evidence_date <= prospective_time.date():
+                return "shadow evidence predates formal registration"
+            if data_cutoff < evidence_date:
+                return "shadow data cutoff predates prospective evidence"
+        if activation:
+            if not evidence:
+                return "shadow activation requires prospective evidence"
+            if activation.get("evaluated_at") != evidence.get("as_of"):
+                return "shadow activation date does not match prospective evidence"
+            activation_gates = activation.get("gates")
+            if (
+                not isinstance(activation_gates, list)
+                or tuple(gate.get("name") for gate in activation_gates if isinstance(gate, Mapping))
+                != SHADOW_ACTIVATION_GATE_NAMES
+            ):
+                return "shadow activation gates are incomplete"
+            if any(not isinstance(gate, Mapping) for gate in activation_gates):
+                return "shadow activation gates are malformed"
+            eligible = all(gate.get("passed") is True for gate in activation_gates)
+            if activation.get("eligible") is not eligible:
+                return "shadow activation eligibility conflicts with its gates"
+            if (activation.get("disposition") == "activation-eligible") is not eligible:
+                return "shadow activation disposition conflicts with its gates"
+            activation_truth_error = _activation_truth_error(
+                registration=registration,
+                evidence=evidence,
+                activation=activation,
+            )
+            if activation_truth_error is not None:
+                return activation_truth_error
+    return None
+
+
+def _historical_screen_truth_error(
+    *,
+    plan: Mapping[str, object],
+    screen: Mapping[str, object],
+    folds: list[object],
+) -> str | None:
+    plan_folds = plan.get("folds")
+    raw_sessions = plan.get("evaluation_sessions")
+    thresholds = plan.get("thresholds")
+    plan_benchmarks = plan.get("benchmarks")
+    selection_policy = plan.get("selection_adjustment")
+    aggregate = screen.get("aggregate")
+    benchmarks = screen.get("benchmarks")
+    selection = screen.get("selection_adjustment")
+    gates = screen.get("gates")
+    if (
+        not all(
+            isinstance(value, Mapping)
+            for value in (
+                thresholds,
+                plan_benchmarks,
+                selection_policy,
+                aggregate,
+                benchmarks,
+                selection,
+            )
+        )
+        or not isinstance(plan_folds, list)
+        or not isinstance(raw_sessions, list)
+    ):
+        return "historical qualification evidence is malformed"
+    try:
+        sessions = tuple(date.fromisoformat(str(value)) for value in raw_sessions)
+    except ValueError:
+        return "historical evaluation sessions are invalid"
+    if sessions != tuple(sorted(set(sessions))):
+        return "historical evaluation sessions must be unique and chronological"
+    for fold in plan_folds:
+        if not isinstance(fold, Mapping) or not {
+            "fold_id",
+            "evaluation_year",
+            "outcome_start",
+            "outcome_end",
+            "signal_start",
+            "signal_end",
+        }.issubset(fold):
+            return "historical qualification fold plan is incomplete"
+        try:
+            year = int(fold["evaluation_year"])
+            annual = tuple(session for session in sessions if session.year == year)
+            outcome_start = date.fromisoformat(str(fold["outcome_start"]))
+            outcome_end = date.fromisoformat(str(fold["outcome_end"]))
+            signal_start = date.fromisoformat(str(fold["signal_start"]))
+            signal_end = date.fromisoformat(str(fold["signal_end"]))
+        except (TypeError, ValueError):
+            return "historical qualification fold dates are invalid"
+        if (
+            len(annual) < 240
+            or annual[0] != outcome_start
+            or annual[-1] != outcome_end
+            or not outcome_start < signal_start <= signal_end < outcome_end
+        ):
+            return "historical qualification folds lack complete frozen sessions"
+    typed_folds = [fold for fold in folds if isinstance(fold, Mapping)]
+    completed = sum(int(fold["completed_trades"]) for fold in typed_folds)
+    traded = sum(int(fold["completed_trades"]) > 0 for fold in typed_folds)
+    positive = sum(
+        int(fold["completed_trades"]) > 0 and float(fold["cumulative_return"]) > 0
+        for fold in typed_folds
+    )
+    cumulative = _compound_result_returns(float(fold["cumulative_return"]) for fold in typed_folds)
+    stress_cumulative = _compound_result_returns(
+        float(fold["stress_cumulative_return"]) for fold in typed_folds
+    )
+    gross_profit = sum(float(fold["gross_profit"]) for fold in typed_folds)
+    gross_loss = sum(float(fold["gross_loss"]) for fold in typed_folds)
+    stress_profit = sum(float(fold["stress_gross_profit"]) for fold in typed_folds)
+    stress_loss = sum(float(fold["stress_gross_loss"]) for fold in typed_folds)
+    profit_factor = (
+        math.inf
+        if gross_profit and not gross_loss
+        else (gross_profit / gross_loss if gross_loss else 0.0)
+    )
+    stress_factor = (
+        math.inf
+        if stress_profit and not stress_loss
+        else (stress_profit / stress_loss if stress_loss else 0.0)
+    )
+    expected_metrics = {
+        "completed_trades": completed,
+        "traded_folds": traded,
+        "positive_traded_fold_rate": positive / traded if traded else 0.0,
+        "cumulative_return": cumulative,
+        "profit_factor": profit_factor,
+        "stress_cumulative_return": stress_cumulative,
+        "stress_profit_factor": stress_factor,
+        "stress_max_drawdown": min(
+            (float(fold["stress_max_drawdown"]) for fold in typed_folds), default=0.0
+        ),
+        "trade_fold_concentration": (
+            max((int(fold["completed_trades"]) for fold in typed_folds), default=0) / completed
+            if completed
+            else 0.0
+        ),
+        "profit_fold_concentration": (
+            max((float(fold["gross_profit"]) for fold in typed_folds), default=0.0) / gross_profit
+            if gross_profit
+            else 0.0
+        ),
+    }
+    if any(
+        not _metric_matches(aggregate.get(name), value) for name, value in expected_metrics.items()
+    ):
+        return "historical screen aggregate conflicts with fold evidence"
+    random_samples = benchmarks.get("random_entry_samples")
+    if not isinstance(random_samples, list) or len(random_samples) != int(
+        plan_benchmarks.get("random_samples", -1)
+    ):
+        return "historical random-entry benchmark sample count is invalid"
+    if (
+        not _finite_metric(benchmarks.get("cash_return"))
+        or float(benchmarks.get("cash_return", math.nan)) != 0.0
+        or not _finite_metric(benchmarks.get("family_baseline_return"))
+    ):
+        return "historical benchmark metrics are invalid"
+    for sample_index, sample in enumerate(random_samples):
+        if (
+            not isinstance(sample, Mapping)
+            or not {
+                "sample_index",
+                "cumulative_return",
+                "completed_trades",
+                "entry_months",
+                "holding_sessions",
+            }.issubset(sample)
+            or not _finite_metric(sample.get("cumulative_return"))
+        ):
+            return "historical random-entry benchmark sample is malformed"
+        entry_months = sample.get("entry_months")
+        holding_sessions = sample.get("holding_sessions")
+        if (
+            sample.get("sample_index") != sample_index
+            or sample.get("completed_trades") != completed
+            or not isinstance(entry_months, list)
+            or not isinstance(holding_sessions, list)
+            or len(entry_months) != completed
+            or len(holding_sessions) != completed
+            or any(not isinstance(month, int) or not 1 <= month <= 12 for month in entry_months)
+            or any(not isinstance(value, int) or value < 0 for value in holding_sessions)
+        ):
+            return "historical random-entry benchmark exposure is malformed"
+    included = selection.get("included_trial_ids")
+    selected = selection.get("selected_trial_id")
+    baseline_id = plan_benchmarks.get("family_baseline_trial_id")
+    try:
+        observed_mean = Decimal(str(selection.get("observed_mean_excess_return")))
+        confidence = Decimal(str(selection.get("adjusted_confidence")))
+        required_confidence = Decimal(str(thresholds.get("selection_confidence")))
+    except InvalidOperation:
+        return "historical selection adjustment confidence is invalid"
+    if (
+        not observed_mean.is_finite()
+        or not confidence.is_finite()
+        or not isinstance(included, list)
+        or not all(isinstance(item, str) for item in included)
+        or len(included) != len(set(included))
+        or selected not in included
+        or baseline_id not in included
+        or selection.get("repetitions") != selection_policy.get("repetitions")
+        or selection.get("block_sessions") != selection_policy.get("block_sessions")
+        or selection.get("passed") is not (confidence >= required_confidence)
+    ):
+        return "historical selection adjustment conflicts with frozen policy"
+    random_returns = tuple(float(sample["cumulative_return"]) for sample in random_samples)
+    random_threshold = sorted(random_returns)[max(0, math.ceil(0.9 * len(random_returns)) - 1)]
+    expected_gates = {
+        "completed_trades": completed >= int(thresholds["minimum_completed_trades"]),
+        "traded_folds": traded >= int(thresholds["minimum_traded_folds"]),
+        "positive_traded_folds": Decimal(str(expected_metrics["positive_traded_fold_rate"]))
+        >= Decimal(str(thresholds["minimum_positive_fold_rate"])),
+        "aggregate_cumulative_return": Decimal(str(cumulative))
+        > Decimal(str(thresholds["minimum_cumulative_return"])),
+        "aggregate_profit_factor": math.isinf(profit_factor)
+        or Decimal(str(profit_factor)) > Decimal(str(thresholds["minimum_profit_factor"])),
+        "stress_cumulative_return": Decimal(str(stress_cumulative))
+        > Decimal(str(thresholds["minimum_stress_cumulative_return"])),
+        "stress_profit_factor": math.isinf(stress_factor)
+        or Decimal(str(stress_factor)) > Decimal(str(thresholds["minimum_stress_profit_factor"])),
+        "stress_drawdown": Decimal(str(expected_metrics["stress_max_drawdown"]))
+        >= -Decimal(str(plan.get("stress_drawdown_limit", "0"))),
+        "trade_fold_concentration": Decimal(str(expected_metrics["trade_fold_concentration"]))
+        <= Decimal(str(thresholds["maximum_fold_concentration"])),
+        "profit_fold_concentration": Decimal(str(expected_metrics["profit_fold_concentration"]))
+        <= Decimal(str(thresholds["maximum_fold_concentration"])),
+        "cash_benchmark": cumulative > float(benchmarks.get("cash_return", 0)),
+        "family_baseline_benchmark": cumulative
+        > float(benchmarks.get("family_baseline_return", 0)),
+        "random_entry_benchmark": cumulative > random_threshold,
+        "selection_adjusted_confidence": selection.get("passed") is True,
+    }
+    gate_map = {str(gate.get("name")): gate for gate in gates if isinstance(gate, Mapping)}
+    if any(gate_map[name].get("passed") is not passed for name, passed in expected_gates.items()):
+        return "historical screen gates conflict with evidence"
+    return None
+
+
+def _compound_result_returns(values) -> float:
+    equity = 1.0
+    for value in values:
+        equity *= 1.0 + value
+    return equity - 1.0
+
+
+def _metric_matches(actual: object, expected: float | int) -> bool:
+    if expected == math.inf:
+        return actual == "Infinity"
+    try:
+        return math.isclose(float(str(actual)), float(expected), rel_tol=1e-12, abs_tol=1e-12)
+    except (TypeError, ValueError):
+        return False
+
+
+def _shadow_execution_evidence_error(
+    *,
+    registration: Mapping[str, object],
+    evidence: Mapping[str, object],
+) -> str | None:
+    proposals = evidence.get("paper_proposals")
+    fills = evidence.get("simulated_fills")
+    if not isinstance(proposals, list) or not isinstance(fills, list):
+        return "Shadow prospective execution evidence is malformed"
+    try:
+        start = parse_timestamp(str(registration.get("prospective_start"))).date()
+        as_of = date.fromisoformat(str(evidence.get("as_of")))
+        cutoff = date.fromisoformat(str(evidence.get("data_cutoff")))
+    except ValueError:
+        return "Shadow prospective execution dates are invalid"
+    proposal_ids: list[str] = []
+    for proposal in proposals:
+        if not isinstance(proposal, Mapping) or not {
+            "proposal_id",
+            "signal_date",
+            "entry_date",
+            "action",
+        }.issubset(proposal):
+            return "Shadow paper proposal is incomplete"
+        try:
+            signal = date.fromisoformat(str(proposal["signal_date"]))
+            entry = date.fromisoformat(str(proposal["entry_date"]))
+        except ValueError:
+            return "Shadow paper proposal dates are invalid"
+        proposal_id = proposal.get("proposal_id")
+        if (
+            not isinstance(proposal_id, str)
+            or not proposal_id
+            or proposal.get("action") != "BUY"
+            or signal <= start
+            or signal > as_of
+            or entry < signal
+            or entry > cutoff
+        ):
+            return "Shadow paper proposal conflicts with prospective evidence"
+        proposal_ids.append(proposal_id)
+    if len(proposal_ids) != len(set(proposal_ids)):
+        return "Shadow paper proposal identities are duplicated"
+    fill_ids: list[str] = []
+    for fill in fills:
+        if not isinstance(fill, Mapping) or not {
+            "proposal_id",
+            "quantity",
+            "executed_entry_price",
+            "executed_exit_price",
+            "pnl",
+        }.issubset(fill):
+            return "canonical simulated fill is incomplete"
+        if (
+            not isinstance(fill.get("proposal_id"), str)
+            or any(
+                not _finite_metric(fill.get(name))
+                for name in (
+                    "quantity",
+                    "executed_entry_price",
+                    "executed_exit_price",
+                    "pnl",
+                )
+            )
+            or float(fill["quantity"]) <= 0
+            or float(fill["executed_entry_price"]) <= 0
+            or float(fill["executed_exit_price"]) <= 0
+        ):
+            return "canonical simulated fill terms are invalid"
+        fill_ids.append(str(fill["proposal_id"]))
+    if len(fill_ids) != len(set(fill_ids)) or not set(fill_ids).issubset(proposal_ids):
+        return "canonical simulated fills do not link unique paper proposals"
+    return None
+
+
+def _activation_truth_error(
+    *,
+    registration: Mapping[str, object],
+    evidence: Mapping[str, object],
+    activation: Mapping[str, object],
+) -> str | None:
+    policy = registration.get("activation_policy")
+    gates = activation.get("gates")
+    fills = evidence.get("simulated_fills")
+    if (
+        not isinstance(policy, Mapping)
+        or not isinstance(gates, list)
+        or not isinstance(fills, list)
+    ):
+        return "shadow activation source evidence is malformed"
+    gate_map = {str(gate.get("name")): gate for gate in gates if isinstance(gate, Mapping)}
+    try:
+        expected = {
+            "shadow_identity": evidence.get("shadow_id") == registration.get("shadow_id"),
+            "definition_unchanged": (
+                evidence.get("definition_fingerprint") == registration.get("definition_fingerprint")
+                and gate_map["definition_unchanged"].get("actual")
+                == registration.get("definition_fingerprint")
+            ),
+            "activation_checkpoint": date.fromisoformat(str(evidence.get("as_of")))
+            >= date.fromisoformat(str(registration.get("activation_checkpoint"))),
+            "completed_sessions": int(evidence.get("completed_sessions", -1))
+            >= int(policy.get("minimum_completed_sessions", -1)),
+            "completed_trades": len(fills) >= int(policy.get("minimum_completed_trades", -1)),
+            "prospective_cumulative_return": Decimal(str(evidence.get("cumulative_return")))
+            > Decimal(str(policy.get("minimum_cumulative_return"))),
+            "prospective_profit_factor": Decimal(str(evidence.get("profit_factor")))
+            > Decimal(str(policy.get("minimum_profit_factor"))),
+            "stress_cumulative_return": Decimal(str(evidence.get("stress_cumulative_return")))
+            > Decimal(str(policy.get("minimum_stress_cumulative_return"))),
+            "stress_profit_factor": Decimal(str(evidence.get("stress_profit_factor")))
+            > Decimal(str(policy.get("minimum_stress_profit_factor"))),
+            "stress_drawdown": Decimal(str(evidence.get("stress_max_drawdown")))
+            >= -Decimal(str(policy.get("stress_drawdown_limit"))),
+            "critical_drift": evidence.get("critical_drift") is False,
+        }
+    except (KeyError, TypeError, ValueError, InvalidOperation):
+        return "shadow activation source evidence is malformed"
+    if any(gate_map[name].get("passed") is not passed for name, passed in expected.items()):
+        return "shadow activation gates conflict with prospective evidence"
+    return None
+
+
+def _finite_metric(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _finite_or_infinite_factor(value: object) -> bool:
+    if value == "Infinity":
+        return True
+    try:
+        return math.isfinite(float(str(value)))
+    except (TypeError, ValueError):
+        return False
+
+
+def _cost_policies_error(value: object) -> str | None:
+    if not isinstance(value, Mapping):
+        return "qualification cost policies must be an object"
+    required = {"entry_slippage_bps", "exit_slippage_bps", "fee_bps_per_side"}
+    for name in ("base", "stress"):
+        policy = value.get(name)
+        if not isinstance(policy, Mapping) or not required.issubset(policy):
+            return "qualification cost policies are incomplete"
+        if any(not _finite_metric(policy.get(field)) for field in required):
+            return "qualification cost policies must be finite"
     return None
 
 

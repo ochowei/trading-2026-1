@@ -5,6 +5,10 @@ from datetime import UTC, date, datetime
 import pandas as pd
 import pytest
 
+from trading.core.qualification import (
+    HISTORICAL_QUALIFICATION_GATE_NAMES,
+    SHADOW_ACTIVATION_GATE_NAMES,
+)
 from trading.core.sleeve_engine import (
     DEFAULT_BASE_COST_POLICY,
     DEFAULT_STRESS_COST_POLICY,
@@ -155,6 +159,284 @@ def test_validity_is_valid_when_snapshot_is_reproducible_fresh_and_current(tmp_p
         now=datetime(2026, 8, 5, 12, tzinfo=UTC),
     )
     assert loaded.validity.status is ResultValidityStatus.VALID
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("historical_stability_folds", [{"fold_id": "fold-2021"}], "historical"),
+        (
+            "development_summary",
+            {
+                "historical_plan": {},
+                "historical_screen": {
+                    "passed": True,
+                    "disposition": "active",
+                },
+            },
+            "Active",
+        ),
+        (
+            "shadow_evidence",
+            {
+                "registration": {"shadow_id": "shadow-1"},
+                "evidence": {},
+                "activation": {"authorized_for_live_orders": True},
+            },
+            "live orders",
+        ),
+        (
+            "live_evidence",
+            {"authorized_for_live_orders": True},
+            "live evidence",
+        ),
+    ],
+)
+def test_validity_rejects_malformed_or_live_authorizing_qualification_evidence(
+    tmp_path,
+    field: str,
+    value: object,
+    message: str,
+) -> None:
+    store, _manifest, _manifest_path, payload = _fixture(tmp_path)
+    payload[field] = value
+
+    validity = classify_result(
+        payload,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+
+    assert validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any(message in reason for reason in validity.reasons)
+
+
+def test_registered_shadow_without_a_checkpoint_remains_valid_non_live_evidence(tmp_path) -> None:
+    store, _manifest, _manifest_path, payload = _fixture(tmp_path)
+    fold = {
+        "fold_id": "",
+        "evaluation_year": 0,
+        "signal_count": 4,
+        "candidate_count": 4,
+        "completed_trades": 4,
+        "cumulative_return": 0.01,
+        "stress_cumulative_return": 0.005,
+        "stress_max_drawdown": -0.01,
+        "gross_profit": 1.0,
+        "gross_loss": 0.0,
+        "stress_gross_profit": 0.5,
+        "stress_gross_loss": 0.0,
+    }
+    folds = [
+        {**fold, "fold_id": f"fold-{year}", "evaluation_year": year} for year in range(2021, 2026)
+    ]
+    evaluation_sessions = [
+        timestamp.date().isoformat() for timestamp in pd.bdate_range("2021-01-01", "2025-12-31")
+    ]
+    plan_folds = []
+    for year in range(2021, 2026):
+        annual = [value for value in evaluation_sessions if value.startswith(str(year))]
+        plan_folds.append(
+            {
+                "fold_id": f"fold-{year}",
+                "evaluation_year": year,
+                "outcome_start": annual[0],
+                "outcome_end": annual[-1],
+                "signal_start": annual[1],
+                "signal_end": annual[-2],
+            }
+        )
+    cost_policies = {
+        "base": {
+            "entry_slippage_bps": 5.0,
+            "exit_slippage_bps": 5.0,
+            "fee_bps_per_side": 1.0,
+        },
+        "stress": {
+            "entry_slippage_bps": 20.0,
+            "exit_slippage_bps": 20.0,
+            "fee_bps_per_side": 2.0,
+        },
+    }
+    payload["development_summary"] = {
+        "historical_plan": {
+            "plan_id": "plan-1",
+            "definition_fingerprint": payload["definition_fingerprint"],
+            "created_at": "2020-12-31T21:00:00.000000Z",
+            "development_years": [2018, 2019, 2020],
+            "evaluation_sessions": evaluation_sessions,
+            "folds": plan_folds,
+            "maximum_holding_sessions": 1,
+            "execution_lag_sessions": 1,
+            "dependency_sessions": 2,
+            "embargo_sessions": 1,
+            "stress_drawdown_limit": "0.2",
+            "thresholds": {
+                "minimum_development_years": 3,
+                "minimum_evaluation_folds": 5,
+                "minimum_completed_trades": 20,
+                "minimum_traded_folds": 3,
+                "minimum_positive_fold_rate": "0.6",
+                "minimum_cumulative_return": "0",
+                "minimum_profit_factor": "1.1",
+                "minimum_stress_cumulative_return": "0",
+                "minimum_stress_profit_factor": "1",
+                "maximum_fold_concentration": "0.5",
+                "selection_confidence": "0.9",
+            },
+            "benchmarks": {
+                "family_baseline_trial_id": "trial-baseline",
+                "random_seed": 17,
+                "random_samples": 10,
+            },
+            "selection_adjustment": {"repetitions": 100, "block_sessions": 5},
+            "cost_policies": cost_policies,
+        },
+        "historical_screen": {
+            "plan_id": "plan-1",
+            "aggregate": {
+                "completed_trades": 20,
+                "traded_folds": 5,
+                "positive_traded_fold_rate": 1.0,
+                "cumulative_return": (1.01**5) - 1,
+                "profit_factor": "Infinity",
+                "stress_cumulative_return": (1.005**5) - 1,
+                "stress_profit_factor": "Infinity",
+                "stress_max_drawdown": -0.01,
+                "trade_fold_concentration": 0.2,
+                "profit_fold_concentration": 0.2,
+            },
+            "benchmarks": {
+                "cash_return": 0.0,
+                "family_baseline_return": 0.0,
+                "random_entry_samples": [
+                    {
+                        "sample_index": index,
+                        "cumulative_return": 0.0,
+                        "completed_trades": 20,
+                        "entry_months": [1] * 20,
+                        "holding_sessions": [1] * 20,
+                    }
+                    for index in range(10)
+                ],
+            },
+            "passed": True,
+            "disposition": "shadow-eligible",
+            "gates": [
+                {"name": name, "passed": True} for name in HISTORICAL_QUALIFICATION_GATE_NAMES
+            ],
+            "selection_adjustment": {
+                "selected_trial_id": "trial-1",
+                "included_trial_ids": ["trial-1", "trial-baseline"],
+                "observed_mean_excess_return": "0.001",
+                "adjusted_confidence": "0.95",
+                "repetitions": 100,
+                "block_sessions": 5,
+                "passed": True,
+            },
+        },
+    }
+    payload["historical_stability_folds"] = folds
+    payload["shadow_evidence"] = {
+        "registration": {
+            "shadow_id": "shadow-1",
+            "historical_plan_id": "plan-1",
+            "trial_id": "trial-1",
+            "definition_fingerprint": payload["definition_fingerprint"],
+            "definition_snapshot_id": "d" * 64,
+            "definition_snapshot_byte_count": 100,
+            "prospective_start": "2026-08-04T21:00:00.000000Z",
+            "recorded_at": "2026-08-04T21:00:00.000000Z",
+            "activation_checkpoint": "2027-08-09",
+            "status": "shadow",
+            "cost_policies": cost_policies,
+            "activation_policy": {
+                "minimum_completed_sessions": 252,
+                "minimum_completed_trades": 12,
+                "minimum_cumulative_return": "0",
+                "minimum_profit_factor": "1",
+                "minimum_stress_cumulative_return": "0",
+                "minimum_stress_profit_factor": "1",
+                "stress_drawdown_limit": "0.2",
+            },
+        },
+        "evidence": {},
+        "activation": {},
+    }
+
+    validity = classify_result(
+        payload,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+
+    assert validity.status is ResultValidityStatus.VALID
+
+    contradictory = json.loads(json.dumps(payload))
+    contradictory["development_summary"]["historical_screen"]["aggregate"]["completed_trades"] = 0
+    contradictory_validity = classify_result(
+        contradictory,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert contradictory_validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("aggregate conflicts" in reason for reason in contradictory_validity.reasons)
+
+    fabricated_activation = json.loads(json.dumps(payload))
+    fabricated_activation["shadow_evidence"]["evidence"] = {
+        "shadow_id": "shadow-1",
+        "definition_fingerprint": payload["definition_fingerprint"],
+        "as_of": "2027-08-10",
+        "data_cutoff": "2027-08-10",
+        "completed_sessions": 0,
+        "paper_proposals": [],
+        "simulated_fills": [],
+        "cumulative_return": 0.0,
+        "profit_factor": "0",
+        "stress_cumulative_return": 0.0,
+        "stress_profit_factor": "0",
+        "stress_max_drawdown": 0.0,
+        "critical_drift": False,
+    }
+    fabricated_activation["shadow_evidence"]["activation"] = {
+        "shadow_id": "shadow-1",
+        "evaluated_at": "2027-08-10",
+        "gates": [
+            {
+                "name": name,
+                "passed": True,
+                "actual": payload["definition_fingerprint"]
+                if name == "definition_unchanged"
+                else "pass",
+                "threshold": "pass",
+            }
+            for name in SHADOW_ACTIVATION_GATE_NAMES
+        ],
+        "eligible": True,
+        "disposition": "activation-eligible",
+        "authorized_for_live_orders": False,
+    }
+    activation_validity = classify_result(
+        fabricated_activation,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert activation_validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("activation gates conflict" in reason for reason in activation_validity.reasons)
+
+    del payload["shadow_evidence"]["registration"]["definition_snapshot_id"]
+    invalid = classify_result(
+        payload,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert invalid.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("registration evidence is incomplete" in reason for reason in invalid.reasons)
 
 
 def test_data_cutoff_becomes_data_stale_without_mutating_the_result(tmp_path) -> None:
