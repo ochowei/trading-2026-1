@@ -219,3 +219,35 @@ results/**/.trial_registry.json.lock
 .cache/
 .research-data/blobs/
 state/
+
+# Manual trading imports and secrets (synthetic fixtures belong under tests/)
+broker-imports/
+.broker-imports/
+credentials/
+.credentials/
+*.broker.csv
+*.broker.json
+*.credentials
+*.credentials.json
+broker.csv
+broker.json
+broker-export*.csv
+broker-export*.json
+manual-execution-ledger*.csv
+.*manual-execution-ledger*.head.json
+manual-reconciliation*.json
+*.reconciliation.json
+secrets/
+credentials.json
+credentials.yaml
+credentials.yml
+*.secret
+*.secret.json
+*.pem
+*.key
+.*.lock
+.*.head.json
+
+# Explicit synthetic broker fixtures remain versionable in tests.
+!tests/**/broker*.csv
+!tests/**/broker*.json

@@ -1,10 +1,40 @@
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from decimal import Decimal
+from pathlib import Path
 
 import pandas as pd
 import pytest
 
 from trading.core.base_config import ExperimentConfig
+from trading.core.manual_ledger import LedgerInitialization, ManualLedgerStore
+
+
+@pytest.fixture
+def make_manual_ledger(tmp_path) -> Callable[..., ManualLedgerStore]:
+    """Create an initialized synthetic ledger with configurable capital and universe."""
+
+    def factory(
+        *,
+        managed_capital: Decimal | int | str = "1000",
+        universe: tuple[str, ...] = ("SPY",),
+        initialized_at: datetime | None = None,
+        allocation_epoch: str = "epoch-0001",
+        path: Path | None = None,
+    ) -> ManualLedgerStore:
+        store = ManualLedgerStore(path or tmp_path / "ledger.csv")
+        store.initialize(
+            LedgerInitialization.create(
+                managed_capital=managed_capital,
+                universe=universe,
+                initialized_at=initialized_at or datetime(2026, 8, 1, 12, 0, tzinfo=UTC),
+                allocation_epoch=allocation_epoch,
+            )
+        )
+        return store
+
+    return factory
 
 
 @pytest.fixture

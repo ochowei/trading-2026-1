@@ -78,6 +78,16 @@ uv run trading compare <exp1> <exp2>
 # 產生跟單訊號報告（Firstrade 下單用）
 uv run trading followup
 
+# 初始化、驗證、成交事件與 broker reconciliation（Phase 5 dry-run）
+uv run trading ledger init --managed-capital 100000 --universe \
+  CIBR COPX DIA EEM EWJ EWT EWZ FCX FXI GLD INDA IWM NVDA SIVR SOXL SPY \
+  TLT TQQQ TSLA TSM URA USO VGK VOO XBI XLU
+uv run trading ledger verify
+uv run trading ledger record --event-type deposit --amount 1000
+uv run trading ledger reconcile --broker-export broker-imports/account.csv
+uv run trading ledger export backup/manual-execution-ledger.csv
+uv run trading ledger import backup/manual-execution-ledger.csv --path state/manual-execution-ledger.csv
+
 # 回測目前跟單策略組合（預設最近 126 個完整交易日）
 uv run trading followup-backtest
 
@@ -157,6 +167,7 @@ docs/
 ├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
 ├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
 ├── canonical-sleeve-execution.md # Phase 4 sleeve capital、cost scenarios、metrics 與 parity
+├── manual-execution-ledger.md   # Phase 5 ledger domain、integrity、reconciliation 與 CLI 契約
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -180,7 +191,14 @@ src/trading/
 │   ├── results.py               # 結果讀取、validity diagnostics 與跨實驗比較
 │   ├── definition_resolver.py   # Current semantic definition 唯讀解析（不發布 blob）
 │   ├── evaluation.py            # 單一資產 stale refresh、完整性與排名邊界
-│   └── sync_docs.py             # Markdown 結果與 latest.json 同步檢查
+│   ├── sync_docs.py             # Markdown 結果與 latest.json 同步檢查
+│   ├── accounting.py            # Decimal、canonical JSON 與 UTC timestamp primitives
+│   ├── ledger_csv.py            # Fixed-schema canonical CSV codec
+│   ├── ledger_storage.py        # Private atomic writes 與 bounded file locking
+│   ├── broker_reconciliation.py # Broker CSV parsing 與 accounting comparison
+│   ├── manual_ledger.py         # Ledger domain、hash chain、replay 與 persistence boundary
+│   ├── proposals.py             # Decimal proposal terms 與 deterministic proposal IDs
+│   └── followup_proposals.py    # 從 verified ledger 建立 dry-run entry/exit proposal terms
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
 │   ├── models.py                # Series/requirement/policy/decision/metadata value types
@@ -204,6 +222,10 @@ src/trading/
     ├── EXPERIMENTS_<TICKER>.md  # 各資產實驗總覽與 AI_CONTEXT
     └── <name>/                  # config.py + signal_detector.py + strategy.py + __init__.py
 ```
+
+Phase 5 manual-execution details and the broker-export CSV contract are documented in
+[docs/manual-execution-ledger.md](docs/manual-execution-ledger.md). Runtime ledger, reconciliation,
+broker-import, and credential files are local-only and must remain outside Git.
 
 ## 按需參考（不需要時不用讀）
 
