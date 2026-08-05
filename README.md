@@ -129,6 +129,36 @@ Failed formal attempts remain in the append-only `results/trial_registry.json`, 
 family and semantic definition fingerprint. The result and trial-history contract is documented in
 [docs/result-validity-and-trial-history.md](docs/result-validity-and-trial-history.md).
 
+## Manual execution ledger
+
+Phase 5 keeps actual followup state in an ignored, local, append-only CSV ledger. It is dry-run only;
+there is no broker API or live cutover. Initialize and verify the managed capital and equal sleeves,
+then reconcile against a broker CSV before allowing a new BUY:
+
+```bash
+uv run trading ledger init --managed-capital 100000 --universe \
+  CIBR COPX DIA EEM EWJ EWT EWZ FCX FXI GLD INDA IWM NVDA SIVR SOXL SPY \
+  TLT TQQQ TSLA TSM URA USO VGK VOO XBI XLU
+uv run trading ledger verify
+uv run trading ledger reconcile --broker-export broker-imports/account.csv
+uv run trading ledger export backup/manual-execution-ledger.csv
+uv run trading ledger import backup/manual-execution-ledger.csv --path state/manual-execution-ledger.csv
+```
+
+The initialization universe must exactly match the current ticker set in
+`trading.followup.STRATEGIES`; update the command when that selected-strategy set changes.
+
+The ledger uses Decimal accounting, a canonical CSV/hash chain, append-only corrections, and a local
+head checkpoint. Confirmed fills—not backtests or unconfirmed proposals—create positions. `followup`
+uses deterministic proposal IDs and actual fill price/quantity for exits; missing, stale, or invalid
+ledger/reconciliation state blocks new BUY proposals. An outstanding entry blocks a different BUY
+until fill or explicit cancellation, while an outstanding GTC stop keeps its proposal ID across later
+runs, reports only its active remainder after partial fills, and requires cancellation before other
+term changes or expiry. A GTC stop left after another exit closes the position blocks the sleeve's
+next BUY until cancellation is recorded. Ledger exports include an adjacent hidden head checkpoint;
+the CSV and checkpoint must be transferred together for import. See
+[docs/manual-execution-ledger.md](docs/manual-execution-ledger.md) for event and broker-export details.
+
 ## Followup Backtest
 
 ```bash
@@ -155,7 +185,7 @@ portfolio 聚合採 base-net，研究排名也只採 daily-equity base-net Sharp
 缺少資料的日期，會從之後第一個完整交易日開始。起日之後不足指定交易日數時，報告會
 使用實際可用區間並顯示警告。單一 ticker 失敗時會列出錯誤並繼續其他策略；若無法建立
 任何回測區間，CLI 以非零狀態結束。現有 `uv run trading followup` 仍固定使用最近 60 個
-交易日並產生 Firstrade 下單報告。
+交易日並產生 Firstrade dry-run proposal 報告；實際部位只來自 verified manual ledger，未核對時不會產生新的 BUY。
 
 ## 如何設計新實驗 (How to Design a New Experiment)
 

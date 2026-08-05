@@ -8,11 +8,21 @@ import argparse
 import json
 import logging
 import sys
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from trading.core.data_fetcher import create_default_market_data_service
 from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.core.manual_ledger import (
+    CASH_EVENT_TYPES,
+    FILL_EVENT_TYPES,
+    RECORDABLE_EVENT_TYPES,
+    LedgerError,
+    LedgerEvent,
+    LedgerInitialization,
+    ManualLedgerStore,
+)
+from trading.core.proposals import ProposalTerms
 from trading.core.results import compare_experiments, inspect_result, save_result
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
@@ -38,6 +48,9 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
+DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
 
 
 def create_default_research_data_store() -> ResearchDataStore:
@@ -237,6 +250,182 @@ def cmd_followup_backtest(args: argparse.Namespace) -> None:
         raise SystemExit(1)
 
 
+def cmd_ledger(args: argparse.Namespace) -> None:
+    """Manage the local dry-run manual execution ledger."""
+    try:
+        path = getattr(args, "path", None) or DEFAULT_MANUAL_LEDGER_PATH
+        if args.ledger_command == "init":
+            if args.managed_capital is None or not args.universe:
+                raise ValueError("ledger init requires --managed-capital and --universe")
+            initialization = LedgerInitialization.create(
+                managed_capital=args.managed_capital,
+                universe=args.universe,
+                initialized_at=args.timestamp or datetime.now(UTC),
+                allocation_epoch=args.allocation_epoch,
+                currency=args.currency,
+            )
+            replay = ManualLedgerStore(path).initialize(initialization)
+            print(
+                f"ledger initialized: {path} (head={replay.head_hash}, "
+                f"managed capital={replay.managed_capital})"
+            )
+            return
+
+        store = ManualLedgerStore(path)
+        if args.ledger_command == "verify":
+            replay = store.verify()
+            print(f"ledger valid: {path}")
+            print(f"  head: {replay.head_hash}")
+            print(f"  cash: {replay.cash}")
+            print(f"  positions: {len(replay.positions)}")
+            print(f"  proposals: {len(replay.proposals)}")
+            return
+        if args.ledger_command == "record":
+            event = _record_ledger_event(store, args)
+            print(f"recorded {event.event_type}: {event.event_id}")
+            return
+        if args.ledger_command == "reconcile":
+            if args.broker_export is None:
+                raise ValueError("ledger reconcile requires --broker-export")
+            report = store.reconcile(args.broker_export, args.report)
+            status = "ok" if report.ok else "failed"
+            print(f"reconciliation {status}: {args.report}")
+            for error in report.errors:
+                print(f"  error: {error}")
+            if not report.ok:
+                raise SystemExit(1)
+            return
+        if args.ledger_command == "export":
+            if args.destination is None:
+                raise ValueError("ledger export requires a destination")
+            destination = store.export(args.destination)
+            print(f"ledger exported: {destination}")
+            return
+        if args.ledger_command == "import":
+            if args.source is None:
+                raise ValueError("ledger import requires a source")
+            replay = store.import_ledger(args.source)
+            print(f"ledger imported: {args.source} -> {path} (head={replay.head_hash})")
+            return
+        raise ValueError(f"unsupported ledger command: {args.ledger_command}")
+    except SystemExit:
+        raise
+    except (LedgerError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        print(f"ledger error: {exc}")
+        raise SystemExit(1) from exc
+
+
+def _record_submission_event(store: ManualLedgerStore, args: argparse.Namespace) -> LedgerEvent:
+    if args.proposal_terms_json is None:
+        raise ValueError("submission requires --proposal-terms-json")
+    payload = json.loads(args.proposal_terms_json)
+    if not isinstance(payload, dict):
+        raise ValueError("--proposal-terms-json must contain an object")
+    proposal = ProposalTerms.from_payload(payload)
+    if args.proposal_id and args.proposal_id != proposal.proposal_id:
+        raise ValueError("--proposal-id does not match proposal terms")
+    return store.record_submission(proposal, occurred_at=args.timestamp, event_id=args.event_id)
+
+
+def _record_fill_event(store: ManualLedgerStore, args: argparse.Namespace) -> LedgerEvent:
+    required = {
+        "proposal_id": args.proposal_id,
+        "sleeve_id": args.sleeve_id,
+        "instrument": args.instrument,
+        "side": args.side,
+        "quantity": args.quantity,
+        "price": args.price,
+    }
+    if any(value is None for value in required.values()):
+        raise ValueError("fill requires proposal, sleeve, instrument, side, quantity, and price")
+    return store.record_fill(
+        proposal_id=args.proposal_id,
+        sleeve_id=args.sleeve_id,
+        instrument=args.instrument,
+        side=args.side,
+        quantity=args.quantity,
+        price=args.price,
+        fee=args.fee,
+        event_type=args.event_type,
+        occurred_at=args.timestamp,
+        event_id=args.event_id,
+        external_id=args.external_id,
+    )
+
+
+def _record_cancellation_event(store: ManualLedgerStore, args: argparse.Namespace) -> LedgerEvent:
+    if args.proposal_id is None:
+        raise ValueError("cancellation requires --proposal-id")
+    return store.record_cancellation(
+        args.proposal_id,
+        occurred_at=args.timestamp,
+        event_id=args.event_id,
+    )
+
+
+def _record_cash_event(store: ManualLedgerStore, args: argparse.Namespace) -> LedgerEvent:
+    if args.amount is None:
+        raise ValueError(f"{args.event_type} requires --amount")
+    return store.record_cash_event(
+        args.event_type,
+        args.amount,
+        sleeve_id=args.sleeve_id or "",
+        occurred_at=args.timestamp,
+        event_id=args.event_id,
+        external_id=args.external_id,
+    )
+
+
+def _record_correction_event(store: ManualLedgerStore, args: argparse.Namespace) -> LedgerEvent:
+    if args.correction_of is None or args.changes_json is None:
+        raise ValueError("correction requires --correction-of and --changes-json")
+    changes = json.loads(args.changes_json)
+    if not isinstance(changes, dict):
+        raise ValueError("--changes-json must contain an object")
+    return store.record_correction(
+        args.correction_of,
+        changes,
+        occurred_at=args.timestamp,
+        event_id=args.event_id,
+    )
+
+
+def _record_manual_adjustment_event(
+    store: ManualLedgerStore,
+    args: argparse.Namespace,
+) -> LedgerEvent:
+    return store.record_manual_adjustment(
+        classification=args.classification or "unrelated_manual",
+        sleeve_id=args.sleeve_id or "",
+        instrument=args.instrument or "",
+        side=args.side or "",
+        quantity=args.quantity,
+        price=args.price,
+        amount=args.amount,
+        position_id=args.position_id or "",
+        occurred_at=args.timestamp,
+        event_id=args.event_id,
+        external_id=args.external_id,
+    )
+
+
+_LEDGER_RECORD_HANDLERS = {
+    "submission": _record_submission_event,
+    **{event_type: _record_fill_event for event_type in FILL_EVENT_TYPES},
+    "cancellation": _record_cancellation_event,
+    **{event_type: _record_cash_event for event_type in CASH_EVENT_TYPES},
+    "correction": _record_correction_event,
+    "manual_adjustment": _record_manual_adjustment_event,
+}
+
+
+def _record_ledger_event(store: ManualLedgerStore, args: argparse.Namespace) -> LedgerEvent:
+    event_type = args.event_type
+    if event_type is None or event_type not in RECORDABLE_EVENT_TYPES:
+        raise ValueError("ledger record requires a supported --event-type")
+    return _LEDGER_RECORD_HANDLERS[event_type](store, args)
+
+
 def cmd_data_status(args: argparse.Namespace) -> None:
     """Inspect one active cache series without network access or writes."""
     service = create_default_market_data_service()
@@ -393,6 +582,17 @@ def iso_date(value: str) -> date:
     return parsed
 
 
+def iso_datetime(value: str) -> datetime:
+    """Parse an aware ISO-8601 timestamp for ledger event ordering."""
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be an aware ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise argparse.ArgumentTypeError("must include a timezone")
+    return parsed.astimezone(UTC)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the CLI parser independently from command dispatch."""
     parser = argparse.ArgumentParser(
@@ -431,7 +631,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # followup
-    sub.add_parser("followup", help="產生跟單訊號報告 (Generate Firstrade trading signals)")
+    followup_p = sub.add_parser(
+        "followup", help="產生跟單訊號報告 (Generate Firstrade trading signals)"
+    )
+    followup_p.add_argument("--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    followup_p.add_argument("--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH)
 
     # followup-backtest
     followup_backtest_p = sub.add_parser(
@@ -494,6 +698,48 @@ def build_parser() -> argparse.ArgumentParser:
 
     # freshness
     sub.add_parser("freshness", help="檢查知識新鮮度 (Check knowledge freshness)")
+
+    # manual execution ledger
+    ledger_p = sub.add_parser("ledger", help="管理本地手動成交 ledger (Manage manual ledger)")
+    ledger_sub = ledger_p.add_subparsers(dest="ledger_command", required=True)
+    ledger_init_p = ledger_sub.add_parser("init", help="Initialize managed capital and sleeves")
+    ledger_init_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_init_p.add_argument("--managed-capital")
+    ledger_init_p.add_argument("--universe", nargs="+")
+    ledger_init_p.add_argument("--allocation-epoch", default="epoch-0001")
+    ledger_init_p.add_argument("--currency", default="USD")
+    ledger_init_p.add_argument("--timestamp", type=iso_datetime)
+    ledger_verify_p = ledger_sub.add_parser("verify", help="Verify chain and replay invariants")
+    ledger_verify_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_record_p = ledger_sub.add_parser("record", help="Append one ledger event")
+    ledger_record_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_record_p.add_argument("--event-type", choices=sorted(RECORDABLE_EVENT_TYPES))
+    ledger_record_p.add_argument("--event-id")
+    ledger_record_p.add_argument("--timestamp", type=iso_datetime)
+    ledger_record_p.add_argument("--proposal-id")
+    ledger_record_p.add_argument("--proposal-terms-json")
+    ledger_record_p.add_argument("--sleeve-id")
+    ledger_record_p.add_argument("--instrument")
+    ledger_record_p.add_argument("--side")
+    ledger_record_p.add_argument("--quantity")
+    ledger_record_p.add_argument("--price")
+    ledger_record_p.add_argument("--amount")
+    ledger_record_p.add_argument("--fee")
+    ledger_record_p.add_argument("--position-id")
+    ledger_record_p.add_argument("--classification")
+    ledger_record_p.add_argument("--external-id")
+    ledger_record_p.add_argument("--correction-of")
+    ledger_record_p.add_argument("--changes-json")
+    ledger_reconcile_p = ledger_sub.add_parser("reconcile", help="Compare with a broker CSV export")
+    ledger_reconcile_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_reconcile_p.add_argument("--broker-export", type=Path)
+    ledger_reconcile_p.add_argument("--report", type=Path, default=DEFAULT_RECONCILIATION_PATH)
+    ledger_export_p = ledger_sub.add_parser("export", help="Export a verified ledger CSV")
+    ledger_export_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_export_p.add_argument("destination", type=Path, nargs="?")
+    ledger_import_p = ledger_sub.add_parser("import", help="Import a verified ledger CSV")
+    ledger_import_p.add_argument("--path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    ledger_import_p.add_argument("source", type=Path, nargs="?")
 
     # data
     data_p = sub.add_parser("data", help="Inspect or refresh the CSV market-data cache")
@@ -590,7 +836,16 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "followup":
         from trading.followup import run_followup
 
-        run_followup()
+        if (
+            args.ledger_path == DEFAULT_MANUAL_LEDGER_PATH
+            and args.reconciliation_path == DEFAULT_RECONCILIATION_PATH
+        ):
+            run_followup()
+        else:
+            run_followup(
+                ledger_path=args.ledger_path,
+                reconciliation_path=args.reconciliation_path,
+            )
     elif args.command == "followup-backtest":
         cmd_followup_backtest(args)
     elif args.command == "compare":
@@ -605,6 +860,8 @@ def main(argv: list[str] | None = None) -> None:
         from trading.core.freshness import check_freshness
 
         check_freshness()
+    elif args.command == "ledger":
+        cmd_ledger(args)
     elif args.command == "data" and args.data_command == "status":
         cmd_data_status(args)
     elif args.command == "data" and args.data_command == "refresh":
