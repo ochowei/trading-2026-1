@@ -55,13 +55,24 @@ def publish_immutable(path: Path, content: bytes, digest: str) -> None:
 
 def read_definition_blob(path: Path, reference: DefinitionBlobRef) -> dict[str, object]:
     """Read and fully verify an exact research-definition artifact."""
+    content = _read_definition_content(path, reference)
+    return verify_definition_bytes(content, reference)
+
+
+def read_definition_blob_bytes(path: Path, reference: DefinitionBlobRef) -> bytes:
+    """Read verified exact definition bytes for portable export."""
+    content = _read_definition_content(path, reference)
+    verify_definition_bytes(content, reference)
+    return content
+
+
+def _read_definition_content(path: Path, reference: DefinitionBlobRef) -> bytes:
     try:
-        content = path.read_bytes()
+        return path.read_bytes()
     except OSError as exc:
         raise ImmutableBlobCorruptionError(
             f"definition blob {reference.digest} is missing or unreadable"
         ) from exc
-    return verify_definition_bytes(content, reference)
 
 
 def verify_definition_bytes(

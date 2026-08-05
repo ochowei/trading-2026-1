@@ -93,7 +93,7 @@ def test_export_import_restores_manifest_data_definition_and_result(tmp_path) ->
     target_root = tmp_path / "target" / "blobs"
     imported = ResearchDataStore(target_root).import_bundle(
         bundle_path,
-        manifest_path=tmp_path / "target" / "results" / "snapshot.json",
+        manifest_path=tmp_path / "target" / "results" / "run.snapshot.json",
     )
 
     assert imported.manifest == manifest
@@ -121,7 +121,7 @@ def test_export_import_restores_manifest_data_definition_and_result(tmp_path) ->
     with pytest.raises(ImmutableBlobCorruptionError, match="collision or corruption"):
         collision_store.import_bundle(
             bundle_path,
-            manifest_path=tmp_path / "collision" / "snapshot.json",
+            manifest_path=tmp_path / "collision" / "run.snapshot.json",
         )
 
     assert collision_path.read_bytes() == b"different immutable content"

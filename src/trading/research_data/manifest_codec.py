@@ -120,6 +120,10 @@ def manifest_from_bytes(content: bytes) -> SnapshotManifest:
     ).hexdigest()
     if manifest.snapshot_id != expected_id:
         raise SnapshotManifestError("snapshot manifest identity does not match its content")
+    if content != canonical_json_bytes(manifest_payload(manifest)):
+        raise SnapshotManifestError(
+            "snapshot manifest contains unknown fields or non-canonical bytes"
+        )
     return manifest
 
 

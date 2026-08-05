@@ -66,8 +66,8 @@ uv sync
 # 列出所有實驗
 uv run trading list
 
-# 執行 snapshot-aware 實驗（formal online；只有成功才更新 latest.json）
-uv run trading run <experiment_name> --snapshot results/example/run.snapshot.json
+# 執行已 prepare 的 snapshot-aware 實驗（預設 formal online）
+uv run trading run <experiment_name>
 
 # 尚未完成 Phase 9 migration 的實驗必須明確選擇 legacy persisted run
 uv run trading run <experiment_name> --legacy
@@ -99,7 +99,11 @@ uv run trading data refresh SPY --start 2020-01-01
 # 完整歷史 refresh；建立 snapshot 前必須執行
 uv run trading data refresh SPY --full
 
-# 完整刷新 primary/auxiliary 並寫入可追蹤的 data snapshot manifest
+# 完整刷新並捕捉 experiment definition；發布 immutable results/NAME/<snapshot_id>.snapshot.json
+uv run trading data snapshot SPY --experiment <experiment_name> --aux '^VIX' \
+  --history-start 2020-01-01 --decision 2026-08-04
+
+# 不供 formal execution 的 data-only snapshot 必須指定可追蹤 destination
 uv run trading data snapshot SPY --aux '^VIX' --history-start 2020-01-01 \
   --decision 2026-08-04 --manifest results/example/data.snapshot.json
 
@@ -110,7 +114,7 @@ uv run trading data verify results/example/data.snapshot.json
 uv run trading data export results/example/run.snapshot.json backup.snapshot.zip
 uv run trading data import backup.snapshot.zip --manifest results/example/imported.snapshot.json
 
-# Reference-aware GC 預設掃描完整 results/ 且為 dry-run
+# Reference-aware GC 預設掃描完整 results/；額外 roots 為 additive；預設 dry-run
 uv run trading data gc --grace-days 7
 
 # Diagnostic run 不改變 results 或 registry state

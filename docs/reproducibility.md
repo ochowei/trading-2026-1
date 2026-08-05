@@ -22,7 +22,9 @@ returns a defensive-copy `MarketDataBundle`. It never calls a provider or repair
 A manifest records every declared series with provider, symbol, interval, adjustment policy, role,
 history start, availability policy, data cutoff, full-refresh timestamp, blob identity, and optional
 definition reference. Its `snapshot_id` is the SHA-256 of canonical manifest content excluding the
-identity field itself.
+identity field itself. Every official publication path requires a `.snapshot.json` destination and
+strictly compares input bytes with the canonical round-trip, rejecting unknown fields and alternate
+JSON representations.
 
 ## Research-definition evidence
 
@@ -50,9 +52,13 @@ outcome-relevant source, configuration, engine, or dependency changes alter the 
   never advances `latest.json`;
 - `ephemeral` returns diagnostics without writing result or registry state.
 
-`trading run --snapshot MANIFEST` selects formal online mode; `--offline MANIFEST` selects formal
-offline mode. Both require snapshot-aware `run_with_bundle` and `capture_research_definition` seams,
-and bind the captured current exact definition reference to the manifest before execution.
+`trading data snapshot --experiment NAME` captures current definition evidence and defaults to
+the immutable `results/NAME/<snapshot_id>.snapshot.json` path. `trading run NAME` selects formal
+online mode by default by discovering the newest retained manifest whose exact definition reference
+matches the current experiment. `--snapshot MANIFEST` overrides discovery and `--offline MANIFEST`
+selects formal offline mode. Formal modes require snapshot-aware `run_with_bundle` and
+`capture_research_definition` seams, and bind the captured current exact definition reference to the
+manifest before execution.
 Unmigrated persisted execution requires explicit `--legacy`; `--ephemeral` remains available because
 it changes no persisted results. Full detector migration remains Phase 9.
 
@@ -60,14 +66,15 @@ it changes no persisted results. Full detector migration remains Phase 9.
 
 Snapshot bundle export verifies and packages `manifest.json`, every referenced data blob, the
 referenced definition blob, and an optional result JSON. Import rejects duplicate, missing, or
-unexpected archive members; verifies every identity and size; refuses immutable collisions; then
-publishes blobs and the requested result-linked manifest. Replaying the imported bundle uses only
+unexpected archive members; verifies every identity, size, adjusted-daily schema, session coverage,
+and exact canonical CSV serialization; refuses immutable collisions; then publishes blobs and the
+requested result-linked manifest. Replaying the imported bundle uses only
 the restored `MarketDataBundle`, so signals, trades, and metrics are independent of Yahoo availability.
 
 ## Garbage collection
 
 `trading data gc` recursively discovers the complete retained-manifest set under `results/` by
-default; repeated `--manifest-root` options declare alternative complete roots. It protects every
+default; repeated `--manifest-root` options add archive roots without removing the default. It protects every
 referenced data and definition blob, considers only unreferenced blobs older than the declared grace
 period, and defaults to dry-run. A missing root or malformed retained manifest fails closed. Deletion
 requires `--apply`. Normal research, trading, result rotation, export, import, and verification paths

@@ -16,6 +16,7 @@ from trading.market_data import (
     SignalDecisionTime,
 )
 from trading.research_data import (
+    DefinitionBlobRef,
     ImmutableBlobCorruptionError,
     ResearchDataStore,
     SnapshotEligibilityError,
@@ -149,6 +150,61 @@ def test_snapshot_manifest_records_every_declared_series_and_policy(tmp_path) ->
     )
 
 
+def test_latest_manifest_discovery_selects_newest_exact_definition(tmp_path) -> None:
+    cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
+    series = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    cache.publish(
+        series,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    times = iter(
+        (
+            datetime(2026, 8, 5, 10, tzinfo=UTC),
+            datetime(2026, 8, 5, 11, tzinfo=UTC),
+            datetime(2026, 8, 5, 12, tzinfo=UTC),
+        )
+    )
+    store = ResearchDataStore(tmp_path / "research-data", now=lambda: next(times))
+    requirement = MarketDataRequirement(series, date(2026, 8, 3), role="primary")
+    decision_time = SignalDecisionTime.for_primary_session(date(2026, 8, 4))
+    definition = DefinitionBlobRef("d" * 64, 1, "f" * 64)
+    other_definition = DefinitionBlobRef("e" * 64, 1, "0" * 64)
+    manifest_root = tmp_path / "results" / "experiment"
+
+    first = store.create_snapshot(
+        cache,
+        (requirement,),
+        decision_time,
+        definition=definition,
+    )
+    second = store.create_snapshot(
+        cache,
+        (requirement,),
+        decision_time,
+        definition=definition,
+    )
+    unrelated = store.create_snapshot(
+        cache,
+        (requirement,),
+        decision_time,
+        definition=other_definition,
+    )
+    first_path = store.write_manifest(first, manifest_root / f"{first.snapshot_id}.snapshot.json")
+    second_path = store.write_manifest(
+        second,
+        manifest_root / f"{second.snapshot_id}.snapshot.json",
+    )
+    store.write_manifest(
+        unrelated,
+        manifest_root / f"{unrelated.snapshot_id}.snapshot.json",
+    )
+
+    assert first_path != second_path
+    assert store.latest_manifest_for_definition(manifest_root, definition) == second_path
+
+
 def test_snapshot_manifest_reconstructs_policy_safe_bundle_without_provider(tmp_path) -> None:
     cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
     primary = MarketDataSeries.yahoo_adjusted_daily("SPY")
@@ -179,7 +235,7 @@ def test_snapshot_manifest_reconstructs_policy_safe_bundle_without_provider(tmp_
         requirements,
         SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
     )
-    manifest_path = tmp_path / "results" / "experiment" / "snapshot.json"
+    manifest_path = tmp_path / "results" / "experiment" / "data.snapshot.json"
     store.write_manifest(manifest, manifest_path)
 
     loaded = ResearchDataStore(root).load_snapshot(manifest_path)
@@ -202,6 +258,55 @@ def test_snapshot_manifest_reconstructs_policy_safe_bundle_without_provider(tmp_
 
     with pytest.raises(SnapshotManifestError, match="cutoff"):
         ResearchDataStore(root).load_snapshot(tampered_path)
+
+
+def test_snapshot_rejects_semantically_valid_noncanonical_csv_blob(tmp_path) -> None:
+    cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
+    series = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    cache.publish(
+        series,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    store = ResearchDataStore(tmp_path / "research-data")
+    manifest = store.create_snapshot(
+        cache,
+        (MarketDataRequirement(series, date(2026, 8, 3), role="primary"),),
+        SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+    )
+    canonical_path = store.write_manifest(manifest, tmp_path / "canonical.snapshot.json")
+    payload = json.loads(canonical_path.read_text(encoding="utf-8"))
+    noncanonical = (
+        bars()
+        .to_csv(
+            index=True,
+            index_label="Date",
+            date_format="%Y-%m-%d",
+            float_format="%.1f",
+            lineterminator="\n",
+        )
+        .encode("utf-8")
+    )
+    digest = hashlib.sha256(noncanonical).hexdigest()
+    blob_payload = payload["data"][0]["blob"]
+    blob_payload["digest"] = digest
+    blob_payload["byte_count"] = len(noncanonical)
+    body = {key: value for key, value in payload.items() if key != "snapshot_id"}
+    payload["snapshot_id"] = hashlib.sha256(
+        (json.dumps(body, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+    ).hexdigest()
+    noncanonical_manifest = tmp_path / "noncanonical.snapshot.json"
+    noncanonical_manifest.write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    blob_path = store.data_blob_path(digest)
+    blob_path.parent.mkdir(parents=True, exist_ok=True)
+    blob_path.write_bytes(noncanonical)
+
+    with pytest.raises(ImmutableBlobCorruptionError, match="canonically serialized"):
+        store.load_snapshot(noncanonical_manifest)
 
 
 def test_manifest_publication_rejects_false_snapshot_identity(tmp_path) -> None:
@@ -230,6 +335,29 @@ def test_manifest_publication_rejects_false_snapshot_identity(tmp_path) -> None:
 
     assert not manifest_path.exists()
     assert not bundle_path.exists()
+
+
+def test_manifest_publication_requires_retained_snapshot_suffix(tmp_path) -> None:
+    cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
+    series = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    cache.publish(
+        series,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    store = ResearchDataStore(tmp_path / "research-data")
+    manifest = store.create_snapshot(
+        cache,
+        (MarketDataRequirement(series, date(2026, 8, 3), role="primary"),),
+        SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+    )
+    unsafe_path = tmp_path / "results" / "manifest.json"
+
+    with pytest.raises(SnapshotManifestError, match=r"\.snapshot\.json"):
+        store.write_manifest(manifest, unsafe_path)
+
+    assert not unsafe_path.exists()
 
 
 def test_manifest_parser_rejects_non_boolean_availability_flag(tmp_path) -> None:
@@ -289,7 +417,7 @@ def test_manifest_parser_rejects_non_integer_blob_count(tmp_path) -> None:
         (MarketDataRequirement(series, date(2026, 8, 3), role="primary"),),
         SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
     )
-    manifest_path = store.write_manifest(manifest, tmp_path / "snapshot.json")
+    manifest_path = store.write_manifest(manifest, tmp_path / "data.snapshot.json")
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
     payload["data"][0]["blob"]["row_count"] = 2.5
     body = {key: value for key, value in payload.items() if key != "snapshot_id"}
@@ -303,6 +431,34 @@ def test_manifest_parser_rejects_non_integer_blob_count(tmp_path) -> None:
     )
 
     with pytest.raises(SnapshotManifestError, match="row_count"):
+        store.load_manifest(malformed_path)
+
+
+def test_manifest_parser_rejects_unknown_noncanonical_content(tmp_path) -> None:
+    cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
+    series = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    cache.publish(
+        series,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    store = ResearchDataStore(tmp_path / "research-data")
+    manifest = store.create_snapshot(
+        cache,
+        (MarketDataRequirement(series, date(2026, 8, 3), role="primary"),),
+        SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+    )
+    manifest_path = store.write_manifest(manifest, tmp_path / "data.snapshot.json")
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["undeclared_context"] = {"ignored": True}
+    malformed_path = tmp_path / "unknown.snapshot.json"
+    malformed_path.write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SnapshotManifestError, match="canonical"):
         store.load_manifest(malformed_path)
 
 

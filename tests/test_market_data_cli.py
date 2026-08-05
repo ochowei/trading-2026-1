@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from trading.cli import build_parser, main
+from trading.research_data import DefinitionBlobRef, ResearchDefinitionSnapshot
 
 
 class FakeInspection:
@@ -38,8 +39,8 @@ class FakeResearchDataStore:
         self.created = []
         self.written = []
 
-    def create_snapshot(self, cache, requirements, decision_time):
-        self.created.append((cache, tuple(requirements), decision_time))
+    def create_snapshot(self, cache, requirements, decision_time, *, definition=None):
+        self.created.append((cache, tuple(requirements), decision_time, definition))
         return SimpleNamespace(snapshot_id="a" * 64, data=tuple(requirements), definition=None)
 
     def write_manifest(self, manifest, path):
@@ -134,15 +135,58 @@ def test_data_snapshot_cli_full_refreshes_declared_series_and_writes_manifest(
 
     assert [call[0].symbol for call in service.refresh_calls] == ["SPY", "^VIX"]
     assert all(call[1:] == ("full", None, date(2026, 8, 4)) for call in service.refresh_calls)
-    _, requirements, decision_time = store.created[0]
+    _, requirements, decision_time, definition = store.created[0]
     assert [(item.series.symbol, item.role) for item in requirements] == [
         ("SPY", "primary"),
         ("^VIX", "auxiliary"),
     ]
     assert requirements[1].availability_policy.publication_lag_sessions == 1
     assert decision_time.session == date(2026, 8, 4)
+    assert definition is None
     assert store.written[0][1] == manifest_path
     assert "a" * 64 in capsys.readouterr().out
+
+
+def test_data_snapshot_cli_captures_definition_for_formal_experiment(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    service = FakeDataService()
+    service.cache = object()
+    store = FakeResearchDataStore()
+    blob = DefinitionBlobRef(
+        digest="d" * 64,
+        byte_count=100,
+        fingerprint="f" * 64,
+    )
+
+    class SnapshotAwareExperiment:
+        def run_with_bundle(self, bundle):
+            return {"metrics": {}}
+
+        def capture_research_definition(self, definition_store):
+            return ResearchDefinitionSnapshot(fingerprint=blob.fingerprint, blob=blob)
+
+    monkeypatch.setattr("trading.cli.create_default_market_data_service", lambda: service)
+    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: store)
+    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
+    monkeypatch.setattr("trading.cli.get_experiment", lambda name: SnapshotAwareExperiment())
+    main(
+        [
+            "data",
+            "snapshot",
+            "SPY",
+            "--experiment",
+            "experiment",
+            "--history-start",
+            "2020-01-01",
+            "--decision",
+            "2026-08-04",
+        ]
+    )
+
+    assert store.created[0][3] == blob
+    assert store.written[0][1] == Path("results/experiment") / (f"{'a' * 64}.snapshot.json")
 
 
 def test_data_reproducibility_cli_exposes_verify_export_import_and_safe_gc(tmp_path) -> None:
@@ -198,3 +242,17 @@ def test_data_gc_discovers_retained_manifests_from_results_by_default(
     assert manifest_roots == (Path("results"),)
     assert grace_period.days == 7
     assert apply is False
+
+
+def test_data_gc_additional_manifest_root_keeps_default_results_protected(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    store = FakeGarbageCollectionStore()
+    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: store)
+    archive_root = tmp_path / "archive"
+
+    main(["data", "gc", "--manifest-root", str(archive_root)])
+
+    manifest_roots, _, _ = store.calls[0]
+    assert manifest_roots == (Path("results"), archive_root)

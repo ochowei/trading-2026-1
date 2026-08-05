@@ -96,3 +96,38 @@ def test_snapshot_cli_run_defaults_to_online_and_binds_current_definition(
     assert kwargs["manifest_path"] == manifest_path
     assert kwargs["mode"] is RunMode.ONLINE
     assert kwargs["current_definition"].fingerprint == "b" * 64
+
+
+def test_snapshot_aware_cli_run_uses_prepared_manifest_by_default(monkeypatch) -> None:
+    calls = []
+    discovery_calls = []
+    prepared_path = Path("results/experiment") / f"{'c' * 64}.snapshot.json"
+
+    class FakeStore:
+        def latest_manifest_for_definition(self, manifest_root, definition):
+            discovery_calls.append((manifest_root, definition))
+            return prepared_path
+
+    class FakeCoordinator:
+        def __init__(self, *, store, results_root):
+            pass
+
+        def execute(self, name, runner, **kwargs):
+            calls.append((name, kwargs))
+
+    monkeypatch.setattr("trading.cli.get_experiment", lambda name: FakeSnapshotAwareStrategy())
+    monkeypatch.setattr("trading.cli.ResearchRunCoordinator", FakeCoordinator)
+    monkeypatch.setattr("trading.cli.create_default_research_data_store", FakeStore)
+    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
+
+    main(["run", "experiment"])
+
+    _, kwargs = calls[0]
+    assert discovery_calls == [
+        (
+            Path("results/experiment"),
+            DefinitionBlobRef(digest="a" * 64, byte_count=100, fingerprint="b" * 64),
+        )
+    ]
+    assert kwargs["manifest_path"] == prepared_path
+    assert kwargs["mode"] is RunMode.ONLINE

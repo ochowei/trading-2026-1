@@ -90,7 +90,7 @@ def test_persisted_run_rejects_snapshot_without_definition_evidence(tmp_path) ->
         (MarketDataRequirement(series, date(2026, 8, 3), role="primary"),),
         SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
     )
-    manifest_path = store.write_manifest(manifest, tmp_path / "snapshot.json")
+    manifest_path = store.write_manifest(manifest, tmp_path / "data.snapshot.json")
 
     with pytest.raises(RunEvidenceError, match="definition evidence"):
         ResearchRunCoordinator(store=store, results_root=tmp_path / "results").execute(
@@ -122,7 +122,7 @@ def test_online_offline_and_ephemeral_modes_have_distinct_publication_rules(tmp_
         SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
         definition=definition_blob(tmp_path),
     )
-    manifest_path = store.write_manifest(manifest, tmp_path / "snapshot.json")
+    manifest_path = store.write_manifest(manifest, tmp_path / "run.snapshot.json")
     coordinator = ResearchRunCoordinator(
         store=store,
         results_root=tmp_path / "results",

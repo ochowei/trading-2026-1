@@ -70,17 +70,24 @@ def cmd_run(args: argparse.Namespace) -> None:
         # 預設執行全部 (Default: run all)
         names = list_experiments()
 
-    formal_manifest = args.offline or args.snapshot
-    if formal_manifest is not None and len(names) != 1:
+    explicit_formal_manifest = args.offline or args.snapshot
+    default_formal = explicit_formal_manifest is None and not args.ephemeral and not args.legacy
+    if (explicit_formal_manifest is not None or default_formal) and len(names) != 1:
         raise SystemExit("formal snapshot execution requires exactly one experiment")
 
     for name in names:
         logger.info(f"執行實驗: {name} (Running experiment: {name})")
         strategy = get_experiment(name)
-        if formal_manifest is not None:
+        formal_manifest = explicit_formal_manifest
+        if formal_manifest is not None or default_formal:
             run_with_bundle = getattr(strategy, "run_with_bundle", None)
             capture_definition = getattr(strategy, "capture_research_definition", None)
             if not callable(run_with_bundle) or not callable(capture_definition):
+                if default_formal:
+                    raise SystemExit(
+                        "persisted runs require a snapshot-aware prepared manifest or "
+                        "--snapshot MANIFEST; use --legacy only for unmigrated experiments"
+                    )
                 raise SystemExit(
                     f"{name} is not snapshot-aware; formal execution requires "
                     "run_with_bundle and capture_research_definition"
@@ -90,8 +97,14 @@ def cmd_run(args: argparse.Namespace) -> None:
                 raise SystemExit(
                     "capture_research_definition must return ResearchDefinitionSnapshot"
                 )
+            research_store = create_default_research_data_store()
+            if default_formal:
+                formal_manifest = research_store.latest_manifest_for_definition(
+                    Path("results") / name,
+                    definition.blob,
+                )
             coordinator = ResearchRunCoordinator(
-                store=create_default_research_data_store(),
+                store=research_store,
                 results_root=Path("results"),
             )
             coordinator.execute(
@@ -107,11 +120,6 @@ def cmd_run(args: argparse.Namespace) -> None:
             result = strategy.run()
             # 儲存 legacy result (Save legacy result)
             save_result(name, result)
-        else:
-            raise SystemExit(
-                "persisted runs require --snapshot MANIFEST; use --legacy only for "
-                "unmigrated experiments"
-            )
 
     if len(names) > 1:
         print("\n  所有實驗已完成 (All experiments completed)")
@@ -183,9 +191,26 @@ def cmd_data_refresh(args: argparse.Namespace) -> None:
 
 
 def cmd_data_snapshot(args: argparse.Namespace) -> None:
-    """Fully refresh declared series and publish one data-only snapshot manifest."""
+    """Fully refresh declared series and publish one immutable snapshot manifest."""
+    manifest_path = args.manifest
+    if manifest_path is None and args.experiment is None:
+        raise SystemExit("data-only snapshot requires --manifest PATH")
     service = create_default_market_data_service()
     store = create_default_research_data_store()
+    definition = None
+    if args.experiment is not None:
+        experiment = get_experiment(args.experiment)
+        run_with_bundle = getattr(experiment, "run_with_bundle", None)
+        capture_definition = getattr(experiment, "capture_research_definition", None)
+        if not callable(run_with_bundle) or not callable(capture_definition):
+            raise SystemExit(
+                f"{args.experiment} is not snapshot-aware; formal snapshot preparation "
+                "requires run_with_bundle and capture_research_definition"
+            )
+        captured = capture_definition(create_default_research_definition_store())
+        if not isinstance(captured, ResearchDefinitionSnapshot):
+            raise SystemExit("capture_research_definition must return ResearchDefinitionSnapshot")
+        definition = captured.blob
     primary = MarketDataSeries.yahoo_adjusted_daily(args.symbol)
     auxiliary = [MarketDataSeries.yahoo_adjusted_daily(symbol) for symbol in args.aux]
     for series in (primary, *auxiliary):
@@ -214,8 +239,11 @@ def cmd_data_snapshot(args: argparse.Namespace) -> None:
         service.cache,
         requirements,
         SignalDecisionTime.for_primary_session(args.decision),
+        definition=definition,
     )
-    path = store.write_manifest(manifest, args.manifest)
+    if manifest_path is None:
+        manifest_path = Path("results") / args.experiment / f"{manifest.snapshot_id}.snapshot.json"
+    path = store.write_manifest(manifest, manifest_path)
     print(f"snapshot {manifest.snapshot_id} published to {path}")
 
 
@@ -253,7 +281,7 @@ def cmd_data_import(args: argparse.Namespace) -> None:
 
 def cmd_data_gc(args: argparse.Namespace) -> None:
     """Plan or explicitly apply reference-aware immutable-blob garbage collection."""
-    manifest_roots = tuple(args.manifest_roots or (Path("results"),))
+    manifest_roots = tuple(dict.fromkeys((Path("results"), *(args.manifest_roots or ()))))
     report = create_default_research_data_store().collect_garbage(
         manifest_roots=manifest_roots,
         grace_period=timedelta(days=args.grace_days),
@@ -395,6 +423,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     data_snapshot_p.add_argument("symbol", help="Primary Yahoo Finance ticker symbol")
     data_snapshot_p.add_argument(
+        "--experiment",
+        help="Capture snapshot-aware experiment definition for formal execution",
+    )
+    data_snapshot_p.add_argument(
         "--aux",
         action="append",
         default=[],
@@ -415,8 +447,10 @@ def build_parser() -> argparse.ArgumentParser:
     data_snapshot_p.add_argument(
         "--manifest",
         type=Path,
-        required=True,
-        help="Tracked result-linked manifest destination",
+        help=(
+            "Tracked result-linked destination; formal default is "
+            "results/NAME/<snapshot_id>.snapshot.json"
+        ),
     )
     data_snapshot_p.add_argument("--aux-publication-lag", type=int, default=1)
     data_snapshot_p.add_argument("--aux-max-observation-lag", type=int, default=1)

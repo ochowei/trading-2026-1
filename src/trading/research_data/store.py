@@ -23,8 +23,14 @@ from trading.market_data import (
     MarketDataSeries,
     SignalDecisionTime,
 )
+from trading.market_data.calendar import PrimaryUSSessionCalendar
+from trading.market_data.validation import (
+    canonical_daily_bar_csv_bytes,
+    validate_daily_bars,
+)
 from trading.research_data.artifacts import (
     ImmutableBlobCorruptionError,
+    read_definition_blob_bytes,
 )
 from trading.research_data.artifacts import (
     canonical_json_bytes as _canonical_json_bytes,
@@ -145,10 +151,13 @@ class ResearchDataStore:
 
     def write_manifest(self, manifest: SnapshotManifest, path: Path) -> Path:
         """Write a result-linked manifest without replacing different content."""
+        path = Path(path)
+        if not path.name.endswith(".snapshot.json"):
+            raise SnapshotManifestError("snapshot manifest path must end with .snapshot.json")
         content = _canonical_json_bytes(_manifest_payload(manifest))
         _manifest_from_bytes(content)
-        _publish_immutable(Path(path), content, hashlib.sha256(content).hexdigest())
-        return Path(path)
+        _publish_immutable(path, content, hashlib.sha256(content).hexdigest())
+        return path
 
     def load_manifest(self, path: Path) -> SnapshotManifest:
         """Parse and verify one immutable snapshot manifest."""
@@ -170,6 +179,31 @@ class ResearchDataStore:
             raise SnapshotManifestError("snapshot manifest identity does not match its content")
         return manifest
 
+    def latest_manifest_for_definition(
+        self,
+        manifest_root: Path,
+        definition: DefinitionBlobRef,
+    ) -> Path:
+        """Find the newest retained manifest for one exact research definition."""
+        matches: list[tuple[SnapshotManifest, Path]] = []
+        for path in sorted(Path(manifest_root).glob("*.snapshot.json")):
+            manifest = self.load_manifest(path)
+            if manifest.definition == definition:
+                matches.append((manifest, path))
+        if not matches:
+            raise SnapshotManifestError(
+                "no prepared snapshot manifest matches the current research definition"
+            )
+        _, path = max(
+            matches,
+            key=lambda item: (
+                item[0].decision_time.session,
+                item[0].created_at,
+                item[0].snapshot_id,
+            ),
+        )
+        return path
+
     def load_snapshot(self, manifest_path: Path) -> ResearchSnapshot:
         """Materialize a verified policy-safe bundle using immutable blobs only."""
         manifest = self.load_manifest(manifest_path)
@@ -184,24 +218,7 @@ class ResearchDataStore:
                     f"decision session {manifest.decision_time.session}"
                 )
             blob_bytes = self._read_data_blob(entry.blob)
-            try:
-                frame = pd.read_csv(
-                    BytesIO(blob_bytes),
-                    parse_dates=["Date"],
-                    index_col="Date",
-                )
-            except (TypeError, ValueError) as exc:
-                raise ImmutableBlobCorruptionError(
-                    f"invalid immutable CSV blob {entry.blob.digest}: {exc}"
-                ) from exc
-            if len(frame) != entry.blob.row_count:
-                raise ImmutableBlobCorruptionError(
-                    f"immutable blob {entry.blob.digest} row count does not match manifest"
-                )
-            if frame.empty or frame.index[-1].date() != entry.data_cutoff:
-                raise SnapshotManifestError(
-                    f"{entry.series.symbol} blob cutoff does not match snapshot manifest"
-                )
+            frame = _parse_canonical_data_blob(blob_bytes, entry)
             requirements.append(
                 MarketDataRequirement(
                     series=entry.series,
@@ -228,9 +245,11 @@ class ResearchDataStore:
         """Export a verified manifest and all referenced immutable evidence."""
         manifest_bytes = _canonical_json_bytes(_manifest_payload(manifest))
         manifest = _manifest_from_bytes(manifest_bytes)
-        data_content = {
-            entry.blob.digest: self._read_data_blob(entry.blob) for entry in manifest.data
-        }
+        data_content: dict[str, bytes] = {}
+        for entry in manifest.data:
+            content = self._read_data_blob(entry.blob)
+            _parse_canonical_data_blob(content, entry)
+            data_content[entry.blob.digest] = content
         definition_content: bytes | None = None
         if manifest.definition is not None:
             definition_content = self._read_definition_blob(manifest.definition)
@@ -286,7 +305,7 @@ class ResearchDataStore:
                     name = f"data/{entry.blob.digest}.csv"
                     expected_names.add(name)
                     content = archive.read(name)
-                    _verify_blob_bytes(content, entry.blob)
+                    _parse_canonical_data_blob(content, entry)
                     data_content[entry.blob.digest] = content
                 definition_content: bytes | None = None
                 if manifest.definition is not None:
@@ -396,15 +415,10 @@ class ResearchDataStore:
         return self.root / "definitions" / "sha256" / digest[:2] / f"{digest}.json"
 
     def _read_definition_blob(self, reference: DefinitionBlobRef) -> bytes:
-        path = self._definition_blob_path(reference.digest)
-        try:
-            content = path.read_bytes()
-        except OSError as exc:
-            raise ImmutableBlobCorruptionError(
-                f"definition blob {reference.digest} is missing or unreadable"
-            ) from exc
-        _verify_definition_bytes(content, reference)
-        return content
+        return read_definition_blob_bytes(
+            self._definition_blob_path(reference.digest),
+            reference,
+        )
 
     def _capture_cache_series(
         self,
@@ -446,3 +460,55 @@ def _verify_blob_bytes(content: bytes, reference: DataBlobRef) -> None:
         raise ImmutableBlobCorruptionError(
             f"immutable blob {reference.digest} failed checksum verification"
         )
+
+
+def _parse_canonical_data_blob(
+    content: bytes,
+    entry: SnapshotDataRef,
+) -> pd.DataFrame:
+    _verify_blob_bytes(content, entry.blob)
+    try:
+        frame = pd.read_csv(
+            BytesIO(content),
+            parse_dates=["Date"],
+            index_col="Date",
+        )
+    except (TypeError, ValueError) as exc:
+        raise ImmutableBlobCorruptionError(
+            f"invalid immutable CSV blob {entry.blob.digest}: {exc}"
+        ) from exc
+    if frame.empty:
+        raise ImmutableBlobCorruptionError(
+            f"immutable blob {entry.blob.digest} contains no daily bars"
+        )
+    normalized, outcome = validate_daily_bars(frame)
+    if not outcome.is_valid:
+        raise ImmutableBlobCorruptionError(
+            f"invalid immutable CSV blob {entry.blob.digest}: " + "; ".join(outcome.errors)
+        )
+    calendar = PrimaryUSSessionCalendar()
+    expected_sessions = calendar.sessions_in_range(
+        normalized.index.min().date(),
+        normalized.index.max().date(),
+    )
+    normalized, outcome = validate_daily_bars(
+        normalized,
+        expected_sessions=expected_sessions,
+    )
+    if not outcome.is_valid:
+        raise ImmutableBlobCorruptionError(
+            f"invalid immutable CSV blob {entry.blob.digest}: " + "; ".join(outcome.errors)
+        )
+    if canonical_daily_bar_csv_bytes(normalized) != content:
+        raise ImmutableBlobCorruptionError(
+            f"immutable blob {entry.blob.digest} is not canonically serialized"
+        )
+    if len(normalized) != entry.blob.row_count:
+        raise ImmutableBlobCorruptionError(
+            f"immutable blob {entry.blob.digest} row count does not match manifest"
+        )
+    if outcome.data_cutoff != entry.data_cutoff:
+        raise SnapshotManifestError(
+            f"{entry.series.symbol} blob cutoff does not match snapshot manifest"
+        )
+    return normalized
