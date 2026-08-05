@@ -55,7 +55,7 @@ snapshot/result 變成 unreproducible，永遠不會以目前 Yahoo 資料覆寫
 fields 或替代 serialization，確保 Git retention、GC discovery 與 snapshot identity 使用同一份契約。
 
 Research-definition fingerprint 包含 canonical resolved config、strategy/detector/backtester 的 normalized
-Python AST、execution-engine version、Python 與 relevant dependency versions。Comments 或 formatting 不改變
+Python AST、execution-engine version、base/stress execution-cost policies、Python 與 relevant dependency versions。Comments 或 formatting 不改變
 semantic fingerprint；threshold、execution rule 或 dependency identity 會改變。Definition capture 必須從
 source 自動解析可重建的 Git context；非 Git source 會 fail closed。Definition blob 另外保存 exact source，
 因此正式執行時的 dirty worktree 可重建。
@@ -91,12 +91,17 @@ blobs 的 checksum、schema、session coverage 與 canonical CSV bytes，再檢�
 dry-run、保護所有 retained manifest references，且只處理 grace period 外的
 orphan blobs。完整契約見 [docs/reproducibility.md](docs/reproducibility.md)。
 
+`run_with_bundle` 必須回傳 typed `CanonicalSleeveInput`；formal coordinator 會依 frozen
+definition 的 base/stress policies 呼叫共享 sleeve evaluator 並生成 result evidence，不接受 runner
+自行聲稱的 canonical metrics。
+
 ## Result validity and trial history
 
-Phase 3 gives every new formal result a versioned validity contract. Schema v2 retains the existing
+Phase 4 gives every new formal result a versioned validity contract. Schema v3 retains the existing
 Part A / Part B / Part C fields and records the referenced data snapshot identity, actual data
 cutoff, definition snapshot identity, semantic definition fingerprint, development summary,
-historical stability folds, shadow/live evidence, and legacy period results. Status is recomputed
+historical stability folds, shadow/live evidence, legacy period results, and canonical sleeve
+gross/base-net/stress-net evidence. Schema-v2 results remain readable as `legacy`. Status is recomputed
 read-only as `valid`, `data-stale`, `definition-stale`, `unreproducible`, or `legacy`.
 
 Only a complete successful result with verified current data and the current semantic definition
@@ -104,7 +109,7 @@ is eligible for ranking or follow-up. Legacy files remain readable but are never
 snapshot evidence. Formatting, comments, and explicitly declared reporting-only symbols do not
 change a definition fingerprint only when the symbol is unambiguous and unreferenced by retained
 outcome code; symbol names are not implicitly trusted, and uncertain or behavior-affecting changes
-do change it. If the current definition cannot be resolved, a schema-v2 result is
+do change it. If the current definition cannot be resolved, a schema-v3 result is
 `unreproducible`, not `valid`.
 
 ```bash
@@ -133,13 +138,18 @@ uv run trading followup-backtest --start 2025-01-01 --days 126  # 指定起日�
 ```
 
 此指令會在執行時直接讀取 `src/trading/followup.py` 的最新 `STRATEGIES`，不維護第二份策略清單。
-回測以 USD 100,000 作為標準化初始資金，平均分配至固定策略袖套；允許 fractional shares，
-袖套之間不借款、不重新平衡，下載失敗的策略配置保留為現金。
+回測以 USD 100,000 作為初始資金，平均分配至固定策略袖套；允許 fractional shares，
+袖套之間不借款、不重新平衡，下載失敗的策略配置保留為現金。每個袖套最多一個未平倉部位；
+重疊訊號記為 `skipped / position_already_open`，不會提高曝險。
 
-訊號與成交完全沿用各實驗目前選用的 backtester，包括隔日開盤成交、滑價、停利、停損、
-到期出場、悲觀日內成交判定及追蹤停損。期末未平倉部位以最後一個完整交易日的 adjusted
+訊號與成交事件沿用各實驗目前選用的 backtester，包括隔日開盤、停利、停損、
+到期出場、悲觀日內成交判定及追蹤停損；candidate generation 先移除 legacy slippage，再由
+canonical base/stress policy 統一計入成本。期末未平倉部位以最後一個完整交易日的 adjusted
 close 做 mark-to-market；未實現損益會影響 equity return、Sharpe 與最大回撤，但不計入已完成
-交易的勝率或平均單筆報酬。核心結果包含每日 equity curve 的結構化資料，可供後續繪圖。
+交易的勝率或平均單筆報酬。Canonical engine 同時保存 gross、base-net 與 stress-net；報表與
+portfolio 聚合採 base-net，研究排名也只採 daily-equity base-net Sharpe。預設 base 成本為進出各
+5 bps slippage + 每側 1 bp fee，stress 為進出各 20 bps + 每側 2 bps。完整契約與 legacy parity
+分類見 [docs/canonical-sleeve-execution.md](docs/canonical-sleeve-execution.md)。
 
 `--days` 僅接受正整數。選用的 `--start` 必須是 `YYYY-MM-DD`；若落在週末、休市日或
 缺少資料的日期，會從之後第一個完整交易日開始。起日之後不足指定交易日數時，報告會

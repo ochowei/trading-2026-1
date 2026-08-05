@@ -3,7 +3,14 @@ import subprocess
 from datetime import UTC, date, datetime
 
 import pandas as pd
+import pytest
 
+from trading.core.sleeve_engine import (
+    DEFAULT_BASE_COST_POLICY,
+    DEFAULT_STRESS_COST_POLICY,
+    evaluate_canonical_sleeve,
+    serialize_canonical_sleeve_evidence,
+)
 from trading.market_data import (
     CsvMarketDataCache,
     MarketDataRequirement,
@@ -16,10 +23,12 @@ from trading.research_data import (
     ResearchDefinitionStore,
 )
 from trading.research_data.result_schema import (
+    ResultSchemaError,
     ResultValidityStatus,
     build_result_payload,
     classify_result,
     load_result,
+    validate_canonical_evidence_against_definition,
 )
 
 
@@ -43,7 +52,7 @@ def _definition_blob(repo_path, blob_root):
         .capture(
             resolved_config={"ticker": "SPY", "threshold": 0.2},
             sources=sources,
-            execution_engine_version="execution-v1",
+            execution_engine_version="canonical-sleeve-v1",
             dependency_versions={"pandas": "2.3.1"},
         )
         .blob
@@ -82,8 +91,24 @@ def _fixture(tmp_path):
         manifest,
         tmp_path / "results" / "experiment" / "run.snapshot.json",
     )
+    cached = cache.load(series)
+    assert cached is not None
+    frame = cached.bars
+    evaluation = evaluate_canonical_sleeve(
+        calendar=frame.index,
+        close_prices=frame["Close"],
+        candidates=(),
+        initial_capital=1.0,
+        base_policy=DEFAULT_BASE_COST_POLICY,
+        stress_policy=DEFAULT_STRESS_COST_POLICY,
+        legacy_candidates=(),
+    )
     payload = build_result_payload(
-        {"part_a": {"total_signals": 1}, "metrics": {"return": 0.1}},
+        {
+            "part_a": {"total_signals": 1},
+            "metrics": {"return": 0.1},
+            "canonical_sleeve_evidence": serialize_canonical_sleeve_evidence(evaluation),
+        },
         manifest=manifest,
         manifest_path=manifest_path,
         run_mode="online",
@@ -94,7 +119,7 @@ def _fixture(tmp_path):
 def test_versioned_result_contains_evidence_lifecycle_sections_and_legacy_parts(tmp_path) -> None:
     _store, manifest, manifest_path, payload = _fixture(tmp_path)
 
-    assert payload["schema_version"] == 2
+    assert payload["schema_version"] == 3
     assert payload["validity"]["status"] == "valid"
     assert payload["data_snapshot_id"] == manifest.snapshot_id
     assert payload["definition_snapshot_id"] == manifest.definition.digest
@@ -106,6 +131,7 @@ def test_versioned_result_contains_evidence_lifecycle_sections_and_legacy_parts(
     assert payload["shadow_evidence"] == {}
     assert payload["live_evidence"] == {}
     assert payload["metadata"]["reproducibility"]["snapshot_manifest"] == str(manifest_path)
+    assert payload["canonical_sleeve_evidence"]["ranking_scenario"] == "base_net"
 
 
 def test_validity_is_valid_when_snapshot_is_reproducible_fresh_and_current(tmp_path) -> None:
@@ -230,7 +256,7 @@ def test_declared_partial_result_is_unreproducible_even_with_valid_evidence(tmp_
     assert any("incomplete" in reason for reason in validity.reasons)
 
 
-def test_schema_v2_requires_lifecycle_evidence_sections(tmp_path) -> None:
+def test_schema_v3_requires_lifecycle_evidence_sections(tmp_path) -> None:
     store, _manifest, _manifest_path, payload = _fixture(tmp_path)
     payload.pop("shadow_evidence")
 
@@ -243,6 +269,55 @@ def test_schema_v2_requires_lifecycle_evidence_sections(tmp_path) -> None:
 
     assert validity.status is ResultValidityStatus.UNREPRODUCIBLE
     assert "shadow_evidence" in validity.reasons[0]
+
+
+def test_schema_v3_rejects_unknown_canonical_sleeve_engine(tmp_path) -> None:
+    store, _manifest, _manifest_path, payload = _fixture(tmp_path)
+    payload["canonical_sleeve_evidence"]["engine_version"] = "unknown-engine"
+
+    validity = classify_result(
+        payload,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+
+    assert validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert "engine version" in validity.reasons[0]
+
+
+def test_schema_v3_rejects_metrics_that_do_not_match_daily_equity(tmp_path) -> None:
+    store, _manifest, _manifest_path, payload = _fixture(tmp_path)
+    payload["canonical_sleeve_evidence"]["scenarios"]["base_net"]["metrics"]["sharpe_ratio"] = 999.0
+
+    validity = classify_result(
+        payload,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+
+    assert validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("metrics do not match daily equity" in reason for reason in validity.reasons)
+
+
+def test_canonical_cost_evidence_must_match_preregistered_definition(tmp_path) -> None:
+    store, manifest, _manifest_path, payload = _fixture(tmp_path)
+    definition = ResearchDefinitionStore(store.root).load(manifest.definition)
+    evidence = payload["canonical_sleeve_evidence"]
+    evidence["cost_policies"]["base"]["entry_slippage_bps"] = 999.0
+
+    with pytest.raises(ResultSchemaError, match="cost policies do not match"):
+        validate_canonical_evidence_against_definition(evidence, definition)
+
+    validity = classify_result(
+        payload,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("cost policies do not match" in reason for reason in validity.reasons)
 
 
 def test_old_result_is_readable_as_legacy_but_not_qualifiable(tmp_path) -> None:
@@ -258,3 +333,11 @@ def test_old_result_is_readable_as_legacy_but_not_qualifiable(tmp_path) -> None:
     assert result.validity.status is ResultValidityStatus.LEGACY
     assert not result.validity.is_qualifiable
     assert result.payload["part_a"]["total_signals"] == 3
+
+
+def test_phase_3_schema_v2_result_is_legacy_after_canonical_execution_upgrade() -> None:
+    validity = classify_result({"schema_version": 2})
+
+    assert validity.status is ResultValidityStatus.LEGACY
+    assert not validity.is_qualifiable
+    assert "canonical sleeve evidence" in validity.reasons[0]

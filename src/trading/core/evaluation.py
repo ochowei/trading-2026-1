@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -37,6 +38,28 @@ class AssetEvaluation:
     ranking: tuple[str, ...]
     complete: bool
     errors: tuple[str, ...]
+
+
+def canonical_ranking_score(payload: Mapping[str, object]) -> float:
+    """Read the base-net Sharpe calculated from canonical daily sleeve equity."""
+    evidence = payload.get("canonical_sleeve_evidence")
+    if not isinstance(evidence, Mapping):
+        raise RuntimeError("candidate has no canonical base-net sleeve evidence")
+    scenarios = evidence.get("scenarios")
+    base_net = scenarios.get("base_net") if isinstance(scenarios, Mapping) else None
+    metrics = base_net.get("metrics") if isinstance(base_net, Mapping) else None
+    if not isinstance(metrics, Mapping) or "sharpe_ratio" not in metrics:
+        raise RuntimeError("candidate has no canonical base-net ranking metrics")
+    value = metrics["sharpe_ratio"]
+    if value is None:
+        return float("-inf")
+    try:
+        score = float(value)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError("canonical base-net Sharpe is not numeric") from exc
+    if not math.isfinite(score):
+        raise RuntimeError("canonical base-net Sharpe must be finite")
+    return score
 
 
 def refresh_candidate_snapshot(
@@ -233,11 +256,7 @@ def evaluate_asset_from_cli(asset: str) -> None:
         record = inspect_result(name)
         if record is None:
             raise RuntimeError("candidate result disappeared during evaluation")
-        part_b = record.result.payload.get("part_b", {})
-        if not isinstance(part_b, dict):
-            return float("-inf")
-        value = part_b.get("sharpe_ratio", float("-inf"))
-        return float(value)
+        return canonical_ranking_score(record.result.payload)
 
     evaluation = evaluate_asset_candidates(
         asset_upper,

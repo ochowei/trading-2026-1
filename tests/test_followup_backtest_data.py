@@ -231,3 +231,36 @@ def test_primary_tickers_are_downloaded_in_isolated_calls(make_ohlcv) -> None:
         fetcher_factory=RecordingFetcher,
     )
     assert RecordingFetcher.calls == [["AAA"], ["BBB"]]
+
+
+def test_followup_generates_gross_candidates_before_canonical_costs(make_ohlcv) -> None:
+    class SlippageBacktester:
+        def __init__(self) -> None:
+            self.slippage_pct = 0.01
+            self.observed: list[float] = []
+
+        def run(self, _frame, *, preserve_open_positions=False):
+            assert preserve_open_positions is True
+            self.observed.append(self.slippage_pct)
+            return {
+                "trades": [],
+                "open_positions": [],
+                "unfilled_signals": [],
+                "execution_model": {"slippage_pct": self.slippage_pct},
+            }
+
+    backtester = SlippageBacktester()
+    strategy = FakeStrategy("AAA")
+    strategy.create_backtester = lambda _config: backtester
+    FakeFetcher.frames = {"AAA": make_ohlcv(5)}
+
+    result = run_followup_backtest(
+        days=3,
+        strategy_definitions=[definition("alpha", "AAA")],
+        get_experiment_fn=lambda _name: strategy,
+        fetcher_factory=FakeFetcher,
+    )
+
+    assert result.strategies[0].error is None
+    assert backtester.observed == [0.0]
+    assert backtester.slippage_pct == 0.01

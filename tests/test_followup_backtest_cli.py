@@ -107,6 +107,8 @@ def test_renderer_prints_strategy_and_portfolio_metrics() -> None:
     assert "Portfolio total return" in text
     assert "+10.00%" in text
     assert "Final asset value" in text
+    assert "base-net canonical" in text
+    assert "skipped (position already open)" in text
 
 
 def test_renderer_prints_requested_start_and_actual_period() -> None:

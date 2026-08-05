@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import math
+import copy
 import sys
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
@@ -14,6 +14,21 @@ import numpy as np
 import pandas as pd
 
 from trading.core.data_fetcher import DataFetcher
+from trading.core.sleeve_engine import (
+    DEFAULT_BASE_COST_POLICY,
+    DEFAULT_STRESS_COST_POLICY,
+    CandidateTrade,
+    CanonicalSleeveEngine,
+    CanonicalSleeveEvaluation,
+    CanonicalSleeveInput,
+    ExecutionCostPolicy,
+    SleeveMetrics,
+    SleeveSimulation,
+    SleeveTrade,
+    compute_daily_equity_metrics,
+    evaluate_canonical_sleeve_input,
+    serialize_canonical_sleeve_evidence,
+)
 from trading.experiments import get_experiment
 from trading.followup import _drop_incomplete_bar
 
@@ -73,6 +88,7 @@ class StrategyBacktestResult:
     final_equity: float | None = None
     trades: list[TradeRecord] = field(default_factory=list)
     daily_equity: list[DailyEquityPoint] = field(default_factory=list)
+    canonical_sleeve_evidence: dict[str, object] = field(default_factory=dict)
     execution_model: dict[str, Any] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     error: str | None = None
@@ -112,6 +128,16 @@ class FollowupBacktestResult:
         return 0 < failures < len(self.strategies)
 
 
+@dataclass(frozen=True)
+class StrategySleeveEvaluation:
+    """Base-net followup view plus all canonical scenario evidence."""
+
+    trades: list[TradeRecord]
+    daily_equity: list[DailyEquityPoint]
+    metrics: SleeveMetrics
+    canonical_sleeve_evidence: dict[str, object]
+
+
 @dataclass
 class _StrategyInput:
     experiment_name: str
@@ -127,7 +153,7 @@ class _StrategyInput:
 
 
 def compute_equity_metrics(equity: pd.Series) -> dict[str, float | None]:
-    """Calculate path-dependent return and risk metrics from daily equity."""
+    """Compatibility adapter for canonical daily sleeve-equity metrics."""
     values = equity.astype(float)
     if values.empty:
         return {
@@ -140,52 +166,66 @@ def compute_equity_metrics(equity: pd.Series) -> dict[str, float | None]:
             "max_drawdown": None,
         }
 
-    initial = float(values.iloc[0])
-    final = float(values.iloc[-1])
-    total_return = (final - initial) / initial if initial > 0 else None
-    observations = len(values) - 1
-    annualized_return = (
-        (final / initial) ** (252 / observations) - 1
-        if observations > 0 and initial > 0 and final > 0
-        else None
+    metrics = compute_daily_equity_metrics(
+        values.tolist(),
+        initial_equity=float(values.iloc[0]),
     )
-    daily_returns = values.pct_change().dropna()
-    daily_std = float(daily_returns.std(ddof=1)) if len(daily_returns) > 1 else 0.0
-    annualized_volatility = daily_std * math.sqrt(252) if daily_std > 0 else None
-    sharpe = float(daily_returns.mean()) / daily_std * math.sqrt(252) if daily_std > 0 else None
-    drawdown = values / values.cummax() - 1
     return {
-        "initial_equity": initial,
-        "final_equity": final,
-        "total_return": total_return,
-        "annualized_return": annualized_return,
-        "annualized_volatility": annualized_volatility,
-        "sharpe_ratio": sharpe,
-        "max_drawdown": float(drawdown.min()),
+        "initial_equity": metrics.initial_equity,
+        "final_equity": metrics.final_equity,
+        "total_return": metrics.total_return,
+        "annualized_return": metrics.annualized_return,
+        "annualized_volatility": metrics.annualized_volatility,
+        "sharpe_ratio": metrics.sharpe_ratio,
+        "max_drawdown": metrics.max_drawdown,
     }
 
 
-def _candidate_record(candidate: dict[str, Any], status: str) -> TradeRecord:
-    return TradeRecord(
-        status=status,
-        signal_date=candidate["date"],
-        entry_date=candidate.get("entry_date"),
-        exit_date=candidate.get("exit_date"),
-        entry_price=float(candidate["entry"]) if candidate.get("entry") is not None else None,
+def _candidate_trade(candidate: dict[str, Any]) -> CandidateTrade:
+    exit_date = candidate.get("exit_date")
+    return CandidateTrade(
+        signal_date=pd.Timestamp(candidate["date"]).date(),
+        entry_date=pd.Timestamp(candidate["entry_date"]).date(),
+        entry_price=float(candidate["entry"]),
+        exit_date=pd.Timestamp(exit_date).date() if exit_date is not None else None,
         exit_price=float(candidate["exit"]) if candidate.get("exit") is not None else None,
-        mark_price=(
-            float(candidate["mark_price"]) if candidate.get("mark_price") is not None else None
-        ),
-        return_pct=(
-            float(candidate["return_pct"]) / 100
-            if candidate.get("return_pct") is not None
-            else (
-                float(candidate["unrealized_return_pct"]) / 100
-                if candidate.get("unrealized_return_pct") is not None
-                else None
-            )
-        ),
         exit_type=candidate.get("exit_type"),
+    )
+
+
+def _gross_candidate_backtester(backtester: Any) -> Any:
+    """Copy a legacy backtester and remove its scenario cost overlay."""
+    candidate_backtester = copy.copy(backtester)
+    if hasattr(candidate_backtester, "slippage_pct"):
+        candidate_backtester.slippage_pct = 0.0
+    return candidate_backtester
+
+
+def _trade_record(trade: SleeveTrade, mark_price: float | None) -> TradeRecord:
+    entry_price = trade.executed_entry_price or trade.entry_price
+    exit_price = trade.executed_exit_price or trade.exit_price
+    return_pct = None
+    if trade.quantity > 0 and entry_price and exit_price is not None:
+        entry_cost = trade.quantity * entry_price + trade.entry_fee
+        exit_proceeds = trade.quantity * exit_price - trade.exit_fee
+        return_pct = (exit_proceeds - entry_cost) / entry_cost
+    elif entry_price and exit_price is not None:
+        return_pct = (exit_price - entry_price) / entry_price
+    elif trade.quantity > 0 and entry_price and mark_price is not None:
+        entry_cost = trade.quantity * entry_price + trade.entry_fee
+        return_pct = (trade.quantity * mark_price - entry_cost) / entry_cost
+    return TradeRecord(
+        status=trade.status,
+        signal_date=trade.signal_date.isoformat(),
+        entry_date=trade.entry_date.isoformat(),
+        exit_date=trade.exit_date.isoformat() if trade.exit_date is not None else None,
+        entry_price=trade.entry_price,
+        exit_price=trade.exit_price,
+        mark_price=mark_price if trade.status == "open" else None,
+        quantity=trade.quantity,
+        return_pct=return_pct,
+        exit_type=trade.exit_type,
+        reason=trade.reason,
     )
 
 
@@ -195,12 +235,12 @@ def simulate_strategy_sleeve(
     raw_result: dict[str, Any],
     initial_cash: float,
 ) -> tuple[list[TradeRecord], list[DailyEquityPoint]]:
-    """Apply one-cash-sleeve allocation to independently simulated trade candidates."""
+    """Adapt legacy backtester candidates to canonical sleeve execution."""
     candidates: list[dict[str, Any]] = []
     for trade in raw_result.get("trades", []):
-        candidates.append({**trade, "candidate_status": "completed"})
+        candidates.append(trade)
     for trade in raw_result.get("open_positions", []):
-        candidates.append({**trade, "candidate_status": "open"})
+        candidates.append(trade)
     candidates.sort(key=lambda item: (item["entry_date"], item["date"]))
 
     records = [
@@ -211,84 +251,104 @@ def simulate_strategy_sleeve(
         )
         for item in raw_result.get("unfilled_signals", [])
     ]
-    entries_by_date: dict[pd.Timestamp, list[dict[str, Any]]] = {}
-    for candidate in candidates:
-        entries_by_date.setdefault(pd.Timestamp(candidate["entry_date"]), []).append(candidate)
-
     close_by_date = frame["Close"].reindex(pd.DatetimeIndex(calendar)).ffill()
-    cash = float(initial_cash)
-    active: tuple[dict[str, Any], TradeRecord] | None = None
-    points: list[DailyEquityPoint] = []
-    running_peak = initial_cash
-    previous_equity: float | None = None
-
-    for date in calendar:
-        date = pd.Timestamp(date)
-        if active is not None:
-            candidate, record = active
-            if (
-                candidate.get("exit_type") == "time_expiry"
-                and pd.Timestamp(candidate["exit_date"]) == date
-            ):
-                cash = record.quantity * float(candidate["exit"])
-                active = None
-
-        for candidate in entries_by_date.get(date, []):
-            if active is not None or cash <= 0:
-                skipped = _candidate_record(candidate, "skipped_insufficient_cash")
-                skipped.reason = "insufficient_cash"
-                records.append(skipped)
-                continue
-            record = _candidate_record(candidate, candidate["candidate_status"])
-            record.quantity = cash / float(candidate["entry"])
-            cash = 0.0
-            records.append(record)
-            active = (candidate, record)
-
-        if active is not None:
-            candidate, record = active
-            exit_date = candidate.get("exit_date")
-            if (
-                candidate.get("exit_type") != "time_expiry"
-                and exit_date is not None
-                and pd.Timestamp(exit_date) == date
-            ):
-                cash = record.quantity * float(candidate["exit"])
-                active = None
-
-        if active is None:
-            position_value = 0.0
-        else:
-            candidate, record = active
-            mark = close_by_date.loc[date]
-            if pd.isna(mark):
-                mark = candidate["entry"]
-            position_value = record.quantity * float(mark)
-            if record.status == "open":
-                record.mark_price = float(mark)
-                record.return_pct = float(mark) / float(candidate["entry"]) - 1
-
-        equity = cash + position_value
-        running_peak = max(running_peak, equity)
-        daily_return = equity / previous_equity - 1 if previous_equity else None
-        drawdown = equity / running_peak - 1 if running_peak else 0.0
-        utilization = position_value / equity if equity else 0.0
-        points.append(
-            DailyEquityPoint(
-                date=date,
-                equity=equity,
-                cash=cash,
-                position_value=position_value,
-                daily_return=daily_return,
-                drawdown=drawdown,
-                utilization=utilization,
-                open_positions=int(active is not None),
-            )
-        )
-        previous_equity = equity
+    simulation = CanonicalSleeveEngine(initial_capital=initial_cash).run(
+        calendar=calendar,
+        close_prices=close_by_date,
+        candidates=[_candidate_trade(candidate) for candidate in candidates],
+    )
+    final_mark = float(close_by_date.iloc[-1]) if not close_by_date.empty else None
+    records.extend(_trade_record(trade, final_mark) for trade in simulation.trades)
+    points = _daily_equity_points(simulation)
 
     records.sort(key=lambda item: item.signal_date)
     return records, points
+
+
+def evaluate_strategy_sleeve(
+    calendar: tuple[pd.Timestamp, ...],
+    frame: pd.DataFrame,
+    raw_result: dict[str, Any],
+    initial_cash: float,
+    *,
+    base_policy: ExecutionCostPolicy = DEFAULT_BASE_COST_POLICY,
+    stress_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
+) -> StrategySleeveEvaluation:
+    """Evaluate followup candidates and select the canonical base-net path."""
+    raw_candidates = tuple(
+        _candidate_trade(candidate)
+        for candidate in (
+            *raw_result.get("trades", []),
+            *raw_result.get("open_positions", []),
+        )
+    )
+    raw_signals = tuple(candidate.signal_date for candidate in raw_candidates) + tuple(
+        pd.Timestamp(item["date"]).date() for item in raw_result.get("unfilled_signals", [])
+    )
+    close_by_date = frame["Close"].reindex(pd.DatetimeIndex(calendar)).ffill()
+    sleeve_input = CanonicalSleeveInput(
+        calendar=calendar,
+        close_prices=close_by_date,
+        candidates=raw_candidates,
+        initial_capital=initial_cash,
+        raw_signals=raw_signals,
+        legacy_signals=raw_signals,
+        legacy_candidates=raw_candidates,
+    )
+    evaluation = evaluate_canonical_sleeve_input(
+        sleeve_input,
+        base_policy=base_policy,
+        stress_policy=stress_policy,
+    )
+    records, points = _followup_view(
+        evaluation,
+        close_by_date,
+        raw_result.get("unfilled_signals", []),
+    )
+    evidence = serialize_canonical_sleeve_evidence(evaluation)
+    evidence["raw_unfilled_signals"] = list(raw_result.get("unfilled_signals", []))
+    return StrategySleeveEvaluation(
+        records,
+        points,
+        evaluation.base_net_metrics,
+        evidence,
+    )
+
+
+def _followup_view(
+    evaluation: CanonicalSleeveEvaluation,
+    close_by_date: pd.Series,
+    unfilled_signals: Sequence[dict[str, Any]],
+) -> tuple[list[TradeRecord], list[DailyEquityPoint]]:
+    records = [
+        TradeRecord(
+            status="unfilled",
+            signal_date=item["date"],
+            reason=item.get("reason", "no_next_day_data"),
+        )
+        for item in unfilled_signals
+    ]
+    simulation: SleeveSimulation = evaluation.scenarios.base_net
+    final_mark = float(close_by_date.iloc[-1]) if not close_by_date.empty else None
+    records.extend(_trade_record(trade, final_mark) for trade in simulation.trades)
+    records.sort(key=lambda item: item.signal_date)
+    return records, _daily_equity_points(simulation)
+
+
+def _daily_equity_points(simulation: SleeveSimulation) -> list[DailyEquityPoint]:
+    return [
+        DailyEquityPoint(
+            date=point.date,
+            equity=point.equity,
+            cash=point.cash,
+            position_value=point.position_value,
+            daily_return=point.daily_return,
+            drawdown=point.drawdown,
+            utilization=point.utilization,
+            open_positions=point.open_positions,
+        )
+        for point in simulation.daily_equity
+    ]
 
 
 def build_portfolio_result(
@@ -333,15 +393,18 @@ def build_portfolio_result(
         )
         previous_equity = equity
 
-    metrics = compute_equity_metrics(pd.Series([point.equity for point in points]))
+    metrics = compute_daily_equity_metrics(
+        [point.equity for point in points],
+        initial_equity=sleeve_cash * len(strategies),
+    )
     return PortfolioBacktestResult(
-        initial_equity=float(metrics["initial_equity"]),
-        final_equity=float(metrics["final_equity"]),
-        total_return=float(metrics["total_return"]),
-        annualized_return=metrics["annualized_return"],
-        annualized_volatility=metrics["annualized_volatility"],
-        sharpe_ratio=metrics["sharpe_ratio"],
-        max_drawdown=float(metrics["max_drawdown"]),
+        initial_equity=metrics.initial_equity,
+        final_equity=metrics.final_equity,
+        total_return=metrics.total_return,
+        annualized_return=metrics.annualized_return,
+        annualized_volatility=metrics.annualized_volatility,
+        sharpe_ratio=metrics.sharpe_ratio,
+        max_drawdown=metrics.max_drawdown,
         average_utilization=float(np.mean([point.utilization for point in points])),
         maximum_utilization=max(point.utilization for point in points),
         maximum_open_positions=max(point.open_positions for point in points),
@@ -542,20 +605,19 @@ def run_followup_backtest(
                     f"{item.ticker}: missing {result.missing_sessions} canonical sessions"
                 )
             result.signal_count = int(evaluation["Signal"].sum())
-            raw = item.backtester.run(evaluation, preserve_open_positions=True)
-            trades, points = simulate_strategy_sleeve(calendar, evaluation, raw, sleeve_cash)
+            candidate_backtester = _gross_candidate_backtester(item.backtester)
+            raw = candidate_backtester.run(evaluation, preserve_open_positions=True)
+            sleeve = evaluate_strategy_sleeve(calendar, evaluation, raw, sleeve_cash)
+            trades, points = sleeve.trades, sleeve.daily_equity
             completed = [trade for trade in trades if trade.status == "completed"]
             completed_returns = [
                 trade.return_pct for trade in completed if trade.return_pct is not None
             ]
-            equity = pd.Series([point.equity for point in points])
-            metrics = compute_equity_metrics(equity)
+            metrics = sleeve.metrics
             result.completed_count = len(completed)
             result.open_count = sum(trade.status == "open" for trade in trades)
             result.unfilled_count = sum(trade.status == "unfilled" for trade in trades)
-            result.skipped_count = sum(
-                trade.status == "skipped_insufficient_cash" for trade in trades
-            )
+            result.skipped_count = sum(trade.status == "skipped" for trade in trades)
             result.win_rate = (
                 sum(value > 0 for value in completed_returns) / len(completed_returns)
                 if completed_returns
@@ -564,12 +626,13 @@ def run_followup_backtest(
             result.avg_trade_return = (
                 float(np.mean(completed_returns)) if completed_returns else None
             )
-            result.cumulative_return = metrics["total_return"]
-            result.sharpe_ratio = metrics["sharpe_ratio"]
-            result.max_drawdown = metrics["max_drawdown"]
-            result.final_equity = metrics["final_equity"]
+            result.cumulative_return = metrics.total_return
+            result.sharpe_ratio = metrics.sharpe_ratio
+            result.max_drawdown = metrics.max_drawdown
+            result.final_equity = metrics.final_equity
             result.trades = trades
             result.daily_equity = points
+            result.canonical_sleeve_evidence = sleeve.canonical_sleeve_evidence
             result.execution_model = raw.get("execution_model", {})
         except Exception as exc:
             result.error = f"{item.experiment_name}: evaluation failed: {exc}"
@@ -620,7 +683,7 @@ def render_followup_backtest(
 
     if result.portfolio is not None:
         portfolio = result.portfolio
-        print("\nPortfolio Summary", file=output)
+        print("\nPortfolio Summary (base-net canonical sleeves)", file=output)
         print(f"Initial equity: ${portfolio.initial_equity:,.2f}", file=output)
         print(f"Final asset value: ${portfolio.final_equity:,.2f}", file=output)
         print(
@@ -665,7 +728,7 @@ def render_followup_backtest(
         print(
             f"Signals: {strategy.signal_count}; completed: {strategy.completed_count}; "
             f"open: {strategy.open_count}; unfilled: {strategy.unfilled_count}; "
-            f"skipped (cash): {strategy.skipped_count}",
+            f"skipped (position already open): {strategy.skipped_count}",
             file=output,
         )
         print(

@@ -4,17 +4,23 @@ from __future__ import annotations
 
 import copy
 import json
+import math
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 
+from trading.core.sleeve_engine import (
+    CANONICAL_SLEEVE_ENGINE_VERSION,
+    compute_daily_equity_metrics,
+)
 from trading.market_data import PrimaryUSSessionCalendar, SessionCalendar
+from trading.research_data.definitions import ResearchDefinitionStore
 from trading.research_data.models import DefinitionBlobRef, SnapshotManifest
 from trading.research_data.store import ResearchDataStore
 
-CURRENT_RESULT_SCHEMA_VERSION = 2
+CURRENT_RESULT_SCHEMA_VERSION = 3
 
 
 class ResultValidityStatus(StrEnum):
@@ -64,11 +70,14 @@ def build_result_payload(
     manifest_path: Path,
     run_mode: str,
 ) -> dict[str, object]:
-    """Attach the Phase 3 schema and immutable evidence to one runner output."""
+    """Attach the current schema and immutable evidence to one runner output."""
     if manifest.definition is None:
         raise ResultSchemaError("persisted result requires a research-definition snapshot")
 
     payload = copy.deepcopy(dict(produced))
+    canonical_error = _canonical_sleeve_evidence_error(payload.get("canonical_sleeve_evidence"))
+    if canonical_error is not None:
+        raise ResultSchemaError(canonical_error)
     metadata = payload.get("metadata", {})
     if not isinstance(metadata, dict):
         raise ResultSchemaError("research result metadata must be an object")
@@ -160,6 +169,11 @@ def classify_result(
     schema_version = payload.get("schema_version")
     if schema_version is None or schema_version == 1:
         return ResultValidity(ResultValidityStatus.LEGACY, ("result has no Phase 3 evidence",))
+    if schema_version == 2:
+        return ResultValidity(
+            ResultValidityStatus.LEGACY,
+            ("result predates canonical sleeve evidence",),
+        )
     if schema_version != CURRENT_RESULT_SCHEMA_VERSION:
         return ResultValidity(
             ResultValidityStatus.UNREPRODUCIBLE,
@@ -183,6 +197,7 @@ def classify_result(
         "shadow_evidence",
         "live_evidence",
         "legacy_period_results",
+        "canonical_sleeve_evidence",
         "run_mode",
     )
     missing = tuple(field for field in required_fields if field not in payload)
@@ -191,6 +206,9 @@ def classify_result(
             ResultValidityStatus.UNREPRODUCIBLE,
             ("result is missing evidence fields: " + ", ".join(missing),),
         )
+    canonical_error = _canonical_sleeve_evidence_error(payload.get("canonical_sleeve_evidence"))
+    if canonical_error is not None:
+        return ResultValidity(ResultValidityStatus.UNREPRODUCIBLE, (canonical_error,))
     if store is None:
         return ResultValidity(
             ResultValidityStatus.UNREPRODUCIBLE,
@@ -222,6 +240,14 @@ def classify_result(
                 errors.append("result definition snapshot identity does not match its manifest")
             if payload["definition_fingerprint"] != definition.fingerprint:
                 errors.append("result definition fingerprint does not match its manifest")
+            try:
+                definition_payload = ResearchDefinitionStore(store.root).load(definition)
+                validate_canonical_evidence_against_definition(
+                    payload.get("canonical_sleeve_evidence"),
+                    definition_payload,
+                )
+            except Exception as exc:  # noqa: BLE001 - validity must fail closed
+                errors.append(f"canonical sleeve evidence cannot be verified: {exc}")
 
     expected_fingerprint = _fingerprint_value(current_definition_fingerprint)
     if expected_fingerprint is None:
@@ -267,6 +293,120 @@ def classify_result(
     else:
         status = ResultValidityStatus.VALID
     return ResultValidity(status, tuple(errors))
+
+
+def _canonical_sleeve_evidence_error(value: object) -> str | None:
+    if not isinstance(value, Mapping):
+        return "result requires canonical sleeve evidence"
+    required = {
+        "engine_version",
+        "ranking_scenario",
+        "initial_capital",
+        "cost_policies",
+        "raw_signals",
+        "raw_candidates",
+        "scenarios",
+        "parity",
+    }
+    missing = sorted(required.difference(value))
+    if missing:
+        return "canonical sleeve evidence is missing fields: " + ", ".join(missing)
+    if value.get("engine_version") != CANONICAL_SLEEVE_ENGINE_VERSION:
+        return "canonical sleeve evidence has an unsupported engine version"
+    if value.get("ranking_scenario") != "base_net":
+        return "canonical sleeve evidence must rank the base_net scenario"
+    policies = value.get("cost_policies")
+    if not isinstance(policies, Mapping) or not {"base", "stress"}.issubset(policies):
+        return "canonical sleeve evidence requires base and stress cost policies"
+    scenarios = value.get("scenarios")
+    if not isinstance(scenarios, Mapping):
+        return "canonical sleeve evidence scenarios must be an object"
+    for name in ("gross", "base_net", "stress_net"):
+        scenario = scenarios.get(name)
+        if not isinstance(scenario, Mapping):
+            return f"canonical sleeve evidence requires {name} scenario"
+        if not {"metrics", "trades", "daily_equity"}.issubset(scenario):
+            return f"canonical sleeve evidence {name} scenario is incomplete"
+        metric_error = _scenario_metric_error(
+            scenario,
+            initial_capital=value.get("initial_capital"),
+        )
+        if metric_error is not None:
+            return f"canonical sleeve evidence {name} {metric_error}"
+    if not isinstance(value.get("raw_signals"), list):
+        return "canonical sleeve raw signals must be a list"
+    if not isinstance(value.get("raw_candidates"), list):
+        return "canonical sleeve raw candidates must be a list"
+    parity = value.get("parity")
+    if not isinstance(parity, Mapping):
+        return "canonical sleeve parity must be an object"
+    parity_fields = {
+        "signal_differences",
+        "trade_differences",
+        "trade_comparisons",
+        "has_unclassified_differences",
+    }
+    if not parity_fields.issubset(parity):
+        return "canonical sleeve parity is incomplete"
+    return None
+
+
+def _scenario_metric_error(
+    scenario: Mapping[str, object],
+    *,
+    initial_capital: object,
+) -> str | None:
+    if not isinstance(initial_capital, (int, float)) or initial_capital <= 0:
+        return "has invalid initial capital"
+    daily_equity = scenario.get("daily_equity")
+    if not isinstance(daily_equity, list):
+        return "daily equity must be a list"
+    try:
+        equities = [float(point["equity"]) for point in daily_equity if isinstance(point, Mapping)]
+    except (KeyError, TypeError, ValueError):
+        return "daily equity is invalid"
+    if len(equities) != len(daily_equity):
+        return "daily equity is invalid"
+    computed = asdict(
+        compute_daily_equity_metrics(
+            equities,
+            initial_equity=float(initial_capital),
+        )
+    )
+    metrics = scenario.get("metrics")
+    if not isinstance(metrics, Mapping):
+        return "metrics must be an object"
+    for key, expected in computed.items():
+        actual = metrics.get(key)
+        if expected is None:
+            if actual is not None:
+                return "metrics do not match daily equity"
+        elif not isinstance(actual, (int, float)) or not math.isclose(
+            float(actual),
+            float(expected),
+            rel_tol=1e-12,
+            abs_tol=1e-12,
+        ):
+            return "metrics do not match daily equity"
+    return None
+
+
+def validate_canonical_evidence_against_definition(
+    evidence: object,
+    definition: Mapping[str, object],
+) -> None:
+    """Require result engine and cost assumptions to match frozen definition evidence."""
+    error = _canonical_sleeve_evidence_error(evidence)
+    if error is not None:
+        raise ResultSchemaError(error)
+    if not isinstance(evidence, Mapping):  # pragma: no cover - established above
+        raise ResultSchemaError("result requires canonical sleeve evidence")
+    if evidence.get("engine_version") != definition.get("execution_engine_version"):
+        raise ResultSchemaError(
+            "canonical sleeve engine version does not match research definition"
+        )
+    if evidence.get("cost_policies") != definition.get("execution_cost_policies"):
+        raise ResultSchemaError("canonical sleeve cost policies do not match research definition")
 
 
 def _fingerprint_value(value: str | DefinitionBlobRef | None) -> str | None:

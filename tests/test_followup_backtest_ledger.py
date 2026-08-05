@@ -8,6 +8,7 @@ from trading.followup_backtest import (
     StrategyBacktestResult,
     build_portfolio_result,
     compute_equity_metrics,
+    evaluate_strategy_sleeve,
     simulate_strategy_sleeve,
 )
 
@@ -76,7 +77,8 @@ def test_overlapping_signal_is_skipped_without_borrowing() -> None:
         "unfilled_signals": [],
     }
     trades, points = simulate_strategy_sleeve(tuple(frame.index), frame, raw, 1000.0)
-    assert [trade.status for trade in trades] == ["completed", "skipped_insufficient_cash"]
+    assert [trade.status for trade in trades] == ["completed", "skipped"]
+    assert trades[1].reason == "position_already_open"
     assert points[-1].equity == 1200.0
     assert all(point.cash >= 0 for point in points)
 
@@ -102,6 +104,45 @@ def test_completed_trade_keeps_realized_return_instead_of_last_mtm() -> None:
     trades, _ = simulate_strategy_sleeve(tuple(frame.index), frame, raw, 1000.0)
     assert trades[0].status == "completed"
     assert trades[0].return_pct == 0.20
+
+
+def test_followup_sleeve_retains_all_canonical_cost_scenarios() -> None:
+    frame = ledger_frame()
+    raw = {
+        "trades": [
+            {
+                "date": "2026-01-05",
+                "entry_date": "2026-01-06",
+                "exit_date": "2026-01-08",
+                "entry": 10.0,
+                "exit": 12.0,
+                "return_pct": 20.0,
+                "exit_type": "target",
+            }
+        ],
+        "open_positions": [],
+        "unfilled_signals": [{"date": "2026-01-04", "reason": "no_next_day_data"}],
+    }
+
+    result = evaluate_strategy_sleeve(tuple(frame.index[1:]), frame, raw, 1000.0)
+    scenarios = result.canonical_sleeve_evidence["scenarios"]
+
+    assert result.daily_equity[-1].equity == scenarios["base_net"]["metrics"]["final_equity"]
+    assert result.metrics.total_return == scenarios["base_net"]["metrics"]["total_return"]
+    assert result.metrics.total_return == pytest.approx(result.daily_equity[-1].equity / 1000.0 - 1)
+    completed = next(trade for trade in result.trades if trade.status == "completed")
+    assert completed.return_pct == pytest.approx(scenarios["base_net"]["metrics"]["total_return"])
+    assert scenarios["gross"]["metrics"]["final_equity"] == 1200.0
+    assert (
+        scenarios["stress_net"]["metrics"]["final_equity"]
+        < scenarios["base_net"]["metrics"]["final_equity"]
+    )
+    assert result.canonical_sleeve_evidence["ranking_scenario"] == "base_net"
+    assert result.canonical_sleeve_evidence["raw_signals"] == [
+        "2026-01-05",
+        "2026-01-04",
+    ]
+    assert len(result.canonical_sleeve_evidence["raw_candidates"]) == 1
 
 
 def test_known_equity_metrics_include_max_drawdown() -> None:

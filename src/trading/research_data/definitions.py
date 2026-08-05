@@ -13,6 +13,12 @@ from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
 
+from trading.core.sleeve_engine import (
+    DEFAULT_BASE_COST_POLICY,
+    DEFAULT_STRESS_COST_POLICY,
+    ExecutionCostPolicy,
+    validate_cost_scenario_policies,
+)
 from trading.research_data.artifacts import (
     canonical_json_bytes,
     publish_immutable,
@@ -48,9 +54,15 @@ class ResearchDefinitionStore:
         reporting_only_symbols: Mapping[str, Iterable[str]] | None = None,
         execution_engine_version: str,
         dependency_versions: Mapping[str, str],
+        base_cost_policy: ExecutionCostPolicy = DEFAULT_BASE_COST_POLICY,
+        stress_cost_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
         repo_root: Path | None = None,
     ) -> ResearchDefinitionSnapshot:
         """Capture exact source while deriving identity from normalized semantics."""
+        try:
+            validate_cost_scenario_policies(base_cost_policy, stress_cost_policy)
+        except ValueError as exc:
+            raise ResearchDefinitionError(str(exc)) from exc
         required_roles = {"strategy", "detector", "backtester"}
         if not required_roles.issubset(sources):
             raise ResearchDefinitionError(
@@ -81,10 +93,14 @@ class ResearchDefinitionStore:
             "dependencies": {key: dependency_versions[key] for key in sorted(dependency_versions)},
         }
         semantic_payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "resolved_config": canonical_config,
             "normalized_python_ast": normalized_sources,
             "execution_engine_version": execution_engine_version,
+            "execution_cost_policies": {
+                "base": _canonical_value(base_cost_policy),
+                "stress": _canonical_value(stress_cost_policy),
+            },
             "runtime": runtime,
         }
         fingerprint = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()
