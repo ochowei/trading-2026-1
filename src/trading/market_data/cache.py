@@ -20,7 +20,10 @@ import pandas as pd
 from trading.market_data.calendar import PrimaryUSSessionCalendar
 from trading.market_data.contracts import RefreshKind, SessionCalendar
 from trading.market_data.models import CacheMetadata, MarketDataSeries
-from trading.market_data.validation import REQUIRED_COLUMNS, validate_daily_bars
+from trading.market_data.validation import (
+    canonical_daily_bar_csv_bytes,
+    validate_daily_bars,
+)
 
 CACHE_SCHEMA_VERSION = 1
 
@@ -204,7 +207,7 @@ class CsvMarketDataCache:
         )
         if not outcome.is_valid:
             raise CacheCorruptionError("invalid cache rows: " + "; ".join(outcome.errors))
-        if _canonical_csv_bytes(normalized) != csv_bytes:
+        if canonical_daily_bar_csv_bytes(normalized) != csv_bytes:
             raise CacheCorruptionError("cache CSV is not canonically serialized")
         if outcome.data_cutoff != metadata.data_cutoff:
             raise CacheCorruptionError("cache data cutoff does not match metadata")
@@ -253,7 +256,7 @@ class CsvMarketDataCache:
         )
         if not outcome.is_valid or outcome.data_cutoff is None:
             raise MarketDataValidationError("; ".join(outcome.errors) or "market data is empty")
-        csv_bytes = _canonical_csv_bytes(normalized)
+        csv_bytes = canonical_daily_bar_csv_bytes(normalized)
         checksum = hashlib.sha256(csv_bytes).hexdigest()
         timestamp = refreshed_at.astimezone(UTC)
         metadata = CacheMetadata(
@@ -315,17 +318,6 @@ class CsvMarketDataCache:
         for path in existing:
             os.replace(path, destination / path.name)
         return destination
-
-
-def _canonical_csv_bytes(frame: pd.DataFrame) -> bytes:
-    rendered = frame.loc[:, REQUIRED_COLUMNS].to_csv(
-        index=True,
-        index_label="Date",
-        date_format="%Y-%m-%d",
-        float_format="%.17g",
-        lineterminator="\n",
-    )
-    return rendered.encode("utf-8")
 
 
 def _metadata_bytes(metadata: CacheMetadata) -> bytes:

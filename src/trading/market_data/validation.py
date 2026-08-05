@@ -12,6 +12,18 @@ from trading.market_data.models import ValidationOutcome
 REQUIRED_COLUMNS = ("Open", "High", "Low", "Close", "Volume")
 
 
+def canonical_daily_bar_csv_bytes(frame: pd.DataFrame) -> bytes:
+    """Serialize normalized adjusted daily bars to their one canonical byte form."""
+    rendered = frame.loc[:, REQUIRED_COLUMNS].to_csv(
+        index=True,
+        index_label="Date",
+        date_format="%Y-%m-%d",
+        float_format="%.17g",
+        lineterminator="\n",
+    )
+    return rendered.encode("utf-8")
+
+
 def _invalid_empty(error: str) -> tuple[pd.DataFrame, ValidationOutcome]:
     return (
         pd.DataFrame(columns=REQUIRED_COLUMNS),

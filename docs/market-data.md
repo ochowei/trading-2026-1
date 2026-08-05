@@ -2,7 +2,7 @@
 
 Phase 1 routes the existing `DataFetcher` primary-ticker path through a validated, disposable CSV
 cache. The cache improves reliability and avoids repeated downloads; it is not reproducibility
-evidence and must never substitute for the immutable research snapshots planned for Phase 2.
+evidence and must never substitute for the immutable research snapshots implemented by Phase 2.
 
 ## Supported contract
 
@@ -36,8 +36,9 @@ downloads the provider's complete history through the requested completed-sessio
 overlap as one provider generation; conflicting duplicate dates inside either provider response or
 the assembled candidate remain corruption.
 
-Full refresh is only the prerequisite for future snapshot eligibility. Phase 1 does not create a
-content-addressed blob, snapshot manifest, bundle export, or persisted-result link.
+Full refresh is the prerequisite for Phase 2 snapshot eligibility. Blob publication, manifests,
+portable bundles, definition evidence, and replay are specified in
+[reproducibility.md](reproducibility.md); the disposable cache itself never becomes evidence.
 
 ## Validation and corruption
 

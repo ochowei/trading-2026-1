@@ -5,14 +5,28 @@ Supports experiment, followup, and analysis subcommands.
 """
 
 import argparse
+import json
 import logging
 import sys
-from datetime import date
+from datetime import date, timedelta
+from pathlib import Path
 
 from trading.core.data_fetcher import create_default_market_data_service
 from trading.core.results import compare_experiments, save_result
 from trading.experiments import get_experiment, list_experiments
-from trading.market_data import MarketDataSeries
+from trading.market_data import (
+    AvailabilityPolicy,
+    MarketDataRequirement,
+    MarketDataSeries,
+    SignalDecisionTime,
+)
+from trading.research_data import (
+    ResearchDataStore,
+    ResearchDefinitionSnapshot,
+    ResearchDefinitionStore,
+    ResearchRunCoordinator,
+    RunMode,
+)
 
 # 設定日誌格式 (Configure logging format)
 logging.basicConfig(
@@ -21,6 +35,16 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+
+def create_default_research_data_store() -> ResearchDataStore:
+    """Build the local protected immutable research-data store."""
+    return ResearchDataStore(Path(".research-data/blobs"))
+
+
+def create_default_research_definition_store() -> ResearchDefinitionStore:
+    """Build the local protected immutable research-definition store."""
+    return ResearchDefinitionStore(Path(".research-data/blobs"))
 
 
 def cmd_list(args: argparse.Namespace) -> None:
@@ -46,13 +70,56 @@ def cmd_run(args: argparse.Namespace) -> None:
         # 預設執行全部 (Default: run all)
         names = list_experiments()
 
+    explicit_formal_manifest = args.offline or args.snapshot
+    default_formal = explicit_formal_manifest is None and not args.ephemeral and not args.legacy
+    if (explicit_formal_manifest is not None or default_formal) and len(names) != 1:
+        raise SystemExit("formal snapshot execution requires exactly one experiment")
+
     for name in names:
         logger.info(f"執行實驗: {name} (Running experiment: {name})")
         strategy = get_experiment(name)
-        result = strategy.run()
-
-        # 儲存結果 (Save results)
-        save_result(name, result)
+        formal_manifest = explicit_formal_manifest
+        if formal_manifest is not None or default_formal:
+            run_with_bundle = getattr(strategy, "run_with_bundle", None)
+            capture_definition = getattr(strategy, "capture_research_definition", None)
+            if not callable(run_with_bundle) or not callable(capture_definition):
+                if default_formal:
+                    raise SystemExit(
+                        "persisted runs require a snapshot-aware prepared manifest or "
+                        "--snapshot MANIFEST; use --legacy only for unmigrated experiments"
+                    )
+                raise SystemExit(
+                    f"{name} is not snapshot-aware; formal execution requires "
+                    "run_with_bundle and capture_research_definition"
+                )
+            definition = capture_definition(create_default_research_definition_store())
+            if not isinstance(definition, ResearchDefinitionSnapshot):
+                raise SystemExit(
+                    "capture_research_definition must return ResearchDefinitionSnapshot"
+                )
+            research_store = create_default_research_data_store()
+            if default_formal:
+                formal_manifest = research_store.latest_manifest_for_definition(
+                    Path("results") / name,
+                    definition.blob,
+                )
+            coordinator = ResearchRunCoordinator(
+                store=research_store,
+                results_root=Path("results"),
+            )
+            coordinator.execute(
+                name,
+                run_with_bundle,
+                manifest_path=formal_manifest,
+                current_definition=definition.blob,
+                mode=RunMode.OFFLINE if args.offline is not None else RunMode.ONLINE,
+            )
+        elif args.ephemeral:
+            result = strategy.run()
+        elif args.legacy:
+            result = strategy.run()
+            # 儲存 legacy result (Save legacy result)
+            save_result(name, result)
 
     if len(names) > 1:
         print("\n  所有實驗已完成 (All experiments completed)")
@@ -123,6 +190,110 @@ def cmd_data_refresh(args: argparse.Namespace) -> None:
     print(f"{series.symbol}: {mode} refresh published {len(frame)} rows through {cutoff}")
 
 
+def cmd_data_snapshot(args: argparse.Namespace) -> None:
+    """Fully refresh declared series and publish one immutable snapshot manifest."""
+    manifest_path = args.manifest
+    if manifest_path is None and args.experiment is None:
+        raise SystemExit("data-only snapshot requires --manifest PATH")
+    service = create_default_market_data_service()
+    store = create_default_research_data_store()
+    definition = None
+    if args.experiment is not None:
+        experiment = get_experiment(args.experiment)
+        run_with_bundle = getattr(experiment, "run_with_bundle", None)
+        capture_definition = getattr(experiment, "capture_research_definition", None)
+        if not callable(run_with_bundle) or not callable(capture_definition):
+            raise SystemExit(
+                f"{args.experiment} is not snapshot-aware; formal snapshot preparation "
+                "requires run_with_bundle and capture_research_definition"
+            )
+        captured = capture_definition(create_default_research_definition_store())
+        if not isinstance(captured, ResearchDefinitionSnapshot):
+            raise SystemExit("capture_research_definition must return ResearchDefinitionSnapshot")
+        definition = captured.blob
+    primary = MarketDataSeries.yahoo_adjusted_daily(args.symbol)
+    auxiliary = [MarketDataSeries.yahoo_adjusted_daily(symbol) for symbol in args.aux]
+    for series in (primary, *auxiliary):
+        service.refresh(series, mode="full", start=None, end=args.decision)
+    requirements = [
+        MarketDataRequirement(
+            primary,
+            args.history_start,
+            role="primary",
+        )
+    ]
+    requirements.extend(
+        MarketDataRequirement(
+            series,
+            args.history_start,
+            role="auxiliary",
+            availability_policy=AvailabilityPolicy(
+                publication_lag_sessions=args.aux_publication_lag,
+                max_observation_lag_sessions=args.aux_max_observation_lag,
+                publication_time_known=args.aux_publication_time_known,
+            ),
+        )
+        for series in auxiliary
+    )
+    manifest = store.create_snapshot(
+        service.cache,
+        requirements,
+        SignalDecisionTime.for_primary_session(args.decision),
+        definition=definition,
+    )
+    if manifest_path is None:
+        manifest_path = Path("results") / args.experiment / f"{manifest.snapshot_id}.snapshot.json"
+    path = store.write_manifest(manifest, manifest_path)
+    print(f"snapshot {manifest.snapshot_id} published to {path}")
+
+
+def cmd_data_verify(args: argparse.Namespace) -> None:
+    """Verify a manifest and every immutable blob without network or writes."""
+    snapshot = create_default_research_data_store().load_snapshot(args.manifest)
+    definition = snapshot.manifest.definition
+    print(f"snapshot {snapshot.manifest.snapshot_id}: valid")
+    print(f"  series: {len(snapshot.manifest.data)}")
+    print(f"  definition: {definition.fingerprint if definition else '-'}")
+
+
+def cmd_data_export(args: argparse.Namespace) -> None:
+    """Export a verified portable snapshot bundle."""
+    store = create_default_research_data_store()
+    manifest = store.load_manifest(args.manifest)
+    result = None
+    if args.result is not None:
+        loaded = json.loads(args.result.read_text(encoding="utf-8"))
+        if not isinstance(loaded, dict):
+            raise SystemExit("--result must contain a JSON object")
+        result = loaded
+    destination = store.export_bundle(manifest, args.destination, result=result)
+    print(f"snapshot bundle exported to {destination}")
+
+
+def cmd_data_import(args: argparse.Namespace) -> None:
+    """Verify and import a portable snapshot bundle."""
+    imported = create_default_research_data_store().import_bundle(
+        args.bundle,
+        manifest_path=args.manifest,
+    )
+    print(f"snapshot {imported.manifest.snapshot_id} imported to {imported.manifest_path}")
+
+
+def cmd_data_gc(args: argparse.Namespace) -> None:
+    """Plan or explicitly apply reference-aware immutable-blob garbage collection."""
+    manifest_roots = tuple(dict.fromkeys((Path("results"), *(args.manifest_roots or ()))))
+    report = create_default_research_data_store().collect_garbage(
+        manifest_roots=manifest_roots,
+        grace_period=timedelta(days=args.grace_days),
+        apply=args.apply,
+    )
+    action = "deleted" if args.apply else "candidate"
+    print(f"GC {action} blobs: {len(report.deleted if args.apply else report.candidates)}")
+    for path in report.deleted if args.apply else report.candidates:
+        print(f"  {path}")
+    print(f"protected referenced blobs: {len(report.protected)}")
+
+
 def positive_int(value: str) -> int:
     """Parse a strictly positive integer for argparse."""
     try:
@@ -160,6 +331,27 @@ def build_parser() -> argparse.ArgumentParser:
     run_p = sub.add_parser("run", help="執行實驗 (Run experiment(s))")
     run_p.add_argument("experiment", nargs="?", help="實驗名稱 (Experiment name)")
     run_p.add_argument("--all", action="store_true", help="執行全部實驗 (Run all experiments)")
+    run_mode = run_p.add_mutually_exclusive_group()
+    run_mode.add_argument(
+        "--snapshot",
+        type=Path,
+        help="Run online against a verified current snapshot and advance latest.json",
+    )
+    run_mode.add_argument(
+        "--offline",
+        type=Path,
+        help="Persist historical output from a verified older snapshot; never update latest.json",
+    )
+    run_mode.add_argument(
+        "--ephemeral",
+        action="store_true",
+        help="Run diagnostics without changing results or registry state",
+    )
+    run_mode.add_argument(
+        "--legacy",
+        action="store_true",
+        help="Explicitly persist an unmigrated result without Phase 2 evidence",
+    )
 
     # followup
     sub.add_parser("followup", help="產生跟單訊號報告 (Generate Firstrade trading signals)")
@@ -225,6 +417,70 @@ def build_parser() -> argparse.ArgumentParser:
     )
     data_refresh_p.add_argument("--start", type=iso_date, help="Optional history start YYYY-MM-DD")
     data_refresh_p.add_argument("--end", type=iso_date, help="Optional inclusive cutoff YYYY-MM-DD")
+    data_snapshot_p = data_sub.add_parser(
+        "snapshot",
+        help="Fully refresh declared series and publish an immutable data snapshot",
+    )
+    data_snapshot_p.add_argument("symbol", help="Primary Yahoo Finance ticker symbol")
+    data_snapshot_p.add_argument(
+        "--experiment",
+        help="Capture snapshot-aware experiment definition for formal execution",
+    )
+    data_snapshot_p.add_argument(
+        "--aux",
+        action="append",
+        default=[],
+        help="Auxiliary Yahoo ticker; repeat for multiple declarations",
+    )
+    data_snapshot_p.add_argument(
+        "--history-start",
+        type=iso_date,
+        required=True,
+        help="Required history start YYYY-MM-DD",
+    )
+    data_snapshot_p.add_argument(
+        "--decision",
+        type=iso_date,
+        required=True,
+        help="Primary signal decision session YYYY-MM-DD",
+    )
+    data_snapshot_p.add_argument(
+        "--manifest",
+        type=Path,
+        help=(
+            "Tracked result-linked destination; formal default is "
+            "results/NAME/<snapshot_id>.snapshot.json"
+        ),
+    )
+    data_snapshot_p.add_argument("--aux-publication-lag", type=int, default=1)
+    data_snapshot_p.add_argument("--aux-max-observation-lag", type=int, default=1)
+    data_snapshot_p.add_argument(
+        "--aux-publication-time-known",
+        action="store_true",
+        help="Declare exact daily publication timing as known",
+    )
+    data_verify_p = data_sub.add_parser("verify", help="Read-only snapshot verification")
+    data_verify_p.add_argument("manifest", type=Path)
+    data_export_p = data_sub.add_parser("export", help="Export a portable snapshot bundle")
+    data_export_p.add_argument("manifest", type=Path)
+    data_export_p.add_argument("destination", type=Path)
+    data_export_p.add_argument("--result", type=Path, help="Optional result JSON to include")
+    data_import_p = data_sub.add_parser("import", help="Import a portable snapshot bundle")
+    data_import_p.add_argument("bundle", type=Path)
+    data_import_p.add_argument("--manifest", type=Path, required=True)
+    data_gc_p = data_sub.add_parser(
+        "gc",
+        help="Reference-aware immutable-blob GC; dry-run unless --apply is given",
+    )
+    data_gc_p.add_argument(
+        "--manifest-root",
+        action="append",
+        dest="manifest_roots",
+        type=Path,
+        help="Retained-manifest root to scan recursively; defaults to results/",
+    )
+    data_gc_p.add_argument("--grace-days", type=positive_int, default=7)
+    data_gc_p.add_argument("--apply", action="store_true")
 
     return parser
 
@@ -259,6 +515,16 @@ def main(argv: list[str] | None = None) -> None:
         cmd_data_status(args)
     elif args.command == "data" and args.data_command == "refresh":
         cmd_data_refresh(args)
+    elif args.command == "data" and args.data_command == "snapshot":
+        cmd_data_snapshot(args)
+    elif args.command == "data" and args.data_command == "verify":
+        cmd_data_verify(args)
+    elif args.command == "data" and args.data_command == "export":
+        cmd_data_export(args)
+    elif args.command == "data" and args.data_command == "import":
+        cmd_data_import(args)
+    elif args.command == "data" and args.data_command == "gc":
+        cmd_data_gc(args)
     else:
         # 無子命令時顯示幫助 (Show help when no subcommand)
         parser.print_help()

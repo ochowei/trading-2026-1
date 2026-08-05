@@ -33,9 +33,8 @@ uv run trading data refresh SPY --end 2026-08-04      # 明確 inclusive cutoff
 refresh timestamps 與 checksum。
 refresh 使用 per-series bounded file lock、temporary files、publish 前 validation 與 atomic replace；
 同一 ticker 的 concurrent refresh（包含 explicit incremental refresh）會在取得 lock 後重新確認
-cache generation，只下載並發布一次完整有效的 cache。`--full` 只建立 Phase 1 的完整刷新
-標記，供未來 snapshot 流程使用；它不可搭配 `--start`，且任何 refresh 都不可讓 active cutoff
-倒退。本階段尚未建立 immutable blob 或 snapshot store。
+cache generation，只下載並發布一次完整有效的 cache。`--full` 建立 snapshot-eligible 的完整刷新
+generation；它不可搭配 `--start`，且任何 refresh 都不可讓 active cutoff 倒退。
 
 新的共用模型可預先宣告 primary/auxiliary `MarketDataRequirement`、`AvailabilityPolicy` 與
 `SignalDecisionTime`，並建立 defensive-copy 的 read-only `MarketDataBundle`。Auxiliary daily series
@@ -44,6 +43,51 @@ cache generation，只下載並發布一次完整有效的 cache。`--full` 只�
 maximum observation lag 會 fail closed。Bundle 由同一 `MarketDataService` 解析全部 declarations，
 缺少 history/session coverage 或重複 declaration 會在 detector 執行前失敗。完整技術契約見
 [docs/market-data.md](docs/market-data.md)。
+
+## Reproducible Research Evidence
+
+Phase 2 將完整刷新 generation 的 canonical CSV bytes 發布為 SHA-256 content-addressed immutable
+data blobs。兩個實驗使用相同 bytes 時共用同一 blob；incremental-mixed cache 不具 snapshot
+eligibility。Snapshot manifest 記錄每個 primary/auxiliary declaration、availability policy、provider
+context、cutoff、blob checksum，以及可選的 research-definition blob。損壞的 immutable blob 只會讓
+snapshot/result 變成 unreproducible，永遠不會以目前 Yahoo 資料覆寫或修補。
+所有 published manifest 必須使用 `.snapshot.json`，並以 strict canonical JSON round-trip 拒絕 unknown
+fields 或替代 serialization，確保 Git retention、GC discovery 與 snapshot identity 使用同一份契約。
+
+Research-definition fingerprint 包含 canonical resolved config、strategy/detector/backtester 的 normalized
+Python AST、execution-engine version、Python 與 relevant dependency versions。Comments 或 formatting 不改變
+semantic fingerprint；threshold、execution rule 或 dependency identity 會改變。Definition capture 必須從
+source 自動解析可重建的 Git context；非 Git source 會 fail closed。Definition blob 另外保存 exact source，
+因此正式執行時的 dirty worktree 可重建。
+
+```bash
+uv run trading data snapshot SPY --experiment migrated_experiment --aux '^VIX' \
+  --history-start 2020-01-01 --decision 2026-08-04
+uv run trading data snapshot SPY --aux '^VIX' --history-start 2020-01-01 \
+  --decision 2026-08-04 --manifest results/example/data.snapshot.json
+uv run trading data verify results/example/data.snapshot.json
+uv run trading data export results/example/run.snapshot.json backup.snapshot.zip
+uv run trading data import backup.snapshot.zip --manifest results/example/imported.snapshot.json
+uv run trading data gc --grace-days 7          # 掃描 results/，dry-run
+uv run trading data gc --grace-days 7 --apply  # explicit delete
+uv run trading run experiment_name --ephemeral
+uv run trading run migrated_experiment
+uv run trading run migrated_experiment --snapshot results/example/run.snapshot.json
+uv run trading run migrated_experiment --offline results/example/run.snapshot.json
+uv run trading run unmigrated_experiment --legacy
+```
+
+`data snapshot --experiment NAME` 會捕捉 current definition，預設發布到
+`results/NAME/<snapshot_id>.snapshot.json`；snapshot-aware experiment 的無旗標 `trading run NAME`
+會找出符合 current exact definition 的最新 immutable manifest，再以此執行 formal online。Online
+只接受最新 completed session 的 verified data+definition snapshot，並在 current definition exact
+reference 相符時更新 historical result 與 `latest.json`；offline 接受較舊
+complete snapshot、只寫 historical result；ephemeral 完全不寫 result/registry。Snapshot-aware experiment
+必須實作 `run_with_bundle` 與 `capture_research_definition`。未遷移 experiment 若要持久化必須明確使用
+`--legacy`，待 Phase 9 declaration migration 後逐批移除。Portable bundle import 會先驗證 manifest、所有
+blobs 的 checksum、schema、session coverage 與 canonical CSV bytes，再檢查 collision 並發布；GC 預設
+dry-run、保護所有 retained manifest references，且只處理 grace period 外的
+orphan blobs。完整契約見 [docs/reproducibility.md](docs/reproducibility.md)。
 
 ## Followup Backtest
 
@@ -221,8 +265,8 @@ register("my_strategy")(MyStrategy)
 # 確認註冊成功
 uv run trading list
 
-# 執行實驗
-uv run trading run my_strategy
+# 尚未加入 snapshot declarations 時，明確執行 legacy persisted run
+uv run trading run my_strategy --legacy
 ```
 
 ## 進階用法 (Advanced Usage)
