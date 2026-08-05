@@ -15,7 +15,7 @@
 
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **檔案結構變更**：新增、刪除或搬移檔案時，必須更新本文件的「架構速覽」段落。
-- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項、以及對應資產的 `EXPERIMENTS_TQQQ.md`、`EXPERIMENTS_GLD.md`、`EXPERIMENTS_SIVR.md`、`EXPERIMENTS_FCX.md`、`EXPERIMENTS_USO.md`、`EXPERIMENTS_SOXL.md`、`EXPERIMENTS_SPY.md`、`EXPERIMENTS_DIA.md`、`EXPERIMENTS_VOO.md`、`EXPERIMENTS_TLT.md`、`EXPERIMENTS_IWM.md`、`EXPERIMENTS_XBI.md`、`EXPERIMENTS_XLU.md`、`EXPERIMENTS_NVDA.md`、`EXPERIMENTS_COPX.md`、`EXPERIMENTS_URA.md`、`EXPERIMENTS_TSLA.md`、`EXPERIMENTS_EEM.md`、`EXPERIMENTS_EWJ.md`、`EXPERIMENTS_EWT.md`、`EXPERIMENTS_EWZ.md`、`EXPERIMENTS_FXI.md`、`EXPERIMENTS_VGK.md`、`EXPERIMENTS_INDA.md`、`EXPERIMENTS_IBIT.md` 或 `EXPERIMENTS_CIBR.md`。
+- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項，以及對應資產的 `src/trading/experiments/EXPERIMENTS_<TICKER>.md`。若是全新資產，建立該總覽文件並在本文件的「按需參考」保留通用查找方式，不要新增逐一列舉且容易過期的資產清單。
 - **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
 - **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
@@ -94,7 +94,8 @@ uv run trading freshness
 .agents/
 ├── context/
 │   ├── cross_asset_lessons.md   # 跨資產共通教訓（波動率分類、禁忌、參數縮放）
-├── skills/                           # Repo 專屬 Codex skills，統一使用 trading- 前綴
+│   └── cross_asset_evidence.md  # 共通教訓的詳細回測證據與原因分析
+├── skills/                      # Repo 專屬 Codex skills，統一使用 trading- 前綴
 │   └── trading-*/
 │       ├── SKILL.md
 │       └── agents/openai.yaml
@@ -102,7 +103,11 @@ uv run trading freshness
     └── execution-model.md       # 成交模型完整規格
 
 pm/                              # 人類 PM 專用文件（AI Agent 禁止編輯）
-└── HUMAN_PM_MEMO.md             # 關注標的、策略想法、執行模型備忘、更新紀錄
+├── HUMAN_PM_MEMO.md             # 關注標的、策略想法、執行模型備忘、更新紀錄
+└── USE_CASES.md                 # 人類使用情境與常用操作索引
+
+results/                         # 各實驗最新與歷史回測結果（JSON）
+tests/                           # 共用引擎與 followup 行為測試
 
 src/trading/
 ├── cli.py                       # 統一 CLI 入口
@@ -116,42 +121,20 @@ src/trading/
 │   ├── base_strategy.py         # BaseStrategy（fetch → 指標 → 訊號 → 回測 → 報表）
 │   ├── execution_strategy.py    # ExecutionModelStrategy（成交模型報表）
 │   ├── data_fetcher.py          # yfinance 多線程資料抓取
+│   ├── performance_analyzer.py  # 滾動窗口績效與漸變性分析
 │   ├── freshness.py             # 知識新鮮度檢查（data_through 過期掃描）
-│   └── results.py               # 結果儲存（JSON）與跨實驗比較
+│   ├── results.py               # 結果儲存（JSON）與跨實驗比較
+│   └── sync_docs.py             # Markdown 結果與 latest.json 同步檢查
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
+    ├── EXPERIMENTS_<TICKER>.md  # 各資產實驗總覽與 AI_CONTEXT
     └── <name>/                  # config.py + signal_detector.py + strategy.py + __init__.py
 ```
 
 ## 按需參考（不需要時不用讀）
 
 - 建立新實驗教學 → [README.md](README.md)
-- TQQQ 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TQQQ.md](src/trading/experiments/EXPERIMENTS_TQQQ.md)
-- GLD 實驗總覽 → [src/trading/experiments/EXPERIMENTS_GLD.md](src/trading/experiments/EXPERIMENTS_GLD.md)
-- SIVR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SIVR.md](src/trading/experiments/EXPERIMENTS_SIVR.md)
-- FCX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_FCX.md](src/trading/experiments/EXPERIMENTS_FCX.md)
-- FXI 實驗總覽 → [src/trading/experiments/EXPERIMENTS_FXI.md](src/trading/experiments/EXPERIMENTS_FXI.md)
-- SOXL 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SOXL.md](src/trading/experiments/EXPERIMENTS_SOXL.md)
-- USO 實驗總覽 → [src/trading/experiments/EXPERIMENTS_USO.md](src/trading/experiments/EXPERIMENTS_USO.md)
-- SPY 實驗總覽 → [src/trading/experiments/EXPERIMENTS_SPY.md](src/trading/experiments/EXPERIMENTS_SPY.md)
-- DIA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_DIA.md](src/trading/experiments/EXPERIMENTS_DIA.md)
-- EEM 實驗總覽 → [src/trading/experiments/EXPERIMENTS_EEM.md](src/trading/experiments/EXPERIMENTS_EEM.md)
-- EWJ 實驗總覽 → [src/trading/experiments/EXPERIMENTS_EWJ.md](src/trading/experiments/EXPERIMENTS_EWJ.md)
-- EWT 實驗總覽 → [src/trading/experiments/EXPERIMENTS_EWT.md](src/trading/experiments/EXPERIMENTS_EWT.md)
-- EWZ 實驗總覽 → [src/trading/experiments/EXPERIMENTS_EWZ.md](src/trading/experiments/EXPERIMENTS_EWZ.md)
-- VOO 實驗總覽 → [src/trading/experiments/EXPERIMENTS_VOO.md](src/trading/experiments/EXPERIMENTS_VOO.md)
-- XBI 實驗總覽 → [src/trading/experiments/EXPERIMENTS_XBI.md](src/trading/experiments/EXPERIMENTS_XBI.md)
-- XLU 實驗總覽 → [src/trading/experiments/EXPERIMENTS_XLU.md](src/trading/experiments/EXPERIMENTS_XLU.md)
-- TLT 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TLT.md](src/trading/experiments/EXPERIMENTS_TLT.md)
-- TSLA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TSLA.md](src/trading/experiments/EXPERIMENTS_TSLA.md)
-- TSM 實驗總覽 → [src/trading/experiments/EXPERIMENTS_TSM.md](src/trading/experiments/EXPERIMENTS_TSM.md)
-- CIBR 實驗總覽 → [src/trading/experiments/EXPERIMENTS_CIBR.md](src/trading/experiments/EXPERIMENTS_CIBR.md)
-- COPX 實驗總覽 → [src/trading/experiments/EXPERIMENTS_COPX.md](src/trading/experiments/EXPERIMENTS_COPX.md)
-- INDA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_INDA.md](src/trading/experiments/EXPERIMENTS_INDA.md)
-- IWM 實驗總覽 → [src/trading/experiments/EXPERIMENTS_IWM.md](src/trading/experiments/EXPERIMENTS_IWM.md)
-- NVDA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_NVDA.md](src/trading/experiments/EXPERIMENTS_NVDA.md)
-- URA 實驗總覽 → [src/trading/experiments/EXPERIMENTS_URA.md](src/trading/experiments/EXPERIMENTS_URA.md)
-- VGK 實驗總覽 → [src/trading/experiments/EXPERIMENTS_VGK.md](src/trading/experiments/EXPERIMENTS_VGK.md)
-- IBIT 實驗總覽 → [src/trading/experiments/EXPERIMENTS_IBIT.md](src/trading/experiments/EXPERIMENTS_IBIT.md)
+- 資產實驗總覽 → `src/trading/experiments/EXPERIMENTS_<TICKER>.md`（例如 [TQQQ](src/trading/experiments/EXPERIMENTS_TQQQ.md)、[GLD](src/trading/experiments/EXPERIMENTS_GLD.md)）
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
 - 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
+- 跨資產詳細證據 → [.agents/context/cross_asset_evidence.md](.agents/context/cross_asset_evidence.md)
