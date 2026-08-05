@@ -1,0 +1,3 @@
+# Recover paused strategies with new shadow evidence
+
+A paused strategy continues paper execution under the same frozen research definition and normally requires at least 126 later trading sessions, six completed shadow trades, cleared hard guards, and two scheduled checkpoints back inside the normal predictive envelope before resuming. Data-integrity or ledger-reconciliation pauses may recover after correction and two clean checks without strategy-trade evidence, while any outcome-relevant strategy change creates a new experiment trial and restarts full qualification. This makes recovery evidence-based without disguising redesign as an unpause.

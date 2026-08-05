@@ -1,0 +1,3 @@
+# Fully refresh adjusted data before creating a research snapshot
+
+Daily trading operations may incrementally refresh their market data cache with a lookback overlap, but a new research data snapshot may be created only from a complete historical refresh for the relevant completed trading session. That full refresh is shared by all experiments run against the same ticker and session, while offline research may reference an older complete snapshot and must disclose that it is stale. This prevents Yahoo Finance corporate-action adjustments from producing a dataset that silently mixes incompatible historical price generations.

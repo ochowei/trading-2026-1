@@ -1,0 +1,3 @@
+# Change portfolio allocation only at explicit epochs
+
+Adding or removing an instrument from the followup universe does not automatically resize existing sleeves. New slots require added managed capital or remain unfunded, retiring slots manage positions to closure and release cash into an unallocated reserve, and equal redistribution occurs only through an explicit allocation epoch after affected positions are flat or an explicit transition is recorded; performance is segmented by epoch. This preserves the no-rebalancing contract and prevents universe maintenance from silently changing portfolio risk.

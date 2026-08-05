@@ -1,0 +1,3 @@
+# Replace fixed Part A, B, and C qualification with lifecycle evidence
+
+Existing Part A, Part B, and Part C outcomes remain read-only legacy period results and no longer grant shadow or active qualification. New persisted results separate development summaries, non-overlapping historical stability folds, prospective shadow evidence, confirmed live evidence, validity, and data and definition snapshots; observations on or before 2026-08-05 are historical, and each frozen definition begins prospective evidence only when formally registered. This preserves past research without relabeling already inspected data as unseen validation.

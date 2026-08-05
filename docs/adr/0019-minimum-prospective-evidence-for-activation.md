@@ -1,0 +1,3 @@
+# Require a year and twelve completed shadow trades before activation
+
+A shadow strategy is eligible for an activation checkpoint only after at least 252 completed trading sessions and twelve completed prospective shadow trades under one frozen research definition. It must also retain positive cumulative return, profit factor above one, remain within its preregistered stress-drawdown limit, and avoid critical signal, fill, or holding-period drift; checkpoint timing is fixed in advance, and insufficient low-frequency strategies remain shadow rather than receiving relaxed thresholds. This chooses slower activation over conclusions drawn from another small favorable sample.

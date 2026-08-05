@@ -1,0 +1,3 @@
+# Requalify legacy followup strategies before new entry
+
+When the unified validation and execution model becomes active, existing followup strategies become legacy active: they continue managing confirmed open positions but cannot propose new entries until requalified with fresh snapshots, the canonical strategy-sleeve model, and the current validation policy. Assets are migrated and reported individually rather than silently grandfathered or replaced as a batch. This favors avoiding new risk from results selected under incompatible historical assumptions while preserving responsibility for positions already opened.

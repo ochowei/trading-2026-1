@@ -1,0 +1,3 @@
+# Align auxiliary data by information availability
+
+Followup decisions use the primary instrument's completed trading session as their cutoff, while every auxiliary market-data requirement declares an availability policy and maximum observation lag. Alignment is backward as-of only, snapshot manifests retain original and aligned dates, excessive lag fails closed, and historical evaluation applies the same publication lag; when exact daily publication timing is unknown, the observation is conservatively delayed by at least one session. This avoids both unnecessary same-calendar-date failures and look-ahead from data that was not yet knowable.

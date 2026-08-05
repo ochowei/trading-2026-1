@@ -1,0 +1,3 @@
+# Adjust experiment selection with a family-wise block bootstrap
+
+Experiment-family qualification uses capital-constrained daily sleeve returns and a block bootstrap that repeats the best-trial selection across every registered family variant, preserving temporal dependence while estimating whether the selected improvement survives the actual search process. A candidate must pass the absolute historical stability thresholds and achieve at least 90 percent selection-adjusted confidence against a preregistered family baseline or cash; incomplete legacy trial histories are disclosed and cannot bypass prospective shadow evidence. This replaces arbitrary trial-count penalties with a test aligned to how candidates were selected.

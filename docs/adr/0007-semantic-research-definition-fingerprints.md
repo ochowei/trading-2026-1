@@ -1,0 +1,3 @@
+# Fingerprint research definitions semantically
+
+Research-result validity uses a semantic fingerprint built from canonical resolved configuration, normalized syntax for the strategy's signal and execution components, explicit engine versions, and relevant computational dependency versions. Formatting, comments, and unrelated reporting code do not intentionally invalidate results, while any dependency whose behavioral relevance cannot be determined is included conservatively. This accepts additional fingerprinting complexity to avoid mass invalidation from non-behavioral edits without allowing uncertain changes to pass as equivalent.

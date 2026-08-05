@@ -1,0 +1,3 @@
+# Rebuild invalid caches but never repair snapshot blobs in place
+
+Market-data ingestion validates schema, ordered unique dates, required values, OHLC relationships, nonnegative volume, and expected session coverage without silently dropping invalid observations. A failed cache is quarantined and may be fully rebuilt, while a hash- or content-invalid immutable research blob can only be restored from the same snapshot bundle and otherwise makes its results unreproducible; no current provider download may impersonate the missing historical evidence. Data-validation failure is a trading hard guard.

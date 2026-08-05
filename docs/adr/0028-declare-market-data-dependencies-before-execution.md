@@ -1,0 +1,3 @@
+# Declare every market-data dependency before execution
+
+Experiments declare all primary and auxiliary market-data requirements before execution, the orchestrator resolves them through the shared provider, and signal detectors receive a complete read-only market-data bundle without network access. Missing requirements fail closed, used series enter the data snapshot and research-definition fingerprint, and experiment code is prohibited from importing or calling yfinance directly. This removes hidden data dependencies that would otherwise bypass caching, freshness, offline replay, and reproducibility controls.
