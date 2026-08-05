@@ -79,15 +79,50 @@ uv run trading run unmigrated_experiment --legacy
 
 `data snapshot --experiment NAME` 會捕捉 current definition，預設發布到
 `results/NAME/<snapshot_id>.snapshot.json`；snapshot-aware experiment 的無旗標 `trading run NAME`
-會找出符合 current exact definition 的最新 immutable manifest，再以此執行 formal online。Online
-只接受最新 completed session 的 verified data+definition snapshot，並在 current definition exact
-reference 相符時更新 historical result 與 `latest.json`；offline 接受較舊
+會找出符合 current exact definition reference 的最新 immutable manifest，再以此執行 formal online。Online
+只接受最新 completed session 的 verified data+definition snapshot，並在 current exact definition
+相符時更新 historical result 與 `latest.json`；offline 接受較舊
 complete snapshot、只寫 historical result；ephemeral 完全不寫 result/registry。Snapshot-aware experiment
-必須實作 `run_with_bundle` 與 `capture_research_definition`。未遷移 experiment 若要持久化必須明確使用
-`--legacy`，待 Phase 9 declaration migration 後逐批移除。Portable bundle import 會先驗證 manifest、所有
+必須實作 `run_with_bundle`、`capture_research_definition` 與回傳穩定 family/hypothesis 的
+`declare_experiment_trial`。未遷移 experiment 若要持久化必須明確使用
+`--legacy`；它只會寫入 legacy historical result，不會更新 `latest.json`，待 Phase 9 declaration migration
+後逐批移除。Portable bundle import 會先驗證 manifest、所有
 blobs 的 checksum、schema、session coverage 與 canonical CSV bytes，再檢查 collision 並發布；GC 預設
 dry-run、保護所有 retained manifest references，且只處理 grace period 外的
 orphan blobs。完整契約見 [docs/reproducibility.md](docs/reproducibility.md)。
+
+## Result validity and trial history
+
+Phase 3 gives every new formal result a versioned validity contract. Schema v2 retains the existing
+Part A / Part B / Part C fields and records the referenced data snapshot identity, actual data
+cutoff, definition snapshot identity, semantic definition fingerprint, development summary,
+historical stability folds, shadow/live evidence, and legacy period results. Status is recomputed
+read-only as `valid`, `data-stale`, `definition-stale`, `unreproducible`, or `legacy`.
+
+Only a complete successful result with verified current data and the current semantic definition
+is eligible for ranking or follow-up. Legacy files remain readable but are never assigned fake
+snapshot evidence. Formatting, comments, and explicitly declared reporting-only symbols do not
+change a definition fingerprint only when the symbol is unambiguous and unreferenced by retained
+outcome code; symbol names are not implicitly trusted, and uncertain or behavior-affecting changes
+do change it. If the current definition cannot be resolved, a schema-v2 result is
+`unreproducible`, not `valid`.
+
+```bash
+uv run trading result status <experiment_name>  # read-only
+uv run trading result status --all              # read-only
+uv run trading result evaluate SPY              # refresh all stale candidates or fail closed
+uv run trading result registry seed             # explicit legacy inventory seed
+```
+
+Formal `online` runs publish historical evidence and advance `latest.json`; formal `offline` runs
+publish historical evidence only; `ephemeral` runs write neither results nor registry observations.
+Explicit evaluation fully refreshes retained requirements and publishes a new current exact
+snapshot before rerunning each stale candidate.
+Followup qualification and experiment-documentation workflows require computed `valid` status
+before consuming metrics; one invalid candidate blocks a complete ranking.
+Failed formal attempts remain in the append-only `results/trial_registry.json`, keyed by experiment
+family and semantic definition fingerprint. The result and trial-history contract is documented in
+[docs/result-validity-and-trial-history.md](docs/result-validity-and-trial-history.md).
 
 ## Followup Backtest
 
@@ -265,7 +300,7 @@ register("my_strategy")(MyStrategy)
 # 確認註冊成功
 uv run trading list
 
-# 尚未加入 snapshot declarations 時，明確執行 legacy persisted run
+# 尚未加入 snapshot declarations 時，明確執行 legacy historical run（不更新 latest.json）
 uv run trading run my_strategy --legacy
 ```
 

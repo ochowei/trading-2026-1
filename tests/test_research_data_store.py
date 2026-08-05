@@ -150,7 +150,7 @@ def test_snapshot_manifest_records_every_declared_series_and_policy(tmp_path) ->
     )
 
 
-def test_latest_manifest_discovery_selects_newest_exact_definition(tmp_path) -> None:
+def test_latest_manifest_discovery_requires_the_exact_definition(tmp_path) -> None:
     cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
     series = MarketDataSeries.yahoo_adjusted_daily("SPY")
     cache.publish(
@@ -164,6 +164,7 @@ def test_latest_manifest_discovery_selects_newest_exact_definition(tmp_path) -> 
             datetime(2026, 8, 5, 10, tzinfo=UTC),
             datetime(2026, 8, 5, 11, tzinfo=UTC),
             datetime(2026, 8, 5, 12, tzinfo=UTC),
+            datetime(2026, 8, 5, 13, tzinfo=UTC),
         )
     )
     store = ResearchDataStore(tmp_path / "research-data", now=lambda: next(times))
@@ -199,6 +200,18 @@ def test_latest_manifest_discovery_selects_newest_exact_definition(tmp_path) -> 
     store.write_manifest(
         unrelated,
         manifest_root / f"{unrelated.snapshot_id}.snapshot.json",
+    )
+
+    same_fingerprint = DefinitionBlobRef("e" * 64, 1, definition.fingerprint)
+    semantic_match = store.create_snapshot(
+        cache,
+        (requirement,),
+        decision_time,
+        definition=same_fingerprint,
+    )
+    store.write_manifest(
+        semantic_match,
+        manifest_root / f"{semantic_match.snapshot_id}.snapshot.json",
     )
 
     assert first_path != second_path

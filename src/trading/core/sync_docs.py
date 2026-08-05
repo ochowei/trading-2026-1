@@ -2,17 +2,25 @@
 Markdown 表格解析與同步檢查工具 (Markdown Table Parser & Sync Checker)
 """
 
-import json
 import logging
 import re
+from collections.abc import Callable
 from pathlib import Path
 
+from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.core.results import ResultStatusRecord, inspect_result
 from trading.experiments import get_experiment
+from trading.research_data.models import DefinitionBlobRef
+from trading.research_data.result_schema import ResultValidityStatus
 
 logger = logging.getLogger(__name__)
 
 RESULTS_DIR = Path("results")
 DOCS_DIR = Path("src/trading/experiments")
+
+
+class ResultSyncError(RuntimeError):
+    """Documentation cannot use a stale, legacy, or unreproducible result source."""
 
 
 def extract_markdown_tables(filepath: Path) -> dict:
@@ -102,37 +110,63 @@ def extract_markdown_tables(filepath: Path) -> dict:
     return tables
 
 
-def find_latest_json(experiment_id: str) -> dict | None:
+def find_latest_record(
+    experiment_id: str,
+    *,
+    results_dir: Path | None = None,
+    definition_resolver: Callable[[str], str | DefinitionBlobRef | None] | None = None,
+) -> ResultStatusRecord | None:
     """根據實驗 ID 尋找對應的 latest.json"""
-    for exp_dir in RESULTS_DIR.iterdir():
+    root = Path(results_dir or RESULTS_DIR)
+    if not root.exists():
+        return None
+    for exp_dir in sorted(root.iterdir()):
         if not exp_dir.is_dir():
             continue
 
         # 嘗試解析 experiment_id
         # 我們可能不知道資料夾名稱，所以需要讀取 latest.json 裡面或者找 config
         latest_path = exp_dir / "latest.json"
-        if latest_path.exists():
-            try:
-                # 若能根據目錄名稱取得 experiment 實例
-                strategy = get_experiment(exp_dir.name)
-                config = strategy.create_config()
-                if config.experiment_id == experiment_id:
-                    return json.loads(latest_path.read_text(encoding="utf-8"))
-            except Exception:
-                pass
-
-            # 或者嘗試透過目錄名稱字首比對
-            if exp_dir.name.lower().startswith(experiment_id.lower().replace("-", "_")):
-                return json.loads(latest_path.read_text(encoding="utf-8"))
+        if not latest_path.exists():
+            continue
+        matches = False
+        try:
+            strategy = get_experiment(exp_dir.name)
+            config = strategy.create_config()
+            matches = config.experiment_id == experiment_id
+        except Exception:  # noqa: BLE001 - discovery is a diagnostic boundary
+            matches = False
+        if not matches:
+            matches = exp_dir.name.lower().startswith(experiment_id.lower().replace("-", "_"))
+        if matches:
+            current_definition = (
+                definition_resolver(exp_dir.name) if definition_resolver is not None else None
+            )
+            return inspect_result(
+                exp_dir.name,
+                results_dir=root,
+                current_definition_fingerprint=current_definition,
+            )
 
     return None
 
 
-def compare_docs_and_results() -> None:
+def find_latest_json(experiment_id: str) -> dict | None:
+    """Return the legacy-compatible payload for one latest result."""
+    record = find_latest_record(experiment_id)
+    return record.result.payload if record is not None else None
+
+
+def compare_docs_and_results(
+    *,
+    definition_resolver: Callable[[str], str | DefinitionBlobRef | None] | None = None,
+) -> None:
     """
     比對 EXPERIMENTS_*.md 中的表格與 results/*/latest.json，
     印出差異報告。
     """
+    current_definition_resolver = definition_resolver or resolve_current_definition_fingerprint
+
     print("\n" + "=" * 80)
     print("  文件同步檢查報告 (Documentation Sync Report)")
     print("=" * 80 + "\n")
@@ -157,10 +191,19 @@ def compare_docs_and_results() -> None:
 
         for part_key, part_tables in tables.items():
             for exp_id, doc_data in part_tables.items():
-                result = find_latest_json(exp_id)
-                if not result:
+                record = find_latest_record(
+                    exp_id,
+                    definition_resolver=current_definition_resolver,
+                )
+                if record is None:
                     # 找不到 json 可能只是尚未執行過，不列為錯誤
                     continue
+                if record.validity.status is not ResultValidityStatus.VALID:
+                    raise ResultSyncError(
+                        f"{exp_id} documentation source is "
+                        f"{record.validity.status.value}; sync-docs requires valid results"
+                    )
+                result = record.result.payload
 
                 part_result = result.get(part_key, {})
                 if not part_result:

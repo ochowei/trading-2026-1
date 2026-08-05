@@ -35,20 +35,31 @@ If no experiments exist for this asset, inform the user and stop.
 
 For each experiment found in Step 1, check if `results/<experiment_name>/latest.json` already exists:
 
-- **If `latest.json` exists**: Skip running, use the existing results. Display: `⏭️ <experiment_name>: using existing latest.json`
+- **If `latest.json` exists**: Inspect it before using any metric:
+
+```bash
+uv run trading result status <experiment_name>
+```
+
+  - Use the result only when its computed status is exactly `valid`.
+  - If any candidate is `data-stale` or `definition-stale`, run the explicit all-candidate
+    workflow once with `uv run trading result evaluate <TICKER>`, then recheck every candidate.
+  - If any candidate is `legacy` or `unreproducible`, stop qualification. Do not rank a partial
+    candidate set and do not modify `followup.py`.
 - **If `latest.json` does NOT exist**: Run the experiment:
 
 ```bash
 uv run trading run <experiment_name>
 ```
 
-This saves results to `results/<experiment_name>/latest.json`.
+Then run `uv run trading result status <experiment_name>`. Continue only if the new result is
+`valid`; an unmigrated legacy result cannot grant followup qualification.
 
 ---
 
 ## Step 3: Compare experiments
 
-If there are 2+ experiments, run:
+If every candidate is `valid` and there are 2+ experiments, run:
 
 ```bash
 uv run trading compare <exp1> <exp2> [<exp3> ...]
@@ -60,7 +71,8 @@ Display the full comparison output to the user.
 
 ## Step 4: Determine the best experiment
 
-Read each experiment's `results/<experiment_name>/latest.json` and evaluate based on these criteria **in priority order**:
+Read each `valid` experiment's `results/<experiment_name>/latest.json` and evaluate based on these
+criteria **in priority order**. Never rank when a discovered candidate was omitted for invalidity:
 
 1. **Part B (Out-of-Sample) win rate > 50%** — mandatory, disqualify if not met
 2. **Part B cumulative return > 0%** — mandatory, disqualify if not met
@@ -124,12 +136,13 @@ Produce a qualification checklist:
 
 | # | 檢查項目 | 結果 | 值 |
 |---|---------|------|-----|
-| 1 | Part B 勝率 ≥ 55% | ✅/❌ | X% |
-| 2 | Part B 累計報酬 > 0% | ✅/❌ | +X% |
-| 3 | Part B 年均訊號 ≥ 2 | ✅/❌ | X/year |
-| 4 | A/B 勝率差 < 15pp | ✅/❌ | Xpp |
-| 5 | ExecutionModelStrategy | ✅/❌ | Yes/No |
-| 6 | 漸變性評估 | ✅/❌/⚠️ | 精準度:✓/✗ 績效:✓/✗ |
+| 1 | Result validity | ✅/❌ | valid / status |
+| 2 | Part B 勝率 ≥ 55% | ✅/❌ | X% |
+| 3 | Part B 累計報酬 > 0% | ✅/❌ | +X% |
+| 4 | Part B 年均訊號 ≥ 2 | ✅/❌ | X/year |
+| 5 | A/B 勝率差 < 15pp | ✅/❌ | Xpp |
+| 6 | ExecutionModelStrategy | ✅/❌ | Yes/No |
+| 7 | 漸變性評估 | ✅/❌/⚠️ | 精準度:✓/✗ 績效:✓/✗ |
 
 結論: 合格 ✅ / 不合格 ❌ / 合格(需人工確認漸變性) ⚠️
 ```
@@ -138,7 +151,9 @@ Produce a qualification checklist:
 
 ## Step 7: Update followup.py (only if qualified)
 
-If the best experiment qualifies, check `src/trading/followup.py`:
+If the best experiment qualifies and its latest result still reports `valid`, check
+`src/trading/followup.py`. Recheck status immediately before editing; otherwise stop without a
+followup change:
 
 ### 7a. If asset already in STRATEGIES list
 - Compare with the currently listed experiment
@@ -193,5 +208,6 @@ uv run trading followup
 - Part B 勝率: X% | 累計: +X% | Sharpe: X
 - 漸變性: 精準度 ✓/✗ | 績效 ✓/✗
 - Followup 資格: 合格 ✅ / 不合格 ❌
+- Result validity: valid / <blocking status>
 - Followup 更新: 已新增 / 已更新 / 未變更 / 不合格未加入
 ```

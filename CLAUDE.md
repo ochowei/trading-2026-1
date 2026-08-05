@@ -69,7 +69,7 @@ uv run trading list
 # 執行已 prepare 的 snapshot-aware 實驗（預設 formal online）
 uv run trading run <experiment_name>
 
-# 尚未完成 Phase 9 migration 的實驗必須明確選擇 legacy persisted run
+# 尚未完成 Phase 9 migration 的實驗必須明確選擇 legacy historical run；不會更新 latest.json
 uv run trading run <experiment_name> --legacy
 
 # 比較實驗結果
@@ -119,6 +119,16 @@ uv run trading data gc --grace-days 7
 
 # Diagnostic run 不改變 results 或 registry state
 uv run trading run <experiment_name> --ephemeral
+
+# 唯讀檢查 result validity；不 refresh、不寫入結果
+uv run trading result status <experiment_name>
+uv run trading result status --all
+
+# 明確評估單一資產；先處理全部 stale candidates，無法完整更新則不排名
+uv run trading result evaluate <asset>
+
+# 一次性建立 legacy experiment inventory；會明確標記 selection history incomplete
+uv run trading result registry seed
 ```
 
 ## 架構速覽
@@ -145,6 +155,7 @@ docs/
 ├── adr/                         # 架構決策紀錄（ADR）
 ├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
 ├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
+├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -163,8 +174,10 @@ src/trading/
 │   ├── execution_strategy.py    # ExecutionModelStrategy（成交模型報表）
 │   ├── data_fetcher.py          # 相容層：多 ticker 存取 validated CSV market data
 │   ├── performance_analyzer.py  # 滾動窗口績效與漸變性分析
-│   ├── freshness.py             # 知識新鮮度檢查（data_through 過期掃描）
-│   ├── results.py               # 結果儲存（JSON）與跨實驗比較
+│   ├── freshness.py             # 知識新鮮度與 result validity 唯讀掃描
+│   ├── results.py               # 結果讀取、validity diagnostics 與跨實驗比較
+│   ├── definition_resolver.py   # Current semantic definition 唯讀解析（不發布 blob）
+│   ├── evaluation.py            # 單一資產 stale refresh、完整性與排名邊界
 │   └── sync_docs.py             # Markdown 結果與 latest.json 同步檢查
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
@@ -181,6 +194,8 @@ src/trading/
 │   ├── models.py                # Blob/manifest/definition/run/GC immutable values
 │   ├── store.py                 # Snapshot orchestration、portable bundles、verification、GC
 │   ├── definitions.py           # Semantic fingerprint 與 dirty-worktree definition blobs
+│   ├── result_schema.py         # Versioned result payload、validity 與 legacy compatibility
+│   ├── trial_registry.py        # Append-only trial identity、observations、tombstones
 │   └── runs.py                  # Online/offline/ephemeral publication boundaries
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）

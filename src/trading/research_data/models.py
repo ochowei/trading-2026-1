@@ -75,6 +75,20 @@ class ResearchDefinitionSnapshot:
 
 
 @dataclass(frozen=True, slots=True)
+class ExperimentTrialDeclaration:
+    """Stable trial-family metadata declared by a snapshot-aware experiment."""
+
+    family: str
+    hypothesis: str = ""
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.family, str) or not self.family.strip():
+            raise ValueError("experiment trial family must be non-empty")
+        if not isinstance(self.hypothesis, str):
+            raise TypeError("experiment trial hypothesis must be text")
+
+
+@dataclass(frozen=True, slots=True)
 class SnapshotBundleImport:
     """Verified artifacts restored from a portable snapshot bundle."""
 

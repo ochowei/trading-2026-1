@@ -9,8 +9,12 @@ import re
 from datetime import date
 from pathlib import Path
 
+from trading.core.definition_resolver import resolve_current_definition_fingerprint
+from trading.core.results import inspect_result
+
 LESSONS_PATH = Path(".agents/context/cross_asset_lessons.md")
 DOCS_DIR = Path("src/trading/experiments")
+RESULTS_DIR = Path("results")
 
 # 過期門檻（月數）
 THRESHOLD_GREEN = 3
@@ -212,6 +216,26 @@ def check_freshness() -> None:
         else:
             counts["unknown"] += 1
             print("  ❓ AI Context (no data_through date)")
+
+    print("\n📊 Result validity (read-only)")
+    if RESULTS_DIR.exists():
+        for result_dir in sorted(RESULTS_DIR.iterdir()):
+            if not result_dir.is_dir() or not (result_dir / "latest.json").exists():
+                continue
+            record = inspect_result(
+                result_dir.name,
+                results_dir=RESULTS_DIR,
+                current_definition_fingerprint=resolve_current_definition_fingerprint(
+                    result_dir.name
+                ),
+            )
+            if record is None:
+                continue
+            print(f"  {record.experiment_name}: {record.validity.status.value}")
+            for reason in record.validity.reasons:
+                print(f"    reason: {reason}")
+    else:
+        print("  (no persisted results found)")
 
     # --- Summary ---
     total = counts["green"] + counts["yellow"] + counts["red"] + counts["unknown"]

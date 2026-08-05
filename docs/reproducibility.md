@@ -41,6 +41,10 @@ discovers the common source repository's Git HEAD, branch, dirty status, relevan
 Sources without reconstructable Git context fail closed. A formatting-only change can
 therefore preserve the semantic fingerprint while producing a different exact definition blob;
 outcome-relevant source, configuration, engine, or dependency changes alter the fingerprint.
+Reporting-only functions are excluded only through an explicit per-source symbol declaration;
+function names and prefixes are never used as evidence that code is outcome-independent. The
+declaration is honored only for one unambiguous symbol that is not referenced outside its own
+definition; uncertain dependencies remain semantic.
 
 ## Formal execution modes
 
@@ -56,11 +60,51 @@ outcome-relevant source, configuration, engine, or dependency changes alter the 
 the immutable `results/NAME/<snapshot_id>.snapshot.json` path. `trading run NAME` selects formal
 online mode by default by discovering the newest retained manifest whose exact definition reference
 matches the current experiment. `--snapshot MANIFEST` overrides discovery and `--offline MANIFEST`
-selects formal offline mode. Formal modes require snapshot-aware `run_with_bundle` and
-`capture_research_definition` seams, and bind the captured current exact definition reference to the
-manifest before execution.
+selects formal offline mode. Formal modes require snapshot-aware `run_with_bundle`,
+`capture_research_definition`, and `declare_experiment_trial` seams, and bind the captured current
+exact definition to the manifest before execution. Semantic fingerprints remain the identity used
+for result validity and trial lineage.
 Unmigrated persisted execution requires explicit `--legacy`; `--ephemeral` remains available because
 it changes no persisted results. Full detector migration remains Phase 9.
+
+## Result validity and trial history
+
+Phase 3 result schema version 2 retains the existing Part A / Part B / Part C payload while adding
+the data snapshot identity, actual cutoff, definition snapshot identity, semantic definition
+fingerprint, development summary, historical stability folds, shadow evidence, live evidence, and
+legacy period results. The validity classifier derives one of `valid`, `data-stale`,
+`definition-stale`, `unreproducible`, or `legacy` without mutating the result or refreshing data.
+
+`valid` requires a complete successful result whose immutable data and definition evidence can be
+verified and whose data cutoff and semantic definition are current. Missing or corrupt blobs are
+`unreproducible`; old files remain readable as `legacy` and are never assigned synthetic snapshot
+identities. Failure to resolve the current definition also yields `unreproducible`, never `valid`.
+Comments, formatting, and safely declared reporting-only symbols are ignored by the semantic
+fingerprint, while undeclared or behavior-affecting changes create a new definition lineage.
+
+`latest.json` is advanced only by a successful formal online run. Formal offline runs write only
+historical results, ephemeral runs write neither results nor registry observations, and the legacy
+compatibility path writes historical legacy output only. Failed or partial formal attempts are
+retained as failed observations; partial output is never published as a successful result.
+If only latest-pointer publication fails after a complete run, its historical evidence remains and
+the registry records both the successful execution and the separate publication failure.
+
+`results/trial_registry.json` is append-only and keyed by experiment family plus semantic definition
+fingerprint. Repeated runs of the same definition append observations; a new fingerprint creates a
+new trial. Result deletion is represented by a tombstone, not erasure. Legacy experiments may be
+explicitly inventoried with `uv run trading result registry seed`; that inventory is marked as
+having incomplete selection history and is not ranking evidence.
+
+Read-only status, comparison, and freshness commands never refresh or write results. Explicit asset
+evaluation fully refreshes retained data requirements, publishes a new current exact snapshot,
+reruns every stale candidate, and emits no partial ranking if any candidate is legacy,
+unreproducible, or cannot be brought to a valid current state. Phase 3 does not migrate the existing
+detector batch automatically; snapshot-aware seams and a prepared manifest are required for refresh.
+Followup qualification and experiment-documentation workflows apply the same computed-validity
+gate before consuming result metrics.
+
+See [result-validity-and-trial-history.md](result-validity-and-trial-history.md) for the complete
+field and publication contract.
 
 ## Portable bundles
 
