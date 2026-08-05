@@ -4,6 +4,7 @@ import subprocess
 
 import pytest
 
+from trading.core.sleeve_engine import ExecutionCostPolicy
 from trading.research_data import (
     DefinitionBlobRef,
     ImmutableBlobCorruptionError,
@@ -320,6 +321,56 @@ def test_engine_and_dependency_identity_change_semantic_fingerprint(tmp_path) ->
 
     assert changed_engine.fingerprint != baseline.fingerprint
     assert changed_dependency.fingerprint != baseline.fingerprint
+
+
+def test_base_and_stress_cost_assumptions_are_part_of_definition_identity(tmp_path) -> None:
+    initialize_repository(tmp_path)
+    sources = {}
+    for role in ("strategy", "detector", "backtester"):
+        source = tmp_path / f"{role}.py"
+        source.write_text(f"class {role.title()}:\n    pass\n", encoding="utf-8")
+        sources[role] = source
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    common = {
+        "resolved_config": {"ticker": "SPY"},
+        "sources": sources,
+        "execution_engine_version": "canonical-sleeve-v1",
+        "dependency_versions": {"pandas": "2.3.1"},
+        "base_cost_policy": ExecutionCostPolicy(5.0, 5.0, 1.0),
+    }
+
+    baseline = store.capture(
+        **common,
+        stress_cost_policy=ExecutionCostPolicy(20.0, 20.0, 2.0),
+    )
+    changed_stress = store.capture(
+        **common,
+        stress_cost_policy=ExecutionCostPolicy(30.0, 30.0, 2.0),
+    )
+    restored = store.load(baseline.blob)
+
+    assert changed_stress.fingerprint != baseline.fingerprint
+    assert restored["execution_cost_policies"]["base"]["entry_slippage_bps"] == 5.0
+    assert restored["execution_cost_policies"]["stress"]["exit_slippage_bps"] == 20.0
+
+
+def test_definition_rejects_non_adverse_stress_cost_policy(tmp_path) -> None:
+    initialize_repository(tmp_path)
+    sources = {}
+    for role in ("strategy", "detector", "backtester"):
+        source = tmp_path / f"{role}.py"
+        source.write_text(f"class {role.title()}:\n    pass\n", encoding="utf-8")
+        sources[role] = source
+
+    with pytest.raises(ResearchDefinitionError, match="stress cost policy"):
+        ResearchDefinitionStore(tmp_path / "research-data").capture(
+            resolved_config={"ticker": "SPY"},
+            sources=sources,
+            execution_engine_version="canonical-sleeve-v1",
+            dependency_versions={"pandas": "2.3.1"},
+            base_cost_policy=ExecutionCostPolicy(10.0, 10.0, 2.0),
+            stress_cost_policy=ExecutionCostPolicy(5.0, 20.0, 2.0),
+        )
 
 
 def test_dirty_worktree_definition_blob_restores_exact_sources_and_git_context(tmp_path) -> None:

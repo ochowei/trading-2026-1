@@ -6,7 +6,7 @@ because a JSON file exists.
 
 ## Result schema
 
-Schema version 2 preserves the existing Part A / Part B / Part C payload and adds explicit
+Schema version 3 preserves the existing Part A / Part B / Part C payload and adds explicit
 reproducibility fields:
 
 - `validity`: recomputed status and reasons;
@@ -14,6 +14,8 @@ reproducibility fields:
 - `definition_snapshot_id` and semantic `definition_fingerprint`;
 - `development_summary`, `historical_stability_folds`, `shadow_evidence`, and `live_evidence`;
 - `legacy_period_results`, which keeps older Part A / Part B / Part C names available to readers.
+- `canonical_sleeve_evidence`, containing separate raw signals and raw candidates,
+  gross/base-net/stress-net daily equity, cost policies, metrics, and signal/trade parity.
 
 The current statuses are:
 
@@ -23,12 +25,12 @@ The current statuses are:
 | `data-stale` | The referenced snapshot is older than the latest completed session | No |
 | `definition-stale` | The result’s semantic definition fingerprint is not current | No |
 | `unreproducible` | Evidence is missing, corrupt, inconsistent, or the result is incomplete | No |
-| `legacy` | Old result without Phase 3 evidence | No |
+| `legacy` | Old result or schema-v2 result without canonical sleeve evidence | No |
 
 Validity is derived read-only from the result and its referenced immutable manifest. A missing or
 corrupt snapshot is never silently refreshed, and an old result is never given a synthetic
 snapshot identity. Legacy files remain readable for diagnostics and migration, but cannot be
-promoted to `valid` without a new formal execution. A schema-v2 result is `unreproducible` when the
+promoted to `valid` without a new formal execution. A schema-v3 result is `unreproducible` when the
 current experiment definition cannot be resolved; absence of a comparison identity never fails
 open.
 
@@ -45,7 +47,7 @@ affected definition lineage.
 
 `ResearchRunCoordinator` applies these boundaries:
 
-- a successful formal `online` run writes a schema-v2 historical result and atomically advances
+- a successful formal `online` run writes a schema-v3 historical result and atomically advances
   `results/<experiment>/latest.json`;
 - a successful formal `offline` run writes only a historical result;
 - `ephemeral` runs do not write result files or trial-registry observations;
@@ -56,6 +58,10 @@ affected definition lineage.
 
 `latest.json` is therefore a convenience pointer, not a qualification decision. Ranking and
 follow-up selection use only complete, successful, current-definition, current-data results.
+The coordinator generates canonical evidence from the runner's typed raw input and verifies its
+engine and cost policies against the exact frozen definition before publication.
+Validity also recomputes every scenario's metrics from its persisted daily-equity ledger; a changed
+Sharpe, return, volatility, or drawdown without the matching path is unreproducible.
 The coordinator records a successful formal observation before advancing `latest.json`; a registry
 failure leaves the previous latest pointer unchanged. Formal execution also requires the current
 exact definition reference to match the manifest, while read-only validity compares semantic
@@ -82,6 +88,10 @@ be refreshed, is legacy/unreproducible, or remains stale, the evaluation exits w
 ranking. The current Phase 3 CLI can refresh only experiments that already expose the Phase 2
 snapshot-aware seams and have a prepared manifest; it does not migrate the existing detector
 batch in place.
+
+Complete candidate ranking uses the canonical base-net daily-equity Sharpe. Schema-v2 and legacy
+Part B metrics remain inspectable but cannot act as a ranking fallback. The execution contract is
+documented in [canonical-sleeve-execution.md](canonical-sleeve-execution.md).
 
 The repository's followup-ranking and experiment-documentation workflows invoke the same read-only
 status gate before consuming metrics. Any non-`valid` candidate blocks complete followup ranking,

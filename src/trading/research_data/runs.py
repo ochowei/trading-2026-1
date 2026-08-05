@@ -13,15 +13,25 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 
+from trading.core.sleeve_engine import (
+    DEFAULT_BASE_COST_POLICY,
+    DEFAULT_STRESS_COST_POLICY,
+    CanonicalSleeveInput,
+    ExecutionCostPolicy,
+    evaluate_canonical_sleeve_input,
+    serialize_canonical_sleeve_evidence,
+)
 from trading.market_data import (
     MarketDataBundle,
     PrimaryUSSessionCalendar,
     SessionCalendar,
 )
+from trading.research_data.definitions import ResearchDefinitionStore
 from trading.research_data.models import DefinitionBlobRef
 from trading.research_data.result_schema import (
     build_result_payload,
     declares_incomplete_result,
+    validate_canonical_evidence_against_definition,
 )
 from trading.research_data.store import ResearchDataStore
 from trading.research_data.trial_registry import ExperimentTrialRegistry
@@ -160,6 +170,38 @@ class ResearchRunCoordinator:
             result = copy.deepcopy(produced)
             if declares_incomplete_result(result):
                 raise RunExecutionError("research runner returned a failed or partial result")
+            sleeve_input = result.pop("canonical_sleeve_input", None)
+            if not isinstance(sleeve_input, CanonicalSleeveInput):
+                raise RunExecutionError(
+                    "research runner must return a typed canonical_sleeve_input"
+                )
+            if sleeve_input.initial_capital != 1.0:
+                raise RunExecutionError(
+                    "research sleeve input requires normalized initial capital 1.0"
+                )
+            definition_payload = (
+                ResearchDefinitionStore(self.store.root).load(definition)
+                if definition is not None
+                else None
+            )
+            base_policy = (
+                _definition_cost_policy(definition_payload, "base")
+                if definition_payload is not None
+                else DEFAULT_BASE_COST_POLICY
+            )
+            stress_policy = (
+                _definition_cost_policy(definition_payload, "stress")
+                if definition_payload is not None
+                else DEFAULT_STRESS_COST_POLICY
+            )
+            sleeve_evaluation = evaluate_canonical_sleeve_input(
+                sleeve_input,
+                base_policy=base_policy,
+                stress_policy=stress_policy,
+            )
+            result["canonical_sleeve_evidence"] = serialize_canonical_sleeve_evidence(
+                sleeve_evaluation
+            )
             raw_metadata = result.setdefault("metadata", {})
             if not isinstance(raw_metadata, dict):
                 raise TypeError("research result metadata must be an object")
@@ -171,6 +213,12 @@ class ResearchRunCoordinator:
                 "run_mode": run_mode.value,
             }
             if definition is not None:
+                if definition_payload is None:  # pragma: no cover - established above
+                    raise RunEvidenceError("formal run lacks exact definition evidence")
+                validate_canonical_evidence_against_definition(
+                    result.get("canonical_sleeve_evidence"),
+                    definition_payload,
+                )
                 result = build_result_payload(
                     result,
                     manifest=snapshot.manifest,
@@ -285,3 +333,23 @@ def _atomic_write(path: Path, content: bytes) -> None:
         os.replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+def _definition_cost_policy(
+    definition: dict[str, object],
+    scenario: str,
+) -> ExecutionCostPolicy:
+    policies = definition.get("execution_cost_policies")
+    raw = policies.get(scenario) if isinstance(policies, dict) else None
+    if not isinstance(raw, dict):
+        raise RunEvidenceError(f"research definition has no canonical {scenario} cost policy")
+    try:
+        return ExecutionCostPolicy(
+            entry_slippage_bps=float(raw["entry_slippage_bps"]),
+            exit_slippage_bps=float(raw["exit_slippage_bps"]),
+            fee_bps_per_side=float(raw["fee_bps_per_side"]),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RunEvidenceError(
+            f"research definition has invalid canonical {scenario} cost policy"
+        ) from exc

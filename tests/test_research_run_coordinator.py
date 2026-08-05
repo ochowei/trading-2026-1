@@ -6,6 +6,9 @@ from datetime import UTC, date, datetime
 import pandas as pd
 import pytest
 
+from trading.core.sleeve_engine import (
+    CanonicalSleeveInput,
+)
 from trading.market_data import (
     CsvMarketDataCache,
     MarketDataRequirement,
@@ -19,6 +22,7 @@ from trading.research_data import (
     ResearchDefinitionStore,
     ResearchRunCoordinator,
     RunEvidenceError,
+    RunExecutionError,
     RunMode,
 )
 
@@ -39,10 +43,21 @@ def bars() -> pd.DataFrame:
 def deterministic_runner(series):
     def run(bundle):
         frame = bundle[series]
+        signal_date = frame.index[-1].date()
+        sleeve_input = CanonicalSleeveInput(
+            calendar=tuple(frame.index),
+            close_prices=frame["Close"],
+            candidates=(),
+            raw_signals=(signal_date,),
+            legacy_signals=(signal_date,),
+            legacy_candidates=(),
+            initial_capital=1.0,
+        )
         return {
             "signals": [frame.index[-1].strftime("%Y-%m-%d")],
             "trades": [{"entry": float(frame.iloc[-1]["Close"])}],
             "metrics": {"last_close": float(frame.iloc[-1]["Close"])},
+            "canonical_sleeve_input": sleeve_input,
         }
 
     return run
@@ -67,7 +82,7 @@ def definition_blob(tmp_path):
         .capture(
             resolved_config={"ticker": "SPY"},
             sources=sources,
-            execution_engine_version="execution-v1",
+            execution_engine_version="canonical-sleeve-v1",
             dependency_versions={"pandas": "2.3.1"},
         )
         .blob
@@ -162,6 +177,23 @@ def test_online_offline_and_ephemeral_modes_have_distinct_publication_rules(tmp_
         now=lambda: datetime(2026, 8, 5, 13, tzinfo=UTC),
     )
 
+    def non_normalized_runner(bundle):
+        produced = deterministic_runner(series)(bundle)
+        produced["canonical_sleeve_input"] = replace(
+            produced["canonical_sleeve_input"],
+            initial_capital=2.0,
+        )
+        return produced
+
+    with pytest.raises(RunExecutionError, match="normalized initial capital 1.0"):
+        coordinator.execute(
+            "experiment",
+            non_normalized_runner,
+            manifest_path=manifest_path,
+            current_definition=manifest.definition,
+            mode=RunMode.OFFLINE,
+        )
+
     online = coordinator.execute(
         "experiment",
         deterministic_runner(series),
@@ -202,13 +234,19 @@ def test_online_offline_and_ephemeral_modes_have_distinct_publication_rules(tmp_
 
     assert latest_path.read_bytes() == latest_before_offline
     assert online.latest_path == latest_path
-    assert online.result["schema_version"] == 2
+    assert online.result["schema_version"] == 3
     assert online.result["data_snapshot_id"] == manifest.snapshot_id
     assert online.result["definition_fingerprint"] == manifest.definition.fingerprint
+    assert online.result["canonical_sleeve_evidence"]["raw_signals"] == ["2026-08-04"]
+    assert (
+        online.result["canonical_sleeve_evidence"]["cost_policies"]["base"]["entry_slippage_bps"]
+        == 5.0
+    )
+    assert "canonical_sleeve_input" not in online.result
     assert json.loads(online.persisted_path.read_text())["validity"]["status"] == "valid"
     registry = json.loads((tmp_path / "results" / "trial_registry.json").read_text())
     assert len(registry["trials"]) == 1
-    assert len(registry["trials"][0]["observations"]) == 2
+    assert len(registry["trials"][0]["observations"]) == 3
     assert offline.latest_path is None
     assert offline.persisted_path is not None
     assert ephemeral.latest_path is None

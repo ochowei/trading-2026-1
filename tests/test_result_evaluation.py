@@ -2,8 +2,13 @@ import subprocess
 from datetime import UTC, date, datetime
 
 import pandas as pd
+import pytest
 
-from trading.core.evaluation import evaluate_asset_candidates, refresh_candidate_snapshot
+from trading.core.evaluation import (
+    canonical_ranking_score,
+    evaluate_asset_candidates,
+    refresh_candidate_snapshot,
+)
 from trading.market_data import (
     CsvMarketDataCache,
     MarketDataRequirement,
@@ -157,6 +162,24 @@ def test_legacy_and_unreproducible_candidates_cannot_be_qualified_by_refresh() -
     assert evaluation.ranking == ()
     assert any("legacy" in error for error in evaluation.errors)
     assert any("unreproducible" in error for error in evaluation.errors)
+
+
+def test_candidate_ranking_uses_canonical_base_net_daily_equity_metrics() -> None:
+    payload = {
+        "part_b": {"sharpe_ratio": 99.0},
+        "canonical_sleeve_evidence": {
+            "scenarios": {
+                "base_net": {"metrics": {"sharpe_ratio": 1.25}},
+            }
+        },
+    }
+
+    assert canonical_ranking_score(payload) == 1.25
+
+
+def test_candidate_ranking_fails_closed_without_canonical_base_net_metrics() -> None:
+    with pytest.raises(RuntimeError, match="canonical base-net"):
+        canonical_ranking_score({"part_b": {"sharpe_ratio": 2.0}})
 
 
 def test_explicit_refresh_publishes_a_new_current_snapshot_from_retained_requirements(

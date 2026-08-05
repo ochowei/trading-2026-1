@@ -34,6 +34,7 @@ sources. The semantic fingerprint hashes:
 - canonical resolved configuration;
 - normalized Python ASTs without formatting or comments;
 - explicit execution-engine version;
+- preregistered base and adverse stress execution-cost policies;
 - Python version and caller-declared relevant dependency versions.
 
 The content-addressed definition blob additionally retains exact source text and automatically
@@ -64,20 +65,26 @@ selects formal offline mode. Formal modes require snapshot-aware `run_with_bundl
 `capture_research_definition`, and `declare_experiment_trial` seams, and bind the captured current
 exact definition to the manifest before execution. Semantic fingerprints remain the identity used
 for result validity and trial lineage.
+The runner returns a typed `CanonicalSleeveInput`; the coordinator itself applies the frozen
+definition's cost policies through the shared sleeve evaluator and publishes the resulting evidence.
+Runner-supplied precomputed canonical evidence is not trusted.
 Unmigrated persisted execution requires explicit `--legacy`; `--ephemeral` remains available because
 it changes no persisted results. Full detector migration remains Phase 9.
 
 ## Result validity and trial history
 
-Phase 3 result schema version 2 retains the existing Part A / Part B / Part C payload while adding
+Current result schema version 3 retains the existing Part A / Part B / Part C payload while adding
 the data snapshot identity, actual cutoff, definition snapshot identity, semantic definition
 fingerprint, development summary, historical stability folds, shadow evidence, live evidence, and
-legacy period results. The validity classifier derives one of `valid`, `data-stale`,
+legacy period results. It also requires canonical sleeve evidence with gross, base-net, and
+stress-net daily-equity paths, explicit cost assumptions, raw candidates, and parity diagnostics.
+The validity classifier derives one of `valid`, `data-stale`,
 `definition-stale`, `unreproducible`, or `legacy` without mutating the result or refreshing data.
 
 `valid` requires a complete successful result whose immutable data and definition evidence can be
 verified and whose data cutoff and semantic definition are current. Missing or corrupt blobs are
-`unreproducible`; old files remain readable as `legacy` and are never assigned synthetic snapshot
+`unreproducible`; old files, including Phase 3 schema-v2 results without canonical sleeve evidence,
+remain readable as `legacy` and are never assigned synthetic snapshot
 identities. Failure to resolve the current definition also yields `unreproducible`, never `valid`.
 Comments, formatting, and safely declared reporting-only symbols are ignored by the semantic
 fingerprint, while undeclared or behavior-affecting changes create a new definition lineage.
@@ -102,6 +109,11 @@ unreproducible, or cannot be brought to a valid current state. Phase 3 does not 
 detector batch automatically; snapshot-aware seams and a prepared manifest are required for refresh.
 Followup qualification and experiment-documentation workflows apply the same computed-validity
 gate before consuming result metrics.
+
+Formal asset ranking reads only the base-net Sharpe calculated from canonical daily sleeve equity;
+legacy Part B independently compounded metrics are never a fallback. See
+[canonical-sleeve-execution.md](canonical-sleeve-execution.md) for the capital, event-order, cost,
+and parity contract.
 
 See [result-validity-and-trial-history.md](result-validity-and-trial-history.md) for the complete
 field and publication contract.

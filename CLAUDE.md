@@ -156,6 +156,7 @@ docs/
 ├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
 ├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
 ├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
+├── canonical-sleeve-execution.md # Phase 4 sleeve capital、cost scenarios、metrics 與 parity
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -170,6 +171,7 @@ src/trading/
 │   ├── base_signal_detector.py  # BaseSignalDetector ABC
 │   ├── base_backtester.py       # 通用回測引擎（停利/停損/到期）
 │   ├── execution_backtester.py  # 成交模型回測引擎（滑價/悲觀認定/隔日開盤）
+│   ├── sleeve_engine.py         # Canonical sleeve、daily equity、成本情境與 parity evidence
 │   ├── base_strategy.py         # BaseStrategy（fetch → 指標 → 訊號 → 回測 → 報表）
 │   ├── execution_strategy.py    # ExecutionModelStrategy（成交模型報表）
 │   ├── data_fetcher.py          # 相容層：多 ticker 存取 validated CSV market data

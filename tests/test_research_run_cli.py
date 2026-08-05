@@ -185,7 +185,7 @@ def test_result_status_compares_with_the_current_definition(monkeypatch, tmp_pat
     latest.write_text(
         json.dumps(
             {
-                "schema_version": 2,
+                "schema_version": 3,
                 "validity": {"status": "valid", "reasons": []},
                 "data_snapshot_id": manifest.snapshot_id,
                 "data_snapshot_manifest": "result.snapshot.json",
@@ -197,6 +197,36 @@ def test_result_status_compares_with_the_current_definition(monkeypatch, tmp_pat
                 "shadow_evidence": {},
                 "live_evidence": {},
                 "legacy_period_results": {},
+                "canonical_sleeve_evidence": {
+                    "engine_version": "canonical-sleeve-v1",
+                    "ranking_scenario": "base_net",
+                    "initial_capital": 1.0,
+                    "cost_policies": {"base": {}, "stress": {}},
+                    "raw_signals": [],
+                    "raw_candidates": [],
+                    "scenarios": {
+                        name: {
+                            "metrics": {
+                                "initial_equity": 1.0,
+                                "final_equity": 1.0,
+                                "total_return": 0.0,
+                                "annualized_return": None,
+                                "annualized_volatility": None,
+                                "sharpe_ratio": None,
+                                "max_drawdown": 0.0,
+                            },
+                            "trades": [],
+                            "daily_equity": [],
+                        }
+                        for name in ("gross", "base_net", "stress_net")
+                    },
+                    "parity": {
+                        "signal_differences": [],
+                        "trade_differences": [],
+                        "trade_comparisons": [],
+                        "has_unclassified_differences": False,
+                    },
+                },
                 "run_mode": "online",
             }
         ),

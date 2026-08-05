@@ -98,17 +98,17 @@ def verify_definition_bytes(
         raise ImmutableBlobCorruptionError(
             f"definition blob {reference.digest} fingerprint does not match reference"
         )
+    semantic_keys = [
+        "schema_version",
+        "resolved_config",
+        "normalized_python_ast",
+        "execution_engine_version",
+        "runtime",
+    ]
+    if payload.get("schema_version") == 2:
+        semantic_keys.append("execution_cost_policies")
     try:
-        semantic_payload = {
-            key: payload[key]
-            for key in (
-                "schema_version",
-                "resolved_config",
-                "normalized_python_ast",
-                "execution_engine_version",
-                "runtime",
-            )
-        }
+        semantic_payload = {key: payload[key] for key in semantic_keys}
     except KeyError as exc:
         raise ImmutableBlobCorruptionError(
             f"definition blob {reference.digest} lacks semantic fingerprint inputs"
