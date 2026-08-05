@@ -237,6 +237,9 @@ manual-execution-ledger*.csv
 .*manual-execution-ledger*.head.json
 manual-reconciliation*.json
 *.reconciliation.json
+qualification-registry*.json
+.*qualification-registry*.lock
+.*qualification-registry*.head.json
 secrets/
 credentials.json
 credentials.yaml

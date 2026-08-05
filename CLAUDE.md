@@ -88,6 +88,9 @@ uv run trading ledger reconcile --broker-export broker-imports/account.csv
 uv run trading ledger export backup/manual-execution-ledger.csv
 uv run trading ledger import backup/manual-execution-ledger.csv --path state/manual-execution-ledger.csv
 
+# 唯讀檢查 Phase 6 Historical / Shadow lifecycle（不執行、不授權 live trading）
+uv run trading qualification status
+
 # 回測目前跟單策略組合（預設最近 126 個完整交易日）
 uv run trading followup-backtest
 
@@ -168,6 +171,7 @@ docs/
 ├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
 ├── canonical-sleeve-execution.md # Phase 4 sleeve capital、cost scenarios、metrics 與 parity
 ├── manual-execution-ledger.md   # Phase 5 ledger domain、integrity、reconciliation 與 CLI 契約
+├── historical-qualification-and-shadow.md # Phase 6 folds、benchmarks、Shadow lifecycle 與 registry
 └── superpowers/plans/           # 已確認的實作計畫
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
@@ -198,7 +202,8 @@ src/trading/
 │   ├── broker_reconciliation.py # Broker CSV parsing 與 accounting comparison
 │   ├── manual_ledger.py         # Ledger domain、hash chain、replay 與 persistence boundary
 │   ├── proposals.py             # Decimal proposal terms 與 deterministic proposal IDs
-│   └── followup_proposals.py    # 從 verified ledger 建立 dry-run entry/exit proposal terms
+│   ├── followup_proposals.py    # 從 verified ledger 建立 dry-run entry/exit proposal terms
+│   └── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
 │   ├── models.py                # Series/requirement/policy/decision/metadata value types
@@ -216,6 +221,7 @@ src/trading/
 │   ├── definitions.py           # Semantic fingerprint 與 dirty-worktree definition blobs
 │   ├── result_schema.py         # Versioned result payload、validity 與 legacy compatibility
 │   ├── trial_registry.py        # Append-only trial identity、observations、tombstones
+│   ├── qualification_registry.py # Local append-only Historical / Shadow lifecycle evidence
 │   └── runs.py                  # Online/offline/ephemeral publication boundaries
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
@@ -226,6 +232,10 @@ src/trading/
 Phase 5 manual-execution details and the broker-export CSV contract are documented in
 [docs/manual-execution-ledger.md](docs/manual-execution-ledger.md). Runtime ledger, reconciliation,
 broker-import, and credential files are local-only and must remain outside Git.
+
+Phase 6 historical qualification, benchmark, selection-adjustment, Shadow, and local registry
+contracts are documented in
+[docs/historical-qualification-and-shadow.md](docs/historical-qualification-and-shadow.md).
 
 ## 按需參考（不需要時不用讀）
 

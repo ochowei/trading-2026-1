@@ -8,6 +8,7 @@ import argparse
 import json
 import logging
 import sys
+from collections.abc import Mapping
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -34,6 +35,7 @@ from trading.market_data import (
 from trading.research_data import (
     ExperimentTrialDeclaration,
     ExperimentTrialRegistry,
+    QualificationRegistry,
     ResearchDataStore,
     ResearchDefinitionSnapshot,
     ResearchDefinitionStore,
@@ -51,6 +53,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
+DEFAULT_QUALIFICATION_REGISTRY_PATH = Path("state/qualification-registry.json")
 
 
 def create_default_research_data_store() -> ResearchDataStore:
@@ -218,6 +221,76 @@ def cmd_result(args: argparse.Namespace) -> None:
         from trading.core.evaluation import evaluate_asset_from_cli
 
         evaluate_asset_from_cli(args.asset)
+
+
+def cmd_qualification_status(args: argparse.Namespace) -> None:
+    """Show persisted historical and Shadow lifecycle without changing it."""
+    state = QualificationRegistry(args.path).read()
+    raw_events = state.get("events")
+    events = raw_events if isinstance(raw_events, list) else []
+    if not events:
+        print("qualification registry: empty")
+        return
+    screens = {
+        payload.get("plan_id"): payload
+        for event in events
+        if isinstance(event, Mapping)
+        and event.get("event_type") == "historical_screen"
+        and isinstance((payload := event.get("payload")), Mapping)
+    }
+    for event in events:
+        if not isinstance(event, Mapping) or event.get("event_type") != "historical_plan":
+            continue
+        payload = event.get("payload")
+        if not isinstance(payload, Mapping):
+            continue
+        plan_id = payload.get("plan_id")
+        screen = screens.get(plan_id, {})
+        disposition = screen.get("disposition", "historical-screen-pending")
+        print(f"{plan_id}: {disposition}")
+        print(f"  definition fingerprint: {payload.get('definition_fingerprint', '-')}")
+    for event in events:
+        if not isinstance(event, Mapping) or event.get("event_type") != "shadow_registration":
+            continue
+        registration = event.get("payload")
+        if not isinstance(registration, Mapping):
+            continue
+        shadow_id = registration.get("shadow_id")
+        evidence = next(
+            (
+                item.get("payload")
+                for item in reversed(events)
+                if isinstance(item, Mapping)
+                and item.get("event_type") == "shadow_evidence"
+                and isinstance(item.get("payload"), Mapping)
+                and item["payload"].get("shadow_id") == shadow_id
+            ),
+            {},
+        )
+        activation = next(
+            (
+                item.get("payload")
+                for item in reversed(events)
+                if isinstance(item, Mapping)
+                and item.get("event_type") == "activation_evaluation"
+                and isinstance(item.get("payload"), Mapping)
+                and item["payload"].get("shadow_id") == shadow_id
+                and item["payload"].get("evaluated_at") == evidence.get("as_of")
+            ),
+            {},
+        )
+        disposition = activation.get(
+            "disposition",
+            "shadow-awaiting-activation" if evidence else "shadow-awaiting-evidence",
+        )
+        fills = evidence.get("simulated_fills", [])
+        trades = len(fills) if isinstance(fills, list) else 0
+        authorization = activation.get("authorized_for_live_orders", False)
+        print(f"{shadow_id}: {disposition}")
+        print(
+            f"  sessions={evidence.get('completed_sessions', 0)} trades={trades} "
+            f"live authorization={str(authorization).lower()}"
+        )
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
@@ -675,6 +748,24 @@ def build_parser() -> argparse.ArgumentParser:
     registry_sub = registry_p.add_subparsers(dest="registry_command", required=True)
     registry_sub.add_parser("seed", help="Seed discoverable legacy experiments")
 
+    qualification_p = sub.add_parser(
+        "qualification",
+        help="Read-only Historical and Shadow lifecycle diagnostics",
+    )
+    qualification_sub = qualification_p.add_subparsers(
+        dest="qualification_command",
+        required=True,
+    )
+    qualification_status_p = qualification_sub.add_parser(
+        "status",
+        help="Show persisted qualification lifecycle",
+    )
+    qualification_status_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+
     # analyze
     analyze_p = sub.add_parser(
         "analyze", help="滾動窗口績效分析 (Rolling window performance analysis)"
@@ -852,6 +943,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_compare(args)
     elif args.command == "result":
         cmd_result(args)
+    elif args.command == "qualification" and args.qualification_command == "status":
+        cmd_qualification_status(args)
     elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "sync-docs":

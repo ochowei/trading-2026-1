@@ -97,6 +97,15 @@ The repository's followup-ranking and experiment-documentation workflows invoke 
 status gate before consuming metrics. Any non-`valid` candidate blocks complete followup ranking,
 and stale, legacy, or unreproducible results cannot update experiment documentation.
 
+Phase 6 projects its verified local lifecycle registry into `development_summary`,
+`historical_stability_folds`, and `shadow_evidence` without changing schema version 3. Validity
+rejects incomplete fold records, plan/fold identity mismatches, definition changes inside Shadow,
+historical evidence claiming Active status, Shadow registration without all historical gates,
+incomplete qualification policies or prospective metrics, cost-policy or lineage conflicts, any
+non-empty Phase 6 live evidence, and any Shadow payload claiming authorization for live orders.
+The qualification lifecycle is documented in
+[historical-qualification-and-shadow.md](historical-qualification-and-shadow.md).
+
 ```bash
 uv run trading result evaluate SPY
 ```

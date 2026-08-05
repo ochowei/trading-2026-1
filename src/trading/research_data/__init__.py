@@ -17,6 +17,10 @@ from trading.research_data.models import (
     SnapshotDataRef,
     SnapshotManifest,
 )
+from trading.research_data.qualification_registry import (
+    QualificationRegistry,
+    QualificationRegistryError,
+)
 from trading.research_data.result_schema import (
     CURRENT_RESULT_SCHEMA_VERSION,
     ResearchResult,
@@ -57,6 +61,8 @@ __all__ = [
     "ResearchDefinitionError",
     "ResearchDefinitionSnapshot",
     "ResearchDefinitionStore",
+    "QualificationRegistry",
+    "QualificationRegistryError",
     "ResearchResult",
     "ResearchSnapshot",
     "ResearchRunCoordinator",

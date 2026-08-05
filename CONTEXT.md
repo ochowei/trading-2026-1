@@ -160,6 +160,22 @@ _Avoid_: Active strategy, shadow strategy, automatically grandfathered strategy
 A historically qualified strategy with a frozen research definition that produces paper proposals and simulated executions on prospective data but is not authorized to create actual positions.
 _Avoid_: Active strategy, backtest candidate, reduced-size live strategy
 
+**Shadow Registration**:
+The formal event that binds a historically qualified trial to one frozen research definition, prospective start time, and preregistered activation checkpoint and thresholds.
+_Avoid_: Part C start, historical qualification date, paper-trading toggle
+
+**Shadow Restart**:
+A new Shadow registration required after an outcome-relevant definition change; prior prospective evidence remains historical but is never carried into the new registration.
+_Avoid_: Evidence reset, continued Shadow, fingerprint update
+
+**Shadow Paper Proposal**:
+A non-actionable strategy instruction recorded after Shadow registration and evaluated only through canonical simulated execution.
+_Avoid_: Proposed order, broker order, historical signal
+
+**Canonical Simulated Fill**:
+A Shadow execution produced by the same frozen position and cost policies used for canonical research, without asserting that a broker transaction occurred.
+_Avoid_: Confirmed fill, assumed fill, backfilled trade
+
 **Frozen Research Definition**:
 A research definition that cannot change during a prospective observation period without restarting that period under a new identity.
 _Avoid_: Current source code, parameter family, mutable candidate
@@ -199,6 +215,10 @@ _Avoid_: Manual unpause, parameter adjustment
 **Historical Stability Screen**:
 A retrospective qualification gate that evaluates one frozen research definition across non-overlapping chronological folds without claiming that repeatedly inspected history is prospective evidence.
 _Avoid_: Prospective validation, rolling-window chart, activation evidence
+
+**Historical Qualification Plan**:
+A preregistered screen identity that freezes the development period, evaluation folds, dependency purge and embargo, benchmark policy, and pass thresholds before evaluation outcomes are observed.
+_Avoid_: Backtest options, adaptive gate, post-hoc screen
 
 **Evaluation Fold**:
 A non-overlapping chronological outcome interval in a historical stability screen, separated as needed so adjacent folds do not share trade outcomes.
