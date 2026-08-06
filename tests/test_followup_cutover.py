@@ -18,6 +18,7 @@ from trading.core.followup_cutover import (
     evaluate_data_access_parity,
     run_verified_data_access_parity,
 )
+from trading.core.live_drift import DriftState
 
 
 def _strategy(
@@ -52,6 +53,9 @@ def _buy_context(**overrides: object) -> FollowupAuthorizationContext:
         "broker_reconciled": True,
         "proposal_epoch_current": True,
         "has_actual_position": False,
+        "drift_state": DriftState.HEALTHY,
+        "drift_hard_guards_clear": True,
+        "drift_envelope_id": "d" * 64,
     }
     values.update(overrides)
     return FollowupAuthorizationContext(**values)  # type: ignore[arg-type]
@@ -96,6 +100,16 @@ def test_buy_authorization_requires_all_phase_7_guards() -> None:
 
     assert decision.authorized is True
     assert decision.reason == "authorized"
+
+
+def test_active_buy_without_phase_8_overlay_fails_closed() -> None:
+    decision = authorize_followup_order(
+        "BUY",
+        _buy_context(drift_state=None, drift_envelope_id=""),
+    )
+
+    assert decision.authorized is False
+    assert decision.reason == "live drift overlay is unavailable"
 
 
 @pytest.mark.parametrize(
@@ -599,7 +613,7 @@ def test_unused_or_duplicate_parity_corrections_fail_closed() -> None:
         (StrategyLifecycle.HISTORICAL_SCREEN_FAILED, False, "historical screen failed"),
         (StrategyLifecycle.SHADOW, False, "Shadow"),
         (StrategyLifecycle.INSUFFICIENT_EVIDENCE, False, "insufficient evidence"),
-        (StrategyLifecycle.ACTIVE, False, "Active"),
+        (StrategyLifecycle.ACTIVE, False, "Active / healthy"),
     ],
 )
 def test_followup_status_report_uses_phase_7_ticker_vocabulary(

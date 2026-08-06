@@ -40,6 +40,12 @@ from trading.core.followup_data import (
     build_followup_data_bundle,
 )
 from trading.core.followup_proposals import build_manual_proposal_terms
+from trading.core.live_drift import DriftState
+from trading.core.live_drift_registry import (
+    LiveDriftRegistry,
+    LiveDriftRegistryError,
+    LiveDriftState,
+)
 from trading.core.manual_ledger import (
     LedgerConflictError,
     LedgerError,
@@ -218,6 +224,7 @@ LOOKBACK_TRADING_DAYS = 60
 DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
 DEFAULT_FOLLOWUP_LIFECYCLE_PATH = Path("state/followup-lifecycle.json")
+DEFAULT_LIVE_DRIFT_PATH = Path("state/live-drift")
 
 _NY_TZ = ZoneInfo("America/New_York")
 
@@ -252,6 +259,7 @@ def run_followup(
     ledger_path: Path = DEFAULT_MANUAL_LEDGER_PATH,
     reconciliation_path: Path = DEFAULT_RECONCILIATION_PATH,
     lifecycle_path: Path = DEFAULT_FOLLOWUP_LIFECYCLE_PATH,
+    drift_path: Path = DEFAULT_LIVE_DRIFT_PATH,
 ) -> None:
     """主入口：產生跟單訊號報告 (Main entry: generate followup signal report)"""
     today = pd.Timestamp.now().normalize()
@@ -341,12 +349,28 @@ def run_followup(
             activation_proof is not None
             and activation_proof.result_fingerprint == result_fingerprint
         )
+        expected_activation_event_id = _activation_event_id_for(lifecycle_state, identity)
+        drift_registry_path = _drift_registry_path(drift_path, identity)
+        drift_state, drift_hard_guards_clear = _followup_drift_state(
+            drift_registry_path,
+            lifecycle=lifecycle,
+            expected_envelope_id=(
+                activation_proof.drift_envelope_id if activation_proof is not None else ""
+            ),
+            expected_activation_event_id=expected_activation_event_id,
+        )
+        expected_drift_envelope_id = (
+            drift_state.envelope.envelope_id
+            if drift_state is not None and drift_state.envelope is not None
+            else ""
+        )
 
         def revalidate_buy_authorization(
             strategy_identity: FollowupStrategy = identity,
             expected_result_identity: str = result_identity,
+            expected_drift_envelope: str = expected_drift_envelope_id,
         ) -> None:
-            current_state = FollowupLifecycleRegistry(lifecycle_path).read()
+            current_state = FollowupLifecycleRegistry(lifecycle_path).read_while_coordinated()
             if current_state.no_new_entry:
                 raise LedgerConflictError("no-new-entry mode changed before submission")
             if (
@@ -369,6 +393,32 @@ def run_followup(
                 or current_proof.result_fingerprint != current_fingerprint
             ):
                 raise LedgerConflictError("Active proof or valid result changed before submission")
+            current_drift, current_hard_guards_clear = _followup_drift_state(
+                _drift_registry_path(drift_path, strategy_identity),
+                lifecycle=StrategyLifecycle.ACTIVE,
+                expected_envelope_id=(
+                    current_proof.drift_envelope_id if current_proof is not None else ""
+                ),
+                expected_activation_event_id=_activation_event_id_for(
+                    current_state, strategy_identity
+                ),
+                coordination_lock_held=True,
+            )
+            if (
+                current_drift is None
+                or current_drift.state is DriftState.PAUSED
+                or not current_hard_guards_clear
+                or (
+                    expected_drift_envelope
+                    and (
+                        current_drift.envelope is None
+                        or current_drift.envelope.envelope_id != expected_drift_envelope
+                    )
+                )
+            ):
+                raise LedgerConflictError(
+                    "live drift is paused, missing, or changed before submission"
+                )
 
         section_buffer = StringIO()
         with redirect_stdout(section_buffer):
@@ -385,6 +435,14 @@ def run_followup(
                 result_valid=result_valid,
                 result_identity=result_identity,
                 active_proof_current=active_proof_current,
+                drift_state=drift_state,
+                drift_hard_guards_clear=drift_hard_guards_clear,
+                drift_envelope_id=expected_drift_envelope_id,
+                drift_checkpoint_id=(
+                    drift_state.checkpoints[-1].checkpoint_id
+                    if drift_state is not None and drift_state.checkpoints
+                    else ""
+                ),
                 broker_reconciled=broker_reconciled,
                 reconciliation_path=reconciliation_path,
                 buy_submission_validator=revalidate_buy_authorization,
@@ -436,6 +494,64 @@ def _strategy_info_for_actual_position(
             return None
         owner = lifecycle_owner.experiment_name
     return _owned_strategy_info(ticker, owner, selected_strategy_info)
+
+
+def _drift_registry_path(base_path: Path, strategy: FollowupStrategy) -> Path:
+    """Resolve one private per-strategy drift registry without mixing trial histories."""
+    base = Path(base_path)
+    if base.suffix.lower() == ".json":
+        return base
+    safe_ticker = strategy.ticker.lower().replace("/", "-")
+    safe_experiment = strategy.experiment_name.replace("/", "-")
+    return base / f"{safe_ticker}--{safe_experiment}.json"
+
+
+def _followup_drift_state(
+    path: Path,
+    *,
+    lifecycle: StrategyLifecycle,
+    expected_envelope_id: str = "",
+    expected_activation_event_id: str = "",
+    coordination_lock_held: bool = False,
+) -> tuple[LiveDriftState | None, bool]:
+    """Read a verified overlay; an Active strategy without one fails closed."""
+    try:
+        registry = LiveDriftRegistry(path)
+        state = registry.read_while_coordinated() if coordination_lock_held else registry.read()
+    except (LiveDriftRegistryError, OSError, TypeError, ValueError):
+        state = None
+    if lifecycle is StrategyLifecycle.ACTIVE:
+        if state is None or state.envelope is None or state.activation_event_id is None:
+            return None, False
+        if not expected_envelope_id or not expected_activation_event_id:
+            return None, False
+        if expected_envelope_id and state.envelope.envelope_id != expected_envelope_id:
+            return None, False
+        if (
+            expected_activation_event_id
+            and state.activation_event_id != expected_activation_event_id
+        ):
+            return None, False
+        return state, not bool(state.hard_guards)
+    return state, True if state is None else not bool(state.hard_guards)
+
+
+def _activation_event_id_for(
+    lifecycle_state: FollowupLifecycleState | None,
+    strategy: FollowupStrategy,
+) -> str:
+    if lifecycle_state is None:
+        return ""
+    for event in reversed(lifecycle_state.events):
+        payload = event.get("payload")
+        if (
+            event.get("event_type") == "strategy_activated"
+            and isinstance(payload, dict)
+            and payload.get("ticker") == strategy.ticker
+            and payload.get("experiment_name") == strategy.experiment_name
+        ):
+            return str(event.get("event_id", ""))
+    return ""
 
 
 def _owned_strategy_info(ticker: str, owner: str, selected_strategy_info: dict) -> dict:
@@ -501,6 +617,10 @@ def _run_single_strategy(
     result_valid: bool = False,
     result_identity: str = "",
     active_proof_current: bool = False,
+    drift_state: LiveDriftState | None = None,
+    drift_hard_guards_clear: bool = True,
+    drift_envelope_id: str = "",
+    drift_checkpoint_id: str = "",
     broker_reconciled: bool = False,
     reconciliation_path: Path | None = None,
     buy_submission_validator: Callable[[], None] | None = None,
@@ -581,6 +701,10 @@ def _run_single_strategy(
                 result_valid=result_valid,
                 result_identity=result_identity,
                 active_proof_current=False,
+                drift_state=drift_state,
+                drift_hard_guards_clear=False,
+                drift_envelope_id=drift_envelope_id,
+                drift_checkpoint_id=drift_checkpoint_id,
                 data_fresh=False,
                 data_cutoff=latest_date.date().isoformat(),
                 data_bundle_identity="",
@@ -640,6 +764,10 @@ def _run_single_strategy(
         result_valid=result_valid,
         result_identity=result_identity,
         active_proof_current=active_proof_current,
+        drift_state=drift_state,
+        drift_hard_guards_clear=(drift_hard_guards_clear and _is_followup_data_fresh(latest_date)),
+        drift_envelope_id=drift_envelope_id,
+        drift_checkpoint_id=drift_checkpoint_id,
         data_fresh=_is_followup_data_fresh(latest_date),
         data_cutoff=latest_date.date().isoformat(),
         data_bundle_identity=data_bundle_identity,
@@ -662,7 +790,11 @@ def _run_single_strategy(
     print(f"  最新資料日期 (Latest data): {latest_date.strftime('%Y-%m-%d')}")
     print(f"  T 日 (Next trading day):    {t_day_str}")
     print(f"  {ticker} 收盤價 (Close):     ${latest_close:.2f}")
-    print(f"  Phase 7 state:              {status.state}")
+    print(f"  Phase 7 lifecycle:          {status.lifecycle.value}")
+    print(
+        "  Phase 8 drift state:         "
+        f"{drift_state.state.value if drift_state is not None else 'unavailable'}"
+    )
     print(f"  BUY authorization:          {status.buy_reason}")
     print(f"{thin_sep}")
 

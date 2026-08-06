@@ -212,6 +212,36 @@ occupancy under a coordination lock shared with lifecycle changes and ledger app
 positions require `followup-state init --position-owner TICKER=EXPERIMENT`. See
 [docs/controlled-followup-cutover.md](docs/controlled-followup-cutover.md).
 
+Active promotion also requires a frozen Phase 8 drift envelope bound to the activation event; pass
+its identity with `followup-state activate --drift-envelope-id ... --drift-path ...`.
+
+## Live drift and recovery (Phase 8)
+
+Phase 8 adds a private, per-strategy drift-health overlay while keeping the project in dry-run
+mode. A predictive drift envelope is frozen from historical folds and Shadow evidence before
+activation; its Decimal thresholds, hard-guard families, definition fingerprint, and completed-XNYS
+checkpoint schedule are immutable after activation. The overlay is `healthy`, `watch`, or `paused`:
+the adverse 20% boundary enters Watch, the adverse 5% boundary or two consecutive scheduled Watch
+checkpoints enters Paused, and data/ledger/reconciliation/execution/stress-risk hard guards block a
+new BUY immediately. Existing verified positions continue to receive management instructions while
+Paused.
+
+```bash
+uv run trading drift status --path state/live-drift/<strategy>.json
+uv run trading drift checkpoint --help
+uv run trading drift recover --help
+```
+
+Activation verifies the envelope's exact Historical Screen and Shadow source events. Drift
+observations bind verified Shadow or ledger evidence, and integrity clean checks/recovery verify the
+current ledger plus broker reconciliation instead of accepting operator-supplied clearance.
+
+Normal recovery requires 126 later sessions, six completed paper trades, cleared hard guards, and
+two consecutive normal checkpoints. A pause caused only by data, ledger, or reconciliation can use
+two post-pause clean checks after reconciliation. State edits, threshold changes, and changed
+strategy definitions never recover in place; a changed definition starts a new trial and
+qualification. See [docs/live-drift-and-recovery.md](docs/live-drift-and-recovery.md).
+
 ## Followup Backtest
 
 ```bash

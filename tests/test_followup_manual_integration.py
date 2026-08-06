@@ -12,6 +12,7 @@ from trading.core.followup_cutover import (
     FollowupStrategy,
     StrategyLifecycle,
 )
+from trading.core.live_drift import DriftState
 from trading.followup import _print_manual_strategy_orders, run_followup
 
 
@@ -48,6 +49,9 @@ def _authorization(
         "broker_reconciled": True,
         "proposal_epoch_current": True,
         "has_actual_position": False,
+        "drift_state": DriftState.HEALTHY,
+        "drift_hard_guards_clear": True,
+        "drift_envelope_id": "d" * 64,
     }
     values.update(overrides)
     return FollowupAuthorizationContext(lifecycle=lifecycle, **values)
@@ -71,6 +75,10 @@ def test_repeated_followup_submission_is_idempotent_and_unconfirmed_buy_has_no_p
     )
     frame = _frame()
     definition = {"ticker": "SPY"}
+    authorization = _authorization(
+        StrategyLifecycle.ACTIVE,
+        ledger_accounting_hash=store.verify().accounting_hash,
+    )
     first = _print_manual_strategy_orders(
         definition,
         _config(),
@@ -82,6 +90,7 @@ def test_repeated_followup_submission_is_idempotent_and_unconfirmed_buy_has_no_p
         today=pd.Timestamp("2026-08-05"),
         frame=frame,
         allow_new_entries=True,
+        authorization_context=authorization,
     )
     second = _print_manual_strategy_orders(
         definition,
@@ -94,6 +103,7 @@ def test_repeated_followup_submission_is_idempotent_and_unconfirmed_buy_has_no_p
         today=pd.Timestamp("2026-08-05"),
         frame=frame,
         allow_new_entries=True,
+        authorization_context=authorization,
     )
 
     assert len(first) == len(second) == 1
@@ -209,6 +219,10 @@ def test_followup_exit_proposals_use_actual_manual_fill(make_manual_ledger) -> N
         today=pd.Timestamp("2026-08-05"),
         frame=_frame(),
         allow_new_entries=True,
+        authorization_context=_authorization(
+            StrategyLifecycle.ACTIVE,
+            ledger_accounting_hash=store.verify().accounting_hash,
+        ),
     )
     proposal_id = entry[0]["proposal_id"]
     fill_time = datetime.now(UTC) + timedelta(seconds=1)

@@ -67,7 +67,9 @@ A BUY is actionable only when all of these facts are true at proposal time:
 4. the ledger verifies and supplies its accounting identity;
 5. broker reconciliation remains current;
 6. the proposal uses the current allocation epoch; and
-7. the sleeve has no actual position.
+7. the sleeve has no actual position; and
+8. the Phase 8 drift envelope is activation-bound, its overlay is not Paused, and no drift hard
+   guard is active.
 
 The submission event records the strategy identity and lifecycle, result identity, data cutoff and
 bundle identity, ledger accounting hash, reconciliation state, and allocation epoch beside the
@@ -124,6 +126,8 @@ uv run trading followup-state activate \
   --qualification-event-id ACTIVATION_EVENT_ID \
   --result-fingerprint SHA256 \
   --parity-digest SHA256 \
+  --drift-envelope-id DRIFT_ENVELOPE_SHA256 \
+  --drift-path state/live-drift/spy--spy_007_trend_pullback.json \
   --reason "prospective qualification passed"
 ```
 
@@ -149,3 +153,19 @@ allocation event invalidates the prior broker reconciliation until reconciliatio
 Rollback is `followup-state pause`. It appends a no-new-entry event without deleting lifecycle,
 qualification, proposal, ledger, or reconciliation history. Verified existing-position management
 continues.
+
+## Phase 8 drift-health boundary
+
+Phase 8 does not replace this lifecycle registry's `Active`, `Retiring`, or lifecycle `Paused`
+states. It projects a separate per-strategy Healthy/Watch/Paused drift-health overlay from a frozen
+predictive envelope. Phase 7 remains authoritative for qualification, current result identity,
+position ownership, retirement, and global no-new-entry mode; Phase 8 is an additional BUY guard.
+
+An Active strategy without a valid frozen envelope and activation binding fails closed. Activation
+also verifies that the envelope names the exact passing Historical Screen and Shadow evidence used
+by the Phase 6 activation evaluation. A drift
+overlay in Watch may still propose a BUY only when every Phase 7 guard passes. A drift overlay in
+Paused blocks every new BUY but does not block SELL instructions for a verified actual position or
+the dry-run paper-execution evidence used for recovery. A drift recovery event cannot mutate the
+Phase 7 lifecycle; it only makes the overlay eligible for new-entry authorization after its own
+replayable gate.
