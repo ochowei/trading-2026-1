@@ -192,6 +192,43 @@ _Avoid_: Historical stability fold, shadow evidence, live evidence
 Confirmed execution and strategy-sleeve observations accumulated by an active strategy after activation.
 _Avoid_: Part C backtest, shadow evidence, recent historical result
 
+**Predictive Drift Envelope**:
+The immutable, pre-activation expectation contract for performance, signal, execution, utilization,
+and concentration metrics. It includes the historical-fold and Shadow source identities, Decimal
+thresholds, sampling policy, fixed checkpoint schedule, and the strategy-definition fingerprint.
+Thresholds and source identities cannot be edited after the envelope is activation-bound.
+_Avoid_: Live-tuned threshold, confidence interval selected after a breach, arbitrary loss count
+
+**Frozen Activation Expectations**:
+The complete set of predictive envelope thresholds, hard-guard kinds, source identities, and
+checkpoint policy captured before an Active lifecycle transition and referenced by every later
+observation and recovery decision.
+_Avoid_: Current configuration, mutable monitoring settings, operator override
+
+**Performance Drift**:
+An adverse departure of realized strategy-sleeve returns or drawdown metrics from the frozen
+performance expectation.
+_Avoid_: Any individual loss, revised backtest result
+
+**Signal Drift**:
+An adverse departure in signal frequency, direction, timing, or conditional hit behavior from
+the frozen signal expectation.
+_Avoid_: A skipped proposal caused by a ledger or position guard
+
+**Execution Drift**:
+An adverse departure in confirmed-fill slippage, fill rate, costs, or execution timing from the
+frozen execution expectation. It is based on confirmed ledger evidence, never an assumed fill.
+_Avoid_: Paper fill, broker quote, estimated order price
+
+**Utilization Drift**:
+An adverse departure in sleeve capital or holding utilization from the frozen portfolio policy.
+_Avoid_: Managed account buying power, unallocated reserve
+
+**Concentration Drift**:
+An adverse departure in instrument, sleeve, fold, or correlated exposure concentration from the
+frozen portfolio expectation.
+_Avoid_: A single profitable trade, equal sleeve allocation itself
+
 **Activation Checkpoint**:
 A pre-scheduled evaluation of whether a shadow strategy has accumulated the required prospective duration, completed trades, performance, risk, and drift evidence for active trading.
 _Avoid_: Best-performing date, manual promotion opportunity
@@ -208,9 +245,51 @@ _Avoid_: Paused strategy, manually suspected strategy
 An active strategy barred from proposing new positions after a critical or persistent drift breach while remaining responsible for existing actual positions.
 _Avoid_: Retiring strategy, rejected experiment, closed position
 
+**Hard Guard**:
+A deterministic data, ledger, reconciliation, execution, or stress-risk breach that immediately
+blocks new BUY authorization. A hard guard does not wait for a scheduled checkpoint or statistical
+persistence and must be cleared by fresh verified evidence.
+_Avoid_: Watch warning, discretionary concern, ordinary single loss
+
+**Drift Health Overlay**:
+The Phase 8 Healthy/Watch/Paused state projected on top of the Phase 7 lifecycle. It governs new
+risk while Phase 7 Active/Retiring ownership and qualification state remains authoritative for
+position ownership and lifecycle transitions.
+_Avoid_: Replacing Active with lifecycle Paused, retirement, manual status flag
+
+**Scheduled Checkpoint**:
+A fixed completed-XNYS-session evaluation date derived from the frozen activation expectations.
+The checkpoint ordinal, session, observations, and result are replayed deterministically and cannot
+be moved by editing a state field.
+_Avoid_: Ad-hoc review date, latest available bar, manual unpause
+
+**Persistent Watch**:
+Watch evidence at two consecutive scheduled checkpoints under the same frozen envelope, which
+deterministically transitions the drift health overlay to Paused.
+_Avoid_: Two arbitrary alerts, one loss, operator suspicion
+
 **Recovery Checkpoint**:
 A preregistered evaluation that determines whether a paused strategy has accumulated sufficient new evidence to resume proposing positions.
 _Avoid_: Manual unpause, parameter adjustment
+
+**Normal Recovery**:
+The fail-closed recovery gate for a non-integrity pause: at least 126 later sessions, six completed
+Shadow trades, all hard guards cleared, and two consecutive scheduled checkpoints in the normal
+envelope. It may only append a replayable recovery event.
+_Avoid_: Direct state edit, threshold relaxation, one profitable trade
+
+**Data/Ledger-Only Recovery**:
+The expedited recovery gate for pauses caused solely by data, ledger, or reconciliation integrity
+guards. It requires completed reconciliation, two distinct clean checks after the pause, and no
+active hard guard; it does not waive a performance, signal, execution, utilization, concentration,
+or stress-risk pause.
+_Avoid_: Strategy-trade recovery, manual acknowledgement
+
+**New Trial Caused by Definition Change**:
+A new Experiment Trial and new Shadow registration required when the outcome-relevant strategy or
+execution definition fingerprint changes. Previous live or Shadow evidence cannot be carried into
+the changed definition.
+_Avoid_: Threshold update, in-place trial mutation, recovery
 
 **Historical Stability Screen**:
 A retrospective qualification gate that evaluates one frozen research definition across non-overlapping chronological folds without claiming that repeatedly inspected history is prospective evidence.
@@ -235,14 +314,6 @@ _Avoid_: Portfolio concentration, ticker allocation
 **Live Drift**:
 A preregistered, evidence-based departure of an active strategy's performance, signal, execution, or portfolio behavior from the range established before activation.
 _Avoid_: Any loss, market opinion, post-hoc concern
-
-**Hard Guard**:
-A preregistered data, reconciliation, execution, or risk boundary whose breach pauses new entries immediately without waiting for statistical persistence.
-_Avoid_: Drift warning, discretionary concern
-
-**Predictive Drift Envelope**:
-The frozen distribution of expected strategy behavior derived from historical folds and prospective shadow evidence before activation.
-_Avoid_: Fixed loss count, live-tuned threshold, confidence interval chosen after a breach
 
 **Retiring Strategy**:
 A formerly active strategy that remains the owner of its ledger-linked actual position and may manage that position to verified flat closure but cannot propose a new position.

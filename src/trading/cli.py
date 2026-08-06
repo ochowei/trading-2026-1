@@ -63,6 +63,7 @@ DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
 DEFAULT_QUALIFICATION_REGISTRY_PATH = Path("state/qualification-registry.json")
 DEFAULT_FOLLOWUP_LIFECYCLE_PATH = Path("state/followup-lifecycle.json")
+DEFAULT_LIVE_DRIFT_PATH = Path("state/live-drift")
 
 
 def create_default_research_data_store() -> ResearchDataStore:
@@ -408,7 +409,14 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
             print(f"new entries: {mode}")
             return
         if args.followup_state_command == "activate":
+            from trading.core.live_drift_registry import (
+                LiveDriftRegistry,
+                verify_envelope_qualification_sources,
+            )
+
             strategy = FollowupStrategy(args.ticker, args.experiment)
+            if not args.drift_envelope_id:
+                raise ValueError("activation requires a frozen --drift-envelope-id")
 
             def current_result_fingerprint(item: FollowupStrategy) -> str:
                 record = inspect_result(
@@ -424,12 +432,42 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
                     raise ValueError("current valid result fingerprint is missing")
                 return fingerprint
 
+            qualification_registry = QualificationRegistry(args.qualification_path)
             verifier = FollowupActivationVerifier(
-                qualification_registry=QualificationRegistry(args.qualification_path),
+                qualification_registry=qualification_registry,
                 lifecycle_registry=registry,
                 current_result_fingerprint_resolver=current_result_fingerprint,
             )
-            writer = FollowupLifecycleRegistry(args.path, activation_verifier=verifier)
+            drift_registry = LiveDriftRegistry(args.drift_path)
+
+            def verify_drift_activation(
+                item: FollowupStrategy,
+                proof: FollowupActivationProof,
+                _activation_event_id: str,
+            ) -> None:
+                drift_state = drift_registry.read()
+                envelope = drift_state.envelope
+                if envelope is None or envelope.envelope_id != proof.drift_envelope_id:
+                    raise ValueError("frozen drift envelope is missing or does not match proof")
+                if envelope.strategy_id != f"{item.ticker}/{item.experiment_name}":
+                    raise ValueError("frozen drift envelope strategy identity does not match")
+                if envelope.definition_fingerprint != proof.result_fingerprint:
+                    raise ValueError("frozen drift envelope definition does not match result")
+                verify_envelope_qualification_sources(
+                    envelope,
+                    qualification_state=qualification_registry.read(),
+                    shadow_id=proof.shadow_id,
+                    activation_event_id=proof.qualification_event_id,
+                )
+                if drift_state.activation_event_id is not None:
+                    raise ValueError("drift envelope is already bound to an activation")
+
+            writer = FollowupLifecycleRegistry(
+                args.path,
+                activation_verifier=verifier,
+                drift_activation_verifier=verify_drift_activation,
+                coordination_lock_path=drift_registry.coordination_lock_path,
+            )
             state = writer.activate_strategy(
                 strategy,
                 proof=FollowupActivationProof(
@@ -437,9 +475,24 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
                     qualification_event_id=args.qualification_event_id,
                     result_fingerprint=args.result_fingerprint,
                     parity_digest=args.parity_digest,
+                    drift_envelope_id=args.drift_envelope_id,
                 ),
                 occurred_at=args.timestamp or datetime.now(UTC),
                 reason=args.reason,
+            )
+            activation_event = next(
+                event
+                for event in reversed(state.events)
+                if event.get("event_type") == "strategy_activated"
+                and isinstance(event.get("payload"), Mapping)
+                and event["payload"].get("ticker") == strategy.ticker
+                and event["payload"].get("experiment_name") == strategy.experiment_name
+            )
+            drift_registry.bind_activation(
+                strategy_id=f"{strategy.ticker}/{strategy.experiment_name}",
+                envelope_id=args.drift_envelope_id,
+                activation_event_id=str(activation_event["event_id"]),
+                occurred_at=args.timestamp or datetime.now(UTC),
             )
             lifecycle = state.status_for(strategy.ticker, strategy.experiment_name)
             print(f"{strategy.ticker}/{strategy.experiment_name}: {lifecycle.value}")
@@ -523,6 +576,243 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
     except (LedgerError, OSError, TypeError, ValueError) as exc:
         print(f"followup-state error: {exc}")
         raise SystemExit(1) from exc
+
+
+def cmd_drift(args: argparse.Namespace) -> None:
+    """Manage private Phase 8 evidence without broker or live-order access."""
+    from trading.core.live_drift import DriftMetricKind, DriftObservation, HardGuardKind
+    from trading.core.live_drift_registry import (
+        LiveDriftRegistry,
+        LiveDriftRegistryError,
+        verified_shadow_trade_total,
+    )
+
+    registry_kwargs: dict[str, object] = {}
+    if args.drift_command == "observe" and args.shadow_evidence_event_id:
+
+        def verify_shadow_trades(envelope, observation) -> bool:
+            expected = verified_shadow_trade_total(
+                envelope,
+                qualification_state=QualificationRegistry(args.qualification_path).read(),
+                evidence_event_id=args.shadow_evidence_event_id,
+                session=observation.session,
+            )
+            return (
+                observation.completed_shadow_trades_total == expected
+                and args.shadow_evidence_event_id in observation.source_identities
+            )
+
+        registry_kwargs["shadow_trade_verifier"] = verify_shadow_trades
+    if args.drift_command in {"clean-check", "recover"}:
+        store = ManualLedgerStore(args.ledger_path)
+
+        def verified_integrity() -> tuple[bool, str]:
+            try:
+                replay = store.verify()
+            except LedgerError:
+                return False, ""
+            return store.reconciliation_is_current(args.reconciliation_path), replay.accounting_hash
+
+        def verify_clean_check(_session: date, evidence_identity: str) -> bool:
+            reconciled, accounting_hash = verified_integrity()
+            return reconciled and evidence_identity == accounting_hash
+
+        registry_kwargs = {
+            "clean_check_verifier": verify_clean_check,
+            "hard_guard_verifier": lambda: verified_integrity()[0],
+        }
+    registry = LiveDriftRegistry(args.path, **registry_kwargs)
+    try:
+        if args.drift_command == "status":
+            state = registry.read()
+            print(f"drift state: {state.state.value}")
+            print(f"buy allowed: {state.buy_allowed}")
+            print(f"envelope: {state.envelope.envelope_id if state.envelope else '-'}")
+            print(f"activation: {state.activation_event_id or '-'}")
+            print(f"observations: {len(state.observations)}")
+            print(f"checkpoints: {len(state.checkpoints)}")
+            if state.pause_session is not None:
+                print(f"paused since: {state.pause_session.isoformat()}")
+            for guard in state.hard_guards:
+                print(f"hard guard: {guard.kind.value}/{guard.guard_id}: {guard.reason}")
+            return
+        if args.drift_command == "freeze":
+            envelope = _load_drift_envelope(args.envelope)
+            state = registry.freeze_envelope(envelope)
+            print(f"frozen envelope: {state.envelope.envelope_id if state.envelope else '-'}")
+            return
+        if args.drift_command == "activate":
+            state = registry.bind_activation(
+                strategy_id=args.strategy_id,
+                envelope_id=args.envelope_id,
+                activation_event_id=args.activation_event_id,
+                occurred_at=args.timestamp or datetime.now(UTC),
+            )
+            print(f"drift activation bound: {state.activation_event_id}")
+            return
+        if args.drift_command == "observe":
+            state = registry.read()
+            if state.envelope is None:
+                raise ValueError("observe requires a frozen envelope")
+            metrics = tuple(_parse_drift_metric_observation(item) for item in args.metric)
+            guards = tuple(_parse_drift_guard(item) for item in args.guard)
+            metric_kinds = {state.envelope.metric(item.metric_id).kind for item in metrics}
+            source_identities = list(args.source_identity)
+            shadow_required = bool(
+                metric_kinds & {DriftMetricKind.PERFORMANCE, DriftMetricKind.SIGNAL}
+            )
+            if shadow_required and not args.shadow_evidence_event_id:
+                raise ValueError(
+                    "performance and signal observations require --shadow-evidence-event-id"
+                )
+            completed_shadow_trades = 0
+            if args.shadow_evidence_event_id:
+                completed_shadow_trades = verified_shadow_trade_total(
+                    state.envelope,
+                    qualification_state=QualificationRegistry(args.qualification_path).read(),
+                    evidence_event_id=args.shadow_evidence_event_id,
+                    session=args.session,
+                )
+                source_identities.append(args.shadow_evidence_event_id)
+            ledger_required = bool(
+                metric_kinds
+                & {
+                    DriftMetricKind.EXECUTION,
+                    DriftMetricKind.PORTFOLIO,
+                    DriftMetricKind.UTILIZATION,
+                    DriftMetricKind.CONCENTRATION,
+                }
+            ) or any(
+                guard.kind
+                in {
+                    HardGuardKind.LEDGER,
+                    HardGuardKind.RECONCILIATION,
+                    HardGuardKind.EXECUTION,
+                }
+                for guard in guards
+            )
+            if ledger_required:
+                replay = ManualLedgerStore(args.ledger_path).verify()
+                source_identities.append(f"ledger-accounting:{replay.accounting_hash}")
+            observation = DriftObservation.create(
+                strategy_id=state.envelope.strategy_id,
+                envelope_id=state.envelope.envelope_id,
+                definition_fingerprint=state.envelope.definition_fingerprint,
+                session=args.session,
+                observed_at=args.observed_at or datetime.now(UTC),
+                metrics=metrics,
+                hard_guards=guards,
+                source_identities=tuple(source_identities),
+                completed_shadow_trades_total=completed_shadow_trades,
+            )
+            state = registry.record_observation(observation)
+            print(f"observation recorded: {observation.observation_id}; state={state.state.value}")
+            return
+        if args.drift_command == "checkpoint":
+            checkpoint = registry.record_checkpoint(
+                ordinal=args.ordinal,
+                session=args.session,
+                evaluated_at=args.timestamp,
+            )
+            print(f"checkpoint {checkpoint.ordinal}: {checkpoint.state.value}")
+            return
+        if args.drift_command == "clean-check":
+            state = registry.record_clean_check(
+                session=args.session,
+                evidence_identity=args.evidence_identity,
+                occurred_at=args.timestamp or datetime.now(UTC),
+            )
+            print(f"clean check recorded: {state.state.value}")
+            return
+        if args.drift_command == "recover":
+            decision = registry.recover(
+                current_session=args.current_session,
+                occurred_at=args.timestamp,
+            )
+            print(
+                f"recovered: {decision.recovery_kind}; "
+                f"sessions={decision.sessions_after_pause}; "
+                f"trades={decision.completed_shadow_trades_after_pause}"
+            )
+            return
+        raise ValueError(f"unsupported drift command: {args.drift_command}")
+    except (OSError, TypeError, ValueError, LiveDriftRegistryError) as exc:
+        print(f"drift error: {exc}")
+        raise SystemExit(1) from exc
+
+
+def _load_drift_envelope(path: Path) -> object:
+    """Decode a canonical envelope manifest supplied by an operator, without network access."""
+    from trading.core.live_drift import (
+        DriftMetricExpectation,
+        DriftMetricKind,
+        PredictiveDriftEnvelope,
+    )
+
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    if isinstance(raw, Mapping) and isinstance(raw.get("envelope"), Mapping):
+        raw = raw["envelope"]
+    if not isinstance(raw, Mapping):
+        raise ValueError("drift envelope manifest must contain an object")
+    metrics = tuple(
+        DriftMetricExpectation.create(
+            metric_id=str(item["metric_id"]),
+            kind=DriftMetricKind(str(item.get("kind", "performance"))),
+            direction=str(item["direction"]),
+            watch_boundary=str(item["watch_boundary"]),
+            pause_boundary=str(item["pause_boundary"]),
+            minimum_observations=int(item["minimum_observations"]),
+            window_sessions=int(item["window_sessions"]),
+            unit=str(item.get("unit", "ratio")),
+        )
+        for item in raw.get("metrics", ())
+        if isinstance(item, Mapping)
+    )
+    return PredictiveDriftEnvelope.create(
+        strategy_id=str(raw["strategy_id"]),
+        definition_fingerprint=str(raw["definition_fingerprint"]),
+        source_identities=tuple(str(value) for value in raw["source_identities"]),
+        metrics=metrics,
+        activation_anchor=date.fromisoformat(str(raw["activation_anchor"])),
+        checkpoint_interval_sessions=int(raw["checkpoint_interval_sessions"]),
+        bootstrap_seed=int(raw["bootstrap_seed"]),
+        bootstrap_repetitions=int(raw["bootstrap_repetitions"]),
+        bootstrap_block_sessions=int(raw["bootstrap_block_sessions"]),
+        frozen_at=iso_datetime(str(raw["frozen_at"])),
+        hard_guard_kinds=tuple(str(value) for value in raw.get("hard_guard_kinds", ())),
+    )
+
+
+def _parse_drift_metric_observation(item: str) -> object:
+    from trading.core.live_drift import DriftMetricObservation
+
+    metric_id, separator, remainder = item.partition("=")
+    value_text, separator2, sample_text = remainder.partition(":")
+    if not separator or not separator2:
+        raise ValueError("metric must use METRIC_ID=DECIMAL:SAMPLE_COUNT")
+    return DriftMetricObservation.create(
+        metric_id=metric_id,
+        value=value_text,
+        sample_count=int(sample_text),
+    )
+
+
+def _parse_drift_guard(item: str) -> object:
+    from trading.core.live_drift import HardGuardKind, HardGuardObservation
+
+    parts = item.split(":", 4)
+    if len(parts) != 5:
+        raise ValueError("guard must use KIND:GUARD_ID:ACTIVE:EVIDENCE_ID:REASON")
+    kind, guard_id, active, evidence_identity, reason = parts
+    if active.lower() not in {"true", "false"}:
+        raise ValueError("guard active value must be true or false")
+    return HardGuardObservation.create(
+        kind=HardGuardKind(kind),
+        guard_id=guard_id,
+        active=active.lower() == "true",
+        evidence_identity=evidence_identity,
+        reason=reason,
+    )
 
 
 def cmd_ledger(args: argparse.Namespace) -> None:
@@ -939,6 +1229,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_FOLLOWUP_LIFECYCLE_PATH,
     )
+    followup_p.add_argument(
+        "--drift-path",
+        type=Path,
+        default=DEFAULT_LIVE_DRIFT_PATH,
+        help="Private per-strategy Phase 8 drift registry directory",
+    )
 
     followup_state_p = sub.add_parser(
         "followup-state",
@@ -999,6 +1295,15 @@ def build_parser() -> argparse.ArgumentParser:
     followup_state_activate_p.add_argument("--qualification-event-id", required=True)
     followup_state_activate_p.add_argument("--result-fingerprint", required=True)
     followup_state_activate_p.add_argument("--parity-digest", required=True)
+    followup_state_activate_p.add_argument(
+        "--drift-envelope-id",
+        help="Frozen predictive drift envelope identity required for activation",
+    )
+    followup_state_activate_p.add_argument(
+        "--drift-path",
+        type=Path,
+        default=Path("state/live-drift.json"),
+    )
     followup_state_activate_p.add_argument("--reason", required=True)
     followup_state_activate_p.add_argument("--timestamp", type=iso_datetime)
     followup_state_shadow_p = followup_state_sub.add_parser(
@@ -1036,6 +1341,66 @@ def build_parser() -> argparse.ArgumentParser:
         retirement_parser.add_argument("--experiment", required=True)
         retirement_parser.add_argument("--reason", required=True)
         retirement_parser.add_argument("--timestamp", type=iso_datetime)
+
+    # live drift and recovery (private, dry-run evidence only)
+    drift_p = sub.add_parser(
+        "drift",
+        help="Inspect and append private Phase 8 drift evidence; never contacts a broker",
+    )
+    drift_sub = drift_p.add_subparsers(dest="drift_command", required=True)
+    drift_status_p = drift_sub.add_parser("status", help="Read verified drift state")
+    drift_status_p.add_argument("--path", type=Path, default=Path("state/live-drift.json"))
+    drift_freeze_p = drift_sub.add_parser("freeze", help="Freeze a predictive envelope manifest")
+    drift_freeze_p.add_argument("--path", type=Path, required=True)
+    drift_freeze_p.add_argument("--envelope", type=Path, required=True)
+    drift_activate_p = drift_sub.add_parser(
+        "activate", help="Bind an envelope to Phase 7 activation"
+    )
+    drift_activate_p.add_argument("--path", type=Path, required=True)
+    drift_activate_p.add_argument("--strategy-id", required=True)
+    drift_activate_p.add_argument("--envelope-id", required=True)
+    drift_activate_p.add_argument("--activation-event-id", required=True)
+    drift_activate_p.add_argument("--timestamp", type=iso_datetime)
+    drift_observe_p = drift_sub.add_parser(
+        "observe", help="Append one completed-session observation"
+    )
+    drift_observe_p.add_argument("--path", type=Path, required=True)
+    drift_observe_p.add_argument("--session", type=iso_date, required=True)
+    drift_observe_p.add_argument("--observed-at", type=iso_datetime)
+    drift_observe_p.add_argument("--metric", action="append", default=[], required=True)
+    drift_observe_p.add_argument("--guard", action="append", default=[])
+    drift_observe_p.add_argument("--source-identity", action="append", default=[])
+    drift_observe_p.add_argument("--shadow-evidence-event-id")
+    drift_observe_p.add_argument(
+        "--qualification-path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    drift_observe_p.add_argument("--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    drift_checkpoint_p = drift_sub.add_parser("checkpoint", help="Evaluate a scheduled checkpoint")
+    drift_checkpoint_p.add_argument("--path", type=Path, required=True)
+    drift_checkpoint_p.add_argument("--ordinal", type=positive_int, required=True)
+    drift_checkpoint_p.add_argument("--session", type=iso_date, required=True)
+    drift_checkpoint_p.add_argument("--timestamp", type=iso_datetime)
+    drift_clean_p = drift_sub.add_parser(
+        "clean-check", help="Record a verified clean integrity check"
+    )
+    drift_clean_p.add_argument("--path", type=Path, required=True)
+    drift_clean_p.add_argument("--session", type=iso_date, required=True)
+    drift_clean_p.add_argument("--evidence-identity", required=True)
+    drift_clean_p.add_argument("--timestamp", type=iso_datetime)
+    drift_clean_p.add_argument("--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    drift_clean_p.add_argument(
+        "--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH
+    )
+    drift_recover_p = drift_sub.add_parser("recover", help="Evaluate a fail-closed recovery gate")
+    drift_recover_p.add_argument("--path", type=Path, required=True)
+    drift_recover_p.add_argument("--current-session", type=iso_date, required=True)
+    drift_recover_p.add_argument("--timestamp", type=iso_datetime)
+    drift_recover_p.add_argument("--ledger-path", type=Path, default=DEFAULT_MANUAL_LEDGER_PATH)
+    drift_recover_p.add_argument(
+        "--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH
+    )
 
     # followup-backtest
     followup_backtest_p = sub.add_parser(
@@ -1267,6 +1632,7 @@ def main(argv: list[str] | None = None) -> None:
             args.ledger_path == DEFAULT_MANUAL_LEDGER_PATH
             and args.reconciliation_path == DEFAULT_RECONCILIATION_PATH
             and args.lifecycle_path == DEFAULT_FOLLOWUP_LIFECYCLE_PATH
+            and args.drift_path == DEFAULT_LIVE_DRIFT_PATH
         ):
             run_followup()
         else:
@@ -1274,9 +1640,12 @@ def main(argv: list[str] | None = None) -> None:
                 ledger_path=args.ledger_path,
                 reconciliation_path=args.reconciliation_path,
                 lifecycle_path=args.lifecycle_path,
+                drift_path=args.drift_path,
             )
     elif args.command == "followup-state":
         cmd_followup_state(args)
+    elif args.command == "drift":
+        cmd_drift(args)
     elif args.command == "followup-backtest":
         cmd_followup_backtest(args)
     elif args.command == "compare":

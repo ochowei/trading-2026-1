@@ -15,6 +15,7 @@ import pandas as pd
 
 from trading.core.accounting import canonical_json_bytes, parse_timestamp, timestamp_text
 from trading.core.ledger_storage import atomic_write, locked_file
+from trading.core.live_drift import DriftState
 
 _SCHEMA_VERSION = 1
 _GENESIS_HASH = "0" * 64
@@ -57,6 +58,7 @@ class FollowupActivationProof:
     qualification_event_id: str
     result_fingerprint: str
     parity_digest: str
+    drift_envelope_id: str = ""
 
     def __post_init__(self) -> None:
         if not self.shadow_id.strip() or not self.qualification_event_id.strip():
@@ -65,14 +67,22 @@ class FollowupActivationProof:
             value = getattr(self, field_name)
             if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
                 raise ValueError(f"{field_name} must be a lowercase SHA-256 digest")
+        if self.drift_envelope_id and (
+            len(self.drift_envelope_id) != 64
+            or any(character not in "0123456789abcdef" for character in self.drift_envelope_id)
+        ):
+            raise ValueError("drift_envelope_id must be a lowercase SHA-256 digest")
 
     def payload(self) -> dict[str, str]:
-        return {
+        payload = {
             "shadow_id": self.shadow_id,
             "qualification_event_id": self.qualification_event_id,
             "result_fingerprint": self.result_fingerprint,
             "parity_digest": self.parity_digest,
         }
+        if self.drift_envelope_id:
+            payload["drift_envelope_id"] = self.drift_envelope_id
+        return payload
 
 
 @dataclass(frozen=True)
@@ -110,6 +120,10 @@ class FollowupAuthorizationContext:
     broker_reconciled: bool
     proposal_epoch_current: bool
     has_actual_position: bool
+    drift_state: DriftState | None = None
+    drift_hard_guards_clear: bool = True
+    drift_envelope_id: str = ""
+    drift_checkpoint_id: str = ""
 
     def authorization_payload(
         self,
@@ -131,6 +145,10 @@ class FollowupAuthorizationContext:
             "ledger_accounting_hash": self.ledger_accounting_hash,
             "broker_reconciled": self.broker_reconciled,
             "allocation_epoch": allocation_epoch,
+            "drift_state": self.drift_state.value if self.drift_state is not None else "",
+            "drift_hard_guards_clear": self.drift_hard_guards_clear,
+            "drift_envelope_id": self.drift_envelope_id,
+            "drift_checkpoint_id": self.drift_checkpoint_id,
         }
 
 
@@ -161,6 +179,8 @@ def build_followup_status_report(
         StrategyLifecycle.PAUSED,
     }:
         state = "legacy position management"
+    elif context.lifecycle is StrategyLifecycle.ACTIVE and context.drift_state is not None:
+        state = f"Active / {context.drift_state.value}"
     else:
         state = {
             StrategyLifecycle.LEGACY_ACTIVE: "migration pending",
@@ -492,7 +512,26 @@ def authorize_followup_order(
             not context.has_actual_position,
             "strategy sleeve already has an actual position",
         ),
+        (
+            context.drift_state is not None,
+            "live drift overlay is unavailable",
+        ),
+        (
+            bool(context.drift_envelope_id.strip()),
+            "live drift envelope identity is missing",
+        ),
+        (
+            context.drift_hard_guards_clear,
+            "live drift hard guard is active",
+        ),
     )
+    if context.drift_state is not None:
+        guards += (
+            (
+                context.drift_state is not DriftState.PAUSED,
+                f"live drift is {context.drift_state.value}",
+            ),
+        )
     for passed, reason in guards:
         if not passed:
             return FollowupAuthorizationDecision(False, reason)
@@ -551,6 +590,8 @@ class FollowupLifecycleRegistry:
         actual_position_resolver: Callable[[FollowupStrategy], bool] | None = None,
         outstanding_entry_resolver: Callable[[FollowupStrategy], bool] | None = None,
         ledger_head_resolver: Callable[[], str] | None = None,
+        drift_activation_verifier: Callable[[FollowupStrategy, FollowupActivationProof, str], None]
+        | None = None,
         coordination_lock_path: Path | None = None,
     ) -> None:
         self.path = Path(path)
@@ -562,6 +603,7 @@ class FollowupLifecycleRegistry:
         self.actual_position_resolver = actual_position_resolver
         self.outstanding_entry_resolver = outstanding_entry_resolver
         self.ledger_head_resolver = ledger_head_resolver
+        self.drift_activation_verifier = drift_activation_verifier
         self.coordination_lock_path = coordination_lock_path or (
             self.path.parent / ".manual-trading-coordination.lock"
         )
@@ -798,6 +840,8 @@ class FollowupLifecycleRegistry:
             raise ValueError("only a registered Shadow strategy can become Active")
         if self.activation_verifier is None:
             raise ValueError("no activation verifier is configured")
+        if proof.drift_envelope_id and self.drift_activation_verifier is None:
+            raise ValueError("no drift activation verifier is configured")
         self.activation_verifier(strategy, proof)
         payload: dict[str, object] = {
             "occurred_at": timestamp_text(occurred_at),
@@ -807,6 +851,11 @@ class FollowupLifecycleRegistry:
             "reason": _required_reason(reason),
             "proof": proof.payload(),
         }
+        activation_event_id = (
+            "strategy_activated:" + hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
+        )
+        if self.drift_activation_verifier is not None:
+            self.drift_activation_verifier(strategy, proof, activation_event_id)
         return self._append_change(
             "strategy_activated",
             payload,
@@ -881,6 +930,11 @@ class FollowupLifecycleRegistry:
         ):
             return _project(self._load_unlocked(allow_missing=False))
 
+    def read_while_coordinated(self) -> FollowupLifecycleState:
+        """Read while the caller already holds ``coordination_lock_path`` exclusively."""
+        with locked_file(self.lock_path, self.lock_timeout_seconds):
+            return _project(self._load_unlocked(allow_missing=False))
+
     def _record_change(
         self,
         *,
@@ -908,7 +962,10 @@ class FollowupLifecycleRegistry:
     ) -> FollowupLifecycleState:
         identity = hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
         event_id = f"{event_type}:{identity}"
-        with locked_file(self.lock_path, self.lock_timeout_seconds):
+        with (
+            locked_file(self.coordination_lock_path, self.lock_timeout_seconds),
+            locked_file(self.lock_path, self.lock_timeout_seconds),
+        ):
             state = self._load_unlocked(allow_missing=False)
             if state_validator is not None:
                 state_validator(_project(state))
@@ -1106,12 +1163,18 @@ def _project(state: dict[str, object]) -> FollowupLifecycleState:
                 proof = payload.get("proof")
                 if lifecycle is not StrategyLifecycle.ACTIVE or not isinstance(proof, dict):
                     raise ValueError("followup lifecycle integrity failure: invalid activation")
-                activation_proofs[strategy] = FollowupActivationProof(
+                activation_proof = FollowupActivationProof(
                     shadow_id=str(proof.get("shadow_id", "")),
                     qualification_event_id=str(proof.get("qualification_event_id", "")),
                     result_fingerprint=str(proof.get("result_fingerprint", "")),
                     parity_digest=str(proof.get("parity_digest", "")),
+                    drift_envelope_id=str(proof.get("drift_envelope_id", "")),
                 )
+                if activation_proof.payload() != proof:
+                    raise ValueError(
+                        "followup lifecycle integrity failure: non-canonical activation proof"
+                    )
+                activation_proofs[strategy] = activation_proof
             elif event_type == "strategy_retiring":
                 if lifecycle is not StrategyLifecycle.RETIRING or not isinstance(
                     payload.get("had_actual_position"), bool
