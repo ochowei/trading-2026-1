@@ -131,6 +131,33 @@ That future work is a new prospective Phase 6/7 qualification program. It is
 not unfinished Phase 9 migration work and cannot make SPY-007 immediately
 Shadow-eligible.
 
+### Post-closure prospective-program preflight
+
+The operator approved starting a new forward-dated qualification program on
+2026-08-07. The read-only preflight stopped before plan registration because
+the current evidence cannot satisfy the frozen Phase 6 inputs:
+
+- `trading result status spy_007_trend_pullback` reports `legacy`; the separate
+  valid offline observation is immutable historical evidence and did not replace
+  `latest.json`.
+- The verified trial registry has `selection_history_incomplete=true`. The
+  family-wise selection-adjustment contract rejects that global state before
+  evaluating any family returns.
+- `SPY:trend-pullback` contains one complete semantic trial and no separately
+  verified family-baseline trial covering the future frozen evaluation sessions.
+- The SPY experiment overview records all three SPY-007 attempts as failed with
+  structurally weak Part A performance and names SPY-009 as the historical best.
+  SPY-009's persisted result is also currently `legacy`, so it cannot be silently
+  substituted as a qualified candidate or baseline.
+
+No `HistoricalQualificationPlan` was registered. Registration would create a
+private state event that is known in advance to be unable to pass the complete-
+history and valid-result gates. Before a prospective plan can be frozen, the
+operator must separately choose whether to formalize a complete SPY candidate
+set and trial history, replace SPY-007 with a newly evaluated candidate, or end
+SPY-007 followup candidacy. Those choices change research/followup scope and are
+not inferred from the Phase 9 migration approval.
+
 ### Existing immutable evidence
 
 The following artifacts are present under `results/` and passed the exact
@@ -315,6 +342,10 @@ are deliberately deferred outside this Phase 9 closure:
 
 Closure classification: **Phase 9 migration complete; requalification blocked;
 Shadow/no-new-entry state not initialized; active promotion prohibited.**
+
+The post-closure prospective preflight did not change this classification: no
+plan was registered because result validity, complete trial history, and family
+baseline identity remain unresolved.
 
 The migrated strategies declare one adjusted-daily primary series through
 `market_data_requirements()`, capture an immutable research definition and
