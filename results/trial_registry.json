@@ -6769,6 +6769,118 @@
       "selection_history_incomplete": true,
       "status": "legacy",
       "trial_id": "legacy-ac5762ced7939ba63f409a28c8ce73a6778a16a0533fb2543f7886f523ac5ac7"
+    },
+    {
+      "definition_fingerprint": "f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612",
+      "experiment_family": "SPY:trend-pullback",
+      "experiment_names": [
+        "spy_007_trend_pullback"
+      ],
+      "first_registered_at": "2026-08-07T01:14:15.165607Z",
+      "hypothesis": "SPY entries after a confirmed uptrend pull back and rebound.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T01:14:15.498570Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "1dab32cf9ca147a38b253ee2ac9ae68a",
+          "observed_at": "2026-08-07T01:14:15.498570Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_007_trend_pullback/ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111.migration-result.json",
+          "run_mode": "migration",
+          "snapshot_id": "ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111",
+          "validity_status": "migration-pending"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "1a760f7729ea1c1cb8fe3c1b63195b51cd0b9c7b5c1c8e3a59c731cdbff0cc52"
+    },
+    {
+      "definition_fingerprint": "228e219cdbbbabc4e84d8561139a963b1501d5680378c8bdef02692147667259",
+      "experiment_family": "SIVR:mean-reversion",
+      "experiment_names": [
+        "sivr_001_mean_reversion"
+      ],
+      "first_registered_at": "2026-08-07T01:47:42.958748Z",
+      "hypothesis": "SIVR deep oversold mean reversion can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T01:47:43.137996Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "b5c9e9fdddf44bca84cb33a7d526d4ff",
+          "observed_at": "2026-08-07T01:47:43.137996Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/sivr_001_mean_reversion/2f4b8260a913919a7785e961dba772d7aa7f226f3689bce07cbf079314e7b5d4.migration-result.json",
+          "run_mode": "migration",
+          "snapshot_id": "2f4b8260a913919a7785e961dba772d7aa7f226f3689bce07cbf079314e7b5d4",
+          "validity_status": "migration-pending"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "f6a6f5bfa524ea37e7c10a9ab3f4597d1dd228d787d20a4dc50ece699bb04980"
+    },
+    {
+      "definition_fingerprint": "d951579fd99a92b519ff4edbb96903877c74a500fb29f2dfda7d1b63dd789945",
+      "experiment_family": "TSLA:extreme-oversold",
+      "experiment_names": [
+        "tsla_001_extreme_oversold"
+      ],
+      "first_registered_at": "2026-08-07T01:48:40.770054Z",
+      "hypothesis": "TSLA extreme oversold mean reversion can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T01:48:40.950592Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "9d1e0ec5716f4d68b583e3ea403690e5",
+          "observed_at": "2026-08-07T01:48:40.950592Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/tsla_001_extreme_oversold/5a7f48e9e134b1cbe16c492446d47653bcdb84e100676775c2dec3051ec1a9e7.migration-result.json",
+          "run_mode": "migration",
+          "snapshot_id": "5a7f48e9e134b1cbe16c492446d47653bcdb84e100676775c2dec3051ec1a9e7",
+          "validity_status": "migration-pending"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "b2ec633032d94c0dc097314cbe9a69697bae151d676a054dc472c67999b39005"
+    },
+    {
+      "definition_fingerprint": "8368f3c1224980eb10712aeac7a0151d4b2b09ce0a6352966eb2809cde69b8b0",
+      "experiment_family": "VOO:rsi2-reversal",
+      "experiment_names": [
+        "voo_001_rsi2_reversal"
+      ],
+      "first_registered_at": "2026-08-07T01:59:59.219461Z",
+      "hypothesis": "VOO RSI(2) mean reversion can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T01:59:59.387258Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "4a8c4b902a1c4b1b9090fa828bd365f9",
+          "observed_at": "2026-08-07T01:59:59.387258Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/voo_001_rsi2_reversal/ea33ffb51e318408675549b451d97c6eff9718965a813aa1db0c663714f3637c.migration-result.json",
+          "run_mode": "migration",
+          "snapshot_id": "ea33ffb51e318408675549b451d97c6eff9718965a813aa1db0c663714f3637c",
+          "validity_status": "migration-pending"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "46239f0cc58640396fafd07a353db4b695331c203e097f50be4ea2f1a742f965"
     }
   ]
 }
