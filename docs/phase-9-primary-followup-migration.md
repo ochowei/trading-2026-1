@@ -158,6 +158,70 @@ set and trial history, replace SPY-007 with a newly evaluated candidate, or end
 SPY-007 followup candidacy. Those choices change research/followup scope and are
 not inferred from the Phase 9 migration approval.
 
+### Approved SPY asset-wide formal-evaluation preparation
+
+The operator approved preparing the complete SPY candidate set. This approval
+does not yet authorize an external download or a `latest.json` rewrite. The
+candidate inventory is fixed at all nine registered SPY experiments; no legacy
+metric is used to omit or rank a candidate:
+
+| Candidate | Trial family | Declared data | Current definition fingerprint | Persisted status |
+| --- | --- | --- | --- | --- |
+| SPY-001 `spy_001_pullback_wr` | `SPY:pullback-wr` | SPY primary from 2010-01-01 | `427dcafd26bee97eba0e5a06e90288d0e27591252bc21cf5d19d5f616148b919` | `legacy` |
+| SPY-002 `spy_002_no_trailing` | `SPY:no-trailing` | SPY primary from 2010-01-01 | `980da6a7dc8796e85f6340ad80e71e6eef2989d1c4fc74f9df13d7b043feaaac` | `legacy` |
+| SPY-003 `spy_003_optimized_wr` | `SPY:vix-filter` | SPY primary and `^VIX` auxiliary from 2010-01-01 | `b5252d106f40eb4b7054768f469470d06231a4131ba6b0f9c886c4d2693cda59` | `legacy` |
+| SPY-004 `spy_004_rsi2_reversal` | `SPY:rsi2-reversal` | SPY primary from 2010-01-01 | `abb0b16c78fc85cf15bf5a8e78505501391a80390a6a965f388f86e4f062921f` | `legacy` |
+| SPY-005 `spy_005_asymmetric_exit` | `SPY:asymmetric-exit` | SPY primary from 2010-01-01 | `56c4876acc9da8cd60053bc4dbbbf848785b6142767037c786fe2f51de370d81` | `legacy` |
+| SPY-006 `spy_006_roc_reversal` | `SPY:roc-reversal` | SPY primary from 2010-01-01 | `36cc682c5019231234517f3365326b23fc98dcbf2e820b531623f60e1c5974c4` | `legacy` |
+| SPY-007 `spy_007_trend_pullback` | `SPY:trend-pullback` | SPY primary from 2010-01-01 | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `legacy` latest; separate offline observation `valid` |
+| SPY-008 `spy_008_bb_squeeze_breakout` | `SPY:bb-squeeze-breakout` | SPY primary from 2018-01-01 | `8d71ee42db60a8316b00b131def2e776cd765dc779eda712d600288b3e1bf2d0` | `legacy` |
+| SPY-009 `spy_009_capitulation_filter` | `SPY:capitulation-filter` | SPY primary from 2010-01-01 | `80128513b79dd9ec5b3dc1a57615f9b8f37248cbd4cf3e730b97c1f1a6924391` | `legacy` |
+
+All nine are snapshot-aware `ExecutionModelStrategy` implementations. The
+latest completed XNYS session at the preflight clock is 2026-08-06. The SPY
+cache is valid through that session and records a complete refresh at
+2026-08-07T06:36:10.796943Z with data digest
+`25ec8f1259440551ad520717ecf8a63bb7517d35b37cb313a9ab8e05a74cdc56`.
+The `^VIX` cache required only by SPY-003 is missing. Therefore the proposed
+decision cutoff is explicitly 2026-08-06; it is derived from both the calendar
+and verified primary cache, not guessed.
+
+The formalization batch must use one consistent source state and cutoff:
+
+1. Obtain explicit approval for one full `^VIX` refresh through 2026-08-06.
+2. Re-verify SPY and `^VIX`, then publish nine new immutable manifests using
+   the current exact definition references. Reuse the one verified SPY blob;
+   do not issue nine redundant provider downloads. SPY-003 alone includes the
+   aligned `^VIX` auxiliary blob and its declared one-session publication lag.
+3. Verify every manifest before execution. The existing SPY-007 manifests are
+   retained as evidence but are not reused because their exact captured
+   definition references belong to earlier source checkpoints.
+4. Run each candidate once with `trading run <experiment> --snapshot
+   <manifest>`. This is formal `online` mode: it intentionally advances that
+   candidate's `latest.json`, writes one immutable historical result, and
+   appends one valid observation to `results/trial_registry.json`.
+5. Re-run result status for all nine. If any candidate is not exactly `valid`,
+   stop without ranking and without changing followup selection.
+6. Only after the complete set is valid, compare all nine, run gradient
+   analysis on the best candidate, and produce the followup qualification
+   checklist. The historical SPY-009 result is a hypothesis, not a ranking
+   input.
+7. Keep the ranking decision separate from evidence publication. Do not edit
+   `followup.py`, qualification state, lifecycle state, ledger state, or broker
+   state in the formalization batch.
+8. If a new candidate is selected, generate exact fixed-snapshot migration
+   parity for that selected definition before any later qualification handoff.
+
+`trading result evaluate SPY` is not the preparation command for this batch:
+the current implementation refreshes only stale schema-3 candidates and will
+fail closed on these nine legacy results. Snapshot preparation and formal runs
+must therefore be explicit and fully reviewed.
+
+The next state-changing gate requires one combined operator approval: download
+`^VIX` through the 2026-08-06 cutoff, publish the nine immutable manifests, and
+allow the nine formal `--snapshot` runs to replace their legacy `latest.json`
+files. This approval still does not authorize Shadow or Active promotion.
+
 ### Existing immutable evidence
 
 The following artifacts are present under `results/` and passed the exact
