@@ -10,6 +10,7 @@ IWM BB Squeeze Breakout Optimized Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_008_bb_squeeze_optimized.config import (
     IWM008BBSqueezeConfig,
@@ -20,10 +21,14 @@ from trading.experiments.iwm_008_bb_squeeze_optimized.signal_detector import (
 )
 
 
-class IWM008BBSqueezeStrategy(ExecutionModelStrategy):
+class IWM008BBSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM-008：BB Squeeze Breakout 優化策略（含成交模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "IWM:bb-squeeze-optimized"
+    bundle_trial_hypothesis = (
+        "IWM optimized BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

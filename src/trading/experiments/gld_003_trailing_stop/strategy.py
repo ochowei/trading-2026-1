@@ -6,6 +6,7 @@ Signal logic identical to GLD-001, exit uses trailing stop mechanism.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_003_trailing_stop.config import (
     GLDTrailingStopConfig,
@@ -19,8 +20,13 @@ from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
 )
 
 
-class GLDTrailingStopStrategy(ExecutionModelStrategy):
+class GLDTrailingStopStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 追蹤停損策略 (GLD-003) — 進場不變，追蹤停損出場"""
+
+    bundle_trial_family = "GLD:trailing-stop"
+    bundle_trial_hypothesis = (
+        "GLD trailing-stop exits can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

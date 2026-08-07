@@ -22,36 +22,22 @@ EEM-020 訊號偵測器：Multi-Anchor (^VIX CAP + EEM-FXI CEILING) Combined Fil
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.eem_020_multi_anchor_combo_mr.config import EEM020Config
 
 logger = logging.getLogger(__name__)
 
 
-class EEM020MultiAnchorComboDetector(BaseSignalDetector):
+class EEM020MultiAnchorComboDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EEM-020 Multi-Anchor (^VIX CAP + EEM-FXI CEILING) Combo Detector"""
 
     def __init__(self, config: EEM020Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker, self.config.fxi_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -96,29 +82,14 @@ class EEM020MultiAnchorComboDetector(BaseSignalDetector):
         df["TwoDayReturn"] = df["Close"] / df["Close"].shift(2) - 1
 
         # 外部資料
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
-        # ^VIX LEVEL
-        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，VIX CAP 過濾停用", self.config.vix_ticker)
-            df["VIX_Close"] = float("nan")
-        else:
-            df["VIX_Close"] = vix_df["Close"].reindex(df.index, method="ffill")
+        vix_df = self.require_auxiliary(self.config.vix_ticker, df.index)
+        df["VIX_Close"] = vix_df["Close"]
 
         # FXI cross-asset divergence
-        fxi_df = self._fetch_external(self.config.fxi_ticker, start_date)
+        fxi_df = self.require_auxiliary(self.config.fxi_ticker, df.index)
         eem_n_return = df["Close"].pct_change(self.config.rel_lookback)
-        if fxi_df is None or fxi_df.empty:
-            logger.error(
-                "無法取得 %s 數據，EEM-FXI CEILING 過濾停用",
-                self.config.fxi_ticker,
-            )
-            df["RelDiff"] = 0.0
-        else:
-            fxi_close = fxi_df["Close"].reindex(df.index, method="ffill")
-            fxi_n_return = fxi_close.pct_change(self.config.rel_lookback)
-            df["RelDiff"] = eem_n_return - fxi_n_return
+        fxi_n_return = fxi_df["Close"].pct_change(self.config.rel_lookback)
+        df["RelDiff"] = eem_n_return - fxi_n_return
 
         return df
 

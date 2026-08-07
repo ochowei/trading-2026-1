@@ -8,6 +8,7 @@ URA 首次嘗試突破策略。基於 NVDA-004 / FCX-004 模板，
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_005_bb_squeeze_breakout.config import (
     URABBSqueezeBreakoutConfig,
@@ -18,10 +19,15 @@ from trading.experiments.ura_005_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class URABBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class URABBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-005: BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
+
+    bundle_trial_family = "URA:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "URA volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

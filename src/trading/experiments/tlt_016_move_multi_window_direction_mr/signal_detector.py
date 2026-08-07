@@ -16,9 +16,9 @@ TLT ^MOVE Multi-Window IV Direction Regime-Gated MR 訊號偵測器 (TLT-016)
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tlt_016_move_multi_window_direction_mr.config import (
     TLT016Config,
 )
@@ -26,29 +26,15 @@ from trading.experiments.tlt_016_move_multi_window_direction_mr.config import (
 logger = logging.getLogger(__name__)
 
 
-class TLT016SignalDetector(BaseSignalDetector):
+class TLT016SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TLT-016: BB-width + ^MOVE LEVEL + TLT-SPY divergence + ^MOVE multi-window
     direction regime gate MR"""
 
     def __init__(self, config: TLT016Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.move_ticker, self.config.benchmark_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -79,33 +65,17 @@ class TLT016SignalDetector(BaseSignalDetector):
         div_n = self.config.divergence_lookback
         df["TLT_Ret_N"] = df["Close"].pct_change(div_n)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        move_df = self._fetch_external(self.config.move_ticker, start_date)
-        if move_df is None or move_df.empty:
-            logger.error("無法取得 %s 數據, ^MOVE 過濾停用", self.config.move_ticker)
-            df["MOVE_Close"] = float("nan")
-            df["MOVE_5d_Change"] = 0.0
-            df["MOVE_3d_Change"] = 0.0
-        else:
-            move_close = move_df["Close"].reindex(df.index, method="ffill")
-            df["MOVE_Close"] = move_close
-            df["MOVE_5d_Change"] = move_close.diff(self.config.move_5d_lookback)
-            df["MOVE_3d_Change"] = move_close.diff(self.config.move_3d_lookback)
+        move_df = self.require_auxiliary(self.config.move_ticker, df.index)
+        move_close = move_df["Close"]
+        df["MOVE_Close"] = move_close
+        df["MOVE_5d_Change"] = move_close.diff(self.config.move_5d_lookback)
+        df["MOVE_3d_Change"] = move_close.diff(self.config.move_3d_lookback)
 
-        bench_df = self._fetch_external(self.config.benchmark_ticker, start_date)
-        if bench_df is None or bench_df.empty:
-            logger.error(
-                "無法取得 %s 數據, cross-asset divergence 過濾停用",
-                self.config.benchmark_ticker,
-            )
-            df["Bench_Close"] = float("nan")
-            df["Bench_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            bench_close = bench_df["Close"].reindex(df.index, method="ffill")
-            df["Bench_Close"] = bench_close
-            df["Bench_Ret_N"] = bench_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["TLT_Ret_N"] - df["Bench_Ret_N"]
+        bench_df = self.require_auxiliary(self.config.benchmark_ticker, df.index)
+        bench_close = bench_df["Close"]
+        df["Bench_Close"] = bench_close
+        df["Bench_Ret_N"] = bench_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["TLT_Ret_N"] - df["Bench_Ret_N"]
 
         return df
 

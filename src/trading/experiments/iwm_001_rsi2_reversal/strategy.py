@@ -7,6 +7,7 @@ IWM-001: RSI(2) 極端超賣均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_001_rsi2_reversal.config import (
     IWMRsi2Config,
@@ -17,8 +18,13 @@ from trading.experiments.iwm_001_rsi2_reversal.signal_detector import (
 )
 
 
-class IWMRsi2Strategy(ExecutionModelStrategy):
+class IWMRsi2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM RSI(2) 極端超賣均值回歸 (IWM-001)"""
+
+    bundle_trial_family = "IWM:rsi2-reversal"
+    bundle_trial_hypothesis = (
+        "IWM RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

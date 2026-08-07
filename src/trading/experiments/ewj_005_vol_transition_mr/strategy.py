@@ -7,6 +7,7 @@ EWJ-005: Post-Capitulation Vol-Transition MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewj_005_vol_transition_mr.config import (
     EWJ005Config,
@@ -17,8 +18,11 @@ from trading.experiments.ewj_005_vol_transition_mr.signal_detector import (
 )
 
 
-class EWJ005Strategy(ExecutionModelStrategy):
+class EWJ005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWJ-005: Post-Capitulation Vol-Transition MR"""
+
+    bundle_trial_family = "EWJ:vol-transition-mr"
+    bundle_trial_hypothesis = "EWJ post-capitulation volatility transition can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

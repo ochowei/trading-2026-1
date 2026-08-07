@@ -7,6 +7,7 @@ TSLA BB Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_005_bb_squeeze_breakout.config import (
     TSLABBSqueezeConfig,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_005_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class TSLABBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class TSLABBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
     """TSLA-005：BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

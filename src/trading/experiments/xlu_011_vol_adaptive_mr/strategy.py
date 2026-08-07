@@ -8,6 +8,7 @@ sharp pullbacks from gradual declines.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_011_vol_adaptive_mr.config import (
     XLUVolAdaptiveMRConfig,
@@ -18,8 +19,13 @@ from trading.experiments.xlu_011_vol_adaptive_mr.signal_detector import (
 )
 
 
-class XLUVolAdaptiveMRStrategy(ExecutionModelStrategy):
+class XLUVolAdaptiveMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU 波動率自適應均值回歸 (XLU-011)"""
+
+    bundle_trial_family = "XLU:vol-adaptive-mr"
+    bundle_trial_hypothesis = (
+        "XLU volatility-adaptive mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

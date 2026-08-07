@@ -24,14 +24,18 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.dia_019_qqq_macro_confirm_mr.config import DIA019Config
 
 logger = logging.getLogger(__name__)
 
 
-class DIA019SignalDetector(BaseSignalDetector):
+class DIA019SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     def __init__(self, config: DIA019Config):
         self.config = config
+
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.macro_ticker,)
 
     @staticmethod
     def _compute_rsi(series: pd.Series, period: int) -> pd.Series:
@@ -60,14 +64,9 @@ class DIA019SignalDetector(BaseSignalDetector):
         df["ClosePos"] = (df["Close"] - df["Low"]) / day_range
         df.loc[day_range == 0, "ClosePos"] = 0.5
 
-        # ── DIA-019 新增：QQQ N 日報酬（QQQ_Close 由 strategy.run() 合併進來）──
-        if "QQQ_Close" in df.columns:
-            df["QQQ_Return_Nd"] = (
-                df["QQQ_Close"] - df["QQQ_Close"].shift(self.config.macro_lookback)
-            ) / df["QQQ_Close"].shift(self.config.macro_lookback)
-        else:
-            logger.warning("DIA-019: QQQ_Close 欄位缺失，macro confirmation 將停用")
-            df["QQQ_Return_Nd"] = pd.Series(float("-inf"), index=df.index)
+        # ── DIA-019 新增：QQQ N 日報酬（由 verified auxiliary bundle 提供）──
+        qqq_close = self.require_auxiliary(self.config.macro_ticker, df.index)["Close"]
+        df["QQQ_Return_Nd"] = qqq_close.pct_change(self.config.macro_lookback)
 
         return df
 

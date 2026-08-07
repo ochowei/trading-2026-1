@@ -25,6 +25,7 @@ capitulation strength 過濾維度，最終發現 oscillator depth (RSI(2) thres
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_013_capitulation_filter.config import (
     IWM013Config,
@@ -35,10 +36,14 @@ from trading.experiments.iwm_013_capitulation_filter.signal_detector import (
 )
 
 
-class IWM013Strategy(ExecutionModelStrategy):
+class IWM013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM Capitulation-Depth Filter MR (IWM-013)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "IWM:capitulation-filter"
+    bundle_trial_hypothesis = (
+        "IWM capitulation-depth filtering can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

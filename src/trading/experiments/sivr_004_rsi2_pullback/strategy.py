@@ -8,6 +8,7 @@ Adds 2-day decline filter and pullback cap for signal quality improvement.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_004_rsi2_pullback.config import (
     SIVRRSI2PullbackConfig,
@@ -18,8 +19,13 @@ from trading.experiments.sivr_004_rsi2_pullback.signal_detector import (
 )
 
 
-class SIVRRSI2PullbackStrategy(ExecutionModelStrategy):
+class SIVRRSI2PullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-004：RSI(2) + 回檔範圍均值回歸"""
+
+    bundle_trial_family = "SIVR:rsi2-pullback"
+    bundle_trial_hypothesis = (
+        "SIVR RSI(2) capped pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%
 

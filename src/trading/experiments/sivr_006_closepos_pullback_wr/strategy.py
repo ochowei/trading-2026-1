@@ -8,6 +8,7 @@ Based on SIVR-005, asymmetric exit: TP +4.5% / SL -3.5% / 20d.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_006_closepos_pullback_wr.config import (
     SIVRClosePosConfig,
@@ -18,7 +19,11 @@ from trading.experiments.sivr_006_closepos_pullback_wr.signal_detector import (
 )
 
 
-class SIVRClosePosStrategy(ExecutionModelStrategy):
+class SIVRClosePosStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "SIVR:closepos-pullback-wr"
+    bundle_trial_hypothesis = (
+        "SIVR pullback mean reversion improves when oversold bars reclaim their daily range."
+    )
     """SIVR-006：非對稱出場 + 回檔範圍 + Williams %R 均值回歸"""
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）

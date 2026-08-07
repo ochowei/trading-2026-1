@@ -18,63 +18,35 @@ Att3 進場條件（全部滿足）：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.cibr_006_rs_momentum_pullback.config import CIBRRSMomentumConfig
 
 logger = logging.getLogger(__name__)
 
 
-class CIBRRSMomentumDetector(BaseSignalDetector):
+class CIBRRSMomentumDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """CIBR 網路安全板塊 RS ���量回調訊號偵測器"""
 
     def __init__(self, config: CIBRRSMomentumConfig):
         self.config = config
 
-    def _fetch_benchmark_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載基準標的數據"""
-        try:
-            df = yf.download(
-                self.config.benchmark_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.benchmark_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.benchmark_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         cfg = self.config
 
-        # Fetch benchmark data
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        benchmark_df = self._fetch_benchmark_data(start_date)
-
-        if benchmark_df is None:
-            logger.error("Unable to fetch %s data for RS calculation", cfg.benchmark_ticker)
-            df["Relative_Strength"] = 0.0
-            df["Pullback"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            df["ATR_ratio"] = 0.0
-            df["ClosePos"] = 0.5
-            return df
-
-        # Align to common dates
-        common_idx = df.index.intersection(benchmark_df.index)
-        df = df.loc[common_idx]
+        # The verified bundle supplies the benchmark already aligned as-of to
+        # every primary decision session.
+        benchmark_df = self.require_auxiliary(cfg.benchmark_ticker, df.index)
 
         # Relative Strength: CIBR N-day return - SPY N-day return
         period = cfg.relative_strength_period
         cibr_return = df["Close"].pct_change(period)
-        benchmark_return = benchmark_df.loc[common_idx, "Close"].pct_change(period)
+        benchmark_return = benchmark_df["Close"].pct_change(period)
         df["Relative_Strength"] = cibr_return - benchmark_return
 
         # Pullback from N-day high

@@ -19,6 +19,8 @@ from trading.market_data.cache import (
 from trading.market_data.calendar import PrimaryUSSessionCalendar
 from trading.market_data.contracts import RefreshKind, SessionCalendar
 from trading.market_data.models import (
+    MarketDataCoveragePolicy,
+    MarketDataDeclaration,
     MarketDataRequirement,
     MarketDataSeries,
     SignalDecisionTime,
@@ -57,12 +59,14 @@ class MarketDataService:
         *,
         start: date | None = None,
         end: date | None = None,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
     ) -> pd.DataFrame:
         """Return a fresh normalized frame, downloading only when needed."""
         return self._resolve(
             series,
             start=start,
             end=end,
+            coverage_policy=coverage_policy,
             refresh_mode=None,
             refresh_started_generation=None,
         )
@@ -74,6 +78,7 @@ class MarketDataService:
         mode: RefreshKind | str = RefreshKind.INCREMENTAL,
         start: date | None = None,
         end: date | None = None,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
     ) -> pd.DataFrame:
         """Explicitly refresh a series incrementally or from full history."""
         try:
@@ -88,23 +93,29 @@ class MarketDataService:
             series,
             start=start,
             end=end,
+            coverage_policy=coverage_policy,
             refresh_mode=kind,
             refresh_started_generation=self.cache.generation_token(series),
         )
 
-    def status(self, series: MarketDataSeries) -> CacheInspection:
+    def status(
+        self,
+        series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> CacheInspection:
         """Return diagnostics under an existing shared lock, without network or writes."""
         try:
             with self.cache.read_lock(series):
-                inspection = self.cache.inspect_locked(series)
+                inspection = self.cache.inspect_locked(series, coverage_policy=coverage_policy)
                 if inspection.state != "valid" or inspection.metadata is None:
                     return inspection
-                cached = self.cache.load_locked(series)
+                cached = self.cache.load_locked(series, coverage_policy=coverage_policy)
                 if cached is None:
                     return CacheInspection("missing")
                 _, outcome = validate_daily_bars(
                     cached.bars,
-                    expected_sessions=self._expected_for(cached.bars),
+                    expected_sessions=self._expected_for(cached.bars, coverage_policy),
                 )
                 if not outcome.is_valid:
                     return CacheInspection("corrupt", cached.metadata, outcome.errors)
@@ -116,8 +127,10 @@ class MarketDataService:
 
     def build_bundle(
         self,
-        requirements: Iterable[MarketDataRequirement],
+        requirements: Iterable[MarketDataRequirement] | MarketDataDeclaration,
         decision_time: SignalDecisionTime,
+        *,
+        decision_times: Iterable[SignalDecisionTime] | None = None,
     ) -> MarketDataBundle:
         """Resolve every declared series through this service into a read-only bundle."""
         requirement_list = MarketDataBundle.validate_requirements(requirements)
@@ -126,6 +139,7 @@ class MarketDataService:
                 requirement.series,
                 start=requirement.history_start,
                 end=decision_time.session,
+                coverage_policy=requirement.coverage_policy,
             )
             for requirement in requirement_list
         }
@@ -133,6 +147,7 @@ class MarketDataService:
             requirement_list,
             frames,
             decision_time=decision_time,
+            decision_times=decision_times,
             calendar=self.calendar,
         )
 
@@ -142,9 +157,11 @@ class MarketDataService:
         *,
         start: date | None,
         end: date | None,
+        coverage_policy: MarketDataCoveragePolicy | None,
         refresh_mode: RefreshKind | None,
         refresh_started_generation: tuple[int, int, int, int] | None,
     ) -> pd.DataFrame:
+        policy = coverage_policy or MarketDataCoveragePolicy.xnys()
         target = (
             self.calendar.session_on_or_before(end)
             if end is not None
@@ -156,7 +173,7 @@ class MarketDataService:
         with self.cache.lock(series):
             force_full = refresh_mode is RefreshKind.FULL
             try:
-                cached = self.cache.load_locked(series)
+                cached = self.cache.load_locked(series, coverage_policy=policy)
             except CacheCorruptionError:
                 self.cache.quarantine_locked(series)
                 cached = None
@@ -164,7 +181,7 @@ class MarketDataService:
             if cached is not None:
                 _, cache_outcome = validate_daily_bars(
                     cached.bars,
-                    expected_sessions=self._expected_for(cached.bars),
+                    expected_sessions=self._expected_for(cached.bars, policy),
                 )
                 if not cache_outcome.is_valid:
                     self.cache.quarantine_locked(series)
@@ -188,21 +205,35 @@ class MarketDataService:
                 )
 
             if force_full:
-                downloaded = self._download(series, start=None, end=target, require_cutoff=True)
+                downloaded = self._download(
+                    series,
+                    start=None,
+                    end=target,
+                    require_cutoff=True,
+                    coverage_policy=policy,
+                )
                 cached = self.cache.publish_locked(
                     series,
                     downloaded,
                     refresh_kind=RefreshKind.FULL,
                     refreshed_at=self.now(),
                     previous_metadata=cached.metadata if cached else None,
+                    coverage_policy=policy,
                 )
             elif cached is None:
-                downloaded = self._download(series, start=start, end=target, require_cutoff=True)
+                downloaded = self._download(
+                    series,
+                    start=start,
+                    end=target,
+                    require_cutoff=True,
+                    coverage_policy=policy,
+                )
                 cached = self.cache.publish_locked(
                     series,
                     downloaded,
                     refresh_kind=RefreshKind.INCREMENTAL,
                     refreshed_at=self.now(),
+                    coverage_policy=policy,
                 )
             else:
                 cached = self._refresh_cached_if_needed(
@@ -211,6 +242,7 @@ class MarketDataService:
                     start=start,
                     target=target,
                     force=(refresh_mode is RefreshKind.INCREMENTAL and not refreshed_while_waiting),
+                    coverage_policy=policy,
                 )
 
             result = cached.bars.loc[: pd.Timestamp(target)]
@@ -228,13 +260,20 @@ class MarketDataService:
         start: date | None,
         target: date,
         force: bool,
+        coverage_policy: MarketDataCoveragePolicy,
     ) -> CachedSeries:
         combined = cached.bars
         changed = False
         cache_start = combined.index[0].date()
         if start is not None and start < cache_start:
             left_end = self.calendar.session_offset(cache_start, -1)
-            left = self._download(series, start=start, end=left_end, require_cutoff=False)
+            left = self._download(
+                series,
+                start=start,
+                end=left_end,
+                require_cutoff=False,
+                coverage_policy=coverage_policy,
+            )
             combined = pd.concat([left, combined])
             changed = True
 
@@ -242,7 +281,13 @@ class MarketDataService:
         if cutoff < target or force:
             overlap_offset = -(self.incremental_overlap_sessions - 1)
             overlap_start = self.calendar.session_offset(cutoff, overlap_offset)
-            right = self._download(series, start=overlap_start, end=target, require_cutoff=True)
+            right = self._download(
+                series,
+                start=overlap_start,
+                end=target,
+                require_cutoff=True,
+                coverage_policy=coverage_policy,
+            )
             combined = pd.concat(
                 [combined.loc[combined.index < pd.Timestamp(overlap_start)], right]
             )
@@ -256,6 +301,7 @@ class MarketDataService:
             refresh_kind=RefreshKind.INCREMENTAL,
             refreshed_at=self.now(),
             previous_metadata=cached.metadata,
+            coverage_policy=coverage_policy,
         )
 
     def _download(
@@ -265,6 +311,7 @@ class MarketDataService:
         start: date | None,
         end: date,
         require_cutoff: bool,
+        coverage_policy: MarketDataCoveragePolicy,
     ) -> pd.DataFrame:
         try:
             frame = self.provider.fetch(series, start=start, end=end)
@@ -275,16 +322,32 @@ class MarketDataService:
         if frame is None or frame.empty:
             raise MarketDataUnavailableError(f"provider returned no data for {series.symbol}")
         normalized, outcome = validate_daily_bars(
-            frame, expected_sessions=self._expected_for(frame)
+            frame, expected_sessions=self._expected_for(frame, coverage_policy)
         )
         if not outcome.is_valid:
             raise MarketDataValidationError("; ".join(outcome.errors))
-        if require_cutoff and outcome.data_cutoff != end:
-            raise MarketDataUnavailableError(
-                f"provider data for {series.symbol} ends at {outcome.data_cutoff}, expected {end}"
-            )
+        if require_cutoff:
+            if outcome.data_cutoff is None:
+                raise MarketDataUnavailableError(
+                    f"provider data for {series.symbol} has no usable observations"
+                )
+            if coverage_policy.requires_complete_sessions and outcome.data_cutoff != end:
+                raise MarketDataUnavailableError(
+                    f"provider data for {series.symbol} ends at {outcome.data_cutoff}, expected {end}"
+                )
+            if not coverage_policy.requires_complete_sessions and outcome.data_cutoff > end:
+                raise MarketDataUnavailableError(
+                    f"provider data for {series.symbol} ends after requested cutoff {end}"
+                )
         return normalized
 
-    def _expected_for(self, frame: pd.DataFrame) -> pd.DatetimeIndex:
+    def _expected_for(
+        self,
+        frame: pd.DataFrame,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> pd.DatetimeIndex | None:
+        policy = coverage_policy or MarketDataCoveragePolicy.xnys()
+        if not policy.requires_complete_sessions:
+            return None
         index = pd.DatetimeIndex(pd.to_datetime(frame.index)).tz_localize(None).normalize()
         return self.calendar.sessions_in_range(index.min().date(), index.max().date())

@@ -5,6 +5,7 @@ VOO-004: Momentum Breakout Pullback Continuation 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.voo_004_momentum_pullback.config import (
     VOO004Config,
@@ -15,8 +16,13 @@ from trading.experiments.voo_004_momentum_pullback.signal_detector import (
 )
 
 
-class VOO004MomentumPullbackStrategy(ExecutionModelStrategy):
+class VOO004MomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VOO-004：Momentum Breakout Pullback Continuation 策略（含成交模型）"""
+
+    bundle_trial_family = "VOO:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "VOO momentum pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% (VOO 流動性佳)
 

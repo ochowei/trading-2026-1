@@ -15,6 +15,7 @@ FXI（中國大型股 ETF）為 EEM 內 ~30% 權重的最大單一國家成分�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_019_eem_fxi_divergence_mr.config import (
     EEM019Config,
@@ -25,8 +26,13 @@ from trading.experiments.eem_019_eem_fxi_divergence_mr.signal_detector import (
 )
 
 
-class EEM019Strategy(ExecutionModelStrategy):
+class EEM019Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-019: EEM-FXI Divergence-Gated Vol-Transition MR"""
+
+    bundle_trial_family = "EEM:eem-fxi-divergence-mr"
+    bundle_trial_hypothesis = (
+        "EEM mean-reversion entries improve when EEM/FXI divergence avoids China-specific weakness."
+    )
 
     slippage_pct: float = 0.001
 

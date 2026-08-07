@@ -20,36 +20,22 @@ XBI-017 訊號偵測器：VIX Implied-Vol Regime Bands Filter Pullback MR
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xbi_017_vix_bands_mr.config import XBI017Config
 
 logger = logging.getLogger(__name__)
 
 
-class XBI017VixBandsMRDetector(BaseSignalDetector):
+class XBI017VixBandsMRDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XBI-017 訊號偵測器"""
 
     def __init__(self, config: XBI017Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -82,13 +68,7 @@ class XBI017VixBandsMRDetector(BaseSignalDetector):
         df["ATR_Regime_Long"] = df["TR"].rolling(self.config.atr_regime_long).mean()
 
         # === ^VIX BANDS gate（XBI-017 核心新增）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，VIX BANDS 過濾停用", self.config.vix_ticker)
-            df["VIX_Close"] = float("nan")
-        else:
-            df["VIX_Close"] = vix_df["Close"].reindex(df.index, method="ffill")
+        df["VIX_Close"] = self.require_auxiliary(self.config.vix_ticker, df.index)["Close"]
 
         return df
 

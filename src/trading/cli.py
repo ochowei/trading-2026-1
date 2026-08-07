@@ -36,6 +36,9 @@ from trading.core.results import compare_experiments, inspect_result, save_resul
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
     AvailabilityPolicy,
+    MarketDataAvailabilityError,
+    MarketDataBundle,
+    MarketDataCoveragePolicy,
     MarketDataRequirement,
     MarketDataSeries,
     SignalDecisionTime,
@@ -100,6 +103,8 @@ def cmd_run(args: argparse.Namespace) -> None:
         names = list_experiments()
 
     explicit_formal_manifest = args.offline or args.snapshot
+    if args.migration_parity is not None and args.offline is None:
+        raise SystemExit("--migration-parity requires --offline MANIFEST")
     default_formal = explicit_formal_manifest is None and not args.ephemeral and not args.legacy
     if (explicit_formal_manifest is not None or default_formal) and len(names) != 1:
         raise SystemExit("formal snapshot execution requires exactly one experiment")
@@ -152,7 +157,14 @@ def cmd_run(args: argparse.Namespace) -> None:
                 run_with_bundle,
                 manifest_path=formal_manifest,
                 current_definition=definition.blob,
-                mode=RunMode.OFFLINE if args.offline is not None else RunMode.ONLINE,
+                mode=(
+                    RunMode.MIGRATION
+                    if args.migration_parity is not None
+                    else RunMode.OFFLINE
+                    if args.offline is not None
+                    else RunMode.ONLINE
+                ),
+                migration_parity_path=args.migration_parity,
             )
         elif args.ephemeral:
             result = strategy.run()
@@ -437,6 +449,7 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
                 qualification_registry=qualification_registry,
                 lifecycle_registry=registry,
                 current_result_fingerprint_resolver=current_result_fingerprint,
+                trial_registry=ExperimentTrialRegistry(Path("results") / "trial_registry.json"),
             )
             drift_registry = LiveDriftRegistry(args.drift_path)
 
@@ -518,6 +531,7 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
                 qualification_registry=QualificationRegistry(args.qualification_path),
                 lifecycle_registry=registry,
                 current_result_fingerprint_resolver=current_result_fingerprint,
+                trial_registry=ExperimentTrialRegistry(Path("results") / "trial_registry.json"),
             )
             writer = FollowupLifecycleRegistry(args.path, shadow_verifier=verifier)
             state = writer.register_shadow_strategy(
@@ -1052,6 +1066,7 @@ def cmd_data_snapshot(args: argparse.Namespace) -> None:
     service = create_default_market_data_service()
     store = create_default_research_data_store()
     definition = None
+    declared_requirements = None
     if args.experiment is not None:
         experiment = get_experiment(args.experiment)
         run_with_bundle = getattr(experiment, "run_with_bundle", None)
@@ -1065,30 +1080,72 @@ def cmd_data_snapshot(args: argparse.Namespace) -> None:
         if not isinstance(captured, ResearchDefinitionSnapshot):
             raise SystemExit("capture_research_definition must return ResearchDefinitionSnapshot")
         definition = captured.blob
+        declaration_factory = getattr(experiment, "market_data_requirements", None)
+        if callable(declaration_factory):
+            try:
+                declared_requirements = MarketDataBundle.validate_requirements(
+                    declaration_factory()
+                )
+            except (TypeError, ValueError, MarketDataAvailabilityError) as exc:
+                raise SystemExit(f"invalid experiment market-data declaration: {exc}") from exc
+            primary_requirement = next(
+                requirement
+                for requirement in declared_requirements
+                if requirement.role == "primary"
+            )
+            if primary_requirement.series.symbol != args.symbol:
+                raise SystemExit(
+                    f"experiment primary {primary_requirement.series.symbol} does not match "
+                    f"requested {args.symbol}"
+                )
+            if primary_requirement.history_start != args.history_start:
+                raise SystemExit(
+                    f"experiment history start {primary_requirement.history_start} does not "
+                    f"match requested {args.history_start}"
+                )
+            declared_auxiliary = tuple(
+                requirement.series.symbol
+                for requirement in declared_requirements
+                if requirement.role == "auxiliary"
+            )
+            if tuple(args.aux) != declared_auxiliary:
+                raise SystemExit(
+                    "requested auxiliary symbols do not match the experiment declaration"
+                )
     primary = MarketDataSeries.yahoo_adjusted_daily(args.symbol)
-    auxiliary = [MarketDataSeries.yahoo_adjusted_daily(symbol) for symbol in args.aux]
-    for series in (primary, *auxiliary):
-        service.refresh(series, mode="full", start=None, end=args.decision)
-    requirements = [
-        MarketDataRequirement(
-            primary,
-            args.history_start,
-            role="primary",
+    if declared_requirements is None:
+        auxiliary = [MarketDataSeries.yahoo_adjusted_daily(symbol) for symbol in args.aux]
+        requirements = [
+            MarketDataRequirement(
+                primary,
+                args.history_start,
+                role="primary",
+            )
+        ]
+        requirements.extend(
+            MarketDataRequirement(
+                series,
+                args.history_start,
+                role="auxiliary",
+                availability_policy=AvailabilityPolicy(
+                    publication_lag_sessions=args.aux_publication_lag,
+                    max_observation_lag_sessions=args.aux_max_observation_lag,
+                    publication_time_known=args.aux_publication_time_known,
+                ),
+            )
+            for series in auxiliary
         )
-    ]
-    requirements.extend(
-        MarketDataRequirement(
-            series,
-            args.history_start,
-            role="auxiliary",
-            availability_policy=AvailabilityPolicy(
-                publication_lag_sessions=args.aux_publication_lag,
-                max_observation_lag_sessions=args.aux_max_observation_lag,
-                publication_time_known=args.aux_publication_time_known,
-            ),
-        )
-        for series in auxiliary
-    )
+    else:
+        requirements = list(declared_requirements)
+    for requirement in requirements:
+        refresh_kwargs = {
+            "mode": "full",
+            "start": None,
+            "end": args.decision,
+        }
+        if requirement.coverage_policy != MarketDataCoveragePolicy.xnys():
+            refresh_kwargs["coverage_policy"] = requirement.coverage_policy
+        service.refresh(requirement.series, **refresh_kwargs)
     manifest = store.create_snapshot(
         service.cache,
         requirements,
@@ -1216,6 +1273,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--legacy",
         action="store_true",
         help="Explicitly persist an unmigrated historical result; never advance latest.json",
+    )
+    run_p.add_argument(
+        "--migration-parity",
+        type=Path,
+        help=(
+            "Persist parity-linked migration evidence from --offline MANIFEST; "
+            "never update latest.json or qualification state"
+        ),
     )
 
     # followup

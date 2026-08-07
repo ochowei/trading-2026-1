@@ -6,6 +6,7 @@ CIBR-015: Momentum Breakout Pullback Continuation Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_015_momentum_pullback.config import (
     CIBR015Config,
@@ -16,8 +17,13 @@ from trading.experiments.cibr_015_momentum_pullback.signal_detector import (
 )
 
 
-class CIBR015Strategy(ExecutionModelStrategy):
+class CIBR015Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-015：Momentum Breakout Pullback Continuation"""
+
+    bundle_trial_family = "CIBR:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "CIBR momentum pullback continuation can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

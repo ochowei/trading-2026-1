@@ -8,6 +8,7 @@ Ported from SPY-004, using RSI(2) signal framework with ExecutionModelBacktester
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.voo_001_rsi2_reversal.config import (
     VOORsi2Config,
@@ -18,8 +19,13 @@ from trading.experiments.voo_001_rsi2_reversal.signal_detector import (
 )
 
 
-class VOORsi2Strategy(ExecutionModelStrategy):
+class VOORsi2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VOO RSI(2) 極端超賣均值回歸 (VOO-001)"""
+
+    bundle_trial_family = "VOO:rsi2-reversal"
+    bundle_trial_hypothesis = (
+        "VOO RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

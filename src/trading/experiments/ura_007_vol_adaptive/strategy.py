@@ -7,6 +7,7 @@ URA-007: 波動率自適應均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_007_vol_adaptive.config import (
     URA007Config,
@@ -17,8 +18,13 @@ from trading.experiments.ura_007_vol_adaptive.signal_detector import (
 )
 
 
-class URA007VolAdaptiveStrategy(ExecutionModelStrategy):
+class URA007VolAdaptiveStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-007：波動率自適應均值回歸"""
+
+    bundle_trial_family = "URA:vol-adaptive"
+    bundle_trial_hypothesis = (
+        "URA volatility-adaptive entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

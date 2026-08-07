@@ -27,7 +27,9 @@ from trading.market_data import (
     SessionCalendar,
 )
 from trading.research_data.definitions import ResearchDefinitionStore
+from trading.research_data.migration import MigrationResultStore
 from trading.research_data.models import DefinitionBlobRef
+from trading.research_data.parity import MigrationParityEvidenceError, MigrationParityStore
 from trading.research_data.result_schema import (
     build_result_payload,
     declares_incomplete_result,
@@ -42,6 +44,7 @@ class RunMode(StrEnum):
 
     ONLINE = "online"
     OFFLINE = "offline"
+    MIGRATION = "migration"
     EPHEMERAL = "ephemeral"
 
 
@@ -96,12 +99,18 @@ class ResearchRunCoordinator:
         manifest_path: Path,
         current_definition: DefinitionBlobRef | None = None,
         mode: RunMode | str = RunMode.ONLINE,
+        migration_parity_path: Path | None = None,
     ) -> ResearchRunOutcome:
         """Verify evidence, run once, then apply the selected publication rule."""
         try:
             run_mode = RunMode(mode)
         except ValueError:
-            raise ValueError("mode must be online, offline, or ephemeral") from None
+            raise ValueError("mode must be online, offline, migration, or ephemeral") from None
+        if run_mode is RunMode.MIGRATION and migration_parity_path is None:
+            raise RunEvidenceError("migration runs require a passing migration parity artifact")
+        if run_mode is not RunMode.MIGRATION and migration_parity_path is not None:
+            raise RunEvidenceError("migration parity evidence is only valid for migration runs")
+        migration_parity_digest: str | None = None
         if not experiment_name or Path(experiment_name).name != experiment_name:
             raise ValueError("experiment_name must be one safe path segment")
         snapshot = self.store.load_snapshot(manifest_path)
@@ -115,6 +124,32 @@ class ResearchRunCoordinator:
             if current_definition != snapshot.manifest.definition:
                 raise RunEvidenceError(
                     "current exact research definition does not match snapshot evidence"
+                )
+        if run_mode is RunMode.MIGRATION:
+            try:
+                parity = MigrationParityStore.load(Path(migration_parity_path))
+            except MigrationParityEvidenceError as exc:
+                raise RunEvidenceError(
+                    f"migration parity evidence cannot be verified: {exc}"
+                ) from exc
+            if parity.get("experiment_name") != experiment_name:
+                raise RunEvidenceError("migration parity experiment does not match execution")
+            if parity.get("snapshot_id") != snapshot.manifest.snapshot_id:
+                raise RunEvidenceError("migration parity snapshot does not match execution")
+            if parity.get("passed") is not True:
+                raise RunEvidenceError("migration execution requires passing parity evidence")
+            migration_parity_digest = parity.get("parity_digest")
+            if not isinstance(migration_parity_digest, str):  # pragma: no cover - store validates
+                raise RunEvidenceError("migration parity digest is missing")
+            definitions = parity.get("definitions")
+            if not isinstance(definitions, dict) or current_definition is None:
+                raise RunEvidenceError("migration parity migrated definition is missing")
+            if definitions.get("migrated") not in {
+                current_definition.fingerprint,
+                current_definition.digest,
+            }:
+                raise RunEvidenceError(
+                    "migration parity migrated definition does not match current definition"
                 )
         current_time: datetime | None = None
         if run_mode is RunMode.ONLINE:
@@ -212,6 +247,14 @@ class ResearchRunCoordinator:
                 "definition_fingerprint": definition.fingerprint if definition else None,
                 "run_mode": run_mode.value,
             }
+            if run_mode is RunMode.MIGRATION:
+                raw_metadata["reproducibility"].update(
+                    {
+                        "migration_parity_artifact": str(Path(migration_parity_path)),
+                        "migration_parity_digest": migration_parity_digest,
+                        "requalification_required": True,
+                    }
+                )
             if definition is not None:
                 if definition_payload is None:  # pragma: no cover - established above
                     raise RunEvidenceError("formal run lacks exact definition evidence")
@@ -239,6 +282,29 @@ class ResearchRunCoordinator:
             raise ValueError("research run clock must be timezone-aware")
         directory = self.results_root / experiment_name
         directory.mkdir(parents=True, exist_ok=True)
+        if run_mode is RunMode.MIGRATION:
+            migration_path = directory / (f"{snapshot.manifest.snapshot_id}.migration-result.json")
+            try:
+                published = MigrationResultStore.write(
+                    result,
+                    experiment_name=experiment_name,
+                    parity_path=Path(migration_parity_path),
+                    path=migration_path,
+                )
+            except Exception as exc:
+                retain_failure(exc, result_path=migration_path)
+                raise
+            if definition is not None and experiment_family is not None:
+                self._record_success(
+                    experiment_family=experiment_family,
+                    definition_fingerprint=definition.fingerprint,
+                    snapshot_id=snapshot.manifest.snapshot_id,
+                    run_mode=run_mode,
+                    observation_id=run_id,
+                    result_path=published,
+                    validity_status="migration-pending",
+                )
+            return ResearchRunOutcome(result, run_mode, published, None)
         stamp = current_time.astimezone(UTC).strftime("%Y%m%d_%H%M%S_%f")
         historical = directory / f"{stamp}_{run_mode.value}_{uuid.uuid4().hex}.json"
         try:
@@ -257,6 +323,7 @@ class ResearchRunCoordinator:
                 run_mode=run_mode,
                 observation_id=run_id,
                 result_path=historical,
+                validity_status="valid",
             )
         if run_mode is RunMode.OFFLINE:
             return ResearchRunOutcome(result, run_mode, historical, None)
@@ -282,6 +349,7 @@ class ResearchRunCoordinator:
         run_mode: RunMode,
         observation_id: str,
         result_path: Path,
+        validity_status: str,
     ) -> None:
         self.trial_registry.record_observation(
             experiment_family,
@@ -290,7 +358,7 @@ class ResearchRunCoordinator:
             result_path=result_path,
             run_mode=run_mode.value,
             outcome_status="succeeded",
-            validity_status="valid",
+            validity_status=validity_status,
             observation_id=observation_id,
         )
 

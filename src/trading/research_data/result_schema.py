@@ -39,6 +39,7 @@ class ResultValidityStatus(StrEnum):
     DEFINITION_STALE = "definition-stale"
     UNREPRODUCIBLE = "unreproducible"
     LEGACY = "legacy"
+    MIGRATION_PENDING = "migration-pending"
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,7 +117,14 @@ def build_result_payload(
     payload.update(
         {
             "schema_version": CURRENT_RESULT_SCHEMA_VERSION,
-            "validity": {"status": ResultValidityStatus.VALID.value, "reasons": []},
+            "validity": {
+                "status": (
+                    ResultValidityStatus.MIGRATION_PENDING.value
+                    if run_mode == "migration"
+                    else ResultValidityStatus.VALID.value
+                ),
+                "reasons": [],
+            },
             "data_snapshot_id": manifest.snapshot_id,
             "data_snapshot_manifest": str(Path(manifest_path)),
             "data_cutoff": manifest.decision_time.session.isoformat(),
@@ -274,6 +282,7 @@ def classify_result(
         errors.append("current research-definition fingerprint differs")
 
     data_stale = False
+    migration_pending = payload.get("run_mode") == "migration"
     if snapshot is not None:
         current_time = now or datetime.now(UTC)
         if current_time.tzinfo is None:
@@ -302,6 +311,8 @@ def classify_result(
         status = ResultValidityStatus.DEFINITION_STALE
     elif data_stale:
         status = ResultValidityStatus.DATA_STALE
+    elif migration_pending:
+        status = ResultValidityStatus.MIGRATION_PENDING
     elif errors:
         status = ResultValidityStatus.UNREPRODUCIBLE
     else:

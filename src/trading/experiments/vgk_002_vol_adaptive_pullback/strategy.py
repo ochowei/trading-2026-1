@@ -7,6 +7,7 @@ VGK-002: Volatility-Adaptive Pullback + WR Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_002_vol_adaptive_pullback.config import (
     VGK002Config,
@@ -17,8 +18,13 @@ from trading.experiments.vgk_002_vol_adaptive_pullback.signal_detector import (
 )
 
 
-class VGK002Strategy(ExecutionModelStrategy):
+class VGK002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK Volatility-Adaptive Pullback MR (VGK-002)"""
+
+    bundle_trial_family = "VGK:vol-adaptive-pullback"
+    bundle_trial_hypothesis = (
+        "VGK volatility-adaptive pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

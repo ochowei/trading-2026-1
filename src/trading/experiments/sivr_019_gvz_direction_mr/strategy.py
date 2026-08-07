@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.15% slippage + pessimistic intrabar
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_019_gvz_direction_mr.config import (
     SIVR019Config,
@@ -15,7 +16,10 @@ from trading.experiments.sivr_019_gvz_direction_mr.signal_detector import (
 )
 
 
-class SIVR019Strategy(ExecutionModelStrategy):
+class SIVR019Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "SIVR:gvz-direction"
+    bundle_trial_hypothesis = "Silver pullbacks improve when gold-volatility direction confirms a stabilizing precious-metals regime."
+
     """SIVR GVZ Direction-Floor Filter MR (SIVR-019)"""
 
     slippage_pct: float = 0.0015

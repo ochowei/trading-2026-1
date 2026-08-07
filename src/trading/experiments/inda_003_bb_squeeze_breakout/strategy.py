@@ -8,6 +8,7 @@ Att3 轉向均值回歸改進：20日回看（GLD 模板）+ 2日急跌（URA/US
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_003_bb_squeeze_breakout.config import (
     INDA003Config,
@@ -18,8 +19,13 @@ from trading.experiments.inda_003_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class INDA003Strategy(ExecutionModelStrategy):
+class INDA003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA 20日回檔+2日急跌均值回歸 (INDA-003)"""
+
+    bundle_trial_family = "INDA:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "INDA volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

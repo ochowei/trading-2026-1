@@ -17,36 +17,22 @@ TSLA-020 訊號偵測器：TSLA-USD(UUP) Direction Regime-Gated BB Squeeze Break
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsla_020_usd_regime_breakout.config import TSLA020Config
 
 logger = logging.getLogger(__name__)
 
 
-class TSLA020USDRegimeBreakoutDetector(BaseSignalDetector):
+class TSLA020USDRegimeBreakoutDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSLA-020：TSLA-QQQ divergence + USD(UUP) regime gate + BB Squeeze breakout"""
 
     def __init__(self, config: TSLA020Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.benchmark_ticker, self.config.usd_benchmark)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -84,36 +70,18 @@ class TSLA020USDRegimeBreakoutDetector(BaseSignalDetector):
         div_n = self.config.divergence_lookback
         df["TSLA_Ret_N"] = df["Close"].pct_change(div_n)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
         # === QQQ benchmark cross-asset divergence（沿用 TSLA-017 Att3）===
-        bench_df = self._fetch_external(self.config.benchmark_ticker, start_date)
-        if bench_df is None or bench_df.empty:
-            logger.error(
-                "無法取得 %s 數據，TSLA-QQQ divergence 過濾停用",
-                self.config.benchmark_ticker,
-            )
-            df["Bench_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            bench_close = bench_df["Close"].reindex(df.index, method="ffill")
-            df["Bench_Ret_N"] = bench_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["TSLA_Ret_N"] - df["Bench_Ret_N"]
+        bench_df = self.require_auxiliary(self.config.benchmark_ticker, df.index)
+        bench_close = bench_df["Close"]
+        df["Bench_Ret_N"] = bench_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["TSLA_Ret_N"] - df["Bench_Ret_N"]
 
         # === USD (UUP) regime gate（TSLA-020 核心新增）===
         usd_n = self.config.usd_lookback
-        usd_df = self._fetch_external(self.config.usd_benchmark, start_date)
-        if usd_df is None or usd_df.empty:
-            logger.error(
-                "無法取得 %s 數據，USD regime gate 停用",
-                self.config.usd_benchmark,
-            )
-            df["USD_Ret_N"] = 0.0
-            df["TSLA_minus_USD_N"] = 0.0
-        else:
-            usd_close = usd_df["Close"].reindex(df.index, method="ffill")
-            df["USD_Ret_N"] = usd_close.pct_change(usd_n)
-            df["TSLA_minus_USD_N"] = df["TSLA_Ret_N"] - df["USD_Ret_N"]
+        usd_df = self.require_auxiliary(self.config.usd_benchmark, df.index)
+        usd_close = usd_df["Close"]
+        df["USD_Ret_N"] = usd_close.pct_change(usd_n)
+        df["TSLA_minus_USD_N"] = df["TSLA_Ret_N"] - df["USD_Ret_N"]
 
         return df
 

@@ -4,6 +4,7 @@ SIVR RSI Bullish Divergence + Pullback+WR Mean Reversion Strategy (SIVR-015)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_015_rsi_divergence_mr.config import (
     SIVRRSIDivergenceMRConfig,
@@ -14,8 +15,13 @@ from trading.experiments.sivr_015_rsi_divergence_mr.signal_detector import (
 )
 
 
-class SIVRRSIDivergenceMRStrategy(ExecutionModelStrategy):
+class SIVRRSIDivergenceMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-015：RSI bullish hook + SIVR-005 回檔+WR 均值回歸"""
+
+    bundle_trial_family = "SIVR:rsi-divergence-mr"
+    bundle_trial_hypothesis = (
+        "SIVR RSI divergence pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

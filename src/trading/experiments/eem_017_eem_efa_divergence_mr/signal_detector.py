@@ -28,36 +28,22 @@ EEM-EFA divergence filter 的設計依據：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.eem_017_eem_efa_divergence_mr.config import EEM017Config
 
 logger = logging.getLogger(__name__)
 
 
-class EEM017DivergenceDetector(BaseSignalDetector):
+class EEM017DivergenceDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EEM-017 EEM-EFA Divergence-Gated Vol-Transition MR"""
 
     def __init__(self, config: EEM017Config):
         self.config = config
 
-    def _fetch_efa_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.efa_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.efa_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.efa_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -105,19 +91,9 @@ class EEM017DivergenceDetector(BaseSignalDetector):
         eem_n_return = df["Close"].pct_change(self.config.rel_lookback)
 
         # EFA cross-asset divergence
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        efa_df = self._fetch_efa_data(start_date)
-
-        if efa_df is None or efa_df.empty:
-            logger.error(
-                "無法取得 %s 數據，EEM-EFA divergence 過濾停用",
-                self.config.efa_ticker,
-            )
-            df["RelDiff"] = 0.0
-        else:
-            efa_close = efa_df["Close"].reindex(df.index, method="ffill")
-            efa_n_return = efa_close.pct_change(self.config.rel_lookback)
-            df["RelDiff"] = eem_n_return - efa_n_return
+        efa_df = self.require_auxiliary(self.config.efa_ticker, df.index)
+        efa_n_return = efa_df["Close"].pct_change(self.config.rel_lookback)
+        df["RelDiff"] = eem_n_return - efa_n_return
 
         return df
 

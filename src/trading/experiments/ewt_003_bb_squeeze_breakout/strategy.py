@@ -8,6 +8,7 @@ EWT-003: BB Squeeze Breakout
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_003_bb_squeeze_breakout.config import (
     EWT003Config,
@@ -18,8 +19,13 @@ from trading.experiments.ewt_003_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class EWT003Strategy(ExecutionModelStrategy):
+class EWT003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT BB Squeeze Breakout (EWT-003)"""
+
+    bundle_trial_family = "EWT:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "EWT BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

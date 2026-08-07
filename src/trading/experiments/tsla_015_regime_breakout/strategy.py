@@ -7,6 +7,7 @@ TSLA-015: Multi-Week Regime-Aware BB Squeeze Breakout 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_015_regime_breakout.config import (
     TSLA015Config,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_015_regime_breakout.signal_detector import (
 )
 
 
-class TSLA015RegimeBreakoutStrategy(ExecutionModelStrategy):
+class TSLA015RegimeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:regime-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA regime-aware breakouts can be reproduced from a verified primary bundle."
+    )
     """TSLA-015: 多週期 regime 過濾 BB Squeeze Breakout（含成交模型）"""
 
     slippage_pct: float = 0.0015

@@ -24,14 +24,18 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.iwm_015_macro_confirmed_mr.config import IWM015Config
 
 logger = logging.getLogger(__name__)
 
 
-class IWM015SignalDetector(BaseSignalDetector):
+class IWM015SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     def __init__(self, config: IWM015Config):
         self.config = config
+
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.macro_ticker,)
 
     @staticmethod
     def _compute_rsi(series: pd.Series, period: int) -> pd.Series:
@@ -69,14 +73,9 @@ class IWM015SignalDetector(BaseSignalDetector):
         atr_long = tr.rolling(self.config.atr_long_period).mean()
         df["ATR_Ratio"] = atr_short / atr_long
 
-        # IWM-015 新增：QQQ N 日報酬（QQQ_Close 由 strategy.run() 合併進來）
-        if "QQQ_Close" in df.columns:
-            df["QQQ_Return_Nd"] = (
-                df["QQQ_Close"] - df["QQQ_Close"].shift(self.config.macro_lookback)
-            ) / df["QQQ_Close"].shift(self.config.macro_lookback)
-        else:
-            logger.warning("IWM-015: QQQ_Close 欄位缺失，macro confirmation 將停用")
-            df["QQQ_Return_Nd"] = pd.Series(float("-inf"), index=df.index)
+        # IWM-015 新增：QQQ N 日報酬（由 verified auxiliary bundle 提供）
+        qqq_close = self.require_auxiliary(self.config.macro_ticker, df.index)["Close"]
+        df["QQQ_Return_Nd"] = qqq_close.pct_change(self.config.macro_lookback)
 
         return df
 

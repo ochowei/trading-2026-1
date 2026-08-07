@@ -29,3 +29,25 @@ jobs:
 
       - name: Format check
         run: uv run ruff format --check src/
+
+      - name: Phase 9 market-data bypass policy
+        shell: bash
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            base_allowlist="$RUNNER_TEMP/phase9-base-allowlist.json"
+            if git cat-file -e "${{ github.event.pull_request.base.sha }}:ci/market-data-bypass-allowlist.json" 2>/dev/null; then
+              git show "${{ github.event.pull_request.base.sha }}:ci/market-data-bypass-allowlist.json" > "$base_allowlist"
+              uv run python tools/check_experiment_market_data_access.py \
+                --allowlist ci/market-data-bypass-allowlist.json \
+                --base-allowlist "$base_allowlist"
+            else
+              uv run python tools/check_experiment_market_data_access.py \
+                --allowlist ci/market-data-bypass-allowlist.json
+            fi
+          else
+            uv run python tools/check_experiment_market_data_access.py \
+              --allowlist ci/market-data-bypass-allowlist.json
+          fi
+
+      - name: Phase 9 market-data policy tests
+        run: uv run pytest -q tests/test_market_data_migration_policy.py

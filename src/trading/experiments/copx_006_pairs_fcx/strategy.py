@@ -8,6 +8,7 @@ COPX RSI(2) Short-Term Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_006_pairs_fcx.config import (
     COPXRsi2Config,
@@ -18,10 +19,15 @@ from trading.experiments.copx_006_pairs_fcx.signal_detector import (
 )
 
 
-class COPXPairsFCXStrategy(ExecutionModelStrategy):
+class COPXPairsFCXStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-006：RSI(2) 短期均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
+
+    bundle_trial_family = "COPX:pairs-fcx"
+    bundle_trial_hypothesis = (
+        "COPX and FCX pair entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

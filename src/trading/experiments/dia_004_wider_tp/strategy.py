@@ -7,6 +7,7 @@ DIA-004: RSI(2) 寬獲利目標均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_004_wider_tp.config import (
     DIARsi2WiderTPConfig,
@@ -17,8 +18,13 @@ from trading.experiments.dia_004_wider_tp.signal_detector import (
 )
 
 
-class DIARsi2WiderTPStrategy(ExecutionModelStrategy):
+class DIARsi2WiderTPStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA RSI(2) 寬獲利目標均值回歸 (DIA-004)"""
+
+    bundle_trial_family = "DIA:wider-tp"
+    bundle_trial_hypothesis = (
+        "DIA RSI(2) with a wider target can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

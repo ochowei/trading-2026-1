@@ -7,6 +7,7 @@ VGK-004: 崩盤隔離回檔+WR+ATR 均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_004_crash_isolated_mr.config import (
     VGK004Config,
@@ -17,8 +18,13 @@ from trading.experiments.vgk_004_crash_isolated_mr.signal_detector import (
 )
 
 
-class VGK004Strategy(ExecutionModelStrategy):
+class VGK004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK 崩盤隔離回檔+WR+ATR 均值回歸 (VGK-004)"""
+
+    bundle_trial_family = "VGK:crash-isolated-mr"
+    bundle_trial_hypothesis = (
+        "VGK crash-isolated mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

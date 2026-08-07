@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_017_yield_curve_slope_mr.config import (
     COPX017Config,
@@ -12,8 +13,11 @@ from trading.experiments.copx_017_yield_curve_slope_mr.signal_detector import (
 )
 
 
-class COPX017YieldCurveSlopeMRStrategy(ExecutionModelStrategy):
+class COPX017YieldCurveSlopeMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-017: vol-adaptive MR + yield curve slope velocity regime gate"""
+
+    bundle_trial_family = "COPX:yield-curve-slope-mr"
+    bundle_trial_hypothesis = "COPX capitulation mean reversion improves when the Treasury curve avoids a recessionary flattening regime."
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
 

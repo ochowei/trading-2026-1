@@ -23,6 +23,7 @@ EEM-022: Global-Equity Macro-Context Confirmation Gate on Vol-Transition MR Stra
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_022_global_macro_context_mr.config import (
     EEM022Config,
@@ -33,8 +34,13 @@ from trading.experiments.eem_022_global_macro_context_mr.signal_detector import 
 )
 
 
-class EEM022Strategy(ExecutionModelStrategy):
+class EEM022Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM Global-Equity Macro-Context Confirmation Gate on Vol-Transition MR (EEM-022)"""
+
+    bundle_trial_family = "EEM:global-macro-context-mr"
+    bundle_trial_hypothesis = (
+        "EEM mean-reversion entries improve when SPY confirms a broad risk-off regime."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

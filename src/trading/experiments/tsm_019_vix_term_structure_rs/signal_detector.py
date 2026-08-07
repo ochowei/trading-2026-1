@@ -14,62 +14,38 @@ TSM-019 訊號偵測器：VIX Term-Structure Regime Gate on RS Momentum Pullback
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsm_019_vix_term_structure_rs.config import TSM019Config
 
 logger = logging.getLogger(__name__)
 
 
-class TSM019Detector(BaseSignalDetector):
+class TSM019Detector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSM-019：VIX Term-Structure Regime Gate on RS Momentum Pullback"""
 
     def __init__(self, config: TSM019Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (
+            self.config.reference_ticker,
+            self.config.vix_ticker,
+            self.config.vix3m_ticker,
+        )
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         cfg = self.config
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
-        smh_df = self._fetch_external(cfg.reference_ticker, start_date)
-        if smh_df is None or smh_df.empty:
-            logger.error("無法取得 %s 數據，無法計算相對強度", cfg.reference_ticker)
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            df["Ret_1d"] = 0.0
-            df["Ret_5d"] = 0.0
-            df["VIX_Term_Ratio"] = 1.0
-            return df
-
-        common_idx = df.index.intersection(smh_df.index)
-        df = df.loc[common_idx]
+        smh_df = self.require_auxiliary(cfg.reference_ticker, df.index)
 
         df["SMA_Trend"] = df["Close"].rolling(cfg.sma_trend_period).mean()
 
         period = cfg.relative_strength_period
         df["TSM_Return"] = df["Close"].pct_change(period)
-        df["SMH_Return"] = smh_df.loc[common_idx, "Close"].pct_change(period)
+        df["SMH_Return"] = smh_df["Close"].pct_change(period)
         df["Relative_Strength"] = df["TSM_Return"] - df["SMH_Return"]
 
         lookback = cfg.pullback_lookback
@@ -80,22 +56,11 @@ class TSM019Detector(BaseSignalDetector):
         df["Ret_5d"] = df["Close"].pct_change(5)
 
         # === VIX term structure (^VIX3M / ^VIX) ===
-        vix_df = self._fetch_external(cfg.vix_ticker, start_date)
-        vix3m_df = self._fetch_external(cfg.vix3m_ticker, start_date)
-
-        if vix_df is None or vix_df.empty or vix3m_df is None or vix3m_df.empty:
-            logger.error(
-                "無法取得 %s / %s 數據，VIX term structure 過濾停用",
-                cfg.vix_ticker,
-                cfg.vix3m_ticker,
-            )
-            df["VIX_Term_Ratio"] = 1.0
-        else:
-            vix_close = vix_df["Close"].reindex(df.index, method="ffill")
-            vix3m_close = vix3m_df["Close"].reindex(df.index, method="ffill")
-            df["VIX_Close"] = vix_close
-            df["VIX3M_Close"] = vix3m_close
-            df["VIX_Term_Ratio"] = vix3m_close / vix_close
+        vix_close = self.require_auxiliary(cfg.vix_ticker, df.index)["Close"]
+        vix3m_close = self.require_auxiliary(cfg.vix3m_ticker, df.index)["Close"]
+        df["VIX_Close"] = vix_close
+        df["VIX3M_Close"] = vix3m_close
+        df["VIX_Term_Ratio"] = vix3m_close / vix_close
 
         return df
 

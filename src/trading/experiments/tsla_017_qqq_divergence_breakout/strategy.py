@@ -9,6 +9,7 @@ TSLA-017: TSLA-QQQ Cross-Asset Divergence Regime-Gated BB Squeeze Breakout 策�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_017_qqq_divergence_breakout.config import (
     TSLA017Config,
@@ -19,7 +20,11 @@ from trading.experiments.tsla_017_qqq_divergence_breakout.signal_detector import
 )
 
 
-class TSLA017QQQDivergenceBreakoutStrategy(ExecutionModelStrategy):
+class TSLA017QQQDivergenceBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:qqq-divergence-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA breakout continuation improves when performance remains strong versus QQQ."
+    )
     """TSLA-017: TSLA-QQQ 跨資產背離 regime gate + BB Squeeze breakout（含成交模型）"""
 
     slippage_pct: float = 0.0015

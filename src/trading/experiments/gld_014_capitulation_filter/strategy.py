@@ -32,6 +32,7 @@ GLD-014: Signal-Day Capitulation-Strength Filter Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_014_capitulation_filter.config import (
     GLD014Config,
@@ -42,8 +43,13 @@ from trading.experiments.gld_014_capitulation_filter.signal_detector import (
 )
 
 
-class GLD014Strategy(ExecutionModelStrategy):
+class GLD014Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD Signal-Day Capitulation-Strength Filter MR (GLD-014)"""
+
+    bundle_trial_family = "GLD:capitulation-filter"
+    bundle_trial_hypothesis = (
+        "GLD signal-day capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

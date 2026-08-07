@@ -6,6 +6,7 @@ XBI-008: Pairs Trading (XBI/IBB) 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_008_pairs_ibb.config import (
     XBI008Config,
@@ -16,7 +17,12 @@ from trading.experiments.xbi_008_pairs_ibb.signal_detector import (
 )
 
 
-class XBIPairsIBBStrategy(ExecutionModelStrategy):
+class XBIPairsIBBStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XBI:ibb-pairs"
+    bundle_trial_hypothesis = (
+        "XBI relative undervaluation versus IBB reverts under a trend-confirmed pairs signal."
+    )
+
     """XBI-008: Pairs Trading XBI/IBB（含成交模型）"""
 
     slippage_pct: float = 0.001

@@ -7,6 +7,7 @@ EEM-016: DXY Direction Filter on Vol-Transition MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_016_dxy_direction_mr.config import (
     EEM016Config,
@@ -17,8 +18,13 @@ from trading.experiments.eem_016_dxy_direction_mr.signal_detector import (
 )
 
 
-class EEM016Strategy(ExecutionModelStrategy):
+class EEM016Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-016: DXY Direction-Gated Vol-Transition MR"""
+
+    bundle_trial_family = "EEM:dxy-direction-mr"
+    bundle_trial_hypothesis = (
+        "EEM mean-reversion entries improve when DXY does not confirm USD-driven weakness."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

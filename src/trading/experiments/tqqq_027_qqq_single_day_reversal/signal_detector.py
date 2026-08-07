@@ -11,59 +11,37 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_027_qqq_single_day_reversal.config import TQQQ027Config
 
 logger = logging.getLogger(__name__)
 
 
-class TQQQ027SignalDetector(BaseSignalDetector):
+class TQQQ027SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """QQQ 單日動量反轉訊號偵測器（訊號基於 QQQ，交易 TQQQ）"""
 
     def __init__(self, config: TQQQ027Config):
         self.config = config
 
-    def _fetch_ohlcv(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.qqq_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         cfg = self.config
-        start_date = df.index[0].strftime("%Y-%m-%d")
+        qqq = self.require_auxiliary(cfg.qqq_ticker, df.index)
 
-        qqq = self._fetch_ohlcv(cfg.qqq_ticker, start_date)
-        if qqq is None:
-            logger.error("無法取得 %s 數據，QQQ 單日反轉訊號停用", cfg.qqq_ticker)
-            df["QQQ_ROC1"] = float("nan")
-            df["QQQ_ClosePos"] = float("nan")
-            df["QQQ_Vol_Spike"] = False
-            return df
-
-        q_close = qqq["Close"].reindex(df.index, method="ffill")
-        q_high = qqq["High"].reindex(df.index, method="ffill")
-        q_low = qqq["Low"].reindex(df.index, method="ffill")
+        q_close = qqq["Close"]
+        q_high = qqq["High"]
+        q_low = qqq["Low"]
 
         df["QQQ_ROC1"] = q_close.pct_change(1) * 100
         rng = (q_high - q_low).replace(0.0, float("nan"))
         df["QQQ_ClosePos"] = (q_close - q_low) / rng
 
-        q_vol = qqq["Volume"].reindex(df.index, method="ffill")
+        q_vol = qqq["Volume"]
         q_vol_sma = q_vol.rolling(cfg.qqq_volume_sma_period).mean()
         df["QQQ_Vol_Spike"] = q_vol > cfg.qqq_volume_multiplier * q_vol_sma
 

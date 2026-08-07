@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_008_vix_implied_vol_mr.config import (
     EWZ008Config,
@@ -12,10 +13,12 @@ from trading.experiments.ewz_008_vix_implied_vol_mr.signal_detector import (
 )
 
 
-class EWZ008Strategy(ExecutionModelStrategy):
+class EWZ008Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ-008：EWZ-007 Att3 框架 + ^VIX forward-looking implied vol regime gate"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "EWZ:vix-implied-vol-mr"
+    bundle_trial_hypothesis = "EWZ mean-reversion entries improve when broad-market implied volatility avoids an adverse regime."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -6,6 +6,7 @@ SIVR 極端超賣均值回歸策略 (SIVR Deep Oversold Mean Reversion Strategy)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_001_mean_reversion.config import (
     SIVRMeanReversionConfig,
@@ -16,8 +17,13 @@ from trading.experiments.sivr_001_mean_reversion.signal_detector import (
 )
 
 
-class SIVRMeanReversionStrategy(ExecutionModelStrategy):
+class SIVRMeanReversionStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-001：極端超賣均值回歸"""
+
+    bundle_trial_family = "SIVR:mean-reversion"
+    bundle_trial_hypothesis = (
+        "SIVR deep oversold mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

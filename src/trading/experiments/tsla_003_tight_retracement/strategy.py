@@ -7,6 +7,7 @@ TSLA Tight Retracement Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_003_tight_retracement.config import (
     TSLATightRetracementConfig,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_003_tight_retracement.signal_detector import (
 )
 
 
-class TSLATightRetracementStrategy(ExecutionModelStrategy):
+class TSLATightRetracementStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:tight-retracement"
+    bundle_trial_hypothesis = (
+        "TSLA tight retracement entries can be reproduced from a verified primary bundle."
+    )
     """TSLA-003：緊密回撤範圍均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

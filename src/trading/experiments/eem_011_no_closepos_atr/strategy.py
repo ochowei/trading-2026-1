@@ -4,6 +4,7 @@ EEM-011: 無 ClosePos + ATR 波動率自適應 RSI(2)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_011_no_closepos_atr.config import (
     EEM011Config,
@@ -14,8 +15,11 @@ from trading.experiments.eem_011_no_closepos_atr.signal_detector import (
 )
 
 
-class EEM011Strategy(ExecutionModelStrategy):
+class EEM011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 無 ClosePos + ATR RSI(2) 均值回歸 (EEM-011)"""
+
+    bundle_trial_family = "EEM:no-closepos-atr"
+    bundle_trial_hypothesis = "EEM ATR-filtered mean reversion without close-position confirmation can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

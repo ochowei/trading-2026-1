@@ -8,6 +8,7 @@ sharp panic pullbacks from gradual declines.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_012_vol_adaptive_mr.config import (
     SIVRVolAdaptiveMRConfig,
@@ -18,8 +19,13 @@ from trading.experiments.sivr_012_vol_adaptive_mr.signal_detector import (
 )
 
 
-class SIVRVolAdaptiveMRStrategy(ExecutionModelStrategy):
+class SIVRVolAdaptiveMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR 波動率自適應均值回歸 (SIVR-012)"""
+
+    bundle_trial_family = "SIVR:vol-adaptive-mr"
+    bundle_trial_hypothesis = (
+        "SIVR volatility-adaptive mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

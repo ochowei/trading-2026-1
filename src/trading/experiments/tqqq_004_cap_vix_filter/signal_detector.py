@@ -8,13 +8,14 @@ import logging
 
 import pandas as pd
 
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_001_capitulation.signal_detector import TQQQSignalDetector
 from trading.experiments.tqqq_004_cap_vix_filter.config import TQQQCapVixFilterConfig
 
 logger = logging.getLogger(__name__)
 
 
-class TQQQCapVixFilterDetector(TQQQSignalDetector):
+class TQQQCapVixFilterDetector(DeclaredAuxiliaryData, TQQQSignalDetector):
     """
     TQQQ VIX 過濾訊號偵測器 (TQQQ VIX Filter Signal Detector)
 
@@ -29,18 +30,18 @@ class TQQQCapVixFilterDetector(TQQQSignalDetector):
         super().__init__(config)
         self.vix_config = config
 
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.vix_config.vix_ticker,)
+
+    def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = super().compute_indicators(df)
+        df["VIX"] = self.require_auxiliary(self.vix_config.vix_ticker, df.index)["Close"]
+        return df
+
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         """偵測訊號：原始三條件 + VIX 過濾"""
         # 先用原始邏輯偵測（含冷卻機制）
         df = super().detect_signals(df)
-
-        # 若 DataFrame 中沒有 VIX 欄位，直接返回（不做過濾）
-        if "VIX" not in df.columns:
-            logger.warning(
-                "[TQQQCapVixFilterDetector] DataFrame 中無 VIX 欄位，跳過 VIX 過濾 "
-                "(No VIX column found, skipping VIX filter)"
-            )
-            return df
 
         # 新增 VIX 過濾條件
         vix_mask = df["VIX"] > self.vix_config.vix_threshold

@@ -17,25 +17,26 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_015_qqq_trend_breakout.config import TQQQQqqBreakoutConfig
 
 logger = logging.getLogger(__name__)
 
 
-class TQQQQqqBreakoutDetector(BaseSignalDetector):
+class TQQQQqqBreakoutDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """QQQ Momentum 訊號偵測器（訊號基於 QQQ，交易 TQQQ）"""
 
     def __init__(self, config: TQQQQqqBreakoutConfig):
         self.config = config
 
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.qqq_ticker,)
+
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        if "QQQ_Close" not in df.columns:
-            logger.warning("QQQ_Close not found, cannot compute momentum indicators")
-            return df
-
-        qqq = df["QQQ_Close"]
+        qqq = self.require_auxiliary(self.config.qqq_ticker, df.index)["Close"]
+        df["QQQ_Close"] = qqq
 
         # 10-day Rate of Change
         df["QQQ_ROC10"] = qqq.pct_change(periods=10) * 100
@@ -50,10 +51,6 @@ class TQQQQqqBreakoutDetector(BaseSignalDetector):
 
     def detect_signals(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
-
-        if "QQQ_Close" not in df.columns:
-            df["Signal"] = False
-            return df
 
         # 1. Strong 10-day momentum (QQQ up >5% in 10 days)
         cond_momentum = df["QQQ_ROC10"] > self.config.momentum_threshold

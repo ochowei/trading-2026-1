@@ -8,6 +8,7 @@ MR regime 的高波動資產（SIVR 2.34% vol、1.5-2x GLD）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_016_wvf_capitulation_mr.config import (
     SIVR016Config,
@@ -18,8 +19,11 @@ from trading.experiments.sivr_016_wvf_capitulation_mr.signal_detector import (
 )
 
 
-class SIVR016Strategy(ExecutionModelStrategy):
+class SIVR016Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR Williams Vix Fix Capitulation MR (SIVR-016)"""
+
+    bundle_trial_family = "SIVR:wvf-capitulation-mr"
+    bundle_trial_hypothesis = "SIVR Williams Vix Fix capitulation mean reversion can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.0015  # SIVR 標準滑價（同 SIVR-015）
 

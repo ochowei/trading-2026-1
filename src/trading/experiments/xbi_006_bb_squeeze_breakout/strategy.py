@@ -10,6 +10,7 @@ XBI-006: Bollinger Band Squeeze Breakout 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_006_bb_squeeze_breakout.config import (
     XBI006Config,
@@ -20,8 +21,13 @@ from trading.experiments.xbi_006_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class XBI006BBSqueezeStrategy(ExecutionModelStrategy):
+class XBI006BBSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-006：BB Squeeze Breakout 策略（含成交模型）"""
+
+    bundle_trial_family = "XBI:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "XBI BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -20,6 +20,7 @@ ratio + WR」框架至 TSLA 高波動單一股票（3.72% 日波動）。所有�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_014_vol_transition_mr.config import (
     TSLA014Config,
@@ -30,7 +31,9 @@ from trading.experiments.tsla_014_vol_transition_mr.signal_detector import (
 )
 
 
-class TSLA014Strategy(ExecutionModelStrategy):
+class TSLA014Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:vol-transition-mr"
+    bundle_trial_hypothesis = "TSLA post-capitulation volatility transition mean reversion can be reproduced from a verified primary bundle."
     """TSLA Post-Capitulation Vol-Transition MR (TSLA-014)"""
 
     slippage_pct: float = 0.0015  # 0.15%（高波動單一股票滑價）

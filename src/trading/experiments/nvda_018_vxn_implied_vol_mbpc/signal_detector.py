@@ -21,15 +21,15 @@ NVDA-018 訊號偵測器：^VXN Forward-Looking Implied-Vol DIRECTION Regime-Gat
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.nvda_018_vxn_implied_vol_mbpc.config import NVDA018Config
 
 logger = logging.getLogger(__name__)
 
 
-class NVDA018SignalDetector(BaseSignalDetector):
+class NVDA018SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """NVDA-018：NVDA-013 Att3 + ^VXN forward-looking implied vol DIRECTION gate"""
 
     def __init__(self, config: NVDA018Config):
@@ -47,22 +47,8 @@ class NVDA018SignalDetector(BaseSignalDetector):
         rsi = 100 - (100 / (1 + rs))
         return rsi.fillna(50.0)
 
-    def _fetch_vxn_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.vxn_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.vxn_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vxn_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -99,17 +85,10 @@ class NVDA018SignalDetector(BaseSignalDetector):
         df["ATR_Regime_Long"] = df["TR"].rolling(self.config.atr_regime_long).mean()
 
         # === ^VXN forward-looking implied vol gate（NVDA-018 核心新增）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vxn_df = self._fetch_vxn_data(start_date)
-
-        if vxn_df is None or vxn_df.empty:
-            logger.error("無法取得 %s 數據，^VXN 過濾停用", self.config.vxn_ticker)
-            df["VXN_Close"] = float("nan")
-            df["VXN_Change_Nd"] = 0.0
-        else:
-            vxn_close = vxn_df["Close"].reindex(df.index, method="ffill")
-            df["VXN_Close"] = vxn_close
-            df["VXN_Change_Nd"] = vxn_close.diff(self.config.vxn_direction_lookback)
+        vxn_df = self.require_auxiliary(self.config.vxn_ticker, df.index)
+        vxn_close = vxn_df["Close"]
+        df["VXN_Close"] = vxn_close
+        df["VXN_Change_Nd"] = vxn_close.diff(self.config.vxn_direction_lookback)
 
         return df
 

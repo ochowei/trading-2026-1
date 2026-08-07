@@ -7,6 +7,7 @@ Repo 首次 lesson #24 family DIRECTION 變體應用於 XBI（XBI-017 為 BANDS 
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_020_vix_direction_mr.config import (
     XBI020Config,
@@ -17,7 +18,12 @@ from trading.experiments.xbi_020_vix_direction_mr.signal_detector import (
 )
 
 
-class XBI020VixDirectionMRStrategy(ExecutionModelStrategy):
+class XBI020VixDirectionMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XBI:vix-direction"
+    bundle_trial_hypothesis = (
+        "XBI pullbacks improve when ^VIX direction excludes accelerating risk-off regimes."
+    )
+
     """XBI-020：^VIX DIRECTION CEILING Filter MR 策略（含成交模型）"""
 
     slippage_pct: float = 0.001  # 0.1%（XBI 高流動板塊 ETF）

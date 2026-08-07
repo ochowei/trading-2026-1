@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_017_usd_regime_mr.config import (
     GLD017Config,
@@ -12,8 +13,13 @@ from trading.experiments.gld_017_usd_regime_mr.signal_detector import (
 )
 
 
-class GLD017UsdRegimeMRStrategy(ExecutionModelStrategy):
+class GLD017UsdRegimeMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD-017：GLD-015 Att2 + GLD–USD 跨資產 divergence regime gate"""
+
+    bundle_trial_family = "GLD:usd-regime-mr"
+    bundle_trial_hypothesis = (
+        "GLD mean-reversion entries improve when GVZ and USD regimes confirm recovery."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（GLD 高流動 ETF）
 

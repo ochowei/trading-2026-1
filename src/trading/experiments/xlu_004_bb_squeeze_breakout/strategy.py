@@ -7,6 +7,7 @@ XLU BB Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_004_bb_squeeze_breakout.config import (
     XLU004BBSqueezeConfig,
@@ -17,10 +18,15 @@ from trading.experiments.xlu_004_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class XLU004BBSqueezeStrategy(ExecutionModelStrategy):
+class XLU004BBSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU-004：BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "XLU:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "XLU volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

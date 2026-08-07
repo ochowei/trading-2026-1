@@ -7,6 +7,7 @@ repo 首次將 Failed Breakdown Reversal 模式作為 MR 主進場訊號於 NVDA
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_019_failed_breakdown_mr.config import (
     NVDA019Config,
@@ -17,10 +18,14 @@ from trading.experiments.nvda_019_failed_breakdown_mr.signal_detector import (
 )
 
 
-class NVDA019FailedBreakdownStrategy(ExecutionModelStrategy):
+class NVDA019FailedBreakdownStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-019：Failed Breakdown Reversal MR 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:failed-breakdown-mr"
+    bundle_trial_hypothesis = (
+        "NVDA failed-breakdown mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

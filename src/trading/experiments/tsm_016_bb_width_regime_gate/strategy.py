@@ -7,6 +7,7 @@ BB-Width Regime Gate（lesson #23 cross-strategy port）作為 calm regime 過�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_016_bb_width_regime_gate.config import (
     TSMBBWidthRegimeGateConfig,
@@ -17,8 +18,11 @@ from trading.experiments.tsm_016_bb_width_regime_gate.signal_detector import (
 )
 
 
-class TSMBBWidthRegimeGateStrategy(ExecutionModelStrategy):
+class TSMBBWidthRegimeGateStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-016：BB-Width Regime Gate on RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:bb-width-regime"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve in calm BB-width regimes."
 
     slippage_pct: float = 0.001
 

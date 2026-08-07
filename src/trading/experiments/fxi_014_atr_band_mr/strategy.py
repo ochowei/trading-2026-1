@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_014_atr_band_mr.config import (
     FXI014Config,
@@ -15,8 +16,13 @@ from trading.experiments.fxi_014_atr_band_mr.signal_detector import (
 )
 
 
-class FXI014Strategy(ExecutionModelStrategy):
+class FXI014Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI ATR-Band MR (FXI-014)"""
+
+    bundle_trial_family = "FXI:atr-band-mr"
+    bundle_trial_hypothesis = (
+        "FXI ATR-band mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

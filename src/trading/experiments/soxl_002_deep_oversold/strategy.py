@@ -5,6 +5,7 @@ SOXL 深度超賣 + 成交模型策略 (SOXL Deep Oversold + Execution Model Str
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_002_deep_oversold.config import (
@@ -16,7 +17,7 @@ from trading.experiments.soxl_002_deep_oversold.signal_detector import (
 )
 
 
-class SOXLDeepOversoldStrategy(ExecutionModelStrategy):
+class SOXLDeepOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL 深度超賣 + 成交模型策略 (SOXL-002)
 
@@ -24,6 +25,11 @@ class SOXLDeepOversoldStrategy(ExecutionModelStrategy):
     出場: TP +15% / SL -12% / 15 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:deep-oversold"
+    bundle_trial_hypothesis = (
+        "SOXL deep oversold mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

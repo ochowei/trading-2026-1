@@ -9,22 +9,25 @@ a substitute for a referenced blob.
 
 `ResearchDataStore` copies the exact canonical CSV bytes validated by Phase 1 and uses their SHA-256
 digest as the blob identity and storage path. Publication requires `last_complete_refresh` to exist
-and to be at least as recent as any incremental refresh. The cache cutoff must exactly match the
-snapshot Signal Decision Time. A later incremental refresh makes that generation ineligible until
-another full refresh completes.
+and to be at least as recent as any incremental refresh. A primary cache cutoff must exactly match
+the snapshot Signal Decision Time; an auxiliary cutoff may be earlier when its declared coverage
+and availability policies prove that the latest usable observation is available by the decision.
+A later incremental refresh makes that generation ineligible until another full refresh completes.
 
 Publication uses temporary files and a no-overwrite immutable link. Existing identical content is
 shared; existing different or corrupted content raises `ImmutableBlobCorruptionError` and remains
 untouched. Snapshot loading verifies manifest identity, schema, declared and actual cutoffs, byte
-counts, row counts, SHA-256 digests, session coverage, and auxiliary availability policies before it
-returns a defensive-copy `MarketDataBundle`. It never calls a provider or repairs evidence.
+counts, row counts, SHA-256 digests, each entry's declared session or provider-observation coverage,
+and auxiliary availability policies before it returns a defensive-copy `MarketDataBundle`. It never
+calls a provider or repairs evidence.
 
 A manifest records every declared series with provider, symbol, interval, adjustment policy, role,
-history start, availability policy, data cutoff, full-refresh timestamp, blob identity, and optional
-definition reference. Its `snapshot_id` is the SHA-256 of canonical manifest content excluding the
-identity field itself. Every official publication path requires a `.snapshot.json` destination and
-strictly compares input bytes with the canonical round-trip, rejecting unknown fields and alternate
-JSON representations.
+history start, availability policy, observation coverage policy, data cutoff, full-refresh timestamp,
+blob identity, and optional definition reference. Default XNYS coverage remains omitted from the
+canonical wire format for compatibility; sparse provider-observation entries carry an explicit policy.
+Its `snapshot_id` is the SHA-256 of canonical manifest content excluding the identity field itself.
+Every official publication path requires a `.snapshot.json` destination and strictly compares input
+bytes with the canonical round-trip, rejecting unknown fields and alternate JSON representations.
 
 ## Research-definition evidence
 
@@ -55,21 +58,43 @@ definition; uncertain dependencies remain semantic.
   XNYS session, writes a historical result, and atomically advances `latest.json`;
 - `offline` explicitly accepts an older complete snapshot, persists only a historical result, and
   never advances `latest.json`;
+- `migration` requires a passing fixed-snapshot parity artifact and publishes only the immutable
+  `results/<experiment>/<snapshot_id>.migration-result.json` envelope. It records a new trial
+  observation as `migration-pending`, never advances `latest.json`, and never writes qualification
+  or lifecycle state. Requalification must produce a separate current result;
 - `ephemeral` returns diagnostics without writing result or registry state.
 
 `trading data snapshot --experiment NAME` captures current definition evidence and defaults to
 the immutable `results/NAME/<snapshot_id>.snapshot.json` path. `trading run NAME` selects formal
 online mode by default by discovering the newest retained manifest whose exact definition reference
 matches the current experiment. `--snapshot MANIFEST` overrides discovery and `--offline MANIFEST`
-selects formal offline mode. Formal modes require snapshot-aware `run_with_bundle`,
+selects formal offline mode; pairing it with `--migration-parity ARTIFACT` selects migration mode.
+Formal modes require snapshot-aware `run_with_bundle`,
 `capture_research_definition`, and `declare_experiment_trial` seams, and bind the captured current
-exact definition to the manifest before execution. Semantic fingerprints remain the identity used
-for result validity and trial lineage.
+exact definition to the manifest before execution. A snapshot-aware experiment also exposes the
+side-effect-free `market_data_requirements()` declaration; preparation and retained-snapshot
+refresh use it verbatim and fail closed on declaration drift. Semantic fingerprints remain the
+identity used for result validity and trial lineage.
 The runner returns a typed `CanonicalSleeveInput`; the coordinator itself applies the frozen
 definition's cost policies through the shared sleeve evaluator and publishes the resulting evidence.
 Runner-supplied precomputed canonical evidence is not trusted.
 Unmigrated persisted execution requires explicit `--legacy`; `--ephemeral` remains available because
 it changes no persisted results. Full detector migration remains Phase 9.
+
+Data-access migration parity executes the legacy-compatible and migrated paths against the same
+verified bundle object. Indicator cells, ordered signal dates, and canonical trade payloads are
+compared exactly. A passing comparison may be retained at
+`results/<experiment>/<snapshot_id>.migration-parity.json`; the artifact records both definition
+references, runtime/dependency identity, aggregate and per-layer checksums, deterministic
+difference identities, corrections, and a self-verifying parity digest. The artifact is immutable,
+and an unexplained difference remains a migration blocker.
+
+The migration result envelope is deliberately not a normal result-schema document. It embeds the
+schema-3 migrated output, the passing parity digest, and `requalification_required: true` under a
+deterministic `<snapshot_id>.migration-result.json` name beside the parity artifact. Publication is
+content-addressed and no-overwrite; a changed retry fails closed. The ordinary legacy result reader
+continues to read existing legacy files, while latest-result and qualification readers cannot
+mistake migration evidence for a current qualified result.
 
 ## Result validity and trial history
 
@@ -79,13 +104,16 @@ fingerprint, development summary, historical stability folds, shadow evidence, l
 legacy period results. It also requires canonical sleeve evidence with gross, base-net, and
 stress-net daily-equity paths, explicit cost assumptions, raw candidates, and parity diagnostics.
 The validity classifier derives one of `valid`, `data-stale`,
-`definition-stale`, `unreproducible`, or `legacy` without mutating the result or refreshing data.
+`definition-stale`, `unreproducible`, `legacy`, or `migration-pending` without mutating the result
+or refreshing data.
 
 `valid` requires a complete successful result whose immutable data and definition evidence can be
 verified and whose data cutoff and semantic definition are current. Missing or corrupt blobs are
 `unreproducible`; old files, including Phase 3 schema-v2 results without canonical sleeve evidence,
 remain readable as `legacy` and are never assigned synthetic snapshot
 identities. Failure to resolve the current definition also yields `unreproducible`, never `valid`.
+An embedded migration-mode result is classified as `migration-pending` even when its evidence is
+fresh; it is never qualifiable until a separately published, requalified result exists.
 Comments, formatting, and safely declared reporting-only symbols are ignored by the semantic
 fingerprint, while undeclared or behavior-affecting changes create a new definition lineage.
 

@@ -20,6 +20,7 @@ NVDA vol 縮放（vs IWM 1.7-2.0x）：
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_011_capitulation_filter.config import (
     NVDA011Config,
@@ -30,10 +31,14 @@ from trading.experiments.nvda_011_capitulation_filter.signal_detector import (
 )
 
 
-class NVDA011Strategy(ExecutionModelStrategy):
+class NVDA011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA Capitulation-Depth Filter MR (NVDA-011)"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:capitulation-filter"
+    bundle_trial_hypothesis = (
+        "NVDA capitulation-depth filtering can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

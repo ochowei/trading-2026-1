@@ -72,6 +72,10 @@ uv run trading run <experiment_name>
 # 尚未完成 Phase 9 migration 的實驗必須明確選擇 legacy historical run；不會更新 latest.json
 uv run trading run <experiment_name> --legacy
 
+# Phase 9 parity-linked migration evidence；只寫 immutable historical envelope，不更新 latest/qualification/lifecycle
+uv run trading run <experiment_name> --offline results/<experiment>/<snapshot_id>.snapshot.json \
+  --migration-parity results/<experiment>/<snapshot_id>.migration-parity.json
+
 # 比較實驗結果
 uv run trading compare <exp1> <exp2>
 
@@ -188,7 +192,14 @@ docs/
 ├── historical-qualification-and-shadow.md # Phase 6 folds、benchmarks、Shadow lifecycle 與 registry
 ├── controlled-followup-cutover.md # Phase 7 lifecycle、authorization、parity、rollback 與 epochs
 ├── live-drift-and-recovery.md  # Phase 8 frozen envelopes、drift overlay、guards 與 recovery
+├── phase-9-primary-followup-migration.md # Phase 9 bundle migration boundaries and verification
 └── superpowers/plans/           # 已確認的實作計畫
+
+ci/
+└── market-data-bypass-allowlist.json # Phase 9 遷移期間的 typed legacy bypass 基線
+
+tools/
+└── check_experiment_market_data_access.py # Phase 9 bypass 與 provider boundary CI 檢查
 
 results/                         # 各實驗最新與歷史回測結果（JSON）
 tests/                           # 共用引擎與 followup 行為測試
@@ -221,6 +232,7 @@ src/trading/
 │   ├── followup_proposals.py    # 從 verified ledger 建立 dry-run entry/exit proposal terms
 │   ├── followup_cutover.py      # Phase 7 lifecycle registry、authorization、parity 與 reporting
 │   ├── followup_data.py         # Phase 7 declared auxiliary data、alignment 與 bundle identity
+│   ├── bundle_strategy.py        # Phase 9 provider-free primary/auxiliary bundle execution seams
 │   ├── live_drift.py             # Phase 8 frozen envelope、Decimal metrics、checkpoint/recovery domain
 │   ├── live_drift_registry.py   # Phase 8 private append-only evidence、hash chain、locks、replay
 │   └── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
@@ -230,6 +242,7 @@ src/trading/
 │   ├── provider.py              # 外部 provider protocol 與 Yahoo adapter
 │   ├── calendar.py              # XNYS sessions、特殊休市與 actual-close cutoff
 │   ├── validation.py            # OHLCV/schema/session fail-closed validation
+│   ├── migration_policy.py      # Phase 9 experiment bypass scanner and allowlist policy
 │   ├── cache.py                 # Lock、canonical CSV、sidecar、atomic publish、quarantine
 │   ├── service.py               # Fresh reuse、incremental/full refresh orchestration
 │   └── bundle.py                # Read-only bundle 與 backward as-of auxiliary alignment
@@ -240,9 +253,11 @@ src/trading/
 │   ├── store.py                 # Snapshot orchestration、portable bundles、verification、GC
 │   ├── definitions.py           # Semantic fingerprint 與 dirty-worktree definition blobs
 │   ├── result_schema.py         # Versioned result payload、validity 與 legacy compatibility
+│   ├── migration.py             # Immutable parity-linked migration-result publication boundary
+│   ├── parity.py                # Fixed-snapshot parity evidence and immutable artifact helpers
 │   ├── trial_registry.py        # Append-only trial identity、observations、tombstones
 │   ├── qualification_registry.py # Local append-only Historical / Shadow lifecycle evidence
-│   └── runs.py                  # Online/offline/ephemeral publication boundaries
+│   └── runs.py                  # Online/offline/migration/ephemeral publication boundaries
 └── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
     ├── _template/               # 新實驗模板（複製即用）
     ├── EXPERIMENTS_<TICKER>.md  # 各資產實驗總覽與 AI_CONTEXT

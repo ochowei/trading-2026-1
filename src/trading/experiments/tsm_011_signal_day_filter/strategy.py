@@ -6,6 +6,7 @@ TSM-011: Signal-Day Direction Filter on RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_011_signal_day_filter.config import (
     TSMSignalDayFilterConfig,
@@ -16,8 +17,13 @@ from trading.experiments.tsm_011_signal_day_filter.signal_detector import (
 )
 
 
-class TSMSignalDayFilterStrategy(ExecutionModelStrategy):
+class TSMSignalDayFilterStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-011：Signal-Day Direction Filter on RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:signal-day-filter"
+    bundle_trial_hypothesis = (
+        "TSM RS pullbacks improve when signal-day rally exhaustion is filtered."
+    )
 
     slippage_pct: float = 0.001
 

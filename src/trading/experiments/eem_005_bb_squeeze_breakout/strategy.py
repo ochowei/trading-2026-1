@@ -7,6 +7,7 @@ TSLA-009 驗證有效的 BB Squeeze 框架移植至 EEM，測試突破策略在�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_005_bb_squeeze_breakout.config import (
     EEM005Config,
@@ -17,8 +18,13 @@ from trading.experiments.eem_005_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class EEM005Strategy(ExecutionModelStrategy):
+class EEM005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM BB 擠壓突破 (EEM-005)"""
+
+    bundle_trial_family = "EEM:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "EEM BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

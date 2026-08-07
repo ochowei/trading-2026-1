@@ -14,14 +14,18 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xlu_006_rsi2_wide_sl.config import XLU006Config
 
 logger = logging.getLogger(__name__)
 
 
-class XLURSI2WideSLSignalDetector(BaseSignalDetector):
+class XLURSI2WideSLSignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     def __init__(self, config: XLU006Config):
         self.config = config
+
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.tlt_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -43,11 +47,9 @@ class XLURSI2WideSLSignalDetector(BaseSignalDetector):
         df["ClosePos"] = (df["Close"] - df["Low"]) / day_range
         df.loc[day_range == 0, "ClosePos"] = 0.5
 
-        # TLT ROC（由 strategy 合併至 df["TLT_Close"]）
-        if "TLT_Close" in df.columns:
-            df["TLT_ROC"] = (
-                df["TLT_Close"] - df["TLT_Close"].shift(self.config.tlt_roc_period)
-            ) / df["TLT_Close"].shift(self.config.tlt_roc_period)
+        # TLT ROC（由 verified auxiliary bundle 提供）
+        tlt_close = self.require_auxiliary(self.config.tlt_ticker, df.index)["Close"]
+        df["TLT_ROC"] = tlt_close.pct_change(self.config.tlt_roc_period)
 
         return df
 
@@ -60,10 +62,7 @@ class XLURSI2WideSLSignalDetector(BaseSignalDetector):
         cond_reversal = df["ClosePos"] >= self.config.close_position_threshold
 
         # TLT 利率環境過濾
-        if "TLT_ROC" in df.columns:
-            cond_tlt = df["TLT_ROC"] > self.config.tlt_roc_threshold
-        else:
-            cond_tlt = True
+        cond_tlt = df["TLT_ROC"] > self.config.tlt_roc_threshold
 
         df["Signal"] = cond_pullback & cond_cap & cond_wr & cond_reversal & cond_tlt
 

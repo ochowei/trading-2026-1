@@ -8,6 +8,7 @@ XLU-SPY Pairs Trading Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_007_momentum_pullback.config import (
     XLU007Config,
@@ -18,8 +19,11 @@ from trading.experiments.xlu_007_momentum_pullback.signal_detector import (
 )
 
 
-class XLU007MomentumPullbackStrategy(ExecutionModelStrategy):
+class XLU007MomentumPullbackStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU-007：XLU-SPY Pairs Trading 策略（含成交模型）"""
+
+    bundle_trial_family = "XLU:spy-relative-value"
+    bundle_trial_hypothesis = "XLU mean reversion improves when its ratio to SPY reaches an extreme while the primary trend remains intact."
 
     slippage_pct: float = 0.001
 

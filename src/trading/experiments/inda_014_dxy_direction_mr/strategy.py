@@ -26,6 +26,7 @@ lookback / 方向皆無 surgical 切點；多筆 INDA winners 反而發生於 US
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_014_dxy_direction_mr.config import (
     INDA014Config,
@@ -36,10 +37,14 @@ from trading.experiments.inda_014_dxy_direction_mr.signal_detector import (
 )
 
 
-class INDA014Strategy(ExecutionModelStrategy):
+class INDA014Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA DXY Direction Filter MR (INDA-014)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價，同 INDA-011）
+    bundle_trial_family = "INDA:dxy-direction-mr"
+    bundle_trial_hypothesis = (
+        "INDA mean-reversion entries improve when DXY does not confirm USD-driven weakness."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

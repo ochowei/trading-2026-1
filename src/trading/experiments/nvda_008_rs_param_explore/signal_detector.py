@@ -12,9 +12,9 @@ NVDA-008 Signal Detector: RS Parameter Exploration
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.nvda_008_rs_param_explore.config import (
     NVDARSParamExploreConfig,
 )
@@ -22,48 +22,21 @@ from trading.experiments.nvda_008_rs_param_explore.config import (
 logger = logging.getLogger(__name__)
 
 
-class NVDARSParamExploreDetector(BaseSignalDetector):
+class NVDARSParamExploreDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """NVDA RS Parameter Exploration 訊號偵測器"""
 
     def __init__(self, config: NVDARSParamExploreConfig):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載參考標的數據"""
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        ref_df = self._fetch_reference_data(start_date)
-
-        if ref_df is None or ref_df.empty:
-            logger.error(
-                "無法取得 %s 數據，無法計算相對強度",
-                self.config.reference_ticker,
-            )
-            df["Relative_Strength"] = 0.0
-            df["Pullback"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            return df
-
-        common_idx = df.index.intersection(ref_df.index)
-        df = df.loc[common_idx]
+        # The verified bundle supplies the reference series already aligned
+        # as-of to every primary decision session.
+        ref_df = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         # SMA trend
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
@@ -71,7 +44,7 @@ class NVDARSParamExploreDetector(BaseSignalDetector):
         # NVDA 和基準的 N日報酬
         period = self.config.relative_strength_period
         df["NVDA_Return"] = df["Close"].pct_change(period)
-        df["Ref_Return"] = ref_df.loc[common_idx, "Close"].pct_change(period)
+        df["Ref_Return"] = ref_df["Close"].pct_change(period)
 
         # 相對強度 = NVDA 報酬 - 基準報酬
         df["Relative_Strength"] = df["NVDA_Return"] - df["Ref_Return"]

@@ -7,6 +7,7 @@ DIA-003: RSI(2) 非對稱出場均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_003_rsi2_bb.config import (
     DIARsi2AsymConfig,
@@ -17,8 +18,13 @@ from trading.experiments.dia_003_rsi2_bb.signal_detector import (
 )
 
 
-class DIARsi2AsymStrategy(ExecutionModelStrategy):
+class DIARsi2AsymStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA RSI(2) 非對稱出場均值回歸 (DIA-003)"""
+
+    bundle_trial_family = "DIA:rsi2-bb"
+    bundle_trial_hypothesis = (
+        "DIA RSI(2) plus Bollinger confirmation can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

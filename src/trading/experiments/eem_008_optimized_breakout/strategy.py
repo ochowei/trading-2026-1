@@ -8,6 +8,7 @@ EEM-008: Optimized Breakout
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_008_optimized_breakout.config import (
     EEM008Config,
@@ -18,8 +19,13 @@ from trading.experiments.eem_008_optimized_breakout.signal_detector import (
 )
 
 
-class EEM008Strategy(ExecutionModelStrategy):
+class EEM008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 優化突破 (EEM-008)"""
+
+    bundle_trial_family = "EEM:optimized-breakout"
+    bundle_trial_hypothesis = (
+        "EEM volatility-filtered breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

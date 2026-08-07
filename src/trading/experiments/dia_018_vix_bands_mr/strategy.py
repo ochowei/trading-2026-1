@@ -9,6 +9,7 @@ pre-analysis 預期決定性失敗（殘餘 SL VIX 22.8 被贏家 22.6/22.9 夾�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_018_vix_bands_mr.config import (
     DIA018Config,
@@ -19,10 +20,14 @@ from trading.experiments.dia_018_vix_bands_mr.signal_detector import (
 )
 
 
-class DIA018Strategy(ExecutionModelStrategy):
+class DIA018Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA ^VIX BANDS (U-shape Regime) Gated MR (DIA-018)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "DIA:vix-bands-mr"
+    bundle_trial_hypothesis = (
+        "DIA mean-reversion entries improve when VIX avoids the complacency middle regime."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

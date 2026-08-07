@@ -7,6 +7,7 @@ EWJ-003: BB Lower Band Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewj_003_bb_lower_mr.config import (
     EWJ003Config,
@@ -17,8 +18,13 @@ from trading.experiments.ewj_003_bb_lower_mr.signal_detector import (
 )
 
 
-class EWJ003Strategy(ExecutionModelStrategy):
+class EWJ003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWJ-003: BB 下軌均值回歸"""
+
+    bundle_trial_family = "EWJ:bb-lower-mr"
+    bundle_trial_hypothesis = (
+        "EWJ BB lower-band mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

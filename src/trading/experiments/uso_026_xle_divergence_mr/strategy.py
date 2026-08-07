@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_026_xle_divergence_mr.config import (
     USO026Config,
@@ -12,7 +13,12 @@ from trading.experiments.uso_026_xle_divergence_mr.signal_detector import (
 )
 
 
-class USO026Strategy(ExecutionModelStrategy):
+class USO026Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "USO:xle-divergence"
+    bundle_trial_hypothesis = (
+        "USO pullback entries improve when crude weakness diverges from the XLE energy benchmark."
+    )
+
     """USO-026：USO-013 框架 + USO-XLE cross-asset divergence regime gate"""
 
     slippage_pct: float = 0.001

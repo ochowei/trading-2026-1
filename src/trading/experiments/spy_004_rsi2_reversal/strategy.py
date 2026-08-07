@@ -7,6 +7,7 @@ SPY-004: RSI(2) 極端超賣均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.spy_004_rsi2_reversal.config import (
     SPYRsi2Config,
@@ -17,8 +18,13 @@ from trading.experiments.spy_004_rsi2_reversal.signal_detector import (
 )
 
 
-class SPYRsi2Strategy(ExecutionModelStrategy):
+class SPYRsi2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY RSI(2) 極端超賣均值回歸 (SPY-004)"""
+
+    bundle_trial_family = "SPY:rsi2-reversal"
+    bundle_trial_hypothesis = (
+        "SPY RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

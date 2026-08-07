@@ -17,36 +17,22 @@ XLU 1.08% vol 利率敏感公用事業 ETF 的有效性。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xlu_013_move_implied_vol_mr.config import XLU013Config
 
 logger = logging.getLogger(__name__)
 
 
-class XLU013SignalDetector(BaseSignalDetector):
+class XLU013SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XLU-013：XLU-012 Att3 框架 + ^MOVE forward-looking implied vol gate"""
 
     def __init__(self, config: XLU013Config):
         self.config = config
 
-    def _fetch_move_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.move_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.move_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.move_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -83,17 +69,9 @@ class XLU013SignalDetector(BaseSignalDetector):
         df["ATR_Ratio"] = atr_short / atr_long.where(atr_long > 0, float("nan"))
 
         # ^MOVE forward-looking implied vol gate（XLU-013 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        move_df = self._fetch_move_data(start_date)
-
-        if move_df is None or move_df.empty:
-            logger.error("無法取得 %s 數據，^MOVE 過濾停用", self.config.move_ticker)
-            df["MOVE_Close"] = float("nan")
-            df["MOVE_Change_Nd"] = 0.0
-        else:
-            move_close = move_df["Close"].reindex(df.index, method="ffill")
-            df["MOVE_Close"] = move_close
-            df["MOVE_Change_Nd"] = move_close.diff(self.config.move_direction_lookback)
+        move_close = self.require_auxiliary(self.config.move_ticker, df.index)["Close"]
+        df["MOVE_Close"] = move_close
+        df["MOVE_Change_Nd"] = move_close.diff(self.config.move_direction_lookback)
 
         return df
 

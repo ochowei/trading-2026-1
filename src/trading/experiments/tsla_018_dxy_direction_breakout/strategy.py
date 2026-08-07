@@ -9,6 +9,7 @@ BB Squeeze Breakout 框架。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_018_dxy_direction_breakout.config import (
     TSLA018Config,
@@ -19,8 +20,13 @@ from trading.experiments.tsla_018_dxy_direction_breakout.signal_detector import 
 )
 
 
-class TSLA018DXYDirectionBreakoutStrategy(ExecutionModelStrategy):
+class TSLA018DXYDirectionBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSLA-018: TSLA-017 Att3 框架 + DXY 5d direction filter（含成交模型）"""
+
+    bundle_trial_family = "TSLA:dxy-direction-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA breakouts improve when DXY direction does not confirm macro headwinds."
+    )
 
     slippage_pct: float = 0.0015
 

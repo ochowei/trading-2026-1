@@ -28,36 +28,22 @@ Trade-level 驗證（FXI-014 Att2 baseline）：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.fxi_015_ashr_divergence_mr.config import FXI015Config
 
 logger = logging.getLogger(__name__)
 
 
-class FXI015ASHRDivergenceDetector(BaseSignalDetector):
+class FXI015ASHRDivergenceDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """FXI-015 FXI-ASHR Cross-Asset Divergence-Gated ATR-Band MR"""
 
     def __init__(self, config: FXI015Config):
         self.config = config
 
-    def _fetch_anchor_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.anchor_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.anchor_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.anchor_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -95,19 +81,9 @@ class FXI015ASHRDivergenceDetector(BaseSignalDetector):
         # FXI vs ASHR cross-asset divergence
         fxi_ret_n = df["Close"].pct_change(self.config.rel_lookback)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        anchor_df = self._fetch_anchor_data(start_date)
-
-        if anchor_df is None or anchor_df.empty:
-            logger.error(
-                "無法取得 %s 數據，FXI-ASHR divergence 過濾停用",
-                self.config.anchor_ticker,
-            )
-            df["Rel_Return"] = 0.0
-        else:
-            anchor_close = anchor_df["Close"].reindex(df.index, method="ffill")
-            anchor_ret_n = anchor_close.pct_change(self.config.rel_lookback)
-            df["Rel_Return"] = fxi_ret_n - anchor_ret_n
+        anchor_df = self.require_auxiliary(self.config.anchor_ticker, df.index)
+        anchor_ret_n = anchor_df["Close"].pct_change(self.config.rel_lookback)
+        df["Rel_Return"] = fxi_ret_n - anchor_ret_n
 
         return df
 

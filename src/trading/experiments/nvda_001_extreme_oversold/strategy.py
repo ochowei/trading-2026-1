@@ -7,6 +7,7 @@ NVDA Extreme Oversold Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_001_extreme_oversold.config import (
     NVDAExtremeOversoldConfig,
@@ -17,10 +18,14 @@ from trading.experiments.nvda_001_extreme_oversold.signal_detector import (
 )
 
 
-class NVDAExtremeOversoldStrategy(ExecutionModelStrategy):
+class NVDAExtremeOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA 極端超賣均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價
+    bundle_trial_family = "NVDA:extreme-oversold"
+    bundle_trial_hypothesis = (
+        "NVDA extreme-oversold mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -13,36 +13,22 @@ filter 過濾此類 2D 結構性 outlier 訊號。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewt_010_ewt_eem_2d_divergence_mr.config import EWT010Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWT010SignalDetector(BaseSignalDetector):
+class EWT010SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EWT-EEM 2D Divergence-Gated Vol-Transition MR 訊號偵測器"""
 
     def __init__(self, config: EWT010Config):
         self.config = config
 
-    def _fetch_eem_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.eem_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.eem_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.eem_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -88,22 +74,16 @@ class EWT010SignalDetector(BaseSignalDetector):
         df["Ret_2d"] = df["Close"].pct_change(2)
 
         # === EWT-010 核心新增：雙時框 EWT-EEM 相對強度 ===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        eem_df = self._fetch_eem_data(start_date)
+        eem_df = self.require_auxiliary(self.config.eem_ticker, df.index)
 
         ewt_short = df["Close"].pct_change(self.config.rs_short_lookback)
         ewt_long = df["Close"].pct_change(self.config.rs_long_lookback)
 
-        if eem_df is None or eem_df.empty:
-            logger.error("無法取得 %s 數據，2D divergence filter 停用", self.config.eem_ticker)
-            df["RS_Short_Excess"] = 0.0
-            df["RS_Long_Excess"] = 0.0
-        else:
-            eem_close = eem_df["Close"].reindex(df.index, method="ffill")
-            eem_short = eem_close.pct_change(self.config.rs_short_lookback)
-            eem_long = eem_close.pct_change(self.config.rs_long_lookback)
-            df["RS_Short_Excess"] = ewt_short - eem_short
-            df["RS_Long_Excess"] = ewt_long - eem_long
+        eem_close = eem_df["Close"]
+        eem_short = eem_close.pct_change(self.config.rs_short_lookback)
+        eem_long = eem_close.pct_change(self.config.rs_long_lookback)
+        df["RS_Short_Excess"] = ewt_short - eem_short
+        df["RS_Long_Excess"] = ewt_long - eem_long
 
         return df
 

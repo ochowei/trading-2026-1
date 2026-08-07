@@ -9,6 +9,7 @@ CIBR-011: 單日 Range Expansion Climax + 強日內反轉均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_011_range_expansion_mr.config import (
     CIBR011Config,
@@ -19,8 +20,13 @@ from trading.experiments.cibr_011_range_expansion_mr.signal_detector import (
 )
 
 
-class CIBR011Strategy(ExecutionModelStrategy):
+class CIBR011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-011：單日 Range Expansion Climax + 強日內反轉均值回歸"""
+
+    bundle_trial_family = "CIBR:range-expansion-mr"
+    bundle_trial_hypothesis = (
+        "CIBR range-expansion reversal entries can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% ETF 標準滑價
 

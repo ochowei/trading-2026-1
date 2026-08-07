@@ -9,6 +9,7 @@ FCX-013 Att3 BB Squeeze Breakout 之上，目標進一步突破 FCX-013 的 min(
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_014_breakout_ceiling.config import (
     FCX014Config,
@@ -19,8 +20,13 @@ from trading.experiments.fcx_014_breakout_ceiling.signal_detector import (
 )
 
 
-class FCX014BreakoutCeilingStrategy(ExecutionModelStrategy):
+class FCX014BreakoutCeilingStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-014：訊號日方向過濾 + lesson #22 regime BB Squeeze Breakout（含成交模型）"""
+
+    bundle_trial_family = "FCX:breakout-ceiling"
+    bundle_trial_hypothesis = (
+        "FCX breakout ceiling filtering can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

@@ -10,6 +10,7 @@ from typing import Literal
 from trading.market_data import (
     AvailabilityPolicy,
     MarketDataBundle,
+    MarketDataCoveragePolicy,
     MarketDataSeries,
     SignalDecisionTime,
 )
@@ -35,6 +36,7 @@ class SnapshotDataRef:
     data_cutoff: date
     full_refresh_at: datetime
     blob: DataBlobRef
+    coverage_policy: MarketDataCoveragePolicy = MarketDataCoveragePolicy.xnys()
 
 
 @dataclass(frozen=True, slots=True)

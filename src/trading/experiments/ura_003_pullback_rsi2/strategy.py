@@ -7,6 +7,7 @@ URA-003: 回檔 + RSI(2) 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_003_pullback_rsi2.config import (
     URAPullbackRSI2Config,
@@ -17,7 +18,11 @@ from trading.experiments.ura_003_pullback_rsi2.signal_detector import (
 )
 
 
-class URAPullbackRSI2Strategy(ExecutionModelStrategy):
+class URAPullbackRSI2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "URA:pullback-rsi2"
+    bundle_trial_hypothesis = (
+        "URA pullback entries improve when short-horizon RSI confirms capitulation."
+    )
     """URA-003：回檔 + RSI(2)"""
 
     def create_config(self) -> ExperimentConfig:

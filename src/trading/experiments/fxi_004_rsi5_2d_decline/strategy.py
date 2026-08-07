@@ -7,6 +7,7 @@ FXI-004: 2-Day Decline Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_004_rsi5_2d_decline.config import (
     FXI004Config,
@@ -17,8 +18,13 @@ from trading.experiments.fxi_004_rsi5_2d_decline.signal_detector import (
 )
 
 
-class FXI004Strategy(ExecutionModelStrategy):
+class FXI004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI 2-Day Decline MR (FXI-004)"""
+
+    bundle_trial_family = "FXI:rsi5-2d-decline"
+    bundle_trial_hypothesis = (
+        "FXI two-day decline mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%
 

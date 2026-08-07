@@ -6,22 +6,30 @@ Signal logic identical to GLD-001, only exit parameters changed.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
-from trading.experiments.gld_001_mean_reversion.signal_detector import GLDSignalDetector
 from trading.experiments.gld_002_optimized_exit.config import (
     GLDOptimizedExitConfig,
     create_default_config,
 )
+from trading.experiments.gld_002_optimized_exit.signal_detector import (
+    GLDOptimizedExitSignalDetector,
+)
 
 
-class GLDOptimizedExitStrategy(ExecutionModelStrategy):
+class GLDOptimizedExitStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 優化出場策略 (GLD-002) — 進場不變，出場優化"""
+
+    bundle_trial_family = "GLD:optimized-exit"
+    bundle_trial_hypothesis = (
+        "GLD optimized exits can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()
 
     def create_detector(self) -> BaseSignalDetector:
-        return GLDSignalDetector(create_default_config())
+        return GLDOptimizedExitSignalDetector(create_default_config())
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
         if isinstance(config, GLDOptimizedExitConfig):

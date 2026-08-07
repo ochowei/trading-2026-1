@@ -26,16 +26,20 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xbi_016_macro_confirmed_mr.config import XBI016Config
 
 logger = logging.getLogger(__name__)
 
 
-class XBI016SignalDetector(BaseSignalDetector):
+class XBI016SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XBI-016 訊號偵測器"""
 
     def __init__(self, config: XBI016Config):
         self.config = config
+
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.macro_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -66,14 +70,8 @@ class XBI016SignalDetector(BaseSignalDetector):
         df["ATR_Regime_Long"] = df["TR"].rolling(self.config.atr_regime_long).mean()
 
         # === Macro context confirmation gate（lesson #25 cross-asset port）===
-        # MACRO_Close 由 strategy.run() 合併進來
-        if "MACRO_Close" in df.columns:
-            df["MACRO_Return_Nd"] = (
-                df["MACRO_Close"] - df["MACRO_Close"].shift(self.config.macro_lookback)
-            ) / df["MACRO_Close"].shift(self.config.macro_lookback)
-        else:
-            logger.warning("XBI-016: MACRO_Close 欄位缺失，macro confirmation 將停用")
-            df["MACRO_Return_Nd"] = pd.Series(float("-inf"), index=df.index)
+        macro_close = self.require_auxiliary(self.config.macro_ticker, df.index)["Close"]
+        df["MACRO_Return_Nd"] = macro_close.pct_change(self.config.macro_lookback)
 
         return df
 

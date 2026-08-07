@@ -4,6 +4,7 @@ EEM-010: 嚴格跌幅 + ATR 波動率自適應 RSI(2)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_010_strict_decline_atr.config import (
     EEM010Config,
@@ -14,8 +15,11 @@ from trading.experiments.eem_010_strict_decline_atr.signal_detector import (
 )
 
 
-class EEM010Strategy(ExecutionModelStrategy):
+class EEM010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 嚴格跌幅 + ATR RSI(2) 均值回歸 (EEM-010)"""
+
+    bundle_trial_family = "EEM:strict-decline-atr"
+    bundle_trial_hypothesis = "EEM strict-decline ATR-filtered mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

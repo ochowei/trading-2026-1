@@ -102,7 +102,8 @@ Part A / Part B / Part C fields and records the referenced data snapshot identit
 cutoff, definition snapshot identity, semantic definition fingerprint, development summary,
 historical stability folds, shadow/live evidence, legacy period results, and canonical sleeve
 gross/base-net/stress-net evidence. Schema-v2 results remain readable as `legacy`. Status is recomputed
-read-only as `valid`, `data-stale`, `definition-stale`, `unreproducible`, or `legacy`.
+read-only as `valid`, `data-stale`, `definition-stale`, `unreproducible`, `legacy`, or
+`migration-pending` (the latter is never qualifiable).
 
 Only a complete successful result with verified current data and the current semantic definition
 is eligible for ranking or follow-up. Legacy files remain readable but are never assigned fake

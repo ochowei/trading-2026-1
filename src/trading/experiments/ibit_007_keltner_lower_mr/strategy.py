@@ -8,6 +8,7 @@ IBIT-007: Keltner 通道下軌 + 回檔 + 反轉 K 線均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_007_keltner_lower_mr.config import (
     IBIT007Config,
@@ -18,8 +19,13 @@ from trading.experiments.ibit_007_keltner_lower_mr.signal_detector import (
 )
 
 
-class IBIT007Strategy(ExecutionModelStrategy):
+class IBIT007Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-007：Keltner 通道下軌 + 回檔 + 反轉 K 線均值回歸"""
+
+    bundle_trial_family = "IBIT:keltner-lower-mr"
+    bundle_trial_hypothesis = (
+        "IBIT Keltner lower-band reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

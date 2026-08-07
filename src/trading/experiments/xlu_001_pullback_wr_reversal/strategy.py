@@ -8,6 +8,7 @@ Exit uses fixed TP/SL (no trailing stop).
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_001_pullback_wr_reversal.config import (
     XLUPullbackWRReversalConfig,
@@ -18,8 +19,13 @@ from trading.experiments.xlu_001_pullback_wr_reversal.signal_detector import (
 )
 
 
-class XLUPullbackWRReversalStrategy(ExecutionModelStrategy):
+class XLUPullbackWRReversalStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU 回檔 + Williams %R + 反轉K線均值回歸策略 (XLU-001)"""
+
+    bundle_trial_family = "XLU:pullback-wr-reversal"
+    bundle_trial_hypothesis = (
+        "XLU pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

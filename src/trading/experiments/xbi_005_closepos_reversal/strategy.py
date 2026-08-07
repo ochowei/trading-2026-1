@@ -9,6 +9,7 @@ XBI 日波動 ~2.0% 與 IWM 接近，測試此過濾器是否能改善 Part A Sh
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_005_closepos_reversal.config import (
     XBI005Config,
@@ -19,8 +20,11 @@ from trading.experiments.xbi_005_closepos_reversal.signal_detector import (
 )
 
 
-class XBI005Strategy(ExecutionModelStrategy):
+class XBI005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-005：回檔 + Williams %R + 反轉K線均值回歸"""
+
+    bundle_trial_family = "XBI:closepos-reversal"
+    bundle_trial_hypothesis = "XBI close-position reversal mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

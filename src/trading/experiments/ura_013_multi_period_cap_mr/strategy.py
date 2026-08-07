@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_013_multi_period_cap_mr.config import (
     URA013Config,
@@ -15,10 +16,15 @@ from trading.experiments.ura_013_multi_period_cap_mr.signal_detector import (
 )
 
 
-class URA013Strategy(ExecutionModelStrategy):
+class URA013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA Multi-Period Capitulation-Strength Filter MR (URA-013)"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "URA:multi-period-cap-mr"
+    bundle_trial_hypothesis = (
+        "URA multi-period capitulation caps can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

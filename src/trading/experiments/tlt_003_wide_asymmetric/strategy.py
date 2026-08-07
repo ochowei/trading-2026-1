@@ -8,6 +8,7 @@ TLT 寬停損非對稱出場均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_003_wide_asymmetric.config import (
     TLTWideAsymmetricConfig,
@@ -18,8 +19,13 @@ from trading.experiments.tlt_003_wide_asymmetric.signal_detector import (
 )
 
 
-class TLTWideAsymmetricStrategy(ExecutionModelStrategy):
+class TLTWideAsymmetricStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT 寬停損非對稱出場均值回歸策略 (TLT-003)"""
+
+    bundle_trial_family = "TLT:wide-asymmetric"
+    bundle_trial_hypothesis = (
+        "TLT wide asymmetric exits can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

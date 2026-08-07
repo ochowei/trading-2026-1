@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester with next-day open entry + pessimistic exits.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_009_failed_breakdown_reversal.config import (
     FXI009Config,
@@ -15,8 +16,13 @@ from trading.experiments.fxi_009_failed_breakdown_reversal.signal_detector impor
 )
 
 
-class FXI009Strategy(ExecutionModelStrategy):
+class FXI009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI Failed Breakdown Reversal (FXI-009)"""
+
+    bundle_trial_family = "FXI:failed-breakdown-reversal"
+    bundle_trial_hypothesis = (
+        "FXI failed-breakdown reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% ETF standard
 

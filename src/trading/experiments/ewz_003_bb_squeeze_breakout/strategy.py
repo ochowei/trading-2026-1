@@ -7,6 +7,7 @@ EWZ-003: Acute Panic Reversal
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_003_bb_squeeze_breakout.config import (
     EWZ003Config,
@@ -17,8 +18,13 @@ from trading.experiments.ewz_003_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class EWZ003Strategy(ExecutionModelStrategy):
+class EWZ003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ Acute Panic Reversal (EWZ-003)"""
+
+    bundle_trial_family = "EWZ:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "EWZ acute-panic reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

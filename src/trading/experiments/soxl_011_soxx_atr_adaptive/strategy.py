@@ -9,6 +9,7 @@ SOXL-011: SOXX ATR-Adaptive Mean Reversion 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_011_soxx_atr_adaptive.config import (
@@ -20,7 +21,7 @@ from trading.experiments.soxl_011_soxx_atr_adaptive.signal_detector import (
 )
 
 
-class SOXLSoxxAtrStrategy(ExecutionModelStrategy):
+class SOXLSoxxAtrStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL-011: SOXX ATR-Adaptive Mean Reversion（含成交模型）
 
@@ -28,6 +29,9 @@ class SOXLSoxxAtrStrategy(ExecutionModelStrategy):
     出場: TP +18% / SL -12% / 25 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:soxx-atr-adaptive"
+    bundle_trial_hypothesis = "SOXL mean-reversion entries improve when SOXX volatility expands."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

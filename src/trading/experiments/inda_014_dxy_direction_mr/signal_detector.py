@@ -21,36 +21,22 @@ DXY 資料於 compute_indicators 內以 yfinance 直接抓取並對齊 INDA 交�
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.inda_014_dxy_direction_mr.config import INDA014Config
 
 logger = logging.getLogger(__name__)
 
 
-class INDA014SignalDetector(BaseSignalDetector):
+class INDA014SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """INDA-014 DXY Direction-Gated Multi-Period Capitulation MR"""
 
     def __init__(self, config: INDA014Config):
         self.config = config
 
-    def _fetch_dxy_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.dxy_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.dxy_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.dxy_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -85,15 +71,8 @@ class INDA014SignalDetector(BaseSignalDetector):
         df["Return_3d"] = df["Close"].pct_change(3)
 
         # DXY direction filter（INDA-014 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        dxy_df = self._fetch_dxy_data(start_date)
-
-        if dxy_df is None or dxy_df.empty:
-            logger.error("無法取得 %s 數據，DXY 過濾停用", self.config.dxy_ticker)
-            df["DXY_Change"] = -1.0
-        else:
-            dxy_close = dxy_df["Close"].reindex(df.index, method="ffill")
-            df["DXY_Change"] = dxy_close.pct_change(self.config.dxy_lookback)
+        dxy_df = self.require_auxiliary(self.config.dxy_ticker, df.index)
+        df["DXY_Change"] = dxy_df["Close"].pct_change(self.config.dxy_lookback)
 
         return df
 

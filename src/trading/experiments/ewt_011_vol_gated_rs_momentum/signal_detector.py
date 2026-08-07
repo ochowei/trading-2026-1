@@ -12,63 +12,37 @@ EWT-011 訊號偵測器：Volatility-Regime-Gated RS Momentum Pullback
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewt_011_vol_gated_rs_momentum.config import EWT011Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWT011SignalDetector(BaseSignalDetector):
+class EWT011SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EWT Volatility-Regime-Gated RS Momentum Pullback 訊號偵測器"""
 
     def __init__(self, config: EWT011Config):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        ref_df = self._fetch_reference_data(start_date)
-
-        if ref_df is None or ref_df.empty:
-            logger.error("無法取得 %s 數據，無法計算相對強度", self.config.reference_ticker)
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            df["ATR_Pct"] = 0.0
-            return df
-
-        common_idx = df.index.intersection(ref_df.index)
-        df = df.loc[common_idx]
+        ref_df = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
 
         period = self.config.relative_strength_period
         df["EWT_Return"] = df["Close"].pct_change(period)
-        df["EEM_Return"] = ref_df.loc[common_idx, "Close"].pct_change(period)
+        df["EEM_Return"] = ref_df["Close"].pct_change(period)
         df["Relative_Strength"] = df["EWT_Return"] - df["EEM_Return"]
 
         sp = self.config.rs_short_period
-        df["RS_Short"] = df["Close"].pct_change(sp) - ref_df.loc[common_idx, "Close"].pct_change(sp)
+        df["RS_Short"] = df["Close"].pct_change(sp) - ref_df["Close"].pct_change(sp)
 
         lookback = self.config.pullback_lookback
         df["High_5d"] = df["High"].rolling(lookback).max()

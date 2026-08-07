@@ -7,6 +7,7 @@ TSM-003: 回檔 + RSI(2) 極端超賣均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_003_rsi2_reversal.config import (
     TSMRsi2Config,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_003_rsi2_reversal.signal_detector import (
 )
 
 
-class TSMRsi2Strategy(ExecutionModelStrategy):
+class TSMRsi2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM 回檔 + RSI(2) 極端超賣均值回歸 (TSM-003)"""
+
+    bundle_trial_family = "TSM:rsi2-reversal"
+    bundle_trial_hypothesis = (
+        "TSM RSI(2) pullback reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0010  # 0.10%
 

@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_012_atr_band_mr.config import (
     URA012Config,
@@ -15,10 +16,15 @@ from trading.experiments.ura_012_atr_band_mr.signal_detector import (
 )
 
 
-class URA012Strategy(ExecutionModelStrategy):
+class URA012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA ATR-Band MR (URA-012)"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "URA:atr-band-mr"
+    bundle_trial_hypothesis = (
+        "URA ATR-band mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

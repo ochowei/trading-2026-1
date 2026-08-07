@@ -8,6 +8,7 @@ SIVR-009: Gold/Silver Ratio Mean Reversion 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_009_ratio_reversion.config import (
     SIVRRatioReversionConfig,
@@ -18,7 +19,12 @@ from trading.experiments.sivr_009_ratio_reversion.signal_detector import (
 )
 
 
-class SIVRRatioReversionStrategy(ExecutionModelStrategy):
+class SIVRRatioReversionStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "SIVR:gld-ratio-reversion"
+    bundle_trial_hypothesis = (
+        "Silver mean reversion improves when the GLD/SIVR ratio identifies relative undervaluation."
+    )
+
     """SIVR-009：Gold/Silver Ratio Mean Reversion（含成交模型）"""
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較低）

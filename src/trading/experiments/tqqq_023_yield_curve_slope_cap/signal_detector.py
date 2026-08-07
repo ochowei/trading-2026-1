@@ -17,9 +17,9 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_018_regime_vol_gate.signal_detector import (
     TQQQ018SignalDetector,
 )
@@ -28,58 +28,25 @@ from trading.experiments.tqqq_023_yield_curve_slope_cap.config import TQQQ023Con
 logger = logging.getLogger(__name__)
 
 
-class TQQQ023YieldCurveSlopeDetector(BaseSignalDetector):
+class TQQQ023YieldCurveSlopeDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TQQQ-023：恐慌抄底 + 波動率 regime + first-day filter + yield curve slope velocity"""
 
     def __init__(self, config: TQQQ023Config):
         self.config = config
         self._base_detector = TQQQ018SignalDetector(config)
 
-    @staticmethod
-    def _fetch_external(ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.long_yield_ticker, self.config.short_yield_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = self._base_detector.compute_indicators(df)
         cfg = self.config
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        long_yield_df = self._fetch_external(cfg.long_yield_ticker, start_date)
-        short_yield_df = self._fetch_external(cfg.short_yield_ticker, start_date)
-
-        if (
-            long_yield_df is None
-            or long_yield_df.empty
-            or short_yield_df is None
-            or short_yield_df.empty
-        ):
-            logger.error(
-                "無法取得 %s / %s 數據, yield curve slope 過濾停用",
-                cfg.long_yield_ticker,
-                cfg.short_yield_ticker,
-            )
-            df["Yield_Slope"] = float("nan")
-            df["Slope_Change_N"] = 0.0
-        else:
-            long_yield = long_yield_df["Close"].reindex(df.index, method="ffill")
-            short_yield = short_yield_df["Close"].reindex(df.index, method="ffill")
-            slope = long_yield - short_yield
-            df["Yield_Slope"] = slope
-            df["Slope_Change_N"] = slope.diff(cfg.slope_lookback)
+        long_yield = self.require_auxiliary(cfg.long_yield_ticker, df.index)["Close"]
+        short_yield = self.require_auxiliary(cfg.short_yield_ticker, df.index)["Close"]
+        slope = long_yield - short_yield
+        df["Yield_Slope"] = slope
+        df["Slope_Change_N"] = slope.diff(cfg.slope_lookback)
 
         return df
 

@@ -7,6 +7,7 @@ FCX Pullback + Williams %R + Reversal Candle Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_002_pullback_wr.config import (
     FCXPullbackWRConfig,
@@ -17,8 +18,13 @@ from trading.experiments.fcx_002_pullback_wr.signal_detector import (
 )
 
 
-class FCXPullbackWRStrategy(ExecutionModelStrategy):
+class FCXPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX 回檔 + Williams %R + 反轉K線均值回歸策略（含成交模型）"""
+
+    bundle_trial_family = "FCX:pullback-wr"
+    bundle_trial_hypothesis = (
+        "FCX pullback reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價
 

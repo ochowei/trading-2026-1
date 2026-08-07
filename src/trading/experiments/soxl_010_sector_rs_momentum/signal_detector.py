@@ -11,64 +11,37 @@ SOXL-010 訊號偵測器：Semiconductor Sector RS Momentum Pullback
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.soxl_010_sector_rs_momentum.config import SOXLSectorRSConfig
 
 logger = logging.getLogger(__name__)
 
 
-class SOXLSectorRSDetector(BaseSignalDetector):
+class SOXLSectorRSDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """SOXL 半導體板塊 RS 動量回調訊號偵測器"""
 
     def __init__(self, config: SOXLSectorRSConfig):
         self.config = config
 
-    def _fetch_ticker_data(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        """下載指定標的數據"""
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.sector_ticker, self.config.benchmark_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         cfg = self.config
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        soxx_df = self._fetch_ticker_data(cfg.sector_ticker, start_date)
-        spy_df = self._fetch_ticker_data(cfg.benchmark_ticker, start_date)
-
-        if soxx_df is None or spy_df is None:
-            logger.error("Unable to fetch SOXX/SPY data for RS calculation")
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            return df
-
-        # Align all three datasets to common dates
-        common_idx = df.index.intersection(soxx_df.index).intersection(spy_df.index)
-        df = df.loc[common_idx]
+        soxx_df = self.require_auxiliary(cfg.sector_ticker, df.index)
+        spy_df = self.require_auxiliary(cfg.benchmark_ticker, df.index)
 
         # SMA trend on SOXL
         df["SMA_Trend"] = df["Close"].rolling(cfg.sma_trend_period).mean()
 
         # Sector RS: SOXX 20d return - SPY 20d return
         period = cfg.relative_strength_period
-        soxx_return = soxx_df.loc[common_idx, "Close"].pct_change(period)
-        spy_return = spy_df.loc[common_idx, "Close"].pct_change(period)
+        soxx_return = soxx_df["Close"].pct_change(period)
+        spy_return = spy_df["Close"].pct_change(period)
         df["Relative_Strength"] = soxx_return - spy_return
 
         # SOXL 5-day pullback from high

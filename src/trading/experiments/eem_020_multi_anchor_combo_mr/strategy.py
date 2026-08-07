@@ -19,6 +19,7 @@ EEM-020: Multi-Anchor (^VIX CAP + EEM-FXI CEILING) Combined Filter on Vol-Transi
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_020_multi_anchor_combo_mr.config import (
     EEM020Config,
@@ -29,8 +30,13 @@ from trading.experiments.eem_020_multi_anchor_combo_mr.signal_detector import (
 )
 
 
-class EEM020Strategy(ExecutionModelStrategy):
+class EEM020Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-020: Multi-Anchor (^VIX CAP + EEM-FXI CEILING) Combined Filter on Vol-Transition MR"""
+
+    bundle_trial_family = "EEM:multi-anchor-combo-mr"
+    bundle_trial_hypothesis = (
+        "EEM mean-reversion entries improve when VIX and FXI anchors jointly confirm recovery."
+    )
 
     slippage_pct: float = 0.001
 

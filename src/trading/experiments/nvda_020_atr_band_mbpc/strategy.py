@@ -7,6 +7,7 @@ NVDA-020: Volatility-Acceleration Band Filter on Regime-Aware MBPC
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_020_atr_band_mbpc.config import (
     NVDA020Config,
@@ -17,10 +18,12 @@ from trading.experiments.nvda_020_atr_band_mbpc.signal_detector import (
 )
 
 
-class NVDA020ATRBandMBPCStrategy(ExecutionModelStrategy):
+class NVDA020ATRBandMBPCStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-020：Vol-Acceleration Band Filter on Regime-Aware MBPC（含成交模型）"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:atr-band-mbpc"
+    bundle_trial_hypothesis = "NVDA ATR-band momentum breakout pullbacks can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

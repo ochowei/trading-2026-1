@@ -13,55 +13,28 @@ INDA-007 Signal Detector: Relative Strength Momentum Pullback
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.inda_007_rs_momentum.config import INDA007Config
 
 logger = logging.getLogger(__name__)
 
 
-class INDA007SignalDetector(BaseSignalDetector):
+class INDA007SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """INDA Relative Strength Momentum Pullback 訊號偵測器"""
 
     def __init__(self, config: INDA007Config):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載參考標的（EEM）數據"""
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # 下載 EEM 數據
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        ref_df = self._fetch_reference_data(start_date)
-
-        if ref_df is None or ref_df.empty:
-            logger.error("無法取得 %s 數據，無法計算相對強度", self.config.reference_ticker)
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            return df
-
-        # 對齊日期（取交集）
-        common_idx = df.index.intersection(ref_df.index)
-        df = df.loc[common_idx]
+        # EEM 由 shared followup data bundle 提供，缺漏時 fail closed。
+        ref_df = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         # SMA trend
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
@@ -69,7 +42,7 @@ class INDA007SignalDetector(BaseSignalDetector):
         # INDA 和 EEM 的 20日報酬
         period = self.config.relative_strength_period
         df["INDA_Return"] = df["Close"].pct_change(period)
-        df["EEM_Return"] = ref_df.loc[common_idx, "Close"].pct_change(period)
+        df["EEM_Return"] = ref_df["Close"].pct_change(period)
 
         # 相對強度 = INDA 報酬 - EEM 報酬
         df["Relative_Strength"] = df["INDA_Return"] - df["EEM_Return"]

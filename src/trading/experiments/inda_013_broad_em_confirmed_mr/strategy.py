@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_013_broad_em_confirmed_mr.config import (
     INDA013Config,
@@ -12,10 +13,14 @@ from trading.experiments.inda_013_broad_em_confirmed_mr.signal_detector import (
 )
 
 
-class INDA013Strategy(ExecutionModelStrategy):
+class INDA013Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA-013：inda_010 框架 + broad-EM macro context confirmation gate"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "INDA:broad-em-confirmed-mr"
+    bundle_trial_hypothesis = (
+        "INDA mean-reversion entries improve when broad EM confirms a risk-off regime."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

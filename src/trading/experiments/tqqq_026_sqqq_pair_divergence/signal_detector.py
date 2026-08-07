@@ -12,9 +12,9 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_001_capitulation.signal_detector import TQQQSignalDetector
 from trading.experiments.tqqq_018_regime_vol_gate.signal_detector import (
     TQQQ018SignalDetector,
@@ -24,47 +24,25 @@ from trading.experiments.tqqq_026_sqqq_pair_divergence.config import TQQQ026Conf
 logger = logging.getLogger(__name__)
 
 
-class TQQQ026SignalDetector(BaseSignalDetector):
+class TQQQ026SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TQQQ-026：TQQQ-018 框架 + SQQQ inverse-pair 恐慌確認 filter"""
 
     def __init__(self, config: TQQQ026Config):
         self.config = config
         self._base_detector = TQQQ018SignalDetector(config)
 
-    def _fetch_ohlcv(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.sqqq_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = self._base_detector.compute_indicators(df)
 
         cfg = self.config
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
-        sqqq = self._fetch_ohlcv(cfg.sqqq_ticker, start_date)
-        if sqqq is None:
-            logger.error("無法取得 %s 數據，SQQQ 配對過濾停用", cfg.sqqq_ticker)
-            df["SQQQ_RSI"] = float("nan")
-            df["SQQQ_Vol_Spike"] = False
-            return df
-
-        sqqq_close = sqqq["Close"].reindex(df.index, method="ffill")
+        sqqq = self.require_auxiliary(cfg.sqqq_ticker, df.index)
+        sqqq_close = sqqq["Close"]
         df["SQQQ_RSI"] = TQQQSignalDetector._compute_rsi(sqqq_close, cfg.sqqq_rsi_period)
 
-        sqqq_vol = sqqq["Volume"].reindex(df.index, method="ffill")
+        sqqq_vol = sqqq["Volume"]
         sqqq_vol_sma = sqqq_vol.rolling(cfg.sqqq_volume_sma_period).mean()
         df["SQQQ_Vol_Spike"] = sqqq_vol > cfg.sqqq_volume_multiplier * sqqq_vol_sma
 

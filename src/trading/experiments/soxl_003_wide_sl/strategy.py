@@ -5,6 +5,7 @@ SOXL 寬停損 + 成交模型策略 (SOXL Wide SL + Execution Model Strategy)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_003_wide_sl.config import (
@@ -16,7 +17,7 @@ from trading.experiments.soxl_003_wide_sl.signal_detector import (
 )
 
 
-class SOXLWideSLStrategy(ExecutionModelStrategy):
+class SOXLWideSLStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL 寬停損 + 成交模型策略 (SOXL-003)
 
@@ -24,6 +25,11 @@ class SOXLWideSLStrategy(ExecutionModelStrategy):
     出場: TP +15% / SL -15% / 20 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:wide-sl"
+    bundle_trial_hypothesis = (
+        "SOXL wide-stop exits can preserve the oversold entry edge from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

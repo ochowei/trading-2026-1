@@ -7,6 +7,7 @@ SOXL-010: Semiconductor Sector RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_010_sector_rs_momentum.config import (
     SOXLSectorRSConfig,
@@ -17,8 +18,13 @@ from trading.experiments.soxl_010_sector_rs_momentum.signal_detector import (
 )
 
 
-class SOXLSectorRSStrategy(ExecutionModelStrategy):
+class SOXLSectorRSStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """SOXL-010: Semiconductor Sector RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "SOXL:sector-rs-momentum"
+    bundle_trial_hypothesis = (
+        "SOXL pullbacks improve when semiconductor leadership versus SPY remains strong."
+    )
 
     slippage_pct: float = 0.001
 

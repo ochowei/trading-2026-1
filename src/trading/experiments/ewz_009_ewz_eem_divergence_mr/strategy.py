@@ -13,6 +13,7 @@ EWZ-009: EWZ-EEM Divergence-Gated Vol-Transition MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_009_ewz_eem_divergence_mr.config import (
     EWZ009Config,
@@ -23,10 +24,14 @@ from trading.experiments.ewz_009_ewz_eem_divergence_mr.signal_detector import (
 )
 
 
-class EWZ009Strategy(ExecutionModelStrategy):
+class EWZ009Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ-009: EWZ-EEM Divergence-Gated Vol-Transition MR"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "EWZ:ewz-eem-divergence-mr"
+    bundle_trial_hypothesis = (
+        "EWZ mean-reversion entries improve when country strength versus EEM is contained."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -18,6 +18,7 @@ lower（多日 swing 結構反轉確認），相較 CIBR-012 的 2DD cap（兩�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_013_higher_low_confirmation_mr.config import (
     CIBR013Config,
@@ -28,8 +29,13 @@ from trading.experiments.cibr_013_higher_low_confirmation_mr.signal_detector imp
 )
 
 
-class CIBR013Strategy(ExecutionModelStrategy):
+class CIBR013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR Higher-Low Structural Confirmation MR (CIBR-013)"""
+
+    bundle_trial_family = "CIBR:higher-low-confirmation-mr"
+    bundle_trial_hypothesis = (
+        "CIBR higher-low confirmation can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

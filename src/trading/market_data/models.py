@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import base64
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime
+from enum import StrEnum
 from typing import Literal
 from zoneinfo import ZoneInfo
 
@@ -92,6 +94,40 @@ class CacheMetadata:
     last_incremental_refresh: datetime | None
     last_complete_refresh: datetime | None
     checksum: str
+    coverage_policy: str = "xnys_sessions"
+
+
+class CoverageMode(StrEnum):
+    """How a series' observation dates are validated before research use."""
+
+    XNYS_SESSIONS = "xnys_sessions"
+    PROVIDER_OBSERVATIONS = "provider_observations"
+
+
+@dataclass(frozen=True, slots=True)
+class MarketDataCoveragePolicy:
+    """Series-specific observation-date coverage contract."""
+
+    mode: CoverageMode = CoverageMode.XNYS_SESSIONS
+
+    def __post_init__(self) -> None:
+        try:
+            mode = CoverageMode(self.mode)
+        except ValueError as exc:
+            raise ValueError(f"unsupported market-data coverage mode: {self.mode}") from exc
+        object.__setattr__(self, "mode", mode)
+
+    @classmethod
+    def xnys(cls) -> MarketDataCoveragePolicy:
+        return cls(CoverageMode.XNYS_SESSIONS)
+
+    @classmethod
+    def provider_observations(cls) -> MarketDataCoveragePolicy:
+        return cls(CoverageMode.PROVIDER_OBSERVATIONS)
+
+    @property
+    def requires_complete_sessions(self) -> bool:
+        return self.mode is CoverageMode.XNYS_SESSIONS
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,6 +157,7 @@ class MarketDataRequirement:
     history_start: date
     role: Literal["primary", "auxiliary"]
     availability_policy: AvailabilityPolicy | None = None
+    coverage_policy: MarketDataCoveragePolicy = MarketDataCoveragePolicy.xnys()
 
     def __post_init__(self) -> None:
         if self.role not in {"primary", "auxiliary"}:
@@ -129,6 +166,45 @@ class MarketDataRequirement:
             raise ValueError("auxiliary requirements must declare an availability policy")
         if self.role == "primary" and self.availability_policy is not None:
             raise ValueError("primary requirements do not use an auxiliary availability policy")
+        if not isinstance(self.coverage_policy, MarketDataCoveragePolicy):
+            raise TypeError("coverage_policy must be a MarketDataCoveragePolicy")
+        if self.role == "primary" and not self.coverage_policy.requires_complete_sessions:
+            raise ValueError("primary series require XNYS session coverage")
+
+
+@dataclass(frozen=True, slots=True)
+class MarketDataDeclaration:
+    """Complete preregistered market-data requirements for one experiment."""
+
+    requirements: tuple[MarketDataRequirement, ...]
+
+    def __post_init__(self) -> None:
+        requirements = tuple(self.requirements)
+        object.__setattr__(self, "requirements", requirements)
+        if not requirements:
+            raise ValueError("a market-data bundle requires declarations")
+        if any(not isinstance(item, MarketDataRequirement) for item in requirements):
+            raise ValueError("market-data declarations require MarketDataRequirement values")
+        series = {item.series for item in requirements}
+        if len(series) != len(requirements):
+            raise ValueError("a market-data series was declared more than once")
+        if sum(item.role == "primary" for item in requirements) != 1:
+            raise ValueError("a market-data declaration requires exactly one primary series")
+
+    @classmethod
+    def from_requirements(
+        cls,
+        requirements: Iterable[MarketDataRequirement],
+    ) -> MarketDataDeclaration:
+        return cls(tuple(requirements))
+
+    @property
+    def primary(self) -> MarketDataRequirement:
+        return next(item for item in self.requirements if item.role == "primary")
+
+    @property
+    def auxiliary(self) -> tuple[MarketDataRequirement, ...]:
+        return tuple(item for item in self.requirements if item.role == "auxiliary")
 
 
 @dataclass(frozen=True, slots=True)

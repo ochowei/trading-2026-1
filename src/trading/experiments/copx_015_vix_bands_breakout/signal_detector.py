@@ -20,36 +20,22 @@ low-VIX calm regime。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.copx_015_vix_bands_breakout.config import COPX015Config
 
 logger = logging.getLogger(__name__)
 
 
-class COPX015VixBandsBreakoutDetector(BaseSignalDetector):
+class COPX015VixBandsBreakoutDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """COPX-015 訊號偵測器"""
 
     def __init__(self, config: COPX015Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -84,13 +70,8 @@ class COPX015VixBandsBreakoutDetector(BaseSignalDetector):
         df["SMA_Regime_Long"] = df["Close"].rolling(self.config.sma_regime_long).mean()
 
         # === ^VIX regime gate（COPX-015 核心新增，lesson #24 family FLOOR）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，^VIX 過濾停用", self.config.vix_ticker)
-            df["VIX_Close"] = float("nan")
-        else:
-            df["VIX_Close"] = vix_df["Close"].reindex(df.index, method="ffill")
+        vix_df = self.require_auxiliary(self.config.vix_ticker, df.index)
+        df["VIX_Close"] = vix_df["Close"]
 
         return df
 

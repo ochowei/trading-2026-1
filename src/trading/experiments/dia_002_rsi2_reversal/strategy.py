@@ -7,6 +7,7 @@ DIA-002: RSI(2) 極端超賣均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_002_rsi2_reversal.config import (
     DIARsi2Config,
@@ -17,8 +18,13 @@ from trading.experiments.dia_002_rsi2_reversal.signal_detector import (
 )
 
 
-class DIARsi2Strategy(ExecutionModelStrategy):
+class DIARsi2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA RSI(2) 極端超賣均值回歸 (DIA-002)"""
+
+    bundle_trial_family = "DIA:rsi2-reversal"
+    bundle_trial_hypothesis = (
+        "DIA RSI(2) reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

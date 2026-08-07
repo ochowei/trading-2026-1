@@ -8,6 +8,7 @@ EEM-017: EEM-EFA Cross-Asset Divergence Filter on Vol-Transition MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_017_eem_efa_divergence_mr.config import (
     EEM017Config,
@@ -18,8 +19,13 @@ from trading.experiments.eem_017_eem_efa_divergence_mr.signal_detector import (
 )
 
 
-class EEM017Strategy(ExecutionModelStrategy):
+class EEM017Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-017: EEM-EFA Divergence-Gated Vol-Transition MR"""
+
+    bundle_trial_family = "EEM:eem-efa-divergence-mr"
+    bundle_trial_hypothesis = (
+        "EEM mean-reversion entries improve when EEM weakness versus EFA is contained."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

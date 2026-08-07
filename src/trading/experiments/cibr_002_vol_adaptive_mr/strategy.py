@@ -7,6 +7,7 @@ CIBR 波動率自適應均值回歸策略 (CIBR Volatility-Adaptive Mean Reversi
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_002_vol_adaptive_mr.config import (
     CIBRVolAdaptiveMRConfig,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_002_vol_adaptive_mr.signal_detector import (
 )
 
 
-class CIBRVolAdaptiveMRStrategy(ExecutionModelStrategy):
+class CIBRVolAdaptiveMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-002：波動率自適應均值回歸"""
+
+    bundle_trial_family = "CIBR:vol-adaptive-mr"
+    bundle_trial_hypothesis = (
+        "CIBR volatility-adaptive mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

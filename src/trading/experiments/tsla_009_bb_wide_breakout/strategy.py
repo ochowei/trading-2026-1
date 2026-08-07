@@ -8,6 +8,7 @@ TSLA BB Wide Band Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_009_bb_wide_breakout.config import (
     TSLABBWideConfig,
@@ -18,7 +19,11 @@ from trading.experiments.tsla_009_bb_wide_breakout.signal_detector import (
 )
 
 
-class TSLABBWideBreakoutStrategy(ExecutionModelStrategy):
+class TSLABBWideBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:bb-wide-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA wide-band breakouts can be reproduced from a verified primary bundle."
+    )
     """TSLA-009：BB Wide Band Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

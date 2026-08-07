@@ -8,6 +8,7 @@ Entry uses Donchian Channel breakout with SMA trend filter, fixed TP/SL exit.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_005_donchian_momentum.config import (
     TLTBreakoutTrendConfig,
@@ -18,8 +19,13 @@ from trading.experiments.tlt_005_donchian_momentum.signal_detector import (
 )
 
 
-class TLTBreakoutTrendStrategy(ExecutionModelStrategy):
+class TLTBreakoutTrendStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT Donchian 突�� + 趨勢跟蹤 (TLT-005)"""
+
+    bundle_trial_family = "TLT:donchian-momentum"
+    bundle_trial_hypothesis = (
+        "TLT Donchian momentum entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

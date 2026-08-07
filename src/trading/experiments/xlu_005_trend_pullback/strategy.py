@@ -8,6 +8,7 @@ XLU Cross-Asset Relative Value Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_005_trend_pullback.config import (
     XLU005Config,
@@ -18,8 +19,13 @@ from trading.experiments.xlu_005_trend_pullback.signal_detector import (
 )
 
 
-class XLU005TrendPullbackStrategy(ExecutionModelStrategy):
+class XLU005TrendPullbackStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU-005：Cross-Asset Relative Value 策略（含成交模型）"""
+
+    bundle_trial_family = "XLU:tlt-relative-value"
+    bundle_trial_hypothesis = (
+        "XLU catches up to TLT after a rate-sensitive relative-value divergence."
+    )
 
     slippage_pct: float = 0.001
 

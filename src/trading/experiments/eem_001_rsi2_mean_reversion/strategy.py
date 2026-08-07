@@ -7,6 +7,7 @@ EEM-001: RSI(2) 均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_001_rsi2_mean_reversion.config import (
     EEMRsi2MeanReversionConfig,
@@ -17,8 +18,13 @@ from trading.experiments.eem_001_rsi2_mean_reversion.signal_detector import (
 )
 
 
-class EEMRsi2MeanReversionStrategy(ExecutionModelStrategy):
+class EEMRsi2MeanReversionStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM RSI(2) 均值回歸 (EEM-001)"""
+
+    bundle_trial_family = "EEM:rsi2-mean-reversion"
+    bundle_trial_hypothesis = (
+        "EEM RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

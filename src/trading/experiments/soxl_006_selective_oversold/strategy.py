@@ -7,6 +7,7 @@ SOXL Selective Oversold + Extended Holding + Execution Model Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_006_selective_oversold.config import (
@@ -18,7 +19,7 @@ from trading.experiments.soxl_006_selective_oversold.signal_detector import (
 )
 
 
-class SOXLSelectiveOversoldStrategy(ExecutionModelStrategy):
+class SOXLSelectiveOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL 精選超賣 + 延長持倉 + 成交模型策略 (SOXL-006)
 
@@ -26,6 +27,11 @@ class SOXLSelectiveOversoldStrategy(ExecutionModelStrategy):
     出場: TP +18% / SL -12% / 25 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:selective-oversold"
+    bundle_trial_hypothesis = (
+        "SOXL selective oversold entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

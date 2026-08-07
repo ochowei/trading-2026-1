@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_016_move_multi_window_direction_mr.config import (
     TLT016Config,
@@ -12,11 +13,15 @@ from trading.experiments.tlt_016_move_multi_window_direction_mr.signal_detector 
 )
 
 
-class TLT016MoveMultiWindowDirectionMRStrategy(ExecutionModelStrategy):
+class TLT016MoveMultiWindowDirectionMRStrategy(
+    AuxiliaryBundleStrategyMixin, ExecutionModelStrategy
+):
     """TLT-016: BB-width + ^MOVE LEVEL + TLT-SPY divergence + ^MOVE multi-window
     IV direction regime gate MR (cross-strategy port from USO-028 Att1)."""
 
     slippage_pct: float = 0.001  # 0.1% (TLT 高流動 ETF)
+    bundle_trial_family = "TLT:move-multi-window-direction-mr"
+    bundle_trial_hypothesis = "TLT mean-reversion entries improve when MOVE direction does not confirm an adverse rate-volatility regime."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

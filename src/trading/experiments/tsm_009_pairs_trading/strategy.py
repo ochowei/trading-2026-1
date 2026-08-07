@@ -7,6 +7,7 @@ TSM/NVDA Pairs Trading Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_009_pairs_trading.config import (
     TSMPairsTradingConfig,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_009_pairs_trading.signal_detector import (
 )
 
 
-class TSMPairsTradingStrategy(ExecutionModelStrategy):
+class TSMPairsTradingStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-009：Pairs Trading TSM/NVDA（含成交模型）"""
+
+    bundle_trial_family = "TSM:pairs-trading"
+    bundle_trial_hypothesis = (
+        "TSM relative-value entries improve when TSM is deeply discounted versus NVDA."
+    )
 
     slippage_pct: float = 0.001
 

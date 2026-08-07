@@ -8,6 +8,7 @@ TSM-010: Multi-Week Regime-Aware Momentum Breakout Pullback Continuation 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_010_regime_mbpc.config import (
     TSM010Config,
@@ -18,8 +19,13 @@ from trading.experiments.tsm_010_regime_mbpc.signal_detector import (
 )
 
 
-class TSM010RegimeMBPCStrategy(ExecutionModelStrategy):
+class TSM010RegimeMBPCStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-010：Multi-Week Regime-Aware MBPC 策略（含成交模型）"""
+
+    bundle_trial_family = "TSM:regime-mbpc"
+    bundle_trial_hypothesis = (
+        "TSM regime-aware momentum pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

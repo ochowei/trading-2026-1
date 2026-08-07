@@ -7,6 +7,7 @@ TSM-019: VIX Term-Structure Regime Gate on RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_019_vix_term_structure_rs.config import (
     TSM019Config,
@@ -17,8 +18,11 @@ from trading.experiments.tsm_019_vix_term_structure_rs.signal_detector import (
 )
 
 
-class TSM019Strategy(ExecutionModelStrategy):
+class TSM019Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-019：VIX Term-Structure Regime Gate on RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:vix-term-structure"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve when VIX term structure avoids extremes."
 
     slippage_pct: float = 0.001
 

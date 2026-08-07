@@ -111,12 +111,20 @@ policy form the proposal's data-bundle identity.
 
 A passing parity run must come from `run_verified_data_access_parity`. Its loader verifies and
 returns one immutable bundle object, and both data-access paths execute against that same object.
-The runner checks detector identity and
-records checksums of both complete indicator/signal/trade outputs. Caller-assembled empty results are
-not accepted by the registry. The verified run is appended for one exact strategy, snapshot, and
-current definition fingerprint. `followup-state activate` then verifies that parity digest against
+The runner checks detector identity and records aggregate plus per-layer checksums of both complete
+indicator/signal/trade outputs; signal dates are compared in order. Caller-assembled empty results
+are not accepted by the registry. The result-linked
+`results/<experiment>/<snapshot_id>.migration-parity.json` artifact records the exact legacy and
+migrated definition references, runtime identity, differences, corrections, and self-verifying
+parity digest. The verified run is appended for one exact strategy, snapshot, and current definition
+fingerprint. `followup-state activate` then verifies that parity digest against
 the hash-chained lifecycle history, the exact Shadow registration and activation-evaluation events
 in `state/qualification-registry.json`, and the current valid persisted result fingerprint:
+
+Both `followup-state shadow` and `followup-state activate` also require the trial registry to contain
+a successful `online` or `offline` observation with `validity_status: valid` for the migrated
+definition fingerprint. A `migration` observation marked `migration-pending` is insufficient, so
+the old result, Shadow, and lifecycle evidence cannot be reused as requalification.
 
 ```bash
 uv run trading followup-state activate \
@@ -142,6 +150,13 @@ The current selected fleet begins the controlled cutover as Legacy Active. Defin
 identical snapshots, parity evidence has passed, and Phase 6 historical and prospective evidence has
 been recorded. Phase 7 code never treats existing legacy results or an unavailable migration run as
 proof of completion.
+
+Phase 9 migration execution uses the explicit `migration` research mode with
+`--offline <manifest> --migration-parity <artifact>`. It writes only the immutable
+`<snapshot_id>.migration-result.json` envelope and appends a `migration-pending` trial observation;
+it cannot replace legacy results or `latest.json`, and it does not append qualification or lifecycle
+events. A later, separately qualified result is required before any Shadow or Active proof can use
+the migrated definition.
 
 ## Allocation epochs and rollback
 

@@ -23,6 +23,7 @@ FLOOR 為 n=7 post-hoc 單點分離器（依 EEM-016 標準應 REJECT）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_015_implied_vol_regime_mr.config import (
     INDA015Config,
@@ -33,10 +34,14 @@ from trading.experiments.inda_015_implied_vol_regime_mr.signal_detector import (
 )
 
 
-class INDA015Strategy(ExecutionModelStrategy):
+class INDA015Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA Implied-Vol Regime-Gated MR (INDA-015)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價，同 INDA-011/012）
+    bundle_trial_family = "INDA:implied-vol-regime-mr"
+    bundle_trial_hypothesis = (
+        "INDA mean-reversion entries improve when implied volatility avoids an adverse regime."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

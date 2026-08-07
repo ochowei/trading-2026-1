@@ -8,6 +8,7 @@ NVDA-006（正向 RS 動量延續）的反向探索：repo 第一次以負向相
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_014_negative_rs_mr.config import (
     NVDA014Config,
@@ -16,8 +17,11 @@ from trading.experiments.nvda_014_negative_rs_mr.config import (
 from trading.experiments.nvda_014_negative_rs_mr.signal_detector import NVDA014Detector
 
 
-class NVDANegativeRSMRStrategy(ExecutionModelStrategy):
+class NVDANegativeRSMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-014：Negative Relative Strength Pairs Mean Reversion（含成交模型）"""
+
+    bundle_trial_family = "NVDA:negative-rs-mr"
+    bundle_trial_hypothesis = "NVDA mean-reversion entries improve when relative weakness versus SMH is followed by capitulation."
 
     slippage_pct: float = 0.0015
 

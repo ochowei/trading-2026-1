@@ -5,6 +5,7 @@ GLD-012: 無追蹤停損均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_012_atr_adaptive.config import (
     GLD012Config,
@@ -15,8 +16,13 @@ from trading.experiments.gld_012_atr_adaptive.signal_detector import (
 )
 
 
-class GLD012Strategy(ExecutionModelStrategy):
+class GLD012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 無追蹤停損均值回歸 (GLD-012)"""
+
+    bundle_trial_family = "GLD:atr-adaptive"
+    bundle_trial_hypothesis = (
+        "GLD ATR-adaptive mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

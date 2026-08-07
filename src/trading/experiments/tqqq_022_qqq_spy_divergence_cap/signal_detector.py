@@ -14,9 +14,9 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_018_regime_vol_gate.signal_detector import (
     TQQQ018SignalDetector,
 )
@@ -25,54 +25,26 @@ from trading.experiments.tqqq_022_qqq_spy_divergence_cap.config import TQQQ022Co
 logger = logging.getLogger(__name__)
 
 
-class TQQQ022QQQSPYDivergenceDetector(BaseSignalDetector):
+class TQQQ022QQQSPYDivergenceDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TQQQ-022：恐慌抄底 + 波動率 regime + first-day filter + QQQ-SPY 跨資產 FLOOR"""
 
     def __init__(self, config: TQQQ022Config):
         self.config = config
         self._base_detector = TQQQ018SignalDetector(config)
 
-    @staticmethod
-    def _fetch_external(ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.qqq_ticker, self.config.spy_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = self._base_detector.compute_indicators(df)
         cfg = self.config
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        qqq_df = self._fetch_external(cfg.qqq_ticker, start_date)
-        spy_df = self._fetch_external(cfg.spy_ticker, start_date)
-
         n = cfg.divergence_lookback
-        if qqq_df is None or qqq_df.empty or spy_df is None or spy_df.empty:
-            logger.error(
-                "無法取得 QQQ/SPY 數據，cross-asset divergence 過濾停用 "
-                "(Failed to fetch QQQ/SPY, divergence filter disabled)"
-            )
-            df["QQQ_Ret_N"] = 0.0
-            df["SPY_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            qqq_close = qqq_df["Close"].reindex(df.index, method="ffill")
-            spy_close = spy_df["Close"].reindex(df.index, method="ffill")
-            df["QQQ_Ret_N"] = qqq_close.pct_change(n)
-            df["SPY_Ret_N"] = spy_close.pct_change(n)
-            df["Rel_Return_N"] = df["QQQ_Ret_N"] - df["SPY_Ret_N"]
+        qqq_close = self.require_auxiliary(cfg.qqq_ticker, df.index)["Close"]
+        spy_close = self.require_auxiliary(cfg.spy_ticker, df.index)["Close"]
+        df["QQQ_Ret_N"] = qqq_close.pct_change(n)
+        df["SPY_Ret_N"] = spy_close.pct_change(n)
+        df["Rel_Return_N"] = df["QQQ_Ret_N"] - df["SPY_Ret_N"]
 
         return df
 

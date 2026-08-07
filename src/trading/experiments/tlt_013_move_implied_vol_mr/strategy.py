@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_013_move_implied_vol_mr.config import (
     TLT013Config,
@@ -12,10 +13,14 @@ from trading.experiments.tlt_013_move_implied_vol_mr.signal_detector import (
 )
 
 
-class TLT013MoveImpliedVolMRStrategy(ExecutionModelStrategy):
+class TLT013MoveImpliedVolMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-013：BB-width + ^MOVE forward-looking implied vol regime gate MR"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+    bundle_trial_family = "TLT:move-implied-vol-mr"
+    bundle_trial_hypothesis = (
+        "TLT mean-reversion entries improve when MOVE avoids an adverse implied-volatility regime."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

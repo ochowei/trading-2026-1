@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_027_multi_period_cap_mr.config import (
     USO027Config,
@@ -12,7 +13,12 @@ from trading.experiments.uso_027_multi_period_cap_mr.signal_detector import (
 )
 
 
-class USO027Strategy(ExecutionModelStrategy):
+class USO027Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "USO:multi-period-cap"
+    bundle_trial_hypothesis = (
+        "USO pullback entries improve when multi-day persistence excludes continuation selloffs."
+    )
+
     """USO-027：USO-025 Att3 框架 + 5d return cap multi-period persistence gate"""
 
     slippage_pct: float = 0.001

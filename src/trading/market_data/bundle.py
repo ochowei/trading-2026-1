@@ -11,6 +11,7 @@ from trading.market_data.calendar import PrimaryUSSessionCalendar
 from trading.market_data.contracts import SessionCalendar
 from trading.market_data.models import (
     AvailabilityPolicy,
+    MarketDataDeclaration,
     MarketDataRequirement,
     MarketDataSeries,
     SignalDecisionTime,
@@ -27,14 +28,20 @@ class MarketDataBundle(Mapping[MarketDataSeries, pd.DataFrame]):
 
     def __init__(
         self,
-        requirements: Iterable[MarketDataRequirement],
+        requirements: Iterable[MarketDataRequirement] | MarketDataDeclaration,
         frames: Mapping[MarketDataSeries, pd.DataFrame],
         *,
         decision_time: SignalDecisionTime,
+        decision_times: Iterable[SignalDecisionTime] | None = None,
         calendar: SessionCalendar | None = None,
     ) -> None:
-        requirement_list = self.validate_requirements(requirements)
+        declaration = self._declaration_from(requirements)
+        requirement_list = declaration.requirements
         session_calendar = calendar or PrimaryUSSessionCalendar()
+        decision_time_list = self._validate_decision_times(
+            decision_time,
+            decision_times,
+        )
         validated = self._validate_frames(requirement_list, frames, session_calendar)
         requirement_by_series = {
             requirement.series: requirement for requirement in requirement_list
@@ -49,26 +56,53 @@ class MarketDataBundle(Mapping[MarketDataSeries, pd.DataFrame]):
                         f"auxiliary series {series.symbol} has no availability policy"
                     )
                 accessible[series] = align_auxiliary(
-                    (decision_time,),
+                    decision_time_list,
                     normalized,
                     policy=policy,
                     calendar=session_calendar,
                 )
             else:
                 accessible[series] = normalized.loc[: pd.Timestamp(decision_time.session)]
+        self._declaration = declaration
+        self._decision_times = decision_time_list
+        self._decision_time = decision_time
         self._frames = accessible
 
     @staticmethod
     def validate_requirements(
-        requirements: Iterable[MarketDataRequirement],
+        requirements: Iterable[MarketDataRequirement] | MarketDataDeclaration,
     ) -> tuple[MarketDataRequirement, ...]:
-        requirement_list = tuple(requirements)
-        if not requirement_list:
-            raise MarketDataAvailabilityError("a market-data bundle requires declarations")
-        required = {requirement.series for requirement in requirement_list}
-        if len(required) != len(requirement_list):
-            raise MarketDataAvailabilityError("a market-data series was declared more than once")
-        return requirement_list
+        return MarketDataBundle._declaration_from(requirements).requirements
+
+    @staticmethod
+    def _declaration_from(
+        requirements: Iterable[MarketDataRequirement] | MarketDataDeclaration,
+    ) -> MarketDataDeclaration:
+        if isinstance(requirements, MarketDataDeclaration):
+            return requirements
+        try:
+            return MarketDataDeclaration.from_requirements(requirements)
+        except ValueError as exc:
+            raise MarketDataAvailabilityError(str(exc)) from exc
+
+    @staticmethod
+    def _validate_decision_times(
+        decision_time: SignalDecisionTime,
+        decision_times: Iterable[SignalDecisionTime] | None,
+    ) -> tuple[SignalDecisionTime, ...]:
+        values = tuple(decision_times) if decision_times is not None else (decision_time,)
+        if not values:
+            raise MarketDataAvailabilityError("a bundle requires decision sessions")
+        if any(not isinstance(item, SignalDecisionTime) for item in values):
+            raise MarketDataAvailabilityError("decision sessions must be SignalDecisionTime values")
+        sessions = tuple(item.session for item in values)
+        if len(set(sessions)) != len(sessions):
+            raise MarketDataAvailabilityError("decision sessions must be unique and chronological")
+        if sessions != tuple(sorted(sessions)):
+            raise MarketDataAvailabilityError("decision sessions must be chronological")
+        if values[-1].session != decision_time.session:
+            raise MarketDataAvailabilityError("the final decision session must match decision_time")
+        return values
 
     @classmethod
     def from_requirements(
@@ -77,12 +111,14 @@ class MarketDataBundle(Mapping[MarketDataSeries, pd.DataFrame]):
         frames: Mapping[MarketDataSeries, pd.DataFrame],
         *,
         decision_time: SignalDecisionTime,
+        decision_times: Iterable[SignalDecisionTime] | None = None,
         calendar: SessionCalendar | None = None,
     ) -> MarketDataBundle:
         return cls(
             requirements,
             frames,
             decision_time=decision_time,
+            decision_times=decision_times,
             calendar=calendar,
         )
 
@@ -103,13 +139,20 @@ class MarketDataBundle(Mapping[MarketDataSeries, pd.DataFrame]):
         if undeclared:
             symbols = ", ".join(sorted(item.symbol for item in undeclared))
             raise MarketDataAvailabilityError(f"bundle contains undeclared series: {symbols}")
-        requirement_by_series = {
-            requirement.series: requirement for requirement in requirement_list
-        }
         validated: dict[MarketDataSeries, pd.DataFrame] = {}
-        for series in required:
+        # Keep declaration order stable.  The execution contract treats the
+        # primary series as the first item and auxiliary series as the
+        # subsequent declared inputs; iterating a set here made bundle
+        # iteration nondeterministic and broke that contract for multi-series
+        # strategies.
+        for requirement in requirement_list:
+            series = requirement.series
             normalized, outcome = validate_daily_bars(frames[series])
-            if outcome.is_valid and not normalized.empty:
+            if (
+                outcome.is_valid
+                and not normalized.empty
+                and requirement.coverage_policy.requires_complete_sessions
+            ):
                 expected_sessions = calendar.sessions_in_range(
                     normalized.index[0].date(),
                     normalized.index[-1].date(),
@@ -122,7 +165,6 @@ class MarketDataBundle(Mapping[MarketDataSeries, pd.DataFrame]):
                 raise MarketDataAvailabilityError(
                     f"invalid declared series {series.symbol}: {'; '.join(outcome.errors)}"
                 )
-            requirement = requirement_by_series[series]
             first_required_session = calendar.session_on_or_after(requirement.history_start)
             first_observation = normalized.index[0].date()
             if first_observation > first_required_session:
@@ -138,6 +180,22 @@ class MarketDataBundle(Mapping[MarketDataSeries, pd.DataFrame]):
         return MappingProxyType(
             {series: frame.copy(deep=True) for series, frame in self._frames.items()}
         )
+
+    @property
+    def declaration(self) -> MarketDataDeclaration:
+        return self._declaration
+
+    @property
+    def requirements(self) -> tuple[MarketDataRequirement, ...]:
+        return self._declaration.requirements
+
+    @property
+    def decision_time(self) -> SignalDecisionTime:
+        return self._decision_time
+
+    @property
+    def decision_times(self) -> tuple[SignalDecisionTime, ...]:
+        return self._decision_times
 
     def __getitem__(self, key: MarketDataSeries) -> pd.DataFrame:
         return self._frames[key].copy(deep=True)
@@ -157,13 +215,24 @@ def align_auxiliary(
     calendar: SessionCalendar,
 ) -> pd.DataFrame:
     """Align observations backward by declared information availability only."""
+    decision_list = tuple(decisions)
+    if not decision_list:
+        raise MarketDataAvailabilityError("auxiliary alignment requires decision sessions")
     normalized, outcome = validate_daily_bars(auxiliary)
     if not outcome.is_valid:
         raise MarketDataAvailabilityError("invalid auxiliary series: " + "; ".join(outcome.errors))
+    latest_decision = max(decision.session for decision in decision_list)
     observations: list[dict[str, object]] = []
     for observation_date, row in normalized.iterrows():
+        if observation_date.date() > latest_decision:
+            continue
         anchor = calendar.session_on_or_after(observation_date.date())
-        available = calendar.session_offset(anchor, policy.publication_lag_sessions)
+        try:
+            available = calendar.session_offset(anchor, policy.publication_lag_sessions)
+        except (IndexError, KeyError, ValueError):
+            continue
+        if available > latest_decision:
+            continue
         observations.append(
             {
                 "observation_date": observation_date,
@@ -174,7 +243,7 @@ def align_auxiliary(
 
     aligned_rows: list[dict[str, object]] = []
     decision_index: list[pd.Timestamp] = []
-    for decision in decisions:
+    for decision in decision_list:
         eligible = [
             observation
             for observation in observations

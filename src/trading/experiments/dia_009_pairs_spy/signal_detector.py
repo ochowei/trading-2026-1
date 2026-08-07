@@ -12,58 +12,30 @@ import logging
 
 import numpy as np
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.dia_009_pairs_spy.config import DIAPairsSPYConfig
 
 logger = logging.getLogger(__name__)
 
 
-class DIAPairsSPYDetector(BaseSignalDetector):
+class DIAPairsSPYDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """DIA/SPY Pairs Trading 訊號偵測器"""
 
     def __init__(self, config: DIAPairsSPYConfig):
         self.config = config
 
-    def _fetch_pair_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載配對標的（SPY）數據"""
-        try:
-            df = yf.download(
-                self.config.pair_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.pair_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.pair_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # 下載 SPY 數據
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        spy_df = self._fetch_pair_data(start_date)
-
-        if spy_df is None or spy_df.empty:
-            logger.error("無法取得 %s 數據，無法計算配對比值", self.config.pair_ticker)
-            df["Price_Ratio"] = 0.0
-            df["Ratio_Zscore"] = 0.0
-            df["SMA"] = 0.0
-            return df
-
-        # 對齊日期（取交集）
-        common_idx = df.index.intersection(spy_df.index)
-        df = df.loc[common_idx]
+        spy_df = self.require_auxiliary(self.config.pair_ticker, df.index)
 
         # 計算對數價格比值（log ratio 更穩定）
-        df["Price_Ratio"] = np.log(df["Close"] / spy_df.loc[common_idx, "Close"])
+        df["Price_Ratio"] = np.log(df["Close"] / spy_df["Close"])
 
         # 滾動 z-score
         lookback = self.config.zscore_lookback

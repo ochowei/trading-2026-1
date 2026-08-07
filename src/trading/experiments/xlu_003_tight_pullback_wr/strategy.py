@@ -7,6 +7,7 @@ XLU-003: Tight Pullback + Williams %R + Reversal Candle
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_003_tight_pullback_wr.config import (
     XLUTightPullbackConfig,
@@ -17,8 +18,13 @@ from trading.experiments.xlu_003_tight_pullback_wr.signal_detector import (
 )
 
 
-class XLUTightPullbackStrategy(ExecutionModelStrategy):
+class XLUTightPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU 緊縮回檔門檻 + Williams %R + 反轉K線 (XLU-003)"""
+
+    bundle_trial_family = "XLU:tight-pullback-wr"
+    bundle_trial_hypothesis = (
+        "XLU tight pullback entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

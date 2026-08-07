@@ -12,6 +12,7 @@ dimensionality extension：1D → 2D AND）
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_010_ewt_eem_2d_divergence_mr.config import (
     EWT010Config,
@@ -22,8 +23,14 @@ from trading.experiments.ewt_010_ewt_eem_2d_divergence_mr.signal_detector import
 )
 
 
-class EWT010Strategy(ExecutionModelStrategy):
+class EWT010Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT-010：EWT-EEM 2D divergence + EWT-009 Att3 Vol-Transition MR"""
+
+    bundle_trial_family = "EWT:ewt-eem-2d-divergence-mr"
+    bundle_trial_hypothesis = (
+        "EWT mean-reversion entries improve when short- and long-horizon leadership "
+        "versus EEM is not simultaneously extreme."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

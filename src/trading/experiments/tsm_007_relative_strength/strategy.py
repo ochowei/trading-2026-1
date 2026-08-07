@@ -8,6 +8,7 @@ TSM Relative Strength Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_007_relative_strength.config import (
     TSMRelativeStrengthConfig,
@@ -18,8 +19,13 @@ from trading.experiments.tsm_007_relative_strength.signal_detector import (
 )
 
 
-class TSMRelativeStrengthStrategy(ExecutionModelStrategy):
+class TSMRelativeStrengthStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-007：Relative Strength Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:relative-strength"
+    bundle_trial_hypothesis = (
+        "TSM pullbacks improve when relative strength versus SMH remains positive."
+    )
 
     slippage_pct: float = 0.001
 

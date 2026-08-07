@@ -7,6 +7,7 @@ INDA-008: BB Lower Band + Pullback Cap Hybrid Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_008_bb_lower_pullback_cap.config import (
     INDA008Config,
@@ -17,10 +18,15 @@ from trading.experiments.inda_008_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class INDA008Strategy(ExecutionModelStrategy):
+class INDA008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA-008: BB 下軌+回檔上限混合進場均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+
+    bundle_trial_family = "INDA:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = (
+        "INDA lower-band pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -21,6 +21,7 @@ XBI-013: Gap-Down Capitulation + Intraday Reversal Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_013_gap_reversal_mr.config import (
     XBI013Config,
@@ -31,10 +32,14 @@ from trading.experiments.xbi_013_gap_reversal_mr.signal_detector import (
 )
 
 
-class XBI013Strategy(ExecutionModelStrategy):
+class XBI013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI Gap-Down Capitulation + Intraday Reversal MR (XBI-013)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "XBI:gap-reversal-mr"
+    bundle_trial_hypothesis = (
+        "XBI gap-down reversal mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -7,6 +7,7 @@ VGK-005: 深回檔+非對稱出場+WR+ATR 均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_005_decline_enhanced_mr.config import (
     VGK005Config,
@@ -17,8 +18,13 @@ from trading.experiments.vgk_005_decline_enhanced_mr.signal_detector import (
 )
 
 
-class VGK005Strategy(ExecutionModelStrategy):
+class VGK005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK 深回檔+非對稱出場+WR+ATR 均值回歸 (VGK-005)"""
+
+    bundle_trial_family = "VGK:decline-enhanced-mr"
+    bundle_trial_hypothesis = (
+        "VGK decline-enhanced mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

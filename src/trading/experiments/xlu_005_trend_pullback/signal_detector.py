@@ -15,31 +15,30 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.core.data_fetcher import DataFetcher
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xlu_005_trend_pullback.config import XLU005Config
 
 logger = logging.getLogger(__name__)
 
 
-class XLU005Detector(BaseSignalDetector):
+class XLU005Detector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XLU Cross-Asset Relative Value 訊號偵測器"""
 
     def __init__(self, config: XLU005Config):
         self.config = config
 
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return ("TLT",)
+
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # Fetch TLT data for cross-asset signal
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        fetcher = DataFetcher(start=start_date)
-        tlt_data = fetcher.fetch_all(["TLT"])
-        tlt = tlt_data["TLT"]
+        # TLT data for cross-asset signal comes from the verified auxiliary bundle.
+        tlt = self.require_auxiliary("TLT", df.index)
 
         # TLT N-day return
         lookback = self.config.tlt_return_lookback
-        tlt_ret = tlt["Close"].pct_change(lookback)
-        df["TLT_Ret"] = tlt_ret.reindex(df.index)
+        df["TLT_Ret"] = tlt["Close"].pct_change(lookback)
 
         # XLU N-day return
         df["XLU_Ret"] = df["Close"].pct_change(lookback)

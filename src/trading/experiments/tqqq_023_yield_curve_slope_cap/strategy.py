@@ -7,6 +7,7 @@ tech ETF (TQQQ) — long-duration valuation 機制間接傳導假設驗證。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_023_yield_curve_slope_cap.config import (
@@ -18,7 +19,12 @@ from trading.experiments.tqqq_023_yield_curve_slope_cap.signal_detector import (
 )
 
 
-class TQQQ023YieldCurveSlopeStrategy(ExecutionModelStrategy):
+class TQQQ023YieldCurveSlopeStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:yield-curve-slope"
+    bundle_trial_hypothesis = (
+        "TQQQ capitulation entries improve when yield-curve slope level and velocity confirm."
+    )
+
     """TQQQ-023：恐慌抄底 + 波動率 regime + yield curve slope velocity（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定

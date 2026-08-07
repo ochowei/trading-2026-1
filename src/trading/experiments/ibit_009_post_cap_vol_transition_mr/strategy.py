@@ -8,6 +8,7 @@ IBIT-009: Post-Capitulation Vol-Transition MR
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_009_post_cap_vol_transition_mr.config import (
     IBIT009Config,
@@ -18,8 +19,11 @@ from trading.experiments.ibit_009_post_cap_vol_transition_mr.signal_detector imp
 )
 
 
-class IBIT009Strategy(ExecutionModelStrategy):
+class IBIT009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-009：Post-Capitulation Vol-Transition MR"""
+
+    bundle_trial_family = "IBIT:post-cap-vol-transition-mr"
+    bundle_trial_hypothesis = "IBIT post-capitulation volatility transition can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

@@ -7,6 +7,7 @@ CIBR-009: Key Reversal Day 均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_009_key_reversal_day_mr.config import (
     CIBR009Config,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_009_key_reversal_day_mr.signal_detector import (
 )
 
 
-class CIBR009Strategy(ExecutionModelStrategy):
+class CIBR009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-009：Key Reversal Day 均值回歸"""
+
+    bundle_trial_family = "CIBR:key-reversal-day-mr"
+    bundle_trial_hypothesis = (
+        "CIBR key-reversal mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -27,36 +27,22 @@ USDJPY 過濾的設計依據：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewj_006_usdjpy_direction_mr.config import EWJ006Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWJ006USDJPYDirectionDetector(BaseSignalDetector):
+class EWJ006USDJPYDirectionDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EWJ-006 USDJPY Direction-Gated Vol-Transition MR"""
 
     def __init__(self, config: EWJ006Config):
         self.config = config
 
-    def _fetch_usdjpy_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.usdjpy_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.usdjpy_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.usdjpy_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -102,15 +88,8 @@ class EWJ006USDJPYDirectionDetector(BaseSignalDetector):
         df["Ret_2d"] = df["Close"].pct_change(2)
 
         # USDJPY direction filter
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        usdjpy_df = self._fetch_usdjpy_data(start_date)
-
-        if usdjpy_df is None or usdjpy_df.empty:
-            logger.error("無法取得 %s 數據，USDJPY 過濾停用", self.config.usdjpy_ticker)
-            df["USDJPY_Change"] = 0.0
-        else:
-            usdjpy_close = usdjpy_df["Close"].reindex(df.index, method="ffill")
-            df["USDJPY_Change"] = usdjpy_close.pct_change(self.config.usdjpy_lookback)
+        usdjpy_df = self.require_auxiliary(self.config.usdjpy_ticker, df.index)
+        df["USDJPY_Change"] = usdjpy_df["Close"].pct_change(self.config.usdjpy_lookback)
 
         return df
 

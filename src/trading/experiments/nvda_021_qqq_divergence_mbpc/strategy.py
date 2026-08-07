@@ -9,6 +9,7 @@ CEILING 方向但於 MR 框架）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_021_qqq_divergence_mbpc.config import (
     NVDA021Config,
@@ -19,8 +20,11 @@ from trading.experiments.nvda_021_qqq_divergence_mbpc.signal_detector import (
 )
 
 
-class NVDA021QQQDivergenceMBPCStrategy(ExecutionModelStrategy):
+class NVDA021QQQDivergenceMBPCStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-021：NVDA-QQQ 跨資產背離 CEILING regime gate + MBPC（含成交模型）"""
+
+    bundle_trial_family = "NVDA:qqq-divergence-mbpc"
+    bundle_trial_hypothesis = "NVDA breakout pullbacks improve when relative performance versus QQQ avoids an exhaustion regime."
 
     slippage_pct: float = 0.0015
 

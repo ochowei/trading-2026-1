@@ -5,6 +5,7 @@ NVDA-009: Momentum Breakout Pullback Continuation 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_009_momentum_pullback.config import (
     NVDA009Config,
@@ -15,10 +16,14 @@ from trading.experiments.nvda_009_momentum_pullback.signal_detector import (
 )
 
 
-class NVDA009MomentumPullbackStrategy(ExecutionModelStrategy):
+class NVDA009MomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-009：Momentum Breakout Pullback Continuation 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:momentum-breakout-pullback"
+    bundle_trial_hypothesis = (
+        "NVDA momentum breakout pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

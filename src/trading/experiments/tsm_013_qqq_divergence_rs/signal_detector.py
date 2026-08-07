@@ -21,64 +21,36 @@ EWZ-009 為 MR / BB Squeeze）。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsm_013_qqq_divergence_rs.config import TSM013Config
 
 logger = logging.getLogger(__name__)
 
 
-class TSM013QQQDivergenceRSDetector(BaseSignalDetector):
+class TSM013QQQDivergenceRSDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSM-013 訊號偵測器"""
 
     def __init__(self, config: TSM013Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker, self.config.benchmark_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        smh_df = self._fetch_external(self.config.reference_ticker, start_date)
-        qqq_df = self._fetch_external(self.config.benchmark_ticker, start_date)
-
-        if smh_df is None or smh_df.empty:
-            logger.error("無法取得 SMH 數據，無法計算相對強度")
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            df["Ret_1d"] = 0.0
-            df["Ret_5d"] = 0.0
-            df["Rel_Return_QQQ"] = 0.0
-            return df
-
-        common_idx = df.index.intersection(smh_df.index)
-        if qqq_df is not None and not qqq_df.empty:
-            common_idx = common_idx.intersection(qqq_df.index)
-        df = df.loc[common_idx]
+        # The verified bundle supplies both references aligned as-of to every
+        # primary decision session.
+        smh_df = self.require_auxiliary(self.config.reference_ticker, df.index)
+        qqq_df = self.require_auxiliary(self.config.benchmark_ticker, df.index)
 
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
 
         period = self.config.relative_strength_period
         df["TSM_Return"] = df["Close"].pct_change(period)
-        df["SMH_Return"] = smh_df.loc[common_idx, "Close"].pct_change(period)
+        df["SMH_Return"] = smh_df["Close"].pct_change(period)
         df["Relative_Strength"] = df["TSM_Return"] - df["SMH_Return"]
 
         lookback = self.config.pullback_lookback
@@ -91,19 +63,10 @@ class TSM013QQQDivergenceRSDetector(BaseSignalDetector):
         # === TSM-QQQ Cross-Asset Divergence CEILING（TSM-013 核心）===
         div_n = self.config.divergence_lookback
         df["TSM_Ret_DivN"] = df["Close"].pct_change(div_n)
-        if qqq_df is not None and not qqq_df.empty:
-            qqq_close = qqq_df["Close"].reindex(df.index, method="ffill")
-            df["QQQ_Close"] = qqq_close
-            df["QQQ_Ret_DivN"] = qqq_close.pct_change(div_n)
-            df["Rel_Return_QQQ"] = df["TSM_Ret_DivN"] - df["QQQ_Ret_DivN"]
-        else:
-            logger.error(
-                "無法取得 %s 數據，cross-asset divergence 過濾停用",
-                self.config.benchmark_ticker,
-            )
-            df["QQQ_Close"] = float("nan")
-            df["QQQ_Ret_DivN"] = 0.0
-            df["Rel_Return_QQQ"] = 0.0
+        qqq_close = qqq_df["Close"]
+        df["QQQ_Close"] = qqq_close
+        df["QQQ_Ret_DivN"] = qqq_close.pct_change(div_n)
+        df["Rel_Return_QQQ"] = df["TSM_Ret_DivN"] - df["QQQ_Ret_DivN"]
 
         return df
 

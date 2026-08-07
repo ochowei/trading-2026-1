@@ -8,6 +8,7 @@ EWT-005: RSI(2) Volatility-Adaptive Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_005_rsi2_vol_adaptive.config import (
     EWT005Config,
@@ -18,8 +19,13 @@ from trading.experiments.ewt_005_rsi2_vol_adaptive.signal_detector import (
 )
 
 
-class EWT005Strategy(ExecutionModelStrategy):
+class EWT005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT RSI(2) 波動率自適應均值回歸 (EWT-005)"""
+
+    bundle_trial_family = "EWT:rsi2-vol-adaptive"
+    bundle_trial_hypothesis = (
+        "EWT volatility-adaptive RSI(2) can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

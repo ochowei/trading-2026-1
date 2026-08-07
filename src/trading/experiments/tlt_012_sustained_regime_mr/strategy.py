@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_012_sustained_regime_mr.config import (
     TLT012Config,
@@ -12,10 +13,13 @@ from trading.experiments.tlt_012_sustained_regime_mr.signal_detector import (
 )
 
 
-class TLT012SustainedRegimeMRStrategy(ExecutionModelStrategy):
+class TLT012SustainedRegimeMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-012：多日持續波動率 regime 閘門均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF，同 TLT-007）
+
+    bundle_trial_family = "TLT:sustained-regime-mr"
+    bundle_trial_hypothesis = "TLT sustained volatility-regime mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -7,6 +7,7 @@ CIBR-012: Post-Capitulation Vol-Transition Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_012_vol_transition_mr.config import (
     CIBR012Config,
@@ -17,8 +18,11 @@ from trading.experiments.cibr_012_vol_transition_mr.signal_detector import (
 )
 
 
-class CIBR012Strategy(ExecutionModelStrategy):
+class CIBR012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-012：Post-Capitulation Vol-Transition MR"""
+
+    bundle_trial_family = "CIBR:vol-transition-mr"
+    bundle_trial_hypothesis = "CIBR post-capitulation volatility transition can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.001
 

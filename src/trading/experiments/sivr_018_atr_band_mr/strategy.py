@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.15% slippage + pessimistic intrabar
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_018_atr_band_mr.config import (
     SIVR018Config,
@@ -15,8 +16,13 @@ from trading.experiments.sivr_018_atr_band_mr.signal_detector import (
 )
 
 
-class SIVR018Strategy(ExecutionModelStrategy):
+class SIVR018Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR Capitulation-Strength Filter MR (SIVR-018)"""
+
+    bundle_trial_family = "SIVR:atr-band-mr"
+    bundle_trial_hypothesis = (
+        "SIVR capitulation-strength ATR bands can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

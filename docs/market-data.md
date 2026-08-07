@@ -22,7 +22,9 @@ filesystem paths.
 
 Each series has one canonical CSV, one JSON metadata sidecar, and one per-series lock. The sidecar
 records provider, original symbol, interval, adjustment policy, schema version, data cutoff, latest
-incremental refresh, latest complete refresh, and the SHA-256 checksum of the exact CSV bytes.
+incremental refresh, latest complete refresh, the observation coverage policy, and the SHA-256
+checksum of the exact CSV bytes. Existing sidecars without the new field remain readable as the
+default `xnys_sessions` policy.
 
 Writers wait for the lock for a bounded interval, recheck the active generation after acquiring it, download
 through the provider boundary, validate the complete candidate, write temporary files, and publish
@@ -48,16 +50,19 @@ Before publication and on active-cache use, validation checks:
 - parseable, unique, strictly increasing normalized dates;
 - `Low <= Open/Close <= High` and `Low <= High`;
 - nonnegative volume;
-- exact primary US session coverage between the series' first and last observation, rejecting both
-  missing sessions and unexpected non-session dates;
+- complete XNYS session coverage for requirements using `xnys_sessions`, rejecting both missing
+  sessions and unexpected non-session dates;
+- unique, ordered, valid observation dates for requirements using `provider_observations`, without
+  inventing missing sessions;
 - sidecar identity, schema, data cutoff, and CSV checksum.
 
 Session expectations come from the version-locked `exchange-calendars` XNYS calendar rather than a
 hand-maintained holiday list, so full-history refreshes account for emergency closures such as the
 September 2001 shutdown as well as scheduled early closes.
 
-The session calendar is owned by `CsvMarketDataCache`; coverage is therefore mandatory for every
-public publish and load rather than an optional validation argument supplied by callers.
+The session calendar is owned by `CsvMarketDataCache` for XNYS-complete series. Sparse auxiliary
+series declare `provider_observations` and are validated on their actual observation dates; their
+availability policy still controls which observations can be used at each XNYS decision session.
 
 An exact duplicate observation may be deduplicated. Conflicting duplicates and every other invalid
 row are reported without row dropping. Invalid active CSV/metadata is quarantined as a diagnostic
@@ -66,9 +71,14 @@ replacement, access fails closed.
 
 ## Declared dependencies and availability
 
-`MarketDataRequirement` declares the complete history and role of each primary or auxiliary series.
-Bundle construction rejects duplicate declarations and data that begins after the first required
-primary session, has gaps in expected XNYS sessions, or contains non-session rows.
+`MarketDataRequirement` declares the complete history, role, and observation coverage policy of
+each primary or auxiliary series; primary requirements must use complete XNYS session coverage,
+while an auxiliary may use sparse provider observations. `MarketDataDeclaration` is the complete
+execution declaration and requires exactly one primary series. Bundle construction rejects duplicate
+declarations and data that begins after the first required primary session, has gaps in expected
+XNYS sessions, or (for XNYS-covered requirements) contains non-session rows. Sparse auxiliary data
+is not padded to an inferred calendar; its `AvailabilityPolicy` determines the backward as-of
+observation and maximum acceptable observation lag.
 `MarketDataService.build_bundle` resolves
 every declaration through the same provider/cache boundary before constructing the defensive-copy
 bundle. An auxiliary requirement must include an `AvailabilityPolicy` with publication lag and
@@ -76,11 +86,19 @@ maximum observation lag; the maximum cannot be shorter than the publication lag.
 publication timing requires at least one primary-session lag.
 
 `align_auxiliary` computes each auxiliary observation's first available primary session and selects
-only the latest observation available at a `SignalDecisionTime`. `MarketDataBundle` retains the
-declarations and decision time, applies that alignment during validated construction, and exposes
-only the policy-aligned auxiliary view—not the raw same-session frame. It never selects forward and
-fails when no eligible observation exists or the maximum lag is exceeded. The bundle rejects
-missing or undeclared series and returns defensive copies so detector code cannot mutate it.
+only the latest observation available at each ordered `SignalDecisionTime`. `MarketDataBundle`
+retains the declaration and decision-session sequence, applies that alignment during validated
+construction, and exposes only the policy-aligned auxiliary view—not the raw same-session frame. It
+never selects forward and fails when no eligible observation exists or the maximum lag is exceeded.
+The bundle rejects missing or undeclared series and returns defensive copies so detector code cannot
+mutate it.
+
+Historical snapshot replay supplies the ordered decision sequence from the declared primary
+history through the snapshot cutoff. Consequently, an auxiliary frame loaded from a
+`ResearchDataStore` is a row-for-row as-of view for every primary decision session, rather than a
+single latest auxiliary row. A lagged auxiliary must therefore include enough observations before
+the first declared decision session; if its earliest decision cannot be satisfied, snapshot loading
+fails closed instead of silently dropping that decision.
 
 `SessionCalendar` and `MarketDataReader` protocols define the shared structural boundaries, while
 `RefreshKind` is the single vocabulary for incremental and full publication paths.
@@ -88,6 +106,17 @@ missing or undeclared series and returns defensive copies so detector code canno
 Phase 1 supplies these common contracts but intentionally does not migrate the existing detector
 fleet. Direct detector downloads are removed family-by-family in Phase 9 with snapshot-based parity
 checks.
+
+## Phase 9 access policy
+
+During the migration, `tools/check_experiment_market_data_access.py` scans experiment Python ASTs
+for direct yfinance imports/calls, dynamic imports, and known legacy DataFetcher/provider/cache
+paths. The typed identities in `ci/market-data-bypass-allowlist.json` are temporary migration
+inventory only; CI requires an exact match with current findings and rejects any allowlist growth,
+stale entry, duplicate, non-canonical path, or newly renamed bypass. Runtime yfinance imports are
+permitted only in `market_data/provider.py`; the legacy experiment findings are the sole temporary
+exception until their migration batches complete. Once the allowlist is empty, the scanner changes
+to zero-tolerance mode and the compatibility data-access paths are removed.
 
 ## Operations
 

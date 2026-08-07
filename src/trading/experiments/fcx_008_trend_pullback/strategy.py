@@ -7,6 +7,7 @@ Att3: FCX-001 進場架構 + 2日急跌 <= -5% 過濾（USO-013 風格）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_008_trend_pullback.config import (
     FCX008Config,
@@ -17,7 +18,11 @@ from trading.experiments.fcx_008_trend_pullback.signal_detector import (
 )
 
 
-class FCXTrendPullbackStrategy(ExecutionModelStrategy):
+class FCXTrendPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "FCX:trend-pullback"
+    bundle_trial_hypothesis = (
+        "FCX trend pullbacks work when price remains aligned with the intermediate trend."
+    )
     """FCX-008：2日急跌 + 極端超賣均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

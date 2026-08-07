@@ -8,6 +8,7 @@ XLU KC Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_009_kc_squeeze_breakout.config import (
     XLU009KCSqueezeConfig,
@@ -18,10 +19,15 @@ from trading.experiments.xlu_009_kc_squeeze_breakout.signal_detector import (
 )
 
 
-class XLU009KCSqueezeStrategy(ExecutionModelStrategy):
+class XLU009KCSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU-009：KC Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "XLU:kc-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "XLU Keltner squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

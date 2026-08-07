@@ -9,6 +9,7 @@ EWZ-006: BB Lower Band + Pullback Cap Hybrid Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_006_bb_lower_pullback_cap.config import (
     EWZ006Config,
@@ -19,7 +20,9 @@ from trading.experiments.ewz_006_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class EWZ006Strategy(ExecutionModelStrategy):
+class EWZ006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "EWZ:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = "EWZ mean reversion improves when a BB lower touch excludes excessive drawdown continuation."
     """EWZ BB Lower + Pullback Cap Hybrid MR (EWZ-006)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）

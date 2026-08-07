@@ -19,6 +19,7 @@ from trading.market_data import (
     CacheMetadata,
     CsvMarketDataCache,
     MarketDataBundle,
+    MarketDataCoveragePolicy,
     MarketDataRequirement,
     MarketDataSeries,
     SignalDecisionTime,
@@ -97,9 +98,11 @@ class ResearchDataStore:
         self,
         cache: CsvMarketDataCache,
         series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
     ) -> DataBlobRef:
         """Capture one fully refreshed cache generation without provider access."""
-        return self._capture_cache_series(cache, series).blob
+        return self._capture_cache_series(cache, series, coverage_policy=coverage_policy).blob
 
     def create_snapshot(
         self,
@@ -113,11 +116,20 @@ class ResearchDataStore:
         requirement_list = MarketDataBundle.validate_requirements(requirements)
         entries: list[SnapshotDataRef] = []
         for requirement in requirement_list:
-            captured = self._capture_cache_series(cache, requirement.series)
+            captured = self._capture_cache_series(
+                cache,
+                requirement.series,
+                coverage_policy=requirement.coverage_policy,
+            )
             metadata = captured.metadata
-            if metadata.data_cutoff != decision_time.session:
+            if requirement.role == "primary" and metadata.data_cutoff != decision_time.session:
                 raise SnapshotEligibilityError(
                     f"{requirement.series.symbol} cutoff {metadata.data_cutoff} does not match "
+                    f"snapshot decision session {decision_time.session}"
+                )
+            if requirement.role == "auxiliary" and metadata.data_cutoff > decision_time.session:
+                raise SnapshotEligibilityError(
+                    f"{requirement.series.symbol} cutoff {metadata.data_cutoff} is after "
                     f"snapshot decision session {decision_time.session}"
                 )
             complete = metadata.last_complete_refresh
@@ -132,6 +144,7 @@ class ResearchDataStore:
                     data_cutoff=metadata.data_cutoff,
                     full_refresh_at=complete,
                     blob=captured.blob,
+                    coverage_policy=requirement.coverage_policy,
                 )
             )
         current_time = self.now()
@@ -212,9 +225,14 @@ class ResearchDataStore:
         requirements: list[MarketDataRequirement] = []
         frames: dict[MarketDataSeries, pd.DataFrame] = {}
         for entry in manifest.data:
-            if entry.data_cutoff != manifest.decision_time.session:
+            if entry.role == "primary" and entry.data_cutoff != manifest.decision_time.session:
                 raise SnapshotManifestError(
                     f"{entry.series.symbol} cutoff {entry.data_cutoff} does not match "
+                    f"decision session {manifest.decision_time.session}"
+                )
+            if entry.role == "auxiliary" and entry.data_cutoff > manifest.decision_time.session:
+                raise SnapshotManifestError(
+                    f"{entry.series.symbol} cutoff {entry.data_cutoff} is after "
                     f"decision session {manifest.decision_time.session}"
                 )
             blob_bytes = self._read_data_blob(entry.blob)
@@ -225,13 +243,28 @@ class ResearchDataStore:
                     history_start=entry.history_start,
                     role=entry.role,
                     availability_policy=entry.availability_policy,
+                    coverage_policy=entry.coverage_policy,
                 )
             )
             frames[entry.series] = frame
+        primary_requirement = next(item for item in requirements if item.role == "primary")
+        primary_frame = frames[primary_requirement.series]
+        calendar = PrimaryUSSessionCalendar()
+        first_session = calendar.session_on_or_after(primary_requirement.history_start)
+        decision_times = tuple(
+            SignalDecisionTime.for_primary_session(timestamp.date(), calendar=calendar)
+            for timestamp in primary_frame.index
+            if first_session <= timestamp.date() <= manifest.decision_time.session
+        )
+        if not decision_times:
+            raise SnapshotManifestError(
+                "snapshot primary series has no decision sessions after its declared history start"
+            )
         bundle = MarketDataBundle.from_requirements(
             requirements,
             frames,
             decision_time=manifest.decision_time,
+            decision_times=decision_times,
         )
         return ResearchSnapshot(manifest=manifest, bundle=bundle)
 
@@ -424,9 +457,11 @@ class ResearchDataStore:
         self,
         cache: CsvMarketDataCache,
         series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
     ) -> _CapturedSeries:
         with cache.lock(series):
-            cached = cache.load_locked(series)
+            cached = cache.load_locked(series, coverage_policy=coverage_policy)
             if cached is None:
                 raise SnapshotEligibilityError(f"no active cache exists for {series.symbol}")
             metadata = cached.metadata
@@ -486,19 +521,20 @@ def _parse_canonical_data_blob(
         raise ImmutableBlobCorruptionError(
             f"invalid immutable CSV blob {entry.blob.digest}: " + "; ".join(outcome.errors)
         )
-    calendar = PrimaryUSSessionCalendar()
-    expected_sessions = calendar.sessions_in_range(
-        normalized.index.min().date(),
-        normalized.index.max().date(),
-    )
-    normalized, outcome = validate_daily_bars(
-        normalized,
-        expected_sessions=expected_sessions,
-    )
-    if not outcome.is_valid:
-        raise ImmutableBlobCorruptionError(
-            f"invalid immutable CSV blob {entry.blob.digest}: " + "; ".join(outcome.errors)
+    if entry.coverage_policy.requires_complete_sessions:
+        calendar = PrimaryUSSessionCalendar()
+        expected_sessions = calendar.sessions_in_range(
+            normalized.index.min().date(),
+            normalized.index.max().date(),
         )
+        normalized, outcome = validate_daily_bars(
+            normalized,
+            expected_sessions=expected_sessions,
+        )
+        if not outcome.is_valid:
+            raise ImmutableBlobCorruptionError(
+                f"invalid immutable CSV blob {entry.blob.digest}: " + "; ".join(outcome.errors)
+            )
     if canonical_daily_bar_csv_bytes(normalized) != content:
         raise ImmutableBlobCorruptionError(
             f"immutable blob {entry.blob.digest} is not canonically serialized"

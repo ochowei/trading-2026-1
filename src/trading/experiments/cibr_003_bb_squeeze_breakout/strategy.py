@@ -7,6 +7,7 @@ CIBR BB 擠壓突破策略 (CIBR BB Squeeze Breakout Strategy)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_003_bb_squeeze_breakout.config import (
     CIBRBBSqueezeConfig,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_003_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class CIBRBBSqueezeStrategy(ExecutionModelStrategy):
+class CIBRBBSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-003：BB 擠壓突破"""
+
+    bundle_trial_family = "CIBR:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "CIBR BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

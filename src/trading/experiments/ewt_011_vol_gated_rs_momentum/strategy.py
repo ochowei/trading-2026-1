@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_011_vol_gated_rs_momentum.config import (
     EWT011Config,
@@ -12,8 +13,13 @@ from trading.experiments.ewt_011_vol_gated_rs_momentum.signal_detector import (
 )
 
 
-class EWT011Strategy(ExecutionModelStrategy):
+class EWT011Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT-011：EWT-007 RS 動量回調 + 波動率 regime 閘門（執行模型）"""
+
+    bundle_trial_family = "EWT:vol-gated-rs-momentum"
+    bundle_trial_hypothesis = (
+        "EWT pullbacks improve when EWT leadership versus EEM remains fresh across horizons."
+    )
 
     slippage_pct: float = 0.001
 

@@ -1,6 +1,9 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
-  last_validated: 2026-04-25
+  last_validated: 2026-08-07
   data_through: 2025-12-31
+  phase9_note: SPY-003 now declares SPY primary plus ^VIX auxiliary data through the verified snapshot bundle; migration runs remain migration-pending and do not advance latest or followup qualification.
+  phase9_note_2026_08_07: SPY-001, SPY-002, SPY-004 through SPY-006, and SPY-008/009 now consume declared primary SPY bundles through the shared execution boundary; SPY-003 remains auxiliary and SPY-007 remains the explicit tracer. Existing backtester variants are unchanged, and formal migration results remain pending requalification.
+  phase9_evidence_2026_08_07: This remaining SPY primary-only wave is contract-covered; fixed-snapshot parity evidence is retained separately for SPY-007, while the seven new migrations remain pending.
   note: SPY-009 added 2026-04-25 (Signal-Day Capitulation-Strength Filter MR, **Att2 SUCCESS** — repo 首次「1 日跌幅下限」(1d FLOOR) 作為主品質過濾器於任何資產). Three iterations Att1/Att2 success, Att3 confirms threshold sweet spot. Att1 (1d floor <= -0.5% only, 3d cap disabled) Part A 10/100% WR/Sharpe **6.56** cum +32.50% / Part B 3/100% WR/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† Part A **6.56** (EWJ-003/EWT-008 慣例，**+1138% vs SPY-005 0.53**) — 1d floor 精準過濾 4/4 Part A SLs（1d -0.09%~-0.30%）+ Part B 唯一 SL（2025-04-07 1d -0.18%），代價移除 Part A 2 筆 1d 過淺贏家（2020-02-28 -0.42%、2023-03-13 -0.14%）淨效果 +6/0; Att2 ★ (1d floor -0.5% AND 3d cap >= -8%) **identical to Att1** — 3d cap 完全非綁定（所有通過 1d floor 的贏家 3d > -7.10%），但保留作為**未來訊號 regime-shift 安全層**（若新訊號 1d > -0.5% 但 3d <= -8%）；Att3 (1d floor <= -0.7%, 3d cap -8%) Part A 8/100% WR/Sharpe **5.88** cum +24.89% / Part B 3/100% WR / min Part A **5.88** — 更嚴 floor 移除 2019-05-29 + 2019-12-03 兩筆贏家（1d -0.67%）但無新增 SL 過濾，確認 -0.5% 為結構性甜蜜點。**Repo 首次 1d FLOOR 方向（與 DIA-012 1d CAP 方向完全相反）**：SPY 與 DIA 雖均為 1.0% vol 寬基 ETF 且共用 RSI(2) 進場框架，但 SLs 在 1d 維度的失敗結構完全相反——SPY SLs 為 1d 過淺弱勢漂移（floor 過濾），DIA SLs 為 1d 過深政策震盪（cap 過濾）。**A/B 平衡達成**（cum 差 28.5% < 30%、訊號比 1.33:1 < 50%）。**擴展 lesson #19 雙向性發現至寬基 ETF 內部子類別**：DJIA (DIA) vs S&P 500 (SPY) 同 vol 等級 1d 失敗模式完全相反，驗證單一資產失敗模式不能直接跨資產移植，需個別 trade-level 分析。SPY-009 added 2026-04-25.
 -->
 ## AI Agent 快速索引
@@ -149,11 +152,11 @@
 |----|----------|------|----------|------|
 | SPY-001 | `spy_001_pullback_wr` | SPY 回檔 + WR + 反轉K線確認，追蹤停損出場 | Pullback ≥3% from 10d high, WR(10) ≤ -80, ClosePos ≥ 40%, cooldown 7d, TP +3.5%, 追蹤停損 | ❌ 累計為負 |
 | SPY-002 | `spy_002_no_trailing` | SPY 回檔 + WR + 反轉K線，無追蹤停損，對稱 TP/SL | Pullback ≥3%, WR(10) ≤ -80, ClosePos ≥ 40%, cooldown 7d, TP +2.5%, SL -2.5%, Hold 15d | ✅ 當前最佳 |
-| SPY-003 | `spy_003_optimized_wr` | SPY 回檔 + WR + VIX 恐慌過濾 | Pullback ≥2.5%, WR(10) ≤ -80, ClosePos ≥ 40%, VIX ≥ 20, cooldown 7d, TP +2.5%, SL -2.5%, Hold 15d | ❌ Part A 為負 |
+| SPY-003 | `spy_003_optimized_wr` | SPY 回檔 + WR + VIX 恐慌過濾（Phase 9 auxiliary bundle） | Pullback ≥2.5%, WR(10) ≤ -80, ClosePos ≥ 40%, VIX ≥ 20, cooldown 7d, TP +2.5%, SL -2.5%, Hold 15d | ❌ Part A 為負 |
 | SPY-004 | `spy_004_rsi2_reversal` | RSI(2) 極端超賣均值回歸 | RSI(2) < 10, 2日跌幅 ≥1.5%, ClosePos ≥ 40%, cooldown 5d, TP +2.5%, SL -2.5%, Hold 15d | ✅ 前最佳 |
 | SPY-005 | `spy_005_asymmetric_exit` | RSI(2) 寬出場均值回歸 | 同 SPY-004 進場, TP +3.0%, SL -3.0%, Hold 20d | ✅ 前任最佳 |
 | SPY-006 | `spy_006_roc_reversal` | 3 次嘗試：ROC 進場/RSI+回檔/寬 TP | Att1: ROC(5)≤-3%, Att2: RSI+PB≥2%, Att3: TP+3.5% | ❌ 均不如 SPY-005 |
-| SPY-007 | `spy_007_trend_pullback` | 3 次嘗試：趨勢跟蹤/動量回檔 | Att1: SMA50回測, Att2: SMA20回測, Att3: +ClosePos | ❌ Part A 結構性弱 |
+| SPY-007 | `spy_007_trend_pullback` | 3 次嘗試：趨勢跟蹤/動量回檔；Phase 9 primary-only tracer | Att1: SMA50回測, Att2: SMA20回測, Att3: +ClosePos | ❌ Part A 結構性弱 |
 | SPY-008 | `spy_008_bb_squeeze_breakout` | 3 次嘗試：BB Squeeze Breakout | BB(20,2/2.5) + SMA(50), TP+3~4%/SL-3~3.5%/20~25d | ❌ 不如 SPY-005 |
 | SPY-009 | `spy_009_capitulation_filter` | Signal-Day Capitulation-Strength Filter MR（**repo 首次 1d FLOOR**） | SPY-005 進場 + 1d floor <= -0.5% AND 3d cap >= -8% | ✅ 全域最優（min 6.56） |
 
@@ -966,6 +969,16 @@ A/B 績效差異較大（4.23% vs 0.13%）是因為 Part A 大幅改善而非 Pa
 
 探索趨勢跟蹤/動量回檔策略能否超越 SPY-005 的均值回歸（Sharpe 0.53/0.56）。
 參考 DIA-007 Att3（Part B Sharpe 1.07），嘗試在 SPY 上復現順勢策略。
+
+### Phase 9 migration note
+
+SPY-007 currently serves as the primary-only snapshot-aware tracer. Its strategy declares the
+complete SPY requirement, captures definition/trial metadata, and exposes `run_with_bundle` for
+verified offline execution and fixed-snapshot parity evidence. This is an execution-contract migration slice only: existing result,
+qualification, and followup lifecycle state are unchanged, and no new performance claim is implied.
+On 2026-08-07, the first fixed-snapshot replay (2010-01-01 through 2026-08-06) passed exact
+indicator, signal-date, and filled-trade parity; the immutable snapshot and migration result
+remain `migration-pending` and do not replace `latest.json`.
 
 ### Attempt 1: SMA(50) 回測 + SMA(50)>SMA(200) 黃金交叉 + 斜率上升
 

@@ -5,6 +5,7 @@ SOXL 回撤範圍限制 + 成交模型策略 (SOXL Capped Drawdown + Execution M
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_005_capped_drawdown.config import (
@@ -16,7 +17,11 @@ from trading.experiments.soxl_005_capped_drawdown.signal_detector import (
 )
 
 
-class SOXLCappedDrawdownStrategy(ExecutionModelStrategy):
+class SOXLCappedDrawdownStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "SOXL:capped-drawdown"
+    bundle_trial_hypothesis = (
+        "SOXL capitulation entries improve when the prior drawdown is bounded."
+    )
     """
     SOXL 回撤範圍限制 + 成交模型策略 (SOXL-005)
 

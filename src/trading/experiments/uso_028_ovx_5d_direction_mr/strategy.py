@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_028_ovx_5d_direction_mr.config import (
     USO028Config,
@@ -12,7 +13,12 @@ from trading.experiments.uso_028_ovx_5d_direction_mr.signal_detector import (
 )
 
 
-class USO028Strategy(ExecutionModelStrategy):
+class USO028Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "USO:ovx-multi-window-direction"
+    bundle_trial_hypothesis = (
+        "USO pullback entries improve when ^OVX short- and medium-window direction agree."
+    )
+
     """USO-028：USO-027 Att2 框架 + ^OVX 5d direction multi-window IV combo gate"""
 
     slippage_pct: float = 0.001

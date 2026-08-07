@@ -7,6 +7,7 @@ VGK-003: 回檔 + Williams %R + ATR 均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_003_pullback_wr.config import (
     VGK003Config,
@@ -17,8 +18,13 @@ from trading.experiments.vgk_003_pullback_wr.signal_detector import (
 )
 
 
-class VGK003Strategy(ExecutionModelStrategy):
+class VGK003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK 回檔 + Williams %R 均值回歸 (VGK-003)"""
+
+    bundle_trial_family = "VGK:pullback-wr"
+    bundle_trial_hypothesis = (
+        "VGK pullback and Williams %R entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

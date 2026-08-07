@@ -12,6 +12,7 @@ from trading.core.data_fetcher import create_default_market_data_service
 from trading.core.results import inspect_result
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
+    MarketDataBundle,
     MarketDataRequirement,
     MarketDataService,
     PrimaryUSSessionCalendar,
@@ -74,21 +75,37 @@ def refresh_candidate_snapshot(
 ) -> Path:
     """Fully refresh retained declarations and publish a current exact snapshot."""
     source = store.load_snapshot(source_manifest_path).manifest
-    requirements = tuple(
+    retained_requirements = tuple(
         MarketDataRequirement(
             entry.series,
             entry.history_start,
             role=entry.role,
             availability_policy=entry.availability_policy,
+            coverage_policy=entry.coverage_policy,
         )
         for entry in source.data
     )
+    try:
+        strategy = get_experiment(experiment_name)
+    except KeyError:
+        strategy = None
+    declaration_factory = getattr(strategy, "market_data_requirements", None)
+    if callable(declaration_factory):
+        declared_requirements = MarketDataBundle.validate_requirements(declaration_factory())
+        if tuple(declared_requirements) != retained_requirements:
+            raise RuntimeError(
+                f"{experiment_name} declaration differs from retained snapshot requirements"
+            )
+        requirements = declared_requirements
+    else:
+        requirements = retained_requirements
     for requirement in requirements:
         market_data_service.refresh(
             requirement.series,
             mode="full",
             start=None,
             end=decision_session,
+            coverage_policy=requirement.coverage_policy,
         )
     manifest = store.create_snapshot(
         market_data_service.cache,

@@ -8,6 +8,7 @@ IWM-002: 回檔 + Williams %R 均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_002_pullback_wr.config import (
     IWMPullbackWRConfig,
@@ -18,8 +19,13 @@ from trading.experiments.iwm_002_pullback_wr.signal_detector import (
 )
 
 
-class IWMPullbackWRStrategy(ExecutionModelStrategy):
+class IWMPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM-002：回檔 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "IWM:pullback-wr"
+    bundle_trial_hypothesis = (
+        "IWM pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

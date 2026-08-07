@@ -17,6 +17,7 @@ COPX-016: DXY Direction Filter on Multi-Week Regime-Aware BB Squeeze Breakout
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_016_dxy_direction_breakout.config import (
     COPX016Config,
@@ -27,8 +28,13 @@ from trading.experiments.copx_016_dxy_direction_breakout.signal_detector import 
 )
 
 
-class COPX016DXYDirectionStrategy(ExecutionModelStrategy):
+class COPX016DXYDirectionStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-016：DXY 方向過濾 + COPX-011 regime BOX BB Squeeze Breakout"""
+
+    bundle_trial_family = "COPX:dxy-direction-breakout"
+    bundle_trial_hypothesis = (
+        "COPX breakouts improve when DXY direction does not add a strong USD headwind."
+    )
 
     slippage_pct: float = 0.0015
 

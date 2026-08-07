@@ -11,6 +11,7 @@ interleaved，TSLA 非 USD-driver-pure（事件驅動 SLs）。含成交模型�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_020_usd_regime_breakout.config import (
     TSLA020Config,
@@ -21,8 +22,13 @@ from trading.experiments.tsla_020_usd_regime_breakout.signal_detector import (
 )
 
 
-class TSLA020USDRegimeBreakoutStrategy(ExecutionModelStrategy):
+class TSLA020USDRegimeBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSLA-020: TSLA-QQQ divergence + USD(UUP) regime gate + BB Squeeze breakout"""
+
+    bundle_trial_family = "TSLA:usd-regime-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA breakouts improve when USD regime does not confirm macro headwinds."
+    )
 
     slippage_pct: float = 0.0015
 

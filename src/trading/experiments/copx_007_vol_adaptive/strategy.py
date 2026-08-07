@@ -7,6 +7,7 @@ COPX-007: 波動率自適應均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_007_vol_adaptive.config import (
     COPX007Config,
@@ -17,7 +18,11 @@ from trading.experiments.copx_007_vol_adaptive.signal_detector import (
 )
 
 
-class COPX007Strategy(ExecutionModelStrategy):
+class COPX007Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "COPX:vol-adaptive"
+    bundle_trial_hypothesis = (
+        "COPX pullback mean reversion improves when ATR expansion confirms capitulation."
+    )
     """COPX-007：波動率自適應均值回歸"""
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價

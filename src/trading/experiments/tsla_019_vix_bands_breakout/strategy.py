@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_019_vix_bands_breakout.config import (
     TSLA019Config,
@@ -12,8 +13,11 @@ from trading.experiments.tsla_019_vix_bands_breakout.signal_detector import (
 )
 
 
-class TSLA019VixBandsBreakoutStrategy(ExecutionModelStrategy):
+class TSLA019VixBandsBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSLA-019: ^VIX BANDS regime gate on TSLA-017 Att3 framework"""
+
+    bundle_trial_family = "TSLA:vix-bands-breakout"
+    bundle_trial_hypothesis = "TSLA breakouts improve when VIX avoids the middle regime band."
 
     slippage_pct: float = 0.0015
 

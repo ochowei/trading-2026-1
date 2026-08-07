@@ -16,36 +16,22 @@ COPX-019 訊號偵測器: HG=F (Copper Futures) Direction Filter on Volume-Confi
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.copx_019_copper_direction_mr.config import COPX019Config
 
 logger = logging.getLogger(__name__)
 
 
-class COPX019SignalDetector(BaseSignalDetector):
+class COPX019SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """COPX-019: vol-adaptive MR + volume-surge + HG=F direction regime gate"""
 
     def __init__(self, config: COPX019Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.copper_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -79,22 +65,12 @@ class COPX019SignalDetector(BaseSignalDetector):
         df["Vol_Zscore_60"] = (df["Volume"] - v_sma60) / v_std60.where(v_std60 > 0, float("nan"))
 
         # COPX-019 核心: HG=F (Copper Futures) direction
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        copper_df = self._fetch_external(self.config.copper_ticker, start_date)
-        if copper_df is None or copper_df.empty:
-            logger.error(
-                "無法取得 %s 數據, copper direction 過濾停用",
-                self.config.copper_ticker,
-            )
-            df["Copper_Close"] = float("nan")
-            df["Copper_Ret_N"] = 0.0
-            df["Copper_SMA_Ratio"] = 1.0
-        else:
-            copper_close = copper_df["Close"].reindex(df.index, method="ffill")
-            df["Copper_Close"] = copper_close
-            df["Copper_Ret_N"] = copper_close.pct_change(self.config.copper_lookback)
-            copper_sma = copper_close.rolling(self.config.copper_sma_period).mean()
-            df["Copper_SMA_Ratio"] = copper_close / copper_sma.where(copper_sma > 0, float("nan"))
+        copper_df = self.require_auxiliary(self.config.copper_ticker, df.index)
+        copper_close = copper_df["Close"]
+        df["Copper_Close"] = copper_close
+        df["Copper_Ret_N"] = copper_close.pct_change(self.config.copper_lookback)
+        copper_sma = copper_close.rolling(self.config.copper_sma_period).mean()
+        df["Copper_SMA_Ratio"] = copper_close / copper_sma.where(copper_sma > 0, float("nan"))
 
         return df
 

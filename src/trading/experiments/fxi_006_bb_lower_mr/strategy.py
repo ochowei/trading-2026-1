@@ -7,6 +7,7 @@ FXI-006: Acute Decline Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_006_bb_lower_mr.config import (
     FXI006Config,
@@ -17,8 +18,13 @@ from trading.experiments.fxi_006_bb_lower_mr.signal_detector import (
 )
 
 
-class FXI006Strategy(ExecutionModelStrategy):
+class FXI006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI Acute Decline Mean Reversion (FXI-006)"""
+
+    bundle_trial_family = "FXI:bb-lower-mr"
+    bundle_trial_hypothesis = (
+        "FXI acute-decline mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

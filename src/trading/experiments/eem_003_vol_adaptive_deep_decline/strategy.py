@@ -8,6 +8,7 @@ to compensate for removed filter.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_003_vol_adaptive_deep_decline.config import (
     EEM003Config,
@@ -18,8 +19,11 @@ from trading.experiments.eem_003_vol_adaptive_deep_decline.signal_detector impor
 )
 
 
-class EEM003Strategy(ExecutionModelStrategy):
+class EEM003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 波動率自適應 RSI(2) + 深度急跌過濾 (EEM-003)"""
+
+    bundle_trial_family = "EEM:vol-adaptive-deep-decline"
+    bundle_trial_hypothesis = "EEM deep-decline volatility-adaptive mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

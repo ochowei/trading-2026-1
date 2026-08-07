@@ -13,36 +13,22 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewt_012_eem_divergence_regime_mr.config import EWT012Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWT012SignalDetector(BaseSignalDetector):
+class EWT012SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EWT-012：EWT-009 Att3 框架 + EWT–EEM 跨資產 divergence regime gate"""
 
     def __init__(self, config: EWT012Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.divergence_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -88,21 +74,12 @@ class EWT012SignalDetector(BaseSignalDetector):
         df["Ret_2d"] = df["Close"].pct_change(2)
 
         # ===== EWT–EEM 跨資產 divergence regime gate（EWT-012 核心新增）=====
-        start_date = df.index[0].strftime("%Y-%m-%d")
         div_n = self.config.divergence_lookback
         df["EWT_Ret_Ndiv"] = df["Close"].pct_change(div_n)
-        eem_df = self._fetch_external(self.config.divergence_ticker, start_date)
-        if eem_df is None or eem_df.empty:
-            logger.error(
-                "無法取得 %s 數據，EWT–EEM divergence 過濾停用",
-                self.config.divergence_ticker,
-            )
-            df["EEM_Ret_Ndiv"] = 0.0
-            df["Divergence_Nd"] = 0.0
-        else:
-            eem_close = eem_df["Close"].reindex(df.index, method="ffill")
-            df["EEM_Ret_Ndiv"] = eem_close.pct_change(div_n)
-            df["Divergence_Nd"] = df["EWT_Ret_Ndiv"] - df["EEM_Ret_Ndiv"]
+        eem_df = self.require_auxiliary(self.config.divergence_ticker, df.index)
+        eem_close = eem_df["Close"]
+        df["EEM_Ret_Ndiv"] = eem_close.pct_change(div_n)
+        df["Divergence_Nd"] = df["EWT_Ret_Ndiv"] - df["EEM_Ret_Ndiv"]
 
         return df
 

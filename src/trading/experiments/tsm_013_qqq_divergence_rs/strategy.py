@@ -8,6 +8,7 @@ gate（CEILING 方向）移植至半導體 ADR 個股 + RS Momentum Pullback 框
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_013_qqq_divergence_rs.config import (
     TSM013Config,
@@ -18,8 +19,13 @@ from trading.experiments.tsm_013_qqq_divergence_rs.signal_detector import (
 )
 
 
-class TSM013QQQDivergenceRSStrategy(ExecutionModelStrategy):
+class TSM013QQQDivergenceRSStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-013：TSM-QQQ 跨資產背離 CEILING regime gate + RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:qqq-divergence-rs"
+    bundle_trial_hypothesis = (
+        "TSM RS pullbacks improve when TSM leadership versus QQQ avoids rally exhaustion."
+    )
 
     slippage_pct: float = 0.001
 

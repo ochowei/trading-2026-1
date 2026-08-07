@@ -5,6 +5,7 @@ Uses WR(14) + extended cooldown with ExecutionModelBacktester.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_005_wr14_extended_mr.config import (
     FXI005Config,
@@ -15,7 +16,11 @@ from trading.experiments.fxi_005_wr14_extended_mr.signal_detector import (
 )
 
 
-class FXI005Strategy(ExecutionModelStrategy):
+class FXI005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "FXI:wr14-extended-mr"
+    bundle_trial_hypothesis = (
+        "FXI extended Williams %R oversold readings identify a recoverable pullback."
+    )
     """FXI WR(14) Extended MR (FXI-005)"""
 
     slippage_pct: float = 0.001  # 0.1% ETF standard

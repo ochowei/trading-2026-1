@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_025_vxn_vix_vvix_filter.config import (
@@ -13,7 +14,11 @@ from trading.experiments.tqqq_025_vxn_vix_vvix_filter.signal_detector import (
 )
 
 
-class TQQQ025VxnVixVvixStrategy(ExecutionModelStrategy):
+class TQQQ025VxnVixVvixStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:vxn-vix-vvix-filter"
+    bundle_trial_hypothesis = (
+        "TQQQ capitulation entries improve when cross-index volatility and VVIX direction confirm."
+    )
     """TQQQ-025：TQQQ-018 框架 + VXN/VIX 比率 + VVIX 方向 filter（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定

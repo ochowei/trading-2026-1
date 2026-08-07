@@ -7,6 +7,7 @@ DIA BB Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_006_bb_squeeze_breakout.config import (
     DIA006BBSqueezeConfig,
@@ -17,8 +18,13 @@ from trading.experiments.dia_006_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class DIA006BBSqueezeStrategy(ExecutionModelStrategy):
+class DIA006BBSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA-006：BB Squeeze Breakout 策略（含成交模型）"""
+
+    bundle_trial_family = "DIA:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "DIA BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

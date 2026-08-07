@@ -7,6 +7,7 @@ IBIT-002: 回檔 + Williams %R 均值回歸（出場優化）
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_002_rsi2_pullback.config import (
     IBITRSI2PullbackConfig,
@@ -17,8 +18,13 @@ from trading.experiments.ibit_002_rsi2_pullback.signal_detector import (
 )
 
 
-class IBITRSI2PullbackStrategy(ExecutionModelStrategy):
+class IBITRSI2PullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-002：回檔 + WR 均值回歸（出場優化）"""
+
+    bundle_trial_family = "IBIT:rsi2-pullback"
+    bundle_trial_hypothesis = (
+        "IBIT RSI(2) pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

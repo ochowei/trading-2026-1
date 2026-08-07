@@ -8,6 +8,7 @@ ATR vol regime（NVDA-013 Att3 雙重 gate）應用於 RS Momentum Pullback
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_015_regime_rs.config import (
     NVDA015Config,
@@ -18,8 +19,13 @@ from trading.experiments.nvda_015_regime_rs.signal_detector import (
 )
 
 
-class NVDA015RegimeRSStrategy(ExecutionModelStrategy):
+class NVDA015RegimeRSStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-015：Multi-Week Regime-Aware RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "NVDA:regime-rs"
+    bundle_trial_hypothesis = (
+        "NVDA RS pullbacks improve when a multi-week volatility regime avoids expansion."
+    )
 
     slippage_pct: float = 0.0015
 

@@ -7,6 +7,7 @@ FXI-007: Relative Strength Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_007_rs_momentum.config import (
     FXI007Config,
@@ -17,8 +18,13 @@ from trading.experiments.fxi_007_rs_momentum.signal_detector import (
 )
 
 
-class FXI007Strategy(ExecutionModelStrategy):
+class FXI007Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-007：Relative Strength Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "FXI:rs-momentum"
+    bundle_trial_hypothesis = (
+        "FXI pullbacks improve when relative strength versus EEM remains positive."
+    )
 
     slippage_pct: float = 0.001
 

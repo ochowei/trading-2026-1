@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_014_tlt_spy_divergence_mr.config import (
     TLT014Config,
@@ -12,10 +13,14 @@ from trading.experiments.tlt_014_tlt_spy_divergence_mr.signal_detector import (
 )
 
 
-class TLT014TltSpyDivergenceMRStrategy(ExecutionModelStrategy):
+class TLT014TltSpyDivergenceMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-014：BB-width + ^MOVE + TLT-SPY divergence regime gate MR"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+    bundle_trial_family = "TLT:tlt-spy-divergence-mr"
+    bundle_trial_hypothesis = (
+        "TLT mean-reversion entries improve when TLT weakness versus SPY is absent."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

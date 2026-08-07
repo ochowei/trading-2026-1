@@ -7,6 +7,7 @@ Att2: 延長擠壓持續確認（7日內≥3日擠壓），過濾短暫波動低
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_012_volume_breakout.config import (
     TSLAVolumeBreakoutConfig,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_012_volume_breakout.signal_detector import (
 )
 
 
-class TSLAVolumeBreakoutStrategy(ExecutionModelStrategy):
+class TSLAVolumeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:volume-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA volume-confirmed breakouts can be reproduced from a verified primary bundle."
+    )
     """TSLA-012：Volume-Confirmed BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

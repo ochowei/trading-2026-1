@@ -9,6 +9,7 @@ USO 為 repo 第 5 次 lesson #22 試驗，**首次純單一商品 ETF（原油�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_024_regime_breakout.config import (
     USO024Config,
@@ -19,10 +20,14 @@ from trading.experiments.uso_024_regime_breakout.signal_detector import (
 )
 
 
-class USO024RegimeBreakoutStrategy(ExecutionModelStrategy):
+class USO024RegimeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-024：多週期 regime 過濾 BB Squeeze Breakout（含成交模型）"""
 
     slippage_pct: float = 0.0010
+    bundle_trial_family = "USO:regime-breakout"
+    bundle_trial_hypothesis = (
+        "USO regime-aware BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

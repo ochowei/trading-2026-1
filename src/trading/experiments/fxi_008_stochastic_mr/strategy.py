@@ -5,6 +5,7 @@ Uses Stochastic momentum reversal confirmation with ExecutionModelBacktester.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_008_stochastic_mr.config import (
     FXI008Config,
@@ -15,8 +16,13 @@ from trading.experiments.fxi_008_stochastic_mr.signal_detector import (
 )
 
 
-class FXI008Strategy(ExecutionModelStrategy):
+class FXI008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI Stochastic %K/%D Crossover MR (FXI-008)"""
+
+    bundle_trial_family = "FXI:stochastic-mr"
+    bundle_trial_hypothesis = (
+        "FXI stochastic crossover mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% ETF standard
 

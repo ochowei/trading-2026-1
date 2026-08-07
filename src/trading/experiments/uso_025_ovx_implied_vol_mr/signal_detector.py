@@ -16,36 +16,22 @@ import logging
 
 import numpy as np
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.uso_025_ovx_implied_vol_mr.config import USO025Config
 
 logger = logging.getLogger(__name__)
 
 
-class USO025SignalDetector(BaseSignalDetector):
+class USO025SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """USO-025：USO-013 框架 + ^OVX forward-looking implied vol DIRECTION gate"""
 
     def __init__(self, config: USO025Config):
         self.config = config
 
-    def _fetch_ovx_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.ovx_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.ovx_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.ovx_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -69,17 +55,9 @@ class USO025SignalDetector(BaseSignalDetector):
         df["Return_2d"] = df["Close"].pct_change(2)
 
         # ^OVX forward-looking implied vol gate（USO-025 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        ovx_df = self._fetch_ovx_data(start_date)
-
-        if ovx_df is None or ovx_df.empty:
-            logger.error("無法取得 %s 數據，^OVX 過濾停用", self.config.ovx_ticker)
-            df["OVX_Close"] = float("nan")
-            df["OVX_Change_Nd"] = 0.0
-        else:
-            ovx_close = ovx_df["Close"].reindex(df.index, method="ffill")
-            df["OVX_Close"] = ovx_close
-            df["OVX_Change_Nd"] = ovx_close.diff(self.config.ovx_direction_lookback)
+        ovx_close = self.require_auxiliary(self.config.ovx_ticker, df.index)["Close"]
+        df["OVX_Close"] = ovx_close
+        df["OVX_Change_Nd"] = ovx_close.diff(self.config.ovx_direction_lookback)
 
         return df
 

@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_019_copper_direction_mr.config import (
     COPX019Config,
@@ -12,8 +13,11 @@ from trading.experiments.copx_019_copper_direction_mr.signal_detector import (
 )
 
 
-class COPX019CopperDirectionMRStrategy(ExecutionModelStrategy):
+class COPX019CopperDirectionMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-019: vol-adaptive MR + volume-surge + HG=F copper direction regime gate"""
+
+    bundle_trial_family = "COPX:copper-direction-mr"
+    bundle_trial_hypothesis = "COPX capitulation mean reversion improves when copper futures avoid an acute underlying-commodity drawdown."
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
 

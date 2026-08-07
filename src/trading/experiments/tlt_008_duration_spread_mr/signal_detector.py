@@ -19,60 +19,27 @@ Att3 備用（use_spread_zscore=True）：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tlt_008_duration_spread_mr.config import TLT008Config
 
 logger = logging.getLogger(__name__)
 
 
-class TLT008SignalDetector(BaseSignalDetector):
+class TLT008SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TLT-008：TLT 相對 IEF 存續期間價差均值回歸（Att2+：hybrid MR + pair filter）"""
 
     def __init__(self, config: TLT008Config):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        ref_df = self._fetch_reference_data(start_date)
-
-        if ref_df is None or ref_df.empty:
-            logger.error("無法取得 %s 數據，無法計算配對訊號", self.config.reference_ticker)
-            for col in [
-                "Pullback",
-                "WR",
-                "ClosePos",
-                "BB_Width_Ratio",
-                "Relative_Spread",
-                "Spread_Z",
-                "Daily_Up",
-            ]:
-                df[col] = 0.0
-            return df
-
-        common_idx = df.index.intersection(ref_df.index)
-        df = df.loc[common_idx]
-        ref = ref_df.loc[common_idx]
+        ref = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         # 回檔幅度
         n_pb = self.config.pullback_lookback

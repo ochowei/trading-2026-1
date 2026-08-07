@@ -21,36 +21,22 @@ TP winners + 單筆 2024-01-18 −0.20% 近乎持平 time-expiry」zero-variance
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xlu_014_tnx_rate_direction_mr.config import XLU014Config
 
 logger = logging.getLogger(__name__)
 
 
-class XLU014SignalDetector(BaseSignalDetector):
+class XLU014SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XLU-014：XLU-013 Att2/Att3 框架 + ^TNX realized-rate-momentum DIRECTION gate"""
 
     def __init__(self, config: XLU014Config):
         self.config = config
 
-    def _fetch_aux_close(self, ticker: str, start_date: str) -> pd.Series | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df["Close"]
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.move_ticker, self.config.tnx_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -86,28 +72,15 @@ class XLU014SignalDetector(BaseSignalDetector):
         atr_long = tr.rolling(self.config.atr_long_period).mean()
         df["ATR_Ratio"] = atr_short / atr_long.where(atr_long > 0, float("nan"))
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
         # ^MOVE forward-looking implied vol gate（沿用 XLU-013 Att2/Att3）
-        move_close = self._fetch_aux_close(self.config.move_ticker, start_date)
-        if move_close is None or move_close.empty:
-            logger.error("無法取得 %s 數據，^MOVE 過濾停用", self.config.move_ticker)
-            df["MOVE_Close"] = float("nan")
-            df["MOVE_Change_Nd"] = 0.0
-        else:
-            move_close = move_close.reindex(df.index, method="ffill")
-            df["MOVE_Close"] = move_close
-            df["MOVE_Change_Nd"] = move_close.diff(self.config.move_direction_lookback)
+        move_close = self.require_auxiliary(self.config.move_ticker, df.index)["Close"]
+        df["MOVE_Close"] = move_close
+        df["MOVE_Change_Nd"] = move_close.diff(self.config.move_direction_lookback)
 
         # ^TNX 10y yield realized-rate-momentum DIRECTION gate（XLU-014 核心新增）
-        tnx_close = self._fetch_aux_close(self.config.tnx_ticker, start_date)
-        if tnx_close is None or tnx_close.empty:
-            logger.error("無法取得 %s 數據，^TNX 過濾停用", self.config.tnx_ticker)
-            df["TNX_Change_Pct"] = 0.0
-        else:
-            tnx_close = tnx_close.reindex(df.index, method="ffill")
-            # N 日 % 變化（× 100），與 predict→confirm 預分析一致
-            df["TNX_Change_Pct"] = tnx_close.pct_change(self.config.tnx_direction_lookback) * 100.0
+        tnx_close = self.require_auxiliary(self.config.tnx_ticker, df.index)["Close"]
+        # N 日 % 變化（× 100），與 predict→confirm 預分析一致
+        df["TNX_Change_Pct"] = tnx_close.pct_change(self.config.tnx_direction_lookback) * 100.0
 
         # XLU 自身 N 日報酬（Att3 正交 capitulation-depth FLOOR 用）
         df["XLU_Return_Nd"] = df["Close"].pct_change(self.config.xlu_depth_lookback)

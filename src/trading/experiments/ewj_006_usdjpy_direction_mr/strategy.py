@@ -7,6 +7,7 @@ EWJ-006: USDJPY Direction Filter on Vol-Transition MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewj_006_usdjpy_direction_mr.config import (
     EWJ006Config,
@@ -17,10 +18,14 @@ from trading.experiments.ewj_006_usdjpy_direction_mr.signal_detector import (
 )
 
 
-class EWJ006Strategy(ExecutionModelStrategy):
+class EWJ006Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWJ-006: USDJPY Direction-Gated Vol-Transition MR"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "EWJ:usdjpy-direction-mr"
+    bundle_trial_hypothesis = (
+        "EWJ mean-reversion entries improve when USDJPY does not confirm currency-driven weakness."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

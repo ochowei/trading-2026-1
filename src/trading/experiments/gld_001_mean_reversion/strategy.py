@@ -4,6 +4,7 @@ GLD 均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_001_mean_reversion.config import (
     GLDMeanReversionConfig,
@@ -12,8 +13,11 @@ from trading.experiments.gld_001_mean_reversion.config import (
 from trading.experiments.gld_001_mean_reversion.signal_detector import GLDSignalDetector
 
 
-class GLDMeanReversionStrategy(ExecutionModelStrategy):
+class GLDMeanReversionStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 均值回歸策略 (Execution Model)"""
+
+    bundle_trial_family = "GLD:mean-reversion"
+    bundle_trial_hypothesis = "GLD mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

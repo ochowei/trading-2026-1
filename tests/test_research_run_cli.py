@@ -63,6 +63,23 @@ def test_run_cli_exposes_offline_and_ephemeral_as_mutually_exclusive_modes(
     assert saved == []
 
 
+def test_run_cli_exposes_migration_parity_as_an_offline_only_mode(tmp_path) -> None:
+    parser = build_parser()
+    parsed = parser.parse_args(
+        [
+            "run",
+            "experiment",
+            "--offline",
+            str(tmp_path / "snapshot.json"),
+            "--migration-parity",
+            str(tmp_path / "parity.json"),
+        ]
+    )
+
+    assert parsed.offline == tmp_path / "snapshot.json"
+    assert parsed.migration_parity == tmp_path / "parity.json"
+
+
 def test_default_persisted_cli_run_requires_formal_snapshot_or_explicit_legacy(
     monkeypatch,
 ) -> None:
@@ -111,6 +128,40 @@ def test_snapshot_cli_run_defaults_to_online_and_binds_current_definition(
     assert kwargs["current_definition"].fingerprint == "b" * 64
     assert coordinator_args[0]["experiment_family"] == "spy-momentum"
     assert coordinator_args[0]["hypothesis"] == "momentum persists"
+
+
+def test_snapshot_cli_migration_binds_parity_and_uses_pending_mode(monkeypatch, tmp_path) -> None:
+    calls = []
+
+    class FakeCoordinator:
+        def __init__(self, **_kwargs):
+            pass
+
+        def execute(self, name, runner, **kwargs):
+            calls.append((name, runner, kwargs))
+
+    strategy = FakeSnapshotAwareStrategy()
+    monkeypatch.setattr("trading.cli.get_experiment", lambda name: strategy)
+    monkeypatch.setattr("trading.cli.ResearchRunCoordinator", FakeCoordinator)
+    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: object())
+    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
+    manifest_path = tmp_path / "run.snapshot.json"
+    parity_path = tmp_path / "run.migration-parity.json"
+
+    main(
+        [
+            "run",
+            "experiment",
+            "--offline",
+            str(manifest_path),
+            "--migration-parity",
+            str(parity_path),
+        ]
+    )
+
+    _name, _runner, kwargs = calls[0]
+    assert kwargs["mode"] is RunMode.MIGRATION
+    assert kwargs["migration_parity_path"] == parity_path
 
 
 def test_snapshot_aware_cli_run_uses_prepared_manifest_by_default(monkeypatch) -> None:

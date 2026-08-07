@@ -8,6 +8,7 @@ TSLA BB Squeeze with SMA Golden Cross Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_008_rs_momentum_pullback.config import (
     TSLA008Config,
@@ -18,7 +19,9 @@ from trading.experiments.tsla_008_rs_momentum_pullback.signal_detector import (
 )
 
 
-class TSLARSMomentumPullbackStrategy(ExecutionModelStrategy):
+class TSLARSMomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:rs-momentum-pullback"
+    bundle_trial_hypothesis = "TSLA relative-strength momentum pullbacks can be reproduced from a verified primary bundle."
     """TSLA-008：BB Squeeze + Golden Cross（含成交模型）"""
 
     slippage_pct: float = 0.0015

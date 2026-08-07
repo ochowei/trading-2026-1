@@ -5,6 +5,7 @@ SOXL 反轉確認 + 成交模型策略 (SOXL Reversal Confirm + Execution Model 
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_004_reversal_confirm.config import (
@@ -16,7 +17,7 @@ from trading.experiments.soxl_004_reversal_confirm.signal_detector import (
 )
 
 
-class SOXLReversalConfirmStrategy(ExecutionModelStrategy):
+class SOXLReversalConfirmStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL 反轉確認 + 成交模型策略 (SOXL-004)
 
@@ -24,6 +25,11 @@ class SOXLReversalConfirmStrategy(ExecutionModelStrategy):
     出場: TP +18% / SL -12% / 20 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:reversal-confirm"
+    bundle_trial_hypothesis = (
+        "SOXL reversal confirmation can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

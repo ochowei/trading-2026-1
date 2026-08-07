@@ -6,6 +6,7 @@ Signal logic identical to SIVR-001, exit uses trailing stop mechanism.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
     TrailingStopBacktester,
@@ -19,8 +20,13 @@ from trading.experiments.sivr_002_trailing_stop.signal_detector import (
 )
 
 
-class SIVRTrailingStopStrategy(ExecutionModelStrategy):
+class SIVRTrailingStopStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-002：追蹤停損均值回歸 — 進場不變，追蹤停損出場"""
+
+    bundle_trial_family = "SIVR:trailing-stop"
+    bundle_trial_hypothesis = (
+        "SIVR trailing-stop exits can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -264,6 +263,8 @@ class VerifiedDataAccessParity:
     result: DataAccessParityResult
     legacy_output_checksum: str
     migrated_output_checksum: str
+    legacy_layer_checksums: Mapping[str, str]
+    migrated_layer_checksums: Mapping[str, str]
     _token: object
 
 
@@ -303,8 +304,51 @@ def run_verified_data_access_parity(
         result=result,
         legacy_output_checksum=_parity_output_checksum(legacy),
         migrated_output_checksum=_parity_output_checksum(migrated),
+        legacy_layer_checksums=_parity_output_layer_checksums(legacy),
+        migrated_layer_checksums=_parity_output_layer_checksums(migrated),
         _token=_VERIFIED_PARITY_TOKEN,
     )
+
+
+def build_migration_parity_payload(
+    evidence: VerifiedDataAccessParity,
+    *,
+    experiment_name: str,
+    legacy_definition: str,
+    migrated_definition: str,
+    runtime: Mapping[str, object],
+) -> dict[str, object]:
+    """Build canonical, result-linked payload from verified fixed-snapshot parity."""
+    if evidence._token is not _VERIFIED_PARITY_TOKEN:
+        raise ValueError("migration parity evidence was not produced by the verified runner")
+    body: dict[str, object] = {
+        "schema_version": 1,
+        "experiment_name": _required_reason(experiment_name),
+        "detector_identity": evidence.detector_identity,
+        "snapshot_id": evidence.snapshot_id,
+        "result_fingerprint": evidence.result_fingerprint,
+        "definitions": {
+            "legacy": _required_reason(legacy_definition),
+            "migrated": _required_reason(migrated_definition),
+        },
+        "runtime": dict(runtime),
+        "outputs": {
+            "legacy": {
+                "checksum": evidence.legacy_output_checksum,
+                "layers": dict(evidence.legacy_layer_checksums),
+            },
+            "migrated": {
+                "checksum": evidence.migrated_output_checksum,
+                "layers": dict(evidence.migrated_layer_checksums),
+            },
+        },
+        "result": evidence.result.payload(),
+        "passed": evidence.result.passed,
+    }
+    return {
+        **body,
+        "parity_digest": hashlib.sha256(canonical_json_bytes(body)).hexdigest(),
+    }
 
 
 @dataclass(frozen=True)
@@ -324,10 +368,12 @@ class FollowupActivationVerifier:
         qualification_registry: object,
         lifecycle_registry: FollowupLifecycleRegistry,
         current_result_fingerprint_resolver: Callable[[FollowupStrategy], str],
+        trial_registry: object | None = None,
     ) -> None:
         self.qualification_registry = qualification_registry
         self.lifecycle_registry = lifecycle_registry
         self.current_result_fingerprint_resolver = current_result_fingerprint_resolver
+        self.trial_registry = trial_registry
 
     def __call__(
         self,
@@ -363,6 +409,7 @@ class FollowupActivationVerifier:
         current_fingerprint = self.current_result_fingerprint_resolver(strategy)
         if current_fingerprint != proof.result_fingerprint:
             raise ValueError("current valid result does not match activation proof")
+        _require_requalified_trial(self.trial_registry, proof.result_fingerprint)
         parity = next(
             (
                 event
@@ -390,10 +437,12 @@ class FollowupShadowVerifier:
         qualification_registry: object,
         lifecycle_registry: FollowupLifecycleRegistry,
         current_result_fingerprint_resolver: Callable[[FollowupStrategy], str],
+        trial_registry: object | None = None,
     ) -> None:
         self.qualification_registry = qualification_registry
         self.lifecycle_registry = lifecycle_registry
         self.current_result_fingerprint_resolver = current_result_fingerprint_resolver
+        self.trial_registry = trial_registry
 
     def __call__(self, strategy: FollowupStrategy, proof: FollowupShadowProof) -> None:
         read = getattr(self.qualification_registry, "read", None)
@@ -419,6 +468,7 @@ class FollowupShadowVerifier:
             raise ValueError("Shadow proof does not match passing Historical Screen evidence")
         if self.current_result_fingerprint_resolver(strategy) != proof.result_fingerprint:
             raise ValueError("current valid result does not match Shadow proof")
+        _require_requalified_trial(self.trial_registry, proof.result_fingerprint)
         parity_exists = any(
             event.get("event_type") == "migration_parity_recorded"
             and isinstance(event.get("payload"), Mapping)
@@ -892,6 +942,8 @@ class FollowupLifecycleRegistry:
             "result_fingerprint": evidence.result_fingerprint,
             "legacy_output_checksum": evidence.legacy_output_checksum,
             "migrated_output_checksum": evidence.migrated_output_checksum,
+            "legacy_output_layers": dict(evidence.legacy_layer_checksums),
+            "migrated_output_layers": dict(evidence.migrated_layer_checksums),
             "result": evidence.result.payload(),
         }
         parity_digest = hashlib.sha256(canonical_json_bytes(digest_payload)).hexdigest()
@@ -1295,6 +1347,17 @@ def _required_reason(reason: str) -> str:
     return normalized
 
 
+def _require_requalified_trial(trial_registry: object | None, definition_fingerprint: str) -> None:
+    """Require a separate successful formal result after migration evidence."""
+    if trial_registry is None:
+        raise ValueError("trial registry is required to verify requalification")
+    has_valid_observation = getattr(trial_registry, "has_valid_observation", None)
+    if not callable(has_valid_observation):
+        raise ValueError("trial registry cannot verify requalification")
+    if not has_valid_observation(definition_fingerprint):
+        raise ValueError("definition has no separate valid formal observation after migration")
+
+
 def _qualification_event(
     events: list[object],
     event_id: str,
@@ -1309,19 +1372,29 @@ def _qualification_event(
 
 
 def _parity_output_checksum(output: DataAccessParityOutputs) -> str:
+    layers = _parity_output_layer_checksums(output)
     payload = {
-        "indicator_checksum": hashlib.sha256(
-            output.indicators.to_csv(
-                index=True,
-                lineterminator="\n",
-                date_format="%Y-%m-%dT%H:%M:%S",
-                float_format="%.17g",
-            ).encode("utf-8")
-        ).hexdigest(),
+        "indicator_checksum": layers["indicators"],
         "signals": [item.isoformat() for item in output.signals],
         "trades": [dict(item) for item in output.trades],
     }
     return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
+
+
+def _parity_output_layer_checksums(output: DataAccessParityOutputs) -> dict[str, str]:
+    indicator_bytes = output.indicators.to_csv(
+        index=True,
+        lineterminator="\n",
+        date_format="%Y-%m-%dT%H:%M:%S",
+        float_format="%.17g",
+    ).encode("utf-8")
+    signal_bytes = canonical_json_bytes([item.isoformat() for item in output.signals])
+    trade_bytes = canonical_json_bytes([dict(item) for item in output.trades])
+    return {
+        "indicators": hashlib.sha256(indicator_bytes).hexdigest(),
+        "signals": hashlib.sha256(signal_bytes).hexdigest(),
+        "trades": hashlib.sha256(trade_bytes).hexdigest(),
+    }
 
 
 def _indicator_differences(
@@ -1368,26 +1441,24 @@ def _sequence_differences(
     legacy: Sequence[object],
     migrated: Sequence[object],
 ) -> list[tuple[str, str, str]]:
-    legacy_counts = Counter(str(item) for item in legacy)
-    migrated_counts = Counter(str(item) for item in migrated)
     differences: list[tuple[str, str, str]] = []
-    for identity, count in sorted((legacy_counts - migrated_counts).items()):
-        differences.extend(
+    for position in range(max(len(legacy), len(migrated))):
+        legacy_value = str(legacy[position]) if position < len(legacy) else None
+        migrated_value = str(migrated[position]) if position < len(migrated) else None
+        if legacy_value == migrated_value:
+            continue
+        if legacy_value is None:
+            reason = f"{scope} is missing from legacy path at position {position}"
+        elif migrated_value is None:
+            reason = f"{scope} is missing from migrated path at position {position}"
+        else:
+            reason = f"{scope} order or identity differs at position {position}"
+        differences.append(
             (
-                f"{scope}:{identity}:legacy_only:{ordinal}",
+                f"{scope}:position:{position}:legacy:{legacy_value}:migrated:{migrated_value}",
                 scope,
-                f"{scope} is missing from migrated path",
+                reason,
             )
-            for ordinal in range(1, count + 1)
-        )
-    for identity, count in sorted((migrated_counts - legacy_counts).items()):
-        differences.extend(
-            (
-                f"{scope}:{identity}:migrated_only:{ordinal}",
-                scope,
-                f"{scope} is missing from legacy path",
-            )
-            for ordinal in range(1, count + 1)
         )
     return differences
 

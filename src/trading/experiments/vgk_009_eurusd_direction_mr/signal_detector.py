@@ -32,36 +32,22 @@ EUR/USD 過濾的設計依據：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.vgk_009_eurusd_direction_mr.config import VGK009Config
 
 logger = logging.getLogger(__name__)
 
 
-class VGK009EURUSDDirectionDetector(BaseSignalDetector):
+class VGK009EURUSDDirectionDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """VGK-009 EURUSD Direction-Gated Vol-Transition MR"""
 
     def __init__(self, config: VGK009Config):
         self.config = config
 
-    def _fetch_eurusd_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.eurusd_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.eurusd_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.eurusd_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -100,15 +86,9 @@ class VGK009EURUSDDirectionDetector(BaseSignalDetector):
         df["TwoDayReturn"] = df["Close"] / df["Close"].shift(2) - 1
 
         # EUR/USD direction filter
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        eurusd_df = self._fetch_eurusd_data(start_date)
-
-        if eurusd_df is None or eurusd_df.empty:
-            logger.error("無法取得 %s 數據，EURUSD 過濾停用", self.config.eurusd_ticker)
-            df["EURUSD_Change"] = 0.0
-        else:
-            eurusd_close = eurusd_df["Close"].reindex(df.index, method="ffill")
-            df["EURUSD_Change"] = eurusd_close.pct_change(self.config.eurusd_lookback)
+        eurusd_df = self.require_auxiliary(self.config.eurusd_ticker, df.index)
+        eurusd_close = eurusd_df["Close"]
+        df["EURUSD_Change"] = eurusd_close.pct_change(self.config.eurusd_lookback)
 
         return df
 

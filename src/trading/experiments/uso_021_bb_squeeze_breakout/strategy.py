@@ -8,6 +8,7 @@ USO 追蹤單一商品（原油期貨），不受 ETF 分散化削弱動能的�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_021_bb_squeeze_breakout.config import (
     USOBBSqueezeConfig,
@@ -18,10 +19,14 @@ from trading.experiments.uso_021_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class USOBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class USOBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-021：BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0010  # 0.10%（USO 高流動性）
+    bundle_trial_family = "USO:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "USO BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

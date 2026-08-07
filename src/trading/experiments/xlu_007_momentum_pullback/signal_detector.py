@@ -13,29 +13,29 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
-from trading.core.data_fetcher import DataFetcher
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xlu_007_momentum_pullback.config import XLU007Config
 
 logger = logging.getLogger(__name__)
 
 
-class XLU007Detector(BaseSignalDetector):
+class XLU007Detector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XLU-SPY Pairs Trading 訊號偵測器"""
 
     def __init__(self, config: XLU007Config):
         self.config = config
 
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return ("SPY",)
+
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # Fetch SPY data
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        fetcher = DataFetcher(start=start_date)
-        spy_data = fetcher.fetch_all(["SPY"])
-        spy = spy_data["SPY"]
+        # SPY data comes from the verified auxiliary bundle.
+        spy = self.require_auxiliary("SPY", df.index)
 
         # XLU/SPY ratio
-        ratio = df["Close"] / spy["Close"].reindex(df.index)
+        ratio = df["Close"] / spy["Close"]
         df["Ratio"] = ratio
 
         # Z-score of ratio

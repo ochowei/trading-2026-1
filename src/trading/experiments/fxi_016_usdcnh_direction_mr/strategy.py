@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_016_usdcnh_direction_mr.config import (
     FXI016Config,
@@ -15,8 +16,11 @@ from trading.experiments.fxi_016_usdcnh_direction_mr.signal_detector import (
 )
 
 
-class FXI016Strategy(ExecutionModelStrategy):
+class FXI016Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI USDCNH Direction-Gated Cross-Asset Divergence MR (FXI-016)"""
+
+    bundle_trial_family = "FXI:usdcnh-direction-mr"
+    bundle_trial_hypothesis = "FXI mean-reversion entries improve when ASHR divergence and yuan direction confirm recovery."
 
     slippage_pct: float = 0.001
 

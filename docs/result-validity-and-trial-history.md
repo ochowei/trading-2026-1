@@ -26,6 +26,7 @@ The current statuses are:
 | `definition-stale` | The result’s semantic definition fingerprint is not current | No |
 | `unreproducible` | Evidence is missing, corrupt, inconsistent, or the result is incomplete | No |
 | `legacy` | Old result or schema-v2 result without canonical sleeve evidence | No |
+| `migration-pending` | Fresh migration-mode evidence awaiting separate requalification | No |
 
 Validity is derived read-only from the result and its referenced immutable manifest. A missing or
 corrupt snapshot is never silently refreshed, and an old result is never given a synthetic
@@ -50,6 +51,8 @@ affected definition lineage.
 - a successful formal `online` run writes a schema-v3 historical result and atomically advances
   `results/<experiment>/latest.json`;
 - a successful formal `offline` run writes only a historical result;
+- a successful formal `migration` run requires passing fixed-snapshot parity and writes only an
+  immutable `<snapshot_id>.migration-result.json` envelope marked `migration-pending`;
 - `ephemeral` runs do not write result files or trial-registry observations;
 - failed, partial, and failed-publication formal attempts are retained as failed trial
   observations, while incomplete results are never published as successful results;
@@ -120,6 +123,10 @@ Snapshot-aware experiments must declare their stable family and optional hypothe
 Observations retain snapshot identity, result path, run mode, outcome, validity, and failure
 reason. Removal is represented by a tombstone; failed trials and deleted result files are not
 forgotten.
+
+`ExperimentTrialRegistry.has_valid_observation()` is the requalification boundary used by the
+followup Shadow/Active verifiers. It accepts only a successful formal `online` or `offline`
+observation marked `valid`; the migration envelope's `migration-pending` observation never counts.
 
 The registry uses a lock file and atomic replacement. Malformed or conflicting state fails closed.
 Legacy entries can be explicitly seeded for discoverable pre-Phase-3 experiments:

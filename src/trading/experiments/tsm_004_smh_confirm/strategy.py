@@ -7,6 +7,7 @@ TSM Capped Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_004_smh_confirm.config import (
     TSMSMHConfirmConfig,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_004_smh_confirm.signal_detector import (
 )
 
 
-class TSMSMHConfirmStrategy(ExecutionModelStrategy):
+class TSMSMHConfirmStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM 回檔上限策略 (TSM-004)"""
+
+    bundle_trial_family = "TSM:capped-pullback"
+    bundle_trial_hypothesis = (
+        "TSM capped pullbacks can filter extreme breakdowns from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0010  # 0.10% 大型 ADR 滑價
 

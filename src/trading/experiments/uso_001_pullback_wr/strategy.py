@@ -9,6 +9,7 @@ Exit uses fixed TP/SL (no trailing stop - proven ineffective for high-vol assets
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_001_pullback_wr.config import (
     USOPullbackWRConfig,
@@ -19,10 +20,14 @@ from trading.experiments.uso_001_pullback_wr.signal_detector import (
 )
 
 
-class USOPullbackWRStrategy(ExecutionModelStrategy):
+class USOPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-001：回檔 + Williams %R 均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%（USO 流動性高，日均量 ~30M）
+    bundle_trial_family = "USO:pullback-wr"
+    bundle_trial_hypothesis = (
+        "USO pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

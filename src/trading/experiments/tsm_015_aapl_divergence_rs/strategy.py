@@ -9,6 +9,7 @@ TSM-015: TSM-AAPL Cross-Asset Divergence Regime-Gated RS Momentum Pullback 策�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_015_aapl_divergence_rs.config import (
     TSM015Config,
@@ -19,8 +20,11 @@ from trading.experiments.tsm_015_aapl_divergence_rs.signal_detector import (
 )
 
 
-class TSM015AAPLDivergenceStrategy(ExecutionModelStrategy):
+class TSM015AAPLDivergenceStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-015：TSM-AAPL 跨資產背離 regime gate + RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:aapl-divergence-rs"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve when relative performance versus AAPL confirms customer-cycle strength."
 
     slippage_pct: float = 0.001
 

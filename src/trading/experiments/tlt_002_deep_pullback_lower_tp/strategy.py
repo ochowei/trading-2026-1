@@ -8,6 +8,7 @@ TLT 回檔 + WR + 反轉K線 + 中期跌幅過濾均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_002_deep_pullback_lower_tp.config import (
     TLTDeepPullbackLowerTPConfig,
@@ -18,8 +19,13 @@ from trading.experiments.tlt_002_deep_pullback_lower_tp.signal_detector import (
 )
 
 
-class TLTDeepPullbackLowerTPStrategy(ExecutionModelStrategy):
+class TLTDeepPullbackLowerTPStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT 回檔 + WR + 反轉K線 + 中期跌幅過濾均值回歸策略 (TLT-002)"""
+
+    bundle_trial_family = "TLT:deep-pullback-lower-tp"
+    bundle_trial_hypothesis = (
+        "TLT deep pullbacks with a lower target can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

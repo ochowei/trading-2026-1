@@ -6,6 +6,7 @@ IWM-007: 趨勢回檔恢復策略 (Trend Pullback Recovery)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_007_trend_pullback.config import (
     IWM007Config,
@@ -16,8 +17,13 @@ from trading.experiments.iwm_007_trend_pullback.signal_detector import (
 )
 
 
-class IWM007Strategy(ExecutionModelStrategy):
+class IWM007Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM Trend Pullback Recovery (IWM-007)"""
+
+    bundle_trial_family = "IWM:trend-pullback"
+    bundle_trial_hypothesis = (
+        "IWM trend pullback recovery can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

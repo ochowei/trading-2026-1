@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_017_yield_curve_slope_mr.config import (
     TLT017Config,
@@ -12,7 +13,9 @@ from trading.experiments.tlt_017_yield_curve_slope_mr.signal_detector import (
 )
 
 
-class TLT017YieldCurveSlopeMRStrategy(ExecutionModelStrategy):
+class TLT017YieldCurveSlopeMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TLT:yield-curve-slope-mr"
+    bundle_trial_hypothesis = "TLT capitulation mean reversion improves when MOVE, benchmark, and yield-curve regimes align."
     """TLT-017: BB-width + ^MOVE LEVEL + TLT-SPY divergence + yield curve slope
     velocity regime gate MR"""
 

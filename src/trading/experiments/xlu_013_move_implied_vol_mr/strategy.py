@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_013_move_implied_vol_mr.config import (
     XLU013Config,
@@ -12,7 +13,10 @@ from trading.experiments.xlu_013_move_implied_vol_mr.signal_detector import (
 )
 
 
-class XLU013Strategy(ExecutionModelStrategy):
+class XLU013Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XLU:move-implied-vol"
+    bundle_trial_hypothesis = "XLU pullback entries improve when ^MOVE level and direction confirm a stable rates-volatility regime."
+
     """XLU-013：XLU-012 Att3 框架 + ^MOVE forward-looking implied vol regime gate"""
 
     slippage_pct: float = 0.001

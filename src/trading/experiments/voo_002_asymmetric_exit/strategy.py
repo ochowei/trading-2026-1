@@ -8,6 +8,7 @@ Applies DIA-003's asymmetric exit: SL -3.5% / 20d.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.voo_002_asymmetric_exit.config import (
     VOOAsymmetricConfig,
@@ -18,8 +19,13 @@ from trading.experiments.voo_002_asymmetric_exit.signal_detector import (
 )
 
 
-class VOOAsymmetricStrategy(ExecutionModelStrategy):
+class VOOAsymmetricStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VOO RSI(2) 非對稱出場均值回歸 (VOO-002)"""
+
+    bundle_trial_family = "VOO:asymmetric-exit"
+    bundle_trial_hypothesis = (
+        "VOO asymmetric exits can preserve the RSI(2) entry edge from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

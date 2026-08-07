@@ -11,6 +11,7 @@ Exit uses fixed TP/SL (no trailing stop at ~2.34% daily vol).
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_001_pullback_wr.config import (
     URAPullbackWRConfig,
@@ -21,8 +22,13 @@ from trading.experiments.ura_001_pullback_wr.signal_detector import (
 )
 
 
-class URAPullbackWRStrategy(ExecutionModelStrategy):
+class URAPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-001：回檔 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "URA:pullback-wr"
+    bundle_trial_hypothesis = (
+        "URA pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

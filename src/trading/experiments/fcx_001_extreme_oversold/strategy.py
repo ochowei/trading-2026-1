@@ -7,6 +7,7 @@ FCX Extreme Oversold Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_001_extreme_oversold.config import (
     FCXExtremeOversoldConfig,
@@ -17,8 +18,13 @@ from trading.experiments.fcx_001_extreme_oversold.signal_detector import (
 )
 
 
-class FCXExtremeOversoldStrategy(ExecutionModelStrategy):
+class FCXExtremeOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX 極端超賣均值回歸策略（含成交模型）"""
+
+    bundle_trial_family = "FCX:extreme-oversold"
+    bundle_trial_hypothesis = (
+        "FCX extreme oversold reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價
 

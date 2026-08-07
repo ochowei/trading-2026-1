@@ -7,6 +7,7 @@ TSLA RSI(5) Mean Reversion + Execution Model Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_010_rsi5_mean_reversion.config import (
@@ -18,7 +19,11 @@ from trading.experiments.tsla_010_rsi5_mean_reversion.signal_detector import (
 )
 
 
-class TSLARSI5MeanRevStrategy(ExecutionModelStrategy):
+class TSLARSI5MeanRevStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:rsi5-mean-reversion"
+    bundle_trial_hypothesis = (
+        "TSLA RSI(5) mean reversion can be reproduced from a verified primary bundle."
+    )
     """
     TSLA RSI(5) 均值回歸 + 成交模型策略 (TSLA-010)
 

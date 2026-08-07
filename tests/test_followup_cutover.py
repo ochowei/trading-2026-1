@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
@@ -11,6 +12,7 @@ from trading.core.followup_cutover import (
     FollowupAuthorizationContext,
     FollowupLifecycleRegistry,
     FollowupShadowProof,
+    FollowupShadowVerifier,
     FollowupStrategy,
     StrategyLifecycle,
     authorize_followup_order,
@@ -461,6 +463,25 @@ def test_unclassified_data_access_difference_blocks_migration() -> None:
     assert all(difference.classification == "unclassified" for difference in result.differences)
 
 
+def test_data_access_parity_rejects_reordered_signal_dates() -> None:
+    index = pd.to_datetime(["2026-08-03", "2026-08-04"])
+    indicators = pd.DataFrame({"Close": [100.0, 101.0]}, index=index)
+
+    result = evaluate_data_access_parity(
+        legacy_indicators=indicators,
+        migrated_indicators=indicators.copy(),
+        legacy_signals=(index[0].date(), index[1].date()),
+        migrated_signals=(index[1].date(), index[0].date()),
+        legacy_trades=(),
+        migrated_trades=(),
+    )
+
+    assert result.passed is False
+    assert len(result.differences) == 2
+    assert all(difference.scope == "signal" for difference in result.differences)
+    assert all(difference.classification == "unclassified" for difference in result.differences)
+
+
 def test_production_activation_verifies_parity_shadow_and_current_result(tmp_path) -> None:
     path = tmp_path / "followup-lifecycle.json"
     strategy = _strategy()
@@ -530,10 +551,15 @@ def test_production_activation_verifies_parity_shadow_and_current_result(tmp_pat
                 ]
             }
 
+    class Trials:
+        def has_valid_observation(self, definition_fingerprint):
+            return definition_fingerprint == "a" * 64
+
     verifier = FollowupActivationVerifier(
         qualification_registry=Qualification(),
         lifecycle_registry=reader,
         current_result_fingerprint_resolver=lambda _strategy: "a" * 64,
+        trial_registry=Trials(),
     )
     writer = FollowupLifecycleRegistry(path, activation_verifier=verifier)
     active = writer.activate_strategy(
@@ -551,6 +577,67 @@ def test_production_activation_verifies_parity_shadow_and_current_result(tmp_pat
     assert active.status_for(strategy.ticker, strategy.experiment_name) is (
         StrategyLifecycle.ACTIVE
     )
+
+
+def test_shadow_verifier_rejects_migration_pending_trial_without_requalification() -> None:
+    strategy = _strategy()
+    proof = _shadow_proof()
+
+    class Qualification:
+        def read(self):
+            return {
+                "events": [
+                    {
+                        "event_id": proof.registration_event_id,
+                        "event_type": "shadow_registration",
+                        "payload": {
+                            "shadow_id": proof.shadow_id,
+                            "definition_fingerprint": proof.result_fingerprint,
+                            "historical_plan_id": "plan-1",
+                        },
+                    },
+                    {
+                        "event_id": proof.historical_screen_event_id,
+                        "event_type": "historical_screen",
+                        "payload": {
+                            "plan_id": "plan-1",
+                            "passed": True,
+                            "disposition": "shadow-eligible",
+                        },
+                    },
+                ]
+            }
+
+    class Lifecycle:
+        def read(self):
+            return SimpleNamespace(
+                events=[
+                    {
+                        "event_type": "migration_parity_recorded",
+                        "payload": {
+                            "ticker": strategy.ticker,
+                            "experiment_name": strategy.experiment_name,
+                            "result_fingerprint": proof.result_fingerprint,
+                            "parity_digest": proof.parity_digest,
+                            "passed": True,
+                        },
+                    }
+                ]
+            )
+
+    class Trials:
+        def has_valid_observation(self, _definition_fingerprint):
+            return False
+
+    verifier = FollowupShadowVerifier(
+        qualification_registry=Qualification(),
+        lifecycle_registry=Lifecycle(),
+        current_result_fingerprint_resolver=lambda _strategy: proof.result_fingerprint,
+        trial_registry=Trials(),
+    )
+
+    with pytest.raises(ValueError, match="separate valid formal observation"):
+        verifier(strategy, proof)
 
 
 def test_documented_data_consistency_correction_is_explicit_and_non_blocking() -> None:

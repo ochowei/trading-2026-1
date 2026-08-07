@@ -12,8 +12,10 @@ import pytest
 
 from trading.market_data import (
     AvailabilityPolicy,
+    CoverageMode,
     CsvMarketDataCache,
     MarketDataAvailabilityError,
+    MarketDataCoveragePolicy,
     MarketDataRequirement,
     MarketDataSeries,
     MarketDataService,
@@ -356,6 +358,64 @@ def test_service_builds_complete_bundle_from_declared_requirements(tmp_path) -> 
     assert set(bundle) == {primary, auxiliary}
     assert len(provider.calls) == 2
     assert all(call == (date(2026, 8, 3), date(2026, 8, 4)) for call in provider.calls)
+
+
+def test_service_builds_historical_auxiliary_rows_for_requested_decisions(tmp_path) -> None:
+    calendar = FakeCalendar(
+        ["2026-08-03", "2026-08-04", "2026-08-05"],
+        "2026-08-05",
+    )
+    provider = FakeProvider(bars())
+    market_data = service(tmp_path, provider, calendar)
+    primary = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    auxiliary = MarketDataSeries.yahoo_adjusted_daily("^VIX")
+    requirements = (
+        MarketDataRequirement(primary, date(2026, 8, 3), role="primary"),
+        MarketDataRequirement(
+            auxiliary,
+            date(2026, 8, 3),
+            role="auxiliary",
+            availability_policy=AvailabilityPolicy(1, 2, False),
+        ),
+    )
+    decisions = (
+        SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+        SignalDecisionTime.for_primary_session(date(2026, 8, 5)),
+    )
+
+    bundle = market_data.build_bundle(
+        requirements,
+        decisions[-1],
+        decision_times=decisions,
+    )
+
+    assert list(bundle[auxiliary].index) == list(pd.to_datetime(["2026-08-04", "2026-08-05"]))
+    assert list(bundle[auxiliary]["ObservationDate"]) == list(
+        pd.to_datetime(["2026-08-03", "2026-08-04"])
+    )
+
+
+def test_provider_observation_coverage_allows_a_valid_gap_at_requested_cutoff(tmp_path) -> None:
+    calendar = FakeCalendar(
+        ["2026-08-03", "2026-08-04", "2026-08-05"],
+        "2026-08-05",
+    )
+    provider = FakeProvider(bars().loc[pd.to_datetime(["2026-08-03", "2026-08-04"])])
+    market_data = service(tmp_path, provider, calendar)
+    series = MarketDataSeries.yahoo_adjusted_daily("EURUSD=X")
+    policy = MarketDataCoveragePolicy.provider_observations()
+
+    resolved = market_data.get(
+        series,
+        start=date(2026, 8, 3),
+        coverage_policy=policy,
+    )
+
+    assert list(resolved.index) == list(pd.to_datetime(["2026-08-03", "2026-08-04"]))
+    cached = market_data.cache.load(series, coverage_policy=policy)
+    assert cached is not None
+    assert cached.metadata.coverage_policy == CoverageMode.PROVIDER_OBSERVATIONS.value
+    assert cached.metadata.data_cutoff == date(2026, 8, 4)
 
 
 def test_bundle_requirement_errors_fail_before_provider_access(tmp_path) -> None:

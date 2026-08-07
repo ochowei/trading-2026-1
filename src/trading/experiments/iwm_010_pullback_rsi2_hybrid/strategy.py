@@ -7,6 +7,7 @@ IWM-010: 回檔範圍 + RSI(2) 混合均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_010_pullback_rsi2_hybrid.config import (
     IWM010Config,
@@ -17,8 +18,11 @@ from trading.experiments.iwm_010_pullback_rsi2_hybrid.signal_detector import (
 )
 
 
-class IWM010Strategy(ExecutionModelStrategy):
+class IWM010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM 回檔範圍 + RSI(2) 混合 (IWM-010)"""
+
+    bundle_trial_family = "IWM:pullback-rsi2-hybrid"
+    bundle_trial_hypothesis = "IWM pullback-range RSI(2) hybrid mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

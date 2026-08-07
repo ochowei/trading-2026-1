@@ -8,6 +8,7 @@ EWT-006: Optimized Exit Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_006_optimized_exit_mr.config import (
     EWT006Config,
@@ -18,8 +19,13 @@ from trading.experiments.ewt_006_optimized_exit_mr.signal_detector import (
 )
 
 
-class EWT006Strategy(ExecutionModelStrategy):
+class EWT006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT Optimized Exit Mean Reversion (EWT-006)"""
+
+    bundle_trial_family = "EWT:optimized-exit-mr"
+    bundle_trial_hypothesis = (
+        "EWT optimized-exit mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

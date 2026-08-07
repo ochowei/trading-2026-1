@@ -8,6 +8,7 @@ IBIT-005: 均值回歸 SL -8% 出場優化策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_005_extended_lookback.config import (
     IBIT005Config,
@@ -18,8 +19,13 @@ from trading.experiments.ibit_005_extended_lookback.signal_detector import (
 )
 
 
-class IBIT005Strategy(ExecutionModelStrategy):
+class IBIT005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-005：均值回歸 SL -8%"""
+
+    bundle_trial_family = "IBIT:extended-lookback"
+    bundle_trial_hypothesis = (
+        "IBIT extended-lookback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

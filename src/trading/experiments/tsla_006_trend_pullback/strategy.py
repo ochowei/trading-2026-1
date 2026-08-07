@@ -8,6 +8,7 @@ Att3: 改用 Donchian Channel + ATR 收縮（從 Trend Pullback 轉向）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_006_trend_pullback.config import (
     TSLATrendPullbackConfig,
@@ -18,7 +19,11 @@ from trading.experiments.tsla_006_trend_pullback.signal_detector import (
 )
 
 
-class TSLATrendPullbackStrategy(ExecutionModelStrategy):
+class TSLATrendPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:trend-pullback"
+    bundle_trial_hypothesis = (
+        "TSLA trend pullbacks can be reproduced from a verified primary bundle."
+    )
     """TSLA-006：Donchian Channel Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

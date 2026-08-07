@@ -13,9 +13,9 @@ TSM-017 訊號偵測器：Earnings-Date Exclusion Filter on RS Momentum Pullback
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsm_017_earnings_exclusion.config import (
     TSMEarningsExclusionConfig,
 )
@@ -23,29 +23,15 @@ from trading.experiments.tsm_017_earnings_exclusion.config import (
 logger = logging.getLogger(__name__)
 
 
-class TSMEarningsExclusionDetector(BaseSignalDetector):
+class TSMEarningsExclusionDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSM Earnings-Date Exclusion Filter 訊號偵測器"""
 
     def __init__(self, config: TSMEarningsExclusionConfig):
         self.config = config
         self._earnings_ts = pd.to_datetime(list(config.earnings_dates))
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def _is_in_earnings_window(self, ts: pd.Timestamp) -> bool:
         """檢查單一日期是否落於任一 earnings ± window 中（calendar days）。"""
@@ -59,26 +45,13 @@ class TSMEarningsExclusionDetector(BaseSignalDetector):
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        smh_df = self._fetch_reference_data(start_date)
-
-        if smh_df is None or smh_df.empty:
-            logger.error("無法取得 SMH 數據，無法計算相對強度")
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            df["Ret_5d"] = 0.0
-            df["Earnings_Exclude"] = False
-            return df
-
-        common_idx = df.index.intersection(smh_df.index)
-        df = df.loc[common_idx]
+        smh_df = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
 
         period = self.config.relative_strength_period
         df["TSM_Return"] = df["Close"].pct_change(period)
-        df["SMH_Return"] = smh_df.loc[common_idx, "Close"].pct_change(period)
+        df["SMH_Return"] = smh_df["Close"].pct_change(period)
         df["Relative_Strength"] = df["TSM_Return"] - df["SMH_Return"]
 
         lookback = self.config.pullback_lookback

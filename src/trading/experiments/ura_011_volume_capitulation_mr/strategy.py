@@ -5,6 +5,7 @@ URA-011：成交量放大資本化均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_011_volume_capitulation_mr.config import (
     URA011Config,
@@ -15,8 +16,11 @@ from trading.experiments.ura_011_volume_capitulation_mr.signal_detector import (
 )
 
 
-class URA011Strategy(ExecutionModelStrategy):
+class URA011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-011：成交量放大資本化均值回歸"""
+
+    bundle_trial_family = "URA:volume-capitulation-mr"
+    bundle_trial_hypothesis = "URA volume-confirmed capitulation entries can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

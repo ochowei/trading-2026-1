@@ -7,6 +7,7 @@ IWM-003: RSI(2) 極端超賣均值回歸（出場優化）
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_003_rsi2_optimized.config import (
     IWMRsi2OptConfig,
@@ -17,8 +18,13 @@ from trading.experiments.iwm_003_rsi2_optimized.signal_detector import (
 )
 
 
-class IWMRsi2OptStrategy(ExecutionModelStrategy):
+class IWMRsi2OptStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM RSI(2) 極端超賣均值回歸（出場優化）(IWM-003)"""
+
+    bundle_trial_family = "IWM:rsi2-optimized"
+    bundle_trial_hypothesis = (
+        "IWM optimized RSI(2) exits can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

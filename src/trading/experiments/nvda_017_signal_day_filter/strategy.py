@@ -9,6 +9,7 @@ Momentum 框架驗證）。三次迭代均失敗，REJECT 跨資產假設於高�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_017_signal_day_filter.config import (
     NVDA017Config,
@@ -19,10 +20,12 @@ from trading.experiments.nvda_017_signal_day_filter.signal_detector import (
 )
 
 
-class NVDA017SignalDayFilterStrategy(ExecutionModelStrategy):
+class NVDA017SignalDayFilterStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-017：MBPC + 訊號日 5 日報酬 CEILING 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:signal-day-filter"
+    bundle_trial_hypothesis = "NVDA signal-day filtered momentum breakout pullbacks can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

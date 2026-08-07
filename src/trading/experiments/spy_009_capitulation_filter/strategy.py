@@ -26,6 +26,7 @@ SPY-009: Signal-Day Capitulation-Strength Filter Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.spy_009_capitulation_filter.config import (
     SPY009Config,
@@ -36,8 +37,13 @@ from trading.experiments.spy_009_capitulation_filter.signal_detector import (
 )
 
 
-class SPY009Strategy(ExecutionModelStrategy):
+class SPY009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY Signal-Day Capitulation-Strength Filter MR (SPY-009)"""
+
+    bundle_trial_family = "SPY:capitulation-filter"
+    bundle_trial_hypothesis = (
+        "SPY signal-day capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

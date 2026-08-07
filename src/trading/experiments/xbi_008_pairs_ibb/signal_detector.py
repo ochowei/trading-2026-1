@@ -11,55 +11,28 @@ import logging
 
 import numpy as np
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xbi_008_pairs_ibb.config import XBI008Config
 
 logger = logging.getLogger(__name__)
 
 
-class XBIPairsIBBDetector(BaseSignalDetector):
+class XBIPairsIBBDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XBI/IBB Pairs Trading 訊號偵測器"""
 
     def __init__(self, config: XBI008Config):
         self.config = config
 
-    def _fetch_pair_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載配對標的（IBB）數據"""
-        try:
-            df = yf.download(
-                self.config.pair_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.pair_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.pair_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        ibb_df = self._fetch_pair_data(start_date)
-
-        if ibb_df is None or ibb_df.empty:
-            logger.error("無法取得 %s 數據", self.config.pair_ticker)
-            df["Price_Ratio"] = 0.0
-            df["Ratio_Zscore"] = 0.0
-            df["SMA"] = 0.0
-            return df
-
-        common_idx = df.index.intersection(ibb_df.index)
-        df = df.loc[common_idx]
-
-        df["Price_Ratio"] = np.log(df["Close"] / ibb_df.loc[common_idx, "Close"])
+        ibb_close = self.require_auxiliary(self.config.pair_ticker, df.index)["Close"]
+        df["Price_Ratio"] = np.log(df["Close"] / ibb_close)
 
         lookback = self.config.zscore_lookback
         rolling_mean = df["Price_Ratio"].rolling(lookback).mean()

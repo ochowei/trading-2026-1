@@ -75,6 +75,33 @@ def test_failed_and_removed_trials_remain_in_registry(tmp_path) -> None:
     assert any(item["event"] == "removed" for item in trial["observations"])
 
 
+def test_migration_observation_cannot_satisfy_requalification_gate(tmp_path) -> None:
+    registry = ExperimentTrialRegistry(tmp_path / "registry.json")
+    fingerprint = "a" * 64
+    registry.register_trial("spy:mean-reversion", fingerprint, experiment_name="spy_001")
+    registry.record_observation(
+        "spy:mean-reversion",
+        fingerprint,
+        snapshot_id="b" * 64,
+        run_mode="migration",
+        validity_status="migration-pending",
+        observation_id="migration",
+    )
+
+    assert registry.has_valid_observation(fingerprint) is False
+
+    registry.record_observation(
+        "spy:mean-reversion",
+        fingerprint,
+        snapshot_id="c" * 64,
+        run_mode="offline",
+        validity_status="valid",
+        observation_id="requalified",
+    )
+
+    assert registry.has_valid_observation(fingerprint) is True
+
+
 @pytest.mark.parametrize(
     "observation",
     (
