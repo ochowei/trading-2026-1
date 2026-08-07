@@ -1,7 +1,8 @@
 # Phase 9 primary-only followup migration
 
-Updated 2026-08-07. This note records the implementation boundary for the
-primary-only followup slice; it does not qualify or cut over any strategy.
+Updated 2026-08-07. The Phase 9 migration and representative-evidence stage is
+closed at its fail-closed qualification boundary. This note does not claim that
+any strategy is qualified, registered as Shadow, or cut over.
 
 This file is the canonical current Phase 9 status, evidence ledger, and
 parity/requalification/Shadow runbook. The
@@ -9,16 +10,19 @@ parity/requalification/Shadow runbook. The
 remains a historical design baseline and is not updated retroactively with
 execution status.
 
-## Canonical current status and next-stage runbook
+## Canonical current status and closure record
 
 ### Current position
 
-The primary-only migration boundary is implemented. The current checkpoint is:
+The primary-only migration boundary and zero-bypass policy are implemented.
+The source and evidence checkpoints are:
 
 ```text
 branch: codex/experiment-data-access-migration-phase-9
-commit: 306fe1cdb2e07d8bb614872f82ae2d5fe942c838
-message: phase9: complete primary followup bundle migration
+source migration: 306fe1cdb2e07d8bb614872f82ae2d5fe942c838
+source message: phase9: complete primary followup bundle migration
+SPY evidence: c09e92be4ce68b02c1b93f8f37239a6e8a21b94f
+evidence message: phase9: checkpoint SPY parity and formal observation
 ```
 
 The migration record covers 285 primary-only experiment entries, 571 primary
@@ -26,23 +30,106 @@ contract test cases, and 1226 tests in the full repository regression. The
 intentional execution-model exceptions are the CIBR-014/SPY-007 tracer
 implementations and nine TQQQ variants outside the primary followup contract.
 
-The repository is not yet at the requalification gate:
+SPY-007 reached the requalification gate; the other requested representatives
+remain evidence-only or were not selected for new snapshot acquisition.
+Requalification is not registered:
 
-- Four fixed-snapshot parity envelopes pass exactly and remain
-  `migration-pending`.
-- The trial registry has four migration-mode observations; none is a valid
-  formal observation for qualification.
+- Five migration-mode observations now exist; all remain `migration-pending`.
+- SPY-007 additionally has one separate valid `offline` formal observation
+  bound to the current definition and the newly published snapshot.
 - No qualification registry, lifecycle registry, manual ledger, or
   reconciliation record is currently registered for this stage.
 - No Shadow registration or global no-new-entry transition has been performed.
 - No active promotion, broker order, or new entry has been performed.
 
-Besides the documentation change recorded here, the worktree contains one
-pre-existing mutable, uncommitted registry change: `results/trial_registry.json`.
-It records the four migration observations and must be explicitly preserved,
-separately checkpointed, or otherwise resolved before any later command that
-appends registry or qualification state. This document does not modify that
-file.
+The source checkpoint includes the original four migration observations. The
+SPY evidence checkpoint adds one current-definition snapshot, one valid offline
+result, one exact parity envelope, one linked migration result, and the two
+append-only trial observations. Qualification and lifecycle state remain absent.
+
+Phase 9 is therefore complete at the migration/evidence boundary. Its requested
+requalification-to-Shadow continuation stopped at the mandatory historical-plan
+guardrail. That stop is the correct terminal result for this phase, not an
+authorization to weaken or backdate the Phase 6 qualification contract.
+
+### Gate 3 attempt — SPY-007 formal observation blocked
+
+The documented separate formal offline observation was attempted against the
+existing SPY-007 snapshot. The runner correctly rejected it because the exact
+definition blob reference changed even though the semantic fingerprint did not:
+
+| Identity | Snapshot-bound definition | Current source definition |
+| --- | --- | --- |
+| Fingerprint | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` |
+| Blob digest | `02c227ad3e9bad06456d6013c9fd0c4e04a507108336aadfd499694790a15a4d` | `a7ccb179cad2918749e0b51898831bc2bd0e6840f0c487484ab8bfe2eb9cb53a` |
+| Blob byte count | `113175` | `104792` |
+
+The formal runner requires the exact definition reference to match the
+snapshot; a matching semantic fingerprint alone is insufficient. The failed
+attempt did not write a result, registry observation, `latest.json`,
+qualification state, or lifecycle state. The existing snapshot was not
+overwritten or rebound, and the migration result was not treated as a formal
+observation. The later approved publication used an explicit 2026-08-06
+decision cutoff and created a new immutable snapshot.
+
+### Gate 3 completion — SPY-007
+
+After the approved full refresh, a new immutable snapshot was published and
+verified:
+
+- snapshot: `fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778`;
+- decision session: `2026-08-06`;
+- current definition digest: `a7ccb179cad2918749e0b51898831bc2bd0e6840f0c487484ab8bfe2eb9cb53a`;
+- semantic definition fingerprint: `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612`.
+
+The separate formal offline observation then succeeded at
+`results/spy_007_trend_pullback/20260807_063639_341769_offline_640017db49b749408ec9e3a855c2acb1.json`
+with registry observation ID `6e378591fc5943cd90ffa9c6182c8866` and
+`validity_status=valid`. It did not update `latest.json`.
+
+The new snapshot's provider-free migration parity also passed exactly. Its
+immutable artifact is
+`results/spy_007_trend_pullback/fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778.migration-parity.json`
+with parity digest
+`c7cee27475aa2da97efd16b6039e0b64e56355c8f8169c81ca9b3e0eada0e5e1` and no
+differences. The linked migration result remains `migration-pending` and is
+not the qualification observation. All four current-definition artifacts and
+their trial observations are checkpointed in commit
+`c09e92be4ce68b02c1b93f8f37239a6e8a21b94f`.
+
+### Gate 4 blocked — frozen historical plan is not registered
+
+The read-only checks after the SPY-007 observation report:
+
+- `trading qualification status`: qualification registry is empty;
+- `trading followup-state status`: lifecycle registry is not initialized;
+- no manual ledger or broker reconciliation record exists.
+
+The codebase exposes Python APIs for a frozen
+`HistoricalQualificationPlan` and `HistoricalScreenResult`, but no production
+CLI command currently constructs and registers the plan/screen sequence. A
+safe requalification requires an explicit plan covering development years,
+evaluation folds, family trial inventory (including legacy variants), benchmark
+and random-selection policy, cost scenarios, and exact cutoff/session rules.
+Those inputs cannot be inferred from migration parity or the one valid offline
+observation. No qualification or lifecycle state is created until that plan
+and its operator-approved execution procedure exist. Operator confirmation on
+2026-08-07 established that no repository-external pre-registered plan or event
+is available for SPY-007. Historical requalification is therefore blocked
+under the current contract; no dates or plan timestamp may be backdated.
+
+### Disposition — preserve the pre-registration guardrail
+
+The approved disposition is to retain the existing historical-plan contract and
+record SPY-007 as `requalification-blocked`. No one-time backdated exception,
+qualification event, Shadow registration, or lifecycle transition will be
+created. Any future qualification effort must begin with a newly frozen,
+forward-dated plan and an explicitly approved observation schedule; it cannot
+reuse this migration evidence as a substitute for plan registration.
+
+That future work is a new prospective Phase 6/7 qualification program. It is
+not unfinished Phase 9 migration work and cannot make SPY-007 immediately
+Shadow-eligible.
 
 ### Existing immutable evidence
 
@@ -52,7 +139,8 @@ definition fingerprint is the `result_fingerprint` in the parity envelope.
 
 | Experiment | Current followup scope | Snapshot ID | Definition fingerprint | Parity digest | State |
 | --- | --- | --- | --- | --- | --- |
-| `spy_007_trend_pullback` (SPY-007) | Yes | `ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `89be61317ff48bc298d33083fd012ec74b56c2afe90cf6119f010214ab70c62b` | `migration-pending` |
+| `spy_007_trend_pullback` (SPY-007), current | Yes | `fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `c7cee27475aa2da97efd16b6039e0b64e56355c8f8169c81ca9b3e0eada0e5e1` | Parity `migration-pending`; separate offline observation `valid`; requalification blocked |
+| `spy_007_trend_pullback` (SPY-007), historical parity | Yes | `ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `89be61317ff48bc298d33083fd012ec74b56c2afe90cf6119f010214ab70c62b` | Retained immutable migration evidence |
 | `sivr_001_mean_reversion` (SIVR-001) | No | `2f4b8260a913919a7785e961dba772d7aa7f226f3689bce07cbf079314e7b5d4` | `228e219cdbbbabc4e84d8561139a963b1501d5680378c8bdef02692147667259` | `d01501158c2dcfb2f0b25276b0be78dc3986f9b4c84daeb5300176ab1564eb18` | `migration-pending` |
 | `tsla_001_extreme_oversold` (TSLA-001) | No | `5a7f48e9e134b1cbe16c492446d47653bcdb84e100676775c2dec3051ec1a9e7` | `d951579fd99a92b519ff4edbb96903877c74a500fb29f2dfda7d1b63dd789945` | `ecbe0eb4f0d6f3624dad10e1d4215af035b8438c448c35a73cdc2101f4a4f389` | `migration-pending` |
 | `voo_001_rsi2_reversal` (VOO-001) | No | `ea33ffb51e318408675549b451d97c6eff9718965a813aa1db0c663714f3637c` | `8368f3c1224980eb10712aeac7a0151d4b2b09ce0a6352966eb2809cde69b8b0` | `438deb343b6522d4d5b2be866015cec06d17079d7a2f4e69c9b1110745718c44` | `migration-pending` |
@@ -68,13 +156,13 @@ scope.
 
 | Representative | Current followup entry | Snapshot inventory | Current decision |
 | --- | --- | --- | --- |
-| SPY-007 | Yes | Existing immutable snapshot | Use existing parity; separate valid observation is eligible after gates |
+| SPY-007 | Yes | New current-definition snapshot published | Parity and valid observation passed; `requalification-blocked` because no pre-registered historical plan exists |
 | SIVR-001 | No | Existing immutable snapshot | Keep as migration evidence unless scope is explicitly changed |
 | TSLA-001 | No | Existing immutable snapshot | Keep as migration evidence unless scope is explicitly changed |
 | VOO-001 | No | Existing immutable snapshot | Keep as migration evidence unless scope is explicitly changed |
 | EEM-021 (`eem_021_bb_width_regime_gate_mr`) | No | No matching snapshot found | Do not guess cutoff; create only after freshness/cutoff approval |
 | NVDA-013 (`nvda_013_regime_mbpc`) | No | No matching snapshot found | Do not guess cutoff; create only after freshness/cutoff approval |
-| USO-009 (`uso_009_momentum_pullback`) | Yes | No matching snapshot found | Highest-priority missing representative; requires snapshot decision |
+| USO-009 (`uso_009_momentum_pullback`) | Yes | No matching snapshot found | Not selected for this closure; any future evidence requires a separately approved cutoff |
 | XBI-015 (`xbi_015_regime_pullback_mr`) | No | No matching snapshot found | Do not guess cutoff; create only after freshness/cutoff approval |
 
 If a missing snapshot requires external data download or a human-selected
@@ -103,7 +191,8 @@ overwritten.
 #### Gate 0 — registry/worktree checkpoint
 
 - Confirm the source worktree and branch are the intended Phase 9 checkpoint.
-- Resolve the uncommitted `results/trial_registry.json` decision.
+- Preserve the SPY artifacts and append-only registry observations in evidence
+  checkpoint `c09e92be4ce68b02c1b93f8f37239a6e8a21b94f`.
 - Keep ignored caches, locks, and private state out of source/evidence commits.
 - Do not start a state-changing workflow while registry ownership is ambiguous.
 
@@ -132,7 +221,10 @@ Review the immutable envelope for indicators, ordered signal dates, filled
 trades, legacy and migrated definition identities, layer checksums, parity
 digest, an empty difference summary, and passing status. The result must remain
 `migration-pending`; do not update `latest.json` or any qualification/lifecycle
-state.
+state. The CLI consumes an existing parity artifact; it does not generate one.
+Artifact generation must use the existing verified parity domain API and write
+only after an exact pass, or a bounded equivalent workflow must be documented
+before another strategy is processed.
 
 #### Gate 3 — separate valid formal observation
 
@@ -142,10 +234,9 @@ definition and trial identity. Verify registry validity, freshness, result
 fingerprint, and snapshot identity. The migration result itself cannot be
 reused as this observation.
 
-The repository currently has read-only qualification status inspection but no
-single CLI command that performs this complete handoff. Before executing it,
-choose and document an approved domain-API/CLI procedure; do not bypass the
-registry guardrails with ad hoc result copies.
+SPY-007 completed this handoff through the formal offline runner; the result was
+not copied or promoted into `latest.json`. Any later strategy must repeat the
+same verified snapshot, current-definition, and formal-run procedure.
 
 #### Gate 4 — historical requalification
 
@@ -159,6 +250,8 @@ For each strategy with a separate valid observation:
 - leave any failing, stale, or incomplete strategy unqualified.
 
 No qualification state may be created merely because migration parity passed.
+For this closure, Gate 4 is blocked because the required plan was not registered
+before the first evaluation outcome. Do not execute or backdate a screen.
 
 #### Gate 5 — Shadow registration
 
@@ -180,12 +273,11 @@ part of this checklist.
 
 The following require explicit operator confirmation before state-changing work:
 
-- whether the four uncommitted migration observations are to be preserved in a
-  separate registry checkpoint;
 - whether SIVR-001, TSLA-001, VOO-001, EEM-021, NVDA-013, or XBI-015 should remain
   evidence-only or be added to followup scope;
 - any external data download, data cutoff, or snapshot freshness exception;
-- the approved procedure for creating a separate valid formal observation;
+- registration of a new forward-dated Historical Qualification Plan and its
+  observation schedule;
 - manual ledger initialization and broker reconciliation before a global
   no-new-entry state is established;
 - any future activation or promotion request.
@@ -193,7 +285,7 @@ The following require explicit operator confirmation before state-changing work:
 ### Items not explicit in the Phase 9 source documents
 
 These operational details are inherited partly from the Phase 6/7 documents or
-remain open and should be tracked explicitly:
+are deliberately deferred outside this Phase 9 closure:
 
 1. A representative-to-followup scope matrix and its change-approval rule.
 2. A per-strategy snapshot acquisition, cutoff, and freshness runbook.
@@ -207,16 +299,22 @@ remain open and should be tracked explicitly:
 8. Final compatibility cleanup: adapter removal, legacy CLI execution policy,
    authoring skill/workflow updates, and the remaining out-of-scope TQQQ audit.
 
-### Current-stage completion criteria
+### Closure checklist
 
-- Selected representative snapshots and cutoffs are documented.
-- Parity envelopes pass with exact layer and identity evidence.
-- Current followup candidates have separate valid formal observations.
-- Historical screen and requalification events are recorded append-only.
-- Shadow registration is exact and global no-new-entry remains enforced.
-- No `latest.json` was overwritten by migration evidence.
-- No invalid, stale, or incomplete strategy is marked qualified.
-- No active promotion, broker order, or new entry occurred.
+| Check | Status | Evidence or disposition |
+| --- | --- | --- |
+| Architecture and zero-bypass policy | Complete | 285 primary-only entries, empty active allowlist, provider boundary clean |
+| Selected representative snapshot | Complete | SPY-007 current-definition snapshot at decision session 2026-08-06 |
+| Exact parity | Complete | Digest `c7cee27475aa2da97efd16b6039e0b64e56355c8f8169c81ca9b3e0eada0e5e1`; no differences |
+| Separate formal observation | Complete | SPY-007 offline observation `valid` and distinct from migration result |
+| Historical requalification | Blocked | No plan pre-registered before the first evaluation outcome; no backdating |
+| Shadow registration | Not reached | Qualification registry empty; lifecycle registry not initialized |
+| Global no-new-entry | Fail-closed, not initialized | Missing lifecycle state authorizes no new entry; no fabricated ledger/reconciliation |
+| Result/state protection | Complete | No `latest.json`, qualification, lifecycle, ledger, or broker state changed |
+| Active promotion | Not performed | No broker order or new entry occurred |
+
+Closure classification: **Phase 9 migration complete; requalification blocked;
+Shadow/no-new-entry state not initialized; active promotion prohibited.**
 
 The migrated strategies declare one adjusted-daily primary series through
 `market_data_requirements()`, capture an immutable research definition and
@@ -666,8 +764,9 @@ implementations and nine TQQQ variants outside the primary followup contract;
 they remain explicitly out of this shared-mixin migration boundary. No result,
 latest, qualification, or lifecycle state is changed by these code-only waves.
 
-The current trial registry additionally contains four migration-mode
-observations for SPY-007, SIVR-001, TSLA-001, and VOO-001. They remain
-`migration-pending` and are not valid formal observations for qualification or
-Shadow registration. Their exact snapshot, fingerprint, and parity identities
-are recorded in the canonical status table above.
+The current trial registry additionally contains five migration-mode
+observations: the original SPY-007, SIVR-001, TSLA-001, and VOO-001 records plus
+the current-definition SPY-007 replay. All remain `migration-pending` and are
+not valid formal observations for qualification or Shadow registration. SPY-007
+also has one separate valid offline observation, recorded in the canonical
+status section above; no qualification or lifecycle state has been created.
