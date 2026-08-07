@@ -23,6 +23,8 @@ source migration: 306fe1cdb2e07d8bb614872f82ae2d5fe942c838
 source message: phase9: complete primary followup bundle migration
 SPY evidence: c09e92be4ce68b02c1b93f8f37239a6e8a21b94f
 evidence message: phase9: checkpoint SPY parity and formal observation
+SPY evaluation preparation: e858cb1406b8d08b3d9c2887e92f00c9e6b2203f
+preparation message: phase9: prepare complete SPY formal evaluation
 ```
 
 The migration record covers 285 primary-only experiment entries, 571 primary
@@ -34,9 +36,9 @@ SPY-007 reached the requalification gate; the other requested representatives
 remain evidence-only or were not selected for new snapshot acquisition.
 Requalification is not registered:
 
-- Five migration-mode observations now exist; all remain `migration-pending`.
-- SPY-007 additionally has one separate valid `offline` formal observation
-  bound to the current definition and the newly published snapshot.
+- Six migration-mode observations now exist; all remain `migration-pending`.
+- The SPY asset-wide batch added nine valid `online` observations. SPY-007 also
+  retains its earlier separate valid `offline` observation.
 - No qualification registry, lifecycle registry, manual ledger, or
   reconciliation record is currently registered for this stage.
 - No Shadow registration or global no-new-entry transition has been performed.
@@ -46,6 +48,16 @@ The source checkpoint includes the original four migration observations. The
 SPY evidence checkpoint adds one current-definition snapshot, one valid offline
 result, one exact parity envelope, one linked migration result, and the two
 append-only trial observations. Qualification and lifecycle state remain absent.
+
+The later approved SPY asset-wide formalization published one current-definition
+snapshot and one valid online observation for every registered SPY experiment.
+That batch replaced the nine legacy `latest.json` files by design, but did not
+change `followup.py`, qualification, lifecycle, ledger, reconciliation, or
+broker state. The complete-set ranking retained SPY-007 as the formal followup
+candidate under the repository evaluation workflow; its new snapshot also has
+exact migration parity. This newer evidence resolves the former `legacy`
+result-validity blocker, but it does not repair the pre-registration or
+incomplete-selection-history blockers described below.
 
 Phase 9 is therefore complete at the migration/evidence boundary. Its requested
 requalification-to-Shadow continuation stopped at the mandatory historical-plan
@@ -222,6 +234,85 @@ The next state-changing gate requires one combined operator approval: download
 allow the nine formal `--snapshot` runs to replace their legacy `latest.json`
 files. This approval still does not authorize Shadow or Active promotion.
 
+### SPY asset-wide formal-evaluation completion
+
+The operator granted the combined approval. The batch completed on 2026-08-07
+against one source state and the explicit 2026-08-06 decision session.
+
+The SPY cache remained valid through the cutoff. The first generic `^VIX`
+refresh attempt correctly stopped on a coverage-policy mismatch because the
+standalone data CLI assumes XNYS sessions. The retry used SPY-003's declared
+`provider_observations` coverage policy, completed a full 9,217-row refresh
+through 2026-08-06, and passed exact snapshot verification. No cutoff or
+missing observation was guessed. The generic standalone `data status ^VIX`
+command still cannot infer an experiment-specific coverage policy; the
+SPY-003 manifest verification is the authoritative check for this batch.
+
+All manifests below passed `trading data verify`. Each formal online run wrote
+one schema-3 `valid` observation and intentionally replaced that experiment's
+legacy `latest.json`. All nine latest results report data cutoff 2026-08-06 and
+the exact fingerprint shown here.
+
+| Candidate | Snapshot ID | Definition fingerprint | Valid observation ID |
+| --- | --- | --- | --- |
+| SPY-001 | `66bd5c33c6810d8dd139be2c56b212d831aefad9ad544049ac48e80dd6d9bfa2` | `427dcafd26bee97eba0e5a06e90288d0e27591252bc21cf5d19d5f616148b919` | `0d8528436788493ba8e5de6eebdee796` |
+| SPY-002 | `48a6e0aaca76a4dffbc27ea0de8fcea2b1a9726532021f3130751c2286c5ff8f` | `980da6a7dc8796e85f6340ad80e71e6eef2989d1c4fc74f9df13d7b043feaaac` | `48e848e48ebc42229a998ced19d9804c` |
+| SPY-003 | `822bb1741f4e96795805d12a42a042a3c85114bacb3e0c93e93fee7816f05c4a` | `b5252d106f40eb4b7054768f469470d06231a4131ba6b0f9c886c4d2693cda59` | `1127b8b8db334e119117a79ca1fb0ef2` |
+| SPY-004 | `2abb1415a9b27ce0f0d4ae8493f0eabeb378ef4721abf7035532c92cf3a81859` | `abb0b16c78fc85cf15bf5a8e78505501391a80390a6a965f388f86e4f062921f` | `2fa9a07ae73b485abc813b8773845350` |
+| SPY-005 | `91ce89af4a997c61c573004bb86726bb6c893594c20e559fb4fa7aa90cbe31d5` | `56c4876acc9da8cd60053bc4dbbbf848785b6142767037c786fe2f51de370d81` | `59dbb1b02b074d1da5041323d679d893` |
+| SPY-006 | `f3c3041632b70bdbb2c42f47cd195827456bdbc9a1ed8d995eb7d8554f96033e` | `36cc682c5019231234517f3365326b23fc98dcbf2e820b531623f60e1c5974c4` | `51f094a252f4495e99096860d6779190` |
+| SPY-007 | `2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `3cb1d36e52814bebb38622d7f7deb30e` |
+| SPY-008 | `925023588ed1cce85b63fc82306f34746165dab052c56e15b2f366eff5d93347` | `8d71ee42db60a8316b00b131def2e776cd765dc779eda712d600288b3e1bf2d0` | `2e743c229f7840878b69742dcf33628b` |
+| SPY-009 | `44d839a58acef398fbf6581b435905931960c801a24354a8a42d7934c76d6cf3` | `80128513b79dd9ec5b3dc1a57615f9b8f37248cbd4cf3e730b97c1f1a6924391` | `1eb3ad995d604a1dacbb903a6abbe9eb` |
+
+The complete valid-set comparison, using the repository's formal followup
+ranking priorities, is:
+
+| Rank | Candidate | Part B WR | Part B cumulative | Part B Sharpe | A/B WR difference | Ranking eligibility |
+| ---: | --- | ---: | ---: | ---: | ---: | --- |
+| 1 | SPY-007 | 68.75% | +18.35% | 0.42 | 11.61pp | Yes |
+| 2 | SPY-008 | 75.00% | +9.85% | 0.34 | 4.41pp | Yes |
+| 3 | SPY-009 | 100.00% | +9.27% | 0.00 | 0.00pp | Yes |
+| 4 | SPY-006 | 75.00% | +7.43% | 0.65 | 6.25pp | Yes |
+| 5 | SPY-005 | 75.00% | +5.89% | 0.56 | 0.00pp | Yes |
+| 6 | SPY-004 | 75.00% | +4.89% | 0.55 | 12.50pp | Yes |
+| — | SPY-002 | 75.00% | +4.89% | 0.55 | 15.00pp | No: consistency requires less than 15pp |
+| — | SPY-003 | 100.00% | +13.14% | 0.00 | 50.00pp | No: A/B inconsistency |
+| — | SPY-001 | 75.00% | -1.41% | -0.15 | 5.00pp | No: Part B cumulative return is not positive |
+
+This ranking does not rewrite the historical experiment-design conclusion that
+SPY-009 has the highest legacy min(A,B) Sharpe convention. It answers a
+different question: the formal followup workflow ranks eligible candidates by
+Part B cumulative return after its mandatory validity and consistency gates.
+Under that policy SPY-007 ranks first, and it was already the configured SPY
+followup entry, so `src/trading/followup.py` did not change.
+
+The SPY-007 followup checklist passes the repository's generic research
+candidate thresholds: result `valid`; Part B WR 68.75%; Part B cumulative
++18.35%; 16 signals over two years, or 8.0/year; A/B WR difference 11.61pp;
+`ExecutionModelStrategy`; and downstream cumulative-return evolution gradual
+despite abrupt rolling win-rate changes. Its 2026 Part C result is negative
+(-5.48%) and remains an explicit risk input for any future historical screen;
+Part C is not one of the generic ranking gates and has not been hidden or
+reclassified.
+
+SPY-007's selected current snapshot was also replayed through both the legacy
+DataFetcher path bound to the verified bundle and the provider-free bundle
+path. Indicators, ordered signal dates, and filled trades matched exactly.
+The immutable parity digest is
+`3a0be6b8eaa37d373fbc3dc19acdd9b30a2510af5925be5bad7ea19811b033ff`.
+The linked migration observation ID is
+`9c64a4b4ea4a45bda74d3c2559febfff`; it remains `migration-pending` and did
+not modify SPY-007 `latest.json`.
+
+This completes the approved asset-wide evidence batch. It does **not** create
+formal Phase 6 qualification: `selection_history_incomplete` remains true,
+there is no pre-registered historical plan for these already-observed sessions,
+the qualification registry is empty, and the lifecycle registry is not
+initialized. No Shadow/no-new-entry state or Active promotion was created.
+Any next qualification attempt is a new forward-dated Phase 6/7 program with
+future observation sessions, not remaining Phase 9 implementation.
+
 ### Existing immutable evidence
 
 The following artifacts are present under `results/` and passed the exact
@@ -230,6 +321,7 @@ definition fingerprint is the `result_fingerprint` in the parity envelope.
 
 | Experiment | Current followup scope | Snapshot ID | Definition fingerprint | Parity digest | State |
 | --- | --- | --- | --- | --- | --- |
+| `spy_007_trend_pullback` (SPY-007), asset-wide formal selection | Yes | `2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `3a0be6b8eaa37d373fbc3dc19acdd9b30a2510af5925be5bad7ea19811b033ff` | Parity `migration-pending`; separate online observation `valid`; requalification blocked |
 | `spy_007_trend_pullback` (SPY-007), current | Yes | `fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `c7cee27475aa2da97efd16b6039e0b64e56355c8f8169c81ca9b3e0eada0e5e1` | Parity `migration-pending`; separate offline observation `valid`; requalification blocked |
 | `spy_007_trend_pullback` (SPY-007), historical parity | Yes | `ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111` | `f75526cd9b8493f26a250d1db915c8c57176bb59e941332bee95bc0870d66612` | `89be61317ff48bc298d33083fd012ec74b56c2afe90cf6119f010214ab70c62b` | Retained immutable migration evidence |
 | `sivr_001_mean_reversion` (SIVR-001) | No | `2f4b8260a913919a7785e961dba772d7aa7f226f3689bce07cbf079314e7b5d4` | `228e219cdbbbabc4e84d8561139a963b1501d5680378c8bdef02692147667259` | `d01501158c2dcfb2f0b25276b0be78dc3986f9b4c84daeb5300176ab1564eb18` | `migration-pending` |
@@ -395,21 +487,22 @@ are deliberately deferred outside this Phase 9 closure:
 | Check | Status | Evidence or disposition |
 | --- | --- | --- |
 | Architecture and zero-bypass policy | Complete | 285 primary-only entries, empty active allowlist, provider boundary clean |
-| Selected representative snapshot | Complete | SPY-007 current-definition snapshot at decision session 2026-08-06 |
-| Exact parity | Complete | Digest `c7cee27475aa2da97efd16b6039e0b64e56355c8f8169c81ca9b3e0eada0e5e1`; no differences |
-| Separate formal observation | Complete | SPY-007 offline observation `valid` and distinct from migration result |
+| Complete SPY formal set | Complete | Nine current-definition snapshots and nine valid online observations at decision session 2026-08-06 |
+| Selected representative snapshot | Complete | SPY-007 snapshot `2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8` |
+| Exact parity | Complete | Digest `3a0be6b8eaa37d373fbc3dc19acdd9b30a2510af5925be5bad7ea19811b033ff`; no differences |
+| Separate formal observation | Complete | SPY-007 online observation `valid` and distinct from migration result |
 | Historical requalification | Blocked | No plan pre-registered before the first evaluation outcome; no backdating |
 | Shadow registration | Not reached | Qualification registry empty; lifecycle registry not initialized |
 | Global no-new-entry | Fail-closed, not initialized | Missing lifecycle state authorizes no new entry; no fabricated ledger/reconciliation |
-| Result/state protection | Complete | No `latest.json`, qualification, lifecycle, ledger, or broker state changed |
+| Result/state protection | Complete | Nine legacy latest results were intentionally formalized under explicit approval; qualification, lifecycle, ledger, reconciliation, and broker state did not change |
 | Active promotion | Not performed | No broker order or new entry occurred |
 
 Closure classification: **Phase 9 migration complete; requalification blocked;
 Shadow/no-new-entry state not initialized; active promotion prohibited.**
 
-The post-closure prospective preflight did not change this classification: no
-plan was registered because result validity, complete trial history, and family
-baseline identity remain unresolved.
+The asset-wide formalization resolved the former SPY result-validity blocker
+but did not change this classification: no plan was registered because complete
+selection history and a prospective historical-screen plan remain unresolved.
 
 The migrated strategies declare one adjusted-daily primary series through
 `market_data_requirements()`, capture an immutable research definition and

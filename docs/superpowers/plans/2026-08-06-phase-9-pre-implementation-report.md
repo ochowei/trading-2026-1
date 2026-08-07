@@ -2,6 +2,8 @@
 
 > 本文件記錄 Phase 9 開始實作前、以 commit `41da32e` 為基線的只讀準備結果。後續 PR0 foundation 變更不回寫本歷史報告；目前工作樹狀態以 Git 與最新實作文件為準。
 
+> Phase 9 的現況、evidence ledger、完成判定與後續 qualification boundary 統一維護於 [`docs/phase-9-primary-followup-migration.md`](../../phase-9-primary-followup-migration.md)；請勿從本歷史基線推論目前進度。
+
 
 結論：Phase 9 不適合單一 PR。建議拆成「CI/contract foundation → followup 優先遷移 → 一般 primary-only → legacy bypass 批次 → zero-tolerance cleanup」。目前架構已具備 snapshot、bundle、result validity 與 research-run 基礎，但所有 423 個實驗仍屬 formal migration 未完成狀態；真正的初始 bypass 基線是 114 個檔案，而不只是 101 個直接 yfinance 檔案。
 

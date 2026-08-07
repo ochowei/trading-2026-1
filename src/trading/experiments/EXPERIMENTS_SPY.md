@@ -1,19 +1,28 @@
 <!-- AI_CONTEXT_START - 此區塊供 AI Agent 快速讀取，人工更新
   last_validated: 2026-08-07
-  data_through: 2025-12-31
+  data_through: 2026-08-06
   phase9_note: SPY-003 now declares SPY primary plus ^VIX auxiliary data through the verified snapshot bundle; migration runs remain migration-pending and do not advance latest or followup qualification.
   phase9_note_2026_08_07: SPY-001, SPY-002, SPY-004 through SPY-006, and SPY-008/009 now consume declared primary SPY bundles through the shared execution boundary; SPY-003 remains auxiliary and SPY-007 remains the explicit tracer. Existing backtester variants are unchanged, and formal migration results remain pending requalification.
   phase9_evidence_2026_08_07: This remaining SPY primary-only wave is contract-covered; fixed-snapshot parity evidence is retained separately for SPY-007, while the seven new migrations remain pending.
+  phase9_formal_evaluation_2026_08_07: All nine SPY experiments now have valid schema-3 online observations at the same 2026-08-06 cutoff. Under the repository followup ranking policy (mandatory Part B gates and A/B consistency, then Part B cumulative return), SPY-007 ranks first at +18.35% Part B cumulative return. SPY-009 remains the historical experiment-design best under the separate min(A,B) Sharpe convention. SPY-007 parity passed on snapshot 2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8; formal Phase 6 requalification remains blocked by incomplete selection history and the absence of a pre-registered historical plan. No followup, qualification, lifecycle, Shadow, or Active state changed.
   note: SPY-009 added 2026-04-25 (Signal-Day Capitulation-Strength Filter MR, **Att2 SUCCESS** — repo 首次「1 日跌幅下限」(1d FLOOR) 作為主品質過濾器於任何資產). Three iterations Att1/Att2 success, Att3 confirms threshold sweet spot. Att1 (1d floor <= -0.5% only, 3d cap disabled) Part A 10/100% WR/Sharpe **6.56** cum +32.50% / Part B 3/100% WR/std=0/Sharpe display 0.00 cum +9.27% / min(A,B)† Part A **6.56** (EWJ-003/EWT-008 慣例，**+1138% vs SPY-005 0.53**) — 1d floor 精準過濾 4/4 Part A SLs（1d -0.09%~-0.30%）+ Part B 唯一 SL（2025-04-07 1d -0.18%），代價移除 Part A 2 筆 1d 過淺贏家（2020-02-28 -0.42%、2023-03-13 -0.14%）淨效果 +6/0; Att2 ★ (1d floor -0.5% AND 3d cap >= -8%) **identical to Att1** — 3d cap 完全非綁定（所有通過 1d floor 的贏家 3d > -7.10%），但保留作為**未來訊號 regime-shift 安全層**（若新訊號 1d > -0.5% 但 3d <= -8%）；Att3 (1d floor <= -0.7%, 3d cap -8%) Part A 8/100% WR/Sharpe **5.88** cum +24.89% / Part B 3/100% WR / min Part A **5.88** — 更嚴 floor 移除 2019-05-29 + 2019-12-03 兩筆贏家（1d -0.67%）但無新增 SL 過濾，確認 -0.5% 為結構性甜蜜點。**Repo 首次 1d FLOOR 方向（與 DIA-012 1d CAP 方向完全相反）**：SPY 與 DIA 雖均為 1.0% vol 寬基 ETF 且共用 RSI(2) 進場框架，但 SLs 在 1d 維度的失敗結構完全相反——SPY SLs 為 1d 過淺弱勢漂移（floor 過濾），DIA SLs 為 1d 過深政策震盪（cap 過濾）。**A/B 平衡達成**（cum 差 28.5% < 30%、訊號比 1.33:1 < 50%）。**擴展 lesson #19 雙向性發現至寬基 ETF 內部子類別**：DJIA (DIA) vs S&P 500 (SPY) 同 vol 等級 1d 失敗模式完全相反，驗證單一資產失敗模式不能直接跨資產移植，需個別 trade-level 分析。SPY-009 added 2026-04-25.
 -->
 ## AI Agent 快速索引
 
-**當前最佳：** SPY-009 Att2（SPY-005 進場 + **1 日跌幅下限 <= -0.5% AND 3 日急跌上限 >= -8%**，TP +3.0% / SL -3.0% / 20d）**已確認為全域最優**
+**歷史實驗設計最佳（min(A,B) Sharpe 慣例）：** SPY-009 Att2（SPY-005 進場 + **1 日跌幅下限 <= -0.5% AND 3 日急跌上限 >= -8%**，TP +3.0% / SL -3.0% / 20d）
 - Part A: +32.50%（10 訊號, 100% WR, Sharpe **6.56**, Sortino 999.99）, Part B: +9.27%（3 訊號, 100% WR, std=0, Sharpe 顯示 0.00）
 - min(A,B)† Part A Sharpe **6.56**（EWJ-003/EWT-008 慣例，Part B 全勝零方差結構性對齊）
 - vs SPY-005: Part A Sharpe **+1138%**（0.53→6.56），Part A WR +25pp（75%→100%），cum +35.8%，Part B 全勝
 - A/B 平衡：cum 差 28.5% < 30% ✓、訊號比 1.33:1（25% gap）< 50% ✓
 - **Repo 首次 1 日跌幅下限（1d FLOOR）作為主品質過濾器於任何資產**（DIA-012 為 1d cap 上限，方向完全相反）
+
+**Phase 9 正式 followup 評估最佳：** SPY-007 `spy_007_trend_pullback`
+- 9/9 候選均以同一 2026-08-06 cutoff 取得 `valid` 正式結果後才排名
+- Part B: 16 訊號、68.75% WR、+18.35% 累積、Sharpe 0.42；A/B WR 差 11.61pp
+- 依 followup workflow 的優先規則，通過 mandatory/consistency gate 後以 Part B 累積報酬排名，因此 SPY-007 第一、SPY-008 第二、SPY-009 第三
+- rolling assessment：勝率為 abrupt、下游累積報酬為 gradual，generic research-candidate checklist 通過
+- SPY-007 已是 `followup.py` 的 SPY entry，故 selection 不變；正式 Phase 6 requalification 仍被 incomplete selection history 與未預先註冊的 historical plan 阻擋
+- 2026 Part C 為 -5.48%，保留為未來 historical screen 的風險證據，不屬 generic ranking gate
 
 **前任最佳：** SPY-005（同 SPY-004 進場，寬出場 TP +3.0% / SL -3.0% / 20d）
 - Part A: +23.93%（16訊號, 75.0% WR, Sharpe 0.53, Sortino 0.89）, Part B: +5.89%（4訊號, 75.0% WR, Sharpe 0.56, Sortino 0.95）
@@ -131,8 +140,27 @@
 # SPY 實驗總覽 (SPY Experiment Index)
 
 > **最新實驗 (Latest):** SPY-009 `spy_009_capitulation_filter`
-> **當前最佳 (Best):** SPY-009 `spy_009_capitulation_filter` Att2 ✅ 全域最優（min(A,B)† 6.56）
+> **歷史實驗設計最佳 (min Sharpe):** SPY-009 `spy_009_capitulation_filter` Att2（min(A,B)† 6.56）
+> **Phase 9 正式 followup 評估最佳:** SPY-007 `spy_007_trend_pullback`（Part B +18.35%，9/9 valid complete-set ranking）
 > **前任最佳：** SPY-005 `spy_005_asymmetric_exit`（min 0.53）
+
+## Phase 9 正式 followup 評估（2026-08-07）
+
+九個 SPY experiments 均以 current-definition immutable snapshot 和相同的
+2026-08-06 cutoff 完成正式 online observation；九個 `latest.json` 的計算狀態
+均為 `valid`。完整 snapshot、observation、ranking、parity 與 state ledger 集中在
+[`docs/phase-9-primary-followup-migration.md`](../../../docs/phase-9-primary-followup-migration.md)。
+
+此正式 followup 排名與下方歷史實驗設計排名使用不同 policy。正式 workflow
+先要求 Part B WR > 50%、Part B cumulative > 0、A/B WR 差 < 15pp，再以 Part B
+cumulative 排名；因此選出 SPY-007。歷史實驗設計結論則以 min(A,B) Sharpe
+慣例保留 SPY-009。兩者皆為正確但用途不同的結論，不應互相覆寫。
+
+SPY-007 新 snapshot 的 indicators、ordered signal dates、filled trades exact
+parity 通過，digest 為
+`3a0be6b8eaa37d373fbc3dc19acdd9b30a2510af5925be5bad7ea19811b033ff`。
+本次未修改 followup selection，也未建立 qualification、lifecycle、Shadow、
+no-new-entry 或 Active state。
 
 ## 資產特性 (Asset Characteristics)
 

@@ -6779,7 +6779,7 @@
       "first_registered_at": "2026-08-07T01:14:15.165607Z",
       "hypothesis": "SPY entries after a confirmed uptrend pull back and rebound.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-08-07T06:39:48.091346Z",
+      "last_observed_at": "2026-08-07T07:43:16.931088Z",
       "legacy": false,
       "observations": [
         {
@@ -6813,6 +6813,28 @@
           "result_path": "results/spy_007_trend_pullback/fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778.migration-result.json",
           "run_mode": "migration",
           "snapshot_id": "fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778",
+          "validity_status": "migration-pending"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "3cb1d36e52814bebb38622d7f7deb30e",
+          "observed_at": "2026-08-07T07:35:44.636779Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_007_trend_pullback/20260807_073544_239917_online_d9bc1b40ad034623a2bbe01dfa97a2d9.json",
+          "run_mode": "online",
+          "snapshot_id": "2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "9c64a4b4ea4a45bda74d3c2559febfff",
+          "observed_at": "2026-08-07T07:43:16.931088Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_007_trend_pullback/2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8.migration-result.json",
+          "run_mode": "migration",
+          "snapshot_id": "2e698ed59c223049b3bc3f8297092b6eca6b91710358e499e298f2c4357cd1e8",
           "validity_status": "migration-pending"
         }
       ],
@@ -6903,6 +6925,230 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "46239f0cc58640396fafd07a353db4b695331c203e097f50be4ea2f1a742f965"
+    },
+    {
+      "definition_fingerprint": "427dcafd26bee97eba0e5a06e90288d0e27591252bc21cf5d19d5f616148b919",
+      "experiment_family": "SPY:pullback-wr",
+      "experiment_names": [
+        "spy_001_pullback_wr"
+      ],
+      "first_registered_at": "2026-08-07T07:35:16.115223Z",
+      "hypothesis": "SPY pullback and Williams %R reversal can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:16.495147Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "0d8528436788493ba8e5de6eebdee796",
+          "observed_at": "2026-08-07T07:35:16.495147Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_001_pullback_wr/20260807_073516_115083_online_b2580b4a4e09449498ac7f8058003862.json",
+          "run_mode": "online",
+          "snapshot_id": "66bd5c33c6810d8dd139be2c56b212d831aefad9ad544049ac48e80dd6d9bfa2",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "01f913f442473c0c6e3f632a04e220760b38d001d51b1c3c53dcb22dc2c866da"
+    },
+    {
+      "definition_fingerprint": "980da6a7dc8796e85f6340ad80e71e6eef2989d1c4fc74f9df13d7b043feaaac",
+      "experiment_family": "SPY:no-trailing",
+      "experiment_names": [
+        "spy_002_no_trailing"
+      ],
+      "first_registered_at": "2026-08-07T07:35:18.053004Z",
+      "hypothesis": "SPY fixed exits can reproduce the pullback reversal baseline from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:18.429521Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "48e848e48ebc42229a998ced19d9804c",
+          "observed_at": "2026-08-07T07:35:18.429521Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_002_no_trailing/20260807_073518_052875_online_fe6ba4fdcd844418ba4607bb338ef167.json",
+          "run_mode": "online",
+          "snapshot_id": "48a6e0aaca76a4dffbc27ea0de8fcea2b1a9726532021f3130751c2286c5ff8f",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "f155b9296b914fb7153b20f99c91be3eb53e91edf508af76bf24546fbc2aeca8"
+    },
+    {
+      "definition_fingerprint": "b5252d106f40eb4b7054768f469470d06231a4131ba6b0f9c886c4d2693cda59",
+      "experiment_family": "SPY:vix-filter",
+      "experiment_names": [
+        "spy_003_optimized_wr"
+      ],
+      "first_registered_at": "2026-08-07T07:35:36.210399Z",
+      "hypothesis": "SPY pullback reversals improve when VIX confirms elevated fear.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:36.860227Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "1127b8b8db334e119117a79ca1fb0ef2",
+          "observed_at": "2026-08-07T07:35:36.860227Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_003_optimized_wr/20260807_073536_210138_online_16ab0fc41abb4b0587aeccc2a091c1aa.json",
+          "run_mode": "online",
+          "snapshot_id": "822bb1741f4e96795805d12a42a042a3c85114bacb3e0c93e93fee7816f05c4a",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "41ab1b180289c4ed6512786116efcc102de3f43a3207c099dbd1b6cccf2d5a54"
+    },
+    {
+      "definition_fingerprint": "abb0b16c78fc85cf15bf5a8e78505501391a80390a6a965f388f86e4f062921f",
+      "experiment_family": "SPY:rsi2-reversal",
+      "experiment_names": [
+        "spy_004_rsi2_reversal"
+      ],
+      "first_registered_at": "2026-08-07T07:35:38.426389Z",
+      "hypothesis": "SPY RSI(2) mean reversion can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:38.804605Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "2fa9a07ae73b485abc813b8773845350",
+          "observed_at": "2026-08-07T07:35:38.804605Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_004_rsi2_reversal/20260807_073538_426258_online_87ed8df6bdb24f978ed2d247ba10083d.json",
+          "run_mode": "online",
+          "snapshot_id": "2abb1415a9b27ce0f0d4ae8493f0eabeb378ef4721abf7035532c92cf3a81859",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "dd28918bb3fddfa41810c7e04a1c240a022da2cd84bd131e7bbb367fc06e035b"
+    },
+    {
+      "definition_fingerprint": "56c4876acc9da8cd60053bc4dbbbf848785b6142767037c786fe2f51de370d81",
+      "experiment_family": "SPY:asymmetric-exit",
+      "experiment_names": [
+        "spy_005_asymmetric_exit"
+      ],
+      "first_registered_at": "2026-08-07T07:35:40.371969Z",
+      "hypothesis": "SPY asymmetric exits can preserve the RSI(2) entry edge from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:40.741954Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "59dbb1b02b074d1da5041323d679d893",
+          "observed_at": "2026-08-07T07:35:40.741954Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_005_asymmetric_exit/20260807_073540_371842_online_4ca6d8f10c8c4c0ca9166a00b6439e3c.json",
+          "run_mode": "online",
+          "snapshot_id": "91ce89af4a997c61c573004bb86726bb6c893594c20e559fb4fa7aa90cbe31d5",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "ee0fd688ec494875020fd62c270b1e091ab145bfd54c7f3acab1f2fb8d941a2c"
+    },
+    {
+      "definition_fingerprint": "36cc682c5019231234517f3365326b23fc98dcbf2e820b531623f60e1c5974c4",
+      "experiment_family": "SPY:roc-reversal",
+      "experiment_names": [
+        "spy_006_roc_reversal"
+      ],
+      "first_registered_at": "2026-08-07T07:35:42.294669Z",
+      "hypothesis": "SPY wider-profit-target reversals can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:42.668817Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "51f094a252f4495e99096860d6779190",
+          "observed_at": "2026-08-07T07:35:42.668817Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_006_roc_reversal/20260807_073542_294526_online_4f44e328763b4eac929213f9726749f0.json",
+          "run_mode": "online",
+          "snapshot_id": "f3c3041632b70bdbb2c42f47cd195827456bdbc9a1ed8d995eb7d8554f96033e",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "2ae7d01777bcc34f0d08da1cbdf2c3b2ae49013c56489e68021388711fa87f16"
+    },
+    {
+      "definition_fingerprint": "8d71ee42db60a8316b00b131def2e776cd765dc779eda712d600288b3e1bf2d0",
+      "experiment_family": "SPY:bb-squeeze-breakout",
+      "experiment_names": [
+        "spy_008_bb_squeeze_breakout"
+      ],
+      "first_registered_at": "2026-08-07T07:35:46.130623Z",
+      "hypothesis": "SPY volatility squeeze breakouts can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:47.023537Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "2e743c229f7840878b69742dcf33628b",
+          "observed_at": "2026-08-07T07:35:47.023537Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_008_bb_squeeze_breakout/20260807_073546_130437_online_299100bc4cb94b7da3d192d79d1d87e4.json",
+          "run_mode": "online",
+          "snapshot_id": "925023588ed1cce85b63fc82306f34746165dab052c56e15b2f366eff5d93347",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "3a0a6b4ba7fc1261b7eab9dc310e3824e70a5cda833616757a19116aece38aa6"
+    },
+    {
+      "definition_fingerprint": "80128513b79dd9ec5b3dc1a57615f9b8f37248cbd4cf3e730b97c1f1a6924391",
+      "experiment_family": "SPY:capitulation-filter",
+      "experiment_names": [
+        "spy_009_capitulation_filter"
+      ],
+      "first_registered_at": "2026-08-07T07:35:48.587842Z",
+      "hypothesis": "SPY signal-day capitulation filtering can be reproduced from a verified primary bundle.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-07T07:35:48.958083Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "1eb3ad995d604a1dacbb903a6abbe9eb",
+          "observed_at": "2026-08-07T07:35:48.958083Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_009_capitulation_filter/20260807_073548_587709_online_3c802ca055b747ceae06f9503d63d940.json",
+          "run_mode": "online",
+          "snapshot_id": "44d839a58acef398fbf6581b435905931960c801a24354a8a42d7934c76d6cf3",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "5cd9e351f611c465cbcf06f4d9f42b92d88c4325e8543e1f9d4d34c69cd2d01d"
     }
   ]
 }
