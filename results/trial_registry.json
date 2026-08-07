@@ -6779,7 +6779,7 @@
       "first_registered_at": "2026-08-07T01:14:15.165607Z",
       "hypothesis": "SPY entries after a confirmed uptrend pull back and rebound.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-08-07T01:14:15.498570Z",
+      "last_observed_at": "2026-08-07T06:39:48.091346Z",
       "legacy": false,
       "observations": [
         {
@@ -6791,6 +6791,28 @@
           "result_path": "results/spy_007_trend_pullback/ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111.migration-result.json",
           "run_mode": "migration",
           "snapshot_id": "ca54bc84ab26762438567d820257941c1ba00b42a8a833a4de9226a13db85111",
+          "validity_status": "migration-pending"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "6e378591fc5943cd90ffa9c6182c8866",
+          "observed_at": "2026-08-07T06:36:39.457968Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_007_trend_pullback/20260807_063639_341769_offline_640017db49b749408ec9e3a855c2acb1.json",
+          "run_mode": "offline",
+          "snapshot_id": "fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "121c537263d54333a6c9464b6651cf61",
+          "observed_at": "2026-08-07T06:39:48.091346Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_007_trend_pullback/fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778.migration-result.json",
+          "run_mode": "migration",
+          "snapshot_id": "fca6ea038930468a383b3f9c598700e8ed5ce9923a2f772536eeb227f4e04778",
           "validity_status": "migration-pending"
         }
       ],
