@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_015_gvz_implied_vol_mr.config import (
     GLD015Config,
@@ -12,8 +13,13 @@ from trading.experiments.gld_015_gvz_implied_vol_mr.signal_detector import (
 )
 
 
-class GLD015GvzImpliedVolMRStrategy(ExecutionModelStrategy):
+class GLD015GvzImpliedVolMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD-015：GLD-014 Att2 + ^GVZ forward-looking implied vol regime gate"""
+
+    bundle_trial_family = "GLD:gvz-implied-vol-mr"
+    bundle_trial_hypothesis = (
+        "GLD mean-reversion entries improve when GVZ confirms a contained volatility regime."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（GLD 高流動 ETF）
 

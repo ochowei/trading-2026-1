@@ -4,6 +4,7 @@ USO 緊密回檔上限 + RSI(2) + 2日急跌策略 (USO-013)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_013_tight_cap.config import (
     USOTightCapConfig,
@@ -14,10 +15,14 @@ from trading.experiments.uso_013_tight_cap.signal_detector import (
 )
 
 
-class USOTightCapStrategy(ExecutionModelStrategy):
+class USOTightCapStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-013：緊密回檔上限 + RSI(2) + 2日急跌"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "USO:tight-cap"
+    bundle_trial_hypothesis = (
+        "USO tight-cap mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

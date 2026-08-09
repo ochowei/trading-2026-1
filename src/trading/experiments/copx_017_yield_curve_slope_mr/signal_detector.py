@@ -14,36 +14,22 @@ COPX Yield-Curve-Slope Industrial-Demand-Regime-Gated MR 訊號偵測器 (COPX-0
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.copx_017_yield_curve_slope_mr.config import COPX017Config
 
 logger = logging.getLogger(__name__)
 
 
-class COPX017SignalDetector(BaseSignalDetector):
+class COPX017SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """COPX-017: vol-adaptive MR + yield curve slope velocity regime gate"""
 
     def __init__(self, config: COPX017Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.long_yield_ticker, self.config.short_yield_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -72,28 +58,13 @@ class COPX017SignalDetector(BaseSignalDetector):
         df["ATR_Ratio"] = atr_short / atr_long
 
         # COPX-017 核心: yield curve slope velocity (^TYX - ^TNX)
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        long_yield_df = self._fetch_external(self.config.long_yield_ticker, start_date)
-        short_yield_df = self._fetch_external(self.config.short_yield_ticker, start_date)
-        if (
-            long_yield_df is None
-            or long_yield_df.empty
-            or short_yield_df is None
-            or short_yield_df.empty
-        ):
-            logger.error(
-                "無法取得 %s / %s 數據, yield curve slope 過濾停用",
-                self.config.long_yield_ticker,
-                self.config.short_yield_ticker,
-            )
-            df["Yield_Slope"] = float("nan")
-            df["Slope_Change_N"] = 0.0
-        else:
-            long_yield = long_yield_df["Close"].reindex(df.index, method="ffill")
-            short_yield = short_yield_df["Close"].reindex(df.index, method="ffill")
-            slope = long_yield - short_yield
-            df["Yield_Slope"] = slope
-            df["Slope_Change_N"] = slope.diff(self.config.slope_lookback)
+        long_yield_df = self.require_auxiliary(self.config.long_yield_ticker, df.index)
+        short_yield_df = self.require_auxiliary(self.config.short_yield_ticker, df.index)
+        long_yield = long_yield_df["Close"]
+        short_yield = short_yield_df["Close"]
+        slope = long_yield - short_yield
+        df["Yield_Slope"] = slope
+        df["Slope_Change_N"] = slope.diff(self.config.slope_lookback)
 
         return df
 

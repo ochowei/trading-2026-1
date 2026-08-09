@@ -31,36 +31,22 @@ USDCNH 過濾的設計依據：
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.fxi_016_usdcnh_direction_mr.config import FXI016Config
 
 logger = logging.getLogger(__name__)
 
 
-class FXI016USDCNHDirectionDetector(BaseSignalDetector):
+class FXI016USDCNHDirectionDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """FXI-016 USDCNH Direction-Gated Cross-Asset Divergence MR"""
 
     def __init__(self, config: FXI016Config):
         self.config = config
 
-    def _fetch_yahoo_data(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.anchor_ticker, self.config.usdcnh_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -98,32 +84,13 @@ class FXI016USDCNHDirectionDetector(BaseSignalDetector):
         # FXI vs ASHR cross-asset divergence
         fxi_ret_n = df["Close"].pct_change(self.config.rel_lookback)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        anchor_df = self._fetch_yahoo_data(self.config.anchor_ticker, start_date)
-
-        if anchor_df is None or anchor_df.empty:
-            logger.error(
-                "無法取得 %s 數據，FXI-ASHR divergence 過濾停用",
-                self.config.anchor_ticker,
-            )
-            df["Rel_Return"] = 0.0
-        else:
-            anchor_close = anchor_df["Close"].reindex(df.index, method="ffill")
-            anchor_ret_n = anchor_close.pct_change(self.config.rel_lookback)
-            df["Rel_Return"] = fxi_ret_n - anchor_ret_n
+        anchor_df = self.require_auxiliary(self.config.anchor_ticker, df.index)
+        anchor_ret_n = anchor_df["Close"].pct_change(self.config.rel_lookback)
+        df["Rel_Return"] = fxi_ret_n - anchor_ret_n
 
         # USDCNH direction filter
-        usdcnh_df = self._fetch_yahoo_data(self.config.usdcnh_ticker, start_date)
-
-        if usdcnh_df is None or usdcnh_df.empty:
-            logger.error(
-                "無法取得 %s 數據，USDCNH 過濾停用",
-                self.config.usdcnh_ticker,
-            )
-            df["USDCNH_Change"] = 0.0
-        else:
-            usdcnh_close = usdcnh_df["Close"].reindex(df.index, method="ffill")
-            df["USDCNH_Change"] = usdcnh_close.pct_change(self.config.usdcnh_lookback)
+        usdcnh_df = self.require_auxiliary(self.config.usdcnh_ticker, df.index)
+        df["USDCNH_Change"] = usdcnh_df["Close"].pct_change(self.config.usdcnh_lookback)
 
         return df
 

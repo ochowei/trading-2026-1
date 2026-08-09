@@ -8,6 +8,7 @@ BB 下軌+回檔上限混合進場框架上，新增「2 日報酬下限」（2D
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_008_vol_transition_mr.config import (
     VGK008Config,
@@ -18,10 +19,15 @@ from trading.experiments.vgk_008_vol_transition_mr.signal_detector import (
 )
 
 
-class VGK008Strategy(ExecutionModelStrategy):
+class VGK008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK Post-Capitulation Vol-Transition MR (VGK-008)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+
+    bundle_trial_family = "VGK:vol-transition-mr"
+    bundle_trial_hypothesis = (
+        "VGK volatility-transition mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

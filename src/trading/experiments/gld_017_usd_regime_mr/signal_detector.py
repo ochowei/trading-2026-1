@@ -16,36 +16,22 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.gld_017_usd_regime_mr.config import GLD017Config
 
 logger = logging.getLogger(__name__)
 
 
-class GLD017SignalDetector(BaseSignalDetector):
+class GLD017SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """GLD-017：GLD-015 Att2 框架 + GLD–USD 跨資產 divergence regime gate"""
 
     def __init__(self, config: GLD017Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.gvz_ticker, self.config.usd_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -70,31 +56,19 @@ class GLD017SignalDetector(BaseSignalDetector):
         df["Return_1d"] = df["Close"].pct_change(1)
         df["Return_2d"] = df["Close"].pct_change(2)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
         # ^GVZ forward-looking implied vol regime gate（沿用 GLD-015 Att2 全域最優）
-        gvz_df = self._fetch_external(self.config.gvz_ticker, start_date)
-        if gvz_df is None or gvz_df.empty:
-            logger.error("無法取得 %s 數據，^GVZ 過濾停用", self.config.gvz_ticker)
-            df["GVZ_Close"] = float("nan")
-            df["GVZ_Change_Nd"] = 0.0
-        else:
-            gvz_close = gvz_df["Close"].reindex(df.index, method="ffill")
-            df["GVZ_Close"] = gvz_close
-            df["GVZ_Change_Nd"] = gvz_close.diff(self.config.gvz_direction_lookback)
+        gvz_df = self.require_auxiliary(self.config.gvz_ticker, df.index)
+        gvz_close = gvz_df["Close"]
+        df["GVZ_Close"] = gvz_close
+        df["GVZ_Change_Nd"] = gvz_close.diff(self.config.gvz_direction_lookback)
 
         # GLD–USD cross-asset divergence regime gate（GLD-017 核心新增）
-        usd_df = self._fetch_external(self.config.usd_ticker, start_date)
+        usd_df = self.require_auxiliary(self.config.usd_ticker, df.index)
         div_n = self.config.usd_lookback
         df["GLD_Ret_N"] = df["Close"].pct_change(div_n)
-        if usd_df is None or usd_df.empty:
-            logger.error("無法取得 %s 數據，GLD–USD divergence 過濾停用", self.config.usd_ticker)
-            df["USD_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            usd_close = usd_df["Close"].reindex(df.index, method="ffill")
-            df["USD_Ret_N"] = usd_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["GLD_Ret_N"] - df["USD_Ret_N"]
+        usd_close = usd_df["Close"]
+        df["USD_Ret_N"] = usd_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["GLD_Ret_N"] - df["USD_Ret_N"]
 
         return df
 

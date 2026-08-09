@@ -10,6 +10,7 @@ USDJPY 後），擴展 lesson #24 family v8 至歐洲已開發 ETF。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_009_eurusd_direction_mr.config import (
     VGK009Config,
@@ -20,8 +21,11 @@ from trading.experiments.vgk_009_eurusd_direction_mr.signal_detector import (
 )
 
 
-class VGK009Strategy(ExecutionModelStrategy):
+class VGK009Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK-009: EURUSD Direction-Gated Vol-Transition MR"""
+
+    bundle_trial_family = "VGK:eurusd-direction-mr"
+    bundle_trial_hypothesis = "VGK capitulation mean reversion improves when EUR/USD direction avoids an acute currency-drag regime."
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

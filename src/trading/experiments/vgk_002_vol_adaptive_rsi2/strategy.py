@@ -8,6 +8,7 @@ sharp panic selling from slow drifts (e.g. 2022 European energy crisis).
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_002_vol_adaptive_rsi2.config import (
     VGK002Config,
@@ -18,8 +19,13 @@ from trading.experiments.vgk_002_vol_adaptive_rsi2.signal_detector import (
 )
 
 
-class VGK002Strategy(ExecutionModelStrategy):
+class VGK002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK 波動率自適應 RSI(2) 均值回歸 (VGK-002)"""
+
+    bundle_trial_family = "VGK:vol-adaptive-rsi2"
+    bundle_trial_hypothesis = (
+        "VGK volatility-adaptive RSI(2) reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

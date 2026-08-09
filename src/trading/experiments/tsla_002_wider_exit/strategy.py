@@ -7,6 +7,7 @@ TSLA Wider Exit Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_002_wider_exit.config import (
     TSLAWiderExitConfig,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_002_wider_exit.signal_detector import (
 )
 
 
-class TSLAWiderExitStrategy(ExecutionModelStrategy):
+class TSLAWiderExitStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:wider-exit"
+    bundle_trial_hypothesis = (
+        "TSLA wider-exit mean reversion can be reproduced from a verified primary bundle."
+    )
     """TSLA-002：寬出場均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價

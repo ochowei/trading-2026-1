@@ -8,6 +8,7 @@ Donchian 突破捕捉價格創新高的趨勢啟動，不需要預先波動收�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_011_donchian_breakout.config import (
     GLD011Config,
@@ -18,8 +19,13 @@ from trading.experiments.gld_011_donchian_breakout.signal_detector import (
 )
 
 
-class GLDDonchianBreakoutStrategy(ExecutionModelStrategy):
+class GLDDonchianBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD-011：Donchian Channel Breakout 策略（含成交模型）"""
+
+    bundle_trial_family = "GLD:donchian-breakout"
+    bundle_trial_hypothesis = (
+        "GLD Donchian breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

@@ -7,6 +7,7 @@ regime confirmation gate（lesson #25 cross-strategy mirror extension from IWM-0
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_021_qqq_macro_health_gate.config import (
     TSM021Config,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_021_qqq_macro_health_gate.signal_detector import (
 )
 
 
-class TSM021QQQMacroHealthGateStrategy(ExecutionModelStrategy):
+class TSM021QQQMacroHealthGateStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-021：QQQ Macro-Health Gate on RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:qqq-macro-health"
+    bundle_trial_hypothesis = (
+        "TSM RS pullbacks improve when QQQ macro health avoids extreme regimes."
+    )
 
     slippage_pct: float = 0.001
 

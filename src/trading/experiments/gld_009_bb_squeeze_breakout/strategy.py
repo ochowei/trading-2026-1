@@ -11,6 +11,7 @@ Att2（SL -3.5%）和 Att3（追蹤停損）均劣化。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_009_bb_squeeze_breakout.config import (
     GLD009Config,
@@ -21,8 +22,13 @@ from trading.experiments.gld_009_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class GLDBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class GLDBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD-009：BB Squeeze Breakout 策略（含成交模型）"""
+
+    bundle_trial_family = "GLD:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "GLD BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

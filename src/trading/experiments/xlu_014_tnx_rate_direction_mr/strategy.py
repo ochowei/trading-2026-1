@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_014_tnx_rate_direction_mr.config import (
     XLU014Config,
@@ -12,7 +13,10 @@ from trading.experiments.xlu_014_tnx_rate_direction_mr.signal_detector import (
 )
 
 
-class XLU014Strategy(ExecutionModelStrategy):
+class XLU014Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XLU:tnx-rate-direction"
+    bundle_trial_hypothesis = "XLU pullback entries improve when Treasury-rate direction confirms the implied-volatility regime."
+
     """XLU-014：XLU-013 Att2/Att3 框架 + ^TNX realized-rate-momentum DIRECTION gate"""
 
     slippage_pct: float = 0.001

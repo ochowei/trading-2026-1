@@ -13,58 +13,34 @@ NVDA-014 訊號偵測器：Negative Relative Strength Mean Reversion (Pairs MR v
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.nvda_014_negative_rs_mr.config import NVDA014Config
 
 logger = logging.getLogger(__name__)
 
 
-class NVDA014Detector(BaseSignalDetector):
+class NVDA014Detector(DeclaredAuxiliaryData, BaseSignalDetector):
     """NVDA Negative Relative Strength Mean Reversion 訊號偵測器"""
 
     def __init__(self, config: NVDA014Config):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載參考標的（SMH）數據"""
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        smh_df = self._fetch_reference_data(start_date)
-
-        if smh_df is None or smh_df.empty:
-            logger.error("無法取得 SMH 數據，無法計算相對強度")
-            df["Relative_Strength"] = 0.0
-            df["Pullback"] = 0.0
-            df["ATR_Ratio"] = 1.0
-            return df
-
-        common_idx = df.index.intersection(smh_df.index)
-        df = df.loc[common_idx]
+        # The verified bundle supplies SMH already aligned as-of to every
+        # primary decision session.
+        smh_df = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         # 相對強度 = NVDA 20d return - SMH 20d return
         period = self.config.relative_strength_period
         df["NVDA_Return"] = df["Close"].pct_change(period)
-        df["SMH_Return"] = smh_df.loc[common_idx, "Close"].pct_change(period)
+        df["SMH_Return"] = smh_df["Close"].pct_change(period)
         df["Relative_Strength"] = df["NVDA_Return"] - df["SMH_Return"]
 
         # 回檔（10日高點）

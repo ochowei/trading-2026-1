@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_012_regime_vol_gate.config import (
@@ -13,11 +14,16 @@ from trading.experiments.soxl_012_regime_vol_gate.signal_detector import (
 )
 
 
-class SOXL012RegimeVolGateStrategy(ExecutionModelStrategy):
+class SOXL012RegimeVolGateStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SOXL-012：波動率 regime 閘門 + 精選超賣（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:regime-vol-gate"
+    bundle_trial_hypothesis = (
+        "SOXL volatility-regime gating can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -7,6 +7,7 @@ GLD-012 驗證有效的 pullback+WR 框架移植至 EEM。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_004_pullback_wr.config import (
     EEM004Config,
@@ -17,8 +18,13 @@ from trading.experiments.eem_004_pullback_wr.signal_detector import (
 )
 
 
-class EEM004Strategy(ExecutionModelStrategy):
+class EEM004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 回檔範圍 + Williams %R 均值回歸 (EEM-004)"""
+
+    bundle_trial_family = "EEM:pullback-wr"
+    bundle_trial_hypothesis = (
+        "EEM pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

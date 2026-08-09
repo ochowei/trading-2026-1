@@ -8,43 +8,22 @@ SPY-003 訊號偵測器（含 VIX 恐慌過濾）
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.spy_003_optimized_wr.config import SPYVixFilterConfig
 
 logger = logging.getLogger(__name__)
 
 
-class SPYVixFilterSignalDetector(BaseSignalDetector):
+class SPYVixFilterSignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
+    """SPY-003 detector using a declared, snapshot-aligned VIX series."""
+
     def __init__(self, config: SPYVixFilterConfig):
         self.config = config
-        self._vix_data: pd.Series | None = None
 
-    def _fetch_vix(self, start_date: str) -> pd.Series:
-        """下載 VIX 收盤數據 (Fetch VIX close data)"""
-        if self._vix_data is not None:
-            return self._vix_data
-
-        logger.info("SPY-003: Fetching VIX data for fear filter...")
-        vix = yf.download(
-            "^VIX",
-            start=start_date,
-            progress=False,
-            auto_adjust=True,
-        )
-        if vix.empty:
-            logger.warning("SPY-003: Failed to fetch VIX data, returning empty series")
-            self._vix_data = pd.Series(dtype=float)
-            return self._vix_data
-
-        # Handle multi-level columns from yfinance
-        if isinstance(vix.columns, pd.MultiIndex):
-            vix.columns = vix.columns.get_level_values(0)
-
-        self._vix_data = vix["Close"]
-        logger.info("SPY-003: VIX data fetched, %d rows", len(self._vix_data))
-        return self._vix_data
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return ("^VIX",)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -65,10 +44,9 @@ class SPYVixFilterSignalDetector(BaseSignalDetector):
         df["ClosePos"] = (df["Close"] - df["Low"]) / day_range
         df.loc[day_range == 0, "ClosePos"] = 0.5
 
-        # VIX 數據（合併至 SPY DataFrame）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_close = self._fetch_vix(start_date)
-        df["VIX"] = vix_close.reindex(df.index, method="ffill")
+        # VIX is supplied by the verified bundle and already aligned as-of to
+        # every primary decision session.
+        df["VIX"] = self.require_auxiliary("^VIX", df.index)["Close"]
 
         return df
 

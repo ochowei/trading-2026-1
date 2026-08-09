@@ -7,6 +7,7 @@ COPX-003: 20日回檔 + Williams %R + 出場優化 均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_003_exit_optimized.config import (
     COPXExitOptimizedConfig,
@@ -17,10 +18,15 @@ from trading.experiments.copx_003_exit_optimized.signal_detector import (
 )
 
 
-class COPXExitOptimizedStrategy(ExecutionModelStrategy):
+class COPXExitOptimizedStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-003：20日回檔 + Williams %R + 出場優化"""
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
+
+    bundle_trial_family = "COPX:exit-optimized"
+    bundle_trial_hypothesis = (
+        "COPX optimized exits can preserve the entry edge from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

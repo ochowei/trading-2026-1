@@ -9,6 +9,7 @@ SOXL-013 Signal-Day Capitulation-Strength CAP MR + 成交模型策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_013_signal_day_capitulation_cap.config import (
@@ -20,8 +21,13 @@ from trading.experiments.soxl_013_signal_day_capitulation_cap.signal_detector im
 )
 
 
-class SOXL013Strategy(ExecutionModelStrategy):
+class SOXL013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SOXL-013 Signal-Day Capitulation-Strength CAP MR 策略"""
+
+    bundle_trial_family = "SOXL:signal-day-capitulation-cap"
+    bundle_trial_hypothesis = (
+        "SOXL signal-day capitulation caps can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

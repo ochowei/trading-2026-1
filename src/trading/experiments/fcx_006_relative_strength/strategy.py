@@ -7,6 +7,7 @@ FCX Relative Strength (FCX vs COPX) Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_006_relative_strength.config import (
     FCXRelativeStrengthConfig,
@@ -17,8 +18,13 @@ from trading.experiments.fcx_006_relative_strength.signal_detector import (
 )
 
 
-class FCXRelativeStrengthStrategy(ExecutionModelStrategy):
+class FCXRelativeStrengthStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-006：Relative Strength（含成交模型）"""
+
+    bundle_trial_family = "FCX:relative-strength"
+    bundle_trial_hypothesis = (
+        "FCX pullbacks improve when relative strength versus COPX remains positive."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% FCX 個股滑價
 

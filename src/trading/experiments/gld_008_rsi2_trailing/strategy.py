@@ -5,6 +5,7 @@ GLD-008: 20日回檔 + WR + 反轉K線 + 追蹤停損均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
     TrailingStopBacktester,
@@ -18,8 +19,13 @@ from trading.experiments.gld_008_rsi2_trailing.signal_detector import (
 )
 
 
-class GLD008Strategy(ExecutionModelStrategy):
+class GLD008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 20日回檔 + WR + 反轉K線 + 追蹤停損 (GLD-008)"""
+
+    bundle_trial_family = "GLD:rsi2-trailing"
+    bundle_trial_hypothesis = (
+        "GLD RSI(2) trailing-stop reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

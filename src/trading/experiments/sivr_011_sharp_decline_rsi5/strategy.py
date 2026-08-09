@@ -8,6 +8,7 @@ Uses RSI(5) + 2-day decline instead of Williams %R.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_011_sharp_decline_rsi5.config import (
     SIVRSharpDeclineRSI5Config,
@@ -18,8 +19,13 @@ from trading.experiments.sivr_011_sharp_decline_rsi5.signal_detector import (
 )
 
 
-class SIVRSharpDeclineRSI5Strategy(ExecutionModelStrategy):
+class SIVRSharpDeclineRSI5Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-011：急跌 + RSI(5) 均值回歸"""
+
+    bundle_trial_family = "SIVR:sharp-decline-rsi5"
+    bundle_trial_hypothesis = (
+        "SIVR sharp-decline RSI(5) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

@@ -19,6 +19,7 @@ INDA-010: Post-Capitulation Vol-Transition Mean Reversion Strategy (Att3 Final)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_010_vol_transition_mr.config import (
     INDA010Config,
@@ -29,7 +30,11 @@ from trading.experiments.inda_010_vol_transition_mr.signal_detector import (
 )
 
 
-class INDA010Strategy(ExecutionModelStrategy):
+class INDA010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "INDA:vol-transition-mr"
+    bundle_trial_hypothesis = (
+        "INDA mean reversion improves when a volatility transition confirms an oversold pullback."
+    )
     """INDA Post-Capitulation Vol-Transition MR (INDA-010)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）

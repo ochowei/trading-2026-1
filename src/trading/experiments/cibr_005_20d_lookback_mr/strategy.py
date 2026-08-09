@@ -7,6 +7,7 @@ CIBR 20日回看窗口均值回歸策略 (CIBR 20-Day Lookback Mean Reversion St
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_005_20d_lookback_mr.config import (
     CIBR20DLookbackMRConfig,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_005_20d_lookback_mr.signal_detector import (
 )
 
 
-class CIBR20DLookbackMRStrategy(ExecutionModelStrategy):
+class CIBR20DLookbackMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-005：20日回看窗口均值回歸"""
+
+    bundle_trial_family = "CIBR:20d-lookback-mr"
+    bundle_trial_hypothesis = (
+        "CIBR 20-day lookback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

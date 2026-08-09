@@ -4,6 +4,7 @@ USO 回檔 + RSI(2) 極端超賣策略 (USO-007)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_007_sharp_pullback.config import (
     USOSharpPullbackConfig,
@@ -14,10 +15,14 @@ from trading.experiments.uso_007_sharp_pullback.signal_detector import (
 )
 
 
-class USOSharpPullbackStrategy(ExecutionModelStrategy):
+class USOSharpPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-007：回檔 + RSI(2) 極端超賣"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "USO:sharp-pullback"
+    bundle_trial_hypothesis = (
+        "USO sharp-pullback RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

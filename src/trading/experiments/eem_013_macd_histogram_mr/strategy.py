@@ -8,6 +8,7 @@ Repo 首次 MACD 試驗。使用 MACD(12, 26, 9) 柱狀圖零軸上穿作為動�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_013_macd_histogram_mr.config import (
     EEM013Config,
@@ -18,10 +19,12 @@ from trading.experiments.eem_013_macd_histogram_mr.signal_detector import (
 )
 
 
-class EEM013Strategy(ExecutionModelStrategy):
+class EEM013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM MACD Histogram Zero-Cross + Pullback MR (EEM-013)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "EEM:macd-histogram-mr"
+    bundle_trial_hypothesis = "EEM MACD histogram pullback mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

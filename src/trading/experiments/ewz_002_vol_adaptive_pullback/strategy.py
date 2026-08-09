@@ -7,6 +7,7 @@ EWZ-002: Volatility-Adaptive Pullback + WR Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_002_vol_adaptive_pullback.config import (
     EWZ002Config,
@@ -17,8 +18,13 @@ from trading.experiments.ewz_002_vol_adaptive_pullback.signal_detector import (
 )
 
 
-class EWZ002Strategy(ExecutionModelStrategy):
+class EWZ002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ Volatility-Adaptive Pullback MR (EWZ-002)"""
+
+    bundle_trial_family = "EWZ:vol-adaptive-pullback"
+    bundle_trial_hypothesis = (
+        "EWZ volatility-adaptive pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

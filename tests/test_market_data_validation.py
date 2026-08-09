@@ -1,6 +1,7 @@
 import pandas as pd
 
 from trading.market_data import validate_daily_bars
+from trading.market_data.validation import canonical_daily_bar_csv_bytes
 
 
 def bars(dates: list[str]) -> pd.DataFrame:
@@ -50,6 +51,44 @@ def test_invalid_rows_are_reported_without_being_dropped() -> None:
     assert "required values contain NaN" in outcome.errors
     assert "invalid OHLC relationships" in outcome.errors
     assert "negative volume" in outcome.errors
+
+
+def test_ohlc_relationship_tolerance_accepts_adjustment_rounding_noise() -> None:
+    frame = bars(["2026-08-03"])
+    frame.loc["2026-08-03", "Low"] = frame.loc["2026-08-03", "Open"] + 3e-13
+    frame.loc["2026-08-03", "High"] = frame.loc["2026-08-03", "Close"] - 3e-13
+
+    _, outcome = validate_daily_bars(frame)
+
+    assert outcome.is_valid
+
+
+def test_ohlc_relationship_tolerance_does_not_hide_material_corruption() -> None:
+    frame = bars(["2026-08-03"])
+    frame.loc["2026-08-03", "Low"] = frame.loc["2026-08-03", "Open"] + 1e-6
+
+    _, outcome = validate_daily_bars(frame)
+
+    assert not outcome.is_valid
+    assert "invalid OHLC relationships" in outcome.errors
+
+
+def test_canonical_csv_bytes_are_stable_after_float_csv_round_trip() -> None:
+    frame = pd.DataFrame(
+        {
+            "Open": [24.267609235348207],
+            "High": [24.353360504731061],
+            "Low": [24.216158473718494],
+            "Close": [24.336210250854492],
+            "Volume": [201300.0],
+        },
+        index=pd.to_datetime(["1993-02-02"]),
+    )
+
+    first = canonical_daily_bar_csv_bytes(frame)
+    replayed = pd.read_csv(pd.io.common.BytesIO(first), parse_dates=["Date"], index_col="Date")
+
+    assert canonical_daily_bar_csv_bytes(replayed) == first
 
 
 def test_dates_must_be_ordered_and_cover_expected_sessions() -> None:

@@ -7,6 +7,7 @@ URA-002: 非對稱出場 + 回檔範圍收窄策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_002_asymmetric_narrow.config import (
     URAAsymmetricNarrowConfig,
@@ -17,8 +18,13 @@ from trading.experiments.ura_002_asymmetric_narrow.signal_detector import (
 )
 
 
-class URAAsymmetricNarrowStrategy(ExecutionModelStrategy):
+class URAAsymmetricNarrowStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-002：非對稱出場 + 回檔範圍收窄"""
+
+    bundle_trial_family = "URA:asymmetric-narrow"
+    bundle_trial_hypothesis = (
+        "URA asymmetric narrow exits can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

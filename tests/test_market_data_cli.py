@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from trading.cli import build_parser, main
+from trading.market_data import MarketDataRequirement, MarketDataSeries
 from trading.research_data import DefinitionBlobRef, ResearchDefinitionSnapshot
 
 
@@ -187,6 +188,60 @@ def test_data_snapshot_cli_captures_definition_for_formal_experiment(
 
     assert store.created[0][3] == blob
     assert store.written[0][1] == Path("results/experiment") / (f"{'a' * 64}.snapshot.json")
+
+
+def test_data_snapshot_cli_uses_snapshot_aware_experiment_declaration(
+    monkeypatch,
+    capsys,
+) -> None:
+    service = FakeDataService()
+    service.cache = object()
+    store = FakeResearchDataStore()
+    blob = DefinitionBlobRef("d" * 64, 100, "f" * 64)
+    declared = (
+        MarketDataRequirement(
+            MarketDataSeries.yahoo_adjusted_daily("SPY"),
+            date(2010, 1, 1),
+            role="primary",
+        ),
+    )
+
+    class DeclaredSnapshotAwareExperiment:
+        def run_with_bundle(self, bundle):
+            return {"metrics": {}}
+
+        def capture_research_definition(self, definition_store):
+            return ResearchDefinitionSnapshot(fingerprint=blob.fingerprint, blob=blob)
+
+        def market_data_requirements(self):
+            return declared
+
+    monkeypatch.setattr("trading.cli.create_default_market_data_service", lambda: service)
+    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: store)
+    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
+    monkeypatch.setattr(
+        "trading.cli.get_experiment",
+        lambda name: DeclaredSnapshotAwareExperiment(),
+    )
+
+    main(
+        [
+            "data",
+            "snapshot",
+            "SPY",
+            "--experiment",
+            "experiment",
+            "--history-start",
+            "2010-01-01",
+            "--decision",
+            "2026-08-04",
+        ]
+    )
+
+    assert [call[0].symbol for call in service.refresh_calls] == ["SPY"]
+    assert store.created[0][1] == declared
+    assert store.created[0][3] == blob
+    assert "snapshot" in capsys.readouterr().out
 
 
 def test_data_reproducibility_cli_exposes_verify_export_import_and_safe_gc(tmp_path) -> None:

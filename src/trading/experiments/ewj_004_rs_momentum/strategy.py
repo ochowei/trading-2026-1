@@ -7,6 +7,7 @@ EWJ-004: Relative Strength Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewj_004_rs_momentum.config import (
     EWJ004Config,
@@ -17,10 +18,14 @@ from trading.experiments.ewj_004_rs_momentum.signal_detector import (
 )
 
 
-class EWJ004Strategy(ExecutionModelStrategy):
+class EWJ004Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWJ-004: RS 動量回調"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "EWJ:rs-momentum"
+    bundle_trial_hypothesis = (
+        "EWJ pullbacks improve when relative strength versus SPY remains positive."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

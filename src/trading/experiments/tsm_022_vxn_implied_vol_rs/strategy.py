@@ -6,6 +6,7 @@ TSM-022: ^VXN Forward-Looking Implied-Vol DIRECTION Regime-Gated RS Momentum Pul
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_022_vxn_implied_vol_rs.config import (
     TSMVXNImpliedVolRSConfig,
@@ -16,8 +17,11 @@ from trading.experiments.tsm_022_vxn_implied_vol_rs.signal_detector import (
 )
 
 
-class TSMVXNImpliedVolRSStrategy(ExecutionModelStrategy):
+class TSMVXNImpliedVolRSStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-022：^VXN Implied-Vol DIRECTION Regime-Gated RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:vxn-implied-vol-rs"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve when VXN direction is not rising."
 
     slippage_pct: float = 0.0015
 

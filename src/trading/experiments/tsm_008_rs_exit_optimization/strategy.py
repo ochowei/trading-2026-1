@@ -7,6 +7,7 @@ TSM Relative Strength Exit Optimization Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_008_rs_exit_optimization.config import (
     TSMRSExitOptConfig,
@@ -17,8 +18,11 @@ from trading.experiments.tsm_008_rs_exit_optimization.signal_detector import (
 )
 
 
-class TSMRSExitOptStrategy(ExecutionModelStrategy):
+class TSMRSExitOptStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-008：RS Exit Optimization（含成交模型）"""
+
+    bundle_trial_family = "TSM:rs-exit-optimization"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve with a wider execution-model exit."
 
     slippage_pct: float = 0.001
 

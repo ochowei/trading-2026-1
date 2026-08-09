@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_013_regime_vol_gate_mr.config import (
     FXI013Config,
@@ -12,8 +13,13 @@ from trading.experiments.fxi_013_regime_vol_gate_mr.signal_detector import (
 )
 
 
-class FXI013RegimeVolGateMRStrategy(ExecutionModelStrategy):
+class FXI013RegimeVolGateMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-013：波動率 regime 閘門均值回歸（FXI-005 框架 + BB 寬度 regime 濾波）"""
+
+    bundle_trial_family = "FXI:regime-vol-gate-mr"
+    bundle_trial_hypothesis = (
+        "FXI volatility-regime gating can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% ETF 標準
 

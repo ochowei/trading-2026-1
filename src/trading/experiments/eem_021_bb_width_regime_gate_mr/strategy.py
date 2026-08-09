@@ -23,6 +23,7 @@ volatility regime classifier：
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_021_bb_width_regime_gate_mr.config import (
     EEM021Config,
@@ -33,10 +34,14 @@ from trading.experiments.eem_021_bb_width_regime_gate_mr.signal_detector import 
 )
 
 
-class EEM021Strategy(ExecutionModelStrategy):
+class EEM021Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-021: BB-Width Regime Gate on Vol-Transition MR"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "EEM:bb-width-regime-gate-mr"
+    bundle_trial_hypothesis = (
+        "EEM BB-width regime-gated mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -9,6 +9,7 @@ FCX-014 Att1 BB Squeeze Breakout 之上，目標進一步突破 FCX-014 的 min(
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_015_vix_bands_breakout.config import (
     FCX015Config,
@@ -19,8 +20,11 @@ from trading.experiments.fcx_015_vix_bands_breakout.signal_detector import (
 )
 
 
-class FCX015VixBandsBreakoutStrategy(ExecutionModelStrategy):
+class FCX015VixBandsBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-015：VIX BANDS + BB Squeeze Breakout（含成交模型）"""
+
+    bundle_trial_family = "FCX:vix-bands-breakout"
+    bundle_trial_hypothesis = "FCX breakouts improve when VIX avoids the middle regime band."
 
     slippage_pct: float = 0.0015
 

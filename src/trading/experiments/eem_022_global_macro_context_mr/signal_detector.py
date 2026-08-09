@@ -24,36 +24,22 @@ EEM 訊號更可能為「中國孤立性政策/貿易衝擊持續走弱起點」
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.eem_022_global_macro_context_mr.config import EEM022Config
 
 logger = logging.getLogger(__name__)
 
 
-class EEM022SignalDetector(BaseSignalDetector):
+class EEM022SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """Global-Equity Macro-Context Confirmation Gate on Vol-Transition MR 訊號偵測器"""
 
     def __init__(self, config: EEM022Config):
         self.config = config
 
-    def _fetch_macro_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.macro_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.macro_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.macro_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -98,17 +84,8 @@ class EEM022SignalDetector(BaseSignalDetector):
         df["TwoDayReturn"] = df["Close"] / df["Close"].shift(2) - 1
 
         # === EEM-022 核心新增：SPY 寬基 N 日絕對報酬 ===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        macro_df = self._fetch_macro_data(start_date)
-        if macro_df is None or macro_df.empty:
-            logger.error(
-                "無法取得 %s 數據，macro-context gate 停用",
-                self.config.macro_ticker,
-            )
-            df["Macro_Return"] = -1.0
-        else:
-            macro_close = macro_df["Close"].reindex(df.index, method="ffill")
-            df["Macro_Return"] = macro_close.pct_change(self.config.macro_lookback)
+        macro_df = self.require_auxiliary(self.config.macro_ticker, df.index)
+        df["Macro_Return"] = macro_df["Close"].pct_change(self.config.macro_lookback)
 
         return df
 

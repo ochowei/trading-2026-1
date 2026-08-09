@@ -16,36 +16,26 @@ TLT HYG Credit Divergence Regime-Gated MR 訊號偵測器 (TLT-015)
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tlt_015_hyg_credit_divergence_mr.config import TLT015Config
 
 logger = logging.getLogger(__name__)
 
 
-class TLT015SignalDetector(BaseSignalDetector):
+class TLT015SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TLT-015：BB-width + ^MOVE + TLT-SPY + HYG-TLT divergence regime gate MR"""
 
     def __init__(self, config: TLT015Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (
+            self.config.move_ticker,
+            self.config.benchmark_ticker,
+            self.config.credit_ticker,
+        )
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -82,47 +72,24 @@ class TLT015SignalDetector(BaseSignalDetector):
         df["TLT_Ret_N"] = df["Close"].pct_change(div_n)
 
         # ^MOVE forward-looking implied vol gate
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        move_df = self._fetch_external(self.config.move_ticker, start_date)
-        if move_df is None or move_df.empty:
-            logger.error("無法取得 %s 數據，^MOVE 過濾停用", self.config.move_ticker)
-            df["MOVE_Close"] = float("nan")
-        else:
-            df["MOVE_Close"] = move_df["Close"].reindex(df.index, method="ffill")
+        move_df = self.require_auxiliary(self.config.move_ticker, df.index)
+        df["MOVE_Close"] = move_df["Close"]
 
         # SPY benchmark cross-asset divergence gate（同 TLT-014）
-        bench_df = self._fetch_external(self.config.benchmark_ticker, start_date)
-        if bench_df is None or bench_df.empty:
-            logger.error(
-                "無法取得 %s 數據，cross-asset divergence 過濾停用",
-                self.config.benchmark_ticker,
-            )
-            df["Bench_Close"] = float("nan")
-            df["Bench_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            bench_close = bench_df["Close"].reindex(df.index, method="ffill")
-            df["Bench_Close"] = bench_close
-            df["Bench_Ret_N"] = bench_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["TLT_Ret_N"] - df["Bench_Ret_N"]
+        bench_df = self.require_auxiliary(self.config.benchmark_ticker, df.index)
+        bench_close = bench_df["Close"]
+        df["Bench_Close"] = bench_close
+        df["Bench_Ret_N"] = bench_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["TLT_Ret_N"] - df["Bench_Ret_N"]
 
         # HYG credit cross-asset divergence gate（TLT-015 核心新增）
-        credit_df = self._fetch_external(self.config.credit_ticker, start_date)
+        credit_df = self.require_auxiliary(self.config.credit_ticker, df.index)
         credit_n = self.config.credit_lookback
-        if credit_df is None or credit_df.empty:
-            logger.error(
-                "無法取得 %s 數據，HYG credit divergence 過濾停用",
-                self.config.credit_ticker,
-            )
-            df["HYG_Close"] = float("nan")
-            df["HYG_Ret_N"] = 0.0
-            df["Credit_Outperformance_N"] = 0.0
-        else:
-            hyg_close = credit_df["Close"].reindex(df.index, method="ffill")
-            df["HYG_Close"] = hyg_close
-            df["HYG_Ret_N"] = hyg_close.pct_change(credit_n)
-            # HYG N 日報酬 - TLT N 日報酬：正值代表 HYG 跑贏 TLT（credit-on regime）
-            df["Credit_Outperformance_N"] = df["HYG_Ret_N"] - df["TLT_Ret_N"]
+        hyg_close = credit_df["Close"]
+        df["HYG_Close"] = hyg_close
+        df["HYG_Ret_N"] = hyg_close.pct_change(credit_n)
+        # HYG N 日報酬 - TLT N 日報酬：正值代表 HYG 跑贏 TLT（credit-on regime）
+        df["Credit_Outperformance_N"] = df["HYG_Ret_N"] - df["TLT_Ret_N"]
 
         return df
 

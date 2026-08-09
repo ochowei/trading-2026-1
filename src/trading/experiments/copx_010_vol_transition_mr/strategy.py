@@ -8,6 +8,7 @@ COPX-010: Post-Capitulation Vol-Transition Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_010_vol_transition_mr.config import (
     COPX010Config,
@@ -18,10 +19,13 @@ from trading.experiments.copx_010_vol_transition_mr.signal_detector import (
 )
 
 
-class COPX010Strategy(ExecutionModelStrategy):
+class COPX010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-010：Post-Capitulation Vol-Transition MR"""
 
     slippage_pct: float = 0.0015
+
+    bundle_trial_family = "COPX:vol-transition-mr"
+    bundle_trial_hypothesis = "COPX volatility-transition mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

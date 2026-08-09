@@ -12,36 +12,22 @@ country-specific 持續性疲弱中段而非 broad EM 同步 capitulation；filt
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewz_009_ewz_eem_divergence_mr.config import EWZ009Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWZ009SignalDetector(BaseSignalDetector):
+class EWZ009SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EWZ-EEM Divergence-Gated Vol-Transition MR 訊號偵測器"""
 
     def __init__(self, config: EWZ009Config):
         self.config = config
 
-    def _fetch_eem_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.eem_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.eem_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.eem_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -87,19 +73,12 @@ class EWZ009SignalDetector(BaseSignalDetector):
         df["Ret_2d"] = df["Close"].pct_change(2)
 
         # === EWZ-009 核心新增：EWZ-EEM 相對強度 ===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        eem_df = self._fetch_eem_data(start_date)
-
         ewz_n_return = df["Close"].pct_change(self.config.rel_lookback)
-        if eem_df is None or eem_df.empty:
-            logger.error("無法取得 %s 數據，rel filter 停用", self.config.eem_ticker)
-            df["Rel_Return"] = 0.0
-        else:
-            eem_close = eem_df["Close"].reindex(df.index, method="ffill")
-            eem_n_return = eem_close.pct_change(self.config.rel_lookback)
-            df["EEM_Return"] = eem_n_return
-            df["EWZ_Return_N"] = ewz_n_return
-            df["Rel_Return"] = ewz_n_return - eem_n_return
+        eem_df = self.require_auxiliary(self.config.eem_ticker, df.index)
+        eem_n_return = eem_df["Close"].pct_change(self.config.rel_lookback)
+        df["EEM_Return"] = eem_n_return
+        df["EWZ_Return_N"] = ewz_n_return
+        df["Rel_Return"] = ewz_n_return - eem_n_return
 
         return df
 

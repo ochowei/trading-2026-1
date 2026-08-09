@@ -16,52 +16,31 @@ N 日變化（Close_T − Close_T−N）以 pp 計算，0.15 pp = 15bps。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tlt_009_yield_velocity_mr.config import TLT009Config
 
 logger = logging.getLogger(__name__)
 
 
-class TLT009SignalDetector(BaseSignalDetector):
+class TLT009SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TLT-009：回檔+WR+反轉K線 + ^TNX yield velocity gate（可選 BB 寬度 hybrid）"""
 
     def __init__(self, config: TLT009Config):
         self.config = config
 
-    def _fetch_yield_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.yield_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s yield data", self.config.yield_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.yield_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
         # === 外部 yield 數據 ===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        yld_df = self._fetch_yield_data(start_date)
-
-        if yld_df is None or yld_df.empty:
-            logger.error("無法取得 %s 數據，yield gate 將全部放行", self.config.yield_ticker)
-            df["Yield_Change_N"] = 0.0
-        else:
-            # 對齊交易日：用 TLT 的 index 做 reindex + ffill（少數 ^TNX 缺資料的日子繼承前一日）
-            yld_close = yld_df["Close"].reindex(df.index).ffill()
-            df["Yield_Close"] = yld_close
-            df["Yield_Change_N"] = yld_close - yld_close.shift(self.config.yield_lookback)
+        yld_df = self.require_auxiliary(self.config.yield_ticker, df.index)
+        yld_close = yld_df["Close"]
+        df["Yield_Close"] = yld_close
+        df["Yield_Change_N"] = yld_close - yld_close.shift(self.config.yield_lookback)
 
         # === 回檔幅度 ===
         n = self.config.pullback_lookback

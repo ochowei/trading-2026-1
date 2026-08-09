@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_012_eem_divergence_regime_mr.config import (
     EWT012Config,
@@ -12,8 +13,13 @@ from trading.experiments.ewt_012_eem_divergence_regime_mr.signal_detector import
 )
 
 
-class EWT012EemDivergenceRegimeMRStrategy(ExecutionModelStrategy):
+class EWT012EemDivergenceRegimeMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT-012：EWT-009 Att3 + EWT–EEM 跨資產 divergence regime gate"""
+
+    bundle_trial_family = "EWT:eem-divergence-regime-mr"
+    bundle_trial_hypothesis = (
+        "EWT mean-reversion entries improve when short-horizon EWT/EEM divergence is contained."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（EWT 高流動 ETF）
 

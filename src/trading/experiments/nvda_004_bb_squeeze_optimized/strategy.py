@@ -7,6 +7,7 @@ NVDA BB Squeeze Breakout Optimized Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_004_bb_squeeze_optimized.config import (
     NVDABBSqueezeOptConfig,
@@ -17,10 +18,14 @@ from trading.experiments.nvda_004_bb_squeeze_optimized.signal_detector import (
 )
 
 
-class NVDABBSqueezeOptimizedStrategy(ExecutionModelStrategy):
+class NVDABBSqueezeOptimizedStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-004：BB Squeeze Breakout Optimized 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:bb-squeeze-optimized"
+    bundle_trial_hypothesis = (
+        "NVDA optimized BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

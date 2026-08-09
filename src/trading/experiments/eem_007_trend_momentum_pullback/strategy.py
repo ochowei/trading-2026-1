@@ -8,6 +8,7 @@ Att3: 策略轉向 — 在 SMA(200) 牛市政權中做 RSI(2) 均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_007_trend_momentum_pullback.config import (
     EEM007Config,
@@ -18,8 +19,13 @@ from trading.experiments.eem_007_trend_momentum_pullback.signal_detector import 
 )
 
 
-class EEM007Strategy(ExecutionModelStrategy):
+class EEM007Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 牛市政權過濾均值回歸 (EEM-007)"""
+
+    bundle_trial_family = "EEM:trend-momentum-pullback"
+    bundle_trial_hypothesis = (
+        "EEM trend-momentum pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

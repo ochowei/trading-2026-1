@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.15% slippage + pessimistic intrabar
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_020_usd_regime_mr.config import (
     SIVR020Config,
@@ -15,7 +16,12 @@ from trading.experiments.sivr_020_usd_regime_mr.signal_detector import (
 )
 
 
-class SIVR020Strategy(ExecutionModelStrategy):
+class SIVR020Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "SIVR:usd-regime"
+    bundle_trial_hypothesis = (
+        "Silver pullbacks improve when USD regime and SIVR relative strength confirm."
+    )
+
     """SIVR–USD Cross-Asset Divergence Regime-Gated MR (SIVR-020)"""
 
     slippage_pct: float = 0.0015

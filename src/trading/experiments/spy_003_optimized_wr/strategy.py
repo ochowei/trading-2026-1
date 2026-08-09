@@ -7,6 +7,7 @@ SPY-003: 回檔 + Williams %R + VIX 恐慌過濾
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.spy_003_optimized_wr.config import (
     SPYVixFilterConfig,
@@ -17,8 +18,11 @@ from trading.experiments.spy_003_optimized_wr.signal_detector import (
 )
 
 
-class SPYVixFilterStrategy(ExecutionModelStrategy):
+class SPYVixFilterStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY 回檔 + WR + VIX 恐慌過濾（SPY-003）"""
+
+    bundle_trial_family = "SPY:vix-filter"
+    bundle_trial_hypothesis = "SPY pullback reversals improve when VIX confirms elevated fear."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

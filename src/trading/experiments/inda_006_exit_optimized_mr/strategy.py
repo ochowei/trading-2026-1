@@ -8,6 +8,7 @@ Uses execution model with fixed TP/SL exit.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_006_exit_optimized_mr.config import (
     INDA006Config,
@@ -18,8 +19,13 @@ from trading.experiments.inda_006_exit_optimized_mr.signal_detector import (
 )
 
 
-class INDA006Strategy(ExecutionModelStrategy):
+class INDA006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA 出場優化均值回歸 (INDA-006)"""
+
+    bundle_trial_family = "INDA:exit-optimized-mr"
+    bundle_trial_hypothesis = (
+        "INDA optimized exits can preserve mean reversion from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

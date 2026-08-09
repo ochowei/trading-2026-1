@@ -7,6 +7,7 @@ XLU-003 framework + ATR ratio filter to distinguish sharp pullbacks from gradual
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_010_20d_wide_pullback.config import (
     XLUVolSpikeMRConfig,
@@ -17,8 +18,13 @@ from trading.experiments.xlu_010_20d_wide_pullback.signal_detector import (
 )
 
 
-class XLUVolSpikeMRStrategy(ExecutionModelStrategy):
+class XLUVolSpikeMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU 波動率飆升均值回歸 (XLU-010)"""
+
+    bundle_trial_family = "XLU:20d-wide-pullback"
+    bundle_trial_hypothesis = (
+        "XLU wide pullback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

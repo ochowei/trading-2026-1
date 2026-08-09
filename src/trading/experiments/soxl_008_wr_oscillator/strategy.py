@@ -5,6 +5,7 @@ SOXL-008 Strategy: Williams %R(10) Oscillator Test + Execution Model
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_008_wr_oscillator.config import (
@@ -16,7 +17,7 @@ from trading.experiments.soxl_008_wr_oscillator.signal_detector import (
 )
 
 
-class SOXLWROscillatorStrategy(ExecutionModelStrategy):
+class SOXLWROscillatorStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL Williams %R(10) 振盪器測試 + 成交模型策略 (SOXL-008)
 
@@ -24,6 +25,11 @@ class SOXLWROscillatorStrategy(ExecutionModelStrategy):
     出場: TP +18% / SL -12% / 25 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:wr-oscillator"
+    bundle_trial_hypothesis = (
+        "SOXL Williams %R oscillator entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

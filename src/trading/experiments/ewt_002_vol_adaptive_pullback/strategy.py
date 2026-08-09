@@ -8,6 +8,7 @@ EWT-002: Volatility-Adaptive Pullback + WR Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_002_vol_adaptive_pullback.config import (
     EWT002Config,
@@ -18,8 +19,13 @@ from trading.experiments.ewt_002_vol_adaptive_pullback.signal_detector import (
 )
 
 
-class EWT002Strategy(ExecutionModelStrategy):
+class EWT002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT Volatility-Adaptive Pullback MR (EWT-002)"""
+
+    bundle_trial_family = "EWT:vol-adaptive-pullback"
+    bundle_trial_hypothesis = (
+        "EWT volatility-adaptive pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

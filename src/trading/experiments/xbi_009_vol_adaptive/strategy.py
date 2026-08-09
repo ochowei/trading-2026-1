@@ -7,6 +7,7 @@ RSI(2)<10 + 2日跌幅>=3.0% + ClosePos>=35%，TP+3.5%/SL-5.0%/15天。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_009_vol_adaptive.config import (
     XBI009Config,
@@ -17,8 +18,11 @@ from trading.experiments.xbi_009_vol_adaptive.signal_detector import (
 )
 
 
-class XBI009Strategy(ExecutionModelStrategy):
+class XBI009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-009：RSI(2) 均值回歸 + 反轉K線"""
+
+    bundle_trial_family = "XBI:vol-adaptive"
+    bundle_trial_hypothesis = "XBI volatility-adaptive RSI(2) mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -25,6 +25,7 @@ DIA-012: Capitulation-Depth Filter Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_012_oneday_capitulation_filter.config import (
     DIA012Config,
@@ -35,8 +36,13 @@ from trading.experiments.dia_012_oneday_capitulation_filter.signal_detector impo
 )
 
 
-class DIA012Strategy(ExecutionModelStrategy):
+class DIA012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA Capitulation-Depth Filter MR (DIA-012)"""
+
+    bundle_trial_family = "DIA:oneday-capitulation-filter"
+    bundle_trial_hypothesis = (
+        "DIA one-day capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

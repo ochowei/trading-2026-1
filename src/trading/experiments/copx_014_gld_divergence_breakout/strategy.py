@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_014_gld_divergence_breakout.config import (
     COPX014Config,
@@ -12,8 +13,11 @@ from trading.experiments.copx_014_gld_divergence_breakout.signal_detector import
 )
 
 
-class COPX014GldDivergenceBreakoutStrategy(ExecutionModelStrategy):
+class COPX014GldDivergenceBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-014：BB Squeeze Breakout + regime BOX + COPX-GLD divergence gate（含成交模型）"""
+
+    bundle_trial_family = "COPX:gld-divergence-breakout"
+    bundle_trial_hypothesis = "COPX breakouts improve when relative performance versus GLD confirms a supportive metals regime."
 
     slippage_pct: float = 0.0015  # 0.15%（同 COPX-011，ETF 中等流動性）
 

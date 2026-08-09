@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_021_move_regime_gate.config import (
@@ -13,7 +14,12 @@ from trading.experiments.tqqq_021_move_regime_gate.signal_detector import (
 )
 
 
-class TQQQ021MoveRegimeStrategy(ExecutionModelStrategy):
+class TQQQ021MoveRegimeStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:move-regime-gate"
+    bundle_trial_hypothesis = (
+        "TQQQ capitulation entries improve when bond-volatility level and direction confirm."
+    )
+
     """TQQQ-021：TQQQ-018 框架 + ^MOVE LEVEL filter（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定

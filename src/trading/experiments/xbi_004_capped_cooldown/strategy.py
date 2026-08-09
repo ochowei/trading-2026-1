@@ -8,6 +8,7 @@ XBI-004: 回檔範圍收窄 + 長冷卻 均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_004_capped_cooldown.config import (
     XBICappedCooldownConfig,
@@ -18,8 +19,11 @@ from trading.experiments.xbi_004_capped_cooldown.signal_detector import (
 )
 
 
-class XBICappedCooldownStrategy(ExecutionModelStrategy):
+class XBICappedCooldownStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-004：回檔範圍收窄 + 長冷卻 均值回歸"""
+
+    bundle_trial_family = "XBI:capped-cooldown"
+    bundle_trial_hypothesis = "XBI capped-pullback cooldown mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

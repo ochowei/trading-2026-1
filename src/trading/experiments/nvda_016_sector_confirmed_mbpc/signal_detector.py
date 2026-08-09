@@ -25,16 +25,20 @@ import logging
 import pandas as pd
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.nvda_016_sector_confirmed_mbpc.config import NVDA016Config
 
 logger = logging.getLogger(__name__)
 
 
-class NVDA016SectorConfirmedMBPCDetector(BaseSignalDetector):
+class NVDA016SectorConfirmedMBPCDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """NVDA-016 訊號偵測器"""
 
     def __init__(self, config: NVDA016Config):
         self.config = config
+
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.macro_ticker,)
 
     @staticmethod
     def _compute_rsi(close: pd.Series, period: int) -> pd.Series:
@@ -82,14 +86,9 @@ class NVDA016SectorConfirmedMBPCDetector(BaseSignalDetector):
         df["ATR_Regime_Short"] = df["TR"].rolling(self.config.atr_regime_short).mean()
         df["ATR_Regime_Long"] = df["TR"].rolling(self.config.atr_regime_long).mean()
 
-        # === NVDA-016 新增：SMH N 日報酬（SMH_Close 由 strategy.run() 合併進來）===
-        if "SMH_Close" in df.columns:
-            df["SMH_Return_Nd"] = (
-                df["SMH_Close"] - df["SMH_Close"].shift(self.config.macro_lookback)
-            ) / df["SMH_Close"].shift(self.config.macro_lookback)
-        else:
-            logger.warning("NVDA-016: SMH_Close 欄位缺失，sector confirmation 將停用")
-            df["SMH_Return_Nd"] = pd.Series(float("inf"), index=df.index)
+        # === NVDA-016 新增：SMH N 日報酬（由 verified auxiliary bundle 提供）===
+        smh_close = self.require_auxiliary(self.config.macro_ticker, df.index)["Close"]
+        df["SMH_Return_Nd"] = smh_close.pct_change(self.config.macro_lookback)
 
         return df
 

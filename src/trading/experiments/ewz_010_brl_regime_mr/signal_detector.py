@@ -16,36 +16,22 @@ subclass：commodity-driven single-country EM equity vs own currency BRL）。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewz_010_brl_regime_mr.config import EWZ010Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWZ010SignalDetector(BaseSignalDetector):
+class EWZ010SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EWZ–BRL Currency-Regime-Gated Vol-Transition MR 訊號偵測器"""
 
     def __init__(self, config: EWZ010Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.eem_ticker, self.config.brl_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -90,33 +76,18 @@ class EWZ010SignalDetector(BaseSignalDetector):
         df["Ret_1d"] = df["Close"].pct_change(1)
         df["Ret_2d"] = df["Close"].pct_change(2)
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-
         # === 第七條件（沿用 EWZ-009 Att1）：EWZ–EEM 相對強度 ===
-        eem_df = self._fetch_external(self.config.eem_ticker, start_date)
         ewz_rel_n = df["Close"].pct_change(self.config.rel_lookback)
-        if eem_df is None or eem_df.empty:
-            logger.error("無法取得 %s 數據，EEM rel filter 停用", self.config.eem_ticker)
-            df["Rel_Return"] = 0.0
-        else:
-            eem_close = eem_df["Close"].reindex(df.index, method="ffill")
-            df["Rel_Return"] = ewz_rel_n - eem_close.pct_change(self.config.rel_lookback)
+        eem_df = self.require_auxiliary(self.config.eem_ticker, df.index)
+        df["Rel_Return"] = ewz_rel_n - eem_df["Close"].pct_change(self.config.rel_lookback)
 
         # === 第八條件（EWZ-010 核心新增）：EWZ–BRL 貨幣 regime gate ===
         brl_n = self.config.brl_lookback
         df["EWZ_Ret_N"] = df["Close"].pct_change(brl_n)
-        brl_df = self._fetch_external(self.config.brl_ticker, start_date)
-        if brl_df is None or brl_df.empty:
-            logger.error(
-                "無法取得 %s 數據，EWZ–BRL regime gate 停用",
-                self.config.brl_ticker,
-            )
-            df["BRL_Ret_N"] = 0.0
-            df["BRL_Rel_Return_N"] = 0.0
-        else:
-            brl_close = brl_df["Close"].reindex(df.index, method="ffill")
-            df["BRL_Ret_N"] = brl_close.pct_change(brl_n)
-            df["BRL_Rel_Return_N"] = df["EWZ_Ret_N"] - df["BRL_Ret_N"]
+        brl_df = self.require_auxiliary(self.config.brl_ticker, df.index)
+        brl_close = brl_df["Close"]
+        df["BRL_Ret_N"] = brl_close.pct_change(brl_n)
+        df["BRL_Rel_Return_N"] = df["EWZ_Ret_N"] - df["BRL_Ret_N"]
 
         return df
 

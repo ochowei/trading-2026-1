@@ -20,36 +20,22 @@ XBI-019 訊號偵測器：XLV Sector Parent Trend Filter on VIX Bands MR
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.xbi_019_xlv_trend_mr.config import XBI019Config
 
 logger = logging.getLogger(__name__)
 
 
-class XBI019SignalDetector(BaseSignalDetector):
+class XBI019SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """XBI-019 訊號偵測器"""
 
     def __init__(self, config: XBI019Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker, self.config.xlv_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -82,22 +68,11 @@ class XBI019SignalDetector(BaseSignalDetector):
         df["ATR_Regime_Long"] = df["TR"].rolling(self.config.atr_regime_long).mean()
 
         # === ^VIX BANDS gate（同 XBI-017）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，VIX BANDS 過濾停用", self.config.vix_ticker)
-            df["VIX_Close"] = float("nan")
-        else:
-            df["VIX_Close"] = vix_df["Close"].reindex(df.index, method="ffill")
+        df["VIX_Close"] = self.require_auxiliary(self.config.vix_ticker, df.index)["Close"]
 
         # === XBI-019 新增：XLV 自身動能方向 ===
-        xlv_df = self._fetch_external(self.config.xlv_ticker, start_date)
-        if xlv_df is None or xlv_df.empty:
-            logger.error("無法取得 %s 數據，XLV trend filter 停用", self.config.xlv_ticker)
-            df["XLV_Return"] = 0.0
-        else:
-            xlv_close = xlv_df["Close"].reindex(df.index, method="ffill")
-            df["XLV_Return"] = xlv_close.pct_change(self.config.xlv_lookback)
+        xlv_close = self.require_auxiliary(self.config.xlv_ticker, df.index)["Close"]
+        df["XLV_Return"] = xlv_close.pct_change(self.config.xlv_lookback)
 
         return df
 

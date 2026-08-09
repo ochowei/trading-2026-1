@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_008_duration_spread_mr.config import (
     TLT008Config,
@@ -12,10 +13,14 @@ from trading.experiments.tlt_008_duration_spread_mr.signal_detector import (
 )
 
 
-class TLT008DurationSpreadMRStrategy(ExecutionModelStrategy):
+class TLT008DurationSpreadMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-008：TLT 相對 IEF 存續期間價差均值回歸"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "TLT:duration-spread-mr"
+    bundle_trial_hypothesis = (
+        "TLT mean-reversion entries improve when duration spread versus IEF is dislocated."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

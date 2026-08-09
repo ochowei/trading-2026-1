@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_026_sqqq_pair_divergence.config import (
@@ -13,7 +14,12 @@ from trading.experiments.tqqq_026_sqqq_pair_divergence.signal_detector import (
 )
 
 
-class TQQQ026SqqqPairStrategy(ExecutionModelStrategy):
+class TQQQ026SqqqPairStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:sqqq-pair-confirmation"
+    bundle_trial_hypothesis = (
+        "TQQQ capitulation entries improve when inverse-pair SQQQ panic confirms."
+    )
+
     """TQQQ-026：TQQQ-018 框架 + SQQQ inverse-pair 確認（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定

@@ -9,6 +9,7 @@ NVDA Relative Strength Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_006_relative_strength.config import (
     NVDARelativeStrengthConfig,
@@ -19,8 +20,13 @@ from trading.experiments.nvda_006_relative_strength.signal_detector import (
 )
 
 
-class NVDARelativeStrengthStrategy(ExecutionModelStrategy):
+class NVDARelativeStrengthStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-006：Relative Strength Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "NVDA:relative-strength"
+    bundle_trial_hypothesis = (
+        "NVDA pullbacks improve when relative strength versus SMH remains positive."
+    )
 
     slippage_pct: float = 0.0015
 

@@ -7,6 +7,7 @@ CIBR-006: Cybersecurity Sector RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_006_rs_momentum_pullback.config import (
     CIBRRSMomentumConfig,
@@ -17,8 +18,11 @@ from trading.experiments.cibr_006_rs_momentum_pullback.signal_detector import (
 )
 
 
-class CIBRRSMomentumStrategy(ExecutionModelStrategy):
+class CIBRRSMomentumStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-006: Cybersecurity Sector RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "CIBR:rs-momentum-pullback"
+    bundle_trial_hypothesis = "CIBR pullback entries improve when sector strength leads SPY."
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

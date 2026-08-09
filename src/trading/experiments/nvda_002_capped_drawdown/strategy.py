@@ -7,6 +7,7 @@ NVDA Wide TP Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_002_capped_drawdown.config import (
     NVDACappedDrawdownConfig,
@@ -17,10 +18,14 @@ from trading.experiments.nvda_002_capped_drawdown.signal_detector import (
 )
 
 
-class NVDACappedDrawdownStrategy(ExecutionModelStrategy):
+class NVDACappedDrawdownStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA 寬獲利目標均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價
+    bundle_trial_family = "NVDA:capped-drawdown"
+    bundle_trial_hypothesis = (
+        "NVDA capped-drawdown mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

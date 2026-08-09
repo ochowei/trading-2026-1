@@ -9,6 +9,7 @@ XBI Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_007_momentum_pullback.config import (
     XBIMomentumPullbackConfig,
@@ -19,10 +20,14 @@ from trading.experiments.xbi_007_momentum_pullback.signal_detector import (
 )
 
 
-class XBIMomentumPullbackStrategy(ExecutionModelStrategy):
+class XBIMomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-007：Momentum Pullback 策略（含成交模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "XBI:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "XBI momentum pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

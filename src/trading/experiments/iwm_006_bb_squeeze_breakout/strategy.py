@@ -7,6 +7,7 @@ IWM BB Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_006_bb_squeeze_breakout.config import (
     IWM006BBSqueezeConfig,
@@ -17,7 +18,11 @@ from trading.experiments.iwm_006_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class IWM006BBSqueezeStrategy(ExecutionModelStrategy):
+class IWM006BBSqueezeStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "IWM:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "IWM volatility compression followed by an upside break can produce continuation."
+    )
     """IWM-006：BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.001

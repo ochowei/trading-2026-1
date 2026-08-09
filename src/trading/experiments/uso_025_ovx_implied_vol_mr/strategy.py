@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_025_ovx_implied_vol_mr.config import (
     USO025Config,
@@ -12,7 +13,10 @@ from trading.experiments.uso_025_ovx_implied_vol_mr.signal_detector import (
 )
 
 
-class USO025Strategy(ExecutionModelStrategy):
+class USO025Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "USO:ovx-direction"
+    bundle_trial_hypothesis = "USO pullback entries improve when ^OVX direction confirms a stabilizing oil-volatility regime."
+
     """USO-025：USO-013 框架 + ^OVX forward-looking implied vol DIRECTION gate"""
 
     slippage_pct: float = 0.001

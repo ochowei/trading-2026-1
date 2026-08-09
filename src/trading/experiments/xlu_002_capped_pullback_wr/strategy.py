@@ -7,6 +7,7 @@ XLU-002: Capped Pullback + Williams %R + Reversal Candle
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_002_capped_pullback_wr.config import (
     XLUCappedPullbackConfig,
@@ -17,7 +18,9 @@ from trading.experiments.xlu_002_capped_pullback_wr.signal_detector import (
 )
 
 
-class XLURsi2ReversalStrategy(ExecutionModelStrategy):
+class XLURsi2ReversalStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XLU:capped-pullback-wr"
+    bundle_trial_hypothesis = "XLU pullback mean reversion improves when drawdown is capped and Williams %R confirms reversal."
     """XLU 回檔範圍 + Williams %R + 反轉K線 (XLU-002)"""
 
     def create_config(self) -> ExperimentConfig:

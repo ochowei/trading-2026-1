@@ -14,6 +14,7 @@ DIA-016: DIA-QQQ Cross-Asset Divergence CEILING Regime-Gated MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_016_qqq_divergence_mr.config import (
     DIA016Config,
@@ -24,10 +25,14 @@ from trading.experiments.dia_016_qqq_divergence_mr.signal_detector import (
 )
 
 
-class DIA016Strategy(ExecutionModelStrategy):
+class DIA016Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA-QQQ Divergence CEILING Regime-Gated MR (DIA-016)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "DIA:qqq-divergence-mr"
+    bundle_trial_hypothesis = (
+        "DIA mean-reversion entries improve when large-cap strength versus QQQ is contained."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

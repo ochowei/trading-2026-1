@@ -19,7 +19,12 @@ import pandas as pd
 
 from trading.market_data.calendar import PrimaryUSSessionCalendar
 from trading.market_data.contracts import RefreshKind, SessionCalendar
-from trading.market_data.models import CacheMetadata, MarketDataSeries
+from trading.market_data.models import (
+    CacheMetadata,
+    CoverageMode,
+    MarketDataCoveragePolicy,
+    MarketDataSeries,
+)
 from trading.market_data.validation import (
     canonical_daily_bar_csv_bytes,
     validate_daily_bars,
@@ -149,32 +154,53 @@ class CsvMarketDataCache:
             fcntl.flock(descriptor, fcntl.LOCK_UN)
             os.close(descriptor)
 
-    def load(self, series: MarketDataSeries) -> CachedSeries | None:
+    def load(
+        self,
+        series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> CachedSeries | None:
         with self.lock(series):
             try:
-                return self.load_locked(series)
+                return self.load_locked(series, coverage_policy=coverage_policy)
             except CacheCorruptionError:
                 self.quarantine_locked(series)
                 raise
 
-    def inspect(self, series: MarketDataSeries) -> CacheInspection:
+    def inspect(
+        self,
+        series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> CacheInspection:
         """Inspect active artifacts without creating files, writing, or downloading."""
         try:
             with self.read_lock(series):
-                return self.inspect_locked(series)
+                return self.inspect_locked(series, coverage_policy=coverage_policy)
         except MarketDataLockTimeout as exc:
             return CacheInspection("busy", errors=(str(exc),))
 
-    def inspect_locked(self, series: MarketDataSeries) -> CacheInspection:
+    def inspect_locked(
+        self,
+        series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> CacheInspection:
         try:
-            cached = self.load_locked(series)
+            cached = self.load_locked(series, coverage_policy=coverage_policy)
         except (CacheCorruptionError, OSError) as exc:
             return CacheInspection("corrupt", errors=(str(exc),))
         if cached is None:
             return CacheInspection("missing")
         return CacheInspection("valid", metadata=cached.metadata)
 
-    def load_locked(self, series: MarketDataSeries) -> CachedSeries | None:
+    def load_locked(
+        self,
+        series: MarketDataSeries,
+        *,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> CachedSeries | None:
+        policy = coverage_policy or MarketDataCoveragePolicy.xnys()
         paths = self.paths(series)
         if not paths.csv.exists() and not paths.metadata.exists():
             return None
@@ -193,6 +219,8 @@ class CsvMarketDataCache:
             or metadata.schema_version != CACHE_SCHEMA_VERSION
         ):
             raise CacheCorruptionError("cache metadata identity or schema mismatch")
+        if metadata.coverage_policy != policy.mode.value:
+            raise CacheCorruptionError("cache coverage policy mismatch")
         csv_bytes = paths.csv.read_bytes()
         checksum = hashlib.sha256(csv_bytes).hexdigest()
         if checksum != metadata.checksum:
@@ -203,7 +231,7 @@ class CsvMarketDataCache:
             raise CacheCorruptionError(f"invalid cache CSV: {exc}") from exc
         normalized, outcome = validate_daily_bars(
             frame,
-            expected_sessions=self._expected_for(frame),
+            expected_sessions=self._expected_for(frame, policy),
         )
         if not outcome.is_valid:
             raise CacheCorruptionError("invalid cache rows: " + "; ".join(outcome.errors))
@@ -220,10 +248,12 @@ class CsvMarketDataCache:
         *,
         refresh_kind: RefreshKind | str,
         refreshed_at: datetime,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
     ) -> CachedSeries:
+        policy = coverage_policy or MarketDataCoveragePolicy.xnys()
         with self.lock(series):
             try:
-                previous = self.load_locked(series)
+                previous = self.load_locked(series, coverage_policy=policy)
             except CacheCorruptionError:
                 self.quarantine_locked(series)
                 previous = None
@@ -233,6 +263,7 @@ class CsvMarketDataCache:
                 refresh_kind=refresh_kind,
                 refreshed_at=refreshed_at,
                 previous_metadata=previous.metadata if previous else None,
+                coverage_policy=policy,
             )
 
     def publish_locked(
@@ -243,7 +274,9 @@ class CsvMarketDataCache:
         refresh_kind: RefreshKind | str,
         refreshed_at: datetime,
         previous_metadata: CacheMetadata | None = None,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
     ) -> CachedSeries:
+        policy = coverage_policy or MarketDataCoveragePolicy.xnys()
         try:
             kind = RefreshKind(refresh_kind)
         except ValueError:
@@ -252,7 +285,7 @@ class CsvMarketDataCache:
             raise ValueError("refreshed_at must be timezone-aware")
         normalized, outcome = validate_daily_bars(
             frame,
-            expected_sessions=self._expected_for(frame),
+            expected_sessions=self._expected_for(frame, policy),
         )
         if not outcome.is_valid or outcome.data_cutoff is None:
             raise MarketDataValidationError("; ".join(outcome.errors) or "market data is empty")
@@ -277,6 +310,7 @@ class CsvMarketDataCache:
                 else (previous_metadata.last_complete_refresh if previous_metadata else None)
             ),
             checksum=checksum,
+            coverage_policy=policy.mode.value,
         )
         metadata_bytes = _metadata_bytes(metadata)
         paths = self.paths(series)
@@ -294,7 +328,14 @@ class CsvMarketDataCache:
                 Path(metadata_temp).unlink(missing_ok=True)
         return CachedSeries(normalized, metadata)
 
-    def _expected_for(self, frame: pd.DataFrame) -> pd.DatetimeIndex:
+    def _expected_for(
+        self,
+        frame: pd.DataFrame,
+        coverage_policy: MarketDataCoveragePolicy | None = None,
+    ) -> pd.DatetimeIndex | None:
+        policy = coverage_policy or MarketDataCoveragePolicy.xnys()
+        if policy.mode is CoverageMode.PROVIDER_OBSERVATIONS:
+            return None
         if "Date" in frame.columns:
             index = pd.DatetimeIndex(pd.to_datetime(frame["Date"]))
         else:
@@ -354,6 +395,7 @@ def _metadata_from_dict(payload: dict[str, object]) -> CacheMetadata:
         last_incremental_refresh=_parse_timestamp(payload["last_incremental_refresh"]),
         last_complete_refresh=_parse_timestamp(payload["last_complete_refresh"]),
         checksum=str(payload["checksum"]),
+        coverage_policy=str(payload.get("coverage_policy", CoverageMode.XNYS_SESSIONS.value)),
     )
 
 

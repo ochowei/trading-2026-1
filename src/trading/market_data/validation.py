@@ -10,15 +10,19 @@ import pandas as pd
 from trading.market_data.models import ValidationOutcome
 
 REQUIRED_COLUMNS = ("Open", "High", "Low", "Close", "Volume")
+_OHLC_COMPARISON_RTOL = 1e-12
+_OHLC_COMPARISON_ATOL = 1e-12
 
 
 def canonical_daily_bar_csv_bytes(frame: pd.DataFrame) -> bytes:
-    """Serialize normalized adjusted daily bars to their one canonical byte form."""
+    """Serialize normalized adjusted daily bars to one parser-stable byte form."""
     rendered = frame.loc[:, REQUIRED_COLUMNS].to_csv(
         index=True,
         index_label="Date",
         date_format="%Y-%m-%d",
-        float_format="%.17g",
+        # Fifteen significant digits survive pandas' CSV float parser without
+        # introducing a different last bit on the next canonicalization pass.
+        float_format="%.15g",
         lineterminator="\n",
     )
     return rendered.encode("utf-8")
@@ -79,10 +83,20 @@ def validate_daily_bars(
         errors.append("required values contain NaN")
     if not np.isfinite(numeric.to_numpy()).all():
         errors.append("required values must be finite")
+    lower_bound = numeric[["Open", "Close"]].min(axis=1)
+    upper_bound = numeric[["Open", "Close"]].max(axis=1)
+    # Yahoo's auto-adjusted OHLC fields are independently rounded.  Compare
+    # relationships with a tiny scale-aware tolerance, while preserving the
+    # original normalized values byte-for-byte for cache identity.
+    scale = pd.concat(
+        [numeric["Low"].abs(), numeric["High"].abs(), lower_bound.abs(), upper_bound.abs()],
+        axis=1,
+    ).max(axis=1)
+    tolerance = _OHLC_COMPARISON_ATOL + (_OHLC_COMPARISON_RTOL * scale)
     invalid_ohlc = (
-        (numeric["Low"] > numeric["High"])
-        | (numeric["Low"] > numeric[["Open", "Close"]].min(axis=1))
-        | (numeric["High"] < numeric[["Open", "Close"]].max(axis=1))
+        (numeric["Low"] - numeric["High"] > tolerance)
+        | (numeric["Low"] - lower_bound > tolerance)
+        | (upper_bound - numeric["High"] > tolerance)
     )
     if invalid_ohlc.any():
         errors.append("invalid OHLC relationships")

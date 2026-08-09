@@ -8,6 +8,7 @@ Replaces pullback-from-high with 2-day momentum crash detection.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_004_rsi2_atr_adaptive.config import (
     INDAMomentumCrashConfig,
@@ -18,8 +19,13 @@ from trading.experiments.inda_004_rsi2_atr_adaptive.signal_detector import (
 )
 
 
-class INDAMomentumCrashStrategy(ExecutionModelStrategy):
+class INDAMomentumCrashStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA 短期動量崩潰均值回歸 (INDA-004)"""
+
+    bundle_trial_family = "INDA:rsi2-atr-adaptive"
+    bundle_trial_hypothesis = (
+        "INDA RSI(2) ATR-adaptive entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -13,9 +13,9 @@ TSM-022 訊號偵測器：^VXN Forward-Looking Implied-Vol DIRECTION Regime-Gate
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsm_022_vxn_implied_vol_rs.config import (
     TSMVXNImpliedVolRSConfig,
 )
@@ -23,53 +23,26 @@ from trading.experiments.tsm_022_vxn_implied_vol_rs.config import (
 logger = logging.getLogger(__name__)
 
 
-class TSMVXNImpliedVolRSDetector(BaseSignalDetector):
+class TSMVXNImpliedVolRSDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSM ^VXN Implied-Vol DIRECTION Regime-Gated RS Momentum Pullback 訊號偵測器"""
 
     def __init__(self, config: TSMVXNImpliedVolRSConfig):
         self.config = config
 
-    def _fetch_series(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker, self.config.vxn_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        smh_df = self._fetch_series(self.config.reference_ticker, start_date)
-        vxn_df = self._fetch_series(self.config.vxn_ticker, start_date)
-
-        if smh_df is None or smh_df.empty:
-            logger.error("無法取得 SMH 數據，無法計算相對強度")
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            df["Ret_5d"] = 0.0
-            df["VXN_Change"] = 0.0
-            return df
-
-        common_idx = df.index.intersection(smh_df.index)
-        df = df.loc[common_idx]
+        smh_df = self.require_auxiliary(self.config.reference_ticker, df.index)
+        vxn_df = self.require_auxiliary(self.config.vxn_ticker, df.index)
 
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
 
         period = self.config.relative_strength_period
         df["TSM_Return"] = df["Close"].pct_change(period)
-        df["SMH_Return"] = smh_df.loc[common_idx, "Close"].pct_change(period)
+        df["SMH_Return"] = smh_df["Close"].pct_change(period)
         df["Relative_Strength"] = df["TSM_Return"] - df["SMH_Return"]
 
         lookback = self.config.pullback_lookback
@@ -78,12 +51,8 @@ class TSMVXNImpliedVolRSDetector(BaseSignalDetector):
 
         df["Ret_5d"] = df["Close"].pct_change(5)
 
-        if vxn_df is None or vxn_df.empty:
-            logger.error("無法取得 %s 數據，^VXN gate 視為停用", self.config.vxn_ticker)
-            df["VXN_Change"] = -999.0
-        else:
-            vxn_close = vxn_df["Close"].reindex(df.index).ffill()
-            df["VXN_Change"] = vxn_close - vxn_close.shift(self.config.vxn_lookback)
+        vxn_close = vxn_df["Close"]
+        df["VXN_Change"] = vxn_close - vxn_close.shift(self.config.vxn_lookback)
 
         return df
 

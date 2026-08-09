@@ -11,6 +11,7 @@ XBI 2.0% 日波動處於 ClosePos 有效邊界，但 ATR 過濾在 XBI-009 已�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_010_bb_lower_pullback_cap.config import (
     XBI010Config,
@@ -21,10 +22,14 @@ from trading.experiments.xbi_010_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class XBI010Strategy(ExecutionModelStrategy):
+class XBI010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-010：BB 下軌 + 回檔上限混合進場"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "XBI:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = (
+        "XBI BB-lower pullback-cap mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

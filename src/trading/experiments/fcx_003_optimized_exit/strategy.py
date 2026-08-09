@@ -7,6 +7,7 @@ FCX Optimized Exit Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_003_optimized_exit.config import (
     FCXOptimizedExitConfig,
@@ -17,8 +18,13 @@ from trading.experiments.fcx_003_optimized_exit.signal_detector import (
 )
 
 
-class FCXOptimizedExitStrategy(ExecutionModelStrategy):
+class FCXOptimizedExitStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX 優化出場均值回歸策略（含成交模型）"""
+
+    bundle_trial_family = "FCX:optimized-exit"
+    bundle_trial_hypothesis = (
+        "FCX optimized exits can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價
 

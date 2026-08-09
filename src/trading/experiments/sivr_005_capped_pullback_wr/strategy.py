@@ -8,6 +8,7 @@ Based on SIVR-003, adds pullback cap to filter extreme crash signals.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_005_capped_pullback_wr.config import (
     SIVRCappedPullbackWRConfig,
@@ -18,8 +19,13 @@ from trading.experiments.sivr_005_capped_pullback_wr.signal_detector import (
 )
 
 
-class SIVRCappedPullbackWRStrategy(ExecutionModelStrategy):
+class SIVRCappedPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-005：回檔範圍 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "SIVR:capped-pullback-wr"
+    bundle_trial_hypothesis = (
+        "SIVR capped pullbacks with Williams %R can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

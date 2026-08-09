@@ -7,6 +7,7 @@ SPY-002: 回檔 + Williams %R + 反轉K線（無追蹤停損版）
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.spy_002_no_trailing.config import (
     SPYNoTrailingConfig,
@@ -17,8 +18,11 @@ from trading.experiments.spy_002_no_trailing.signal_detector import (
 )
 
 
-class SPYNoTrailingStrategy(ExecutionModelStrategy):
+class SPYNoTrailingStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY 回檔 + WR + 反轉K線（無追蹤停損）(SPY-002)"""
+
+    bundle_trial_family = "SPY:no-trailing"
+    bundle_trial_hypothesis = "SPY fixed exits can reproduce the pullback reversal baseline from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

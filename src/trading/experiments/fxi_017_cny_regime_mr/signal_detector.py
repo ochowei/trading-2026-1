@@ -16,36 +16,22 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.fxi_017_cny_regime_mr.config import FXI017Config
 
 logger = logging.getLogger(__name__)
 
 
-class FXI017SignalDetector(BaseSignalDetector):
+class FXI017SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """FXI-017：FXI-014 Att2 框架 + FXI–CNY 貨幣 regime gate"""
 
     def __init__(self, config: FXI017Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.cny_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -81,22 +67,12 @@ class FXI017SignalDetector(BaseSignalDetector):
         df["ATR_Ratio"] = atr_short / atr_long
 
         # FXI–CNY 貨幣 regime gate（FXI-017 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
         div_n = self.config.cny_lookback
         df["FXI_Ret_N"] = df["Close"].pct_change(div_n)
-
-        cny_df = self._fetch_external(self.config.cny_ticker, start_date)
-        if cny_df is None or cny_df.empty:
-            logger.error(
-                "無法取得 %s 數據，FXI–CNY regime gate 停用",
-                self.config.cny_ticker,
-            )
-            df["CNY_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            cny_close = cny_df["Close"].reindex(df.index, method="ffill")
-            df["CNY_Ret_N"] = cny_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["FXI_Ret_N"] - df["CNY_Ret_N"]
+        cny_df = self.require_auxiliary(self.config.cny_ticker, df.index)
+        cny_close = cny_df["Close"]
+        df["CNY_Ret_N"] = cny_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["FXI_Ret_N"] - df["CNY_Ret_N"]
 
         return df
 

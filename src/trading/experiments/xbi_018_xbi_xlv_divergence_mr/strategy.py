@@ -6,6 +6,7 @@ XBI-017 Att1 框架（lesson #22 vol stability + lesson #24 VIX BANDS）+
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_018_xbi_xlv_divergence_mr.config import (
     XBI018Config,
@@ -16,7 +17,9 @@ from trading.experiments.xbi_018_xbi_xlv_divergence_mr.signal_detector import (
 )
 
 
-class XBI018XbiXlvDivergenceMRStrategy(ExecutionModelStrategy):
+class XBI018XbiXlvDivergenceMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XBI:xbi-xlv-divergence-mr"
+    bundle_trial_hypothesis = "XBI capitulation mean reversion improves when volatility and XLV relative strength confirm."
     """XBI-018：XBI-XLV Cross-Asset Divergence Filter MR 策略（含成交模型）"""
 
     slippage_pct: float = 0.001  # 0.1%（XBI 高流動板塊 ETF）

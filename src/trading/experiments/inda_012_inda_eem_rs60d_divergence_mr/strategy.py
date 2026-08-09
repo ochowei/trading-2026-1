@@ -10,6 +10,7 @@ cross-asset divergence regime gate。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_012_inda_eem_rs60d_divergence_mr.config import (
     INDA012Config,
@@ -20,10 +21,14 @@ from trading.experiments.inda_012_inda_eem_rs60d_divergence_mr.signal_detector i
 )
 
 
-class INDA012Strategy(ExecutionModelStrategy):
+class INDA012Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA-012：INDA-EEM RS divergence + INDA-011 多週期 capitulation MR"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "INDA:inda-eem-rs60d-divergence-mr"
+    bundle_trial_hypothesis = (
+        "INDA mean-reversion entries improve when INDA leadership versus EEM is contained."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

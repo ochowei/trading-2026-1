@@ -14,6 +14,7 @@ prior-60d run-ups 全為 winners）→ 預測 documented-failure，三次迭代�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_016_postparabola_regime_breakout.config import (
     FCX016Config,
@@ -24,8 +25,15 @@ from trading.experiments.fcx_016_postparabola_regime_breakout.signal_detector im
 )
 
 
-class FCX016PostparabolaRegimeBreakoutStrategy(ExecutionModelStrategy):
+class FCX016PostparabolaRegimeBreakoutStrategy(
+    AuxiliaryBundleStrategyMixin, ExecutionModelStrategy
+):
     """FCX-016：Post-Parabolic Regime Gate + VIX-FLOOR BB Squeeze Breakout"""
+
+    bundle_trial_family = "FCX:postparabola-regime-breakout"
+    bundle_trial_hypothesis = (
+        "FCX breakouts improve when VIX confirms a non-parabolic volatility regime."
+    )
 
     slippage_pct: float = 0.0015
 

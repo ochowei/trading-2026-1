@@ -8,6 +8,7 @@ Pullback Mean Reversion 框架（先前 TSLA-015 / NVDA-012 / FCX-013 / COPX-011
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_015_regime_pullback_mr.config import (
     XBI015Config,
@@ -18,8 +19,13 @@ from trading.experiments.xbi_015_regime_pullback_mr.signal_detector import (
 )
 
 
-class XBI015RegimePullbackMRStrategy(ExecutionModelStrategy):
+class XBI015RegimePullbackMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-015：Multi-Week Regime-Aware Pullback MR 策略（含成交模型）"""
+
+    bundle_trial_family = "XBI:regime-pullback-mr"
+    bundle_trial_hypothesis = (
+        "XBI regime-aware pullback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

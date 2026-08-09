@@ -12,9 +12,9 @@ SIVR-009 Signal Detector: Gold/Silver Ratio Mean Reversion
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.sivr_009_ratio_reversion.config import (
     SIVRRatioReversionConfig,
 )
@@ -22,7 +22,7 @@ from trading.experiments.sivr_009_ratio_reversion.config import (
 logger = logging.getLogger(__name__)
 
 
-class SIVRRatioReversionDetector(BaseSignalDetector):
+class SIVRRatioReversionDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """
     Gold/Silver Ratio Mean Reversion 訊號偵測器
 
@@ -33,43 +33,14 @@ class SIVRRatioReversionDetector(BaseSignalDetector):
     def __init__(self, config: SIVRRatioReversionConfig):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載參考標的（GLD）數據"""
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # 下載 GLD 數據
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        gld_df = self._fetch_reference_data(start_date)
-
-        if gld_df is None or gld_df.empty:
-            logger.error("無法取得 GLD 數據，無法計算比率")
-            df["Ratio_Zscore"] = 0.0
-            df["WR"] = 0.0
-            return df
-
-        # 對齊日期（取交集）
-        common_idx = df.index.intersection(gld_df.index)
-        df = df.loc[common_idx]
-
         # 計算 GLD/SIVR 價格比率
-        df["GLD_Close"] = gld_df.loc[common_idx, "Close"].values
+        df["GLD_Close"] = self.require_auxiliary(self.config.reference_ticker, df.index)["Close"]
         df["Ratio"] = df["GLD_Close"] / df["Close"]
 
         # 計算比率的滾動 z-score

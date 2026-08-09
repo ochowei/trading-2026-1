@@ -9,6 +9,7 @@ Exit uses trailing stop mechanism.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
     TrailingStopBacktester,
@@ -22,8 +23,13 @@ from trading.experiments.spy_001_pullback_wr.signal_detector import (
 )
 
 
-class SPYPullbackWRStrategy(ExecutionModelStrategy):
+class SPYPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY 回檔 + Williams %R + 反轉K線均值回歸策略 (SPY-001)"""
+
+    bundle_trial_family = "SPY:pullback-wr"
+    bundle_trial_hypothesis = (
+        "SPY pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -24,6 +24,7 @@ EEM-012 successful BB-lower hybrid pattern。Repo 首次將此模式應用至小
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_012_bb_lower_pullback_cap.config import (
     IWM012Config,
@@ -34,10 +35,14 @@ from trading.experiments.iwm_012_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class IWM012Strategy(ExecutionModelStrategy):
+class IWM012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM BB 下軌 + 回檔上限混合進場 (IWM-012)"""
 
     slippage_pct: float = 0.001  # 0.1%（高流動性 ETF 標準滑價）
+    bundle_trial_family = "IWM:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = (
+        "IWM BB-lower pullback-cap mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

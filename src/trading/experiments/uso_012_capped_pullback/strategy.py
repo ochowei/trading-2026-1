@@ -4,6 +4,7 @@ USO 回檔範圍過濾 + RSI(2) + 2日急跌策略 (USO-012)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_012_capped_pullback.config import (
     USOCappedPullbackConfig,
@@ -14,10 +15,14 @@ from trading.experiments.uso_012_capped_pullback.signal_detector import (
 )
 
 
-class USOCappedPullbackStrategy(ExecutionModelStrategy):
+class USOCappedPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-012：回檔範圍過濾 + RSI(2) + 2日急跌"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "USO:capped-pullback"
+    bundle_trial_hypothesis = (
+        "USO capped-pullback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

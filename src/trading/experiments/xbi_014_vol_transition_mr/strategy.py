@@ -12,6 +12,7 @@ XBI 2.0% 日波動位於該模板已驗證 vol 區間 [0.97%, 3.17%] 內，是 r
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_014_vol_transition_mr.config import (
     XBI014Config,
@@ -22,10 +23,12 @@ from trading.experiments.xbi_014_vol_transition_mr.signal_detector import (
 )
 
 
-class XBI014Strategy(ExecutionModelStrategy):
+class XBI014Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI Post-Capitulation Vol-Transition MR (XBI-014)"""
 
     slippage_pct: float = 0.001  # 0.1% (ETF 標準滑價)
+    bundle_trial_family = "XBI:vol-transition-mr"
+    bundle_trial_hypothesis = "XBI post-capitulation volatility-transition mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

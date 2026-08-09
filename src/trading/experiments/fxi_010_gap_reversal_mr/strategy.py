@@ -7,6 +7,7 @@ FXI-010: Gap-Down Capitulation + Intraday Reversal Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_010_gap_reversal_mr.config import (
     FXI010Config,
@@ -17,8 +18,13 @@ from trading.experiments.fxi_010_gap_reversal_mr.signal_detector import (
 )
 
 
-class FXI010Strategy(ExecutionModelStrategy):
+class FXI010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-010：Gap-Down 資本化 + 日內反轉均值回歸"""
+
+    bundle_trial_family = "FXI:gap-reversal-mr"
+    bundle_trial_hypothesis = (
+        "FXI gap-down reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% ETF standard
 

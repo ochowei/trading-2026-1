@@ -16,36 +16,22 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.sivr_020_usd_regime_mr.config import SIVR020Config
 
 logger = logging.getLogger(__name__)
 
 
-class SIVR020SignalDetector(BaseSignalDetector):
+class SIVR020SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """SIVR-020：SIVR-018 Att3 框架 + SIVR–USD 跨資產 divergence regime gate"""
 
     def __init__(self, config: SIVR020Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.usd_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -91,21 +77,11 @@ class SIVR020SignalDetector(BaseSignalDetector):
             df["Ret_3d"] = df["Close"].pct_change(3)
 
         # SIVR–USD cross-asset divergence regime gate（SIVR-020 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        usd_df = self._fetch_external(self.config.usd_ticker, start_date)
         div_n = self.config.usd_lookback
         df["SIVR_Ret_N"] = df["Close"].pct_change(div_n)
-        if usd_df is None or usd_df.empty:
-            logger.error(
-                "無法取得 %s 數據，SIVR–USD divergence 過濾停用",
-                self.config.usd_ticker,
-            )
-            df["USD_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            usd_close = usd_df["Close"].reindex(df.index, method="ffill")
-            df["USD_Ret_N"] = usd_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["SIVR_Ret_N"] - df["USD_Ret_N"]
+        usd_close = self.require_auxiliary(self.config.usd_ticker, df.index)["Close"]
+        df["USD_Ret_N"] = usd_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["SIVR_Ret_N"] - df["USD_Ret_N"]
 
         return df
 

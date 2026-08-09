@@ -8,6 +8,7 @@ IWM-014: Momentum Breakout Pullback Continuation 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_014_momentum_pullback.config import (
     IWM014Config,
@@ -18,10 +19,14 @@ from trading.experiments.iwm_014_momentum_pullback.signal_detector import (
 )
 
 
-class IWM014MomentumPullbackStrategy(ExecutionModelStrategy):
+class IWM014MomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM-014：Momentum Breakout Pullback Continuation 策略（含成交模型）"""
 
     slippage_pct: float = 0.001  # 0.1% (IWM 流動性高)
+    bundle_trial_family = "IWM:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "IWM momentum breakout pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

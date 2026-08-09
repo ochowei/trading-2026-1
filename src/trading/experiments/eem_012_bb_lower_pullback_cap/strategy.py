@@ -9,6 +9,7 @@ EEM-012: BB Lower Band + Pullback Cap Hybrid Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_012_bb_lower_pullback_cap.config import (
     EEM012Config,
@@ -19,7 +20,9 @@ from trading.experiments.eem_012_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class EEM012Strategy(ExecutionModelStrategy):
+class EEM012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "EEM:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = "EEM mean reversion improves when a BB lower touch is capped against crash-depth continuation."
     """EEM BB Lower + Pullback Cap Hybrid MR (EEM-012)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）

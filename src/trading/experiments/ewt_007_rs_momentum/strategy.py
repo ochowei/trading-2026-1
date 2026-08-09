@@ -8,6 +8,7 @@ EWT Relative Strength Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_007_rs_momentum.config import (
     EWT007Config,
@@ -18,8 +19,13 @@ from trading.experiments.ewt_007_rs_momentum.signal_detector import (
 )
 
 
-class EWT007Strategy(ExecutionModelStrategy):
+class EWT007Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT-007：Relative Strength Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "EWT:rs-momentum"
+    bundle_trial_hypothesis = (
+        "EWT pullbacks improve when relative strength versus EEM remains positive."
+    )
 
     slippage_pct: float = 0.001
 

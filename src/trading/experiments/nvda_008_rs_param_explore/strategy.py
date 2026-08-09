@@ -8,6 +8,7 @@ NVDA RS Parameter Exploration Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_008_rs_param_explore.config import (
     NVDARSParamExploreConfig,
@@ -18,8 +19,13 @@ from trading.experiments.nvda_008_rs_param_explore.signal_detector import (
 )
 
 
-class NVDARSParamExploreStrategy(ExecutionModelStrategy):
+class NVDARSParamExploreStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-008：RS Parameter Exploration（含成交模型）"""
+
+    bundle_trial_family = "NVDA:rs-parameter-exploration"
+    bundle_trial_hypothesis = (
+        "NVDA RS pullbacks remain robust across benchmark and lookback variants."
+    )
 
     slippage_pct: float = 0.0015
 

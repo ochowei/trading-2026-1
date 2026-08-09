@@ -15,36 +15,22 @@ style/value-vs-growth divergence。relQQQ_10d 移除 Part A SL 2022-01-18
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.dia_016_qqq_divergence_mr.config import DIA016Config
 
 logger = logging.getLogger(__name__)
 
 
-class DIA016SignalDetector(BaseSignalDetector):
+class DIA016SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """DIA-QQQ Divergence CEILING Regime-Gated MR 訊號偵測器"""
 
     def __init__(self, config: DIA016Config):
         self.config = config
 
-    def _fetch_anchor_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.anchor_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.anchor_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.anchor_ticker,)
 
     @staticmethod
     def _compute_rsi(series: pd.Series, period: int) -> pd.Series:
@@ -77,22 +63,12 @@ class DIA016SignalDetector(BaseSignalDetector):
         df.loc[day_range == 0, "ClosePos"] = 0.5
 
         # === DIA-016 核心新增：DIA-QQQ 相對強度（CEILING）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        anchor_df = self._fetch_anchor_data(start_date)
-
         dia_n_return = df["Close"].pct_change(self.config.rel_lookback)
-        if anchor_df is None or anchor_df.empty:
-            logger.error(
-                "無法取得 %s 數據，rel filter 停用（fail-safe：不過濾）",
-                self.config.anchor_ticker,
-            )
-            df["Rel_Return"] = -1.0
-        else:
-            anchor_close = anchor_df["Close"].reindex(df.index, method="ffill")
-            anchor_n_return = anchor_close.pct_change(self.config.rel_lookback)
-            df["Anchor_Return_N"] = anchor_n_return
-            df["DIA_Return_N"] = dia_n_return
-            df["Rel_Return"] = dia_n_return - anchor_n_return
+        anchor_df = self.require_auxiliary(self.config.anchor_ticker, df.index)
+        anchor_n_return = anchor_df["Close"].pct_change(self.config.rel_lookback)
+        df["Anchor_Return_N"] = anchor_n_return
+        df["DIA_Return_N"] = dia_n_return
+        df["Rel_Return"] = dia_n_return - anchor_n_return
 
         return df
 

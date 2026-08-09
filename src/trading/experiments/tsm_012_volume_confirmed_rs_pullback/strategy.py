@@ -6,6 +6,7 @@ TSM-012: Volume-Confirmed RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_012_volume_confirmed_rs_pullback.config import (
     TSMVolumeConfirmedConfig,
@@ -16,8 +17,11 @@ from trading.experiments.tsm_012_volume_confirmed_rs_pullback.signal_detector im
 )
 
 
-class TSMVolumeConfirmedStrategy(ExecutionModelStrategy):
+class TSMVolumeConfirmedStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-012：Volume-Confirmed RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:volume-confirmed-rs"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve when signal-day volume confirms the setup."
 
     slippage_pct: float = 0.001
 

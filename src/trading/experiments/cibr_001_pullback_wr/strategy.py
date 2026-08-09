@@ -9,6 +9,7 @@ Exit uses fixed TP/SL (no trailing stop - daily vol 1.53% is at boundary).
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_001_pullback_wr.config import (
     CIBRPullbackWRConfig,
@@ -19,8 +20,13 @@ from trading.experiments.cibr_001_pullback_wr.signal_detector import (
 )
 
 
-class CIBRPullbackWRStrategy(ExecutionModelStrategy):
+class CIBRPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-001：回檔 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "CIBR:pullback-wr"
+    bundle_trial_hypothesis = (
+        "CIBR pullback entries can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

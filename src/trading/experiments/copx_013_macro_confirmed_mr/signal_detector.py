@@ -18,36 +18,22 @@ COPX-013 訊號偵測器：Macro-Confirmed Vol-Adaptive Capitulation MR
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.copx_013_macro_confirmed_mr.config import COPX013Config
 
 logger = logging.getLogger(__name__)
 
 
-class COPX013SignalDetector(BaseSignalDetector):
+class COPX013SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """COPX-013 macro-confirmed vol-adaptive capitulation MR 訊號偵測器"""
 
     def __init__(self, config: COPX013Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.macro_ticker, self.config.vix_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -80,30 +66,14 @@ class COPX013SignalDetector(BaseSignalDetector):
         df["ATR_Ratio"] = atr_short / atr_long.where(atr_long > 0, float("nan"))
 
         # SPY broad-market macro context confirmation gate（lesson #25）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        macro_df = self._fetch_external(self.config.macro_ticker, start_date)
-
-        if macro_df is None or macro_df.empty:
-            logger.error(
-                "無法取得 %s 數據，broad-market macro filter 停用",
-                self.config.macro_ticker,
-            )
-            df["Macro_Return_Nd"] = 0.0
-        else:
-            macro_close = macro_df["Close"].reindex(df.index, method="ffill")
-            df["Macro_Return_Nd"] = macro_close.pct_change(self.config.macro_lookback)
+        macro_df = self.require_auxiliary(self.config.macro_ticker, df.index)
+        macro_close = macro_df["Close"]
+        df["Macro_Return_Nd"] = macro_close.pct_change(self.config.macro_lookback)
 
         # ^VIX forward-looking macro vol direction filter（lesson #24）
-        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
-        if vix_df is None or vix_df.empty:
-            logger.error(
-                "無法取得 %s 數據，VIX direction filter 停用",
-                self.config.vix_ticker,
-            )
-            df["VIX_Change_Nd"] = 0.0
-        else:
-            vix_close = vix_df["Close"].reindex(df.index, method="ffill")
-            df["VIX_Change_Nd"] = vix_close.diff(self.config.vix_direction_lookback)
+        vix_df = self.require_auxiliary(self.config.vix_ticker, df.index)
+        vix_close = vix_df["Close"]
+        df["VIX_Change_Nd"] = vix_close.diff(self.config.vix_direction_lookback)
 
         return df
 

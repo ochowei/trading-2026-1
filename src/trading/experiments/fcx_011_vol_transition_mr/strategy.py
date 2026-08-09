@@ -11,6 +11,7 @@ FCX (Freeport-McMoRan) 為銅礦龍頭單一個股，日波動 ~3%，其急跌�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_011_vol_transition_mr.config import (
     FCX011Config,
@@ -21,8 +22,11 @@ from trading.experiments.fcx_011_vol_transition_mr.signal_detector import (
 )
 
 
-class FCX011Strategy(ExecutionModelStrategy):
+class FCX011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX Post-Capitulation Vol-Transition MR (FCX-011)"""
+
+    bundle_trial_family = "FCX:vol-transition-mr"
+    bundle_trial_hypothesis = "FCX post-capitulation volatility transition can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.0015  # 0.15%（FCX 高波動個股標準滑價）
 

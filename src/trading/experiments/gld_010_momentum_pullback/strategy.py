@@ -5,6 +5,7 @@ GLD-010: 動量回檔策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_010_momentum_pullback.config import (
@@ -16,8 +17,13 @@ from trading.experiments.gld_010_momentum_pullback.signal_detector import (
 )
 
 
-class GLD010Strategy(ExecutionModelStrategy):
+class GLD010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 動量回檔 (GLD-010)"""
+
+    bundle_trial_family = "GLD:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "GLD momentum pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -5,6 +5,7 @@ TSLA-013: BB Squeeze Breakout + Pre-Breakout Calm Filter Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_013_pre_breakout_calm.config import (
     TSLAPreBreakoutCalmConfig,
@@ -15,7 +16,11 @@ from trading.experiments.tsla_013_pre_breakout_calm.signal_detector import (
 )
 
 
-class TSLAPreBreakoutCalmStrategy(ExecutionModelStrategy):
+class TSLAPreBreakoutCalmStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:pre-breakout-calm"
+    bundle_trial_hypothesis = (
+        "TSLA pre-breakout calm filters can be reproduced from a verified primary bundle."
+    )
     """TSLA-013：BB 擠壓突破 + 突破前平靜度過濾（含成交模型）"""
 
     slippage_pct: float = 0.0015

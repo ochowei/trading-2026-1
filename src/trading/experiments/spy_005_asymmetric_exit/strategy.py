@@ -7,6 +7,7 @@ SPY-005: RSI(2) 非對稱出場均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.spy_005_asymmetric_exit.config import (
     SPYAsymmetricExitConfig,
@@ -17,8 +18,13 @@ from trading.experiments.spy_005_asymmetric_exit.signal_detector import (
 )
 
 
-class SPYAsymmetricExitStrategy(ExecutionModelStrategy):
+class SPYAsymmetricExitStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY RSI(2) 非對稱出場均值回歸 (SPY-005)"""
+
+    bundle_trial_family = "SPY:asymmetric-exit"
+    bundle_trial_hypothesis = (
+        "SPY asymmetric exits can preserve the RSI(2) entry edge from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

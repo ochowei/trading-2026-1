@@ -5,6 +5,7 @@ Composite oscillator (RSI(3) + Streak_RSI(2) + PercentRank(1d, 100d)) on FXI.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_011_connors_rsi_mr.config import (
     FXI011Config,
@@ -15,8 +16,13 @@ from trading.experiments.fxi_011_connors_rsi_mr.signal_detector import (
 )
 
 
-class FXI011Strategy(ExecutionModelStrategy):
+class FXI011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI Connor's RSI Mean Reversion (FXI-011)"""
+
+    bundle_trial_family = "FXI:connors-rsi-mr"
+    bundle_trial_hypothesis = (
+        "FXI Connors RSI mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1% ETF standard
 

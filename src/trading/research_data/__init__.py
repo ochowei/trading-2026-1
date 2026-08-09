@@ -6,6 +6,12 @@ from trading.research_data.definitions import (
     ResearchDefinitionStore,
 )
 from trading.research_data.manifest_codec import SnapshotManifestError
+from trading.research_data.migration import (
+    MIGRATION_RESULT_SCHEMA_VERSION,
+    MIGRATION_RESULT_SUFFIX,
+    MigrationResultError,
+    MigrationResultStore,
+)
 from trading.research_data.models import (
     DataBlobRef,
     DefinitionBlobRef,
@@ -17,6 +23,7 @@ from trading.research_data.models import (
     SnapshotDataRef,
     SnapshotManifest,
 )
+from trading.research_data.parity import MigrationParityEvidenceError, MigrationParityStore
 from trading.research_data.qualification_registry import (
     QualificationRegistry,
     QualificationRegistryError,
@@ -57,6 +64,12 @@ __all__ = [
     "ExperimentTrialRegistry",
     "GarbageCollectionReport",
     "ImmutableBlobCorruptionError",
+    "MIGRATION_RESULT_SCHEMA_VERSION",
+    "MIGRATION_RESULT_SUFFIX",
+    "MigrationParityEvidenceError",
+    "MigrationParityStore",
+    "MigrationResultError",
+    "MigrationResultStore",
     "ResearchDataStore",
     "ResearchDefinitionError",
     "ResearchDefinitionSnapshot",

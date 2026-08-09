@@ -6,6 +6,7 @@ Based on TQQQ-010 template, with parameters scaled for SOXL volatility and execu
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_001_extreme_oversold.config import (
@@ -15,7 +16,7 @@ from trading.experiments.soxl_001_extreme_oversold.config import (
 from trading.experiments.soxl_001_extreme_oversold.signal_detector import SOXLSignalDetector
 
 
-class SOXLExtremeOversoldStrategy(ExecutionModelStrategy):
+class SOXLExtremeOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL 極端超賣 + 成交模型策略 (SOXL-001)
 
@@ -24,6 +25,11 @@ class SOXLExtremeOversoldStrategy(ExecutionModelStrategy):
     Signal logic: 3-condition entry (drawdown >= 20% + RSI < 25 + volume spike)
     Execution model: next_open_market entry, limit_order profit, stop_market stop, pessimistic
     """
+
+    bundle_trial_family = "SOXL:extreme-oversold"
+    bundle_trial_hypothesis = (
+        "SOXL extreme oversold mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

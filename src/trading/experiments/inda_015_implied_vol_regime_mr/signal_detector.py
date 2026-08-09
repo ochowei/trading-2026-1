@@ -26,36 +26,22 @@ INDA 交易日（沿用 INDA-012 / COPX-016 模式，不需覆寫 strategy.run()
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.inda_015_implied_vol_regime_mr.config import INDA015Config
 
 logger = logging.getLogger(__name__)
 
 
-class INDA015SignalDetector(BaseSignalDetector):
+class INDA015SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """INDA-015 Implied-Vol Regime-Gated Multi-Period Capitulation MR"""
 
     def __init__(self, config: INDA015Config):
         self.config = config
 
-    def _fetch_iv_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.iv_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.iv_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.iv_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -90,15 +76,8 @@ class INDA015SignalDetector(BaseSignalDetector):
         df["Return_3d"] = df["Close"].pct_change(3)
 
         # forward-looking implied-vol regime gate（INDA-015 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        iv_df = self._fetch_iv_data(start_date)
-
-        if iv_df is None or iv_df.empty:
-            logger.error("無法取得 %s 數據，IV regime gate 停用", self.config.iv_ticker)
-            df["IV_Pass"] = True
-            return df
-
-        iv_close = iv_df["Close"].reindex(df.index, method="ffill")
+        iv_df = self.require_auxiliary(self.config.iv_ticker, df.index)
+        iv_close = iv_df["Close"]
         mode = self.config.iv_mode
         thr = self.config.iv_threshold
 

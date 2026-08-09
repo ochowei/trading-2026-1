@@ -9,6 +9,7 @@ IBIT-008: 單日 Range Expansion Climax + 強日內反轉均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_008_range_expansion_mr.config import (
     IBIT008Config,
@@ -19,8 +20,13 @@ from trading.experiments.ibit_008_range_expansion_mr.signal_detector import (
 )
 
 
-class IBIT008Strategy(ExecutionModelStrategy):
+class IBIT008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-008：單日 Range Expansion Climax + 強日內反轉均值回歸"""
+
+    bundle_trial_family = "IBIT:range-expansion-mr"
+    bundle_trial_hypothesis = (
+        "IBIT range-expansion reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

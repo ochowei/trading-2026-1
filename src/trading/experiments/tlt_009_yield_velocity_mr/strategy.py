@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_009_yield_velocity_mr.config import (
     TLT009Config,
@@ -12,10 +13,12 @@ from trading.experiments.tlt_009_yield_velocity_mr.signal_detector import (
 )
 
 
-class TLT009YieldVelocityMRStrategy(ExecutionModelStrategy):
+class TLT009YieldVelocityMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-009：^TNX yield velocity gate 均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+    bundle_trial_family = "TLT:yield-velocity-mr"
+    bundle_trial_hypothesis = "TLT mean-reversion entries improve when Treasury yield velocity avoids an adverse rate regime."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -7,6 +7,7 @@ EWZ-005: Relative Strength Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_005_rs_momentum.config import (
     EWZ005Config,
@@ -17,10 +18,14 @@ from trading.experiments.ewz_005_rs_momentum.signal_detector import (
 )
 
 
-class EWZ005Strategy(ExecutionModelStrategy):
+class EWZ005Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ-005：Relative Strength Momentum Pullback（含成交模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "EWZ:rs-momentum"
+    bundle_trial_hypothesis = (
+        "EWZ pullbacks improve when relative strength versus EEM remains positive."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

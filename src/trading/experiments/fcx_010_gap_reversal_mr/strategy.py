@@ -8,6 +8,7 @@ FCX-010: Gap-Down 資本化 + 日內反轉均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_010_gap_reversal_mr.config import (
     FCX010Config,
@@ -18,8 +19,13 @@ from trading.experiments.fcx_010_gap_reversal_mr.signal_detector import (
 )
 
 
-class FCX010Strategy(ExecutionModelStrategy):
+class FCX010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-010：Gap-Down 資本化 + 日內反轉均值回歸"""
+
+    bundle_trial_family = "FCX:gap-reversal-mr"
+    bundle_trial_hypothesis = (
+        "FCX gap-down reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價
 

@@ -7,6 +7,7 @@ Exit uses trailing stop mechanism.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
     TrailingStopBacktester,
@@ -20,8 +21,13 @@ from trading.experiments.gld_006_pullback_wr.signal_detector import (
 )
 
 
-class GLDPullbackWRStrategy(ExecutionModelStrategy):
+class GLDPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD 回檔 + Williams %R 均值回歸策略 (GLD-006)"""
+
+    bundle_trial_family = "GLD:pullback-wr"
+    bundle_trial_hypothesis = (
+        "GLD pullback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

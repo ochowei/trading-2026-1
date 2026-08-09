@@ -8,6 +8,7 @@ FCX-012: Donchian Lower Washout + Intraday Reversal Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_012_donchian_low_washout.config import (
     FCX012Config,
@@ -18,8 +19,13 @@ from trading.experiments.fcx_012_donchian_low_washout.signal_detector import (
 )
 
 
-class FCX012Strategy(ExecutionModelStrategy):
+class FCX012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX Donchian Lower Washout + Intraday Reversal MR (FCX-012)"""
+
+    bundle_trial_family = "FCX:donchian-low-washout"
+    bundle_trial_hypothesis = (
+        "FCX Donchian lower washout reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（FCX 高波動個股標準滑價）
 

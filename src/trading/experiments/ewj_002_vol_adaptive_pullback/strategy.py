@@ -7,6 +7,7 @@ EWJ-002: Volatility-Adaptive Pullback + WR Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewj_002_vol_adaptive_pullback.config import (
     EWJ002Config,
@@ -17,7 +18,11 @@ from trading.experiments.ewj_002_vol_adaptive_pullback.signal_detector import (
 )
 
 
-class EWJ002Strategy(ExecutionModelStrategy):
+class EWJ002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "EWJ:vol-adaptive-pullback"
+    bundle_trial_hypothesis = (
+        "EWJ pullback mean reversion improves when volatility confirms an oversold reversal."
+    )
     """EWJ Volatility-Adaptive Pullback MR (EWJ-002)"""
 
     def create_config(self) -> ExperimentConfig:

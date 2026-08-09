@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_013_trend_regime_pullback.config import (
     DIA013Config,
@@ -12,7 +13,11 @@ from trading.experiments.dia_013_trend_regime_pullback.signal_detector import (
 )
 
 
-class DIA013Strategy(ExecutionModelStrategy):
+class DIA013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "DIA:trend-regime-pullback"
+    bundle_trial_hypothesis = (
+        "DIA pullback continuation is selective when a secular bull regime remains intact."
+    )
     """DIA-013：嚴格 secular 多頭 regime + 趨勢回檔 continuation（執行模型）"""
 
     slippage_pct: float = 0.001

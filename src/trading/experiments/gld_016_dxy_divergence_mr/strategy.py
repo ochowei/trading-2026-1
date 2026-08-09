@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_016_dxy_divergence_mr.config import (
     GLD016Config,
@@ -12,7 +13,11 @@ from trading.experiments.gld_016_dxy_divergence_mr.signal_detector import (
 )
 
 
-class GLD016DxyDivergenceMRStrategy(ExecutionModelStrategy):
+class GLD016DxyDivergenceMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "GLD:dxy-divergence-mr"
+    bundle_trial_hypothesis = (
+        "GLD capitulation mean reversion improves when GVZ and DXY regimes confirm recovery."
+    )
     """GLD-016：GLD-015 Att2 framework + DXY cross-asset divergence regime gate"""
 
     slippage_pct: float = 0.001

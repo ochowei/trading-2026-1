@@ -8,6 +8,7 @@ Donchian(30) 突破新高 + BB Squeeze 確保波動收縮後才進場。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_007_donchian_breakout.config import (
     FCXDonchianConfig,
@@ -18,8 +19,13 @@ from trading.experiments.fcx_007_donchian_breakout.signal_detector import (
 )
 
 
-class FCXDonchianBreakoutStrategy(ExecutionModelStrategy):
+class FCXDonchianBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-007：Donchian Channel Breakout 策略（含成交模型）"""
+
+    bundle_trial_family = "FCX:donchian-breakout"
+    bundle_trial_hypothesis = (
+        "FCX Donchian breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

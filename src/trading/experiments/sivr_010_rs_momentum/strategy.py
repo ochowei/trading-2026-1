@@ -8,6 +8,7 @@ Attempt 3: SMA 金叉 + 回調進場趨勢跟蹤策略。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_010_rs_momentum.config import (
     SIVRRSMomentumConfig,
@@ -18,8 +19,13 @@ from trading.experiments.sivr_010_rs_momentum.signal_detector import (
 )
 
 
-class SIVRRSMomentumStrategy(ExecutionModelStrategy):
+class SIVRRSMomentumStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-010：Trend Following SMA Crossover + Pullback（含成交模型）"""
+
+    bundle_trial_family = "SIVR:rs-momentum"
+    bundle_trial_hypothesis = (
+        "SIVR trend-following pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較低）
 

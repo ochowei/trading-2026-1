@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_009_day_after_reversal_mr.config import (
     URADayAfterReversalMRConfig,
@@ -12,10 +13,15 @@ from trading.experiments.ura_009_day_after_reversal_mr.signal_detector import (
 )
 
 
-class URADayAfterReversalMRStrategy(ExecutionModelStrategy):
+class URADayAfterReversalMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-009：日後資本化 + 單K反轉 均值回歸"""
 
     slippage_pct: float = 0.0010
+
+    bundle_trial_family = "URA:day-after-reversal-mr"
+    bundle_trial_hypothesis = (
+        "URA day-after reversal mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

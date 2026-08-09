@@ -14,6 +14,7 @@ DIA-014: DIA-IWM Cross-Asset Divergence CEILING Regime-Gated MR Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_014_iwm_divergence_mr.config import (
     DIA014Config,
@@ -24,10 +25,14 @@ from trading.experiments.dia_014_iwm_divergence_mr.signal_detector import (
 )
 
 
-class DIA014Strategy(ExecutionModelStrategy):
+class DIA014Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA-IWM Divergence CEILING Regime-Gated MR (DIA-014)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "DIA:iwm-divergence-mr"
+    bundle_trial_hypothesis = (
+        "DIA mean-reversion entries improve when large-cap strength versus IWM is contained."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

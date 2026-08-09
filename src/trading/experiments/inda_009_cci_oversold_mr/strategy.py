@@ -7,6 +7,7 @@ Uses execution model with fixed TP/SL exit.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_009_cci_oversold_mr.config import (
     INDA009Config,
@@ -17,8 +18,13 @@ from trading.experiments.inda_009_cci_oversold_mr.signal_detector import (
 )
 
 
-class INDA009Strategy(ExecutionModelStrategy):
+class INDA009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA CCI 超賣反轉均值回歸 (INDA-009)"""
+
+    bundle_trial_family = "INDA:cci-oversold-mr"
+    bundle_trial_hypothesis = (
+        "INDA CCI oversold mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

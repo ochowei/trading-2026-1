@@ -7,6 +7,7 @@ USO-025 皆於 MR 框架）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_018_vxn_implied_vol_mbpc.config import (
     NVDA018Config,
@@ -17,8 +18,11 @@ from trading.experiments.nvda_018_vxn_implied_vol_mbpc.signal_detector import (
 )
 
 
-class NVDA018Strategy(ExecutionModelStrategy):
+class NVDA018Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-018：NVDA-013 Att3 + ^VXN forward-looking implied vol DIRECTION gate"""
+
+    bundle_trial_family = "NVDA:vxn-direction-mbpc"
+    bundle_trial_hypothesis = "NVDA breakout pullbacks improve when VXN direction confirms a stable implied-volatility regime."
 
     slippage_pct: float = 0.0015
 

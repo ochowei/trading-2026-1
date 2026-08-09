@@ -9,6 +9,7 @@ return CEILING 維度跨資產移植至 TSLA-015 Att3 BB Squeeze Breakout 框架
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_016_breakout_ceiling.config import (
     TSLA016Config,
@@ -19,7 +20,9 @@ from trading.experiments.tsla_016_breakout_ceiling.signal_detector import (
 )
 
 
-class TSLA016BreakoutCeilingStrategy(ExecutionModelStrategy):
+class TSLA016BreakoutCeilingStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:breakout-ceiling"
+    bundle_trial_hypothesis = "TSLA multi-period breakout ceiling filters can be reproduced from a verified primary bundle."
     """TSLA-016：訊號日方向過濾 + lesson #22 regime BB Squeeze Breakout（含成交模型）"""
 
     slippage_pct: float = 0.0015

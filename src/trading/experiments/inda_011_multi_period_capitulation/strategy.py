@@ -30,6 +30,7 @@ INDA-011: Multi-Period Capitulation-Strength Filter MR Strategy (Att3 Final)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_011_multi_period_capitulation.config import (
     INDA011Config,
@@ -40,10 +41,15 @@ from trading.experiments.inda_011_multi_period_capitulation.signal_detector impo
 )
 
 
-class INDA011Strategy(ExecutionModelStrategy):
+class INDA011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA Multi-Period Capitulation-Strength Filter MR (INDA-011)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+
+    bundle_trial_family = "INDA:multi-period-capitulation"
+    bundle_trial_hypothesis = (
+        "INDA multi-period capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

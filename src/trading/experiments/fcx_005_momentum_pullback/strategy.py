@@ -8,6 +8,7 @@ FCX RSI(2) Short-Term Extreme Oversold Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_005_momentum_pullback.config import (
     FCXRSI2Config,
@@ -18,8 +19,13 @@ from trading.experiments.fcx_005_momentum_pullback.signal_detector import (
 )
 
 
-class FCXMomentumPullbackStrategy(ExecutionModelStrategy):
+class FCXMomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-005：RSI(2) 短期均值回歸策略（含成交模型）"""
+
+    bundle_trial_family = "FCX:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "FCX momentum pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

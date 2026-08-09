@@ -10,6 +10,7 @@ Three iterations tested, all failed:
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_006_trend_pullback_momentum.config import (
     VGK006Config,
@@ -20,8 +21,13 @@ from trading.experiments.vgk_006_trend_pullback_momentum.signal_detector import 
 )
 
 
-class VGK006Strategy(ExecutionModelStrategy):
+class VGK006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VGK Trend Pullback Momentum (VGK-006)"""
+
+    bundle_trial_family = "VGK:trend-pullback-momentum"
+    bundle_trial_hypothesis = (
+        "VGK trend pullback momentum can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -7,6 +7,7 @@ IWM-004: RSI(2) 極端超賣均值回歸（TP +4.0% 測試）
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_004_relative_weakness.config import (
     IWM004Config,
@@ -17,8 +18,13 @@ from trading.experiments.iwm_004_relative_weakness.signal_detector import (
 )
 
 
-class IWM004Strategy(ExecutionModelStrategy):
+class IWM004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM RSI(2) TP +4.0% 測試 (IWM-004)"""
+
+    bundle_trial_family = "IWM:relative-weakness"
+    bundle_trial_hypothesis = (
+        "IWM RSI(2) relative-weakness variant can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

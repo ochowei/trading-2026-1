@@ -7,6 +7,7 @@ CIBR BB 下軌均值回歸策略 (CIBR BB Lower Band Mean Reversion Strategy)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_007_bb_lower_mr.config import (
     CIBRBBLowerMRConfig,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_007_bb_lower_mr.signal_detector import (
 )
 
 
-class CIBRBBLowerMRStrategy(ExecutionModelStrategy):
+class CIBRBBLowerMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-007：BB 下軌均值回歸"""
+
+    bundle_trial_family = "CIBR:bb-lower-mr"
+    bundle_trial_hypothesis = (
+        "CIBR BB lower-band mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

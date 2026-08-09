@@ -6,6 +6,7 @@ Repo 第 1 次 lesson #24 family BANDS 變體（既往為 LEVEL CAP 或 DIRECTIO
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_017_vix_bands_mr.config import (
     XBI017Config,
@@ -16,7 +17,12 @@ from trading.experiments.xbi_017_vix_bands_mr.signal_detector import (
 )
 
 
-class XBI017VixBandsMRStrategy(ExecutionModelStrategy):
+class XBI017VixBandsMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "XBI:vix-bands"
+    bundle_trial_hypothesis = (
+        "XBI pullbacks improve when ^VIX is outside the medium-volatility band."
+    )
+
     """XBI-017：^VIX BANDS Filter MR 策略（含成交模型）"""
 
     slippage_pct: float = 0.001  # 0.1%（XBI 高流動板塊 ETF）

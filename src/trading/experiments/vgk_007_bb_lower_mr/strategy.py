@@ -7,6 +7,7 @@ VGK-007: BB Lower Band Mean Reversion Strategy (Hybrid Entry)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.vgk_007_bb_lower_mr.config import (
     VGK007Config,
@@ -17,7 +18,11 @@ from trading.experiments.vgk_007_bb_lower_mr.signal_detector import (
 )
 
 
-class VGK007Strategy(ExecutionModelStrategy):
+class VGK007Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "VGK:bb-lower-mr"
+    bundle_trial_hypothesis = (
+        "VGK mean reversion improves when a statistically extreme BB lower touch rebounds."
+    )
     """VGK-007: BB 下軌均值回歸（混合進場）"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）

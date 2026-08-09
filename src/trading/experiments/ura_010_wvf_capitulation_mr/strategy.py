@@ -8,6 +8,7 @@ URA-010：Williams Vix Fix 資本化 + 回檔深度均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_010_wvf_capitulation_mr.config import (
     URA010Config,
@@ -18,10 +19,13 @@ from trading.experiments.ura_010_wvf_capitulation_mr.signal_detector import (
 )
 
 
-class URA010WVFCapitulationStrategy(ExecutionModelStrategy):
+class URA010WVFCapitulationStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-010：Williams Vix Fix 資本化 + 回檔深度均值回歸"""
 
     slippage_pct: float = 0.001  # 0.10%（沿用 URA 系列）
+
+    bundle_trial_family = "URA:wvf-capitulation-mr"
+    bundle_trial_hypothesis = "URA Williams VIX Fix capitulation entries can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

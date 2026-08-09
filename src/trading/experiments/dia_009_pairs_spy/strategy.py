@@ -7,6 +7,7 @@ DIA/SPY Pairs Trading Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_009_pairs_spy.config import (
     DIAPairsSPYConfig,
@@ -17,10 +18,14 @@ from trading.experiments.dia_009_pairs_spy.signal_detector import (
 )
 
 
-class DIAPairsSPYStrategy(ExecutionModelStrategy):
+class DIAPairsSPYStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA-009：Pairs Trading DIA/SPY（含成交模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "DIA:pairs-spy"
+    bundle_trial_hypothesis = (
+        "DIA mean-reversion entries improve when DIA/SPY relative value is depressed."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -8,6 +8,7 @@ XBI-005 Part A Sharpe 0.36 / Part B 0.65（A/B 訊號比 3.5:1，累計差 57%�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_011_rsi_divergence_mr.config import (
     XBI011Config,
@@ -18,8 +19,13 @@ from trading.experiments.xbi_011_rsi_divergence_mr.signal_detector import (
 )
 
 
-class XBI011Strategy(ExecutionModelStrategy):
+class XBI011Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-011：RSI Bullish Divergence + Pullback+WR+ClosePos 均值回歸"""
+
+    bundle_trial_family = "XBI:rsi-divergence-mr"
+    bundle_trial_hypothesis = (
+        "XBI RSI divergence mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

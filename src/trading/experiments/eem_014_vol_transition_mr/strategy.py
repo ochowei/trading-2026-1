@@ -7,6 +7,7 @@ EEM-014: Post-Capitulation Vol-Transition Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_014_vol_transition_mr.config import (
     EEM014Config,
@@ -17,10 +18,12 @@ from trading.experiments.eem_014_vol_transition_mr.signal_detector import (
 )
 
 
-class EEM014Strategy(ExecutionModelStrategy):
+class EEM014Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM Post-Capitulation Vol-Transition MR (EEM-014)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "EEM:vol-transition-mr"
+    bundle_trial_hypothesis = "EEM post-capitulation volatility-transition mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

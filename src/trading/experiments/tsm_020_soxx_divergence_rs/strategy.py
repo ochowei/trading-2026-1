@@ -9,6 +9,7 @@ TSM-015 為 AAPL 主要客戶 anchor）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_020_soxx_divergence_rs.config import (
     TSM020Config,
@@ -19,8 +20,13 @@ from trading.experiments.tsm_020_soxx_divergence_rs.signal_detector import (
 )
 
 
-class TSM020SOXXDivergenceRSStrategy(ExecutionModelStrategy):
+class TSM020SOXXDivergenceRSStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-020：TSM-SOXX 跨資產背離 CEILING regime gate + RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:soxx-divergence-rs"
+    bundle_trial_hypothesis = (
+        "TSM RS pullbacks improve when TSM leadership versus SOXX avoids exhaustion."
+    )
 
     slippage_pct: float = 0.001
 

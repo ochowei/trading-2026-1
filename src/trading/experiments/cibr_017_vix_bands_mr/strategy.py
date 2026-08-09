@@ -7,6 +7,7 @@ Repo 第 2 次 lesson #24 family BANDS 變體跨資產驗證（XBI-017 後首次
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_017_vix_bands_mr.config import (
     CIBR017Config,
@@ -17,8 +18,11 @@ from trading.experiments.cibr_017_vix_bands_mr.signal_detector import (
 )
 
 
-class CIBR017VixBandsMRStrategy(ExecutionModelStrategy):
+class CIBR017VixBandsMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-017：^VIX BANDS Filter MR 策略（含成交模型）"""
+
+    bundle_trial_family = "CIBR:vix-bands-mr"
+    bundle_trial_hypothesis = "CIBR capitulation mean reversion improves when VIX avoids the unstable middle volatility regime."
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

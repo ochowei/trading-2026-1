@@ -8,6 +8,7 @@ INDA Relative Strength Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_007_rs_momentum.config import (
     INDA007Config,
@@ -18,10 +19,14 @@ from trading.experiments.inda_007_rs_momentum.signal_detector import (
 )
 
 
-class INDA007Strategy(ExecutionModelStrategy):
+class INDA007Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA-007：Relative Strength Momentum Pullback（含成交模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "INDA:rs-momentum"
+    bundle_trial_hypothesis = (
+        "INDA pullbacks improve when relative strength versus EEM remains positive."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

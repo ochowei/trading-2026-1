@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_013_macro_confirmed_mr.config import (
     COPX013Config,
@@ -12,8 +13,11 @@ from trading.experiments.copx_013_macro_confirmed_mr.signal_detector import (
 )
 
 
-class COPX013Strategy(ExecutionModelStrategy):
+class COPX013Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-013：COPX-007 框架 + SPY broad-market macro context confirmation gate"""
+
+    bundle_trial_family = "COPX:macro-confirmed-mr"
+    bundle_trial_hypothesis = "COPX capitulation mean reversion improves when broad-market and VIX direction confirm a macro drawdown regime."
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
 

@@ -7,6 +7,7 @@ URA-004: 回檔 + RSI(2) + 2日急跌 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_004_20d_pullback_rsi2.config import (
     URA20dPullbackRSI2Config,
@@ -17,8 +18,13 @@ from trading.experiments.ura_004_20d_pullback_rsi2.signal_detector import (
 )
 
 
-class URA20dPullbackRSI2Strategy(ExecutionModelStrategy):
+class URA20dPullbackRSI2Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-004：回檔 + RSI(2) + 2日急跌"""
+
+    bundle_trial_family = "URA:20d-pullback-rsi2"
+    bundle_trial_hypothesis = (
+        "URA 20-day pullback RSI(2) entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

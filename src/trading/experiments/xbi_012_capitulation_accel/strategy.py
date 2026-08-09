@@ -5,6 +5,7 @@ XBI-012: Capitulation + Acceleration Reversal 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xbi_012_capitulation_accel.config import (
     XBI012Config,
@@ -15,8 +16,11 @@ from trading.experiments.xbi_012_capitulation_accel.signal_detector import (
 )
 
 
-class XBI012Strategy(ExecutionModelStrategy):
+class XBI012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XBI-012: 短期急跌 + 中點反攻均值回歸"""
+
+    bundle_trial_family = "XBI:capitulation-accel"
+    bundle_trial_hypothesis = "XBI capitulation acceleration mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

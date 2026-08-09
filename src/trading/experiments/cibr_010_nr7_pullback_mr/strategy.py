@@ -7,6 +7,7 @@ CIBR-010: NR7 Volatility Contraction + Pullback Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_010_nr7_pullback_mr.config import (
     CIBR010Config,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_010_nr7_pullback_mr.signal_detector import (
 )
 
 
-class CIBR010Strategy(ExecutionModelStrategy):
+class CIBR010Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-010：NR7 Volatility Contraction + Pullback MR"""
+
+    bundle_trial_family = "CIBR:nr7-pullback-mr"
+    bundle_trial_hypothesis = (
+        "CIBR NR7 pullback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

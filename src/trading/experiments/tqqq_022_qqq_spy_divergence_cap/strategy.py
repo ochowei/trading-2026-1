@@ -7,6 +7,7 @@ mirror TLT-014 / TSLA-017 underperformance-as-weakness）應用於 3x 槓桿
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_022_qqq_spy_divergence_cap.config import (
@@ -18,7 +19,10 @@ from trading.experiments.tqqq_022_qqq_spy_divergence_cap.signal_detector import 
 )
 
 
-class TQQQ022QQQSPYDivergenceStrategy(ExecutionModelStrategy):
+class TQQQ022QQQSPYDivergenceStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:qqq-spy-divergence"
+    bundle_trial_hypothesis = "TQQQ capitulation entries improve when QQQ weakness diverges from broad-market SPY weakness."
+
     """TQQQ-022：QQQ-SPY 跨資產背離 FLOOR + 波動率 regime + capitulation 抄底"""
 
     def create_config(self) -> ExperimentConfig:

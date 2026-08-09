@@ -7,6 +7,7 @@ DIA-007: Trend Pullback to SMA(50)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_007_trend_pullback.config import (
     DIA007TrendPullbackConfig,
@@ -17,8 +18,13 @@ from trading.experiments.dia_007_trend_pullback.signal_detector import (
 )
 
 
-class DIATrendPullbackStrategy(ExecutionModelStrategy):
+class DIATrendPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA Trend Pullback to SMA(50) (DIA-007)"""
+
+    bundle_trial_family = "DIA:trend-pullback"
+    bundle_trial_hypothesis = (
+        "DIA trend pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -8,6 +8,7 @@ TSLA Keltner Channel Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_007_keltner_breakout.config import (
     TSLAKeltnerConfig,
@@ -18,7 +19,11 @@ from trading.experiments.tsla_007_keltner_breakout.signal_detector import (
 )
 
 
-class TSLAKeltnerBreakoutStrategy(ExecutionModelStrategy):
+class TSLAKeltnerBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:keltner-breakout"
+    bundle_trial_hypothesis = (
+        "TSLA Keltner breakouts can be reproduced from a verified primary bundle."
+    )
     """TSLA-007：Keltner Channel Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

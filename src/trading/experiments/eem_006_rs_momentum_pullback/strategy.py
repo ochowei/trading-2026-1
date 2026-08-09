@@ -8,6 +8,7 @@ EEM Relative Strength Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_006_rs_momentum_pullback.config import (
     EEMRSMomentumConfig,
@@ -18,8 +19,13 @@ from trading.experiments.eem_006_rs_momentum_pullback.signal_detector import (
 )
 
 
-class EEMRSMomentumStrategy(ExecutionModelStrategy):
+class EEMRSMomentumStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-006：RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "EEM:rs-momentum-pullback"
+    bundle_trial_hypothesis = (
+        "EEM pullbacks improve when relative strength versus SPY remains positive."
+    )
 
     slippage_pct: float = 0.001
 

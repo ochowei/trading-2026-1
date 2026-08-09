@@ -7,6 +7,7 @@ TSM Extreme Oversold Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_001_extreme_oversold.config import (
     TSMExtremeOversoldConfig,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_001_extreme_oversold.signal_detector import (
 )
 
 
-class TSMExtremeOversoldStrategy(ExecutionModelStrategy):
+class TSMExtremeOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM 極端超賣均值回歸策略（含成交模型）"""
+
+    bundle_trial_family = "TSM:extreme-oversold"
+    bundle_trial_hypothesis = (
+        "TSM extreme oversold mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0010  # 0.10% 大型 ADR 滑價
 

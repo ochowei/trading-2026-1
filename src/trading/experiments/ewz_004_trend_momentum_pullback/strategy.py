@@ -7,6 +7,7 @@ EWZ-004: Short-Window WR Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_004_trend_momentum_pullback.config import (
     EWZ004Config,
@@ -17,8 +18,13 @@ from trading.experiments.ewz_004_trend_momentum_pullback.signal_detector import 
 )
 
 
-class EWZ004Strategy(ExecutionModelStrategy):
+class EWZ004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ Short-Window WR Mean Reversion (EWZ-004)"""
+
+    bundle_trial_family = "EWZ:trend-momentum-pullback"
+    bundle_trial_hypothesis = (
+        "EWZ short-window pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

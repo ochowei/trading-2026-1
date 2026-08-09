@@ -4,6 +4,7 @@ EEM Multi-Period Capitulation-Strength Filter MR Strategy (EEM-015)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_015_multi_period_cap.config import (
     EEM015Config,
@@ -14,10 +15,14 @@ from trading.experiments.eem_015_multi_period_cap.signal_detector import (
 )
 
 
-class EEM015Strategy(ExecutionModelStrategy):
+class EEM015Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM-015：EEM-014 + 3DD cap（INDA-011 Att3 跨資產驗證）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "EEM:multi-period-cap"
+    bundle_trial_hypothesis = (
+        "EEM multi-period capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

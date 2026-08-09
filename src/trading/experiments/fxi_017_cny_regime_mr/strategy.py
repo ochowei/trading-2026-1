@@ -4,6 +4,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_017_cny_regime_mr.config import (
     FXI017Config,
@@ -14,8 +15,13 @@ from trading.experiments.fxi_017_cny_regime_mr.signal_detector import (
 )
 
 
-class FXI017CnyRegimeMRStrategy(ExecutionModelStrategy):
+class FXI017CnyRegimeMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-017：FXI-014 Att2 + FXI–CNY 貨幣 regime gate"""
+
+    bundle_trial_family = "FXI:cny-regime-mr"
+    bundle_trial_hypothesis = (
+        "FXI mean-reversion entries improve when CNY weakness does not confirm risk-off conditions."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（FXI 高流動 ETF）
 

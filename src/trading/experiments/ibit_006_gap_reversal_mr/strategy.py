@@ -8,6 +8,7 @@ IBIT-006: Gap-Down 資本化 + 日內反轉均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_006_gap_reversal_mr.config import (
     IBIT006Config,
@@ -18,8 +19,13 @@ from trading.experiments.ibit_006_gap_reversal_mr.signal_detector import (
 )
 
 
-class IBIT006Strategy(ExecutionModelStrategy):
+class IBIT006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-006：Gap-Down 資本化 + 日內反轉均值回歸"""
+
+    bundle_trial_family = "IBIT:gap-reversal-mr"
+    bundle_trial_hypothesis = (
+        "IBIT gap-down reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

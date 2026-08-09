@@ -8,6 +8,7 @@ TP +5% 匹配 IBIT-001 已驗證的 TP 上限。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_003_bb_squeeze_breakout.config import (
     IBITRsi5TrendConfig,
@@ -18,8 +19,13 @@ from trading.experiments.ibit_003_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class IBITBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class IBITBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-003：RSI(5) Trend Pullback 策略（含成交模型）"""
+
+    bundle_trial_family = "IBIT:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "IBIT trend pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

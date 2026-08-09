@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_014_postparabola_regime_mr.config import (
     URA014Config,
@@ -15,10 +16,15 @@ from trading.experiments.ura_014_postparabola_regime_mr.signal_detector import (
 )
 
 
-class URA014Strategy(ExecutionModelStrategy):
+class URA014Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA Post-Parabolic Long-Horizon Regime-Gated Capitulation MR (URA-014)"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "URA:postparabola-regime-mr"
+    bundle_trial_hypothesis = (
+        "URA post-parabolic regime filtering can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

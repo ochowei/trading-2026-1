@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_007_regime_vol_gate_mr.config import (
     TLT007Config,
@@ -12,10 +13,13 @@ from trading.experiments.tlt_007_regime_vol_gate_mr.signal_detector import (
 )
 
 
-class TLT007RegimeVolGateMRStrategy(ExecutionModelStrategy):
+class TLT007RegimeVolGateMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-007：波動率 regime 閘門均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+
+    bundle_trial_family = "TLT:regime-vol-gate-mr"
+    bundle_trial_hypothesis = "TLT volatility-regime-gated mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

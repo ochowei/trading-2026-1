@@ -28,6 +28,7 @@ VOO-006: Signal-Day Capitulation-Strength Filter Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.voo_006_signal_day_capitulation_mr.config import (
     VOO006Config,
@@ -38,8 +39,13 @@ from trading.experiments.voo_006_signal_day_capitulation_mr.signal_detector impo
 )
 
 
-class VOO006Strategy(ExecutionModelStrategy):
+class VOO006Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VOO Signal-Day Capitulation-Strength Filter MR (VOO-006)"""
+
+    bundle_trial_family = "VOO:capitulation-filter-mr"
+    bundle_trial_hypothesis = (
+        "VOO RSI(2) capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

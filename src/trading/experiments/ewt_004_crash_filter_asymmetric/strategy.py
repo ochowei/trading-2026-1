@@ -8,6 +8,7 @@ EWT-004: 2-Day Crash Filter + Asymmetric Exit Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_004_crash_filter_asymmetric.config import (
     EWT004Config,
@@ -18,8 +19,11 @@ from trading.experiments.ewt_004_crash_filter_asymmetric.signal_detector import 
 )
 
 
-class EWT004Strategy(ExecutionModelStrategy):
+class EWT004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT 2-Day Crash Filter + Asymmetric Exit MR (EWT-004)"""
+
+    bundle_trial_family = "EWT:crash-filter-asymmetric"
+    bundle_trial_hypothesis = "EWT crash-filtered asymmetric mean reversion can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

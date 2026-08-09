@@ -4,6 +4,7 @@ USO 深回檔 + RSI(2) + 2日急跌策略 (USO-010)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_010_deep_pullback.config import (
     USODeepPullbackConfig,
@@ -14,10 +15,14 @@ from trading.experiments.uso_010_deep_pullback.signal_detector import (
 )
 
 
-class USODeepPullbackStrategy(ExecutionModelStrategy):
+class USODeepPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-010：深回檔 + RSI(2) + 2日急跌"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "USO:deep-pullback"
+    bundle_trial_hypothesis = (
+        "USO deep-pullback RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_015_hyg_credit_divergence_mr.config import (
     TLT015Config,
@@ -12,10 +13,12 @@ from trading.experiments.tlt_015_hyg_credit_divergence_mr.signal_detector import
 )
 
 
-class TLT015HygCreditDivergenceMRStrategy(ExecutionModelStrategy):
+class TLT015HygCreditDivergenceMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-015：BB-width + ^MOVE + TLT-SPY + HYG-TLT divergence regime gate MR"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+    bundle_trial_family = "TLT:hyg-credit-divergence-mr"
+    bundle_trial_hypothesis = "TLT mean-reversion entries improve when HYG credit outperformance does not confirm risk-on weakness."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

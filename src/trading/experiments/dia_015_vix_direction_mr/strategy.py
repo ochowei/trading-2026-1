@@ -12,6 +12,7 @@ separator——建立 lesson #24 family 失敗邊界（鏡像 NVDA-018）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_015_vix_direction_mr.config import (
     DIA015Config,
@@ -22,10 +23,14 @@ from trading.experiments.dia_015_vix_direction_mr.signal_detector import (
 )
 
 
-class DIA015Strategy(ExecutionModelStrategy):
+class DIA015Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA ^VIX DIRECTION Regime-Gated MR (DIA-015)"""
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
+    bundle_trial_family = "DIA:vix-direction-mr"
+    bundle_trial_hypothesis = (
+        "DIA mean-reversion entries improve when VIX does not confirm an adverse volatility regime."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

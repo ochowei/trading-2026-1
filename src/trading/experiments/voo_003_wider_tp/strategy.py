@@ -7,6 +7,7 @@ TP 從 +2.5% 提升至 +3.0%，與 SPY-005 對齊。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.voo_003_wider_tp.config import (
     VOOWiderTPConfig,
@@ -17,7 +18,11 @@ from trading.experiments.voo_003_wider_tp.signal_detector import (
 )
 
 
-class VOOWiderTPStrategy(ExecutionModelStrategy):
+class VOOWiderTPStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "VOO:wider-tp"
+    bundle_trial_hypothesis = (
+        "VOO trend pullbacks can support a wider profit target without changing the entry signal."
+    )
     """VOO RSI(2) 寬獲利目標均值回歸 (VOO-003)"""
 
     def create_config(self) -> ExperimentConfig:

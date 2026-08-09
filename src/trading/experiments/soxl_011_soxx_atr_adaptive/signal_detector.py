@@ -15,15 +15,15 @@ ATR 過濾移除 3 個 Part A 訊號（2 好/1 壞），未改善基線
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.soxl_011_soxx_atr_adaptive.config import SOXLSoxxAtrConfig
 
 logger = logging.getLogger(__name__)
 
 
-class SOXLSoxxAtrDetector(BaseSignalDetector):
+class SOXLSoxxAtrDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """SOXL SOXX ATR-Adaptive 均值回歸訊號偵測器"""
 
     def __init__(self, config: SOXLSoxxAtrConfig):
@@ -52,23 +52,8 @@ class SOXLSoxxAtrDetector(BaseSignalDetector):
         tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
         return tr.rolling(window=period, min_periods=period).mean()
 
-    def _fetch_soxx_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載 SOXX 數據"""
-        try:
-            df = yf.download(
-                self.config.soxx_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.soxx_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.soxx_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """計算技術指標（SOXL + SOXX ATR）"""
@@ -82,23 +67,10 @@ class SOXLSoxxAtrDetector(BaseSignalDetector):
         df["Drop2D"] = df["Close"].pct_change(periods=2)
 
         # SOXX ATR ratio
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        soxx_df = self._fetch_soxx_data(start_date)
-
-        if soxx_df is not None:
-            common_idx = df.index.intersection(soxx_df.index)
-            soxx_aligned = soxx_df.loc[common_idx]
-
-            atr_fast = self._compute_atr(soxx_aligned, cfg.atr_fast_period)
-            atr_slow = self._compute_atr(soxx_aligned, cfg.atr_slow_period)
-            atr_ratio = atr_fast / atr_slow
-
-            df["SOXX_ATR_Ratio"] = pd.Series(index=df.index, dtype=float)
-            df.loc[common_idx, "SOXX_ATR_Ratio"] = atr_ratio
-            df["SOXX_ATR_Ratio"] = df["SOXX_ATR_Ratio"].ffill()
-        else:
-            logger.error("Unable to fetch SOXX data for ATR calculation")
-            df["SOXX_ATR_Ratio"] = 1.0
+        soxx_df = self.require_auxiliary(self.config.soxx_ticker, df.index)
+        atr_fast = self._compute_atr(soxx_df, cfg.atr_fast_period)
+        atr_slow = self._compute_atr(soxx_df, cfg.atr_slow_period)
+        df["SOXX_ATR_Ratio"] = atr_fast / atr_slow
 
         return df
 

@@ -14,6 +14,7 @@ SMA regime 過濾器疊加於 COPX-005 BB Squeeze Breakout 之上，並新增 re
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_011_regime_breakout.config import (
     COPX011Config,
@@ -24,10 +25,15 @@ from trading.experiments.copx_011_regime_breakout.signal_detector import (
 )
 
 
-class COPX011RegimeBreakoutStrategy(ExecutionModelStrategy):
+class COPX011RegimeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-011：多週期 regime 過濾 BB Squeeze Breakout（含成交模型）"""
 
     slippage_pct: float = 0.0015
+
+    bundle_trial_family = "COPX:regime-breakout"
+    bundle_trial_hypothesis = (
+        "COPX regime-aware breakout entries can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

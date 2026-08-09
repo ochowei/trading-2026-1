@@ -15,15 +15,15 @@ EWJ-007 最終訊號集。
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.ewj_007_vix_implied_vol_mr.config import EWJ007Config
 
 logger = logging.getLogger(__name__)
 
 
-class EWJ007SignalDetector(BaseSignalDetector):
+class EWJ007SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """
     EWJ ^VIX Forward-Looking Implied-Vol Regime-Gated MR 訊號偵測器
 
@@ -41,22 +41,8 @@ class EWJ007SignalDetector(BaseSignalDetector):
     def __init__(self, config: EWJ007Config):
         self.config = config
 
-    def _fetch_vix_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.vix_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.vix_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -102,24 +88,14 @@ class EWJ007SignalDetector(BaseSignalDetector):
         df["Ret_2d"] = df["Close"].pct_change(2)
 
         # ^VIX forward-looking implied vol gate（EWJ-007 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_df = self._fetch_vix_data(start_date)
-
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，^VIX 過濾停用", self.config.vix_ticker)
-            df["VIX_Close"] = float("nan")
-            df["VIX_Change_Nd"] = 0.0
-            df["VIX_Change_3d"] = 0.0
-            df["VIX_Change_5d"] = 0.0
-            df["VIX_Change_10d"] = 0.0
-        else:
-            vix_close = vix_df["Close"].reindex(df.index, method="ffill")
-            df["VIX_Close"] = vix_close
-            df["VIX_Change_Nd"] = vix_close.diff(self.config.vix_direction_lookback)
-            # 校準輔助欄位（lesson #24 規則 #3）：固定 3/5/10d 變化
-            df["VIX_Change_3d"] = vix_close.diff(3)
-            df["VIX_Change_5d"] = vix_close.diff(5)
-            df["VIX_Change_10d"] = vix_close.diff(10)
+        vix_df = self.require_auxiliary(self.config.vix_ticker, df.index)
+        vix_close = vix_df["Close"]
+        df["VIX_Close"] = vix_close
+        df["VIX_Change_Nd"] = vix_close.diff(self.config.vix_direction_lookback)
+        # 校準輔助欄位（lesson #24 規則 #3）：固定 3/5/10d 變化
+        df["VIX_Change_3d"] = vix_close.diff(3)
+        df["VIX_Change_5d"] = vix_close.diff(5)
+        df["VIX_Change_10d"] = vix_close.diff(10)
 
         return df
 

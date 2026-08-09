@@ -9,6 +9,7 @@ EWT-008: BB Lower Band + Pullback Cap Hybrid Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_008_bb_lower_pullback_cap.config import (
     EWT008Config,
@@ -19,8 +20,13 @@ from trading.experiments.ewt_008_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class EWT008Strategy(ExecutionModelStrategy):
+class EWT008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWT BB Lower + Pullback Cap Hybrid MR (EWT-008)"""
+
+    bundle_trial_family = "EWT:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = (
+        "EWT BB lower-band pullback caps can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

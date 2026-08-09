@@ -8,6 +8,7 @@ TSM Momentum Pullback Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_006_momentum_pullback.config import (
     TSMMomentumPullbackConfig,
@@ -18,7 +19,9 @@ from trading.experiments.tsm_006_momentum_pullback.signal_detector import (
 )
 
 
-class TSMMomentumPullbackStrategy(ExecutionModelStrategy):
+class TSMMomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSM:momentum-pullback"
+    bundle_trial_hypothesis = "TSM continuation entries improve when momentum remains positive through a controlled pullback."
     """TSM-006：Momentum Pullback 策略（含成交模型）"""
 
     slippage_pct: float = 0.001

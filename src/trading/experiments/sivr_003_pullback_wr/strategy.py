@@ -9,6 +9,7 @@ Exit uses fixed TP/SL (no trailing stop - proven ineffective for SIVR in SIVR-00
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_003_pullback_wr.config import (
     SIVRPullbackWRConfig,
@@ -19,8 +20,11 @@ from trading.experiments.sivr_003_pullback_wr.signal_detector import (
 )
 
 
-class SIVRPullbackWRStrategy(ExecutionModelStrategy):
+class SIVRPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-003：回檔 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "SIVR:pullback-wr"
+    bundle_trial_hypothesis = "SIVR pullback and Williams %R confirmation can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

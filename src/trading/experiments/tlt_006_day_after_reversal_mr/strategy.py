@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_006_day_after_reversal_mr.config import (
     TLT006Config,
@@ -12,10 +13,15 @@ from trading.experiments.tlt_006_day_after_reversal_mr.signal_detector import (
 )
 
 
-class TLTDayAfterReversalMRStrategy(ExecutionModelStrategy):
+class TLTDayAfterReversalMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-006：日後資本化 + 單K反轉"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 為高流動 ETF）
+
+    bundle_trial_family = "TLT:day-after-reversal-mr"
+    bundle_trial_hypothesis = (
+        "TLT day-after reversal mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

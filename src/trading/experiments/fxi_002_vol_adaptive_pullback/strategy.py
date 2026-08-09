@@ -7,6 +7,7 @@ FXI-002: Volatility-Adaptive Pullback + WR Mean Reversion
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_002_vol_adaptive_pullback.config import (
     FXI002Config,
@@ -17,8 +18,13 @@ from trading.experiments.fxi_002_vol_adaptive_pullback.signal_detector import (
 )
 
 
-class FXI002Strategy(ExecutionModelStrategy):
+class FXI002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI Volatility-Adaptive Pullback MR (FXI-002)"""
+
+    bundle_trial_family = "FXI:vol-adaptive-pullback"
+    bundle_trial_hypothesis = (
+        "FXI volatility-adaptive pullbacks can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

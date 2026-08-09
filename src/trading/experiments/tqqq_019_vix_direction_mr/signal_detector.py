@@ -13,9 +13,9 @@
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tqqq_018_regime_vol_gate.signal_detector import (
     TQQQ018SignalDetector,
 )
@@ -24,45 +24,23 @@ from trading.experiments.tqqq_019_vix_direction_mr.config import TQQQ019Config
 logger = logging.getLogger(__name__)
 
 
-class TQQQ019SignalDetector(BaseSignalDetector):
+class TQQQ019SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TQQQ-019：TQQQ-018 框架 + ^VIX direction filter"""
 
     def __init__(self, config: TQQQ019Config):
         self.config = config
         self._base_detector = TQQQ018SignalDetector(config)
 
-    def _fetch_vix_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.vix_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.vix_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = self._base_detector.compute_indicators(df)
 
         cfg = self.config
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_df = self._fetch_vix_data(start_date)
-
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，^VIX direction 過濾停用", cfg.vix_ticker)
-            df["VIX_Close"] = float("nan")
-            df["VIX_Direction_Change"] = 0.0
-        else:
-            vix_close = vix_df["Close"].reindex(df.index, method="ffill")
-            df["VIX_Close"] = vix_close
-            df["VIX_Direction_Change"] = vix_close.diff(cfg.vix_direction_lookback)
+        vix_close = self.require_auxiliary(cfg.vix_ticker, df.index)["Close"]
+        df["VIX_Close"] = vix_close
+        df["VIX_Direction_Change"] = vix_close.diff(cfg.vix_direction_lookback)
 
         return df
 

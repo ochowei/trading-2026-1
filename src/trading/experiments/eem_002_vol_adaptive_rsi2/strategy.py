@@ -8,6 +8,7 @@ sharp panic selling from slow drifts.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.eem_002_vol_adaptive_rsi2.config import (
     EEM002Config,
@@ -18,8 +19,13 @@ from trading.experiments.eem_002_vol_adaptive_rsi2.signal_detector import (
 )
 
 
-class EEM002Strategy(ExecutionModelStrategy):
+class EEM002Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """EEM 波動率自適應 RSI(2) 均值回歸 (EEM-002)"""
+
+    bundle_trial_family = "EEM:vol-adaptive-rsi2"
+    bundle_trial_hypothesis = (
+        "EEM volatility-adaptive RSI(2) can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

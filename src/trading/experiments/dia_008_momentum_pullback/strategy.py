@@ -8,6 +8,7 @@ DIA-008: 20-day Pullback Range + Williams %R
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_008_momentum_pullback.config import (
     DIA008PullbackRangeConfig,
@@ -18,8 +19,13 @@ from trading.experiments.dia_008_momentum_pullback.signal_detector import (
 )
 
 
-class DIA008MomentumPullbackStrategy(ExecutionModelStrategy):
+class DIA008MomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA 20-day Pullback Range + WR (DIA-008)"""
+
+    bundle_trial_family = "DIA:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "DIA momentum pullback continuation can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

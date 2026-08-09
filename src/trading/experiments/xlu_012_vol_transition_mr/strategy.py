@@ -9,6 +9,7 @@ XLU-012: Post-Capitulation Vol-Transition Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.xlu_012_vol_transition_mr.config import (
     XLU012Config,
@@ -19,10 +20,15 @@ from trading.experiments.xlu_012_vol_transition_mr.signal_detector import (
 )
 
 
-class XLU012Strategy(ExecutionModelStrategy):
+class XLU012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """XLU Post-Capitulation Vol-Transition MR (XLU-012)"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "XLU:vol-transition-mr"
+    bundle_trial_hypothesis = (
+        "XLU volatility-transition mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

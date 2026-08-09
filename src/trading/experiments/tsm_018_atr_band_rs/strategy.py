@@ -6,6 +6,7 @@ TSM-018: ATR(5)/ATR(20) BAND on RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_018_atr_band_rs.config import (
     TSMAtrBandRSConfig,
@@ -16,8 +17,13 @@ from trading.experiments.tsm_018_atr_band_rs.signal_detector import (
 )
 
 
-class TSMAtrBandRSStrategy(ExecutionModelStrategy):
+class TSMAtrBandRSStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-018：ATR(5)/ATR(20) BAND on RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:atr-band-rs"
+    bundle_trial_hypothesis = (
+        "TSM RS pullbacks improve when volatility acceleration stays within a band."
+    )
 
     slippage_pct: float = 0.001
 

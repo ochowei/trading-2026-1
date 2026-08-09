@@ -8,6 +8,7 @@ No trailing stop - fixed TP/SL symmetric exit.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_002_vol_adaptive_mr.config import (
     INDAVolAdaptiveMRConfig,
@@ -18,8 +19,13 @@ from trading.experiments.inda_002_vol_adaptive_mr.signal_detector import (
 )
 
 
-class INDAVolAdaptiveMRStrategy(ExecutionModelStrategy):
+class INDAVolAdaptiveMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA 波動率自適應均值回歸 (INDA-002)"""
+
+    bundle_trial_family = "INDA:vol-adaptive-mr"
+    bundle_trial_hypothesis = (
+        "INDA volatility-adaptive mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

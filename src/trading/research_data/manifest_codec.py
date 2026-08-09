@@ -8,6 +8,8 @@ from datetime import UTC, date, datetime
 
 from trading.market_data import (
     AvailabilityPolicy,
+    CoverageMode,
+    MarketDataCoveragePolicy,
     MarketDataSeries,
     SignalDecisionTime,
 )
@@ -38,41 +40,7 @@ def manifest_body(
             "session": decision_time.session.isoformat(),
             "decided_at": _timestamp(decision_time.decided_at),
         },
-        "data": [
-            {
-                "series": {
-                    "provider": entry.series.provider,
-                    "symbol": entry.series.symbol,
-                    "interval": entry.series.interval,
-                    "adjustment_policy": entry.series.adjustment_policy,
-                },
-                "history_start": entry.history_start.isoformat(),
-                "role": entry.role,
-                "availability_policy": (
-                    {
-                        "publication_lag_sessions": (
-                            entry.availability_policy.publication_lag_sessions
-                        ),
-                        "max_observation_lag_sessions": (
-                            entry.availability_policy.max_observation_lag_sessions
-                        ),
-                        "publication_time_known": (
-                            entry.availability_policy.publication_time_known
-                        ),
-                    }
-                    if entry.availability_policy
-                    else None
-                ),
-                "data_cutoff": entry.data_cutoff.isoformat(),
-                "full_refresh_at": _timestamp(entry.full_refresh_at),
-                "blob": {
-                    "digest": entry.blob.digest,
-                    "byte_count": entry.blob.byte_count,
-                    "row_count": entry.blob.row_count,
-                },
-            }
-            for entry in entries
-        ],
+        "data": [_data_entry_payload(entry) for entry in entries],
         "definition": (
             {
                 "digest": definition.digest,
@@ -83,6 +51,41 @@ def manifest_body(
             else None
         ),
     }
+
+
+def _data_entry_payload(entry: SnapshotDataRef) -> dict[str, object]:
+    """Serialize one data entry while preserving old default manifest bytes."""
+    payload: dict[str, object] = {
+        "series": {
+            "provider": entry.series.provider,
+            "symbol": entry.series.symbol,
+            "interval": entry.series.interval,
+            "adjustment_policy": entry.series.adjustment_policy,
+        },
+        "history_start": entry.history_start.isoformat(),
+        "role": entry.role,
+        "availability_policy": (
+            {
+                "publication_lag_sessions": entry.availability_policy.publication_lag_sessions,
+                "max_observation_lag_sessions": (
+                    entry.availability_policy.max_observation_lag_sessions
+                ),
+                "publication_time_known": entry.availability_policy.publication_time_known,
+            }
+            if entry.availability_policy
+            else None
+        ),
+        "data_cutoff": entry.data_cutoff.isoformat(),
+        "full_refresh_at": _timestamp(entry.full_refresh_at),
+        "blob": {
+            "digest": entry.blob.digest,
+            "byte_count": entry.blob.byte_count,
+            "row_count": entry.blob.row_count,
+        },
+    }
+    if entry.coverage_policy.mode is not CoverageMode.XNYS_SESSIONS:
+        payload["coverage_policy"] = entry.coverage_policy.mode.value
+    return payload
 
 
 def manifest_payload(manifest: SnapshotManifest) -> dict[str, object]:
@@ -163,6 +166,8 @@ def _manifest_from_payload(payload: dict[str, object]) -> SnapshotManifest:
             if raw_policy is not None
             else None
         )
+        raw_coverage = raw_entry.get("coverage_policy", CoverageMode.XNYS_SESSIONS.value)
+        coverage = MarketDataCoveragePolicy(_require_str(raw_coverage, "coverage_policy"))
         entries.append(
             SnapshotDataRef(
                 series=MarketDataSeries(
@@ -188,6 +193,7 @@ def _manifest_from_payload(payload: dict[str, object]) -> SnapshotManifest:
                     byte_count=_require_int(raw_blob["byte_count"], "byte_count"),
                     row_count=_require_int(raw_blob["row_count"], "row_count"),
                 ),
+                coverage_policy=coverage,
             )
         )
     raw_definition = payload.get("definition")

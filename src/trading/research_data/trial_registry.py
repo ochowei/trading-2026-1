@@ -18,10 +18,17 @@ from typing import Any
 from trading.research_data.artifacts import canonical_json_bytes
 
 TRIAL_REGISTRY_SCHEMA_VERSION = 1
-_FORMAL_RUN_MODES = frozenset({"online", "offline"})
+_FORMAL_RUN_MODES = frozenset({"online", "offline", "migration"})
 _OUTCOME_STATUSES = frozenset({"succeeded", "failed"})
 _VALIDITY_STATUSES = frozenset(
-    {"valid", "data-stale", "definition-stale", "unreproducible", "legacy"}
+    {
+        "valid",
+        "data-stale",
+        "definition-stale",
+        "unreproducible",
+        "legacy",
+        "migration-pending",
+    }
 )
 
 try:  # pragma: no cover - the project runs on POSIX, fallback keeps imports portable
@@ -54,6 +61,36 @@ class ExperimentTrialRegistry:
         """Read a verified registry state without changing it."""
         with self._locked():
             return copy.deepcopy(self._load_unlocked())
+
+    def has_valid_observation(self, definition_fingerprint: str) -> bool:
+        """Return whether a formal definition has a separate current-valid observation.
+
+        Migration observations deliberately use ``migration-pending`` and therefore cannot
+        satisfy this gate. The method is read-only and does not infer validity from a result
+        filename or from a legacy trial identity.
+        """
+        _require_text(definition_fingerprint, "definition_fingerprint")
+        state = self.read()
+        trials = _trials(state)
+        for trial in trials:
+            if (
+                trial.get("legacy") is True
+                or trial.get("definition_fingerprint") != definition_fingerprint
+            ):
+                continue
+            observations = trial.get("observations")
+            if not isinstance(observations, list):  # pragma: no cover - read validates state
+                continue
+            if any(
+                isinstance(observation, dict)
+                and observation.get("event") == "observation"
+                and observation.get("run_mode") in {"online", "offline"}
+                and observation.get("outcome_status") == "succeeded"
+                and observation.get("validity_status") == "valid"
+                for observation in observations
+            ):
+                return True
+        return False
 
     def register_trial(
         self,
@@ -473,7 +510,7 @@ def _validate_observation_statuses(
     failure_reason: object,
 ) -> None:
     if not isinstance(run_mode, str) or run_mode not in _FORMAL_RUN_MODES:
-        raise TrialRegistryError("observation run_mode must be online or offline")
+        raise TrialRegistryError("observation run_mode must be online, offline, or migration")
     if not isinstance(outcome_status, str) or outcome_status not in _OUTCOME_STATUSES:
         raise TrialRegistryError("observation outcome_status must be succeeded or failed")
     if validity_status is not None and (

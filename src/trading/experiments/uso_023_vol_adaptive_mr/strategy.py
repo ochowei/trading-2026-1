@@ -7,6 +7,7 @@ USO-013 框架 + ATR(5)/ATR(20) 波動率飆升過濾，目標改善 USO-013 Par
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_023_vol_adaptive_mr.config import (
     USO023Config,
@@ -17,10 +18,14 @@ from trading.experiments.uso_023_vol_adaptive_mr.signal_detector import (
 )
 
 
-class USO023Strategy(ExecutionModelStrategy):
+class USO023Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-023：波動率自適應均值回歸"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "USO:vol-adaptive-mr"
+    bundle_trial_hypothesis = (
+        "USO volatility-adaptive mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

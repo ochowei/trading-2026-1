@@ -6,6 +6,7 @@ TSM-017: Earnings-Date Exclusion Filter on RS Momentum Pullback 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_017_earnings_exclusion.config import (
     TSMEarningsExclusionConfig,
@@ -16,8 +17,11 @@ from trading.experiments.tsm_017_earnings_exclusion.signal_detector import (
 )
 
 
-class TSMEarningsExclusionStrategy(ExecutionModelStrategy):
+class TSMEarningsExclusionStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-017：Earnings-Date Exclusion Filter on RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:earnings-exclusion"
+    bundle_trial_hypothesis = "TSM RS pullbacks improve when known earnings windows are excluded."
 
     slippage_pct: float = 0.001
 

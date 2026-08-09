@@ -7,6 +7,7 @@ Based on NVDA-003 success, adapted for TSM volatility profile.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_005_bb_squeeze_breakout.config import (
     TSMBBSqueezeConfig,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_005_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class TSMBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class TSMBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-005: BB Squeeze Breakout Strategy (with execution model)"""
+
+    bundle_trial_family = "TSM:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "TSM volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0010  # 0.10% for TSM ADR
 

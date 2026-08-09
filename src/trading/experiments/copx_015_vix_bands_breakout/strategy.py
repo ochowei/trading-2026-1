@@ -10,6 +10,7 @@ gap 52.5%→7.1%）成功的 ^VIX FLOOR regime gate 跨資產移植至 COPX-011 
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_015_vix_bands_breakout.config import (
     COPX015Config,
@@ -20,8 +21,13 @@ from trading.experiments.copx_015_vix_bands_breakout.signal_detector import (
 )
 
 
-class COPX015VixBandsBreakoutStrategy(ExecutionModelStrategy):
+class COPX015VixBandsBreakoutStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-015：^VIX FLOOR + regime BOX BB Squeeze Breakout（含成交模型）"""
+
+    bundle_trial_family = "COPX:vix-bands-breakout"
+    bundle_trial_hypothesis = (
+        "COPX breakouts improve when VIX avoids the unstable middle volatility regime."
+    )
 
     slippage_pct: float = 0.0015
 

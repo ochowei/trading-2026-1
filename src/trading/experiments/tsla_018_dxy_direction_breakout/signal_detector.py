@@ -14,36 +14,22 @@ TSLA-018 訊號偵測器：DXY 5d Direction Filter on TSLA-QQQ Divergence BB Squ
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsla_018_dxy_direction_breakout.config import TSLA018Config
 
 logger = logging.getLogger(__name__)
 
 
-class TSLA018DXYDirectionBreakoutDetector(BaseSignalDetector):
+class TSLA018DXYDirectionBreakoutDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSLA-018：TSLA-017 Att3 框架 + DXY 5d direction filter"""
 
     def __init__(self, config: TSLA018Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.benchmark_ticker, self.config.dxy_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -82,30 +68,16 @@ class TSLA018DXYDirectionBreakoutDetector(BaseSignalDetector):
         df["TSLA_Ret_N"] = df["Close"].pct_change(div_n)
 
         # === QQQ benchmark cross-asset divergence（同 TSLA-017 Att3）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        bench_df = self._fetch_external(self.config.benchmark_ticker, start_date)
-        if bench_df is None or bench_df.empty:
-            logger.error(
-                "無法取得 %s 數據，cross-asset divergence 過濾停用",
-                self.config.benchmark_ticker,
-            )
-            df["Bench_Close"] = float("nan")
-            df["Bench_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            bench_close = bench_df["Close"].reindex(df.index, method="ffill")
-            df["Bench_Close"] = bench_close
-            df["Bench_Ret_N"] = bench_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["TSLA_Ret_N"] - df["Bench_Ret_N"]
+        bench_df = self.require_auxiliary(self.config.benchmark_ticker, df.index)
+        bench_close = bench_df["Close"]
+        df["Bench_Close"] = bench_close
+        df["Bench_Ret_N"] = bench_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["TSLA_Ret_N"] - df["Bench_Ret_N"]
 
         # === DXY direction filter（TSLA-018 核心）===
-        dxy_df = self._fetch_external(self.config.dxy_ticker, start_date)
-        if dxy_df is None or dxy_df.empty:
-            logger.error("無法取得 %s 數據，DXY 過濾停用", self.config.dxy_ticker)
-            df["DXY_PctChange_Nd"] = 0.0
-        else:
-            dxy_close = dxy_df["Close"].reindex(df.index, method="ffill")
-            df["DXY_PctChange_Nd"] = dxy_close.pct_change(self.config.dxy_lookback)
+        dxy_df = self.require_auxiliary(self.config.dxy_ticker, df.index)
+        dxy_close = dxy_df["Close"]
+        df["DXY_PctChange_Nd"] = dxy_close.pct_change(self.config.dxy_lookback)
 
         return df
 

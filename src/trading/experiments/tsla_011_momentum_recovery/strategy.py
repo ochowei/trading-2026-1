@@ -9,6 +9,7 @@ This is a breakout/momentum strategy, fundamentally different from mean reversio
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_011_momentum_recovery.config import (
     TSLABreakoutConfig,
@@ -19,7 +20,11 @@ from trading.experiments.tsla_011_momentum_recovery.signal_detector import (
 )
 
 
-class TSLAMomentumRecoveryStrategy(ExecutionModelStrategy):
+class TSLAMomentumRecoveryStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:momentum-recovery"
+    bundle_trial_hypothesis = (
+        "TSLA breakout recovery entries can be reproduced from a verified primary bundle."
+    )
     """TSLA-011：回檔後突破策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

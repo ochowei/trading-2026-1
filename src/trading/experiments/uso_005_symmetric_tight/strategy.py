@@ -5,6 +5,7 @@ USO 收緊出場 + 短持倉均值回歸策略 (USO-005)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_005_symmetric_tight.config import (
     USOSymmetricTightConfig,
@@ -15,10 +16,14 @@ from trading.experiments.uso_005_symmetric_tight.signal_detector import (
 )
 
 
-class USOSymmetricTightStrategy(ExecutionModelStrategy):
+class USOSymmetricTightStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-005：收緊出場 + 短持倉均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%
+    bundle_trial_family = "USO:symmetric-tight"
+    bundle_trial_hypothesis = (
+        "USO symmetric tight exits can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

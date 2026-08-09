@@ -7,6 +7,7 @@ DIA-010: RSI(5) 趨勢回調策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_010_rsi5_trend_pullback.config import (
     DIARsi5TrendPullbackConfig,
@@ -17,8 +18,13 @@ from trading.experiments.dia_010_rsi5_trend_pullback.signal_detector import (
 )
 
 
-class DIARsi5TrendPullbackStrategy(ExecutionModelStrategy):
+class DIARsi5TrendPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA RSI(5) 趨勢回調策略 (DIA-010)"""
+
+    bundle_trial_family = "DIA:rsi5-trend-pullback"
+    bundle_trial_hypothesis = (
+        "DIA RSI(5) trend pullbacks can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

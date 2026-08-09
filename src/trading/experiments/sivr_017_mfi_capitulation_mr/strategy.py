@@ -4,6 +4,7 @@ SIVR-017 Money Flow Index Capitulation Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_017_mfi_capitulation_mr.config import (
     SIVR017Config,
@@ -14,8 +15,13 @@ from trading.experiments.sivr_017_mfi_capitulation_mr.signal_detector import (
 )
 
 
-class SIVRMFICapitulationMRStrategy(ExecutionModelStrategy):
+class SIVRMFICapitulationMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-017：MFI volume-weighted capitulation 過濾於 SIVR-005 基礎進場"""
+
+    bundle_trial_family = "SIVR:mfi-capitulation-mr"
+    bundle_trial_hypothesis = (
+        "SIVR MFI capitulation filters can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

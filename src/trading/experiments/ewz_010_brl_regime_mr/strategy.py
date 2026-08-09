@@ -12,6 +12,7 @@ intrabar)。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewz_010_brl_regime_mr.config import (
     EWZ010Config,
@@ -22,10 +23,12 @@ from trading.experiments.ewz_010_brl_regime_mr.signal_detector import (
 )
 
 
-class EWZ010BrlRegimeMRStrategy(ExecutionModelStrategy):
+class EWZ010BrlRegimeMRStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """EWZ-010：EWZ-009 Att1 + EWZ–BRL 貨幣 regime gate"""
 
     slippage_pct: float = 0.001  # 0.1%（EWZ 高流動 ETF）
+    bundle_trial_family = "EWZ:brl-regime-mr"
+    bundle_trial_hypothesis = "EWZ mean-reversion entries improve when BRL currency regime does not confirm adverse EWZ weakness."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

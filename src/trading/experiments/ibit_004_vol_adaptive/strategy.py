@@ -7,6 +7,7 @@ IBIT-004: 波動率自適應 / 2日急跌均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ibit_004_vol_adaptive.config import (
     IBIT004Config,
@@ -17,8 +18,13 @@ from trading.experiments.ibit_004_vol_adaptive.signal_detector import (
 )
 
 
-class IBIT004Strategy(ExecutionModelStrategy):
+class IBIT004Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IBIT-004：波動率自適應 / 2日急跌均值回歸"""
+
+    bundle_trial_family = "IBIT:vol-adaptive"
+    bundle_trial_hypothesis = (
+        "IBIT volatility-adaptive reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15% 加密貨幣 ETF 滑價
 

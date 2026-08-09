@@ -8,6 +8,7 @@ SIVR BB Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_008_bb_squeeze_breakout.config import (
     SIVRBBSqueezeConfig,
@@ -18,8 +19,13 @@ from trading.experiments.sivr_008_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class SIVRBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class SIVRBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-008：BB Squeeze Breakout 策略（含成交模型）"""
+
+    bundle_trial_family = "SIVR:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "SIVR volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

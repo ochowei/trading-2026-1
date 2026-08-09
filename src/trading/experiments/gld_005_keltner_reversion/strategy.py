@@ -7,6 +7,7 @@ Exit uses GLD-004's trailing stop mechanism.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
     TrailingStopBacktester,
@@ -20,8 +21,13 @@ from trading.experiments.gld_005_keltner_reversion.signal_detector import (
 )
 
 
-class GLDKeltnerReversionStrategy(ExecutionModelStrategy):
+class GLDKeltnerReversionStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD Keltner 通道均值回歸策略 (GLD-005)"""
+
+    bundle_trial_family = "GLD:keltner-reversion"
+    bundle_trial_hypothesis = (
+        "GLD Keltner mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

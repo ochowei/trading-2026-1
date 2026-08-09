@@ -10,6 +10,7 @@ Part B Sharpe 0.56 優異，但 Part A 0.10 拖累整體。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_014_donchian_breakout.config import (
     SIVRDonchianBreakoutConfig,
@@ -20,8 +21,13 @@ from trading.experiments.sivr_014_donchian_breakout.signal_detector import (
 )
 
 
-class SIVRDonchianBreakoutStrategy(ExecutionModelStrategy):
+class SIVRDonchianBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-014：Donchian 通道突破"""
+
+    bundle_trial_family = "SIVR:donchian-breakout"
+    bundle_trial_hypothesis = (
+        "SIVR Donchian breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%
 

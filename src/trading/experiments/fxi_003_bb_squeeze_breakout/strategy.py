@@ -7,6 +7,7 @@ EEM-005 驗證有效的 BB Squeeze 框架移植至 FXI，測試突破策略在�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_003_bb_squeeze_breakout.config import (
     FXI003Config,
@@ -17,8 +18,13 @@ from trading.experiments.fxi_003_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class FXI003Strategy(ExecutionModelStrategy):
+class FXI003Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI BB 擠壓突破 (FXI-003)"""
+
+    bundle_trial_family = "FXI:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "FXI BB squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

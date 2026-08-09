@@ -11,6 +11,7 @@ Exit uses fixed TP/SL (no trailing stop - daily vol ~2% makes it ineffective).
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_001_pullback_wr.config import (
     FXIPullbackWRConfig,
@@ -21,8 +22,13 @@ from trading.experiments.fxi_001_pullback_wr.signal_detector import (
 )
 
 
-class FXIPullbackWRStrategy(ExecutionModelStrategy):
+class FXIPullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-001：回檔 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "FXI:pullback-wr"
+    bundle_trial_hypothesis = (
+        "FXI pullback mean reversion can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

@@ -6,6 +6,7 @@ IWM-009: Small-Cap Momentum Pullback (IWM/SPY)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_009_momentum_rotation.config import (
     IWM009Config,
@@ -16,10 +17,14 @@ from trading.experiments.iwm_009_momentum_rotation.signal_detector import (
 )
 
 
-class IWM009Strategy(ExecutionModelStrategy):
+class IWM009Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM-009：Small-Cap Momentum Pullback IWM/SPY（含成交模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "IWM:momentum-rotation"
+    bundle_trial_hypothesis = (
+        "IWM pullbacks improve when small-cap relative strength versus SPY remains positive."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

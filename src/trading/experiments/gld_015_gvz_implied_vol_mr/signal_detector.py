@@ -16,36 +16,22 @@ GLD GVZ Implied-Vol Forward-Looking Regime-Gated MR 訊號偵測器 (GLD-015)
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.gld_015_gvz_implied_vol_mr.config import GLD015Config
 
 logger = logging.getLogger(__name__)
 
 
-class GLD015SignalDetector(BaseSignalDetector):
+class GLD015SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """GLD-015：GLD-014 Att2 框架 + ^GVZ forward-looking implied vol regime gate"""
 
     def __init__(self, config: GLD015Config):
         self.config = config
 
-    def _fetch_gvz_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.gvz_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.gvz_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.gvz_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -71,17 +57,10 @@ class GLD015SignalDetector(BaseSignalDetector):
         df["Return_2d"] = df["Close"].pct_change(2)
 
         # ^GVZ forward-looking implied vol regime gate（GLD-015 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        gvz_df = self._fetch_gvz_data(start_date)
-
-        if gvz_df is None or gvz_df.empty:
-            logger.error("無法取得 %s 數據，^GVZ 過濾停用", self.config.gvz_ticker)
-            df["GVZ_Close"] = float("nan")
-            df["GVZ_Change_Nd"] = 0.0
-        else:
-            gvz_close = gvz_df["Close"].reindex(df.index, method="ffill")
-            df["GVZ_Close"] = gvz_close
-            df["GVZ_Change_Nd"] = gvz_close.diff(self.config.gvz_direction_lookback)
+        gvz_df = self.require_auxiliary(self.config.gvz_ticker, df.index)
+        gvz_close = gvz_df["Close"]
+        df["GVZ_Close"] = gvz_close
+        df["GVZ_Change_Nd"] = gvz_close.diff(self.config.gvz_direction_lookback)
 
         return df
 

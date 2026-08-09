@@ -5,6 +5,7 @@ NVDA-010: ADX-Filtered RSI(2) Mean Reversion 策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_010_adx_rsi2_mr.config import (
     NVDA010Config,
@@ -15,10 +16,14 @@ from trading.experiments.nvda_010_adx_rsi2_mr.signal_detector import (
 )
 
 
-class NVDA010ADXRsi2MRStrategy(ExecutionModelStrategy):
+class NVDA010ADXRsi2MRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """NVDA-010：ADX-Filtered RSI(2) Mean Reversion（含成交模型）"""
 
     slippage_pct: float = 0.0015
+    bundle_trial_family = "NVDA:adx-rsi2-mr"
+    bundle_trial_hypothesis = (
+        "NVDA ADX-filtered RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

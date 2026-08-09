@@ -7,6 +7,7 @@ SOXL BB Squeeze Breakout + Execution Model Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.soxl_009_bb_squeeze_breakout.config import (
@@ -18,7 +19,7 @@ from trading.experiments.soxl_009_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class SOXLBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class SOXLBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """
     SOXL BB 擠壓突破 + 成交模型策略 (SOXL-009)
 
@@ -26,6 +27,11 @@ class SOXLBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
     出場: TP +15% / SL -10% / 20 天
     成交模型: next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定
     """
+
+    bundle_trial_family = "SOXL:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "SOXL volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

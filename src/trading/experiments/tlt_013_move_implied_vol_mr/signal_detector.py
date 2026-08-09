@@ -14,36 +14,22 @@ TLT MOVE Implied-Vol Forward-Looking Regime-Gated MR 訊號偵測器 (TLT-013)
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tlt_013_move_implied_vol_mr.config import TLT013Config
 
 logger = logging.getLogger(__name__)
 
 
-class TLT013SignalDetector(BaseSignalDetector):
+class TLT013SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TLT-013：BB-width regime gate + ^MOVE forward-looking implied vol gate"""
 
     def __init__(self, config: TLT013Config):
         self.config = config
 
-    def _fetch_move_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.move_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.move_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.move_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -82,19 +68,11 @@ class TLT013SignalDetector(BaseSignalDetector):
         df["Prior_DD"] = df["Drawdown_N"].shift(self.config.prior_dd_lookback_offset)
 
         # ^MOVE forward-looking implied vol gate（TLT-013 核心新增）
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        move_df = self._fetch_move_data(start_date)
-
-        if move_df is None or move_df.empty:
-            logger.error("無法取得 %s 數據，^MOVE 過濾停用", self.config.move_ticker)
-            df["MOVE_Close"] = float("nan")
-            df["MOVE_Change_Nd"] = 0.0
-            df["MOVE_SMA"] = float("nan")
-        else:
-            move_close = move_df["Close"].reindex(df.index, method="ffill")
-            df["MOVE_Close"] = move_close
-            df["MOVE_Change_Nd"] = move_close.diff(self.config.move_direction_lookback)
-            df["MOVE_SMA"] = move_close.rolling(self.config.move_sma_window).mean()
+        move_df = self.require_auxiliary(self.config.move_ticker, df.index)
+        move_close = move_df["Close"]
+        df["MOVE_Close"] = move_close
+        df["MOVE_Change_Nd"] = move_close.diff(self.config.move_direction_lookback)
+        df["MOVE_SMA"] = move_close.rolling(self.config.move_sma_window).mean()
 
         return df
 

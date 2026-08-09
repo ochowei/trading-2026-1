@@ -9,6 +9,7 @@ TLT BB Squeeze Breakout Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_004_bb_squeeze_breakout.config import (
     TLTBBSqueezeConfig,
@@ -19,10 +20,15 @@ from trading.experiments.tlt_004_bb_squeeze_breakout.signal_detector import (
 )
 
 
-class TLTBBSqueezeBreakoutStrategy(ExecutionModelStrategy):
+class TLTBBSqueezeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-004：BB Squeeze Breakout 策略（含成交模型）"""
 
     slippage_pct: float = 0.001
+
+    bundle_trial_family = "TLT:bb-squeeze-breakout"
+    bundle_trial_hypothesis = (
+        "TLT volatility squeeze breakouts can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

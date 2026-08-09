@@ -37,6 +37,19 @@ def bars() -> pd.DataFrame:
     )
 
 
+def auxiliary_bars() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "Open": [9.0, 10.0, 11.0],
+            "High": [10.0, 12.0, 13.0],
+            "Low": [8.0, 9.0, 10.0],
+            "Close": [9.0, 11.0, 12.0],
+            "Volume": [90.0, 100.0, 200.0],
+        },
+        index=pd.to_datetime(["2026-07-31", "2026-08-03", "2026-08-04"]),
+    )
+
+
 def test_identical_complete_cache_bytes_share_one_immutable_data_blob(tmp_path) -> None:
     cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
     first_series = MarketDataSeries.yahoo_adjusted_daily("SPY")
@@ -105,13 +118,18 @@ def test_snapshot_manifest_records_every_declared_series_and_policy(tmp_path) ->
     cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
     primary = MarketDataSeries.yahoo_adjusted_daily("SPY")
     auxiliary = MarketDataSeries.yahoo_adjusted_daily("^VIX")
-    for series in (primary, auxiliary):
-        cache.publish(
-            series,
-            bars(),
-            refresh_kind=RefreshKind.FULL,
-            refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
-        )
+    cache.publish(
+        primary,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    cache.publish(
+        auxiliary,
+        auxiliary_bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
     policy = AvailabilityPolicy(
         publication_lag_sessions=1,
         max_observation_lag_sessions=2,
@@ -222,13 +240,18 @@ def test_snapshot_manifest_reconstructs_policy_safe_bundle_without_provider(tmp_
     cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
     primary = MarketDataSeries.yahoo_adjusted_daily("SPY")
     auxiliary = MarketDataSeries.yahoo_adjusted_daily("^VIX")
-    for series in (primary, auxiliary):
-        cache.publish(
-            series,
-            bars(),
-            refresh_kind=RefreshKind.FULL,
-            refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
-        )
+    cache.publish(
+        primary,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    cache.publish(
+        auxiliary,
+        auxiliary_bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
     requirements = (
         MarketDataRequirement(primary, date(2026, 8, 3), role="primary"),
         MarketDataRequirement(
@@ -255,7 +278,14 @@ def test_snapshot_manifest_reconstructs_policy_safe_bundle_without_provider(tmp_
 
     assert loaded.manifest == manifest
     assert list(loaded.bundle[primary].index) == list(bars().index)
-    assert list(loaded.bundle[auxiliary]["ObservationDate"]) == [pd.Timestamp("2026-08-03")]
+    assert list(loaded.bundle[auxiliary]["ObservationDate"]) == [
+        pd.Timestamp("2026-07-31"),
+        pd.Timestamp("2026-08-03"),
+    ]
+    assert list(loaded.bundle[auxiliary].index) == [
+        pd.Timestamp("2026-08-03"),
+        pd.Timestamp("2026-08-04"),
+    ]
 
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
     payload["data"][0]["data_cutoff"] = "2026-08-03"

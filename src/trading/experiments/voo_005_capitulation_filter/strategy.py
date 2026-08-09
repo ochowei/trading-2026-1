@@ -25,6 +25,7 @@ Acceptance criteria：
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.voo_005_capitulation_filter.config import (
     VOO005Config,
@@ -35,8 +36,13 @@ from trading.experiments.voo_005_capitulation_filter.signal_detector import (
 )
 
 
-class VOO005Strategy(ExecutionModelStrategy):
+class VOO005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """VOO Signal-Day Capitulation-Strength Filter MR (VOO-005)"""
+
+    bundle_trial_family = "VOO:capitulation-filter"
+    bundle_trial_hypothesis = (
+        "VOO signal-day capitulation filtering can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

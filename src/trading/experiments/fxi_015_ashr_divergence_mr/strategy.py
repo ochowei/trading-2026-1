@@ -5,6 +5,7 @@ Uses ExecutionModelBacktester (next-open + 0.1% slippage + pessimistic intrabar)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_015_ashr_divergence_mr.config import (
     FXI015Config,
@@ -15,8 +16,13 @@ from trading.experiments.fxi_015_ashr_divergence_mr.signal_detector import (
 )
 
 
-class FXI015Strategy(ExecutionModelStrategy):
+class FXI015Strategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-ASHR Cross-Asset Divergence MR (FXI-015)"""
+
+    bundle_trial_family = "FXI:ashr-divergence-mr"
+    bundle_trial_hypothesis = (
+        "FXI mean-reversion entries improve when FXI weakness versus ASHR is contained."
+    )
 
     slippage_pct: float = 0.001
 

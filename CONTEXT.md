@@ -12,6 +12,18 @@ _Avoid_: Raw bar, intraday bar, adjusted close only
 A research definition's declaration of one primary or auxiliary market-data series and the history needed before execution begins.
 _Avoid_: Runtime download, optional ticker, hidden detector dependency
 
+**Market Data Declaration**:
+The complete preregistered set of market-data requirements for one experiment execution, with exactly one primary series and any explicitly governed auxiliary series.
+_Avoid_: A single ticker setting, an inferred detector dependency, a runtime download request
+
+**Observation Coverage Policy**:
+A market-data requirement's explicit rule for validating observation dates: primary series use complete XNYS sessions, while auxiliary series may opt into sparse provider-observation coverage when their availability policy governs as-of alignment.
+_Avoid_: An inferred exchange calendar, an implicit forward fill, a freshness guarantee
+
+**Decision Session Sequence**:
+The ordered primary-session decisions for one research execution against which auxiliary observations are evaluated for information availability.
+_Avoid_: Provider response order, cache row order, an unbounded future observation
+
 **Signal Decision Time**:
 The cutoff at which all information used to produce a strategy signal must already have been available.
 _Avoid_: Bar date, order time, data download time
@@ -31,6 +43,22 @@ _Avoid_: Data cache, detector-owned download
 **Data-Access Migration Parity**:
 The requirement that moving an experiment from hidden downloads to a declared market-data bundle preserve its signals, indicators, and trades on the same research data snapshot except for explicitly explained corrections.
 _Avoid_: Similar aggregate performance, successful execution
+
+**Provider Boundary**:
+The single system boundary where externally sourced market data may be obtained; research logic consumes declared observations instead of contacting an external provider.
+_Avoid_: Detector download, strategy-owned data access, cache as provider
+
+**Direct Data-Access Bypass**:
+Any experiment-owned path that obtains market data outside its declared research-data bundle, including a hidden provider call or an indirect legacy reader.
+_Avoid_: A declared market-data requirement, an offline bundle read
+
+**Legacy Market-Data Allowlist**:
+The temporary, explicitly identified set of unmigrated data-access bypasses that may remain historical compatibility evidence during migration.
+_Avoid_: Permanent exemption, qualification approval, new-entry authorization
+
+**Monotonic Allowlist Shrink**:
+The migration rule that a legacy allowlist may retain or remove an existing identity but may never add or rename one to conceal a new bypass.
+_Avoid_: Mutable exception list, bypass inventory refresh
 
 **Market Data Cache**:
 A disposable, current working copy of externally sourced market data used to avoid repeated retrieval. It may be refreshed or rebuilt and is not evidence that a research result can be reproduced.
@@ -133,6 +161,14 @@ _Avoid_: Buy-and-hold, cash benchmark, shuffled returns
 **Research Definition**:
 The resolved strategy, signal, execution, and computational inputs whose semantics determine an experiment outcome.
 _Avoid_: Experiment name, source file, display configuration
+
+**Snapshot-Aware Experiment**:
+An experiment that declares all outcome-relevant market-data dependencies before execution and consumes only the verified immutable data supplied for that run.
+_Avoid_: Experiment with a cache, experiment with a hidden auxiliary download
+
+**Legacy/Unmigrated Experiment**:
+An experiment that has not yet adopted the snapshot-aware contract and therefore remains historical compatibility evidence until a new definition is formally evaluated.
+_Avoid_: Current qualified experiment, automatically grandfathered strategy
 
 **Research-Definition Fingerprint**:
 A semantic identity for a research definition that ignores non-behavioral source changes and conservatively changes whenever outcome-relevant behavior may have changed.

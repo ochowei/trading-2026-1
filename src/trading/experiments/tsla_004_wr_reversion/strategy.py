@@ -7,6 +7,7 @@ TSLA Williams %R Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_004_wr_reversion.config import (
     TSLAWRReversionConfig,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_004_wr_reversion.signal_detector import (
 )
 
 
-class TSLAWRReversionStrategy(ExecutionModelStrategy):
+class TSLAWRReversionStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:wr-reversion"
+    bundle_trial_hypothesis = (
+        "TSLA Williams %R mean reversion can be reproduced from a verified primary bundle."
+    )
     """TSLA-004：Williams %R 均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015

@@ -12,9 +12,9 @@ EEM-006 Signal Detector: Relative Strength Momentum Pullback
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.eem_006_rs_momentum_pullback.config import (
     EEMRSMomentumConfig,
 )
@@ -22,47 +22,20 @@ from trading.experiments.eem_006_rs_momentum_pullback.config import (
 logger = logging.getLogger(__name__)
 
 
-class EEMRSMomentumDetector(BaseSignalDetector):
+class EEMRSMomentumDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """EEM RS Momentum Pullback 訊號偵測器"""
 
     def __init__(self, config: EEMRSMomentumConfig):
         self.config = config
 
-    def _fetch_reference_data(self, start_date: str) -> pd.DataFrame | None:
-        """下載參考標的（SPY）數據"""
-        try:
-            df = yf.download(
-                self.config.reference_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.reference_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.reference_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
-        # 下載 SPY 數據
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        spy_df = self._fetch_reference_data(start_date)
-
-        if spy_df is None or spy_df.empty:
-            logger.error("無法取得 SPY 數據，無法計算相對強度")
-            df["Relative_Strength"] = 0.0
-            df["Pullback_5d"] = 0.0
-            df["SMA_Trend"] = df["Close"]
-            return df
-
-        # 對齊日期（取交集）
-        common_idx = df.index.intersection(spy_df.index)
-        df = df.loc[common_idx]
+        # The verified bundle supplies SPY aligned as-of to every primary decision session.
+        spy_df = self.require_auxiliary(self.config.reference_ticker, df.index)
 
         # SMA trend
         df["SMA_Trend"] = df["Close"].rolling(self.config.sma_trend_period).mean()
@@ -70,7 +43,7 @@ class EEMRSMomentumDetector(BaseSignalDetector):
         # EEM 和 SPY 的 20日報酬
         period = self.config.relative_strength_period
         df["EEM_Return"] = df["Close"].pct_change(period)
-        df["SPY_Return"] = spy_df.loc[common_idx, "Close"].pct_change(period)
+        df["SPY_Return"] = spy_df["Close"].pct_change(period)
 
         # 相對強度 = EEM 報酬 - SPY 報酬
         df["Relative_Strength"] = df["EEM_Return"] - df["SPY_Return"]

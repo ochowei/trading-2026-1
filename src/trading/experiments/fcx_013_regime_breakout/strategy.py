@@ -8,6 +8,7 @@ multi-week SMA regime 過濾器疊加於 FCX-004 BB Squeeze Breakout 之上，�
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fcx_013_regime_breakout.config import (
     FCX013Config,
@@ -18,8 +19,13 @@ from trading.experiments.fcx_013_regime_breakout.signal_detector import (
 )
 
 
-class FCX013RegimeBreakoutStrategy(ExecutionModelStrategy):
+class FCX013RegimeBreakoutStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FCX-013：多週期 regime 過濾 BB Squeeze Breakout（含成交模型）"""
+
+    bundle_trial_family = "FCX:regime-breakout"
+    bundle_trial_hypothesis = (
+        "FCX regime-filtered breakouts can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015
 

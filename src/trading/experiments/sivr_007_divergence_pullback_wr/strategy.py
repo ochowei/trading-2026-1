@@ -7,6 +7,7 @@ SIVR 20日回檔範圍 + Williams %R 均值回歸策略
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.sivr_007_divergence_pullback_wr.config import (
     SIVRDivergencePullbackWRConfig,
@@ -17,8 +18,13 @@ from trading.experiments.sivr_007_divergence_pullback_wr.signal_detector import 
 )
 
 
-class SIVRDivergencePullbackWRStrategy(ExecutionModelStrategy):
+class SIVRDivergencePullbackWRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SIVR-007：20日回檔範圍 + Williams %R 均值回歸"""
+
+    bundle_trial_family = "SIVR:divergence-pullback-wr"
+    bundle_trial_hypothesis = (
+        "SIVR longer-window pullback confirmation can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（SIVR 流動性較 GLD 低）
 

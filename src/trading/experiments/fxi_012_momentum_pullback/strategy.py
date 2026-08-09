@@ -16,6 +16,7 @@ FXI-012: Momentum Breakout Pullback Continuation Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.fxi_012_momentum_pullback.config import (
     FXI012Config,
@@ -26,8 +27,13 @@ from trading.experiments.fxi_012_momentum_pullback.signal_detector import (
 )
 
 
-class FXI012Strategy(ExecutionModelStrategy):
+class FXI012Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """FXI-012：Donchian 動量突破回檔連續進場"""
+
+    bundle_trial_family = "FXI:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "FXI momentum pullback continuation can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%（單一國家 EM ETF 標準）
 

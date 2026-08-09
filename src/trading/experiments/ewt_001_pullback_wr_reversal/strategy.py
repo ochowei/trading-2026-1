@@ -8,6 +8,7 @@ Exit uses trailing stop mechanism.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ewt_001_pullback_wr_reversal.config import (
     EWTPullbackWRReversalConfig,
@@ -21,7 +22,11 @@ from trading.experiments.gld_003_trailing_stop.trailing_backtester import (
 )
 
 
-class EWTPullbackWRReversalStrategy(ExecutionModelStrategy):
+class EWTPullbackWRReversalStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "EWT:pullback-wr-reversal"
+    bundle_trial_hypothesis = (
+        "EWT pullback and Williams %R oversold signals improve with reversal-candle confirmation."
+    )
     """EWT 回檔 + Williams %R + 反轉K線均值回歸策略 (EWT-001)"""
 
     def create_config(self) -> ExperimentConfig:

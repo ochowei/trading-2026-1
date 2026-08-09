@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tlt_010_capitulation_regime_mr.config import (
     TLT010Config,
@@ -12,10 +13,15 @@ from trading.experiments.tlt_010_capitulation_regime_mr.signal_detector import (
 )
 
 
-class TLT010CapitulationRegimeMRStrategy(ExecutionModelStrategy):
+class TLT010CapitulationRegimeMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TLT-010：2 日急跌確認 + 波動率 regime 閘門均值回歸"""
 
     slippage_pct: float = 0.001  # 0.1%（TLT 高流動 ETF）
+
+    bundle_trial_family = "TLT:capitulation-regime-mr"
+    bundle_trial_hypothesis = (
+        "TLT capitulation regime mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

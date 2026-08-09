@@ -10,6 +10,7 @@ bull-regime gate 反向移除）。
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.dia_017_trend_regime_gate_mr.config import (
     DIA017Config,
@@ -20,8 +21,13 @@ from trading.experiments.dia_017_trend_regime_gate_mr.signal_detector import (
 )
 
 
-class DIA017Strategy(ExecutionModelStrategy):
+class DIA017Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """DIA Buffered Multi-Week SMA Trend-Regime-Gated MR (DIA-017)"""
+
+    bundle_trial_family = "DIA:trend-regime-gate-mr"
+    bundle_trial_hypothesis = (
+        "DIA trend-regime gating can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

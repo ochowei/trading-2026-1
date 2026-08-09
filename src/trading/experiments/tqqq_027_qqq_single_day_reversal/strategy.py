@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_027_qqq_single_day_reversal.config import (
@@ -13,7 +14,12 @@ from trading.experiments.tqqq_027_qqq_single_day_reversal.signal_detector import
 )
 
 
-class TQQQ027QqqReversalStrategy(ExecutionModelStrategy):
+class TQQQ027QqqReversalStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:qqq-single-day-reversal"
+    bundle_trial_hypothesis = (
+        "QQQ single-day momentum reversal can time short-term TQQQ mean reversion."
+    )
+
     """TQQQ-027：QQQ 單日動量反轉 → 交易 TQQQ（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定

@@ -15,36 +15,22 @@ INDA-013 訊號偵測器：Broad-EM Macro-Context-Confirmed Vol-Transition MR
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.inda_013_broad_em_confirmed_mr.config import INDA013Config
 
 logger = logging.getLogger(__name__)
 
 
-class INDA013SignalDetector(BaseSignalDetector):
+class INDA013SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """INDA-013：inda_010 框架 + broad-EM macro context confirmation gate"""
 
     def __init__(self, config: INDA013Config):
         self.config = config
 
-    def _fetch_broad_em(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.broad_em_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.broad_em_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.broad_em_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -78,14 +64,8 @@ class INDA013SignalDetector(BaseSignalDetector):
         df["Return_2d"] = df["Close"].pct_change(2)
 
         # INDA-013：broad-EM macro context (EEM N 日報酬)
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        em_df = self._fetch_broad_em(start_date)
-        if em_df is None or em_df.empty:
-            logger.error("無法取得 %s，broad-EM gate 停用", self.config.broad_em_ticker)
-            df["EEM_Return_N"] = -999.0
-        else:
-            em_close = em_df["Close"].reindex(df.index, method="ffill")
-            df["EEM_Return_N"] = em_close.pct_change(self.config.eem_lookback)
+        em_df = self.require_auxiliary(self.config.broad_em_ticker, df.index)
+        df["EEM_Return_N"] = em_df["Close"].pct_change(self.config.eem_lookback)
 
         return df
 

@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_016_vol_level_gate_mr.config import (
     CIBR016Config,
@@ -12,8 +13,13 @@ from trading.experiments.cibr_016_vol_level_gate_mr.signal_detector import (
 )
 
 
-class CIBR016Strategy(ExecutionModelStrategy):
+class CIBR016Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-016：CIBR-008 框架 + 絕對波動率 LEVEL regime 閘門（執行模型）"""
+
+    bundle_trial_family = "CIBR:vol-level-gate-mr"
+    bundle_trial_hypothesis = (
+        "CIBR absolute volatility regime gating can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001
 

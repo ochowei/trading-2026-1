@@ -8,6 +8,7 @@ URA 相對 XLE 有超額表現時買入回調，
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.ura_006_trend_pullback.config import (
     URATrendPullbackConfig,
@@ -18,8 +19,13 @@ from trading.experiments.ura_006_trend_pullback.signal_detector import (
 )
 
 
-class URATrendPullbackStrategy(ExecutionModelStrategy):
+class URATrendPullbackStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """URA-006：相對強度回調買入（含成交模型）"""
+
+    bundle_trial_family = "URA:rs-pullback"
+    bundle_trial_hypothesis = (
+        "URA pullback entries improve when uranium shows relative strength versus XLE."
+    )
 
     slippage_pct: float = 0.0015  # 0.15%
 

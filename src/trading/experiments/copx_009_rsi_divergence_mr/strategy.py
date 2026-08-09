@@ -7,6 +7,7 @@ COPX-009: RSI Bullish Divergence + Pullback+WR+ATR Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_009_rsi_divergence_mr.config import (
     COPX009Config,
@@ -17,10 +18,15 @@ from trading.experiments.copx_009_rsi_divergence_mr.signal_detector import (
 )
 
 
-class COPX009Strategy(ExecutionModelStrategy):
+class COPX009Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-009：RSI bullish divergence + pullback+WR+ATR 均值回歸"""
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
+
+    bundle_trial_family = "COPX:rsi-divergence-mr"
+    bundle_trial_hypothesis = (
+        "COPX RSI divergence mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

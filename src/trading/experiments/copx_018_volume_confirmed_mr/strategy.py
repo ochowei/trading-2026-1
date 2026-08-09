@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.copx_018_volume_confirmed_mr.config import (
     COPX018Config,
@@ -12,10 +13,15 @@ from trading.experiments.copx_018_volume_confirmed_mr.signal_detector import (
 )
 
 
-class COPX018VolumeConfirmedMRStrategy(ExecutionModelStrategy):
+class COPX018VolumeConfirmedMRStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """COPX-018: vol-adaptive MR + volume-surge confirmation gate"""
 
     slippage_pct: float = 0.0015  # 0.15% 商品 ETF 滑價
+
+    bundle_trial_family = "COPX:volume-confirmed-mr"
+    bundle_trial_hypothesis = (
+        "COPX volume-confirmed mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

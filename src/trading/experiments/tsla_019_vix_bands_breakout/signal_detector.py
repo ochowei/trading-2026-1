@@ -15,36 +15,22 @@ TSLA-019 訊號偵測器：^VIX BANDS Regime Gate on TSLA-017 Att3 BB Squeeze Br
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.tsla_019_vix_bands_breakout.config import TSLA019Config
 
 logger = logging.getLogger(__name__)
 
 
-class TSLA019VixBandsBreakoutDetector(BaseSignalDetector):
+class TSLA019VixBandsBreakoutDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """TSLA-019：^VIX BANDS regime gate + TSLA-017 Att3 cross-asset divergence breakout"""
 
     def __init__(self, config: TSLA019Config):
         self.config = config
 
-    def _fetch_external(self, ticker: str, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.benchmark_ticker, self.config.vix_ticker)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -83,29 +69,15 @@ class TSLA019VixBandsBreakoutDetector(BaseSignalDetector):
         df["TSLA_Ret_N"] = df["Close"].pct_change(div_n)
 
         # === QQQ benchmark cross-asset divergence regime gate（同 TSLA-017）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        bench_df = self._fetch_external(self.config.benchmark_ticker, start_date)
-        if bench_df is None or bench_df.empty:
-            logger.error(
-                "無法取得 %s 數據，cross-asset divergence 過濾停用",
-                self.config.benchmark_ticker,
-            )
-            df["Bench_Close"] = float("nan")
-            df["Bench_Ret_N"] = 0.0
-            df["Rel_Return_N"] = 0.0
-        else:
-            bench_close = bench_df["Close"].reindex(df.index, method="ffill")
-            df["Bench_Close"] = bench_close
-            df["Bench_Ret_N"] = bench_close.pct_change(div_n)
-            df["Rel_Return_N"] = df["TSLA_Ret_N"] - df["Bench_Ret_N"]
+        bench_df = self.require_auxiliary(self.config.benchmark_ticker, df.index)
+        bench_close = bench_df["Close"]
+        df["Bench_Close"] = bench_close
+        df["Bench_Ret_N"] = bench_close.pct_change(div_n)
+        df["Rel_Return_N"] = df["TSLA_Ret_N"] - df["Bench_Ret_N"]
 
         # === ^VIX BANDS gate（TSLA-019 核心新增）===
-        vix_df = self._fetch_external(self.config.vix_ticker, start_date)
-        if vix_df is None or vix_df.empty:
-            logger.error("無法取得 %s 數據，VIX BANDS 過濾停用", self.config.vix_ticker)
-            df["VIX_Close"] = float("nan")
-        else:
-            df["VIX_Close"] = vix_df["Close"].reindex(df.index, method="ffill")
+        vix_df = self.require_auxiliary(self.config.vix_ticker, df.index)
+        df["VIX_Close"] = vix_df["Close"]
 
         return df
 

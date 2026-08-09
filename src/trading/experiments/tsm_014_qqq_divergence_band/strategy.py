@@ -9,6 +9,7 @@ cross-asset divergence regime gate 從單向 CEILING/FLOOR 擴展為雙向 BAND 
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_014_qqq_divergence_band.config import (
     TSM014Config,
@@ -19,8 +20,13 @@ from trading.experiments.tsm_014_qqq_divergence_band.signal_detector import (
 )
 
 
-class TSM014QQQDivergenceBandStrategy(ExecutionModelStrategy):
+class TSM014QQQDivergenceBandStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM-014：TSM-QQQ 跨資產背離 BAND regime gate + RS Momentum Pullback（含成交模型）"""
+
+    bundle_trial_family = "TSM:qqq-divergence-band"
+    bundle_trial_hypothesis = (
+        "TSM RS pullbacks improve when TSM-QQQ relative returns stay inside a stable band."
+    )
 
     slippage_pct: float = 0.001
 

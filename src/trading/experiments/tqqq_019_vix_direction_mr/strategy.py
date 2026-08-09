@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_backtester import ExecutionModelBacktester
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tqqq_019_vix_direction_mr.config import (
@@ -13,7 +14,10 @@ from trading.experiments.tqqq_019_vix_direction_mr.signal_detector import (
 )
 
 
-class TQQQ019VixDirectionStrategy(ExecutionModelStrategy):
+class TQQQ019VixDirectionStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TQQQ:vix-direction-filter"
+    bundle_trial_hypothesis = "TQQQ capitulation entries improve when ^VIX direction confirms a stabilizing volatility regime."
+
     """TQQQ-019：TQQQ-018 框架 + ^VIX direction filter（含成交模型）
 
     成交模型：next_open_market 進場、limit_order 止盈、stop_market 停損、悲觀認定

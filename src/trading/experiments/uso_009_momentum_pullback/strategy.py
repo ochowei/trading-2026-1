@@ -4,6 +4,7 @@ USO 回檔 + RSI(2) + 2日急跌策略 (USO-009)
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_009_momentum_pullback.config import (
     USOMomentumPullbackConfig,
@@ -14,7 +15,11 @@ from trading.experiments.uso_009_momentum_pullback.signal_detector import (
 )
 
 
-class USOMomentumPullbackStrategy(ExecutionModelStrategy):
+class USOMomentumPullbackStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "USO:momentum-pullback"
+    bundle_trial_hypothesis = (
+        "USO continuation entries improve when momentum survives a measured pullback."
+    )
     """USO-009：回檔 + RSI(2) + 2日急跌"""
 
     slippage_pct: float = 0.001

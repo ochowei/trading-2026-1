@@ -7,6 +7,7 @@ IWM-005: RSI(2) 極端超賣均值回歸（縮短持倉測試）
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.iwm_005_shorter_hold.config import (
     IWM005Config,
@@ -17,8 +18,13 @@ from trading.experiments.iwm_005_shorter_hold.signal_detector import (
 )
 
 
-class IWM005Strategy(ExecutionModelStrategy):
+class IWM005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """IWM RSI(2) 縮短持倉測試 (IWM-005)"""
+
+    bundle_trial_family = "IWM:shorter-hold"
+    bundle_trial_hypothesis = (
+        "IWM shorter-hold RSI(2) mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

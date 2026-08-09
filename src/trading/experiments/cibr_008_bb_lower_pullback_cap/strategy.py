@@ -7,6 +7,7 @@ CIBR-008: BB Lower Band + Pullback Cap Hybrid Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.cibr_008_bb_lower_pullback_cap.config import (
     CIBR008Config,
@@ -17,8 +18,13 @@ from trading.experiments.cibr_008_bb_lower_pullback_cap.signal_detector import (
 )
 
 
-class CIBR008Strategy(ExecutionModelStrategy):
+class CIBR008Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """CIBR-008：BB 下軌 + 回檔上限混合進場"""
+
+    bundle_trial_family = "CIBR:bb-lower-pullback-cap"
+    bundle_trial_hypothesis = (
+        "CIBR BB lower-band entries improve with a pullback cap on a verified primary bundle."
+    )
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

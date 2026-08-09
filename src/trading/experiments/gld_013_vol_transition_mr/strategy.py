@@ -9,6 +9,7 @@ GLD-013: Post-Capitulation Vol-Transition Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.gld_013_vol_transition_mr.config import (
     GLD013Config,
@@ -19,8 +20,11 @@ from trading.experiments.gld_013_vol_transition_mr.signal_detector import (
 )
 
 
-class GLD013Strategy(ExecutionModelStrategy):
+class GLD013Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """GLD Post-Capitulation Vol-Transition MR (GLD-013)"""
+
+    bundle_trial_family = "GLD:vol-transition-mr"
+    bundle_trial_hypothesis = "GLD post-capitulation volatility transition can be reproduced from a verified primary bundle."
 
     slippage_pct: float = 0.001  # 0.1%（ETF 標準滑價）
 

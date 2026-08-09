@@ -2,6 +2,7 @@
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.uso_029_trend_pullback_continuation.config import (
     USO029Config,
@@ -12,10 +13,12 @@ from trading.experiments.uso_029_trend_pullback_continuation.signal_detector imp
 )
 
 
-class USO029Strategy(ExecutionModelStrategy):
+class USO029Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """USO-029：趨勢跟蹤回檔延續（執行模型）"""
 
     slippage_pct: float = 0.001
+    bundle_trial_family = "USO:trend-pullback-continuation"
+    bundle_trial_hypothesis = "USO trend-following pullback continuation can be reproduced from a verified primary bundle."
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

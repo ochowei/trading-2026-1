@@ -7,6 +7,7 @@ TSLA Extreme Oversold Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsla_001_extreme_oversold.config import (
     TSLAExtremeOversoldConfig,
@@ -17,7 +18,11 @@ from trading.experiments.tsla_001_extreme_oversold.signal_detector import (
 )
 
 
-class TSLAExtremeOversoldStrategy(ExecutionModelStrategy):
+class TSLAExtremeOversoldStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "TSLA:extreme-oversold"
+    bundle_trial_hypothesis = (
+        "TSLA extreme oversold mean reversion can be reproduced from a verified primary bundle."
+    )
     """TSLA 極端超賣均值回歸策略（含成交模型）"""
 
     slippage_pct: float = 0.0015  # 0.15% 個股滑價

@@ -7,6 +7,7 @@ TSM Pullback + Williams %R + Reversal Candle Mean Reversion Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.tsm_002_pullback_wr_reversal.config import (
     TSMPullbackWRReversalConfig,
@@ -17,8 +18,13 @@ from trading.experiments.tsm_002_pullback_wr_reversal.signal_detector import (
 )
 
 
-class TSMPullbackWRReversalStrategy(ExecutionModelStrategy):
+class TSMPullbackWRReversalStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """TSM 回檔 + Williams %R + 反轉K線均值回歸策略 (TSM-002)"""
+
+    bundle_trial_family = "TSM:pullback-wr-reversal"
+    bundle_trial_hypothesis = (
+        "TSM pullback and Williams %R reversal can be reproduced from a verified primary bundle."
+    )
 
     slippage_pct: float = 0.0010  # 0.10% 大型 ADR 滑價
 

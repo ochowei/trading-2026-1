@@ -8,6 +8,7 @@ NVDA RS Exit Optimization Strategy
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import AuxiliaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.nvda_007_rs_exit_optimized.config import (
     NVDARSExitOptimizedConfig,
@@ -18,7 +19,11 @@ from trading.experiments.nvda_007_rs_exit_optimized.signal_detector import (
 )
 
 
-class NVDARSExitOptimizedStrategy(ExecutionModelStrategy):
+class NVDARSExitOptimizedStrategy(AuxiliaryBundleStrategyMixin, ExecutionModelStrategy):
+    bundle_trial_family = "NVDA:rs-exit-optimized"
+    bundle_trial_hypothesis = (
+        "NVDA pullback continuation improves when relative strength versus SMH remains positive."
+    )
     """NVDA-007：RS Exit Optimization（含成交模型）"""
 
     slippage_pct: float = 0.0015

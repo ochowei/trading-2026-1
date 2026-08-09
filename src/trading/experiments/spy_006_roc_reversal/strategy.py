@@ -7,6 +7,7 @@ SPY-006: RSI(2) 寬獲利目標均值回歸
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.spy_006_roc_reversal.config import (
     SPYROCReversalConfig,
@@ -17,8 +18,13 @@ from trading.experiments.spy_006_roc_reversal.signal_detector import (
 )
 
 
-class SPYROCReversalStrategy(ExecutionModelStrategy):
+class SPYROCReversalStrategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """SPY RSI(2) 寬獲利目標均值回歸 (SPY-006)"""
+
+    bundle_trial_family = "SPY:roc-reversal"
+    bundle_trial_hypothesis = (
+        "SPY wider-profit-target reversals can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()

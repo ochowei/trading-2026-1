@@ -12,9 +12,9 @@ INDA-012 訊號偵測器：INDA-EEM RS Divergence Filter on Multi-Period Capitul
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.inda_012_inda_eem_rs60d_divergence_mr.config import (
     INDA012Config,
 )
@@ -22,28 +22,14 @@ from trading.experiments.inda_012_inda_eem_rs60d_divergence_mr.config import (
 logger = logging.getLogger(__name__)
 
 
-class INDA012SignalDetector(BaseSignalDetector):
+class INDA012SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """INDA-EEM RS Divergence-Gated Multi-Period Capitulation MR 訊號偵測器"""
 
     def __init__(self, config: INDA012Config):
         self.config = config
 
-    def _fetch_eem_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.eem_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.eem_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.eem_ticker,)
 
     def compute_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
@@ -78,17 +64,10 @@ class INDA012SignalDetector(BaseSignalDetector):
         df["Return_3d"] = df["Close"].pct_change(3)
 
         # === INDA-012 核心新增：INDA-EEM 相對強度（N 日報酬差）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        eem_df = self._fetch_eem_data(start_date)
-
         inda_n_return = df["Close"].pct_change(self.config.rs_lookback)
-        if eem_df is None or eem_df.empty:
-            logger.error("無法取得 %s 數據，RS filter 停用", self.config.eem_ticker)
-            df["RS_Excess"] = 0.0
-        else:
-            eem_close = eem_df["Close"].reindex(df.index, method="ffill")
-            eem_n_return = eem_close.pct_change(self.config.rs_lookback)
-            df["RS_Excess"] = inda_n_return - eem_n_return
+        eem_df = self.require_auxiliary(self.config.eem_ticker, df.index)
+        eem_n_return = eem_df["Close"].pct_change(self.config.rs_lookback)
+        df["RS_Excess"] = inda_n_return - eem_n_return
 
         return df
 

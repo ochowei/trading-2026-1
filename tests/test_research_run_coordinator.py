@@ -1,3 +1,4 @@
+import hashlib
 import json
 import subprocess
 from dataclasses import replace
@@ -18,6 +19,8 @@ from trading.market_data import (
 )
 from trading.research_data import (
     ExperimentTrialRegistry,
+    MigrationParityStore,
+    MigrationResultStore,
     ResearchDataStore,
     ResearchDefinitionStore,
     ResearchRunCoordinator,
@@ -25,6 +28,8 @@ from trading.research_data import (
     RunExecutionError,
     RunMode,
 )
+from trading.research_data.artifacts import canonical_json_bytes
+from trading.research_data.result_schema import ResultValidityStatus, classify_result
 
 
 def bars() -> pd.DataFrame:
@@ -255,6 +260,113 @@ def test_online_offline_and_ephemeral_modes_have_distinct_publication_rules(tmp_
     assert not (tmp_path / "stale-results").exists()
     for key in ("signals", "trades", "metrics"):
         assert online.result[key] == offline.result[key] == ephemeral.result[key]
+
+
+def test_migration_mode_publishes_only_immutable_pending_evidence(tmp_path) -> None:
+    series = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
+    cache.publish(
+        series,
+        bars(),
+        refresh_kind=RefreshKind.FULL,
+        refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+    )
+    store = ResearchDataStore(
+        tmp_path / "blobs",
+        now=lambda: datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    manifest = store.create_snapshot(
+        cache,
+        (MarketDataRequirement(series, date(2026, 8, 3), role="primary"),),
+        SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+        definition=definition_blob(tmp_path),
+    )
+    manifest_path = store.write_manifest(manifest, tmp_path / "run.snapshot.json")
+    parity_body = {
+        "schema_version": 1,
+        "experiment_name": "experiment",
+        "detector_identity": "detector",
+        "snapshot_id": manifest.snapshot_id,
+        "result_fingerprint": manifest.definition.fingerprint,
+        "definitions": {
+            "legacy": "legacy:experiment",
+            "migrated": manifest.definition.fingerprint,
+        },
+        "runtime": {"python": "3.11"},
+        "outputs": {
+            name: {
+                "checksum": "a" * 64,
+                "layers": {
+                    "indicators": "b" * 64,
+                    "signals": "c" * 64,
+                    "trades": "d" * 64,
+                },
+            }
+            for name in ("legacy", "migrated")
+        },
+        "result": {},
+        "passed": True,
+    }
+    parity_payload = {
+        **parity_body,
+        "parity_digest": hashlib.sha256(canonical_json_bytes(parity_body)).hexdigest(),
+    }
+    parity_path = MigrationParityStore.write(
+        parity_payload,
+        tmp_path / "results" / "experiment" / (manifest.snapshot_id + ".migration-parity.json"),
+    )
+    latest = tmp_path / "results" / "experiment" / "latest.json"
+    latest.parent.mkdir(parents=True, exist_ok=True)
+    latest.write_bytes(b'{"legacy_latest": true}\n')
+    legacy = tmp_path / "results" / "experiment" / "legacy_previous.json"
+    legacy.write_bytes(b'{"legacy": true}\n')
+    qualification = tmp_path / "state" / "qualification-registry.json"
+    qualification.parent.mkdir(parents=True)
+    qualification.write_bytes(b'{"qualification": "unchanged"}\n')
+    lifecycle = tmp_path / "state" / "followup-lifecycle.json"
+    lifecycle.write_bytes(b'{"lifecycle": "unchanged"}\n')
+    before_latest = latest.read_bytes()
+    before_legacy = legacy.read_bytes()
+    before_qualification = qualification.read_bytes()
+    before_lifecycle = lifecycle.read_bytes()
+
+    outcome = ResearchRunCoordinator(
+        store=store,
+        results_root=tmp_path / "results",
+        experiment_family="test-family",
+        now=lambda: datetime(2026, 8, 5, 13, tzinfo=UTC),
+    ).execute(
+        "experiment",
+        deterministic_runner(series),
+        manifest_path=manifest_path,
+        current_definition=manifest.definition,
+        mode=RunMode.MIGRATION,
+        migration_parity_path=parity_path,
+    )
+
+    assert outcome.latest_path is None
+    assert outcome.persisted_path is not None
+    assert outcome.persisted_path.name == f"{manifest.snapshot_id}.migration-result.json"
+    validity = classify_result(
+        outcome.result,
+        store=store,
+        current_definition_fingerprint=manifest.definition.fingerprint,
+        now=datetime(2026, 8, 5, 13, tzinfo=UTC),
+    )
+    assert validity.status is ResultValidityStatus.MIGRATION_PENDING
+    assert not validity.is_qualifiable
+    migration = MigrationResultStore.load(outcome.persisted_path)
+    assert migration["requalification_required"] is True
+    assert migration["parity_digest"] == parity_payload["parity_digest"]
+    assert migration["result"]["run_mode"] == "migration"
+    assert latest.read_bytes() == before_latest
+    assert legacy.read_bytes() == before_legacy
+    assert qualification.read_bytes() == before_qualification
+    assert lifecycle.read_bytes() == before_lifecycle
+    registry = json.loads((tmp_path / "results" / "trial_registry.json").read_text())
+    observation = registry["trials"][0]["observations"][0]
+    assert observation["run_mode"] == "migration"
+    assert observation["validity_status"] == "migration-pending"
 
 
 def test_partial_formal_run_does_not_persist_a_result(tmp_path) -> None:

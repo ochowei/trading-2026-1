@@ -14,36 +14,22 @@ DIA-015（^VIX DIRECTION）共同完成 lesson #24 family 於 DIA 之失敗邊�
 import logging
 
 import pandas as pd
-import yfinance as yf
 
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.followup_data import DeclaredAuxiliaryData
 from trading.experiments.dia_018_vix_bands_mr.config import DIA018Config
 
 logger = logging.getLogger(__name__)
 
 
-class DIA018SignalDetector(BaseSignalDetector):
+class DIA018SignalDetector(DeclaredAuxiliaryData, BaseSignalDetector):
     """^VIX BANDS (U-shape Regime) Gated MR 訊號偵測器"""
 
     def __init__(self, config: DIA018Config):
         self.config = config
 
-    def _fetch_vix_data(self, start_date: str) -> pd.DataFrame | None:
-        try:
-            df = yf.download(
-                self.config.vix_ticker,
-                start=start_date,
-                progress=False,
-                auto_adjust=True,
-            )
-            if df is None or df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df
-        except Exception:
-            logger.exception("Failed to fetch %s data", self.config.vix_ticker)
-            return None
+    def auxiliary_symbols(self) -> tuple[str, ...]:
+        return (self.config.vix_ticker,)
 
     @staticmethod
     def _compute_rsi(series: pd.Series, period: int) -> pd.Series:
@@ -76,17 +62,8 @@ class DIA018SignalDetector(BaseSignalDetector):
         df.loc[day_range == 0, "ClosePos"] = 0.5
 
         # === DIA-018 核心新增：^VIX LEVEL（BANDS 用）===
-        start_date = df.index[0].strftime("%Y-%m-%d")
-        vix_df = self._fetch_vix_data(start_date)
-
-        if vix_df is None or vix_df.empty:
-            logger.error(
-                "無法取得 %s 數據，VIX BANDS filter 停用（fail-safe：不過濾）",
-                self.config.vix_ticker,
-            )
-            df["VIX_Level"] = float("nan")
-        else:
-            df["VIX_Level"] = vix_df["Close"].reindex(df.index, method="ffill")
+        vix_df = self.require_auxiliary(self.config.vix_ticker, df.index)
+        df["VIX_Level"] = vix_df["Close"]
 
         return df
 

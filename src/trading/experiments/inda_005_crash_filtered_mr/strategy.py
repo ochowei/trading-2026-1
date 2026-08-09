@@ -8,6 +8,7 @@ Uses execution model with fixed TP/SL exit.
 
 from trading.core.base_config import ExperimentConfig
 from trading.core.base_signal_detector import BaseSignalDetector
+from trading.core.bundle_strategy import PrimaryBundleStrategyMixin
 from trading.core.execution_strategy import ExecutionModelStrategy
 from trading.experiments.inda_005_crash_filtered_mr.config import (
     INDA005Config,
@@ -18,8 +19,13 @@ from trading.experiments.inda_005_crash_filtered_mr.signal_detector import (
 )
 
 
-class INDA005Strategy(ExecutionModelStrategy):
+class INDA005Strategy(PrimaryBundleStrategyMixin, ExecutionModelStrategy):
     """INDA 2日急跌過濾均值回歸 (INDA-005)"""
+
+    bundle_trial_family = "INDA:crash-filtered-mr"
+    bundle_trial_hypothesis = (
+        "INDA crash-filtered mean reversion can be reproduced from a verified primary bundle."
+    )
 
     def create_config(self) -> ExperimentConfig:
         return create_default_config()
