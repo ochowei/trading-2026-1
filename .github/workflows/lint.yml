@@ -30,6 +30,12 @@ jobs:
       - name: Format check
         run: uv run ruff format --check src/
 
+      - name: Workflow contract validation
+        run: uv run trading workflow validate --all
+
+      - name: Workflow authoring tests
+        run: uv run pytest -q tests/test_workflow_authoring.py
+
       - name: Phase 9 market-data bypass policy
         shell: bash
         run: |

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Author Trading Workflows"
+  short_description: "Create and evolve versioned research workflows"
+  default_prompt: "Use $trading-author-workflow to review a source document and guide me to a versioned workflow draft."
