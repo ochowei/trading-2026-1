@@ -190,6 +190,7 @@ pm/                              # 人類 PM 專用文件（AI Agent 禁止編�
 
 docs/
 ├── adr/                         # 架構決策紀錄（ADR）
+├── strategy-forward-replication-research-process.md # 策略歷史績效的未來複製性研究與晉級流程
 ├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
 ├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
 ├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
