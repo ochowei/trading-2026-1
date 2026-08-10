@@ -150,36 +150,45 @@ Shadow-eligible.
 
 The operator approved starting a new forward-dated qualification program on
 2026-08-07. The read-only preflight stopped before plan registration because
-the current evidence cannot satisfy the frozen Phase 6 inputs:
+the evidence at that checkpoint could not satisfy the frozen Phase 6 inputs.
+The 2026-08-10 follow-up implemented and formally observed the missing
+comparator, while still stopping before any epoch or plan registration:
 
-- `trading result status spy_007_trend_pullback` reports `legacy`; the separate
-  valid offline observation is immutable historical evidence and did not replace
-  `latest.json`.
+- At the 2026-08-07 checkpoint, `trading result status
+  spy_007_trend_pullback` reported `legacy`; the separate valid offline
+  observation was immutable historical evidence and did not replace
+  `latest.json`. By the 2026-08-10 review, the persisted result was
+  `data-stale`. Neither status can serve as a future epoch observation.
 - The verified trial registry has `selection_history_incomplete=true`. At this
   checkpoint the family-wise selection-adjustment contract rejected that global
   state before evaluating any family returns. The later Forward Selection Epoch
   boundary preserves the flag and can use only preregistered future sessions.
-- `SPY:trend-pullback` contains one complete semantic trial and no separately
-  verified family-baseline trial covering the future frozen evaluation sessions.
+- At preflight, `SPY:trend-pullback` contained one complete semantic trial and
+  no separately verified family-baseline trial covering future frozen evaluation
+  sessions. SPY-010 now freezes the documented SPY-007 Attempt 2 definition and
+  has a valid schema-3 online observation through 2026-08-07 as trial
+  `a960a0c24a544e063ca3e97b9c29933f7dde2b58ac50356eb2672905c658eaf3`.
 - The SPY experiment overview records all three SPY-007 attempts as failed with
   structurally weak Part A performance and names SPY-009 as the historical best.
-  SPY-009's persisted result is also currently `legacy`, so it cannot be silently
-  substituted as a qualified candidate or baseline.
+  SPY-009's persisted result is also currently `data-stale`, so it cannot be
+  silently substituted as a qualified candidate or baseline.
 
-No `HistoricalQualificationPlan` was registered. The current CLI still refuses
-to register the SPY-007 program because `SPY:trend-pullback` has no distinct
-formal family-baseline trial. Before a prospective plan can be frozen, the
-operator must separately establish that baseline, replace SPY-007 with a newly
-evaluated candidate and family, or end SPY-007 followup candidacy. Those choices
-change research/followup scope and are not inferred from the Phase 9 migration
-approval.
+No `HistoricalQualificationPlan` or Forward Selection Epoch was registered.
+The formal family universe is now SPY-007 selected trial plus the distinct
+SPY-010 baseline trial. The remaining prerequisite is an operator-approved
+future observation schedule; only then may a forward-dated plan freeze the exact
+trial manifests and included trial identities. Replacing SPY-007 with a new
+candidate/family or ending its followup candidacy remain separate research-scope
+choices and are not inferred from the Phase 9 migration approval.
 
 ### Approved SPY asset-wide formal-evaluation preparation
 
-The operator approved preparing the complete SPY candidate set. This approval
-does not yet authorize an external download or a `latest.json` rewrite. The
-candidate inventory is fixed at all nine registered SPY experiments; no legacy
-metric is used to omit or rank a candidate:
+At that checkpoint, the operator approved preparing the complete SPY candidate
+set but did not authorize an external download or a `latest.json` rewrite. The
+later SPY-010 comparator run was separately authorized on 2026-08-10 and does
+not alter this dated nine-candidate ranking evidence. The candidate inventory
+was fixed at all nine registered SPY experiments; no legacy metric was used to
+omit or rank a candidate:
 
 | Candidate | Trial family | Declared data | Current definition fingerprint | Persisted status |
 | --- | --- | --- | --- | --- |
