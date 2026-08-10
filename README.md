@@ -145,7 +145,17 @@ critical drift. It returns only `activation-eligible` and always keeps live auth
 
 ```bash
 uv run trading qualification status  # read-only; no network or result writes
+uv run trading qualification plan register --help
+uv run trading qualification screen run --help
 ```
+
+An incomplete legacy selection history is never marked complete. A newly preregistered Forward
+Selection Epoch may instead freeze the selected trial, a distinct family baseline, and the complete
+current family trial universe before five or more future annual folds begin. The plan registration
+clock is always the current UTC time; the CLI has no backdating option. Adding another trial to that
+family invalidates the frozen epoch. Once all folds finish, `screen run` accepts only exact manifests
+with matching successful formal observations and recomputes the canonical sleeve, benchmarks,
+family-wise adjustment, and every gate before appending evidence.
 
 Qualification lifecycle events are stored atomically in a hash-chained, ignored local
 `state/qualification-registry.json` plus a private head checkpoint. Exact retries are idempotent;

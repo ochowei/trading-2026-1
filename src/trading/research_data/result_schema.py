@@ -529,6 +529,35 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             return "historical qualification fold dates are invalid"
         if created_at.date() >= first_outcome:
             return "historical qualification plan was not frozen before outcomes"
+        forward_epoch = plan.get("forward_selection_epoch")
+        if forward_epoch is not None:
+            if not isinstance(forward_epoch, Mapping) or not {
+                "started_at",
+                "selected_trial_id",
+                "included_trial_ids",
+                "prior_selection_history_incomplete",
+            }.issubset(forward_epoch):
+                return "forward selection epoch is incomplete"
+            included_trial_ids = forward_epoch.get("included_trial_ids")
+            selected_trial_id = forward_epoch.get("selected_trial_id")
+            family_baseline_trial_id = plan_benchmarks.get("family_baseline_trial_id")
+            try:
+                epoch_started_at = parse_timestamp(str(forward_epoch.get("started_at")))
+            except ValueError:
+                return "forward selection epoch timestamp is invalid"
+            if (
+                epoch_started_at != created_at
+                or not isinstance(included_trial_ids, list)
+                or not included_trial_ids
+                or not all(isinstance(item, str) and item for item in included_trial_ids)
+                or included_trial_ids != sorted(set(included_trial_ids))
+                or not isinstance(selected_trial_id, str)
+                or selected_trial_id not in included_trial_ids
+                or family_baseline_trial_id not in included_trial_ids
+                or selected_trial_id == family_baseline_trial_id
+                or type(forward_epoch.get("prior_selection_history_incomplete")) is not bool
+            ):
+                return "forward selection epoch is inconsistent"
         plan_cost_error = _cost_policies_error(plan.get("cost_policies"))
         if plan_cost_error is not None:
             return plan_cost_error
@@ -591,6 +620,11 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             }.issubset(selection)
         ):
             return "historical screen benchmark or selection evidence is incomplete"
+        if isinstance(forward_epoch, Mapping) and (
+            selection.get("selected_trial_id") != forward_epoch.get("selected_trial_id")
+            or selection.get("included_trial_ids") != forward_epoch.get("included_trial_ids")
+        ):
+            return "historical screen differs from the forward selection epoch"
         if any(
             not _finite_metric(aggregate.get(name))
             for name in aggregate_fields - {"profit_factor", "stress_profit_factor"}

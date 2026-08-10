@@ -1,6 +1,6 @@
 # Phase 9 primary-only followup migration
 
-Updated 2026-08-07. The Phase 9 migration and representative-evidence stage is
+Updated 2026-08-10. The Phase 9 migration and representative-evidence stage is
 closed at its fail-closed qualification boundary. This note does not claim that
 any strategy is qualified, registered as Shadow, or cut over.
 
@@ -117,10 +117,13 @@ The read-only checks after the SPY-007 observation report:
 - `trading followup-state status`: lifecycle registry is not initialized;
 - no manual ledger or broker reconciliation record exists.
 
-The codebase exposes Python APIs for a frozen
+At this closure checkpoint the codebase exposed Python APIs for a frozen
 `HistoricalQualificationPlan` and `HistoricalScreenResult`, but no production
-CLI command currently constructs and registers the plan/screen sequence. A
-safe requalification requires an explicit plan covering development years,
+CLI constructed and registered the plan/screen sequence. The later
+`qualification plan register` and `qualification screen run` commands now
+provide that boundary through a forward-only selection epoch; they do not
+retroactively change this closure result or permit these already observed
+sessions to qualify. A safe requalification requires an explicit plan covering development years,
 evaluation folds, family trial inventory (including legacy variants), benchmark
 and random-selection policy, cost scenarios, and exact cutoff/session rules.
 Those inputs cannot be inferred from migration parity or the one valid offline
@@ -152,9 +155,10 @@ the current evidence cannot satisfy the frozen Phase 6 inputs:
 - `trading result status spy_007_trend_pullback` reports `legacy`; the separate
   valid offline observation is immutable historical evidence and did not replace
   `latest.json`.
-- The verified trial registry has `selection_history_incomplete=true`. The
-  family-wise selection-adjustment contract rejects that global state before
-  evaluating any family returns.
+- The verified trial registry has `selection_history_incomplete=true`. At this
+  checkpoint the family-wise selection-adjustment contract rejected that global
+  state before evaluating any family returns. The later Forward Selection Epoch
+  boundary preserves the flag and can use only preregistered future sessions.
 - `SPY:trend-pullback` contains one complete semantic trial and no separately
   verified family-baseline trial covering the future frozen evaluation sessions.
 - The SPY experiment overview records all three SPY-007 attempts as failed with
@@ -162,13 +166,13 @@ the current evidence cannot satisfy the frozen Phase 6 inputs:
   SPY-009's persisted result is also currently `legacy`, so it cannot be silently
   substituted as a qualified candidate or baseline.
 
-No `HistoricalQualificationPlan` was registered. Registration would create a
-private state event that is known in advance to be unable to pass the complete-
-history and valid-result gates. Before a prospective plan can be frozen, the
-operator must separately choose whether to formalize a complete SPY candidate
-set and trial history, replace SPY-007 with a newly evaluated candidate, or end
-SPY-007 followup candidacy. Those choices change research/followup scope and are
-not inferred from the Phase 9 migration approval.
+No `HistoricalQualificationPlan` was registered. The current CLI still refuses
+to register the SPY-007 program because `SPY:trend-pullback` has no distinct
+formal family-baseline trial. Before a prospective plan can be frozen, the
+operator must separately establish that baseline, replace SPY-007 with a newly
+evaluated candidate and family, or end SPY-007 followup candidacy. Those choices
+change research/followup scope and are not inferred from the Phase 9 migration
+approval.
 
 ### Approved SPY asset-wide formal-evaluation preparation
 

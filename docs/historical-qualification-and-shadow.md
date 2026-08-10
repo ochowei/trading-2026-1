@@ -32,7 +32,56 @@ daily excess-return evidence for every formal trial in the experiment family, in
 removed variants. Every trial must contain exactly the same unique, chronological session identities
 frozen by the qualification plan.
 Duplicate trials, missing or shifted sessions, non-finite returns, or an incomplete legacy selection
-history block qualification.
+history block retrospective qualification.
+
+When the global registry discloses incomplete legacy selection history, it is never cleared or
+relabelled complete. A new program may instead register a `ForwardSelectionEpoch` before its first
+evaluation outcome. The epoch freezes the selected trial, a distinct family baseline, and every
+currently registered non-legacy trial in that exact experiment family. All evaluation sessions are
+future sessions relative to registration. A trial added to the family after registration invalidates
+the epoch, and a screen must restart from a new plan; past outcomes and older Phase 9 evidence cannot
+be imported into the epoch.
+
+The production CLI deliberately has no `--created-at` option. It takes the current UTC clock,
+generates complete XNYS development and evaluation sessions, captures the selected experiment's
+current exact definition, verifies the frozen family universe against the append-only trial registry,
+and atomically appends the plan:
+
+```bash
+uv run trading qualification plan register \
+  --experiment <selected_experiment> \
+  --family-baseline-trial-id <registered_baseline_trial_id> \
+  --evaluation-years 2027 2028 2029 2030 2031 \
+  --maximum-holding-sessions 5 \
+  --execution-lag-sessions 1 \
+  --dependency-sessions 6 \
+  --embargo-sessions 1 \
+  --random-seed 17
+```
+
+The family baseline must already be a distinct formal trial in the selected experiment family.
+Registration fails without it and does not manufacture a comparator. The default base/stress costs,
+Phase 6 thresholds, 1,000 random samples, 1,000 bootstrap repetitions, and 20-session bootstrap
+blocks are serialized into the immutable plan; explicit pre-registration changes are also frozen,
+and the domain validators reject non-positive policies or weaker qualification gates. A family may
+have only one open Forward Selection Epoch, preventing parallel plan variants from being selected
+after their outcomes are known.
+
+After the final frozen fold completes, the screen CLI requires one exact formal manifest for every
+frozen family trial. Each manifest must match the trial's current exact definition, cover the final
+evaluation session, and have a successful `online` or `offline` registry observation that was valid
+for that exact snapshot. The CLI reruns all strategies from immutable bundles, derives daily sleeve
+returns, repeats the family selection adjustment, recomputes every Historical Screen gate, and only
+then appends the result:
+
+```bash
+uv run trading qualification screen run \
+  --plan-id <historical-plan-id> \
+  --trial selected_experiment=results/selected/<snapshot>.snapshot.json \
+  --trial baseline_experiment=results/baseline/<snapshot>.snapshot.json
+```
+
+Supplying a `passed` flag or precomputed screen payload is not supported.
 
 ## Prospective Shadow
 
