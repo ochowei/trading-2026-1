@@ -2,147 +2,150 @@
 
 ## 文件定位
 
-本文件定義一套用來降低回測過度擬合、選擇偏誤、資料洩漏、成交落差與市場狀態漂移的
-策略研究流程。目標不是保證未來報酬等於歷史報酬，而是：
+本文件定義一套降低回測過度擬合、選擇偏誤、資料洩漏、成交落差與市場漂移的研究
+流程。它不保證未來報酬等於歷史報酬，也不授權實際下單；repository 仍維持 dry-run
+manual trading 邊界。
 
-1. 讓所有正式結論都來自可重現、未被選擇性省略的證據；
-2. 在看見評估結果前，先凍結策略、資料、成本、比較方式與淘汰門檻；
-3. 用多個獨立時間區段、完整策略家族與真正的未來資料估計泛化能力；
-4. 把「未來表現相似」定義成一個可檢驗的預測區間，而不是主觀感受；
-5. 在上線後持續偵測漂移，於證據惡化時停止新進場。
+本文件區分三種規範層級：
 
-本文件是研究與晉級規範，不授權實際下單，也不取代人工風險決策。現有系統仍維持
-dry-run manual trading 邊界。
+- **現行契約**：Phase 6/7/8 已實作並可由 CLI 或 domain validator 強制驗證。
+- **完整流程要求**：支持較強複製性結論所需的額外 evidence；尚無 schema 時必須明確記錄
+  人工 artifact，不能假裝已由系統自動驗證。
+- **Target-state**：需要程式或 schema 變更，完成前只能作為 roadmap。
+
+現行正式路徑是高成本的 `strict_forward` profile：至少三個完整 development years、五個在
+結果出現前登記的未來年度 evaluation folds，之後再累積至少 252 sessions 的 Shadow。從
+plan registration 到最早 activation eligibility 通常至少約六年，也可能增加策略老化風險。
+
+已看過結果的歷史 walk-forward 可以作診斷，但不能產生 Phase 6 `shadow-eligible`，也不能
+重新命名為 prospective evidence。
 
 ## 規範用語
 
-- **必須（MUST）**：未滿足便不得晉級。
-- **應該（SHOULD）**：原則上必須採用；偏離時要在預註冊文件中說明原因。
-- **建議（RECOMMENDED）**：保守研究配置，可依策略頻率與風險需求預先調整。
-- **開發資料（Development）**：可用於提出假說、選擇特徵與調整參數的資料。
-- **外層樣本外資料（Outer OOS）**：只能依預先凍結的流程評估，不得回頭調整策略。
-- **策略家族（Experiment Family）**：共享一個研究假說、且彼此存在選擇關係的完整 trial
-  集合。
-- **Trial**：一個 outcome-relevant semantic definition fingerprint。參數、訊號、成交或風險
-  規則的實質變更都形成新 trial。
-- **Historical Replication Envelope**：只由歷史 Outer OOS 證據建立、在 Shadow 開始前凍結
-  的未來表現預測區間。
-- **Predictive Drift Envelope**：策略通過 Shadow 後，依預註冊方法用合格歷史與 Shadow
-  證據建立、在 Active 前凍結的持續監控區間。
+- **必須（MUST）**：未滿足便不得通過本文件所稱的完整流程。
+- **開發資料（Development）**：可用於提出假說、調參與選定候選的資料。
+- **Retrospective Diagnostic**：結果可能已被看過，只能用來除錯、理解敏感度與建立假說。
+- **Forward Evaluation**：在第一個 outcome 前已凍結 candidate 與判定流程的未來資料。
+- **Prospective Shadow**：Historical Screen 通過後才開始的非下單 paper-execution evidence。
+- **Experiment Family**：共享研究假說，且其結果曾影響本次候選選擇的完整 trial 集合。
+- **Trial**：一個 outcome-relevant semantic definition fingerprint。
+- **Selected Candidate**：Development 結束後、Forward Evaluation 開始前凍結的唯一候選。
 
-## 核心原則
+## 核心決策規則
 
-### 不把「最好回測」當成「最可能複製」
+1. **先選候選，再驗證候選**：Forward Evaluation 只能接受或拒絕 frozen candidate，不能
+   看完結果後改選 runner-up。
+2. **保留完整搜尋歷史**：刪除失敗結果、重新命名或只呈現冠軍，不會消除已發生的研究
+   自由度。
+3. **一個主要確認統計量**：其他 Sharpe、profit factor、regime 與 robustness 指標是風險
+   限制或診斷，不得事後挑選成主要結論。
+4. **Fail closed**：資料、定義、family、成本、benchmark 或 prospective evidence 不完整時，
+   狀態只能是 `blocked` 或 `insufficient evidence`。
+5. **Watch 不等於 evidence 缺失**：Watch 只表示 evidence 完整但接近不利邊界；缺失或樣本
+   不足是 `inconclusive`，必須阻擋新進場。
+6. **Lifecycle 與 health 分離**：Phase 7 lifecycle 和 Phase 8 Healthy/Watch/Paused overlay 是
+   兩個維度；retirement 不是 drift health。
 
-候選策略越多，最高的回測績效越可能只是幸運極值。正式研究必須保留所有嘗試，並依
-完整策略家族修正 selection bias。刪除失敗結果、重新命名策略或只呈現冠軍，都不能消除
-已經發生的研究自由度。
-
-### 不把曾經看過的歷史資料重新稱為未見資料
-
-Walk-forward 可以檢查時間穩定性，但若研究者已反覆看過那些年份，它仍不是純粹的
-prospective evidence。真正未污染的驗證從預先登記的 Forward Selection Epoch 或 Shadow
-開始。想提高保證程度，最重要的成本是等待新資料，而不是增加回測次數。
-
-### 不要求未來精確複製單一歷史點估計
-
-市場報酬有高度雜訊。研究應預測一個分布，並判斷新證據是否仍在合理範圍內。單一勝率、
-累計報酬或 Sharpe 點估計都不足以代表複製性。
-
-### Fail closed
-
-資料、定義、trial history、成本證據、benchmark 或 prospective evidence 只要不完整，狀態
-就是 `blocked` 或 `insufficient evidence`，不得以人工推測補齊或降級門檻。
-
-## 全流程
+## 六階段流程
 
 ```mermaid
 flowchart LR
-    A["經濟假說與績效契約"] --> B["凍結資料、定義、成本與 trial budget"]
-    B --> C["Development 探索"]
-    C --> D["Purged Walk-forward Outer OOS"]
-    D --> E{"歷史、選擇修正與穩健性通過？"}
-    E -- "否" --> X["淘汰或建立新 trial"]
-    E -- "是" --> F["選定單一候選並凍結歷史預測區間"]
-    F --> G["Prospective Shadow"]
-    G --> H{"複製性與操作門檻通過？"}
-    H -- "否" --> X
-    H -- "證據不足" --> G
-    H -- "是" --> I["受控啟用"]
-    I --> J["Healthy / Watch / Paused / Retired"]
+    A["1. 研究章程與 evidence contract"] --> B["2. Development 與候選凍結"]
+    B --> C["3. Fixed-candidate Forward Evaluation"]
+    C --> D{"Historical gates 通過？"}
+    D -- "否／缺證據" --> X["拒絕或 blocked；新候選需新 program"]
+    D -- "是" --> E["4. Prospective Shadow"]
+    E --> F{"Shadow evidence"}
+    F -- "不足" --> E
+    F -- "失敗" --> X
+    F -- "通過" --> G["5. 受控 promotion"]
+    G --> H["6. Active monitoring 與 recovery"]
 ```
 
 ---
 
-## Gate 0：研究問題與績效契約
+## 階段 1：研究章程與 evidence contract
 
-正式測試前必須建立研究章程，至少包含：
+研究章程分兩次凍結：
+
+1. Development 開始前，凍結假說、資料邊界、evaluation 年份、trial budget、selection rule、
+   成本與停止條件。
+2. Development 結束後、第一個 Forward Evaluation outcome 前，填入 selected trial、baseline、
+   frozen family universe、definition fingerprint、seeds 與全部正式門檻。
+
+最少欄位如下：
 
 ```yaml
 asset: SPY
 experiment_family: example_family
-hypothesis: "策略為何可能取得非隨機、可持續的 edge"
+assurance_profile: strict_forward
+hypothesis: "可被反駁的 edge 假說"
 economic_mechanism: "風險溢酬、行為偏誤、流動性或制度原因"
-decision_horizon_sessions: 252
+
+development_period: "YYYY-MM-DD/YYYY-MM-DD"
+forward_evaluation_years: [2027, 2028, 2029, 2030, 2031]
+development_selection_rule: canonical_base_net_sharpe_then_simplicity
+primary_confirmatory_statistic: mean_base_net_daily_sleeve_return
+trial_budget: 12
+
+selected_trial_id: "Development 結束時填入"
+selected_definition_fingerprint: "正式 plan registration 時填入"
+family_baseline_trial_id: "與 selected trial 不同"
+frozen_family_trial_ids:
+  - "trial-id-1"
+  - "trial-id-2"
+
 maximum_holding_sessions: 5
 execution_lag_sessions: 1
-development_period: "YYYY-MM-DD/YYYY-MM-DD"
-outer_evaluation_folds:
-  - "YYYY"
-  - "YYYY"
-primary_metric: base_net_excess_sharpe
-ranking_metric: lower_confidence_bound_90
-hard_risk_budget:
-  maximum_stress_drawdown: "預先設定"
-trial_budget: "預先設定的最大正式 trial 數"
-benchmarks:
-  - cash
-  - preregistered_family_baseline
-  - exposure_matched_random_entry
+dependency_sessions: 6
+embargo_sessions: 1
 base_cost_policy: "凍結的 base 成本"
-stress_cost_policy: "嚴格較差的 stress 成本"
-selection_adjustment: family_wise_block_bootstrap
+stress_cost_policy: "凍結的 adverse 成本"
+maximum_stress_drawdown: 0.20
+
+cash_policy: zero_return_cash
+random_entry_quantile: 0.90
+random_seed: 17
+random_samples: 1000
+family_test: circular_block_bootstrap_max_mean
+family_alpha: 0.10
+bootstrap_block_sessions: 20
+bootstrap_repetitions: 1000
+
 shadow_minimum_sessions: 252
 shadow_minimum_fills: 12
+shadow_activation_checkpoint: "YYYY-MM-DD"
+data_evidence_grade: snapshot_reproducible
 ```
 
-研究假說必須說明策略可能持續存在的經濟原因。純粹由價格圖形搜尋得到、但沒有可反駁
-機制的策略可以探索，卻需要更嚴格的 selection adjustment 與 prospective evidence。
+`assurance_profile` 與 `data_evidence_grade` 是研究治理欄位，不是現行 CLI enum；它們必須
+出現在研究章程或等價 artifact 中。
 
-### Gate 0 通過條件
+### Data evidence grade
 
-- 所有欄位在第一個正式 OOS 結果出現前凍結。
-- 成功、失敗與停止條件均已定義。
-- 定義何種修改必須建立新 trial。
-- 沒有依已知 OOS 結果反推門檻。
+| Grade | 可以宣稱 | 不可以宣稱 |
+| --- | --- | --- |
+| `snapshot_reproducible` | 重現某次 full refresh 取得的完整資料 | 每個歷史 session 都使用當時原始 vintage |
+| `vintage_point_in_time` | 每個 decision session 的 availability 與 revision vintage 可驗證 | 未保存 vintage 卻依名稱推定 point-in-time |
 
----
+目前 Yahoo `auto_adjust=True` snapshot 只支持 `snapshot_reproducible`。Publication lag 只能證明
+observation 何時可用，不能證明日後沒有修訂。Universe 會變動時，仍必須保存 point-in-time
+constituents 並處理 survivorship bias。
 
-## Gate 1：資料、時間與成交有效性
+### Data 與 execution guardrails
 
-### 資料要求
+- 每個 signal session 有明確 cutoff；provider、series、adjustment、availability 與 revision
+  policy 在結果前凍結。
+- 缺漏 session、重複列、非有限值、公司行動或 snapshot identity 問題一律 fail closed。
+- Snapshot 損壞時只能由同一 bundle 復原，不能用現在下載的資料冒充原 evidence。
+- 研究與 followup 使用相同的 capital-constrained canonical sleeve、base/stress costs、entry／
+  exit ordering、未成交處理與持有期。
+- 不支援多部位或 pyramiding 的策略應標成 platform-incompatible，不能偷偷改成單部位後仍
+  宣稱驗證原策略。
 
-- 使用 point-in-time 可得的資料；不得使用未來修訂值或未來才能知道的成分名單。
-- 每個 signal session 必須有明確 data cutoff。
-- 輔助資料依實際發布時間做 as-of alignment，並凍結 publication lag。
-- 價格調整、公司行動、缺漏 session、重複列與非有限值必須 fail closed。
-- 若研究 universe 會變動，必須處理 survivorship bias；固定單一 ticker 也要保存其歷史身份與
-  corporate-action 證據。
-- Immutable snapshot 損壞時只能由同一 bundle 復原，不能用現在下載的資料冒充歷史證據。
-
-### 成交要求
-
-- 研究與 followup 必須使用同一個 capital-constrained canonical sleeve。
-- 每個 sleeve 最多一個部位；不可用獨立複利的重疊交易放大曝險。
-- 凍結進出場順序、隔日成交、未成交處理、滑價、費用與持有期。
-- 同一 candidate stream 必須同時產生 gross、base-net 與 stress-net daily equity。
-- 正式排名與資格必須使用 canonical daily-equity metrics，不能退回 legacy Part A/B/C 指標。
-
-### Gate 1 通過條件
-
-- `result status` 精確為 `valid`。
-- Snapshot、definition fingerprint、runtime、成本與 canonical evidence 完整可重現。
-- 任一 discovered family candidate 不完整時，不得做 partial ranking。
+正式執行要求 `result status == valid`，且 plan 中每個 frozen family trial 都有完整 snapshot、
+definition、runtime、cost 與 canonical evidence。任意新 discovered package 不屬於 frozen
+family 時，不應成為此 plan 的無關阻擋條件。
 
 相關契約：
 
@@ -153,358 +156,298 @@ shadow_minimum_fills: 12
 
 ---
 
-## Gate 2：Development 探索
+## 階段 2：Development 與候選凍結
 
-開發階段可以：
+Development 可提出假說、調整訊號／參數／exit rules、執行敏感度分析與只使用 Development
+data 的 ephemeral diagnostics。不得讀取 Forward Evaluation／Shadow outcome 後再修改本次
+candidate、刪除失敗 trial 或重新定義 family。
 
-- 提出或拒絕假說；
-- 選擇訊號、參數與退出規則；
-- 進行錯誤診斷與敏感度探索；
-- 執行不寫入 qualification evidence 的 ephemeral diagnostics。
+只在 Development data 上執行、且從未接觸正式 evaluation outcome 的 diagnostics，不需要
+冒充 qualification evidence。但只要 definition 被送入正式 evaluation、可被替換成 candidate，
+或其 evaluation outcome 影響決策，就必須成為 append-only registry 中的正式 trial。
 
-開發階段不得：
+在 Forward Evaluation 前必須完成：
 
-- 把 Outer OOS 或 Shadow 結果拿回來調整同一 trial；
-- 刪除失敗 trial 以降低多重測試數量；
-- 在看到結果後重新定義策略家族；
-- 將報告格式變更以外的 outcome-relevant 修改視為同一 definition。
+- 依 frozen `development_selection_rule` 選出恰好一個 candidate；
+- 選出一個不同的 formal family baseline；
+- 凍結完整 family universe 與所有可被選成 candidate 的 robustness variants；
+- 凍結只會一致套用、不可被選成 candidate 的 stress transforms。
 
-所有正式 trial 都必須寫入 append-only registry。重跑相同 definition 是新 observation；修改
-definition 則是新 trial。達到預註冊 trial budget 後，若仍無候選通過，研究家族應停止，或以
-新的假說與新的 prospective program 重新開始。
+Forward Evaluation 開始後若新結果啟發了另一個 candidate 或 selectable variant，原 plan 不能
+原地擴充；必須建立新 trial、新 plan 與新 prospective program。達到 trial budget 仍無候選時，
+正式結論是停止該 family，或以新假說與新 family identity 重新開始。
 
 ---
 
-## Gate 3：Purged Walk-forward Outer OOS
+## 階段 3：Fixed-candidate Forward Evaluation
 
-### 最低結構
+現行 Phase 6 是固定 candidate 的未來評估，不是每年重新選參數的 nested walk-forward。
 
-- 至少三個完整且連續的 development years。
-- 至少五個完整、連續、不重疊的年度 evaluation folds。
-- Purge 必須覆蓋 `maximum holding + execution dependency`。
-- Embargo 必須覆蓋 execution lag。
-- 交易歸屬於 signal date 所在 fold，exit 必須完整落在該 fold 可評估範圍內。
-- Zero-signal folds 必須保留，不能從穩定性分母中消失。
+### 時間結構
 
-如果模型會定期重訓，研究必須凍結「重訓演算法」與可使用的歷史範圍。每個 fold 只能使用
-當時已知的資料重新估計，不能人工選擇該年度最佳參數。
+- 至少三個完整、連續 development years。
+- 至少五個完整、連續、不重疊的未來年度 evaluation folds。
+- Plan 在第一個 evaluation outcome 前建立。
+- `dependency_sessions >= maximum holding + execution lag`。
+- `embargo_sessions >= execution lag`。
+- 現行 purge／embargo 實際是 fold-edge signal exclusions：開頭排除 embargo sessions，結尾
+  排除無法在 fold 內完成 exit 的 dependency sessions；它們不是一般 cross-validation 對
+  training labels 的 purge。
+- Trade 歸屬 signal date 所在 fold，exit 完整落在同一 fold。
+- Zero-signal folds 保留為明確 evidence。
 
-重疊 rolling windows 可以做診斷，但不得把同一交易重複計算成多份資格證據。
+若策略會自動重訓，rolling／expanding window、特徵可用時間、演算法與更新頻率都必須屬於
+frozen definition。相鄰年度 folds 是同一市場時間序列的分段，不是五個統計獨立實驗。
 
-### 歷史穩定性最低門檻
+### Fold 與 continuous path
 
-| 指標 | 必須通過的門檻 |
+現行 Phase 6 每年以相同 initial capital 重建 isolated sleeve，再 compound fold returns；stress
+drawdown 也是最差的單一 fold drawdown。它不能量到跨年持倉、跨年 drawdown 或完整
+time-under-water。
+
+完整流程應附一條不在年界重設資本的 continuous canonical sleeve report，annual folds 只作
+歸因。這尚未成為正式 schema；缺少它時只能宣稱通過 repository core，不能宣稱跨年風險已
+完整驗證。
+
+### 現行 Historical Stability Screen
+
+| 指標 | 門檻 |
 | --- | ---: |
 | 完成交易 | 至少 20 筆 |
 | 有交易 folds | 至少 3 個 |
 | 正報酬 traded folds | 至少 60% |
-| Base compounded return | `> 0` |
-| Base profit factor | `> 1.1` |
-| Stress compounded return | `> 0` |
-| Stress profit factor | `> 1.0` |
-| Stress drawdown | 不得突破預註冊風險上限 |
-| Fold 集中度 | 任一 fold 不得占超過 50% 交易或獲利 |
+| Base compounded return / profit factor | `> 0` / `> 1.1` |
+| Stress compounded return / profit factor | `> 0` / `> 1.0` |
+| Stress drawdown | 不突破 frozen risk limit |
+| Fold 集中度 | 任一 fold 不超過 50% trades 或 gross profit |
 
-以上是最低資格，不是排名分數。某策略即使累計報酬最高，只要一個硬門檻失敗便不得晉級。
+Zero-signal folds 會保存，但現行 `positive_traded_fold_rate` 的分母只包含 traded folds。若假說
+預期每年最低 signal rate，必須另設 signal-coverage gate。Profit factor、positive return 與
+zero-return cash 高度重疊，只是資格條件，不是多份獨立統計證據。
 
-相關契約：[Historical qualification and prospective Shadow](historical-qualification-and-shadow.md)。
+### Benchmarks
 
----
+1. **Zero-return cash**：現行 cash 固定為 0，與 `base return > 0` 是同一條件，只報告一次。
+2. **Family baseline**：candidate cumulative return 必須高於 frozen distinct baseline trial。
+3. **Random entry**：candidate cumulative return 必須高於 1,000 random paths 的第 90 percentile。
 
-## Gate 4：Benchmark 與 selection-bias 修正
+現行 random matcher 保留月份、entry lag、已實現 holding、fold 與 completed-trade count。這只
+對 fixed-hold／expiry strategy 有清楚 null。Dynamic target、stop 或 trailing exit 的 realized
+holding 已包含 outcome information；完整流程必須隨機化 signal 後重新執行 frozen exit rules、
+sleeve occupancy 與未成交處理。現行 evaluator 尚未支援，只有現行 matcher 時必須標成
+`limited-null`，不能用它支持完整 timing-edge 結論。
 
-### 三個必要 benchmark
+### Robustness
 
-候選策略必須同時對照：
+- Parameter neighborhood、signal delay、missed fill、cost、regime 與 placebo 全部預先數值化。
+- 「合理的小幅惡化」、「平台」或「單一 regime 支撐」不能單獨作為 gate。
+- Forward Evaluation 後只允許執行已凍結、不可被選成 candidate 的 stress transforms。
+- 若結果促成新 candidate／trial，原 plan 不得吸收它，必須開新 prospective program。
+- Crisis-only 等策略可以只在 declared regime 取得 edge；若聲稱跨資產，資產集合也要預先
+  凍結並完整呈現。
 
-1. **Cash**：確認絕對資本成長不是負值。
-2. **Preregistered family baseline**：確認複雜化後確實改善原始策略。
-3. **Exposure-matched random entries**：保留月份、holding、lag、fold 與交易數，只移除擇時
-   訊息，確認 edge 不只是市場曝險或幸運進場。
+### Final family-wise adjustment
 
-Buy-and-hold 可以作為描述性參考，但對低曝險事件型策略，不應取代 exposure-matched
-benchmark。
+Family adjustment 在所有 frozen benchmark 與 robustness evidence 完成後最後執行：
 
-### 完整 family 修正
+- 使用 frozen family universe 中全部正式 trials 的相同 evaluation sessions；
+- 現行 test statistic 是 selected candidate 的 mean base-net daily return；
+- null 是每次 circular block resample 的 family maximum centered mean；
+- 預設 20-session blocks、1,000 repetitions；
+- 現行 `adjusted_confidence >= 0.90` 應解讀為 family-wise adjusted p-value `<= 0.10`，不是
+  「策略有 90% 機率為真」；
+- 缺 trial、duplicate／shifted sessions、non-finite return 或不完整 history 一律 blocked。
 
-- Family-wise block bootstrap 必須包含所有正式 trial，包括失敗、移除與落後版本。
-- 每個 trial 必須提供相同 session identities 的 dated daily excess returns。
-- 預設可使用 20-session blocks 與 1,000 repetitions；若變更，必須事前凍結。
-- 至少達到 90% selection-adjusted confidence，才可通過現有 Phase 6 family gate。
-- Duplicate、缺漏、session 位移、non-finite return 或不完整 legacy selection history 都會阻擋
-  retrospective qualification。
+這個 gate 不重新排名。其他 trial 即使表現較好，也不能取代 frozen candidate。20-session
+block 是預註冊 policy，不是自然常數；可報告 block-length sensitivity，但不得事後換正式值。
 
-### 保守研究配置的額外診斷
+DSR、PBO、White Reality Check 或 Hansen SPA 不需要全部堆成 hard gates。研究章程只指定一個
+正式 family test，其餘作 diagnostic；若使用 PBO，winner statistic 必須與實際 Development
+selection rule 相同。
 
-下列項目目前不是全部由 repository CLI 強制執行，但對高保證流程應加入：
+Legacy history 不完整時，現行 `ForwardSelectionEpoch` 會凍結 selected trial、baseline 與
+family universe；同 family 新增 trial 會使 open epoch 失效。以 `epoch_id` 隔離下一代研究、
+避免自動摧毀 fixed-candidate program，是尚未實作的 target-state。
 
-- **Deflated Sharpe Ratio（DSR）≥ 95%**：修正 trial 數、樣本長度、偏態與峰態後，仍有足夠
-  證據高於基準 Sharpe。
-- **Probability of Backtest Overfitting（PBO）≤ 10%**：用 CSCV 評估家族內冠軍到了 OOS
-  反而落後的風險。
-- 視策略家族特性加入 White Reality Check 或 Hansen SPA；不得在看過結果後選擇最有利的
-  顯著性檢定。
+### Historical decision
 
-若歷史 selection history 已經不完整，不能假裝補齊。必須在第一個未來結果前建立新的
-`ForwardSelectionEpoch`，凍結 candidate、baseline 與完整 family universe。
+- 全部現行 gates 通過：`shadow-eligible`。
+- 任一 hard gate 失敗：`historical-screen-failed`。
+- Evidence 不完整或不可驗證：`blocked`。
 
-參考決策：
-
-- [ADR 0022 — Append-only experiment trial registry](adr/0022-append-only-experiment-trial-registry.md)
-- [ADR 0023 — Family-wise block bootstrap](adr/0023-family-wise-block-bootstrap-for-selection-bias.md)
-- [ADR 0024 — Three benchmarks](adr/0024-three-benchmarks-for-signal-qualification.md)
-
----
-
-## Gate 5：破壞性穩健測試
-
-穩健測試必須在規格中預先列出，且其變體仍計入 trial 或明確凍結為同一 robustness protocol。
-
-### 參數地形
-
-- 對核心連續參數測試預註冊的鄰近網格，例如基準值上下 10% 與 20%。
-- 績效應形成可辨識的平台，而不是只有一個孤立尖峰。
-- 建議至少 70% 鄰近組合仍維持 stress-net 正報酬與未突破風險預算。
-- 鄰近組合的結果不得用來事後換選另一個冠軍；若要換選，必須建立新 trial 並重新修正選擇
-  偏誤。
-
-### 時間與成交擾動
-
-- Signal 或 entry 向後延遲一個 session。
-- 模擬漏單、較差 fill 與既有 stress cost policy。
-- 檢查 warmup、fold boundary、同日 entry/exit 與 open-position mark-to-market。
-- 任何合理的小幅成交惡化都讓 edge 消失時，策略不得晉級。
-
-### 市場狀態
-
-- 事前定義 bull/bear、高低波動、利率或流動性狀態。
-- 每個狀態都報告樣本量、曝險、報酬與回撤，不只呈現通過的區段。
-- 不要求每種 regime 都正報酬，但策略必須符合預註冊的適用範圍，且不可由單一 regime 支撐
-  全部結果。
-
-### Placebo 與外部複製
-
-- Random-entry benchmark 與 signal-date shift 是必要 placebo。
-- 若假說聲稱跨資產普遍性，必須在相關資產上不重新調參地驗證方向一致性。
-- 若假說只適用特定資產，跨資產失敗是診斷資訊，不應事後改寫成普遍假說。
-
-### Gate 5 通過條件
-
-- 所有預註冊 hard robustness tests 通過。
-- 沒有單一合理擾動立即消滅策略 edge。
-- 參數地形不是孤立尖峰。
-- 所有結果完整呈現且納入 selection history。
-
----
-
-## Gate 6：選擇單一候選與建立歷史預測區間
-
-### 選擇順序
-
-只有通過 Gate 1 至 Gate 5 的候選可以排名。建議選擇規則如下：
-
-1. 最大化 `90% lower confidence bound of base-net excess Sharpe`；
-2. 比較 stress-net 報酬與 stress drawdown；
-3. 比較跨 folds 與參數鄰域的穩定性；
-4. 若證據接近，選參數較少、換手率較低、機制較簡單的策略。
-
-不應以單一 Part B 累計報酬、勝率或未修正 Sharpe 直接選冠軍。若沒有候選通過全部 hard
-gates，正式結論就是「沒有合格策略」。
-
-### Historical Replication Envelope
-
-選定單一候選後，使用固定演算法從 Outer OOS daily-equity paths 建立一個 252-session
-預測區間。這個 envelope 必須在 Shadow 開始前凍結並記錄：
-
-- strategy ID 與 definition fingerprint；
-- historical plan、fold 與 family-selection evidence IDs；
-- bootstrap seed、block length、repetitions 與 horizon；
-- metric families、最低樣本與 checkpoint schedule；
-- 每個 metric 的 Normal、Watch 與 Pause 邊界；
-- 不依分位數放寬的 hard economic/risk floors。
-
-建議 metric families：
-
-| Family | Higher/lower is better | 主要指標 |
-| --- | --- | --- |
-| Performance | Higher | base/stress net return、excess Sharpe、profit factor |
-| Signal | Within range | signal/fill count、win rate、平均 holding |
-| Risk | Lower | drawdown、tail loss、time under water |
-| Execution | Lower | slippage、unfilled rate、fees、execution lag |
-| Portfolio | Within/lower | utilization、turnover、concentration |
-
-對 higher-is-better 指標：
-
-- adverse 20th percentile 為 `Watch`；
-- adverse 5th percentile 為 `Pause`。
-
-對 lower-is-better 指標：
-
-- adverse 80th percentile 為 `Watch`；
-- adverse 95th percentile 為 `Pause`。
-
-若 bootstrap 不能產生穩定區間，或有效樣本不足，候選只能標記為 `insufficient evidence`。
-
----
-
-## Gate 7：Prospective Shadow
-
-Shadow 是第一層真正未見資料的複製測試。只能有 Gate 6 選定的單一 frozen candidate 進入
-同一 prospective program；不得同時觀察多個 Shadow 後再挑最好者。
-
-### 最低證據
-
-- 至少 252 個完成的交易 sessions。
-- 至少 12 個完成的 simulated fills。
-- Base 與 stress return 都為正。
-- Base 與 stress profit factor 都大於 1。
-- Stress drawdown 未突破預註冊風險上限。
-- 資料、proposal、fill 與 cutoff evidence 完整且單調前進。
-
-固定的 252 sessions 與 12 fills 只是最低操作門檻。保守流程還必須達到由
-Probabilistic Sharpe Ratio／Minimum Track Record Length 或等價方法推導的樣本需求。低頻策略
-若未累積足夠證據，只能繼續 Shadow，不能降低門檻。
-
-### 與歷史預測區間比較
-
-- 每個預註冊 checkpoint 都以 frozen Historical Replication Envelope 分類。
-- 一次 Watch 表示延長觀察與加強診斷，不立即認定失效。
-- 任一 hard guard 或 adverse 5% Pause boundary 表示 Shadow 不通過。
-- 連續兩個 scheduled checkpoints 為 Watch，視為持續性漂移，不得晉級。
-- 晉級前最後兩個 scheduled checkpoints 應為 Normal。
-
-### 禁止事項
-
-- 不得改參數、跳過不喜歡的交易、改資料 provider 或回填較早的 Shadow evidence。
-- 不得在 exit outcome 出現後重寫 proposal terms。
-- Outcome-relevant definition change 必須建立新 trial、新 Shadow identity，且證據歸零。
-
-Shadow 通過只代表 `activation-eligible`，不代表已授權實際下單。
-
----
-
-## Gate 8：受控啟用與持續漂移控制
-
-通過 Shadow 後，使用預先凍結的 derivation policy，從合格歷史 folds 與 Shadow evidence 建立
-`PredictiveDriftEnvelope`。Envelope 必須在 Active 前凍結，並綁定通過資格時使用的精確
-historical、Shadow、definition 與 result identities。
-
-### 啟用條件
-
-- Exact strategy 為 Active，且沒有 global no-new-entry。
-- Current result 仍為 `valid`。
-- Data bundle 等於最新完成 session，identity 可驗證。
-- Ledger 與 broker reconciliation 通過。
-- Allocation epoch 正確，且 sleeve 沒有實際部位或占用中的 entry proposal。
-- Drift envelope 已綁定，狀態不是 Paused，且沒有 hard guard。
-
-若將流程連接到真實資金，初始風險配置必須事前設定且顯著小於目標配置；只有在預定
-checkpoint 通過後才可擴大。不得因近期正報酬臨時提前加碼。Repository 現況仍是 dry-run
-manual trading，本條是研究治理要求，不表示系統已實作 broker live cutover。
-
-### Drift 狀態
-
-| 狀態 | 意義 | 新進場 | 既有部位 |
-| --- | --- | --- | --- |
-| Healthy | 所有 scheduled metrics 正常且無 hard guard | 其他 guards 也通過時才允許 | 正常管理 |
-| Watch | 指標進入 adverse 20% 或證據暫時不足 | 加強監控，仍受其他 guards 限制 | 正常管理 |
-| Paused | adverse 5%、hard guard 或連續兩次 Watch | 一律阻擋 | 繼續驗證後的 target/stop/expiry 管理 |
-| Retired | 經正式決策停止策略 | 一律阻擋 | 平倉前仍保留原策略 ownership |
-
-恢復必須由追加的新證據推導，不能直接編輯狀態或門檻。正常 performance pause 至少需要新
-Shadow sessions、完成交易、清除 hard guards 與連續正常 checkpoints；策略規則若改變則重走
-完整資格流程。
+失敗後不得換 runner-up；任何新 candidate 都要新 plan 與新 prospective program。
 
 相關契約：
 
-- [Controlled followup cutover](controlled-followup-cutover.md)
-- [Live drift and recovery](live-drift-and-recovery.md)
+- [Historical qualification and prospective Shadow](historical-qualification-and-shadow.md)
+- [ADR 0022 — Trial registry](adr/0022-append-only-experiment-trial-registry.md)
+- [ADR 0023 — Family-wise bootstrap](adr/0023-family-wise-block-bootstrap-for-selection-bias.md)
+- [ADR 0024 — Benchmarks](adr/0024-three-benchmarks-for-signal-qualification.md)
+
+---
+
+## 階段 4：Prospective Shadow
+
+同一 prospective program 只能有一個 frozen candidate。Shadow registration 綁定 exact
+Historical Screen、trial、definition snapshot、cost policies、prospective start、activation
+checkpoint 與 activation policy。
+
+### 現行最低 evidence
+
+- 至少 252 completed sessions 與 12 completed simulated fills；
+- base/stress return `> 0`、base/stress profit factor `> 1`；
+- stress drawdown 不突破 frozen limit；
+- critical-drift assessment 通過；
+- data、proposal、fill 與 cutoff evidence 完整且單調前進。
+
+252 sessions／12 fills 是操作下限，不代表充分 power。完整流程應另報 PSR／Minimum Track
+Record Length 或等價樣本需求；在統一 schema 完成前它是人工 artifact，不得冒充 CLI gate。
+
+- 未達樣本需求：`insufficient evidence`，繼續 Shadow，不能降低門檻。
+- Evidence 缺漏、definition mismatch 或 cutoff 不單調：`blocked`。
+- Hard economic/risk gate 失敗：不通過；不得原地調參。
+- 全部通過：`activation-eligible`，但仍不是 Active，也未授權下單。
+
+不得跳過交易、回填較早 evidence、改 provider policy，或在 exit outcome 出現後重寫 proposal。
+Outcome-relevant change 必須建立新 trial、新 Shadow identity，且 evidence 歸零。
+
+---
+
+## 階段 5：受控 promotion
+
+Shadow → Active promotion 和 Active 後每筆 BUY authorization 是不同邊界。
+
+### Promotion 前置條件
+
+- Exact activation evaluation 為 `activation-eligible`。
+- Historical Screen、Shadow、definition、result 與 parity identities 精確匹配。
+- Current persisted result 仍為 `valid`。
+- `PredictiveDriftEnvelope` 已從 exact passing Historical Screen 與 Shadow evidence 建立、驗證並
+  在 Active 前凍結。
+- 同 ticker 的既有 Active strategy 已依 replacement／retirement 契約處理。
+
+成功 promotion 後 lifecycle 才成為 Active；「strategy 已 Active」不是 promotion 前置條件。
+
+### 每筆 BUY authorization
+
+- Lifecycle 為 Active，global no-new-entry 關閉，Active proof/current result 有效。
+- Data bundle 等於最新 completed session，cutoff 與 identity 可驗證。
+- Ledger、broker reconciliation、allocation epoch 與 sleeve occupancy 全部通過。
+- Drift binding 有效、health 不是 Paused、沒有 hard guard。
+- Latest assessment 若是 `inconclusive`，即使現行 health 投影為 Watch，也必須另外維持 global
+  no-new-entry，才符合本文件的 fail-closed 規則。
+
+相關契約：[Controlled followup cutover](controlled-followup-cutover.md)。
+
+---
+
+## 階段 6：Active monitoring 與 recovery
+
+### 兩個狀態維度
+
+| 維度 | 狀態 | 說明 |
+| --- | --- | --- |
+| Phase 7 lifecycle | Shadow / Active / Retiring / lifecycle Paused | 決定 qualification、ownership 與 entry authority |
+| Phase 8 health | Healthy / Watch / Paused | 只描述 Active strategy 的 drift health |
+
+Retirement completion 是 Phase 7 event，不是 Phase 8 的 `Retired` health state。
+
+| Health | 新進場 | 既有部位 |
+| --- | --- | --- |
+| Healthy | 其他 Phase 7 guards 通過才允許 | 正常管理 |
+| Watch | 只限 evidence 完整的 borderline metric；依 frozen policy 處理 | 正常管理 |
+| Paused | 一律阻擋 | 繼續 verified target/stop/expiry 管理 |
+
+現行 drift engine 會把第一次 inconclusive checkpoint 投影為 Watch、第二次投影為 Paused，而
+authorizer 對第一次 Watch 仍可能允許 BUY。完整流程必須在 inconclusive 時以 global
+no-new-entry 補足，直到有獨立 blocking state。
+
+現行 `PredictiveDriftEnvelope` 可保存 metric boundaries、minimum samples、windows、checkpoint
+schedule 與 hard guards，但沒有自動推導 joint false-alarm rate。個別 metric 的 20%／5%
+quantile 不代表多 metrics、多 checkpoints 下的全域 20%／5%；overlapping windows 下連續兩次
+Watch 也不是兩份獨立 evidence。
+
+Target-state 應在 Shadow 前凍結一份 joint `ReplicationAndDriftSpec`，同時處理 within-range
+雙尾、family-wise metrics、sequential checkpoints 與 window dependence。若仍用 Shadow 校準
+Active envelope，應分開 calibration／confirmation evidence，避免同一資料既驗證又放寬邊界。
+
+Recovery 必須由追加 evidence 推導，不能編輯 state 或 threshold。Definition 改變時重走完整
+qualification；Paused 不阻擋 verified existing-position exit management。
+
+相關契約：[Live drift and recovery](live-drift-and-recovery.md)。
 
 ---
 
 ## 統一判定邏輯
 
 ```text
-IF 任一 discovered candidate 不是 valid:
-    BLOCK，禁止 partial ranking
+DEVELOP on Development data only
+SELECT exactly one candidate and FREEZE family, baseline, sessions, costs, tests, and thresholds
 
-FOR 每個 registered family trial:
-    使用相同 immutable sessions 與 canonical sleeve 重算
+REQUIRE exact valid evidence for every frozen family trial
+RUN fixed-candidate folds, frozen benchmarks, and preregistered non-selectable robustness transforms
+RUN the frozen family-wise test last
 
-IF selected candidate 未通過歷史硬門檻、三個 benchmarks、
-   family-wise selection adjustment 或 robustness protocol:
-    REJECT
+hard-gate failure => REJECT; runner-up substitution forbidden
+missing evidence => BLOCK
+all historical gates pass => REGISTER exactly one Shadow
 
-SELECT 在全部合格候選中具有最佳保守下界者
-FREEZE selected definition 與 Historical Replication Envelope
+Shadow sample insufficient => CONTINUE SHADOW; block new entry
+Shadow hard-gate failure => REJECT; changed candidate requires new program
+Shadow pass => ACTIVATION-ELIGIBLE
 
-IF Shadow 未達最低 sessions 或統計樣本需求:
-    INSUFFICIENT EVIDENCE，繼續觀察
-
-IF Shadow 突破 hard floor、Pause boundary 或持續 Watch:
-    REJECT；不得原地調參
-
-IF Shadow 通過且所有 activation guards 通過:
-    ACTIVATION-ELIGIBLE
-
+FREEZE PredictiveDriftEnvelope and PROMOTE through Phase 7
 WHILE Active:
-    依 frozen Predictive Drift Envelope 定期重算
-    hard guard / adverse 5% / persistent Watch => PAUSED
+    authorize every BUY from current result/data/ledger/epoch/drift evidence
+    inconclusive evidence => global no-new-entry
+    drift Pause or hard guard => block new entry
 ```
 
-## 研究輸出與稽核清單
+## 稽核清單
 
-每個晉級決策至少要能追溯下列 artifacts：
+- [ ] Charter、假說、Development boundary、selection rule 與 trial budget。
+- [ ] Selected candidate、baseline、frozen family universe 與完整 trial history。
+- [ ] Data evidence grade、snapshot、cutoff、definition 與 runtime identity。
+- [ ] Base/stress isolated-fold evidence；continuous sleeve report 或明確未執行狀態。
+- [ ] Cash、baseline、random benchmark；dynamic-exit strategy 的 null 限制。
+- [ ] Frozen robustness protocol 與全部結果。
+- [ ] Final family-wise adjusted p-value；DSR/PBO 等 diagnostic 狀態。
+- [ ] Shadow registration、activation policy、proposals、fills、PSR/MTRL 狀態。
+- [ ] Activation、result、parity、PredictiveDriftEnvelope identities。
+- [ ] Inconclusive 對應 no-new-entry、pause、recovery 與 retirement logs。
 
-- [ ] 研究章程與經濟假說。
-- [ ] Immutable data snapshot 與 data cutoff。
-- [ ] Exact definition snapshot 與 semantic fingerprint。
-- [ ] 完整 append-only trial family history。
-- [ ] Historical qualification plan 與 annual fold evidence。
-- [ ] Base/stress canonical sleeve daily equity。
-- [ ] Cash、family baseline、random-entry benchmark evidence。
-- [ ] Family-wise selection-adjusted bootstrap evidence。
-- [ ] DSR/PBO 或其明確未執行狀態。
-- [ ] Parameter、execution、regime 與 placebo robustness report。
-- [ ] Frozen Historical Replication Envelope。
-- [ ] Shadow registration、proposals、fills 與 checkpoints。
-- [ ] Activation evaluation 與 current valid-result identity。
-- [ ] Frozen Predictive Drift Envelope 與後續 observations。
-- [ ] 所有 rejection、pause、recovery 與 retirement decision log。
+缺少必要 artifact 時不得以口頭結論或舊報告代替。尚未實作的 artifact 必須標成未執行，
+不能因 checklist 有欄位就宣稱已自動驗證。
 
-任一必要 artifact 缺失時，不得以口頭結論或舊報告代替。
+## 現有能力與已知缺口
 
-## 與現有專案能力的對照
-
-| 能力 | 現況 | 對應文件 |
+| 能力 | 現況 | 限制 |
 | --- | --- | --- |
-| Immutable data/definition snapshots | 已實作 | [reproducibility.md](reproducibility.md) |
-| Result validity 與 fail-closed ranking | 已實作 | [result-validity-and-trial-history.md](result-validity-and-trial-history.md) |
-| Append-only trial registry | 已實作 | [ADR 0022](adr/0022-append-only-experiment-trial-registry.md) |
-| Canonical base/stress sleeve | 已實作 | [canonical-sleeve-execution.md](canonical-sleeve-execution.md) |
-| Five-fold historical screen | 已實作 | [historical-qualification-and-shadow.md](historical-qualification-and-shadow.md) |
-| Three benchmarks | 已實作 | [ADR 0024](adr/0024-three-benchmarks-for-signal-qualification.md) |
-| Family-wise block bootstrap | 已實作 | [ADR 0023](adr/0023-family-wise-block-bootstrap-for-selection-bias.md) |
-| Prospective Shadow lifecycle | 已實作 | [historical-qualification-and-shadow.md](historical-qualification-and-shadow.md) |
-| Controlled activation guards | 已實作為 dry-run manual workflow | [controlled-followup-cutover.md](controlled-followup-cutover.md) |
-| Predictive drift / Watch / Paused | 已實作為 dry-run evidence layer | [live-drift-and-recovery.md](live-drift-and-recovery.md) |
-| DSR 與 PBO | 尚未成為正式 CLI gate | 本文件 Gate 4 的建議擴充 |
-| Parameter/regime robustness artifact | 尚未成為統一 schema | 本文件 Gate 5 的建議擴充 |
-| Historical Replication Envelope | 尚未成為獨立 domain artifact | 本文件 Gate 6 的建議擴充 |
-| 以保守信賴下界排名 | 尚未取代現有 point-estimate ranking | 本文件 Gate 6 的建議擴充 |
-| Shadow 對歷史 envelope 的正式 equivalence gate | 尚未成為獨立 gate | 本文件 Gate 7 的建議擴充 |
+| Snapshot、definition、validity、trial registry | 已實作 | Snapshot reproducibility 不等於 true revision vintage |
+| Five-fold fixed-candidate screen | 已實作 | Annual sleeves 重設 capital；通常需等五年 |
+| Three benchmarks | 已實作 | Cash 為 0；dynamic-exit random matcher 是 limited null |
+| Max-mean family bootstrap | 已實作 | `confidence >= .90` 應解讀為 adjusted p-value `<= .10` |
+| Prospective Shadow | 已實作 | 252 sessions／12 fills 是最低操作門檻 |
+| Activation 與 per-BUY guards | 已實作為 dry-run | Promotion 與 order authorization 不可混用 |
+| Predictive drift | 已實作為 evidence layer | 無 joint/sequential false-alarm calibration |
+| Continuous cross-fold path | 尚未 formalize | 目前需人工 report |
+| True point-in-time revision vintage | 尚未實作 | Yahoo full refresh 不支持此 claim |
+| Dynamic-exit random re-execution | 尚未實作 | 目前不能完整隔離 timing edge |
+| DSR/PBO/PSR/MTRL、統一 robustness schema | 尚未 formalize | 記錄人工 artifact 或未執行狀態 |
+| Inconclusive 專用 blocking state | 尚未實作 | 目前以 global no-new-entry 補足 |
+| Joint pre-Shadow ReplicationAndDriftSpec | Target-state | 完成前沿用 Phase 6 policy + Phase 8 envelope |
 
-因此，`trading-evaluate-best` 可以保留為快速診斷與候選摘要工具，但不應單獨作為正式
-Followup 晉級權威。正式晉級應以 Phase 6/7/8 verified lifecycle evidence，加上本文件所列的
-複製性擴充 gate 為準。
+`trading-evaluate-best` 只能作 Development 診斷與候選摘要，不能在 Forward Evaluation 後重新
+選 champion。正式晉級權威是 frozen candidate 的 Phase 6/7/8 verified lifecycle evidence，
+加上本文件明確列出的人工完整流程 artifacts。
 
-## 解讀結果時的限制
+## 解讀限制
 
-- 通過流程代表「目前證據與預先設定的失效風險相容」，不是保證未來獲利。
-- 結構性斷裂、制度改變、擁擠交易、資產下市與流動性消失都可能讓歷史分布失效。
-- 統計門檻不能修復錯誤資料、錯誤成交假設或事後修改的研究設計。
-- 低頻策略需要更長日曆時間；不能把交易數不足解釋為策略穩定。
-- 更高的可信度必然交換成更少候選、更長 Shadow、較慢啟用與較保守的資本配置。
+- 通過代表目前 evidence 與預先設定的失效風險相容，不保證未來獲利。
+- Forward Evaluation folds 是相鄰時間區段，不是獨立重複實驗。
+- Snapshot reproducibility、publication as-of 與 true revision vintage 是三件不同的事。
+- 結構斷裂、制度改變、擁擠、下市與流動性消失仍可能讓歷史分布失效。
+- 低頻策略需要更長時間；交易不足只能解讀為 insufficient evidence。
 
 ## 方法參考
 
@@ -512,4 +455,4 @@ Followup 晉級權威。正式晉級應以 Phase 6/7/8 verified lifecycle eviden
 - David H. Bailey and Marcos López de Prado,
   [The Deflated Sharpe Ratio](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551).
 - David H. Bailey, Jonathan M. Borwein, Marcos López de Prado, and Qiji Jim Zhu,
-  [The Probability of Backtest Overfitting](https://www.risk.net/journal-of-computational-finance/2471206/the-probability-of-backtest-overfitting).
+  [The Probability of Backtest Overfitting](https://doi.org/10.21314/JCF.2016.322).
