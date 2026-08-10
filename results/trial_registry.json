@@ -7149,6 +7149,34 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "5cd9e351f611c465cbcf06f4d9f42b92d88c4325e8543e1f9d4d34c69cd2d01d"
+    },
+    {
+      "definition_fingerprint": "56a5f1017ccc23049deba83b2e9c29a10db0c650c8b19433a2b9160992ce7898",
+      "experiment_family": "SPY:trend-pullback",
+      "experiment_names": [
+        "spy_010_trend_pullback_baseline"
+      ],
+      "first_registered_at": "2026-08-10T09:48:17.641227Z",
+      "hypothesis": "SPY trend-pullback family baseline reproducing SPY-007 Attempt 2 without ClosePos confirmation.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-10T09:48:18.042866Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "951e49964c924881b7c8a52c924d2ed5",
+          "observed_at": "2026-08-10T09:48:18.042866Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/spy_010_trend_pullback_baseline/20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json",
+          "run_mode": "online",
+          "snapshot_id": "c4fce4ad7cd67f0f71e218ecb30f3c08d59074c2e35c2887cacc216b60dcc466",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "a960a0c24a544e063ca3e97b9c29933f7dde2b58ac50356eb2672905c658eaf3"
     }
   ]
 }
