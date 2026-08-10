@@ -21,8 +21,13 @@ from trading.core.ledger_storage import atomic_write, locked_file
 from trading.core.qualification import (
     HISTORICAL_QUALIFICATION_GATE_NAMES,
     SHADOW_ACTIVATION_GATE_NAMES,
+    EvaluationFold,
+    ForwardSelectionEpoch,
+    HistoricalBenchmarkPolicy,
     HistoricalQualificationPlan,
     HistoricalScreenResult,
+    HistoricalScreenThresholds,
+    SelectionAdjustmentPolicy,
     ShadowActivationEvaluation,
     ShadowEvidence,
     ShadowRegistration,
@@ -165,6 +170,17 @@ class QualificationRegistry:
             "shadow_evidence": shadow,
         }
 
+    def historical_plan(self, plan_id: str) -> HistoricalQualificationPlan:
+        """Return one verified frozen plan as a typed domain value."""
+        state = self._load_unlocked()
+        event = _event_for_identity(
+            state,
+            event_type="historical_plan",
+            identity_name="plan_id",
+            identity=plan_id,
+        )
+        return _historical_plan_from_payload(_payload(event))
+
     def register_historical_plan(self, plan: HistoricalQualificationPlan) -> str:
         """Persist frozen folds and thresholds before recording their outcomes."""
         try:
@@ -176,11 +192,54 @@ class QualificationRegistry:
         if len(plan.folds) < plan.thresholds.minimum_evaluation_folds:
             raise QualificationRegistryError("historical plan has insufficient evaluation folds")
         payload = _historical_plan_payload(plan)
-        self._append(
-            event_id=f"historical-plan:{plan.plan_id}",
-            event_type="historical_plan",
-            payload=payload,
-        )
+        event_id = f"historical-plan:{plan.plan_id}"
+        if plan.forward_selection_epoch is None:
+            self._append(
+                event_id=event_id,
+                event_type="historical_plan",
+                payload=payload,
+            )
+        else:
+            with locked_file(self.lock_path, self.lock_timeout_seconds):
+                state = self._load_unlocked()
+                existing = next(
+                    (event for event in _events(state) if event.get("event_id") == event_id),
+                    None,
+                )
+                if existing is None:
+                    recorded_at = self.now()
+                    if recorded_at.tzinfo is None:
+                        raise QualificationRegistryError(
+                            "qualification registry clock must be timezone-aware"
+                        )
+                    elapsed = abs((recorded_at.astimezone(UTC) - plan.created_at).total_seconds())
+                    if elapsed > 5:
+                        raise QualificationRegistryError(
+                            "forward selection plan must be registered when its epoch begins"
+                        )
+                open_plan_ids = {
+                    event_payload.get("plan_id")
+                    for event in _events(state)
+                    if event.get("event_type") == "historical_plan"
+                    and isinstance((event_payload := event.get("payload")), Mapping)
+                    and event_payload.get("experiment_family") == plan.experiment_family
+                    and not any(
+                        screen.get("event_type") == "historical_screen"
+                        and isinstance(screen.get("payload"), Mapping)
+                        and screen["payload"].get("plan_id") == event_payload.get("plan_id")
+                        for screen in _events(state)
+                    )
+                }
+                if open_plan_ids - {plan.plan_id}:
+                    raise QualificationRegistryError(
+                        "experiment family already has an open forward qualification plan"
+                    )
+                self._append_unlocked(
+                    state,
+                    event_id=event_id,
+                    event_type="historical_plan",
+                    payload=payload,
+                )
         return plan.plan_id
 
     def record_historical_screen(
@@ -836,7 +895,7 @@ def _payload(event: dict[str, object]) -> Mapping[str, object]:
 
 def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, object]:
     thresholds = plan.thresholds
-    return {
+    payload: dict[str, object] = {
         "plan_id": plan.plan_id,
         "experiment_family": plan.experiment_family,
         "definition_fingerprint": plan.definition_fingerprint,
@@ -888,6 +947,131 @@ def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, obj
             "block_sessions": plan.selection_adjustment.block_sessions,
         },
     }
+    if plan.forward_selection_epoch is not None:
+        epoch = plan.forward_selection_epoch
+        payload["forward_selection_epoch"] = {
+            "started_at": timestamp_text(epoch.started_at),
+            "selected_trial_id": epoch.selected_trial_id,
+            "included_trial_ids": list(epoch.included_trial_ids),
+            "prior_selection_history_incomplete": epoch.prior_selection_history_incomplete,
+        }
+    return payload
+
+
+def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQualificationPlan:
+    try:
+        thresholds_payload = _mapping_field(payload, "thresholds")
+        benchmark_payload = _mapping_field(payload, "benchmarks")
+        adjustment_payload = _mapping_field(payload, "selection_adjustment")
+        costs = _mapping_field(payload, "cost_policies")
+        base_cost = _execution_cost_policy(_mapping_field(costs, "base"))
+        stress_cost = _execution_cost_policy(_mapping_field(costs, "stress"))
+        raw_folds = payload["folds"]
+        raw_sessions = payload["evaluation_sessions"]
+        raw_development_years = payload["development_years"]
+        if not isinstance(raw_folds, list) or not isinstance(raw_sessions, list):
+            raise ValueError("plan folds or sessions are malformed")
+        if not isinstance(raw_development_years, list):
+            raise ValueError("plan development years are malformed")
+        folds = tuple(
+            EvaluationFold(
+                fold_id=str(item["fold_id"]),
+                evaluation_year=int(item["evaluation_year"]),
+                outcome_start=date.fromisoformat(str(item["outcome_start"])),
+                outcome_end=date.fromisoformat(str(item["outcome_end"])),
+                signal_start=date.fromisoformat(str(item["signal_start"])),
+                signal_end=date.fromisoformat(str(item["signal_end"])),
+            )
+            for item in raw_folds
+            if isinstance(item, Mapping)
+        )
+        if len(folds) != len(raw_folds):
+            raise ValueError("plan folds are malformed")
+        raw_epoch = payload.get("forward_selection_epoch")
+        epoch = None
+        if raw_epoch is not None:
+            epoch_payload = _mapping_value(raw_epoch, "forward selection epoch")
+            included = epoch_payload["included_trial_ids"]
+            if not isinstance(included, list):
+                raise ValueError("forward selection epoch trial identities are malformed")
+            prior_incomplete = epoch_payload["prior_selection_history_incomplete"]
+            if type(prior_incomplete) is not bool:
+                raise ValueError("forward selection epoch history flag is malformed")
+            epoch = ForwardSelectionEpoch(
+                started_at=parse_timestamp(str(epoch_payload["started_at"])),
+                selected_trial_id=str(epoch_payload["selected_trial_id"]),
+                included_trial_ids=tuple(str(item) for item in included),
+                prior_selection_history_incomplete=prior_incomplete,
+            )
+        return HistoricalQualificationPlan(
+            plan_id=str(payload["plan_id"]),
+            experiment_family=str(payload["experiment_family"]),
+            definition_fingerprint=str(payload["definition_fingerprint"]),
+            created_at=parse_timestamp(str(payload["created_at"])),
+            development_years=tuple(int(item) for item in raw_development_years),
+            evaluation_sessions=tuple(date.fromisoformat(str(item)) for item in raw_sessions),
+            folds=folds,
+            maximum_holding_sessions=int(payload["maximum_holding_sessions"]),
+            execution_lag_sessions=int(payload["execution_lag_sessions"]),
+            dependency_sessions=int(payload["dependency_sessions"]),
+            embargo_sessions=int(payload["embargo_sessions"]),
+            stress_drawdown_limit=Decimal(str(payload["stress_drawdown_limit"])),
+            base_cost_policy=base_cost,
+            stress_cost_policy=stress_cost,
+            thresholds=HistoricalScreenThresholds(
+                minimum_development_years=int(thresholds_payload["minimum_development_years"]),
+                minimum_evaluation_folds=int(thresholds_payload["minimum_evaluation_folds"]),
+                minimum_completed_trades=int(thresholds_payload["minimum_completed_trades"]),
+                minimum_traded_folds=int(thresholds_payload["minimum_traded_folds"]),
+                minimum_positive_fold_rate=Decimal(
+                    str(thresholds_payload["minimum_positive_fold_rate"])
+                ),
+                minimum_cumulative_return=Decimal(
+                    str(thresholds_payload["minimum_cumulative_return"])
+                ),
+                minimum_profit_factor=Decimal(str(thresholds_payload["minimum_profit_factor"])),
+                minimum_stress_cumulative_return=Decimal(
+                    str(thresholds_payload["minimum_stress_cumulative_return"])
+                ),
+                minimum_stress_profit_factor=Decimal(
+                    str(thresholds_payload["minimum_stress_profit_factor"])
+                ),
+                maximum_fold_concentration=Decimal(
+                    str(thresholds_payload["maximum_fold_concentration"])
+                ),
+                selection_confidence=Decimal(str(thresholds_payload["selection_confidence"])),
+            ),
+            benchmarks=HistoricalBenchmarkPolicy(
+                family_baseline_trial_id=str(benchmark_payload["family_baseline_trial_id"]),
+                random_seed=int(benchmark_payload["random_seed"]),
+                random_samples=int(benchmark_payload["random_samples"]),
+            ),
+            selection_adjustment=SelectionAdjustmentPolicy(
+                repetitions=int(adjustment_payload["repetitions"]),
+                block_sessions=int(adjustment_payload["block_sessions"]),
+            ),
+            forward_selection_epoch=epoch,
+        )
+    except (KeyError, TypeError, ValueError, InvalidOperation) as exc:
+        raise QualificationRegistryError(f"historical plan payload is malformed: {exc}") from exc
+
+
+def _mapping_value(value: object, name: str) -> Mapping[str, object]:
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{name} must be an object")
+    return value
+
+
+def _mapping_field(payload: Mapping[str, object], name: str) -> Mapping[str, object]:
+    return _mapping_value(payload[name], name)
+
+
+def _execution_cost_policy(payload: Mapping[str, object]) -> ExecutionCostPolicy:
+    return ExecutionCostPolicy(
+        entry_slippage_bps=float(payload["entry_slippage_bps"]),
+        exit_slippage_bps=float(payload["exit_slippage_bps"]),
+        fee_bps_per_side=float(payload["fee_bps_per_side"]),
+    )
 
 
 def _historical_screen_payload(

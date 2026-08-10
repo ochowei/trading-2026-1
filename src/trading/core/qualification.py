@@ -12,7 +12,13 @@ from decimal import Decimal
 
 import pandas as pd
 
-from trading.core.accounting import canonical_json_bytes, decimal_text, timestamp_text, to_decimal
+from trading.core.accounting import (
+    canonical_json_bytes,
+    decimal_text,
+    parse_timestamp,
+    timestamp_text,
+    to_decimal,
+)
 from trading.core.sleeve_engine import (
     DEFAULT_BASE_COST_POLICY,
     DEFAULT_STRESS_COST_POLICY,
@@ -92,6 +98,16 @@ class SelectionAdjustmentPolicy:
 
 
 @dataclass(frozen=True, slots=True)
+class ForwardSelectionEpoch:
+    """Frozen future-only trial universe that bounds incomplete legacy selection history."""
+
+    started_at: datetime
+    selected_trial_id: str
+    included_trial_ids: tuple[str, ...]
+    prior_selection_history_incomplete: bool
+
+
+@dataclass(frozen=True, slots=True)
 class EvaluationFold:
     """One annual outcome interval and its dependency-safe signal window."""
 
@@ -127,6 +143,7 @@ class HistoricalQualificationPlan:
     thresholds: HistoricalScreenThresholds
     benchmarks: HistoricalBenchmarkPolicy
     selection_adjustment: SelectionAdjustmentPolicy
+    forward_selection_epoch: ForwardSelectionEpoch | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -357,6 +374,7 @@ def build_historical_qualification_plan(
     thresholds: HistoricalScreenThresholds | None = None,
     base_cost_policy: ExecutionCostPolicy = DEFAULT_BASE_COST_POLICY,
     stress_cost_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
+    forward_selection_epoch: ForwardSelectionEpoch | None = None,
 ) -> HistoricalQualificationPlan:
     """Freeze annual folds with explicit purge and embargo signal exclusions."""
     if not experiment_family.strip() or not definition_fingerprint.strip():
@@ -434,6 +452,12 @@ def build_historical_qualification_plan(
         repetitions=bootstrap_repetitions,
         block_sessions=bootstrap_block_sessions,
     )
+    if forward_selection_epoch is not None:
+        _validate_forward_selection_epoch(
+            forward_selection_epoch,
+            created_at=created_at.astimezone(UTC),
+            family_baseline_trial_id=family_baseline_trial_id,
+        )
     payload = {
         "schema_version": 1,
         "experiment_family": experiment_family,
@@ -471,6 +495,10 @@ def build_historical_qualification_plan(
             "block_sessions": selection_adjustment.block_sessions,
         },
     }
+    if forward_selection_epoch is not None:
+        payload["forward_selection_epoch"] = _forward_selection_epoch_payload(
+            forward_selection_epoch
+        )
     plan_id = "historical-plan-" + hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
     return HistoricalQualificationPlan(
         plan_id=plan_id,
@@ -490,6 +518,7 @@ def build_historical_qualification_plan(
         thresholds=gate,
         benchmarks=benchmarks,
         selection_adjustment=selection_adjustment,
+        forward_selection_epoch=forward_selection_epoch,
     )
 
 
@@ -695,8 +724,6 @@ def evaluate_family_selection_adjustment(
     trial_daily_excess_returns: dict[str, tuple[DailyExcessReturn, ...]],
 ) -> SelectionAdjustmentResult:
     """Reproduce family selection with a deterministic block-bootstrap max statistic."""
-    if trial_registry_state.get("selection_history_incomplete") is not False:
-        raise ValueError("selection adjustment rejects incomplete trial registry history")
     raw_trials = trial_registry_state.get("trials")
     if not isinstance(raw_trials, list):
         raise ValueError("selection adjustment requires a verified trial registry")
@@ -719,6 +746,30 @@ def evaluate_family_selection_adjustment(
         raise ValueError("selected trial is absent from its registered family")
     if plan.benchmarks.family_baseline_trial_id not in registered:
         raise ValueError("preregistered family baseline is absent from the trial family")
+    history_incomplete = trial_registry_state.get("selection_history_incomplete") is not False
+    epoch = plan.forward_selection_epoch
+    if epoch is not None and epoch.prior_selection_history_incomplete is not history_incomplete:
+        raise ValueError("forward selection epoch history disclosure differs from the registry")
+    if history_incomplete:
+        if epoch is None or not epoch.prior_selection_history_incomplete:
+            raise ValueError("selection adjustment rejects incomplete trial registry history")
+        if registered != epoch.included_trial_ids:
+            raise ValueError("forward selection epoch trial universe changed after registration")
+        if selected_trial_id != epoch.selected_trial_id:
+            raise ValueError("selected trial differs from the forward selection epoch")
+        for trial in raw_trials:
+            if (
+                not isinstance(trial, Mapping)
+                or trial.get("experiment_family") != plan.experiment_family
+            ):
+                continue
+            registered_at = trial.get("first_registered_at")
+            if not isinstance(registered_at, str):
+                raise ValueError("forward selection epoch requires trial registration timestamps")
+            if parse_timestamp(registered_at) > epoch.started_at:
+                raise ValueError(
+                    "forward selection epoch contains a trial registered after it began"
+                )
     if set(trial_daily_excess_returns) != set(registered):
         raise ValueError("selection adjustment requires evidence for every registered family trial")
     lengths = {len(trial_daily_excess_returns[trial_id]) for trial_id in registered}
@@ -781,6 +832,34 @@ def evaluate_family_selection_adjustment(
         block_sessions=block_sessions,
         passed=confidence >= plan.thresholds.selection_confidence,
     )
+
+
+def _validate_forward_selection_epoch(
+    epoch: ForwardSelectionEpoch,
+    *,
+    created_at: datetime,
+    family_baseline_trial_id: str,
+) -> None:
+    if epoch.started_at.tzinfo is None or epoch.started_at.astimezone(UTC) != created_at:
+        raise ValueError("forward selection epoch must start with the qualification plan")
+    included = epoch.included_trial_ids
+    if included != tuple(sorted(set(included))) or not included:
+        raise ValueError("forward selection epoch trial identities must be sorted and unique")
+    if not epoch.selected_trial_id.strip() or epoch.selected_trial_id not in included:
+        raise ValueError("forward selection epoch must include its selected trial")
+    if family_baseline_trial_id not in included:
+        raise ValueError("forward selection epoch must include its family baseline")
+    if epoch.selected_trial_id == family_baseline_trial_id:
+        raise ValueError("forward selection epoch baseline must differ from the selected trial")
+
+
+def _forward_selection_epoch_payload(epoch: ForwardSelectionEpoch) -> dict[str, object]:
+    return {
+        "started_at": timestamp_text(epoch.started_at.astimezone(UTC)),
+        "selected_trial_id": epoch.selected_trial_id,
+        "included_trial_ids": list(epoch.included_trial_ids),
+        "prior_selection_history_incomplete": epoch.prior_selection_history_incomplete,
+    }
 
 
 def register_shadow(

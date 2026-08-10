@@ -1,5 +1,10 @@
 import hashlib
 import json
+from datetime import date
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
 
 from trading.cli import build_parser, main
 from trading.core.accounting import canonical_json_bytes
@@ -134,3 +139,107 @@ def test_qualification_status_is_read_only_and_reports_lifecycle(
     assert "live authorization=false" in output
     assert registry_path.read_bytes() == before
     assert not registry_path.with_name(f".{registry_path.name}.lock").exists()
+
+
+def test_qualification_plan_register_has_no_backdated_clock_input(
+    tmp_path,
+    capsys,
+    monkeypatch,
+) -> None:
+    captured = {}
+    epoch = SimpleNamespace(
+        selected_trial_id="selected-trial",
+        included_trial_ids=("baseline-trial", "selected-trial"),
+        prior_selection_history_incomplete=True,
+    )
+    plan = SimpleNamespace(
+        plan_id="historical-plan-forward",
+        experiment_family="SPY:forward-program",
+        evaluation_sessions=(date(2027, 1, 4), date(2031, 12, 31)),
+        forward_selection_epoch=epoch,
+    )
+
+    def register(**kwargs):
+        captured.update(kwargs)
+        return plan
+
+    monkeypatch.setattr("trading.cli.register_forward_qualification_plan", register)
+    argv = [
+        "qualification",
+        "plan",
+        "register",
+        "--path",
+        str(tmp_path / "qualification.json"),
+        "--trial-registry-path",
+        str(tmp_path / "trials.json"),
+        "--experiment",
+        "spy_forward",
+        "--family-baseline-trial-id",
+        "baseline-trial",
+        "--evaluation-years",
+        "2027",
+        "2028",
+        "2029",
+        "2030",
+        "2031",
+        "--maximum-holding-sessions",
+        "5",
+        "--execution-lag-sessions",
+        "1",
+        "--dependency-sessions",
+        "6",
+        "--embargo-sessions",
+        "1",
+        "--random-seed",
+        "17",
+    ]
+
+    main(argv)
+
+    assert captured["evaluation_years"] == (2027, 2028, 2029, 2030, 2031)
+    assert captured["random_samples"] == 1000
+    assert "created_at" not in captured
+    assert "qualification plan registered: historical-plan-forward" in capsys.readouterr().out
+    with pytest.raises(SystemExit):
+        build_parser().parse_args([*argv, "--created-at", "2020-01-01T00:00:00Z"])
+
+
+def test_qualification_screen_run_routes_exact_trial_manifests(
+    tmp_path,
+    capsys,
+    monkeypatch,
+) -> None:
+    captured = {}
+    execution = SimpleNamespace(
+        event_id="historical-screen:plan-1",
+        screen=SimpleNamespace(disposition="historical-screen-failed", passed=False),
+    )
+
+    def run_screen(**kwargs):
+        captured.update(kwargs)
+        return execution
+
+    monkeypatch.setattr("trading.cli.run_registered_historical_screen", run_screen)
+    main(
+        [
+            "qualification",
+            "screen",
+            "run",
+            "--path",
+            str(tmp_path / "qualification.json"),
+            "--trial-registry-path",
+            str(tmp_path / "trials.json"),
+            "--plan-id",
+            "plan-1",
+            "--trial",
+            "selected=selected.snapshot.json",
+            "--trial",
+            "baseline=baseline.snapshot.json",
+        ]
+    )
+
+    assert captured["trial_manifests"] == {
+        "selected": Path("selected.snapshot.json"),
+        "baseline": Path("baseline.snapshot.json"),
+    }
+    assert "historical screen recorded: historical-screen:plan-1" in capsys.readouterr().out

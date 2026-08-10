@@ -364,6 +364,12 @@ def test_registered_shadow_without_a_checkpoint_remains_valid_non_live_evidence(
         "evidence": {},
         "activation": {},
     }
+    payload["development_summary"]["historical_plan"]["forward_selection_epoch"] = {
+        "started_at": "2020-12-31T21:00:00.000000Z",
+        "selected_trial_id": "trial-1",
+        "included_trial_ids": ["trial-1", "trial-baseline"],
+        "prior_selection_history_incomplete": True,
+    }
 
     validity = classify_result(
         payload,
@@ -373,6 +379,19 @@ def test_registered_shadow_without_a_checkpoint_remains_valid_non_live_evidence(
     )
 
     assert validity.status is ResultValidityStatus.VALID
+
+    changed_epoch = json.loads(json.dumps(payload))
+    changed_epoch["development_summary"]["historical_plan"]["forward_selection_epoch"][
+        "included_trial_ids"
+    ] = ["trial-1", "trial-new", "trial-baseline"]
+    changed_epoch_validity = classify_result(
+        changed_epoch,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert changed_epoch_validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("forward selection epoch" in reason for reason in changed_epoch_validity.reasons)
 
     contradictory = json.loads(json.dumps(payload))
     contradictory["development_summary"]["historical_screen"]["aggregate"]["completed_trades"] = 0

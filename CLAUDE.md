@@ -97,6 +97,12 @@ uv run trading ledger import backup/manual-execution-ledger.csv --path state/man
 # 唯讀檢查 Phase 6 Historical / Shadow lifecycle（不執行、不授權 live trading）
 uv run trading qualification status
 
+# 註冊 forward-only qualification plan；created_at 固定取當下 UTC，不接受回填
+uv run trading qualification plan register --help
+
+# 最後一個 frozen fold 完成後，以每個 family trial 的 exact manifest 重算 screen
+uv run trading qualification screen run --help
+
 # Phase 7 controlled cutover（預設 no-new-entry；仍為 dry-run）
 uv run trading followup-state init
 uv run trading followup-state status
@@ -235,7 +241,8 @@ src/trading/
 │   ├── bundle_strategy.py        # Phase 9 provider-free primary/auxiliary bundle execution seams
 │   ├── live_drift.py             # Phase 8 frozen envelope、Decimal metrics、checkpoint/recovery domain
 │   ├── live_drift_registry.py   # Phase 8 private append-only evidence、hash chain、locks、replay
-│   └── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
+│   ├── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
+│   └── qualification_workflow.py # Forward Selection Epoch、plan registration 與 screen orchestration
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
 │   ├── models.py                # Series/requirement/policy/decision/metadata value types

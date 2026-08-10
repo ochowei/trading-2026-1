@@ -1,0 +1,3 @@
+# Bound incomplete selection history with forward epochs
+
+When legacy selection history is incomplete, it remains permanently disclosed rather than being reconstructed or marked complete. A new qualification program may instead freeze a Forward Selection Epoch containing the selected trial, family baseline, complete current family universe, and a start time before every evaluation outcome; only future sessions may be evaluated, and any later family trial invalidates the epoch. This preserves the fail-closed legacy record while allowing genuinely prospective evidence to become qualifiable without backdating or weakening family-wise selection adjustment.

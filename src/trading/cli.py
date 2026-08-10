@@ -32,6 +32,10 @@ from trading.core.manual_ledger import (
     ManualLedgerStore,
 )
 from trading.core.proposals import ProposalTerms
+from trading.core.qualification_workflow import (
+    register_forward_qualification_plan,
+    run_registered_historical_screen,
+)
 from trading.core.results import compare_experiments, inspect_result, save_result
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
@@ -313,6 +317,74 @@ def cmd_qualification_status(args: argparse.Namespace) -> None:
             f"  sessions={evidence.get('completed_sessions', 0)} trades={trades} "
             f"live authorization={str(authorization).lower()}"
         )
+
+
+def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
+    """Freeze and append one forward-dated qualification plan."""
+    plan = register_forward_qualification_plan(
+        experiment_name=args.experiment,
+        family_baseline_trial_id=args.family_baseline_trial_id,
+        evaluation_years=tuple(args.evaluation_years),
+        maximum_holding_sessions=args.maximum_holding_sessions,
+        execution_lag_sessions=args.execution_lag_sessions,
+        dependency_sessions=args.dependency_sessions,
+        embargo_sessions=args.embargo_sessions,
+        stress_drawdown_limit=args.stress_drawdown_limit,
+        random_seed=args.random_seed,
+        random_samples=args.random_samples,
+        bootstrap_repetitions=args.bootstrap_repetitions,
+        bootstrap_block_sessions=args.bootstrap_block_sessions,
+        qualification_registry_path=args.path,
+        trial_registry_path=args.trial_registry_path,
+    )
+    epoch = plan.forward_selection_epoch
+    print(f"qualification plan registered: {plan.plan_id}")
+    print(f"  family: {plan.experiment_family}")
+    print(f"  first evaluation session: {plan.evaluation_sessions[0].isoformat()}")
+    print(f"  last evaluation session: {plan.evaluation_sessions[-1].isoformat()}")
+    print(f"  selected trial: {epoch.selected_trial_id if epoch else '-'}")
+    print(f"  frozen family trials: {len(epoch.included_trial_ids) if epoch else 0}")
+    print(
+        "  prior selection history incomplete: "
+        f"{str(epoch.prior_selection_history_incomplete).lower() if epoch else 'false'}"
+    )
+
+
+def cmd_qualification_screen_run(args: argparse.Namespace) -> None:
+    """Recompute and record a completed frozen Historical Screen."""
+    trial_manifests: dict[str, Path] = {}
+    for assignment in args.trial:
+        experiment, separator, manifest = assignment.partition("=")
+        if separator != "=" or not experiment.strip() or not manifest.strip():
+            raise ValueError("--trial must use EXPERIMENT=MANIFEST")
+        experiment = experiment.strip()
+        if experiment in trial_manifests:
+            raise ValueError(f"duplicate screen experiment: {experiment}")
+        trial_manifests[experiment] = Path(manifest.strip())
+    execution = run_registered_historical_screen(
+        plan_id=args.plan_id,
+        trial_manifests=trial_manifests,
+        qualification_registry_path=args.path,
+        trial_registry_path=args.trial_registry_path,
+        research_data_store=create_default_research_data_store(),
+        definition_store=create_default_research_definition_store(),
+    )
+    print(f"historical screen recorded: {execution.event_id}")
+    print(f"  disposition: {execution.screen.disposition}")
+    print(f"  passed: {str(execution.screen.passed).lower()}")
+
+
+def cmd_qualification(args: argparse.Namespace) -> None:
+    """Dispatch qualification lifecycle workflows."""
+    try:
+        if args.qualification_command == "status":
+            cmd_qualification_status(args)
+        elif args.qualification_command == "plan" and args.plan_command == "register":
+            cmd_qualification_plan_register(args)
+        elif args.qualification_command == "screen" and args.screen_command == "run":
+            cmd_qualification_screen_run(args)
+    except (KeyError, RuntimeError, ValueError) as exc:
+        raise SystemExit(f"qualification error: {exc}") from exc
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
@@ -1216,6 +1288,17 @@ def positive_int(value: str) -> int:
     return parsed
 
 
+def nonnegative_int(value: str) -> int:
+    """Parse a non-negative integer for qualification dependency boundaries."""
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a non-negative integer") from exc
+    if parsed < 0:
+        raise argparse.ArgumentTypeError("must be a non-negative integer")
+    return parsed
+
+
 def iso_date(value: str) -> date:
     """Parse a strict ISO calendar date for argparse."""
     try:
@@ -1507,7 +1590,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     qualification_p = sub.add_parser(
         "qualification",
-        help="Read-only Historical and Shadow lifecycle diagnostics",
+        help="Historical qualification and Shadow lifecycle operations",
     )
     qualification_sub = qualification_p.add_subparsers(
         dest="qualification_command",
@@ -1521,6 +1604,102 @@ def build_parser() -> argparse.ArgumentParser:
         "--path",
         type=Path,
         default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_plan_p = qualification_sub.add_parser(
+        "plan",
+        help="Manage preregistered forward qualification plans",
+    )
+    qualification_plan_sub = qualification_plan_p.add_subparsers(
+        dest="plan_command",
+        required=True,
+    )
+    qualification_plan_register_p = qualification_plan_sub.add_parser(
+        "register",
+        help="Freeze a future-only selection epoch and Historical Screen plan",
+    )
+    qualification_plan_register_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_plan_register_p.add_argument(
+        "--trial-registry-path",
+        type=Path,
+        default=Path("results/trial_registry.json"),
+    )
+    qualification_plan_register_p.add_argument("--experiment", required=True)
+    qualification_plan_register_p.add_argument("--family-baseline-trial-id", required=True)
+    qualification_plan_register_p.add_argument(
+        "--evaluation-years",
+        type=int,
+        nargs="+",
+        required=True,
+    )
+    qualification_plan_register_p.add_argument(
+        "--maximum-holding-sessions",
+        type=nonnegative_int,
+        required=True,
+    )
+    qualification_plan_register_p.add_argument(
+        "--execution-lag-sessions",
+        type=nonnegative_int,
+        required=True,
+    )
+    qualification_plan_register_p.add_argument(
+        "--dependency-sessions",
+        type=nonnegative_int,
+        required=True,
+    )
+    qualification_plan_register_p.add_argument(
+        "--embargo-sessions",
+        type=nonnegative_int,
+        required=True,
+    )
+    qualification_plan_register_p.add_argument("--stress-drawdown-limit", default="0.20")
+    qualification_plan_register_p.add_argument("--random-seed", type=int, required=True)
+    qualification_plan_register_p.add_argument(
+        "--random-samples",
+        type=positive_int,
+        default=1000,
+    )
+    qualification_plan_register_p.add_argument(
+        "--bootstrap-repetitions",
+        type=positive_int,
+        default=1000,
+    )
+    qualification_plan_register_p.add_argument(
+        "--bootstrap-block-sessions",
+        type=positive_int,
+        default=20,
+    )
+    qualification_screen_p = qualification_sub.add_parser(
+        "screen",
+        help="Run a completed preregistered Historical Screen",
+    )
+    qualification_screen_sub = qualification_screen_p.add_subparsers(
+        dest="screen_command",
+        required=True,
+    )
+    qualification_screen_run_p = qualification_screen_sub.add_parser(
+        "run",
+        help="Recompute a screen from exact formal trial snapshots",
+    )
+    qualification_screen_run_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_screen_run_p.add_argument(
+        "--trial-registry-path",
+        type=Path,
+        default=Path("results/trial_registry.json"),
+    )
+    qualification_screen_run_p.add_argument("--plan-id", required=True)
+    qualification_screen_run_p.add_argument(
+        "--trial",
+        action="append",
+        required=True,
+        help="EXPERIMENT=MANIFEST; repeat for every frozen family trial",
     )
 
     # analyze
@@ -1717,8 +1896,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_compare(args)
     elif args.command == "result":
         cmd_result(args)
-    elif args.command == "qualification" and args.qualification_command == "status":
-        cmd_qualification_status(args)
+    elif args.command == "qualification":
+        cmd_qualification(args)
     elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "sync-docs":

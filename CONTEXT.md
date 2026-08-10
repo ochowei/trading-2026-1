@@ -335,6 +335,10 @@ _Avoid_: Prospective validation, rolling-window chart, activation evidence
 A preregistered screen identity that freezes the development period, evaluation folds, dependency purge and embargo, benchmark policy, and pass thresholds before evaluation outcomes are observed.
 _Avoid_: Backtest options, adaptive gate, post-hoc screen
 
+**Forward Selection Epoch**:
+A future-only qualification boundary that freezes one selected trial, its family baseline, and the complete family trial universe before any included evaluation outcome exists. Previously incomplete selection history remains disclosed, and any later family trial invalidates the epoch.
+_Avoid_: Cleared selection history, retroactive trial inventory, rolling candidate set
+
 **Evaluation Fold**:
 A non-overlapping chronological outcome interval in a historical stability screen, separated as needed so adjacent folds do not share trade outcomes.
 _Avoid_: Training period, overlapping rolling window
