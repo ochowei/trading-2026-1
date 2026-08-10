@@ -37,6 +37,7 @@ from trading.core.qualification_workflow import (
     run_registered_historical_screen,
 )
 from trading.core.results import compare_experiments, inspect_result, save_result
+from trading.core.workflow_authoring import WorkflowAuthoringError, WorkflowRepository
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
     AvailabilityPolicy,
@@ -385,6 +386,48 @@ def cmd_qualification(args: argparse.Namespace) -> None:
             cmd_qualification_screen_run(args)
     except (KeyError, RuntimeError, ValueError) as exc:
         raise SystemExit(f"qualification error: {exc}") from exc
+
+
+def cmd_workflow(args: argparse.Namespace) -> None:
+    """Dispatch tracked workflow authoring validation and lifecycle operations."""
+    repository = WorkflowRepository(args.root)
+    try:
+        if args.workflow_command == "validate":
+            if args.all and args.path is not None:
+                raise WorkflowAuthoringError("validate accepts a path or --all, not both")
+            issues = (
+                repository.validate_all()
+                if args.all or args.path is None
+                else repository.validate_path(args.path)
+            )
+            if issues:
+                for issue in issues:
+                    print(f"FAIL {issue}")
+                raise SystemExit(f"workflow validation failed: {len(issues)} issue(s)")
+            print("workflow validation passed")
+        elif args.workflow_command == "sync":
+            repository.sync()
+            print("workflow indexes synchronized")
+        elif args.workflow_command == "change":
+            repository.transition_change(
+                args.path,
+                args.status,
+                approved_by=args.approved_by,
+            )
+            print(f"workflow change transitioned to {args.status}: {args.path}")
+        elif args.workflow_command == "version":
+            repository.transition_version(
+                args.path,
+                args.status,
+                approved_by=args.approved_by,
+            )
+            print(f"workflow version transitioned to {args.status}: {args.path}")
+        elif args.workflow_command == "release":
+            release = repository.release(args.path, approved_by=args.approved_by)
+            print(f"workflow release prepared: {release['workflow']}@{release['version']}")
+            print("  becomes effective only after merge to the canonical branch")
+    except WorkflowAuthoringError as exc:
+        raise SystemExit(f"workflow error: {exc}") from exc
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
@@ -1702,6 +1745,72 @@ def build_parser() -> argparse.ArgumentParser:
         help="EXPERIMENT=MANIFEST; repeat for every frozen family trial",
     )
 
+    # tracked workflow authoring and release declarations
+    workflow_p = sub.add_parser(
+        "workflow",
+        help="Validate and transition tracked research workflow definitions",
+    )
+    workflow_p.add_argument(
+        "--root",
+        type=Path,
+        default=Path("workflows"),
+        help="Tracked workflow registry root (default: workflows)",
+    )
+    workflow_sub = workflow_p.add_subparsers(dest="workflow_command", required=True)
+    workflow_validate_p = workflow_sub.add_parser(
+        "validate",
+        help="Read-only validation of workflow metadata, indexes, and immutable evidence",
+    )
+    workflow_validate_p.add_argument("path", type=Path, nargs="?")
+    workflow_validate_p.add_argument("--all", action="store_true")
+    workflow_sub.add_parser("sync", help="Regenerate root and per-version Markdown indexes")
+    workflow_change_p = workflow_sub.add_parser(
+        "change",
+        help="Transition one workflow change proposal",
+    )
+    workflow_change_sub = workflow_change_p.add_subparsers(
+        dest="workflow_change_command",
+        required=True,
+    )
+    workflow_change_transition_p = workflow_change_sub.add_parser(
+        "transition",
+        help="Apply one legal change lifecycle transition",
+    )
+    workflow_change_transition_p.add_argument("path", type=Path)
+    workflow_change_transition_p.add_argument(
+        "--to",
+        dest="status",
+        required=True,
+        choices=("proposed", "accepted", "rejected", "deferred", "withdrawn"),
+    )
+    workflow_change_transition_p.add_argument("--approved-by")
+    workflow_version_p = workflow_sub.add_parser(
+        "version",
+        help="Abandon a draft or retire an active workflow version",
+    )
+    workflow_version_sub = workflow_version_p.add_subparsers(
+        dest="workflow_version_command",
+        required=True,
+    )
+    workflow_version_transition_p = workflow_version_sub.add_parser(
+        "transition",
+        help="Apply an allowed terminal version transition",
+    )
+    workflow_version_transition_p.add_argument("path", type=Path)
+    workflow_version_transition_p.add_argument(
+        "--to",
+        dest="status",
+        required=True,
+        choices=("abandoned", "retired"),
+    )
+    workflow_version_transition_p.add_argument("--approved-by")
+    workflow_release_p = workflow_sub.add_parser(
+        "release",
+        help="Prepare an approved release declaration and intended registry state",
+    )
+    workflow_release_p.add_argument("path", type=Path)
+    workflow_release_p.add_argument("--approved-by", required=True)
+
     # analyze
     analyze_p = sub.add_parser(
         "analyze", help="滾動窗口績效分析 (Rolling window performance analysis)"
@@ -1898,6 +2007,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_result(args)
     elif args.command == "qualification":
         cmd_qualification(args)
+    elif args.command == "workflow":
+        cmd_workflow(args)
     elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "sync-docs":

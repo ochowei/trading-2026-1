@@ -127,6 +127,20 @@ uv run trading followup-backtest --start 2025-01-01 --days 126
 # 檢查知識新鮮度
 uv run trading freshness
 
+# 唯讀驗證所有 tracked workflow metadata、索引與 immutable evidence
+uv run trading workflow validate --all
+
+# 從 metadata 重建 root 與 version README 索引
+uv run trading workflow sync
+
+# 依合法生命週期轉換 workflow change 或 version
+uv run trading workflow change transition <change-path> --to proposed
+uv run trading workflow version transition <version-path> --to retired \
+  --approved-by <human-id>
+
+# 準備經人類批准的 workflow release；合併 canonical branch 後才生效
+uv run trading workflow release <version-path> --approved-by <human-id>
+
 # 唯讀檢查單一 Yahoo adjusted daily series 的 CSV cache 狀態
 uv run trading data status SPY
 
@@ -190,6 +204,7 @@ pm/                              # 人類 PM 專用文件（AI Agent 禁止編�
 
 docs/
 ├── adr/                         # 架構決策紀錄（ADR）
+├── strategy-forward-replication-research-workflow.md # 策略歷史績效的未來複製性研究與晉級流程
 ├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
 ├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
 ├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
@@ -200,6 +215,10 @@ docs/
 ├── live-drift-and-recovery.md  # Phase 8 frozen envelopes、drift overlay、guards 與 recovery
 ├── phase-9-primary-followup-migration.md # Phase 9 bundle migration boundaries and verification
 └── superpowers/plans/           # 已確認的實作計畫
+
+workflows/                        # 人類與 Agent 共用的版本化研究流程 registry
+├── README.md                     # 唯一 version lifecycle authority 與產生式索引
+└── <slug>--vNNN/                # 自足 workflow contract、release evidence 與相關工作
 
 ci/
 └── market-data-bypass-allowlist.json # Phase 9 遷移期間的 typed legacy bypass 基線
@@ -242,7 +261,8 @@ src/trading/
 │   ├── live_drift.py             # Phase 8 frozen envelope、Decimal metrics、checkpoint/recovery domain
 │   ├── live_drift_registry.py   # Phase 8 private append-only evidence、hash chain、locks、replay
 │   ├── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
-│   └── qualification_workflow.py # Forward Selection Epoch、plan registration 與 screen orchestration
+│   ├── qualification_workflow.py # Forward Selection Epoch、plan registration 與 screen orchestration
+│   └── workflow_authoring.py    # Tracked workflow metadata、hash、index 與 lifecycle boundary
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
 │   ├── models.py                # Series/requirement/policy/decision/metadata value types
