@@ -13,6 +13,7 @@ from trading.core.workflow_authoring import (
     read_markdown_document,
     render_markdown_document,
 )
+from trading.core.workflow_studies import WorkflowStudyService
 
 FIXED_TIME = datetime(2026, 8, 11, 4, 5, 6, tzinfo=UTC)
 
@@ -135,6 +136,17 @@ def _create_change(version_path: Path, *, number: int = 1) -> Path:
     return change_path
 
 
+def _complete_study_plan(study_path: Path) -> None:
+    (study_path / "HYPOTHESIS.md").write_text(
+        "# Hypothesis\n\nThe frozen candidate must exceed its benchmark under every declared gate.\n",
+        encoding="utf-8",
+    )
+    (study_path / "PLAN.md").write_text(
+        "# Plan\n\nUse the pinned snapshot and workflow stages; fail on any missing gate or identity.\n",
+        encoding="utf-8",
+    )
+
+
 def test_empty_registry_is_valid_and_cli_reports_success(tmp_path, capsys) -> None:
     root, repository = _initialize_root(tmp_path)
 
@@ -207,6 +219,25 @@ def test_release_supersedes_active_version_and_releases_source_changes(tmp_path)
         dependencies=[{"path": "docs/qualification.md", "role": "normative"}],
     )
     repository.sync()
+
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    open_study = studies.initialize(
+        v1,
+        study_slug="open-version-boundary",
+        title="Open version boundary",
+        created_by="research-agent",
+    )
+    _complete_study_plan(open_study)
+    studies.preregister(open_study, approved_by="research-owner")
+    studies.transition(open_study, "running", actor="research-agent")
+    with pytest.raises(WorkflowAuthoringError, match="resolve running study"):
+        repository.release(v2, approved_by="research-owner")
+    studies.transition(
+        open_study,
+        "paused",
+        actor="research-agent",
+        reason="Replacement workflow impact must be resolved first",
+    )
 
     release = repository.release(v2, approved_by="research-owner")
 
@@ -356,6 +387,261 @@ def test_cli_has_no_backdated_release_clock(tmp_path) -> None:
                 "--approved-by",
                 "research-owner",
                 "--prepared-at",
+                "2020-01-01T00:00:00Z",
+            ]
+        )
+
+
+def test_study_lifecycle_freezes_plan_evidence_and_conclusion(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(root)
+    repository.sync()
+    repository.release(version, approved_by="research-owner")
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+
+    study = studies.initialize(
+        version,
+        study_slug="forward-gate",
+        title="Forward gate study",
+        created_by="research-agent",
+    )
+    second = studies.initialize(
+        version,
+        study_slug="second-gate",
+        title="Second gate study",
+        created_by="research-agent",
+        revisits=str(study.relative_to(tmp_path)),
+    )
+
+    assert study.name == "forward-gate--s001"
+    assert second.name == "second-gate--s002"
+    assert read_markdown_document(second / "README.md").metadata["revisits"] == str(
+        study.relative_to(tmp_path)
+    )
+    assert read_markdown_document(study / "README.md").metadata["status"] == "draft"
+    _complete_study_plan(study)
+    registration = studies.preregister(study, approved_by="research-owner")
+    assert registration["approved_at"] == "2026-08-11T04:05:06.000000Z"
+    assert registration["workflow_sha256"]
+
+    original_plan = (study / "PLAN.md").read_text(encoding="utf-8")
+    (study / "PLAN.md").write_text(
+        f"{original_plan}\nPost-registration change.\n", encoding="utf-8"
+    )
+    assert any(
+        "preregistered content digest has changed" in issue.message
+        for issue in repository.validate_all()
+    )
+    (study / "PLAN.md").write_text(original_plan, encoding="utf-8")
+
+    studies.transition(study, "running", actor="research-agent")
+    with pytest.raises(WorkflowAuthoringError, match="EVIDENCE.md must be complete"):
+        studies.transition(study, "awaiting-review", actor="research-agent")
+    (study / "EVIDENCE.md").write_text(
+        "# Evidence\n\nAll declared gates ran against immutable result manifests and exact snapshots.\n",
+        encoding="utf-8",
+    )
+    studies.transition(study, "awaiting-review", actor="research-agent")
+    (study / "CONCLUSION.md").write_text(
+        "# Conclusion\n\nPass: every frozen gate succeeded and each claim traces to immutable evidence.\n",
+        encoding="utf-8",
+    )
+    completion = studies.complete(study, outcome="pass", reviewed_by="independent-reviewer")
+
+    assert completion["outcome"] == "pass"
+    assert completion["evidence_sha256"]
+    assert read_markdown_document(study / "README.md").metadata["status"] == "completed"
+    assert repository.validate_all() == ()
+
+    (study / "EVIDENCE.md").write_text(
+        "# Evidence\n\nEvidence was modified after completion, which must invalidate the record.\n",
+        encoding="utf-8",
+    )
+    assert any(
+        "completed study artifact has changed" in issue.message
+        for issue in repository.validate_all()
+    )
+
+
+def test_study_transitions_are_guarded_and_require_reasons(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(root)
+    repository.sync()
+    repository.release(version, approved_by="research-owner")
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    study = studies.initialize(
+        version,
+        study_slug="pause-boundary",
+        title="Pause boundary",
+        created_by="research-agent",
+    )
+    _complete_study_plan(study)
+    studies.preregister(study, approved_by="research-owner")
+
+    with pytest.raises(WorkflowAuthoringError, match="only an awaiting-review study"):
+        studies.complete(study, outcome="pass", reviewed_by="reviewer")
+    studies.transition(study, "running", actor="research-agent")
+    with pytest.raises(WorkflowAuthoringError, match="paused transition requires --reason"):
+        studies.transition(study, "paused", actor="research-agent")
+    studies.transition(
+        study,
+        "paused",
+        actor="research-agent",
+        reason="Required market-data snapshot is unavailable",
+    )
+    studies.transition(study, "running", actor="research-agent")
+
+    draft = studies.initialize(
+        version,
+        study_slug="cancelled-draft",
+        title="Cancelled draft",
+        created_by="research-agent",
+    )
+    with pytest.raises(WorkflowAuthoringError, match="cancelled transition requires --reason"):
+        studies.transition(draft, "cancelled", actor="research-agent")
+    studies.transition(
+        draft,
+        "cancelled",
+        actor="research-agent",
+        reason="The proposed question duplicates an existing study",
+    )
+    assert repository.validate_all() == ()
+
+
+def test_study_creation_and_preregistration_require_active_workflow(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(root)
+    repository.sync()
+    repository.release(version, approved_by="research-owner")
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    draft = studies.initialize(
+        version,
+        study_slug="retirement-boundary",
+        title="Retirement boundary",
+        created_by="research-agent",
+    )
+    _complete_study_plan(draft)
+    with pytest.raises(WorkflowAuthoringError, match="resolve draft study"):
+        repository.transition_version(version, "retired", approved_by="research-owner")
+    studies.transition(
+        draft,
+        "cancelled",
+        actor="research-agent",
+        reason="Workflow retirement ended this draft",
+    )
+    repository.transition_version(version, "retired", approved_by="research-owner")
+
+    with pytest.raises(WorkflowAuthoringError, match="active workflow version"):
+        studies.initialize(
+            version,
+            study_slug="too-late",
+            title="Too late",
+            created_by="research-agent",
+        )
+
+
+def test_cli_exposes_study_lifecycle_without_backdating_options(tmp_path, capsys) -> None:
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(root)
+    repository.sync()
+    repository.release(version, approved_by="research-owner")
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "study",
+            "init",
+            str(version),
+            "--slug",
+            "cli-study",
+            "--title",
+            "CLI study",
+            "--created-by",
+            "research-agent",
+        ]
+    )
+    assert "workflow study initialized" in capsys.readouterr().out
+    study = version / "work" / "studies" / "cli-study--s001"
+    _complete_study_plan(study)
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "study",
+            "preregister",
+            str(study),
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "study",
+            "transition",
+            str(study),
+            "--to",
+            "running",
+            "--by",
+            "research-agent",
+        ]
+    )
+    (study / "EVIDENCE.md").write_text(
+        "# Evidence\n\nEvery planned CLI stage produced an exact immutable evidence identity.\n",
+        encoding="utf-8",
+    )
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "study",
+            "transition",
+            str(study),
+            "--to",
+            "awaiting-review",
+            "--by",
+            "research-agent",
+        ]
+    )
+    (study / "CONCLUSION.md").write_text(
+        "# Conclusion\n\nPass: the exact CLI evidence satisfies every frozen outcome rule.\n",
+        encoding="utf-8",
+    )
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "study",
+            "complete",
+            str(study),
+            "--outcome",
+            "pass",
+            "--reviewed-by",
+            "independent-reviewer",
+        ]
+    )
+    assert "workflow study completed" in capsys.readouterr().out
+    assert repository.validate_all() == ()
+
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(
+            [
+                "workflow",
+                "--root",
+                str(root),
+                "study",
+                "preregister",
+                str(version / "work" / "studies" / "cli-study--s001"),
+                "--approved-by",
+                "research-owner",
+                "--approved-at",
                 "2020-01-01T00:00:00Z",
             ]
         )

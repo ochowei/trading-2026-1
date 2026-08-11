@@ -33,7 +33,7 @@ jobs:
       - name: Workflow contract validation
         run: uv run trading workflow validate --all
 
-      - name: Workflow authoring tests
+      - name: Workflow authoring and study lifecycle tests
         run: uv run pytest -q tests/test_workflow_authoring.py
 
       - name: Phase 9 market-data bypass policy

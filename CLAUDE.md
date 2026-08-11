@@ -141,6 +141,19 @@ uv run trading workflow version transition <version-path> --to retired \
 # 準備經人類批准的 workflow release；合併 canonical branch 後才生效
 uv run trading workflow release <version-path> --approved-by <human-id>
 
+# 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC
+uv run trading workflow study init <version-path> --slug <study-slug> \
+  --title <title> --created-by <identity>
+uv run trading workflow study preregister <study-path> --approved-by <human-id>
+
+# 依 frozen plan 推進 study；pause/cancel 必須附 reason
+uv run trading workflow study transition <study-path> --to running --by <identity>
+uv run trading workflow study transition <study-path> --to awaiting-review --by <identity>
+
+# 獨立 reviewer 確認後凍結 evidence、conclusion 與 outcome
+uv run trading workflow study complete <study-path> \
+  --outcome <pass|fail|insufficient-evidence|indeterminate> --reviewed-by <identity>
+
 # 唯讀檢查單一 Yahoo adjusted daily series 的 CSV cache 狀態
 uv run trading data status SPY
 
@@ -262,7 +275,8 @@ src/trading/
 │   ├── live_drift_registry.py   # Phase 8 private append-only evidence、hash chain、locks、replay
 │   ├── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
 │   ├── qualification_workflow.py # Forward Selection Epoch、plan registration 與 screen orchestration
-│   └── workflow_authoring.py    # Tracked workflow metadata、hash、index 與 lifecycle boundary
+│   ├── workflow_authoring.py    # Tracked workflow metadata、hash、index 與 lifecycle boundary
+│   └── workflow_studies.py      # Study scaffold、preregistration、operation 與 completion evidence
 ├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
 │   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
 │   ├── models.py                # Series/requirement/policy/decision/metadata value types

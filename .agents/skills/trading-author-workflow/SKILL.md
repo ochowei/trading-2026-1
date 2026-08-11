@@ -104,6 +104,10 @@ or reinterpret studies with this skill. Do not place code, tests, formal results
 broker exports, private ledger data, or personal trading records under `workflows/`; link exact
 immutable evidence identities from their authoritative locations.
 
+Route study creation, preregistration, execution, evidence capture, pause, recovery, and
+cancellation to `trading-operate-workflow`. Route independent evidence judgment and terminal study
+outcomes to `trading-evaluate-study`.
+
 ## Finish
 
 Report the selected mode, files changed, validation results, source disposition, remaining open

@@ -27,6 +27,8 @@ Use the matching repository skill for these workflows:
 | Rank one asset's experiments or update followup | `trading-evaluate-best` |
 | Rebuild the complete followup strategy list | `trading-rebuild-followup` |
 | Review, create, version, or release a repository research workflow | `trading-author-workflow` |
+| Start, preregister, run, pause, or submit a workflow study for review | `trading-operate-workflow` |
+| Independently assess evidence and conclude a workflow study | `trading-evaluate-study` |
 
 For ordinary code changes, bug fixes, and reviews that do not match a skill, inspect the relevant
 implementation and tests directly while following [CLAUDE.md](CLAUDE.md).
