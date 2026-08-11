@@ -38,6 +38,7 @@ from trading.core.qualification_workflow import (
 )
 from trading.core.results import compare_experiments, inspect_result, save_result
 from trading.core.workflow_authoring import WorkflowAuthoringError, WorkflowRepository
+from trading.core.workflow_studies import WorkflowStudyService
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
     AvailabilityPolicy,
@@ -422,6 +423,37 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                 approved_by=args.approved_by,
             )
             print(f"workflow version transitioned to {args.status}: {args.path}")
+        elif args.workflow_command == "study":
+            studies = WorkflowStudyService(args.root)
+            if args.workflow_study_command == "init":
+                path = studies.initialize(
+                    args.path,
+                    study_slug=args.slug,
+                    title=args.title,
+                    created_by=args.created_by,
+                    revisits=args.revisits,
+                )
+                print(f"workflow study initialized: {path}")
+            elif args.workflow_study_command == "preregister":
+                registration = studies.preregister(args.path, approved_by=args.approved_by)
+                print(f"workflow study preregistered: {registration['study_id']}")
+            elif args.workflow_study_command == "transition":
+                studies.transition(
+                    args.path,
+                    args.status,
+                    actor=args.actor,
+                    reason=args.reason,
+                )
+                print(f"workflow study transitioned to {args.status}: {args.path}")
+            elif args.workflow_study_command == "complete":
+                completion = studies.complete(
+                    args.path,
+                    outcome=args.outcome,
+                    reviewed_by=args.reviewed_by,
+                )
+                print(
+                    f"workflow study completed: {completion['study_id']} ({completion['outcome']})"
+                )
         elif args.workflow_command == "release":
             release = repository.release(args.path, approved_by=args.approved_by)
             print(f"workflow release prepared: {release['workflow']}@{release['version']}")
@@ -1804,6 +1836,56 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("abandoned", "retired"),
     )
     workflow_version_transition_p.add_argument("--approved-by")
+    workflow_study_p = workflow_sub.add_parser(
+        "study",
+        help="Create, preregister, operate, and conclude workflow studies",
+    )
+    workflow_study_sub = workflow_study_p.add_subparsers(
+        dest="workflow_study_command",
+        required=True,
+    )
+    workflow_study_init_p = workflow_study_sub.add_parser(
+        "init",
+        help="Create the next local study draft under an active workflow version",
+    )
+    workflow_study_init_p.add_argument("path", type=Path, help="Active workflow version path")
+    workflow_study_init_p.add_argument("--slug", required=True, help="Study slug in kebab-case")
+    workflow_study_init_p.add_argument("--title", required=True)
+    workflow_study_init_p.add_argument("--created-by", required=True)
+    workflow_study_init_p.add_argument(
+        "--revisits",
+        help="Repository-relative path of an earlier study being revisited",
+    )
+    workflow_study_preregister_p = workflow_study_sub.add_parser(
+        "preregister",
+        help="Freeze hypothesis and plan with explicit human approval",
+    )
+    workflow_study_preregister_p.add_argument("path", type=Path)
+    workflow_study_preregister_p.add_argument("--approved-by", required=True)
+    workflow_study_transition_p = workflow_study_sub.add_parser(
+        "transition",
+        help="Apply one legal operational study transition",
+    )
+    workflow_study_transition_p.add_argument("path", type=Path)
+    workflow_study_transition_p.add_argument(
+        "--to",
+        dest="status",
+        required=True,
+        choices=("running", "paused", "awaiting-review", "cancelled"),
+    )
+    workflow_study_transition_p.add_argument("--by", dest="actor", required=True)
+    workflow_study_transition_p.add_argument("--reason")
+    workflow_study_complete_p = workflow_study_sub.add_parser(
+        "complete",
+        help="Freeze an independently reviewed conclusion and outcome",
+    )
+    workflow_study_complete_p.add_argument("path", type=Path)
+    workflow_study_complete_p.add_argument(
+        "--outcome",
+        required=True,
+        choices=("pass", "fail", "insufficient-evidence", "indeterminate"),
+    )
+    workflow_study_complete_p.add_argument("--reviewed-by", required=True)
     workflow_release_p = workflow_sub.add_parser(
         "release",
         help="Prepare an approved release declaration and intended registry state",

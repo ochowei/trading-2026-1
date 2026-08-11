@@ -1,0 +1,4 @@
+interface:
+  display_name: "Operate Trading Workflows"
+  short_description: "Run preregistered workflow studies safely"
+  default_prompt: "Use $trading-operate-workflow to start or resume a governed research study."

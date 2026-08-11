@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evaluate Trading Studies"
+  short_description: "Review evidence and conclude workflow studies"
+  default_prompt: "Use $trading-evaluate-study to independently review and conclude a workflow study."

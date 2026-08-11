@@ -9,7 +9,7 @@
 - [Workflow contract](#workflow-contract)
 - [Version lifecycle](#version-lifecycle)
 - [Change records](#change-records)
-- [Study impact boundary](#study-impact-boundary)
+- [Study operation and version impact](#study-operation-and-version-impact)
 - [Release evidence](#release-evidence)
 - [Dependencies and shared artifacts](#dependencies-and-shared-artifacts)
 - [Source import](#source-import)
@@ -48,7 +48,15 @@ workflows/
     ├── WORKFLOW.md
     ├── RELEASE.json              # generated only for released versions
     └── work/
-        ├── studies/              # owned by a separate execution workflow
+        ├── studies/
+        │   └── <study-slug>--sNNN/
+        │       ├── README.md
+        │       ├── HYPOTHESIS.md
+        │       ├── PLAN.md
+        │       ├── EVIDENCE.md
+        │       ├── CONCLUSION.md
+        │       ├── PREREGISTRATION.json # generated after human approval
+        │       └── COMPLETION.json      # generated only at completion
         └── changes/
             └── <change-slug>--cNNN/
                 ├── README.md
@@ -59,7 +67,7 @@ workflows/
 ```
 
 Do not create empty placeholder directories merely for Git. Create `work/changes/` on the first
-change and leave study creation to the future execution skill.
+change and leave study creation to `trading-operate-workflow`.
 
 Use English ASCII for paths, filenames, metadata keys, IDs, and state values. Use Traditional
 Chinese for explanatory prose when appropriate. Do not maintain two authoritative translations.
@@ -210,20 +218,93 @@ draft/proposed/deferred -> withdrawn
 - Keep source changes under the version they modify. The replacement version links back; do not
   copy the records.
 
-## Study impact boundary
+## Study operation and version impact
 
-This authoring skill reads studies only for impact analysis. It must not create, preregister,
-execute, move, complete, cancel, or reinterpret them.
+A workflow is a versioned procedure definition. A study is one execution instance pinned to one
+released workflow version. Use `trading-operate-workflow` for execution and
+`trading-evaluate-study` for independent judgment; workflow authoring must not perform either role.
 
-When a new version replaces an active version, default every unfinished old study to paused until
-the change analysis assigns one explicit disposition:
+Scope study IDs to the pinned workflow version. Let the CLI allocate the next never-reused local
+`Sxxx` and use:
+
+```text
+<study-slug>--sNNN/
+```
+
+Store this minimum README metadata:
+
+```yaml
+---
+id: S001
+title: Example study
+workflow: example-workflow
+workflow_version: v001
+status: draft
+outcome: null
+created_at: "2026-08-11T00:00:00.000000Z"
+created_by: researcher-id
+status_changed_at: null
+status_changed_by: null
+status_reason: null
+preregistered_at: null
+preregistered_by: null
+completed_at: null
+reviewed_by: null
+revisits: null
+---
+```
+
+Use this lifecycle:
+
+```text
+draft -> preregistered -> running -> awaiting-review -> completed
+                           |  ^             |
+                           v  |             └-> running
+                         paused
+
+draft/preregistered/running/paused -> cancelled
+```
+
+- Create and preregister new studies only under the active workflow version.
+- Require complete `HYPOTHESIS.md` and `PLAN.md` plus explicit human approval before
+  preregistration.
+- Generate `PREREGISTRATION.json` at the current time. Pin the workflow, hypothesis, and plan
+  SHA-256 values; never accept a backdated timestamp.
+- Never change hypothesis or plan after preregistration. Cancel and create a new study with an
+  exact `revisits` path when the research design changes.
+- Let the operator follow the frozen workflow and record exact immutable evidence identities. The
+  operator may not choose or write an outcome.
+- Require complete evidence before `awaiting-review`. Only an independent evaluation may write
+  `CONCLUSION.md` and move the study to `completed`.
+- Use only `pass`, `fail`, `insufficient-evidence`, or `indeterminate` as terminal outcomes.
+- Generate `COMPLETION.json` at completion, pinning preregistration, evidence, conclusion, outcome,
+  time, and reviewer identity. Never edit completed artifacts.
+- Require reasons for pause and cancellation. Treat `completed` and `cancelled` as terminal.
+- Permit a reviewer to return `awaiting-review -> running` only with a reason and without changing
+  the frozen design.
+
+Use guarded CLI transitions instead of editing lifecycle metadata directly:
+
+```bash
+uv run trading workflow study init <active-version-path> \
+  --slug <study-slug> --title <title> --created-by <identity>
+uv run trading workflow study preregister <study-path> --approved-by <human-id>
+uv run trading workflow study transition <study-path> --to running --by <identity>
+uv run trading workflow study transition <study-path> --to awaiting-review --by <identity>
+uv run trading workflow study complete <study-path> --outcome <outcome> \
+  --reviewed-by <identity>
+```
+
+When a new version replaces or retires an active version, first move every unfinished study to a
+safe state. The CLI permits the version boundary only when each study is `paused`, `completed`, or
+`cancelled`. The change impact must assign every paused old study one explicit disposition:
 
 - `continue-on-vNNN`
 - `restart-on-vNNN`
 - `close-invalidated`
 
-Never move or overwrite an old study. A future execution skill must create a new local study ID in
-the new version and record an exact `revisits` link when research restarts.
+Never move or overwrite an old study. Create a new local study ID under the replacement version
+and record an exact `revisits` path when research restarts or continues there.
 
 ## Release evidence
 
@@ -281,7 +362,8 @@ Use three layers:
 
 1. CLI validates structure, paths, metadata, lifecycle, indexes, hashes, and exact references.
 2. Agent validates semantic fidelity, change coverage, and impact reasoning.
-3. Human approves preregistration, change decisions, and release authority.
+3. Human approves preregistration, change decisions, and release authority; an identified,
+   independent reviewer confirms study outcomes.
 
 The Agent may prepare and execute an explicitly approved release command, but is never the release
 authority. Do not infer permission to commit, push, open a PR, or merge.

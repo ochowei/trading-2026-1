@@ -37,7 +37,15 @@ CHANGE_STATUSES = frozenset(
     {"draft", "proposed", "accepted", "rejected", "deferred", "withdrawn", "released"}
 )
 STUDY_STATUSES = frozenset(
-    {"draft", "preregistered", "running", "paused", "completed", "cancelled"}
+    {
+        "draft",
+        "preregistered",
+        "running",
+        "paused",
+        "awaiting-review",
+        "completed",
+        "cancelled",
+    }
 )
 STUDY_OUTCOMES = frozenset({"pass", "fail", "insufficient-evidence", "indeterminate"})
 
@@ -430,6 +438,7 @@ class WorkflowRepository:
             if not approved_by or not approved_by.strip():
                 raise WorkflowAuthoringError("retiring a workflow requires --approved-by")
             self._require_no_blocking_changes(path, included_changes=frozenset())
+            self._require_studies_ready_for_version_end(path)
         else:
             raise WorkflowAuthoringError("version transition supports only abandoned or retired")
         occurred_at = timestamp_text(self._current_time())
@@ -528,10 +537,12 @@ class WorkflowRepository:
             change_documents.append((change_path, change_document))
 
         if active_record is not None:
+            active_path = self.root / str(active_record["path"])
             self._require_no_blocking_changes(
-                self.root / str(active_record["path"]),
+                active_path,
                 included_changes=frozenset(path for path, _document in change_documents),
             )
+            self._require_studies_ready_for_version_end(active_path)
 
         dependencies = self._release_dependencies(metadata.get("dependencies"))
         prepared_at = timestamp_text(self._current_time())
@@ -771,7 +782,7 @@ class WorkflowRepository:
                 ValidationIssue(release_path, f"{status} version must not have RELEASE.json")
             )
         self._validate_changes(path, slug, version, status, issues)
-        self._validate_studies(path, slug, version, issues)
+        self._validate_studies(path, slug, version, status, issues)
 
     def _validate_release(
         self,
@@ -1124,6 +1135,7 @@ class WorkflowRepository:
         version_path: Path,
         slug: str,
         version: str,
+        version_status: Any,
         issues: list[ValidationIssue],
     ) -> None:
         root = version_path / "work" / "studies"
@@ -1150,6 +1162,26 @@ class WorkflowRepository:
                 issues.append(ValidationIssue(readme, str(exc)))
                 continue
             expected_id = f"S{match.group('number')}"
+            for field in (
+                "id",
+                "title",
+                "workflow",
+                "workflow_version",
+                "status",
+                "outcome",
+                "created_at",
+                "created_by",
+                "status_changed_at",
+                "status_changed_by",
+                "status_reason",
+                "preregistered_at",
+                "preregistered_by",
+                "completed_at",
+                "reviewed_by",
+                "revisits",
+            ):
+                if field not in metadata:
+                    issues.append(ValidationIssue(readme, f"missing frontmatter field: {field}"))
             study_id = metadata.get("id")
             if study_id != expected_id:
                 issues.append(ValidationIssue(readme, f"id must be {expected_id}"))
@@ -1159,16 +1191,119 @@ class WorkflowRepository:
                 ids.add(study_id)
             if metadata.get("workflow") != slug or metadata.get("workflow_version") != version:
                 issues.append(ValidationIssue(readme, "study workflow identity is inconsistent"))
+            if not isinstance(metadata.get("title"), str) or not str(metadata.get("title")).strip():
+                issues.append(ValidationIssue(readme, "study title must be a non-empty string"))
+            if not _is_canonical_utc_timestamp(metadata.get("created_at")):
+                issues.append(ValidationIssue(readme, "study created_at must be canonical UTC"))
+            if (
+                not isinstance(metadata.get("created_by"), str)
+                or not str(metadata.get("created_by")).strip()
+            ):
+                issues.append(ValidationIssue(readme, "study created_by is required"))
             status = metadata.get("status")
             outcome = metadata.get("outcome")
             if status not in STUDY_STATUSES:
                 issues.append(ValidationIssue(readme, f"invalid study status: {status}"))
+            elif status == "draft":
+                if (
+                    metadata.get("status_changed_at") is not None
+                    or metadata.get("status_changed_by") is not None
+                ):
+                    issues.append(
+                        ValidationIssue(readme, "draft study must not claim a status transition")
+                    )
+            elif (
+                not _is_canonical_utc_timestamp(metadata.get("status_changed_at"))
+                or not str(metadata.get("status_changed_by") or "").strip()
+            ):
+                issues.append(
+                    ValidationIssue(readme, "non-draft study needs transition time and identity")
+                )
+            if version_status in {"draft", "abandoned"}:
+                issues.append(ValidationIssue(readme, "study requires a released workflow version"))
+            elif version_status != "active" and status in {
+                "draft",
+                "preregistered",
+                "running",
+                "awaiting-review",
+            }:
+                issues.append(
+                    ValidationIssue(
+                        readme,
+                        f"{version_status} workflow version cannot have active study {study_id}",
+                    )
+                )
             if status == "completed" and outcome not in STUDY_OUTCOMES:
                 issues.append(ValidationIssue(readme, "completed study needs a valid outcome"))
             if status != "completed" and outcome is not None:
                 issues.append(ValidationIssue(readme, "only completed studies may have an outcome"))
+            if status == "completed":
+                if (
+                    not _is_canonical_utc_timestamp(metadata.get("completed_at"))
+                    or not str(metadata.get("reviewed_by") or "").strip()
+                ):
+                    issues.append(
+                        ValidationIssue(
+                            readme, "completed study needs completion time and reviewer"
+                        )
+                    )
+                if metadata.get("status_changed_at") != metadata.get(
+                    "completed_at"
+                ) or metadata.get("status_changed_by") != metadata.get("reviewed_by"):
+                    issues.append(
+                        ValidationIssue(readme, "completion and status transition must agree")
+                    )
+            elif (
+                metadata.get("completed_at") is not None or metadata.get("reviewed_by") is not None
+            ):
+                issues.append(
+                    ValidationIssue(readme, "unfinished study must not claim completion metadata")
+                )
+            if (
+                status in {"paused", "cancelled"}
+                and not str(metadata.get("status_reason") or "").strip()
+            ):
+                issues.append(ValidationIssue(readme, f"{status} study needs a status reason"))
+
+            revisits = metadata.get("revisits")
+            if revisits is not None:
+                if not isinstance(revisits, str) or not revisits:
+                    issues.append(ValidationIssue(readme, "revisits must be null or a study path"))
+                else:
+                    try:
+                        revisited = self._resolve_repo_reference(revisits)
+                    except WorkflowAuthoringError as exc:
+                        issues.append(ValidationIssue(readme, str(exc)))
+                    else:
+                        try:
+                            revisited_version = self._containing_version(revisited)
+                        except WorkflowAuthoringError:
+                            valid_study = False
+                        else:
+                            valid_study = (
+                                revisited.is_dir()
+                                and bool(STUDY_DIRECTORY_PATTERN.fullmatch(revisited.name))
+                                and revisited.parent
+                                == (revisited_version / "work" / "studies").resolve()
+                            )
+                        if not valid_study:
+                            issues.append(
+                                ValidationIssue(
+                                    revisited, "revisits must identify an existing study"
+                                )
+                            )
+                        elif revisited == study_path.resolve():
+                            issues.append(ValidationIssue(readme, "study cannot revisit itself"))
+
             registration = study_path / "PREREGISTRATION.json"
-            if status in {"preregistered", "running", "paused", "completed"}:
+            registration_required = status in {
+                "preregistered",
+                "running",
+                "paused",
+                "awaiting-review",
+                "completed",
+            }
+            if registration_required:
                 if not registration.is_file():
                     issues.append(
                         ValidationIssue(
@@ -1179,6 +1314,53 @@ class WorkflowRepository:
                     self._validate_preregistration(registration, metadata, study_path, issues)
             elif registration.exists():
                 self._validate_preregistration(registration, metadata, study_path, issues)
+            if registration.exists():
+                if (
+                    not _is_canonical_utc_timestamp(metadata.get("preregistered_at"))
+                    or not str(metadata.get("preregistered_by") or "").strip()
+                ):
+                    issues.append(
+                        ValidationIssue(
+                            readme, "preregistered study needs approval time and identity"
+                        )
+                    )
+            elif (
+                metadata.get("preregistered_at") is not None
+                or metadata.get("preregistered_by") is not None
+            ):
+                issues.append(
+                    ValidationIssue(readme, "study without preregistration must not claim approval")
+                )
+
+            if status in {"awaiting-review", "completed"} and not _is_substantive(
+                study_path / "EVIDENCE.md"
+            ):
+                issues.append(
+                    ValidationIssue(
+                        study_path / "EVIDENCE.md",
+                        f"{status} study needs completed evidence",
+                    )
+                )
+            if status == "completed" and not _is_substantive(study_path / "CONCLUSION.md"):
+                issues.append(
+                    ValidationIssue(
+                        study_path / "CONCLUSION.md",
+                        "completed study needs a completed conclusion",
+                    )
+                )
+
+            completion = study_path / "COMPLETION.json"
+            if status == "completed":
+                if not completion.is_file():
+                    issues.append(
+                        ValidationIssue(completion, "completed study needs completion evidence")
+                    )
+                else:
+                    self._validate_completion(completion, metadata, study_path, issues)
+            elif completion.exists():
+                issues.append(
+                    ValidationIssue(completion, "unfinished study must not have COMPLETION.json")
+                )
 
     def _validate_preregistration(
         self,
@@ -1192,10 +1374,20 @@ class WorkflowRepository:
         except (OSError, json.JSONDecodeError) as exc:
             issues.append(ValidationIssue(path, f"invalid preregistration JSON: {exc}"))
             return
+        if not isinstance(payload, dict):
+            issues.append(ValidationIssue(path, "preregistration payload must be an object"))
+            return
+        if payload.get("schema_version") != 1:
+            issues.append(ValidationIssue(path, "preregistration schema_version must be 1"))
+        relative_study = study_path.resolve().relative_to(self.repo_root.resolve()).as_posix()
         expected = {
             "study_id": metadata.get("id"),
             "workflow": metadata.get("workflow"),
             "workflow_version": metadata.get("workflow_version"),
+            "study_path": relative_study,
+            "approved_at": metadata.get("preregistered_at"),
+            "approved_by": metadata.get("preregistered_by"),
+            "revisits": metadata.get("revisits"),
         }
         for field, value in expected.items():
             if payload.get(field) != value:
@@ -1210,6 +1402,60 @@ class WorkflowRepository:
                 issues.append(ValidationIssue(path, f"{field} must be a SHA-256 digest"))
             elif artifact.exists() and digest != _sha256(artifact):
                 issues.append(ValidationIssue(artifact, "preregistered content digest has changed"))
+        workflow_release = study_path.parents[2] / "RELEASE.json"
+        try:
+            release_payload = json.loads(workflow_release.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            issues.append(
+                ValidationIssue(workflow_release, f"cannot verify workflow release identity: {exc}")
+            )
+        else:
+            if payload.get("workflow_sha256") != release_payload.get("workflow_sha256"):
+                issues.append(
+                    ValidationIssue(path, "preregistration workflow digest differs from release")
+                )
+
+    def _validate_completion(
+        self,
+        path: Path,
+        metadata: Mapping[str, Any],
+        study_path: Path,
+        issues: list[ValidationIssue],
+    ) -> None:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            issues.append(ValidationIssue(path, f"invalid completion JSON: {exc}"))
+            return
+        if not isinstance(payload, dict):
+            issues.append(ValidationIssue(path, "completion payload must be an object"))
+            return
+        if payload.get("schema_version") != 1:
+            issues.append(ValidationIssue(path, "completion schema_version must be 1"))
+        relative_study = study_path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        expected = {
+            "study_id": metadata.get("id"),
+            "workflow": metadata.get("workflow"),
+            "workflow_version": metadata.get("workflow_version"),
+            "study_path": relative_study,
+            "outcome": metadata.get("outcome"),
+            "completed_at": metadata.get("completed_at"),
+            "reviewed_by": metadata.get("reviewed_by"),
+        }
+        for field, value in expected.items():
+            if payload.get(field) != value:
+                issues.append(ValidationIssue(path, f"completion {field} is inconsistent"))
+        digests = {
+            "preregistration_sha256": study_path / "PREREGISTRATION.json",
+            "evidence_sha256": study_path / "EVIDENCE.md",
+            "conclusion_sha256": study_path / "CONCLUSION.md",
+        }
+        for field, artifact in digests.items():
+            digest = payload.get(field)
+            if not isinstance(digest, str) or not SHA256_PATTERN.fullmatch(digest):
+                issues.append(ValidationIssue(path, f"{field} must be a SHA-256 digest"))
+            elif artifact.exists() and digest != _sha256(artifact):
+                issues.append(ValidationIssue(artifact, "completed study artifact has changed"))
 
     def _release_dependencies(self, raw: Any) -> list[dict[str, str]]:
         if not isinstance(raw, list):
@@ -1409,6 +1655,19 @@ class WorkflowRepository:
             if status == "accepted" and change_path.resolve() not in included:
                 raise WorkflowAuthoringError(
                     f"accepted change must be included or otherwise resolved: {change_path}"
+                )
+
+    def _require_studies_ready_for_version_end(self, version_path: Path) -> None:
+        studies_root = version_path / "work" / "studies"
+        if not studies_root.exists():
+            return
+        allowed = {"paused", "completed", "cancelled"}
+        for study_path in sorted(path for path in studies_root.iterdir() if path.is_dir()):
+            metadata = read_markdown_document(study_path / "README.md").metadata
+            status = metadata.get("status")
+            if status not in allowed:
+                raise WorkflowAuthoringError(
+                    f"resolve {status} study before ending the active version: {study_path}"
                 )
 
     def _require_valid(self) -> None:
