@@ -85,6 +85,17 @@ identity used for result validity and trial lineage.
 The runner returns a typed `CanonicalSleeveInput`; the coordinator itself applies the frozen
 definition's cost policies through the shared sleeve evaluator and publishes the resulting evidence.
 Runner-supplied precomputed canonical evidence is not trusted.
+
+Workflow-native `trading research run` results additionally persist
+`metadata.observation_provenance`. The CLI constructs this evidence before invoking the runner and
+records the canonical application argv, working directory, exact workflow family/version/path,
+SHA-256 identities for `RELEASE.json` and `WORKFLOW.md`, the resolved composite policy-set identity,
+and the complete Git HEAD. It also embeds the exact UTF-8 bytes and SHA-256 identity of every
+maintained orchestration source required to reproduce workflow binding and formal publication.
+Missing or unreadable workflow files, source bytes, policy-set identity, or Git HEAD fail closed
+before strategy output is published. Embedded bytes preserve dirty-worktree orchestration exactly;
+a commit SHA alone does not replace them.
+
 Unmigrated persisted execution requires explicit `--legacy`; `--ephemeral` remains available because
 it changes no persisted results. Full detector migration remains Phase 9.
 

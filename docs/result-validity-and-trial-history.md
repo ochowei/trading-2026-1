@@ -16,6 +16,11 @@ reproducibility fields:
 - `legacy_period_results`, which keeps older Part A / Part B / Part C names available to readers.
 - `canonical_sleeve_evidence`, containing separate raw signals and raw candidates,
   gross/base-net/stress-net daily equity, cost policies, metrics, and signal/trade parity.
+- workflow-native formal results also carry `metadata.observation_provenance`: canonical argv,
+  working directory, exact workflow release/definition and composite policy-set identities,
+  complete Git HEAD, and content-addressed exact orchestration source bytes. This field is produced
+  by the workflow-native CLI boundary; legacy and ordinary experiment results are not assigned
+  synthetic workflow provenance.
 
 The current statuses are:
 
@@ -63,6 +68,11 @@ affected definition lineage.
 follow-up selection use only complete, successful, current-definition, current-data results.
 The coordinator generates canonical evidence from the runner's typed raw input and verifies its
 engine and cost policies against the exact frozen definition before publication.
+For workflow-native execution, the CLI supplies observation provenance before the runner is
+invoked, and the coordinator defensively copies it into the persisted historical result. The
+historical result file remains local-only unless repository policy explicitly retains it; tracked
+snapshot manifests, trial-registry observations, and study evidence refer to its exact path and
+SHA-256 identity instead of copying mutable result content into the workflow directory.
 Validity also recomputes every scenario's metrics from its persisted daily-equity ledger; a changed
 Sharpe, return, volatility, or drawdown without the matching path is unreproducible.
 The coordinator records a successful formal observation before advancing `latest.json`; a registry
