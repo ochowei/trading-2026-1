@@ -7294,6 +7294,241 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "dace5b8f44c9e8e3d23a15261556486fcb664d9fe014dcb11bf3e38a20716517"
+    },
+    {
+      "definition_fingerprint": "ec27e4730402f248fe176f27429aa0a72554a1a0e81800aec4913b3296af9dc5",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-minus-two-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T09:29:52.454060Z",
+      "hypothesis": "ACWI has a net turn-of-month cash-flow effect around the M-2 open.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T09:29:52.462460Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": "IndexError: single positional indexer is out-of-bounds",
+          "observation_id": "0e9f5b13c6c848e9b89a878f698f80d2",
+          "observed_at": "2026-08-12T09:29:52.462460Z",
+          "outcome_status": "failed",
+          "result_path": null,
+          "run_mode": "offline",
+          "snapshot_id": "74beeafe7ba8b4a1341a339f2d682711ad2ed5af203ce736d8f2a0aff6e971a2",
+          "validity_status": null
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "failed",
+      "trial_id": "1e1f89e8e1584e2fe7b9be85a82571bd24a17ff8f4f7ecd720e4537ac7220b3f"
+    },
+    {
+      "definition_fingerprint": "584645817fbe9b0bc80302f65358a361f2a1da05f0c1f74c97f145210457706a",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-minus-one-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T09:29:53.835466Z",
+      "hypothesis": "ACWI has a net turn-of-month cash-flow effect around the M-1 open.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T09:29:53.986999Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "8c9c0d218a0e4ceaa455b8dd43706c19",
+          "observed_at": "2026-08-12T09:29:53.986999Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-minus-one-hold-five/20260812_092953_932291_offline_8e59fa530cde40adb48296b5300c44d7.json",
+          "run_mode": "offline",
+          "snapshot_id": "78c34b037e244fbf23806d2efe6ccf81a144077c49cff9b6169d06d2e3413339",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "3fe5d2925e08cfb278ef63f9fd3cb02984d496ef615d630f409e0305f93df588"
+    },
+    {
+      "definition_fingerprint": "7ce804ad2fa9c4c58a82d50160faef585a11b3925b2b89c7462f7f03f6a48fdc",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-month-end-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T09:29:55.376186Z",
+      "hypothesis": "ACWI has a net turn-of-month cash-flow effect around the M0 open.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T09:29:55.523115Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "167b0f0e071b4bb0b688330ad2a73c71",
+          "observed_at": "2026-08-12T09:29:55.523115Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-month-end-hold-five/20260812_092955_472108_offline_06015f06a8184a61a9892bf83cd4e466.json",
+          "run_mode": "offline",
+          "snapshot_id": "7bff8247f47fbc7149ec13ee72d9aea813ddd393f5576af6544a73de9e646378",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "475f2aa5acfc8099f5c722663881a40d6b25b1eafdae4584a057a31d8f0c3210"
+    },
+    {
+      "definition_fingerprint": "a051f6c7eaac628bb4e366d7dbadd0e14d9df3ba655b6f9a6f7440d90db05ca5",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-session-ten-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T09:29:56.909106Z",
+      "hypothesis": "A tenth-session monthly exposure is the distinct simple family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T09:29:57.059132Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "efaf7fdc051b4ac59444f0ae04d1e80d",
+          "observed_at": "2026-08-12T09:29:57.059132Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-session-ten-hold-five/20260812_092957_005514_offline_3b8311bf878141deb13099d6346fdcef.json",
+          "run_mode": "offline",
+          "snapshot_id": "fb6499caaf72471b41bc08b496bd51b7c66cf5b62e03f287bc31ff0020600e7f",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "b3ca6a6aaa2e5b2954b4649f13ddf41599edcabc2a523b500df4aa9fee76434c"
+    },
+    {
+      "definition_fingerprint": "9ea3a69d2a97701b3a390373db7b9f38566be09a563bd3123c6fd5157702bb5a",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-minus-two-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T09:30:52.259096Z",
+      "hypothesis": "ACWI has a net turn-of-month cash-flow effect around the M-2 open.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T11:45:39.681951Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "cfda25b74e104ecb8bee6dcd65379523",
+          "observed_at": "2026-08-12T09:30:52.410440Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-minus-two-hold-five/20260812_093052_356121_offline_c15a67fa7fc74afb9d03d5c61375c9a8.json",
+          "run_mode": "offline",
+          "snapshot_id": "51137539f3bec6a8435a713dfa53aea76b3be43995e21b26187e0447c7de47b9",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "dd8a20a5db844e98889d6d4bbd2bd900",
+          "observed_at": "2026-08-12T11:45:39.681951Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-minus-two-hold-five/20260812_114539_625028_offline_4e88dc445c524148a7dd3308f73c00b3.json",
+          "run_mode": "offline",
+          "snapshot_id": "bd52bfd9d29b08076adc33cfbff2ffe53ef2616c3c2e88173d35185a110985a7",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "605400ea4d872c0ca217046cd44551afaa34ecb86335b714b617bc9b72a9c9d7"
+    },
+    {
+      "definition_fingerprint": "98aa53497e28ed66138f65fbedc9c95822d05d325d0d7a2e4255c58e010f0998",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-minus-one-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T11:45:41.068599Z",
+      "hypothesis": "ACWI has a net turn-of-month cash-flow effect around the M-1 open.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T11:45:41.216056Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "14101e255a6f488a8f3d709f978ce14d",
+          "observed_at": "2026-08-12T11:45:41.216056Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-minus-one-hold-five/20260812_114541_164029_offline_4dbaf7e9dfab439e84693c69729b1013.json",
+          "run_mode": "offline",
+          "snapshot_id": "14ac45aa8ea535283cb9710b124f6476209f88683218511e553292aafa8bd05b",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "876710e58e7826909740575501b8fcc1573480affedb8ceeb7a49b200a2bd045"
+    },
+    {
+      "definition_fingerprint": "ee8d633d16f50d0a021881148df39f246f9ef52d007f160eefab2cf95f790b39",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-month-end-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T11:45:42.593540Z",
+      "hypothesis": "ACWI has a net turn-of-month cash-flow effect around the M0 open.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T11:45:42.743795Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "4bc88e1cac7b4f71b9339eec0613af2a",
+          "observed_at": "2026-08-12T11:45:42.743795Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-month-end-hold-five/20260812_114542_689370_offline_2624f91471c748c59000b9875183e00b.json",
+          "run_mode": "offline",
+          "snapshot_id": "dea09b7a5338ab9972d8cdad2500caf4f1eda0dd5f47e78f172b4183ac69b4d2",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "8b453c62cb75f269f5b1b84752d75c8a7535b0ce8b37e744f956edb52fe7c722"
+    },
+    {
+      "definition_fingerprint": "66091d271cbe846de97b96366ed24f8e6023aece46aee75959a34c6791bfcd4a",
+      "experiment_family": "acwi-turn-of-month",
+      "experiment_names": [
+        "acwi-turn-of-month--enter-session-ten-hold-five"
+      ],
+      "first_registered_at": "2026-08-12T11:45:44.137265Z",
+      "hypothesis": "A tenth-session monthly exposure is the distinct simple family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T11:45:44.292648Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "257cac3415a24ec4875592cf0d1c3b03",
+          "observed_at": "2026-08-12T11:45:44.292648Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/acwi-turn-of-month--enter-session-ten-hold-five/20260812_114544_233957_offline_83ed30fea612425194bb0917f94a6f35.json",
+          "run_mode": "offline",
+          "snapshot_id": "6fa762b900bdac0526a9e52b9a8d6e0e710a31714ccb09ec88402eb1430c920c",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "f4bda41352379aa43493d32ba1b18b6e39c17e3b6005180162d5add02d323201"
     }
   ]
 }

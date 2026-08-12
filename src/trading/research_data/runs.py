@@ -7,7 +7,7 @@ import json
 import os
 import tempfile
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -100,6 +100,7 @@ class ResearchRunCoordinator:
         current_definition: DefinitionBlobRef | None = None,
         mode: RunMode | str = RunMode.ONLINE,
         migration_parity_path: Path | None = None,
+        observation_provenance: Mapping[str, object] | None = None,
     ) -> ResearchRunOutcome:
         """Verify evidence, run once, then apply the selected publication rule."""
         try:
@@ -247,6 +248,8 @@ class ResearchRunCoordinator:
                 "definition_fingerprint": definition.fingerprint if definition else None,
                 "run_mode": run_mode.value,
             }
+            if observation_provenance is not None:
+                raw_metadata["observation_provenance"] = copy.deepcopy(dict(observation_provenance))
             if run_mode is RunMode.MIGRATION:
                 raw_metadata["reproducibility"].update(
                     {

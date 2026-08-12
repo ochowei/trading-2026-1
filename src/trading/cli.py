@@ -5,8 +5,10 @@ Supports experiment, followup, and analysis subcommands.
 """
 
 import argparse
+import hashlib
 import json
 import logging
+import subprocess
 import sys
 from collections.abc import Mapping
 from datetime import UTC, date, datetime, timedelta
@@ -506,6 +508,84 @@ def _workflow_native_context(identity: str, workflow_path: Path) -> tuple[object
     return definition, policy_set
 
 
+def _workflow_observation_provenance(
+    args: argparse.Namespace,
+    policy_set: object,
+) -> dict[str, object]:
+    """Capture exact workflow-native run coordination and invocation evidence."""
+    workflow_path = Path(args.workflow)
+    release_path = workflow_path / "RELEASE.json"
+    workflow_definition_path = workflow_path / "WORKFLOW.md"
+    try:
+        release_bytes = release_path.read_bytes()
+        workflow_bytes = workflow_definition_path.read_bytes()
+        release = json.loads(release_bytes)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise WorkflowNativeExecutionError(
+            f"cannot capture workflow release provenance: {exc}"
+        ) from exc
+    if not isinstance(release, dict):
+        raise WorkflowNativeExecutionError("workflow release provenance must be an object")
+
+    source_paths = (
+        Path("src/trading/cli.py"),
+        Path("src/trading/research_definitions/execution.py"),
+        Path("src/trading/research_data/runs.py"),
+        Path("src/trading/research_data/result_schema.py"),
+    )
+    sources: dict[str, object] = {}
+    try:
+        for path in source_paths:
+            content = path.read_text(encoding="utf-8")
+            sources[str(path)] = {
+                "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+                "content": content,
+            }
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, UnicodeError, subprocess.CalledProcessError) as exc:
+        raise WorkflowNativeExecutionError(
+            f"cannot capture orchestration provenance: {exc}"
+        ) from exc
+
+    canonical_argv = [
+        "trading",
+        "research",
+        "run",
+        args.identity,
+        "--workflow",
+        str(workflow_path),
+        "--manifest",
+        str(args.manifest),
+    ]
+    if args.offline:
+        canonical_argv.append("--offline")
+    policy_set_identity = getattr(policy_set, "identity", None)
+    if not isinstance(policy_set_identity, str):
+        raise WorkflowNativeExecutionError("resolved policy set identity is missing")
+    return {
+        "schema_version": 1,
+        "canonical_argv": canonical_argv,
+        "working_directory": str(Path.cwd()),
+        "workflow": {
+            "path": str(workflow_path),
+            "workflow": release.get("workflow"),
+            "version": release.get("version"),
+            "release_sha256": hashlib.sha256(release_bytes).hexdigest(),
+            "workflow_sha256": hashlib.sha256(workflow_bytes).hexdigest(),
+            "policy_set_identity": policy_set_identity,
+        },
+        "orchestration": {
+            "git_head": completed.stdout.strip(),
+            "sources": sources,
+        },
+    }
+
+
 def cmd_research(args: argparse.Namespace) -> None:
     """Prepare and execute workflow-native definitions outside the legacy inventory."""
     try:
@@ -571,6 +651,7 @@ def cmd_research(args: argparse.Namespace) -> None:
             manifest_path=args.manifest,
             current_definition=captured.blob,
             mode=RunMode.OFFLINE if args.offline else RunMode.ONLINE,
+            observation_provenance=_workflow_observation_provenance(args, policy_set),
         )
         print(f"research result published to {outcome.persisted_path}")
         print(f"  definition fingerprint: {captured.fingerprint}")

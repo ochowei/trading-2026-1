@@ -1,12 +1,12 @@
 ---
 workflow: strategy-forward-replication-research
 title: 策略前瞻驗證流程
-version: v002
+version: v003
 definition: WORKFLOW.md
-supersedes: v001
+supersedes: v002
 derived_from: null
 source_changes:
-- workflows/strategy-forward-replication-research--v001/work/changes/pin-normative-dependencies--c001
+- workflows/strategy-forward-replication-research--v002/work/changes/document-observation-provenance--c001
 policies:
 - family: us-equity-market
   version: v001
@@ -53,11 +53,12 @@ only in the root `workflows/README.md` registry.
 
 ## Authoring basis
 
-本版完整保留 v001 的研究 stages、gates、authority boundaries、policy pins 與 legacy
-protections，並實作 accepted change
-`strategy-forward-replication-research@v001/C001`。該 change 來自 S001 end-to-end pilot 的
-獨立 review：修正 `WORKFLOW.md` 與 release metadata 對四個 normative dependencies 的角色
-不一致，並要求 formal observation 固定完整 outcome-relevant orchestration source identity。
+本版完整保留 v002 的研究 stages、gates、authority boundaries、policy pins、legacy
+protections 與 completed-study identities，並實作 accepted change
+`strategy-forward-replication-research@v002/C001`。該 change 明確定義 workflow-native formal
+result 的 `metadata.observation_provenance` wire contract、exact orchestration source capture 與
+tracked/local-only storage boundary，使 workflow、implementation、reproducibility 與 result
+documentation 保持一致。
 
 ## Errata
 
@@ -68,15 +69,9 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-| ID | Title | Status | Outcome | Path |
-| --- | --- | --- | --- | --- |
-| `S003` | ACWI Turn-of-Month Integrity Replication | `completed` | `fail` | [acwi-turn-of-month-integrity-replication--s003](work/studies/acwi-turn-of-month-integrity-replication--s003/) |
-| `S001` | ACWI Turn-of-Month Replication | `cancelled` | `-` | [acwi-turn-of-month-replication--s001](work/studies/acwi-turn-of-month-replication--s001/) |
-| `S002` | ACWI Turn-of-Month Replication — Corrected Availability | `completed` | `indeterminate` | [acwi-turn-of-month-replication-revised-availability--s002](work/studies/acwi-turn-of-month-replication-revised-availability--s002/) |
+_No studies._
 
 ### Changes
 
-| ID | Title | Status | Released in | Path |
-| --- | --- | --- | --- | --- |
-| `C001` | Document Workflow Observation Provenance | `released` | `v003` | [document-observation-provenance--c001](work/changes/document-observation-provenance--c001/) |
+_No changes._
 <!-- GENERATED:WORK_INDEX_END -->

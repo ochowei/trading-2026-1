@@ -214,6 +214,10 @@ def test_online_offline_and_ephemeral_modes_have_distinct_publication_rules(tmp_
         manifest_path=manifest_path,
         current_definition=manifest.definition,
         mode=RunMode.OFFLINE,
+        observation_provenance={
+            "canonical_argv": ["trading", "research", "run", "family/trial"],
+            "workflow": {"version": "v002"},
+        },
     )
     stale_online_coordinator = ResearchRunCoordinator(
         store=store,
@@ -254,6 +258,10 @@ def test_online_offline_and_ephemeral_modes_have_distinct_publication_rules(tmp_
     assert len(registry["trials"][0]["observations"]) == 3
     assert offline.latest_path is None
     assert offline.persisted_path is not None
+    assert offline.result["metadata"]["observation_provenance"] == {
+        "canonical_argv": ["trading", "research", "run", "family/trial"],
+        "workflow": {"version": "v002"},
+    }
     assert ephemeral.latest_path is None
     assert ephemeral.persisted_path is None
     assert set((tmp_path / "results").rglob("*.json")) == files_before_ephemeral
