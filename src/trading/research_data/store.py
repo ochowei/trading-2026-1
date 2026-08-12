@@ -248,9 +248,10 @@ class ResearchDataStore:
             )
             frames[entry.series] = frame
         primary_requirement = next(item for item in requirements if item.role == "primary")
-        primary_frame = frames[primary_requirement.series]
         calendar = PrimaryUSSessionCalendar()
         first_session = calendar.session_on_or_after(primary_requirement.history_start)
+        primary_frame = frames[primary_requirement.series].loc[pd.Timestamp(first_session) :]
+        frames[primary_requirement.series] = primary_frame
         decision_times = tuple(
             SignalDecisionTime.for_primary_session(timestamp.date(), calendar=calendar)
             for timestamp in primary_frame.index
