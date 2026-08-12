@@ -9,8 +9,9 @@ qualified experiments into manual Firstrade followup reports.
 ## Start here
 
 Read [CLAUDE.md](CLAUDE.md) completely before working in this repository. It is the canonical
-source for project rules, required documentation updates, commands, and architecture. Keep details
-there instead of duplicating them in this router.
+source for project rules, required documentation updates, and commands. Use
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) as the canonical repository map and file-ownership
+guide. Keep details in those documents instead of duplicating them in this router.
 
 ## Task router
 
@@ -45,6 +46,10 @@ implementation and tests directly while following [CLAUDE.md](CLAUDE.md).
 ## Non-negotiable guardrails
 
 - Keep code and its related documentation synchronized.
+- When adding, removing, moving, renaming, or repurposing a tracked file or directory, update
+  `docs/ARCHITECTURE.md` in the same change. Also update it for new repeated file patterns, public
+  entry points, generated artifacts, or local-only data boundaries. Routine additions that already
+  fit a documented pattern do not need per-instance entries.
 - Do not edit `pm/` unless the user explicitly designates the task as `HUMAN_PM_HELPER`.
 - Use the required execution model for every non-grandfathered experiment.
 - Preserve the freshness metadata when changing experiment context or cross-asset lessons.

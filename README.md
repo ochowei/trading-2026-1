@@ -6,7 +6,8 @@ Quantitative trading experiment framework — manage unlimited trading strategy 
 
 ## 快速開始 (Quick Start)
 
-開發指令與專案架構請參考 [CLAUDE.md](CLAUDE.md)。
+開發指令與 Agent 規則請參考 [CLAUDE.md](CLAUDE.md)；專案檔案與資料夾用途請參考
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
 ## CSV Market Data
 

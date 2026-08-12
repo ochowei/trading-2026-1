@@ -1,3 +1,5 @@
 # GEMINI.md
 
-All project rules, CLI commands, and architecture are defined in [CLAUDE.md](CLAUDE.md). Please read that file first.
+Read [CLAUDE.md](CLAUDE.md) first for project rules and CLI commands. Use
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) as the canonical repository map and file-ownership
+guide.
