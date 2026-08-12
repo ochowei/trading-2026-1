@@ -1,11 +1,21 @@
 ---
 name: trading-new-experiment
-description: Use when creating the next numbered trading experiment for an asset that already has experiments.
+description: Use only for inspecting or migrating an existing frozen legacy experiment lineage. New trials must use trading-operate-workflow and the workflow-native research-definition registry.
 ---
 
 # Create a New Experiment
 
 Read `CLAUDE.md` completely before starting this workflow.
+
+## Workflow-first boundary
+
+Do not create another numbered package under `src/trading/experiments/`. For a substantive strategy,
+parameter, data, execution, or evaluation change, use `trading-operate-workflow`, preregister before
+outcome-relevant execution, select exact released policies, and create a permanent trial under
+`src/trading/research_definitions/` with provenance to any legacy source.
+
+The procedure below is a frozen compatibility appendix. It may inform an explicitly governed
+migration but does not authorize a new legacy identity.
 
 Infer the asset ticker and brief strategy description from the user's request (for example, "GLD bollinger_squeeze" or "TQQQ volume_climax"). If either is unclear, ask for the missing information before proceeding.
 

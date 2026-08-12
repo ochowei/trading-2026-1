@@ -31,6 +31,7 @@ from trading.core.manual_ledger import (
     LedgerInitialization,
     ManualLedgerStore,
 )
+from trading.core.policy_authoring import PolicyAuthoringError, PolicyRepository
 from trading.core.proposals import ProposalTerms
 from trading.core.qualification_workflow import (
     register_forward_qualification_plan,
@@ -460,6 +461,37 @@ def cmd_workflow(args: argparse.Namespace) -> None:
             print("  becomes effective only after merge to the canonical branch")
     except WorkflowAuthoringError as exc:
         raise SystemExit(f"workflow error: {exc}") from exc
+
+
+def cmd_policy(args: argparse.Namespace) -> None:
+    """Dispatch tracked policy validation, synchronization, and release preparation."""
+    repository = PolicyRepository(args.root)
+    try:
+        if args.policy_command == "validate":
+            if args.all and args.path is not None:
+                raise PolicyAuthoringError("validate accepts a path or --all, not both")
+            issues = repository.validate_all()
+            if issues:
+                for issue in issues:
+                    print(f"FAIL {issue}")
+                raise SystemExit(f"policy validation failed: {len(issues)} issue(s)")
+            print("policy validation passed")
+        elif args.policy_command == "sync":
+            repository.sync()
+            print("policy indexes synchronized")
+        elif args.policy_command == "version":
+            repository.transition_version(
+                args.path,
+                args.status,
+                approved_by=args.approved_by,
+            )
+            print(f"policy version transitioned to {args.status}: {args.path}")
+        elif args.policy_command == "release":
+            release = repository.release(args.path, approved_by=args.approved_by)
+            print(f"policy release prepared: {release['policy']}@{release['version']}")
+            print("  becomes effective only after merge to the canonical branch")
+    except PolicyAuthoringError as exc:
+        raise SystemExit(f"policy error: {exc}") from exc
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
@@ -1893,6 +1925,52 @@ def build_parser() -> argparse.ArgumentParser:
     workflow_release_p.add_argument("path", type=Path)
     workflow_release_p.add_argument("--approved-by", required=True)
 
+    # tracked executable policy authoring and release declarations
+    policy_p = sub.add_parser(
+        "policy",
+        help="Validate and release versioned executable research policies",
+    )
+    policy_p.add_argument(
+        "--root",
+        type=Path,
+        default=Path("policies"),
+        help="Tracked policy registry root (default: policies)",
+    )
+    policy_sub = policy_p.add_subparsers(dest="policy_command", required=True)
+    policy_validate_p = policy_sub.add_parser(
+        "validate",
+        help="Read-only validation of policy metadata and immutable evidence",
+    )
+    policy_validate_p.add_argument("path", type=Path, nargs="?")
+    policy_validate_p.add_argument("--all", action="store_true")
+    policy_sub.add_parser("sync", help="Regenerate the policy registry index")
+    policy_version_p = policy_sub.add_parser(
+        "version",
+        help="Abandon a draft or retire an active policy version",
+    )
+    policy_version_sub = policy_version_p.add_subparsers(
+        dest="policy_version_command",
+        required=True,
+    )
+    policy_version_transition_p = policy_version_sub.add_parser(
+        "transition",
+        help="Apply an allowed terminal policy-version transition",
+    )
+    policy_version_transition_p.add_argument("path", type=Path)
+    policy_version_transition_p.add_argument(
+        "--to",
+        dest="status",
+        required=True,
+        choices=("abandoned", "retired"),
+    )
+    policy_version_transition_p.add_argument("--approved-by")
+    policy_release_p = policy_sub.add_parser(
+        "release",
+        help="Prepare an approved policy release declaration",
+    )
+    policy_release_p.add_argument("path", type=Path)
+    policy_release_p.add_argument("--approved-by", required=True)
+
     # analyze
     analyze_p = sub.add_parser(
         "analyze", help="滾動窗口績效分析 (Rolling window performance analysis)"
@@ -2091,6 +2169,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_qualification(args)
     elif args.command == "workflow":
         cmd_workflow(args)
+    elif args.command == "policy":
+        cmd_policy(args)
     elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "sync-docs":

@@ -74,6 +74,8 @@ class ResearchDefinitionSnapshot:
 
     fingerprint: str
     blob: DefinitionBlobRef
+    policy_set_identity: str | None = None
+    policies: tuple[dict[str, str], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

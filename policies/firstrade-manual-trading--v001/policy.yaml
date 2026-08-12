@@ -1,0 +1,14 @@
+schema_version: 1
+family: firstrade-manual-trading
+version: v001
+kind: broker
+values:
+  broker: firstrade
+  access_mode: manual_only
+  automatic_submission: false
+  supported_order_types:
+  - MARKET
+  - LIMIT
+  - STOP
+  broker_reconciliation_required_for_new_buy: true
+  actual_position_authority: manual_execution_ledger

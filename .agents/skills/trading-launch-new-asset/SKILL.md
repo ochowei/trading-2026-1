@@ -1,11 +1,22 @@
 ---
 name: trading-launch-new-asset
-description: Use when creating the first experiment and experiment documentation for a ticker that has no existing experiments.
+description: Use only for inspecting the frozen legacy first-experiment procedure or an explicitly governed migration of an existing legacy identity. New asset research must use trading-operate-workflow.
 ---
 
 # Launch a New Asset
 
 Read `CLAUDE.md` completely before starting this workflow.
+
+## Workflow-first boundary
+
+Do not create a new package under `src/trading/experiments/`. That tree is a closed legacy
+inventory. For any genuinely new asset research, route to `trading-operate-workflow`: select an
+active workflow, create and preregister its study before outcome-relevant execution, select exact
+released policy versions, and create the trial under `src/trading/research_definitions/`.
+
+The procedure below is retained only as historical compatibility context. Execute it only when a
+governing workflow explicitly requires a bounded migration of an already inventoried legacy
+identity; it never authorizes a new legacy identity.
 
 Infer the asset ticker and brief strategy description from the user's request (for example, "SLV pullback_wr" or "COPX extreme_oversold"). If either is unclear, ask for the missing information before proceeding.
 

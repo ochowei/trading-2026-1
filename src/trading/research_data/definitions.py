@@ -19,6 +19,7 @@ from trading.core.sleeve_engine import (
     ExecutionCostPolicy,
     validate_cost_scenario_policies,
 )
+from trading.policies import PolicySet
 from trading.research_data.artifacts import (
     canonical_json_bytes,
     publish_immutable,
@@ -57,8 +58,14 @@ class ResearchDefinitionStore:
         base_cost_policy: ExecutionCostPolicy = DEFAULT_BASE_COST_POLICY,
         stress_cost_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
         repo_root: Path | None = None,
+        policy_set: PolicySet | None = None,
+        workflow_native: bool = False,
     ) -> ResearchDefinitionSnapshot:
         """Capture exact source while deriving identity from normalized semantics."""
+        if workflow_native and policy_set is None:
+            raise ResearchDefinitionError(
+                "workflow-native definition capture requires an explicit policy set"
+            )
         try:
             validate_cost_scenario_policies(base_cost_policy, stress_cost_policy)
         except ValueError as exc:
@@ -103,6 +110,25 @@ class ResearchDefinitionStore:
             },
             "runtime": runtime,
         }
+        policy_references: tuple[dict[str, str], ...] = ()
+        if policy_set is not None:
+            policy_references = tuple(
+                {
+                    "family": release.identity.family,
+                    "version": release.identity.version,
+                    "path": release.path,
+                    "release_digest": release.release_digest,
+                    "config_digest": release.config_digest,
+                }
+                for release in sorted(
+                    policy_set.releases,
+                    key=lambda item: item.identity.family,
+                )
+            )
+            semantic_payload["policy_set"] = {
+                "identity": policy_set.identity,
+                "policies": policy_references,
+            }
         fingerprint = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()
         git_root = (
             Path(repo_root).resolve() if repo_root is not None else _discover_git_root(source_paths)
@@ -126,7 +152,12 @@ class ResearchDefinitionStore:
             byte_count=len(blob_bytes),
             fingerprint=fingerprint,
         )
-        return ResearchDefinitionSnapshot(fingerprint=fingerprint, blob=reference)
+        return ResearchDefinitionSnapshot(
+            fingerprint=fingerprint,
+            blob=reference,
+            policy_set_identity=policy_set.identity if policy_set is not None else None,
+            policies=policy_references,
+        )
 
     def load(self, reference: DefinitionBlobRef) -> dict[str, object]:
         """Verify and return exact reconstructable definition content."""

@@ -26,6 +26,11 @@ recovery。它規範資料角色、決策權限、必要證據、晉級 gate，�
   private ledger。這些內容必須留在各自的 authoritative location，workflow 只記錄精確
   identity 或 link。
 
+新 research definition 的 source 必須位於 `src/trading/research_definitions/`。既有
+`src/trading/experiments/` identity 只可作為凍結的 legacy provenance 或 migration input，
+不得就地改變研究語意。Source 不複製進 study；正式執行以 immutable Research Definition
+Snapshot 保存 exact source、runtime 與 policy-set identity。
+
 ## Entry conditions and required inputs
 
 一輪研究必須在任何 Evaluation outcome 被查看或用於選擇之前開始，並滿足以下 entry
@@ -35,6 +40,8 @@ conditions：
    以及預期進入受控啟用時的 operator。
 2. 取得可驗證的 market-data、snapshot、research-definition 與 trial-registry identities；
    legacy、stale、unreproducible 或 selection history 不完整的資料不得冒充有效證據。
+   Research definition 必須綁定本 workflow release 所選的 exact released policy versions；
+   缺少、retired、digest drift 或 implicit latest policy 一律不可進入正式執行。
 3. 若既有 selection history 不完整，必須在任何 evaluation outcome 前建立 future-only
    Forward Selection Epoch；不得回填或宣稱舊 history 完整。
 4. 先完成並由人類研究負責人核准下列 preregistration inputs：
@@ -215,7 +222,7 @@ expiry 規則管理，不得因 pause 失去退出責任。
 | Stage | Required artifacts and evidence |
 | --- | --- |
 | Planning | Research-round identity、human owner approval、hypothesis/falsification、data-role calendar、`maximum_trials`、candidate inventory、selection rule、baseline、execution dependencies、cost/risk policies、thresholds、checkpoints 與 outcome rules。 |
-| Development | 每個 semantic trial identity、immutable data/definition snapshot、formal observation、failed/removed history、Development-only metrics、完整 candidate ranking 與 selection rationale。 |
+| Development | 每個 workflow-native semantic trial identity、legacy provenance（如有）、composite policy-set identity、immutable data/definition snapshot、formal observation、failed/removed history、Development-only metrics、完整 candidate ranking 與 selection rationale。 |
 | Candidate freeze | Selected trial 與 distinct baseline identities、definition fingerprint/blob、data declarations、base/stress policies、holding/lag/purge/embargo、全部 gates，以及 human approval timestamp。 |
 | Historical Evaluation | Plan ID、annual fold/session identities、verified manifests、canonical daily-equity paths、per-fold 與 chained metrics、cash/baseline/random evidence、family selection adjustment、robustness tests、gate results與 disposition。 |
 | Shadow | Historical source events、Shadow registration、immutable definition identity、prospective paper proposals、simulated fills、monotonic checkpoints、base/stress metrics、critical-drift assessment 與 activation evaluation。 |
@@ -225,6 +232,18 @@ expiry 規則管理，不得因 pause 失去退出責任。
 Formal evidence 必須留在 authoritative repository 或 private runtime location；workflow/study
 records只保存精確 repository-relative paths、immutable manifest IDs、complete commit SHAs 與
 checksums。Mutable `latest` reference 只能作便利 pointer，不能單獨支持決策。
+
+## Shared policies and implementation links
+
+本 workflow version 在 release 時必須固定四個 released policy families：
+`us-equity-market`、`firstrade-manual-trading`、`canonical-execution` 與 `portfolio-risk`。
+Workflow 定義研究 stages 與 gates；policy 定義可重用的市場、broker、execution 與 portfolio
+constraints。Workflow 不得覆寫 selected policy configuration；不同規則必須先發布新 policy
+version，再由新的 workflow version 明確採用。
+
+執行使用 maintained market-data、research-data、execution、ledger、qualification、cutover 與
+drift modules。正式 evidence 必須保存 exact policy releases、composite policy-set identity、
+definition snapshot、data snapshot、result identity、complete commit SHA 與 checksum。
 
 ## Outcomes
 

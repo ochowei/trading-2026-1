@@ -1,4 +1,5 @@
 import copy
+import hashlib
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -6,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from trading.cli import build_parser, main
+from trading.core.policy_authoring import PolicyRepository
 from trading.core.workflow_authoring import (
     MarkdownDocument,
     WorkflowAuthoringError,
@@ -78,6 +80,7 @@ def _register_version(
     supersedes: str | None = None,
     source_changes: list[str] | None = None,
     dependencies: list[dict[str, str]] | None = None,
+    policies: list[dict[str, str]] | None = None,
 ) -> Path:
     registry_path = root / "README.md"
     registry_document = read_markdown_document(registry_path)
@@ -100,11 +103,106 @@ def _register_version(
             "derived_from": None,
             "source_changes": source_changes or [],
             "dependencies": dependencies or [],
+            **({"policies": policies} if policies is not None else {}),
         },
         _version_body(title),
     )
     (path / "WORKFLOW.md").write_text(_workflow_definition(title), encoding="utf-8")
     return path
+
+
+def _released_policy(tmp_path: Path, *, family: str = "market-policy") -> dict[str, str]:
+    root = tmp_path / "policies"
+    path_name = f"{family}--v001"
+    _write_document(
+        root / "README.md",
+        {
+            "schema_version": 1,
+            "policies": {
+                family: {
+                    "title": "Market Policy",
+                    "versions": {"v001": {"path": path_name, "status": "draft"}},
+                }
+            },
+        },
+        """# Policies
+
+<!-- GENERATED:POLICY_INDEX_START -->
+stale
+<!-- GENERATED:POLICY_INDEX_END -->
+""",
+    )
+    version = root / path_name
+    implementation = tmp_path / "src" / "trading" / "policy_fixture.py"
+    implementation.parent.mkdir(parents=True, exist_ok=True)
+    implementation.write_text("POLICY = 1\n", encoding="utf-8")
+    conformance = tmp_path / "tests" / "test_policy_fixture.py"
+    conformance.parent.mkdir(exist_ok=True)
+    conformance.write_text("def test_policy():\n    assert True\n", encoding="utf-8")
+    _write_document(
+        version / "README.md",
+        {
+            "policy": family,
+            "title": "Market Policy",
+            "version": "v001",
+            "definition": "POLICY.md",
+            "config": "policy.yaml",
+            "supersedes": None,
+            "implementation": ["src/trading/policy_fixture.py"],
+            "conformance": ["tests/test_policy_fixture.py"],
+        },
+        "# Market Policy\n",
+    )
+    (version / "POLICY.md").write_text(
+        "# Market Policy\n\nA complete executable market policy for workflow tests.\n",
+        encoding="utf-8",
+    )
+    (version / "policy.yaml").write_text(
+        f"schema_version: 1\nfamily: {family}\nversion: v001\nkind: test\nvalues:\n  calendar: XNYS\n",
+        encoding="utf-8",
+    )
+    repository = PolicyRepository(
+        root,
+        now=lambda: FIXED_TIME,
+        conformance_runner=lambda _paths: None,
+    )
+    repository.sync()
+    repository.release(version, approved_by="policy-owner")
+    release_digest = hashlib.sha256((version / "RELEASE.json").read_bytes()).hexdigest()
+    return {
+        "family": family,
+        "version": "v001",
+        "path": f"policies/{path_name}",
+        "release_digest": release_digest,
+    }
+
+
+def test_repository_with_policy_registry_requires_exact_released_policy_pins(tmp_path) -> None:
+    policy = _released_policy(tmp_path)
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(root, policies=[policy])
+    repository.sync()
+
+    release = repository.release(version, approved_by="research-owner")
+
+    assert release["policies"] == [policy]
+    assert repository.validate_all() == ()
+
+    release_path = tmp_path / policy["path"] / "RELEASE.json"
+    release_path.write_text("{}\n", encoding="utf-8")
+    assert any(
+        "policy release digest has changed" in issue.message for issue in repository.validate_all()
+    )
+
+
+def test_repository_with_policy_registry_rejects_unpinned_workflow_release(tmp_path) -> None:
+    _released_policy(tmp_path)
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(root)
+    repository.sync()
+
+    with pytest.raises(WorkflowAuthoringError, match="explicit policy pins"):
+        repository.release(version, approved_by="research-owner")
 
 
 def _create_change(version_path: Path, *, number: int = 1) -> Path:

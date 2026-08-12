@@ -6,6 +6,7 @@ definition: WORKFLOW.md
 supersedes: REPLACE_ME_SUPERSEDES_OR_NULL
 derived_from: null
 source_changes: []
+policies: []
 dependencies: []
 ---
 # REPLACE_ME_WORKFLOW_TITLE

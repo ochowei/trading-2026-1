@@ -13,8 +13,17 @@
 
 ## 規則（必讀）
 
+- **Workflow-first research**：新的 outcome-relevant 研究 identity 必須由 released workflow
+  與其 study 治理。第一次會影響選擇的正式 execution 或 outcome inspection 前，study 必須
+  preregister；純工程維護與不查看 outcome 的探索不需要 study。
+- **Versioned policies**：workflow 必須明確選擇 released market、broker、execution 與
+  portfolio policy versions，不可使用隱含 latest 或複製後自行覆寫。
+- **Legacy identity freeze**：`src/trading/experiments/` 是封閉的 legacy inventory。不得新增、
+  改名或就地改變既有 identity 的研究語意；改良必須建立 workflow-native research definition。
+
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
-- **檔案結構變更**：新增、刪除或搬移檔案時，必須更新本文件的「架構速覽」段落。
+- **架構文件是唯一權威**：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 是專案檔案、資料夾用途與 ownership boundary 的 canonical map。
+- **自動維護架構文件**：新增、刪除、搬移、重新命名或改變 tracked 檔案／資料夾用途時，必須在同一個 change 更新 `docs/ARCHITECTURE.md`。新增 public entry point、重複性檔案模式、generated artifact 或 local-only data boundary 時亦同。若只是新增符合文件既有 pattern 的 experiment、result、test、ADR 或 workflow study，無須逐一列出，除非 pattern 或責任本身改變。
 - **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項，以及對應資產的 `src/trading/experiments/EXPERIMENTS_<TICKER>.md`。若是全新資產，建立該總覽文件並在本文件的「按需參考」保留通用查找方式，不要新增逐一列舉且容易過期的資產清單。
 - **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
 - **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
@@ -130,6 +139,10 @@ uv run trading freshness
 # 唯讀驗證所有 tracked workflow metadata、索引與 immutable evidence
 uv run trading workflow validate --all
 
+# 驗證／同步 versioned executable policy registry
+uv run trading policy validate --all
+uv run trading policy sync
+
 # 從 metadata 重建 root 與 version README 索引
 uv run trading workflow sync
 
@@ -197,113 +210,9 @@ uv run trading result registry seed
 
 ## 架構速覽
 
-```
-CONTEXT.md                       # 量化研究領域術語與統一語言
-
-.agents/
-├── context/
-│   ├── cross_asset_lessons.md   # 跨資產共通教訓（波動率分類、禁忌、參數縮放）
-│   └── cross_asset_evidence.md  # 共通教訓的詳細回測證據與原因分析
-├── skills/                      # Repo 專屬 Codex skills，統一使用 trading- 前綴
-│   └── trading-*/
-│       ├── SKILL.md
-│       └── agents/openai.yaml
-└── rules/
-    └── execution-model.md       # 成交模型完整規格
-
-pm/                              # 人類 PM 專用文件（AI Agent 禁止編輯）
-├── HUMAN_PM_MEMO.md             # 關注標的、策略想法、執行模型備忘、更新紀錄
-└── USE_CASES.md                 # 人類使用情境與常用操作索引
-
-docs/
-├── adr/                         # 架構決策紀錄（ADR）
-├── strategy-forward-replication-research-workflow.md # 策略歷史績效的未來複製性研究與晉級流程
-├── market-data.md               # Phase 1 CSV cache、provider、驗證與 CLI 契約
-├── reproducibility.md           # Phase 2 blobs、manifests、definitions、bundles、run modes、GC
-├── result-validity-and-trial-history.md # Phase 3 result validity、evaluation、trial history
-├── canonical-sleeve-execution.md # Phase 4 sleeve capital、cost scenarios、metrics 與 parity
-├── manual-execution-ledger.md   # Phase 5 ledger domain、integrity、reconciliation 與 CLI 契約
-├── historical-qualification-and-shadow.md # Phase 6 folds、benchmarks、Shadow lifecycle 與 registry
-├── controlled-followup-cutover.md # Phase 7 lifecycle、authorization、parity、rollback 與 epochs
-├── live-drift-and-recovery.md  # Phase 8 frozen envelopes、drift overlay、guards 與 recovery
-├── phase-9-primary-followup-migration.md # Phase 9 bundle migration boundaries and verification
-└── superpowers/plans/           # 已確認的實作計畫
-
-workflows/                        # 人類與 Agent 共用的版本化研究流程 registry
-├── README.md                     # 唯一 version lifecycle authority 與產生式索引
-└── <slug>--vNNN/                # 自足 workflow contract、release evidence 與相關工作
-
-ci/
-└── market-data-bypass-allowlist.json # Phase 9 遷移期間的 typed legacy bypass 基線
-
-tools/
-└── check_experiment_market_data_access.py # Phase 9 bypass 與 provider boundary CI 檢查
-
-results/                         # 各實驗最新與歷史回測結果（JSON）
-tests/                           # 共用引擎與 followup 行為測試
-
-src/trading/
-├── cli.py                       # 統一 CLI 入口
-├── followup.py                  # 跟單訊號產生器（60 天回測 + Firstrade 下單指令）
-├── followup_backtest.py         # 跟單策略等權袖套回測、每日 equity 與結構化報告
-├── core/                        # 共用基礎設施
-│   ├── base_config.py           # ExperimentConfig dataclass
-│   ├── base_signal_detector.py  # BaseSignalDetector ABC
-│   ├── base_backtester.py       # 通用回測引擎（停利/停損/到期）
-│   ├── execution_backtester.py  # 成交模型回測引擎（滑價/悲觀認定/隔日開盤）
-│   ├── sleeve_engine.py         # Canonical sleeve、daily equity、成本情境與 parity evidence
-│   ├── base_strategy.py         # BaseStrategy（fetch → 指標 → 訊號 → 回測 → 報表）
-│   ├── execution_strategy.py    # ExecutionModelStrategy（成交模型報表）
-│   ├── data_fetcher.py          # 相容層：多 ticker 存取 validated CSV market data
-│   ├── performance_analyzer.py  # 滾動窗口績效與漸變性分析
-│   ├── freshness.py             # 知識新鮮度與 result validity 唯讀掃描
-│   ├── results.py               # 結果讀取、validity diagnostics 與跨實驗比較
-│   ├── definition_resolver.py   # Current semantic definition 唯讀解析（不發布 blob）
-│   ├── evaluation.py            # 單一資產 stale refresh、完整性與排名邊界
-│   ├── sync_docs.py             # Markdown 結果與 latest.json 同步檢查
-│   ├── accounting.py            # Decimal、canonical JSON 與 UTC timestamp primitives
-│   ├── ledger_csv.py            # Fixed-schema canonical CSV codec
-│   ├── ledger_storage.py        # Private atomic writes 與 bounded file locking
-│   ├── broker_reconciliation.py # Broker CSV parsing 與 accounting comparison
-│   ├── manual_ledger.py         # Ledger domain、hash chain、replay 與 persistence boundary
-│   ├── proposals.py             # Decimal proposal terms 與 deterministic proposal IDs
-│   ├── followup_proposals.py    # 從 verified ledger 建立 dry-run entry/exit proposal terms
-│   ├── followup_cutover.py      # Phase 7 lifecycle registry、authorization、parity 與 reporting
-│   ├── followup_data.py         # Phase 7 declared auxiliary data、alignment 與 bundle identity
-│   ├── bundle_strategy.py        # Phase 9 provider-free primary/auxiliary bundle execution seams
-│   ├── live_drift.py             # Phase 8 frozen envelope、Decimal metrics、checkpoint/recovery domain
-│   ├── live_drift_registry.py   # Phase 8 private append-only evidence、hash chain、locks、replay
-│   ├── qualification.py         # Historical screen、selection adjustment、Shadow evidence/gates
-│   ├── qualification_workflow.py # Forward Selection Epoch、plan registration 與 screen orchestration
-│   ├── workflow_authoring.py    # Tracked workflow metadata、hash、index 與 lifecycle boundary
-│   └── workflow_studies.py      # Study scaffold、preregistration、operation 與 completion evidence
-├── market_data/                 # Yahoo adjusted daily provider boundary 與 CSV cache
-│   ├── contracts.py             # Calendar/reader protocols 與 RefreshKind vocabulary
-│   ├── models.py                # Series/requirement/policy/decision/metadata value types
-│   ├── provider.py              # 外部 provider protocol 與 Yahoo adapter
-│   ├── calendar.py              # XNYS sessions、特殊休市與 actual-close cutoff
-│   ├── validation.py            # OHLCV/schema/session fail-closed validation
-│   ├── migration_policy.py      # Phase 9 experiment bypass scanner and allowlist policy
-│   ├── cache.py                 # Lock、canonical CSV、sidecar、atomic publish、quarantine
-│   ├── service.py               # Fresh reuse、incremental/full refresh orchestration
-│   └── bundle.py                # Read-only bundle 與 backward as-of auxiliary alignment
-├── research_data/               # Phase 2 immutable reproducibility evidence
-│   ├── artifacts.py             # 共用 immutable publish/checksum/semantic verification
-│   ├── manifest_codec.py        # 嚴格型別、canonical manifest codec 與 snapshot identity
-│   ├── models.py                # Blob/manifest/definition/run/GC immutable values
-│   ├── store.py                 # Snapshot orchestration、portable bundles、verification、GC
-│   ├── definitions.py           # Semantic fingerprint 與 dirty-worktree definition blobs
-│   ├── result_schema.py         # Versioned result payload、validity 與 legacy compatibility
-│   ├── migration.py             # Immutable parity-linked migration-result publication boundary
-│   ├── parity.py                # Fixed-snapshot parity evidence and immutable artifact helpers
-│   ├── trial_registry.py        # Append-only trial identity、observations、tombstones
-│   ├── qualification_registry.py # Local append-only Historical / Shadow lifecycle evidence
-│   └── runs.py                  # Online/offline/migration/ephemeral publication boundaries
-└── experiments/                 # 各實驗（pkgutil 自動發現，無需手動註冊）
-    ├── _template/               # 新實驗模板（複製即用）
-    ├── EXPERIMENTS_<TICKER>.md  # 各資產實驗總覽與 AI_CONTEXT
-    └── <name>/                  # config.py + signal_detector.py + strategy.py + __init__.py
-```
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 是 repository structure、各檔案／資料夾用途、
+tracked evidence 與 local-only runtime boundary 的唯一權威。需要找實作位置或調整檔案結構時先查閱該文件；
+不要在本文件維護第二份容易分歧的完整 tree。
 
 Phase 5 manual-execution details and the broker-export CSV contract are documented in
 [docs/manual-execution-ledger.md](docs/manual-execution-ledger.md). Runtime ledger, reconciliation,
@@ -325,6 +234,8 @@ checkpoints, and fail-closed recovery contracts are documented in
 ## 按需參考（不需要時不用讀）
 
 - 建立新實驗教學 → [README.md](README.md)
+- Versioned executable policies → [docs/policies.md](docs/policies.md)
+- 專案檔案與資料夾用途 → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - 資產實驗總覽 → `src/trading/experiments/EXPERIMENTS_<TICKER>.md`（例如 [TQQQ](src/trading/experiments/EXPERIMENTS_TQQQ.md)、[GLD](src/trading/experiments/EXPERIMENTS_GLD.md)）
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
 - 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
