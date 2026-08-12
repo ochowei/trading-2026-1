@@ -282,14 +282,38 @@ portfolio 聚合採 base-net，研究排名也只採 daily-equity base-net Sharp
 任何回測區間，CLI 以非零狀態結束。現有 `uv run trading followup` 仍固定使用最近 60 個
 交易日並產生 Firstrade dry-run proposal 報告；實際部位只來自 verified manual ledger，未核對時不會產生新的 BUY。
 
-## 如何設計新實驗 (How to Design a New Experiment)
+## Workflow-first research
 
-新增一個實驗只需 **3 個檔案**（config / signal_detector / strategy）。框架使用 `pkgutil` 自動發現實驗，無需手動註冊。以下是完整步驟：
+新的正式研究不再新增 `src/trading/experiments/` package。先選擇已發布的 workflow version；
+在第一次 outcome-relevant execution 或查看會影響選擇的結果前建立並 preregister study。每個
+workflow release 明確固定 released market、Firstrade、execution 與 portfolio policy versions。
 
-### Step 1: 複製模板 (Copy Template)
+新的 source identity 位於 `src/trading/research_definitions/<family>/<trial>/`，正式執行會捕捉
+exact source、policy-set、runtime 與 data identities。Study 只保存 preregistered plan、immutable
+evidence references 與 independent conclusion，不複製 application source。
 
 ```bash
-cp -r src/trading/experiments/_template src/trading/experiments/my_strategy
+uv run trading policy validate --all
+uv run trading workflow validate --all
+uv run trading workflow study init <active-workflow-path> \
+  --slug <study-slug> --title <title> --created-by <identity>
+uv run trading workflow study preregister <study-path> --approved-by <human-id>
+```
+
+完整 policy contract 見 [docs/policies.md](docs/policies.md)。
+
+## Legacy experiment compatibility appendix
+
+以下內容只說明既有 `src/trading/experiments/` identity 的歷史結構，供 reproduction 與 bounded
+migration 參考。該目錄已由 `ci/legacy-experiment-inventory.json` 封閉；不得照以下步驟建立、
+複製或改名成新的 legacy experiment。Substantive improvement 必須建立 workflow-native trial。
+
+既有 legacy experiment 使用 config / signal_detector / strategy，並由 `pkgutil` 自動發現：
+
+### Historical Step 1: Template shape
+
+```bash
+# Historical example only — closed inventory forbids this operation for new research.
 ```
 
 ### Step 2: 定義配置 `config.py` (Define Configuration)

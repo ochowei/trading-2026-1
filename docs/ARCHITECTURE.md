@@ -43,6 +43,8 @@ manual trading state are deliberately local-only.
 | `uv.lock` | Locked dependency graph used by `uv` for reproducible environments. |
 | `.python-version` | Project Python-version selection for compatible version managers. |
 | `.gitignore` | Excludes caches, environments, private trading state, credentials, and non-retained results; explicitly allows retained research artifacts. |
+| `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
+| `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
 
 ## Agent and automation configuration
 
@@ -92,6 +94,7 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
 | `docs/phase-9-primary-followup-migration.md` | Primary followup migration boundaries, parity evidence, and verification. |
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
+| `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |
 | `docs/superpowers/plans/YYYY-MM-DD-*.md` | Historical approved implementation plans retained as execution context. |
@@ -115,7 +118,7 @@ All installable Python code lives under `src/trading/`. `src/trading/__init__.py
 
 | Path | Purpose |
 |---|---|
-| `src/trading/cli.py` | Unified command parser and dispatcher for experiments, results, data, ledger, qualification, followup lifecycle, drift, and versioned workflows. |
+| `src/trading/cli.py` | Unified command parser and dispatcher for experiments, results, data, ledger, qualification, followup lifecycle, drift, versioned policies, and versioned workflows. |
 | `src/trading/followup.py` | Selected-strategy definitions and generation of manual Firstrade followup signals/order instructions. |
 | `src/trading/followup_backtest.py` | Portfolio-level simulation of the followup set, including equal sleeves, daily equity, and structured reporting. |
 
@@ -156,6 +159,8 @@ creating parallel infrastructure.
 | `qualification_workflow.py` | Forward Selection Epoch registration and historical-screen orchestration. |
 | `workflow_authoring.py` | Versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
 | `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion. |
+| `policy_authoring.py` | Versioned policy registry validation, synchronization, conformance execution, immutable releases, and lifecycle evidence. |
+| `legacy_experiments.py` | Closed-inventory scan and monotonic-removal guard for legacy experiment identities. |
 | `__init__.py` | Package marker; shared APIs are normally imported from their defining modules. |
 
 ### `src/trading/market_data/`
@@ -194,10 +199,32 @@ Immutable reproducibility evidence and formal run coordination.
 | `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence. |
 | `__init__.py` | Curated public research-data API exports. |
 
+### `src/trading/policies/`
+
+Runtime values and fail-closed resolution for released executable policies.
+
+| File | Purpose |
+|---|---|
+| `models.py` | Exact policy identities and verified release values. |
+| `resolver.py` | Exact family/version resolution, digest verification, duplicate-family rejection, and deterministic composite policy-set identity. |
+| `__init__.py` | Curated public policy API. |
+
+### `src/trading/research_definitions/`
+
+Workflow-native research source. New formal trials belong here rather than in the closed legacy
+experiment tree.
+
+| Pattern | Purpose |
+|---|---|
+| `registry.py` | Resolves explicit lowercase `<family>/<trial>` source identities without importing legacy experiments. |
+| `_template/` | Starting structure for a workflow-native definition. |
+| `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
+
 ### `src/trading/experiments/`
 
-The experiment registry auto-imports every package whose name does not start with `_`; each
-package's `__init__.py` registers its strategy. No central registration list is required.
+This is the closed legacy experiment tree. The registry auto-imports every inventoried package
+whose name does not start with `_`; each package's `__init__.py` registers its strategy. CI rejects
+new or renamed identities. New formal research uses `src/trading/research_definitions/`.
 
 | Pattern | Purpose |
 |---|---|
@@ -215,13 +242,26 @@ package's `__init__.py` registers its strategy. No central registration list is 
 |---|---|
 | `tests/conftest.py` | Shared pytest setup and fixtures. |
 | `tests/test_*.py` | Behavioral and contract tests, generally named after the module or lifecycle being protected. Snapshot-contract tests pin migration behavior for selected experiments. |
+| `tests/policies/test_*.py` | Policy resolution, composition, definition-identity, and version-specific conformance tests. |
 | `tools/check_experiment_market_data_access.py` | CI scanner that detects experiment access which bypasses the declared market-data boundary. |
+| `tools/check_legacy_experiment_inventory.py` | CI entry point that rejects additions or rename-based replacements in the legacy experiment tree. |
 | `ci/market-data-bypass-allowlist.json` | Typed, shrinking baseline of legacy experiment bypasses permitted during migration. |
+| `ci/legacy-experiment-inventory.json` | Sorted stage-one baseline of frozen legacy experiment package identities; removals are allowed but additions are not. |
 
 Tests may contain explicit synthetic broker fixtures. Real broker exports, credentials, and personal
 trading data must never be placed in `tests/` or committed anywhere.
 
 ## Research results and workflow registry
+
+### `policies/`
+
+| Pattern | Purpose |
+|---|---|
+| `policies/README.md` | Policy lifecycle authority and generated registry index. |
+| `policies/<family>--vNNN/README.md` | Version identity plus implementation and conformance paths. |
+| `policies/<family>--vNNN/POLICY.md` | Self-contained human-readable policy contract. |
+| `policies/<family>--vNNN/policy.yaml` | Strict machine-readable family configuration. |
+| `policies/<family>--vNNN/RELEASE.json` | Human-approved immutable release evidence, present only after release preparation. |
 
 ### `results/`
 
@@ -251,6 +291,10 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 Workflow metadata and generated indexes must be changed through the authoring/study services or
 their repository skills, not hand-edited casually.
 
+Workflow releases pin exact released policy family/version identities and `RELEASE.json` digests.
+Studies inherit those immutable selections from their workflow version and record the composite
+policy-set identity in formal definition evidence.
+
 ## Local-only runtime directories
 
 These paths are intentionally ignored and must not be committed. Their absence in a fresh clone is
@@ -274,7 +318,9 @@ application architecture and is not a source of project rules.
 
 | Change | Primary location | Usually update too |
 |---|---|---|
-| Add or revise a strategy experiment | `src/trading/experiments/` | Per-asset `EXPERIMENTS_<TICKER>.md`, required CI choices, tests, and result evidence. |
+| Maintain or reproduce a legacy experiment | Existing `src/trading/experiments/<identity>/` | Preserve semantic identity, per-asset overview, tests, and result evidence; do not add or rename a package. |
+| Add a new research identity | `src/trading/research_definitions/` | Released workflow/study, exact policy versions, immutable definition/data evidence, tests. Never add a legacy experiment package. |
+| Add or revise reusable research constraints | `policies/` and `src/trading/policies/` | Conformance tests, affected workflow version, `docs/policies.md`, and technical docs. |
 | Change shared strategy/backtest behavior | `src/trading/core/` | Focused tests, affected phase docs, and experiment docs if metrics or contracts change. |
 | Change provider/cache behavior | `src/trading/market_data/` | `docs/market-data.md`, tests, ADR when architectural. |
 | Change snapshots/results/formal runs | `src/trading/research_data/` | Reproducibility/result docs, tests, ADR when architectural. |

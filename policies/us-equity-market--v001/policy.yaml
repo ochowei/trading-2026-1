@@ -1,0 +1,12 @@
+schema_version: 1
+family: us-equity-market
+version: v001
+kind: market
+values:
+  provider: yahoo
+  interval: 1d
+  adjustment_policy: auto_adjusted
+  primary_calendar: XNYS
+  decision_buffer_minutes: 30
+  primary_coverage: xnys_sessions
+  unknown_publication_min_lag_sessions: 1

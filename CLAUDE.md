@@ -13,6 +13,14 @@
 
 ## 規則（必讀）
 
+- **Workflow-first research**：新的 outcome-relevant 研究 identity 必須由 released workflow
+  與其 study 治理。第一次會影響選擇的正式 execution 或 outcome inspection 前，study 必須
+  preregister；純工程維護與不查看 outcome 的探索不需要 study。
+- **Versioned policies**：workflow 必須明確選擇 released market、broker、execution 與
+  portfolio policy versions，不可使用隱含 latest 或複製後自行覆寫。
+- **Legacy identity freeze**：`src/trading/experiments/` 是封閉的 legacy inventory。不得新增、
+  改名或就地改變既有 identity 的研究語意；改良必須建立 workflow-native research definition。
+
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **架構文件是唯一權威**：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 是專案檔案、資料夾用途與 ownership boundary 的 canonical map。
 - **自動維護架構文件**：新增、刪除、搬移、重新命名或改變 tracked 檔案／資料夾用途時，必須在同一個 change 更新 `docs/ARCHITECTURE.md`。新增 public entry point、重複性檔案模式、generated artifact 或 local-only data boundary 時亦同。若只是新增符合文件既有 pattern 的 experiment、result、test、ADR 或 workflow study，無須逐一列出，除非 pattern 或責任本身改變。
@@ -131,6 +139,10 @@ uv run trading freshness
 # 唯讀驗證所有 tracked workflow metadata、索引與 immutable evidence
 uv run trading workflow validate --all
 
+# 驗證／同步 versioned executable policy registry
+uv run trading policy validate --all
+uv run trading policy sync
+
 # 從 metadata 重建 root 與 version README 索引
 uv run trading workflow sync
 
@@ -222,6 +234,7 @@ checkpoints, and fail-closed recovery contracts are documented in
 ## 按需參考（不需要時不用讀）
 
 - 建立新實驗教學 → [README.md](README.md)
+- Versioned executable policies → [docs/policies.md](docs/policies.md)
 - 專案檔案與資料夾用途 → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - 資產實驗總覽 → `src/trading/experiments/EXPERIMENTS_<TICKER>.md`（例如 [TQQQ](src/trading/experiments/EXPERIMENTS_TQQQ.md)、[GLD](src/trading/experiments/EXPERIMENTS_GLD.md)）
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)

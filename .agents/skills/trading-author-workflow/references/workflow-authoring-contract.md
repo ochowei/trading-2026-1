@@ -115,6 +115,11 @@ supersedes: v001
 derived_from: null
 source_changes:
   - workflows/example-workflow--v001/work/changes/example-change--c001
+policies:
+  - family: us-equity-market
+    version: v001
+    path: policies/us-equity-market--v001
+    release_digest: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 dependencies:
   - path: docs/example-contract.md
     role: normative
@@ -129,6 +134,11 @@ lineage only and never causes inheritance.
 
 Every `v002+` substantive rule must trace to one or more accepted source changes. A release may
 aggregate multiple accepted changes, but must assess their combined effects.
+
+Every new workflow release must select exact released policy versions. Draft metadata may use a
+null `release_digest` while its policy dependencies remain drafts, but release preparation requires
+the exact SHA-256 of each selected policy's `RELEASE.json`. Never resolve an implicit active/latest
+policy, duplicate one family, or select a retired/unreleased policy.
 
 ## Workflow contract
 
@@ -316,6 +326,7 @@ and record an exact `revisits` path when research restarts or continues there.
 - exact `WORKFLOW.md` SHA-256;
 - `supersedes`, `derived_from`, and source changes;
 - dependencies, including SHA-256 for normative dependencies.
+- exact policy family, version, path, and policy-release digest pins.
 
 Do not write `released_at` before merge. Treat the canonical-branch merge as the effective release
 boundary. Never rewrite an old release digest.
@@ -328,6 +339,10 @@ Classify every shared link:
   affecting the active workflow requires a new workflow version.
 - `reference`: background or implementation detail. It may point to the current document and does
   not define workflow validity.
+
+Use versioned policy pins—not mutable document dependencies—for reusable market, broker,
+execution, and portfolio constraints. Different workflows may select different released policy
+versions. A policy adoption change requires a new workflow version but never rewrites an old study.
 
 Keep common code, tests, formal results, technical contracts, and ADRs at one authoritative path.
 Do not copy them into each workflow version. Formal evidence must use immutable result manifests,

@@ -1,7 +1,7 @@
 """
 實驗註冊表 (Experiment Registry)
-管理所有已註冊的交易實驗。
-Manages all registered trading experiments.
+管理所有已註冊的 legacy 交易實驗。
+Manages the closed inventory of registered legacy trading experiments.
 """
 
 import importlib
@@ -45,9 +45,9 @@ def list_experiments() -> list[str]:
     return sorted(_REGISTRY.keys())
 
 
-# === 自動發現並註冊所有實驗 (Auto-discover and register all experiments) ===
+# === 自動發現並註冊既有 legacy 實驗 (Auto-discover registered legacy experiments) ===
 # 每個實驗的 __init__.py 會呼叫 register() 完成註冊
-# 新增實驗時不需要修改此檔案
+# 新研究不得新增 package；使用 trading.research_definitions registry。
 for _finder, _module_name, _ispkg in pkgutil.iter_modules(__path__):
     if not _module_name.startswith("_"):
         importlib.import_module(f"{__name__}.{_module_name}")

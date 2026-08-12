@@ -23,6 +23,11 @@ Do not operate a draft workflow version. Do not silently move a study to another
 Treat the workflow as the procedure definition and the study as one execution instance pinned to
 that exact version.
 
+Resolve and verify every policy pin from the workflow release before preregistration. New formal
+trial source belongs under `src/trading/research_definitions/`, never the closed
+`src/trading/experiments/` inventory. Formal evidence must include the composite policy-set identity
+and the immutable Research Definition Snapshot identity.
+
 ## Start a study
 
 Search the active version, generated index, repository references, and Git history for similar

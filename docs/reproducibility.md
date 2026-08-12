@@ -39,12 +39,19 @@ sources. The semantic fingerprint hashes:
 - explicit execution-engine version;
 - preregistered base and adverse stress execution-cost policies;
 - Python version and caller-declared relevant dependency versions.
+- for workflow-native definitions, every exact released policy identity, policy-release digest,
+  configuration digest, and the deterministic composite policy-set identity.
 
 The content-addressed definition blob additionally retains exact source text and automatically
 discovers the common source repository's Git HEAD, branch, dirty status, relevant diff, and status.
 Sources without reconstructable Git context fail closed. A formatting-only change can
 therefore preserve the semantic fingerprint while producing a different exact definition blob;
 outcome-relevant source, configuration, engine, or dependency changes alter the fingerprint.
+Changing a selected policy version or either of its pinned digests also creates a new fingerprint;
+an old workflow or study therefore remains tied to its original behavior. Legacy definition blobs
+without policy-set fields remain readable but cannot be presented as workflow-native evidence.
+Callers capturing source from `src/trading/research_definitions/` must set `workflow_native=True`;
+capture then rejects a missing explicit `PolicySet` before reading or publishing evidence.
 Reporting-only functions are excluded only through an explicit per-source symbol declaration;
 function names and prefixes are never used as evidence that code is outcome-independent. The
 declaration is honored only for one unambiguous symbol that is not referenced outside its own

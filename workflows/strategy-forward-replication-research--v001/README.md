@@ -6,21 +6,38 @@ definition: WORKFLOW.md
 supersedes: null
 derived_from: null
 source_changes: []
+policies:
+- family: us-equity-market
+  version: v001
+  path: policies/us-equity-market--v001
+  release_digest: 7df1e266aa72ccfaca3efa3e490ad6234f300bb0bfc4e31b3dd3c85ab93de542
+- family: firstrade-manual-trading
+  version: v001
+  path: policies/firstrade-manual-trading--v001
+  release_digest: 0b40404f668dc1bfb15e21558bbdc221f68742093d0ecc99856be9f0031470d9
+- family: canonical-execution
+  version: v001
+  path: policies/canonical-execution--v001
+  release_digest: e6a745aeb4d7bdbad6ed53f25ff5a41fed0a447200edf51b545c7163d5d50925
+- family: portfolio-risk
+  version: v001
+  path: policies/portfolio-risk--v001
+  release_digest: 63e565e6eebbfe55dc9ffb4914af28706d6164a029447fcc52f8825d5da57b69
 dependencies:
 - path: .agents/rules/execution-model.md
-  role: normative
+  role: reference
 - path: docs/reproducibility.md
   role: normative
 - path: docs/result-validity-and-trial-history.md
   role: normative
 - path: docs/canonical-sleeve-execution.md
-  role: normative
+  role: reference
 - path: docs/historical-qualification-and-shadow.md
   role: normative
 - path: docs/controlled-followup-cutover.md
-  role: normative
+  role: reference
 - path: docs/live-drift-and-recovery.md
-  role: normative
+  role: reference
 - path: docs/market-data.md
   role: reference
 - path: docs/manual-execution-ledger.md

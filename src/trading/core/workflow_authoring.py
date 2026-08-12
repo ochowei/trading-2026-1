@@ -545,6 +545,7 @@ class WorkflowRepository:
             self._require_studies_ready_for_version_end(active_path)
 
         dependencies = self._release_dependencies(metadata.get("dependencies"))
+        policies = self._release_policies(metadata.get("policies"))
         prepared_at = timestamp_text(self._current_time())
         release = {
             "schema_version": 1,
@@ -558,6 +559,7 @@ class WorkflowRepository:
             "derived_from": metadata.get("derived_from"),
             "source_changes": source_changes,
             "dependencies": dependencies,
+            "policies": policies,
         }
 
         _atomic_write(release_path, canonical_json_bytes(release), replace=False)
@@ -875,6 +877,71 @@ class WorkflowRepository:
                 issues.append(
                     ValidationIssue(resolved, "active normative dependency digest has changed")
                 )
+        release_policies = payload.get("policies")
+        if (self.repo_root / "policies" / "README.md").is_file():
+            if not isinstance(release_policies, list):
+                issues.append(ValidationIssue(path, "release policies must be a list"))
+            elif release_policies != metadata.get("policies"):
+                issues.append(ValidationIssue(path, "release policies differ from README"))
+            else:
+                for policy in release_policies:
+                    if not isinstance(policy, dict):
+                        issues.append(ValidationIssue(path, "release policy must be a mapping"))
+                        continue
+                    policy_path = policy.get("path")
+                    expected_digest = policy.get("release_digest")
+                    if not isinstance(policy_path, str) or not isinstance(expected_digest, str):
+                        issues.append(
+                            ValidationIssue(path, "release policy identity is incomplete")
+                        )
+                        continue
+                    release_path = self.repo_root / policy_path / "RELEASE.json"
+                    if not release_path.is_file() or _sha256(release_path) != expected_digest:
+                        issues.append(
+                            ValidationIssue(release_path, "policy release digest has changed")
+                        )
+
+    def _release_policies(self, raw: object) -> list[dict[str, str]]:
+        policy_registry = self.repo_root / "policies" / "README.md"
+        if not policy_registry.is_file():
+            return []
+        if not isinstance(raw, list) or not raw:
+            raise WorkflowAuthoringError("workflow release requires explicit policy pins")
+        from trading.policies import PolicyResolutionError, PolicyResolver
+
+        resolver = PolicyResolver(self.repo_root / "policies")
+        released: list[dict[str, str]] = []
+        families: set[str] = set()
+        for item in raw:
+            if not isinstance(item, dict) or set(item) != {
+                "family",
+                "version",
+                "path",
+                "release_digest",
+            }:
+                raise WorkflowAuthoringError("policy pin has invalid fields")
+            family = item.get("family")
+            version = item.get("version")
+            path = item.get("path")
+            digest = item.get("release_digest")
+            if not all(
+                isinstance(value, str) and value for value in (family, version, path, digest)
+            ):
+                raise WorkflowAuthoringError("policy pin identity is incomplete")
+            if family in families:
+                raise WorkflowAuthoringError(f"duplicate policy family: {family}")
+            families.add(family)
+            try:
+                resolved = resolver.resolve(family, version)
+            except PolicyResolutionError as exc:
+                raise WorkflowAuthoringError(str(exc)) from exc
+            expected_path = resolved.path
+            if path != expected_path or digest != resolved.release_digest:
+                raise WorkflowAuthoringError(
+                    f"policy pin does not match release: {family}@{version}"
+                )
+            released.append(dict(item))
+        return released
 
     def _validate_source_changes(
         self,

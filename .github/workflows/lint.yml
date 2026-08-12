@@ -33,8 +33,19 @@ jobs:
       - name: Workflow contract validation
         run: uv run trading workflow validate --all
 
+      - name: Policy contract validation
+        run: uv run trading policy validate --all
+
       - name: Workflow authoring and study lifecycle tests
         run: uv run pytest -q tests/test_workflow_authoring.py
+
+      - name: Policy authoring and composition tests
+        run: uv run pytest -q tests/test_policy_authoring.py tests/policies
+
+      - name: Closed legacy experiment inventory
+        run: |
+          uv run python tools/check_legacy_experiment_inventory.py
+          uv run pytest -q tests/test_legacy_experiment_inventory.py
 
       - name: Phase 9 market-data bypass policy
         shell: bash
