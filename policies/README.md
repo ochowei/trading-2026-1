@@ -6,8 +6,13 @@ policies:
     versions:
       v001:
         path: us-equity-market--v001
+        status: superseded
+        status_changed_at: '2026-08-12T14:45:18.213820Z'
+        status_changed_by: ochowei@gmail.com
+      v002:
+        path: us-equity-market--v002
         status: active
-        status_changed_at: '2026-08-12T05:36:39.114580Z'
+        status_changed_at: '2026-08-12T14:45:18.213820Z'
         status_changed_by: ochowei@gmail.com
   firstrade-manual-trading:
     title: Firstrade Manual Trading
@@ -45,5 +50,6 @@ workflow selects exact released policy versions; it never resolves an implicit l
 | Canonical Daily-Bar Execution (`canonical-execution`) | `v001` | `active` | [canonical-execution--v001](canonical-execution--v001/) |
 | Firstrade Manual Trading (`firstrade-manual-trading`) | `v001` | `active` | [firstrade-manual-trading--v001](firstrade-manual-trading--v001/) |
 | Isolated Sleeve Portfolio Risk (`portfolio-risk`) | `v001` | `active` | [portfolio-risk--v001](portfolio-risk--v001/) |
-| US Equity Daily-Bar Market (`us-equity-market`) | `v001` | `active` | [us-equity-market--v001](us-equity-market--v001/) |
+| US Equity Daily-Bar Market (`us-equity-market`) | `v001` | `superseded` | [us-equity-market--v001](us-equity-market--v001/) |
+| US Equity Daily-Bar Market (`us-equity-market`) | `v002` | `active` | [us-equity-market--v002](us-equity-market--v002/) |
 <!-- GENERATED:POLICY_INDEX_END -->

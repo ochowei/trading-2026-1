@@ -171,6 +171,10 @@ uv run trading workflow study complete <study-path> \
 uv run trading research list
 uv run trading research snapshot <family/trial> --workflow <released-version-path> \
   --decision 2026-08-04
+# 同一 cutoff 的 family trials 共用首個已完成的 full-refresh generation；此模式不呼叫 provider，
+# 並由 snapshot eligibility 驗證 full-refresh freshness、coverage 與 exact cutoff
+uv run trading research snapshot <family/trial> --workflow <released-version-path> \
+  --decision 2026-08-04 --reuse-full-refresh
 uv run trading research run <family/trial> --workflow <released-version-path> \
   --manifest results/<result-name>/<snapshot-id>.snapshot.json --offline
 

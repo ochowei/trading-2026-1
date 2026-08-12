@@ -42,6 +42,13 @@ uv run trading workflow study init <active-version-path> \
 Add `--revisits workflows/.../<prior-study>--sNNN` when restarting or revisiting prior research.
 Let the CLI allocate the next never-reused local `Sxxx`.
 
+Study IDs are scoped to the exact workflow version, not to the workflow family or research
+lineage. Determine numbering only from studies already present under the target version and never
+predict an ID from a prior version. The first study under a replacement version is `S001` even when
+it revisits `S003` from the superseded version; preserve that lineage only through the exact
+`revisits` path. Prefer saying “the next CLI-allocated study” before initialization, then report the
+ID returned by the CLI. Never use a research-round ordinal such as “fourth attempt” as an `Sxxx`.
+
 ## Prepare and preregister
 
 Guide the user through unresolved hypothesis and plan decisions one at a time. Complete

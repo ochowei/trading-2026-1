@@ -256,7 +256,9 @@ def align_auxiliary(
         selected = eligible[-1]
         observation_date = selected["observation_date"]
         lag = calendar.session_distance(observation_date.date(), decision.session)
-        if lag > policy.max_observation_lag_sessions:
+        observation_available = lag <= policy.max_observation_lag_sessions
+        mark_unavailable = getattr(policy, "excess_lag_mode", "fail") == "mark_unavailable"
+        if not observation_available and not mark_unavailable:
             raise MarketDataAvailabilityError(
                 f"maximum observation lag exceeded at signal decision {decision.session}: {lag}"
             )
@@ -266,6 +268,8 @@ def align_auxiliary(
             AvailableSession=selected["available_session"],
             ObservationLagSessions=lag,
         )
+        if mark_unavailable:
+            row["ObservationAvailable"] = observation_available
         aligned_rows.append(row)
         decision_index.append(pd.Timestamp(decision.session))
 

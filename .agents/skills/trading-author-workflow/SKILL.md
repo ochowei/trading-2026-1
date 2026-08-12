@@ -79,6 +79,11 @@ interpretation.
 7. Keep the new version complete and self-contained. Do not implement inherited variants.
 8. Run sync and validation after every mutation.
 
+Treat study numbering as local to each exact workflow version. In change impact analysis and
+handoff language, refer to “the next CLI-allocated study under vNNN” instead of carrying an `Sxxx`
+from the source version or incrementing a family-wide sequence. A replacement version with no
+studies starts at `S001`; cross-version continuity is represented only by the exact `revisits` path.
+
 When a similar workflow must remain active in parallel, create a distinct workflow family only
 after explicit confirmation. Record the exact `derived_from` workflow version; do not inherit its
 rules implicitly.

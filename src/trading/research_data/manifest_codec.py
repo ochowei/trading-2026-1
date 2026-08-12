@@ -71,6 +71,11 @@ def _data_entry_payload(entry: SnapshotDataRef) -> dict[str, object]:
                     entry.availability_policy.max_observation_lag_sessions
                 ),
                 "publication_time_known": entry.availability_policy.publication_time_known,
+                **(
+                    {"excess_lag_mode": str(entry.availability_policy.excess_lag_mode)}
+                    if getattr(entry.availability_policy, "excess_lag_mode", "fail") != "fail"
+                    else {}
+                ),
             }
             if entry.availability_policy
             else None
@@ -148,8 +153,13 @@ def _manifest_from_payload(payload: dict[str, object]) -> SnapshotManifest:
         raw_policy = raw_entry["availability_policy"]
         if raw_policy is not None and not isinstance(raw_policy, dict):
             raise TypeError("availability_policy must be an object or null")
+        policy_type = AvailabilityPolicy
+        if raw_policy is not None and raw_policy.get("excess_lag_mode", "fail") != "fail":
+            from trading.market_data.availability import GapAwareAvailabilityPolicy
+
+            policy_type = GapAwareAvailabilityPolicy
         policy = (
-            AvailabilityPolicy(
+            policy_type(
                 publication_lag_sessions=_require_int(
                     raw_policy["publication_lag_sessions"],
                     "publication_lag_sessions",
