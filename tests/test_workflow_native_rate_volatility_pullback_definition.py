@@ -159,6 +159,67 @@ def test_publication_lag_safe_family_starts_after_first_move_observation() -> No
     ).config.history_start == date(1998, 12, 22)
 
 
+def test_gap_safe_family_has_new_permanent_v002_bound_identities(tmp_path) -> None:
+    registry = ResearchDefinitionRegistry()
+    family = "xlf-rate-volatility-conditioned-pullback-gap-safe"
+    trials = (
+        "move-direction-cap-3",
+        "move-direction-cap-5",
+        "move-direction-cap-7",
+        "ungated-pullback-baseline",
+    )
+
+    definitions = [registry.load(f"{family}/{trial}") for trial in trials]
+
+    assert all(
+        isinstance(definition, GapSafeRateVolatilityPullbackResearchDefinition)
+        for definition in definitions
+    )
+    assert all(definition.family == family for definition in definitions)
+    assert all(definition.config.history_start == date(2002, 11, 13) for definition in definitions)
+    assert all(definition.config.research_start == date(2004, 1, 2) for definition in definitions)
+    resolver = PolicyResolver()
+    policy_set = PolicySet(
+        (
+            resolver.resolve("us-equity-market", "v002"),
+            resolver.resolve("canonical-execution", "v001"),
+            resolver.resolve("firstrade-manual-trading", "v001"),
+            resolver.resolve("portfolio-risk", "v001"),
+        )
+    )
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    snapshots = [
+        definition.capture_research_definition(store, policy_set) for definition in definitions
+    ]
+
+    assert all(snapshot.policy_set_identity == policy_set.identity for snapshot in snapshots)
+    legacy_family = "xlf-rate-volatility-conditioned-pullback-publication-lag-safe"
+    legacy_definitions = [registry.load(f"{legacy_family}/{trial}") for trial in trials]
+
+    assert all(
+        not isinstance(definition, GapSafeRateVolatilityPullbackResearchDefinition)
+        for definition in legacy_definitions
+    )
+    assert [definition.identity for definition in legacy_definitions] == [
+        f"{legacy_family}/{trial}" for trial in trials
+    ]
+    assert [definition.result_name for definition in legacy_definitions] == [
+        f"{legacy_family}--{trial}" for trial in trials
+    ]
+    assert all(definition.family == legacy_family for definition in legacy_definitions)
+    assert all(
+        definition.config.history_start == date(2002, 11, 13)
+        and definition.config.research_start == date(2004, 1, 2)
+        for definition in legacy_definitions
+    )
+    assert [definition.config.move_change_cap for definition in legacy_definitions] == [
+        3.0,
+        5.0,
+        7.0,
+        None,
+    ]
+
+
 def test_gap_safe_definition_removes_only_over_age_signal_decisions() -> None:
     primary = _primary()
     auxiliary = _auxiliary(primary, 5.0)
