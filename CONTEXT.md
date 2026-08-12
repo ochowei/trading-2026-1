@@ -134,6 +134,38 @@ _Avoid_: Incrementally updated cache, fresh-enough followup data
 
 ## Research Definitions
 
+**Research Workflow**:
+A repeatable, end-to-end research decision process whose released versions define the required stages, evidence, authority, and terminal outcomes.
+_Avoid_: Individual study, engineering task, strategy implementation
+
+**Workflow Version**:
+An immutable released contract for one research workflow; every study is pinned to exactly one version.
+_Avoid_: Current workflow file, mutable procedure, study version
+
+**Workflow Study**:
+One execution instance of a released workflow version, containing its preregistered question, plan, evidence references, and independently reviewed conclusion.
+_Avoid_: Workflow, experiment directory, ad-hoc backtest
+
+**Policy Family**:
+A version lineage for one composable class of shared market, broker, execution, or portfolio constraints that workflows may select independently.
+_Avoid_: Global settings file, workflow stage, documentation category
+
+**Policy Version**:
+An immutable, executable, and verifiable contract that binds human-readable rules, machine-readable configuration, implementation identity, and conformance evidence.
+_Avoid_: Mutable default, copied workflow rule, unversioned configuration
+
+**Workflow-Native Research Definition**:
+A new research identity developed for use by workflow studies, stored in maintained source code and captured as an immutable Research Definition Snapshot for formal evidence.
+_Avoid_: Legacy experiment edit, source copy inside a study, informal prototype
+
+**Legacy Research Identity**:
+An existing research identity whose outcome-relevant semantics are frozen for compatibility and historical reproduction; substantive improvement creates a new workflow-native identity.
+_Avoid_: All pre-existing files, maintained infrastructure, editable baseline
+
+**Maintained Research Infrastructure**:
+Shared market-data, execution, accounting, evidence, and verification capabilities that remain evolvable when their semantic effects are governed by the workflows and policy versions that use them.
+_Avoid_: Legacy research identity, frozen implementation, strategy candidate
+
 **Experiment Family**:
 A declared lineage of experiment trials that share a baseline hypothesis or signal structure and therefore contribute to the same selection history.
 _Avoid_: Asset, directory prefix, renamed independent idea

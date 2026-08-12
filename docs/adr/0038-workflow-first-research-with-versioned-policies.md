@@ -1,0 +1,3 @@
+# Govern new research through workflows and composable versioned policies
+
+New outcome-relevant research is governed by a released workflow version and a preregistered study, while shared market, broker, execution, and portfolio constraints are published as independently versioned executable policy families that each workflow pins explicitly. Existing research identities remain in place with frozen semantics, maintained infrastructure remains evolvable, and formal runs capture immutable source and policy identities. This separates research governance from reusable implementation, lets different workflows choose different constraints, and preserves historical reproducibility without requiring a disruptive bulk migration.
