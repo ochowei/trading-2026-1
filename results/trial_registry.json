@@ -7177,6 +7177,123 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "a960a0c24a544e063ca3e97b9c29933f7dde2b58ac50356eb2672905c658eaf3"
+    },
+    {
+      "definition_fingerprint": "f7a1025baad00aa4f71e27f9d9a81f3a43eb1579299fdb5d0437cde3051fb18a",
+      "experiment_family": "schd-down-streak-reversion",
+      "experiment_names": [
+        "schd-down-streak-reversion--two-down"
+      ],
+      "first_registered_at": "2026-08-12T06:02:33.305501Z",
+      "hypothesis": "SCHD rebounds after consecutive down closes under frozen costs.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T06:07:14.230601Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "a12608c6ccc1473380050c4a69204e51",
+          "observed_at": "2026-08-12T06:02:33.366253Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/schd-down-streak-reversion--two-down/20260812_060233_349219_offline_ba0636412bc84b299cc9e32d40a7182f.json",
+          "run_mode": "offline",
+          "snapshot_id": "20ad839d50b6bd7124bbe120e3a16bedc5880ced24c260caa7884aaabc9965b7",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "37a55c03c02246beabe00bbda88d4716",
+          "observed_at": "2026-08-12T06:07:14.230601Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/schd-down-streak-reversion--two-down/20260812_060714_213104_offline_e08466698ef04d418672bab3ab42036f.json",
+          "run_mode": "offline",
+          "snapshot_id": "f211c66533acdfd44cf769d4f30077a205d581fd84ab38527ffb96ee72e50b70",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "efebe5117e35b66c23cabf2bc06d0e3ce10840c70c3115665689d2f92e7bfd48"
+    },
+    {
+      "definition_fingerprint": "feb06e3eb55c03f01cd32913b02fb07aad467061835c5134b3a81bf6209972a2",
+      "experiment_family": "schd-down-streak-reversion",
+      "experiment_names": [
+        "schd-down-streak-reversion--three-down"
+      ],
+      "first_registered_at": "2026-08-12T06:02:34.498175Z",
+      "hypothesis": "SCHD rebounds after consecutive down closes under frozen costs.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T06:07:18.429740Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "32019222674a4a49892f6298aa4b184f",
+          "observed_at": "2026-08-12T06:02:34.547135Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/schd-down-streak-reversion--three-down/20260812_060234_532375_offline_31cf4795f8da4d3eb20191a9180e4905.json",
+          "run_mode": "offline",
+          "snapshot_id": "2968e7893ff74e544ab04e78cc19c6d2e59e35f4d2f647fd9acffcd854cc31c9",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "54ce44f5517545ffb2587565053f4eae",
+          "observed_at": "2026-08-12T06:07:18.429740Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/schd-down-streak-reversion--three-down/20260812_060718_415505_offline_e6120109318a469f9db4bab87036899f.json",
+          "run_mode": "offline",
+          "snapshot_id": "67f48f24898ea7f4ee50a5d759ac1c049ce2b24d7a6f0d82745946f411601d6b",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "a8e4f39b2e405d27df8e947eb48feeb940d22d19a7b62783a67a8fdec2731a49"
+    },
+    {
+      "definition_fingerprint": "7f2f4d0eb2c0e75157870feb761c7aeeab6d79dfc5af5251dece47fe75fb0d8b",
+      "experiment_family": "schd-down-streak-reversion",
+      "experiment_names": [
+        "schd-down-streak-reversion--periodic-baseline"
+      ],
+      "first_registered_at": "2026-08-12T06:02:35.686900Z",
+      "hypothesis": "Unconditioned five-session SCHD exposure is the simple family comparator.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T06:07:22.696752Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "d8d663a7893043c584fbf1e36cfe45ea",
+          "observed_at": "2026-08-12T06:02:35.796751Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/schd-down-streak-reversion--periodic-baseline/20260812_060235_760188_offline_53487abf1bbe4d24829706ce0f482ec7.json",
+          "run_mode": "offline",
+          "snapshot_id": "64f1a49507f9493b5ff8e2e6438058328100e990d85d020ea2f529f18a137d2f",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "974184e14ab4476ebab3c0f439c0d387",
+          "observed_at": "2026-08-12T06:07:22.696752Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/schd-down-streak-reversion--periodic-baseline/20260812_060722_659029_offline_36cd1be1af8146a2bb73b7686b538c28.json",
+          "run_mode": "offline",
+          "snapshot_id": "330dfe2f7ab607df51effd875a265ace65bf891d37334ccdb8ed1ee0c6ce2f62",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "dace5b8f44c9e8e3d23a15261556486fcb664d9fe014dcb11bf3e38a20716517"
     }
   ]
 }

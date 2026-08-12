@@ -107,6 +107,8 @@ def verify_definition_bytes(
     ]
     if payload.get("schema_version") == 2:
         semantic_keys.append("execution_cost_policies")
+    if "policy_set" in payload:
+        semantic_keys.append("policy_set")
     try:
         semantic_payload = {key: payload[key] for key in semantic_keys}
     except KeyError as exc:

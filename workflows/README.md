@@ -6,8 +6,13 @@ workflows:
     versions:
       v001:
         path: strategy-forward-replication-research--v001
+        status: superseded
+        status_changed_at: '2026-08-12T06:33:13.489428Z'
+        status_changed_by: ochowei@gmail.com
+      v002:
+        path: strategy-forward-replication-research--v002
         status: active
-        status_changed_at: '2026-08-12T05:37:07.966188Z'
+        status_changed_at: '2026-08-12T06:33:13.489428Z'
         status_changed_by: ochowei@gmail.com
 ---
 # Research Workflows
@@ -24,5 +29,6 @@ study conclusions. Use `uv run trading workflow validate --all` for deterministi
 <!-- GENERATED:WORKFLOW_INDEX_START -->
 | Workflow | Version | Status | Path |
 | --- | --- | --- | --- |
-| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v001` | `active` | [strategy-forward-replication-research--v001](strategy-forward-replication-research--v001/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v001` | `superseded` | [strategy-forward-replication-research--v001](strategy-forward-replication-research--v001/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v002` | `active` | [strategy-forward-replication-research--v002](strategy-forward-replication-research--v002/) |
 <!-- GENERATED:WORKFLOW_INDEX_END -->

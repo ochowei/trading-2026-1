@@ -35,3 +35,22 @@ def test_workflow_native_registry_rejects_legacy_or_ambiguous_identity(tmp_path:
         registry.resolve("spy_007")
     with pytest.raises(ResearchDefinitionRegistryError, match="lowercase kebab-case"):
         registry.resolve("SPY/trial_001")
+
+
+def test_workflow_native_registry_loads_explicit_definition_object(tmp_path: Path) -> None:
+    root = tmp_path / "research_definitions"
+    path = root / "trend-pullback" / "trial-001"
+    path.mkdir(parents=True)
+    (path / "definition.py").write_text("DEFINITION = {'period': 20}\n", encoding="utf-8")
+
+    assert ResearchDefinitionRegistry(root).load("trend-pullback/trial-001") == {"period": 20}
+
+
+def test_workflow_native_registry_rejects_missing_definition_object(tmp_path: Path) -> None:
+    root = tmp_path / "research_definitions"
+    path = root / "trend-pullback" / "trial-001"
+    path.mkdir(parents=True)
+    (path / "definition.py").write_text("VALUE = 1\n", encoding="utf-8")
+
+    with pytest.raises(ResearchDefinitionRegistryError, match="no DEFINITION object"):
+        ResearchDefinitionRegistry(root).load("trend-pullback/trial-001")

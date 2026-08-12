@@ -60,6 +60,12 @@ from trading.research_data import (
     ResearchRunCoordinator,
     RunMode,
 )
+from trading.research_definitions import (
+    ResearchDefinitionRegistry,
+    ResearchDefinitionRegistryError,
+    WorkflowNativeExecutionError,
+    resolve_workflow_policy_set,
+)
 
 # 設定日誌格式 (Configure logging format)
 logging.basicConfig(
@@ -492,6 +498,92 @@ def cmd_policy(args: argparse.Namespace) -> None:
             print("  becomes effective only after merge to the canonical branch")
     except PolicyAuthoringError as exc:
         raise SystemExit(f"policy error: {exc}") from exc
+
+
+def _workflow_native_context(identity: str, workflow_path: Path) -> tuple[object, object]:
+    definition = ResearchDefinitionRegistry().load(identity)
+    policy_set = resolve_workflow_policy_set(workflow_path)
+    return definition, policy_set
+
+
+def cmd_research(args: argparse.Namespace) -> None:
+    """Prepare and execute workflow-native definitions outside the legacy inventory."""
+    try:
+        if args.research_command == "list":
+            for identity in ResearchDefinitionRegistry().list_trials():
+                print(identity)
+            return
+        definition, policy_set = _workflow_native_context(args.identity, args.workflow)
+        capture = getattr(definition, "capture_research_definition", None)
+        requirements_factory = getattr(definition, "market_data_requirements", None)
+        result_name = getattr(definition, "result_name", None)
+        if (
+            not callable(capture)
+            or not callable(requirements_factory)
+            or not isinstance(result_name, str)
+        ):
+            raise WorkflowNativeExecutionError("definition does not implement formal seams")
+        captured = capture(create_default_research_definition_store(), policy_set)
+        if not isinstance(captured, ResearchDefinitionSnapshot):
+            raise WorkflowNativeExecutionError(
+                "capture_research_definition must return ResearchDefinitionSnapshot"
+            )
+        if args.research_command == "snapshot":
+            requirements = MarketDataBundle.validate_requirements(requirements_factory())
+            service = create_default_market_data_service()
+            for requirement in requirements:
+                refresh_kwargs = {"mode": "full", "start": None, "end": args.decision}
+                if requirement.coverage_policy != MarketDataCoveragePolicy.xnys():
+                    refresh_kwargs["coverage_policy"] = requirement.coverage_policy
+                service.refresh(requirement.series, **refresh_kwargs)
+            store = create_default_research_data_store()
+            manifest = store.create_snapshot(
+                service.cache,
+                requirements,
+                SignalDecisionTime.for_primary_session(args.decision),
+                definition=captured.blob,
+            )
+            destination = args.manifest or (
+                Path("results") / result_name / f"{manifest.snapshot_id}.snapshot.json"
+            )
+            path = store.write_manifest(manifest, destination)
+            print(f"research snapshot {manifest.snapshot_id} published to {path}")
+            print(f"  definition fingerprint: {captured.fingerprint}")
+            print(f"  policy set: {captured.policy_set_identity}")
+            return
+        run_with_bundle = getattr(definition, "run_with_bundle", None)
+        declare_trial = getattr(definition, "declare_experiment_trial", None)
+        if not callable(run_with_bundle) or not callable(declare_trial):
+            raise WorkflowNativeExecutionError("definition does not implement formal run seams")
+        trial = declare_trial()
+        if not isinstance(trial, ExperimentTrialDeclaration):
+            raise WorkflowNativeExecutionError(
+                "declare_experiment_trial must return ExperimentTrialDeclaration"
+            )
+        outcome = ResearchRunCoordinator(
+            store=create_default_research_data_store(),
+            results_root=Path("results"),
+            experiment_family=trial.family,
+            hypothesis=trial.hypothesis,
+        ).execute(
+            result_name,
+            run_with_bundle,
+            manifest_path=args.manifest,
+            current_definition=captured.blob,
+            mode=RunMode.OFFLINE if args.offline else RunMode.ONLINE,
+        )
+        print(f"research result published to {outcome.persisted_path}")
+        print(f"  definition fingerprint: {captured.fingerprint}")
+        print(f"  policy set: {captured.policy_set_identity}")
+    except (
+        MarketDataAvailabilityError,
+        ResearchDefinitionRegistryError,
+        WorkflowNativeExecutionError,
+        RuntimeError,
+        TypeError,
+        ValueError,
+    ) as exc:
+        raise SystemExit(f"research error: {exc}") from exc
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
@@ -1971,6 +2063,33 @@ def build_parser() -> argparse.ArgumentParser:
     policy_release_p.add_argument("path", type=Path)
     policy_release_p.add_argument("--approved-by", required=True)
 
+    research_p = sub.add_parser(
+        "research",
+        help="Prepare and execute workflow-native research definitions",
+    )
+    research_sub = research_p.add_subparsers(dest="research_command", required=True)
+    research_sub.add_parser("list", help="List workflow-native family/trial identities")
+    research_snapshot_p = research_sub.add_parser(
+        "snapshot",
+        help="Capture exact definition and immutable market data",
+    )
+    research_snapshot_p.add_argument("identity", help="Exact family/trial identity")
+    research_snapshot_p.add_argument("--workflow", type=Path, required=True)
+    research_snapshot_p.add_argument("--decision", type=iso_date, required=True)
+    research_snapshot_p.add_argument("--manifest", type=Path)
+    research_run_p = research_sub.add_parser(
+        "run",
+        help="Execute a workflow-native definition against an immutable snapshot",
+    )
+    research_run_p.add_argument("identity", help="Exact family/trial identity")
+    research_run_p.add_argument("--workflow", type=Path, required=True)
+    research_run_p.add_argument("--manifest", type=Path, required=True)
+    research_run_p.add_argument(
+        "--offline",
+        action="store_true",
+        help="Persist historical evidence without advancing latest.json",
+    )
+
     # analyze
     analyze_p = sub.add_parser(
         "analyze", help="滾動窗口績效分析 (Rolling window performance analysis)"
@@ -2171,6 +2290,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_workflow(args)
     elif args.command == "policy":
         cmd_policy(args)
+    elif args.command == "research":
+        cmd_research(args)
     elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "sync-docs":
