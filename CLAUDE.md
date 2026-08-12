@@ -167,6 +167,13 @@ uv run trading workflow study transition <study-path> --to awaiting-review --by 
 uv run trading workflow study complete <study-path> \
   --outcome <pass|fail|insufficient-evidence|indeterminate> --reviewed-by <identity>
 
+# 列出、捕捉與正式執行 workflow-native research definitions；不經 legacy registry
+uv run trading research list
+uv run trading research snapshot <family/trial> --workflow <released-version-path> \
+  --decision 2026-08-04
+uv run trading research run <family/trial> --workflow <released-version-path> \
+  --manifest results/<result-name>/<snapshot-id>.snapshot.json --offline
+
 # 唯讀檢查單一 Yahoo adjusted daily series 的 CSV cache 狀態
 uv run trading data status SPY
 

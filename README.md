@@ -298,7 +298,16 @@ uv run trading workflow validate --all
 uv run trading workflow study init <active-workflow-path> \
   --slug <study-slug> --title <title> --created-by <identity>
 uv run trading workflow study preregister <study-path> --approved-by <human-id>
+uv run trading research list
+uv run trading research snapshot <family/trial> --workflow <released-workflow-path> \
+  --decision 2026-08-04
+uv run trading research run <family/trial> --workflow <released-workflow-path> \
+  --manifest results/<result-name>/<snapshot-id>.snapshot.json --offline
 ```
+
+`research snapshot/run` 會重新驗證 released workflow、四個 exact policy pins、release/config
+digests 與 composite policy-set identity，再透過既有 immutable snapshot、canonical sleeve、result
+schema 與 append-only trial registry 執行；不會 import 或新增 legacy experiment identity。
 
 完整 policy contract 見 [docs/policies.md](docs/policies.md)。
 

@@ -118,7 +118,7 @@ All installable Python code lives under `src/trading/`. `src/trading/__init__.py
 
 | Path | Purpose |
 |---|---|
-| `src/trading/cli.py` | Unified command parser and dispatcher for experiments, results, data, ledger, qualification, followup lifecycle, drift, versioned policies, and versioned workflows. |
+| `src/trading/cli.py` | Unified command parser and dispatcher for experiments, workflow-native research definitions, results, data, ledger, qualification, followup lifecycle, drift, versioned policies, and versioned workflows. |
 | `src/trading/followup.py` | Selected-strategy definitions and generation of manual Firstrade followup signals/order instructions. |
 | `src/trading/followup_backtest.py` | Portfolio-level simulation of the followup set, including equal sleeves, daily equity, and structured reporting. |
 
@@ -216,7 +216,9 @@ experiment tree.
 
 | Pattern | Purpose |
 |---|---|
-| `registry.py` | Resolves explicit lowercase `<family>/<trial>` source identities without importing legacy experiments. |
+| `registry.py` | Resolves and explicitly loads lowercase `<family>/<trial>` source identities without importing legacy experiments. |
+| `execution.py` | Verifies one released workflow and resolves its four exact policy pins into the composite policy set required for definition capture and formal execution. |
+| `daily_bar.py` | Reusable primary-only daily-bar definition seam for declarative workflow-native trials, producing gross candidate trades for canonical sleeve evaluation. |
 | `_template/` | Starting structure for a workflow-native definition. |
 | `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
 
@@ -271,6 +273,7 @@ trading data must never be placed in `tests/` or committed anywhere.
 | `results/<experiment_name>/prev_1.json`, `prev_2.json` | Retained recent predecessors when present. |
 | `results/<experiment_name>/<snapshot_id>.snapshot.json` | Retained immutable snapshot manifest used for reproducible formal execution. |
 | `results/<experiment_name>/<timestamp>.json` | Historical run output; most such files are ignored unless explicitly retained by repository policy. |
+| `results/<research-family>--<stage>-gate/<study-id>.json` | Tracked workflow-study stage-gate calculation that binds frozen rules to exact formal observation identities and checksums. |
 | `results/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
 
 Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data

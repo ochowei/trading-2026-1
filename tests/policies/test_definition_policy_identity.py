@@ -64,6 +64,7 @@ def test_definition_snapshot_identity_changes_with_selected_policy_release(tmp_p
     assert first.fingerprint != changed.fingerprint
     assert first.policy_set_identity == _policy_set("b" * 64).identity
     assert first.policies[0]["family"] == "market"
+    assert store.load(first.blob)["policy_set"]["identity"] == first.policy_set_identity
 
 
 def test_workflow_native_capture_requires_an_explicit_policy_set(tmp_path: Path) -> None:

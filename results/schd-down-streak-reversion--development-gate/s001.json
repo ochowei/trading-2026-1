@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "study": "strategy-forward-replication-research@v001/S001",
+  "stage": "Development",
+  "computed_at": "2026-08-12T06:09:34Z",
+  "frozen_window": {
+    "start": "2023-01-01",
+    "end": "2025-12-31"
+  },
+  "shared_market_data_blob": "811661a1b18dde967c0d62140f282b6f7f754f642f9f7ad9cf0f707535b427e2",
+  "baseline": {
+    "source_identity": "schd-down-streak-reversion/periodic-baseline",
+    "trial_id": "dace5b8f44c9e8e3d23a15261556486fcb664d9fe014dcb11bf3e38a20716517",
+    "observation_id": "974184e14ab4476ebab3c0f439c0d387",
+    "snapshot_id": "330dfe2f7ab607df51effd875a265ace65bf891d37334ccdb8ed1ee0c6ce2f62",
+    "result_sha256": "d5b11a9f483a816690a0ad2ee29926beb0e3d39bf144cde13919827537458212",
+    "base_net_sharpe": 0.1172177761152083
+  },
+  "candidates": [
+    {
+      "source_identity": "schd-down-streak-reversion/two-down",
+      "trial_id": "efebe5117e35b66c23cabf2bc06d0e3ce10840c70c3115665689d2f92e7bfd48",
+      "observation_id": "37a55c03c02246beabe00bbda88d4716",
+      "snapshot_id": "f211c66533acdfd44cf769d4f30077a205d581fd84ab38527ffb96ee72e50b70",
+      "result_sha256": "2f4f73a67c67b28a9da7e8384a6811f0cbf16b1b60f29bcd7dfaa6de1951e6b1",
+      "metrics": {
+        "completed_trades": 81,
+        "trades_by_entry_year": {"2023": 27, "2024": 25, "2025": 29},
+        "base_compounded_return": 0.034985678447950086,
+        "base_profit_factor": 1.0539159077001867,
+        "base_net_sharpe": 0.15970221822022995,
+        "baseline_sharpe_margin": 0.042484442105021655,
+        "stress_compounded_return": -0.20133431396832968,
+        "stress_profit_factor": 0.7094792001828107,
+        "stress_max_drawdown": -0.28037565187637437,
+        "maximum_trade_year_concentration": 0.35802469135802467,
+        "maximum_positive_profit_year_concentration": 0.4000891030098705
+      },
+      "gates": {
+        "minimum_completed_trades": true,
+        "every_year_traded": true,
+        "positive_base_return": true,
+        "base_profit_factor_above_1_10": false,
+        "positive_stress_return": false,
+        "stress_profit_factor_above_1_00": false,
+        "stress_drawdown_no_worse_than_minus_15_percent": false,
+        "trade_year_concentration_at_most_50_percent": true,
+        "positive_profit_year_concentration_at_most_50_percent": true,
+        "baseline_sharpe_margin_at_least_0_25": false,
+        "valid_identity_and_parity": true
+      },
+      "eligible": false
+    },
+    {
+      "source_identity": "schd-down-streak-reversion/three-down",
+      "trial_id": "a8e4f39b2e405d27df8e947eb48feeb940d22d19a7b62783a67a8fdec2731a49",
+      "observation_id": "54ce44f5517545ffb2587565053f4eae",
+      "snapshot_id": "67f48f24898ea7f4ee50a5d759ac1c049ce2b24d7a6f0d82745946f411601d6b",
+      "result_sha256": "ac583c9d33b0cad3dbb12e92cbe45c1a5a4b5eca6ad9bfcbd99dd7f984fc5ab7",
+      "metrics": {
+        "completed_trades": 41,
+        "trades_by_entry_year": {"2023": 17, "2024": 13, "2025": 11},
+        "base_compounded_return": -0.03609535525498209,
+        "base_profit_factor": 0.8797687523770255,
+        "base_net_sharpe": -0.10308127233411574,
+        "baseline_sharpe_margin": -0.22029904844932404,
+        "stress_compounded_return": -0.15461498889040526,
+        "stress_profit_factor": 0.5538764368668625,
+        "stress_max_drawdown": -0.22518190454476072,
+        "maximum_trade_year_concentration": 0.4146341463414634,
+        "maximum_positive_profit_year_concentration": 0.5665875572658093
+      },
+      "gates": {
+        "minimum_completed_trades": true,
+        "every_year_traded": true,
+        "positive_base_return": false,
+        "base_profit_factor_above_1_10": false,
+        "positive_stress_return": false,
+        "stress_profit_factor_above_1_00": false,
+        "stress_drawdown_no_worse_than_minus_15_percent": false,
+        "trade_year_concentration_at_most_50_percent": true,
+        "positive_profit_year_concentration_at_most_50_percent": false,
+        "baseline_sharpe_margin_at_least_0_25": false,
+        "valid_identity_and_parity": true
+      },
+      "eligible": false
+    }
+  ],
+  "monotonic_claim": {
+    "rule": "three-down base-net Sharpe must be strictly greater than two-down",
+    "passed": false
+  },
+  "selection": null,
+  "stage_gate": "fail",
+  "stopping_rule_applied": "No candidate is eligible and the monotonic claim failed; stop before robustness or Evaluation inspection."
+}
