@@ -174,6 +174,7 @@ Fail-closed boundary around Yahoo adjusted daily OHLCV and the validated local c
 | `models.py` | Market series, requirements, availability policies, decisions, and metadata values. |
 | `provider.py` | Provider protocol and Yahoo Finance adapter. |
 | `calendar.py` | XNYS sessions, historical special closures, and actual-close cutoffs. |
+| `availability.py` | Explicit excess-observation-lag modes, including auditable unavailable auxiliary decisions. |
 | `validation.py` | Schema, OHLCV, finiteness, uniqueness, and exact-session validation. |
 | `cache.py` | Canonical CSV/sidecar storage, locks, atomic publication, and quarantine. |
 | `service.py` | Fresh reuse plus incremental/full refresh orchestration. |
@@ -292,8 +293,8 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/README.md` | Version lifecycle authority and generated registry index. |
 | `workflows/<slug>--vNNN/README.md` | Version metadata, state, checksums, release evidence, and generated study/change indexes. |
 | `workflows/<slug>--vNNN/WORKFLOW.md` | Self-contained workflow contract pinned by studies. |
-| `workflows/<slug>--vNNN/studies/<study>/` | Preregistered plan, metadata, evidence, conclusion, and outcome for a workflow study when present. |
-| `workflows/<slug>--vNNN/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
+| `workflows/<slug>--vNNN/work/studies/<study>/` | Preregistered plan, metadata, evidence, conclusion, and outcome for a workflow study when present. |
+| `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or
 their repository skills, not hand-edited casually.

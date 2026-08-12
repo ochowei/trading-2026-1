@@ -16,5 +16,5 @@ conformance:
 ---
 # US Equity Daily-Bar Market v002
 
-Draft replacement adding explicit, auditable unavailable-decision handling for sparse auxiliary
+Released replacement adding explicit, auditable unavailable-decision handling for sparse auxiliary
 series while preserving v001 fail-closed behavior as the default.
