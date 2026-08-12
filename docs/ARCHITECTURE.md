@@ -219,6 +219,7 @@ experiment tree.
 | `registry.py` | Resolves and explicitly loads lowercase `<family>/<trial>` source identities without importing legacy experiments. |
 | `execution.py` | Verifies one released workflow and resolves its four exact policy pins into the composite policy set required for definition capture and formal execution. |
 | `daily_bar.py` | Reusable primary-only daily-bar definition seam for declarative workflow-native trials, producing gross candidate trades for canonical sleeve evaluation. |
+| `monthly_calendar.py` | Reusable primary-only monthly-calendar definition seam with frozen XNYS entry-session and fixed-holding semantics for workflow-native trials. |
 | `_template/` | Starting structure for a workflow-native definition. |
 | `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
 
