@@ -243,7 +243,7 @@ def test_snapshot_manifest_reconstructs_policy_safe_bundle_without_provider(tmp_
     auxiliary = MarketDataSeries.yahoo_adjusted_daily("^VIX")
     cache.publish(
         primary,
-        bars(),
+        auxiliary_bars(),
         refresh_kind=RefreshKind.FULL,
         refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
     )

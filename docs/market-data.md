@@ -111,6 +111,11 @@ history through the snapshot cutoff. Consequently, an auxiliary frame loaded fro
 single latest auxiliary row. A lagged auxiliary must therefore include enough observations before
 the first declared decision session; if its earliest decision cannot be satisfied, snapshot loading
 fails closed instead of silently dropping that decision.
+Complete provider refresh blobs may contain observations earlier than a manifest entry's declared
+`history_start`. Replay exposes the primary frame only from its first declared XNYS session onward,
+while an auxiliary raw frame may retain earlier observations needed to prove publication-lag
+availability at that first decision. Earlier primary rows cannot enter the runner or be required to
+match the aligned auxiliary decision sequence.
 
 `SessionCalendar` and `MarketDataReader` protocols define the shared structural boundaries, while
 `RefreshKind` is the single vocabulary for incremental and full publication paths.

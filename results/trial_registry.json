@@ -7529,6 +7529,129 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "f4bda41352379aa43493d32ba1b18b6e39c17e3b6005180162d5add02d323201"
+    },
+    {
+      "definition_fingerprint": "f5b19cc7b7f3345d4a7e126ab7fe4cfa3f23d21fe164d92bcbea151e606c1948",
+      "experiment_family": "xlf-rate-volatility-conditioned-pullback-gap-safe",
+      "experiment_names": [
+        "xlf-rate-volatility-conditioned-pullback-gap-safe--move-direction-cap-3"
+      ],
+      "first_registered_at": "2026-08-12T16:27:38.236879Z",
+      "hypothesis": "XLF pullbacks improve when gap-safe backward-as-of MOVE acceleration is capped.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T16:29:58.033225Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": "ValueError: aligned MOVE observations do not cover every primary session",
+          "observation_id": "c447f2a624a14e8691652fc5bfd5d208",
+          "observed_at": "2026-08-12T16:27:38.247725Z",
+          "outcome_status": "failed",
+          "result_path": null,
+          "run_mode": "offline",
+          "snapshot_id": "da65ed3874d1f9ba17d50930368a4fe829752849349c0973405d3e40e9e62836",
+          "validity_status": null
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "167c6d4a3c7b474682e4471d1c547b3f",
+          "observed_at": "2026-08-12T16:29:58.033225Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/xlf-rate-volatility-conditioned-pullback-gap-safe--move-direction-cap-3/20260812_162957_960677_offline_c0d44538842d4724984c2d8229e0bb4c.json",
+          "run_mode": "offline",
+          "snapshot_id": "da65ed3874d1f9ba17d50930368a4fe829752849349c0973405d3e40e9e62836",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "7ea4a12de658c427be39a74c40d47cd4b3201694301be2cd0115916e610f1533"
+    },
+    {
+      "definition_fingerprint": "11297003061eb2d4c48e3fd10019f05e48cbbb72b460f1ac6de8e36db3cf5b60",
+      "experiment_family": "xlf-rate-volatility-conditioned-pullback-gap-safe",
+      "experiment_names": [
+        "xlf-rate-volatility-conditioned-pullback-gap-safe--move-direction-cap-5"
+      ],
+      "first_registered_at": "2026-08-12T16:30:19.480843Z",
+      "hypothesis": "XLF pullbacks improve when gap-safe backward-as-of MOVE acceleration is capped.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T16:30:19.690329Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "3e5f62068ea443b3bed73d34ddf91401",
+          "observed_at": "2026-08-12T16:30:19.690329Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/xlf-rate-volatility-conditioned-pullback-gap-safe--move-direction-cap-5/20260812_163019_621267_offline_4b2cdf0496584fadaac3a56c39c531f4.json",
+          "run_mode": "offline",
+          "snapshot_id": "34209ec0c06d6514485f9dd03e7e1fead796484efef71fa3c669a52e804ede28",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "149ce9a2a4c1100663fccd6f9f3b9841c3ed08147765de572d706b157ebcbb95"
+    },
+    {
+      "definition_fingerprint": "8c0ea6baab1ff6ef9931d031280f25563835c8d337b69a71867b91b5cc9f0ede",
+      "experiment_family": "xlf-rate-volatility-conditioned-pullback-gap-safe",
+      "experiment_names": [
+        "xlf-rate-volatility-conditioned-pullback-gap-safe--move-direction-cap-7"
+      ],
+      "first_registered_at": "2026-08-12T16:30:29.474847Z",
+      "hypothesis": "XLF pullbacks improve when gap-safe backward-as-of MOVE acceleration is capped.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T16:30:29.690586Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "9c64715d27af4f0dba135d654bbbc1e1",
+          "observed_at": "2026-08-12T16:30:29.690586Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/xlf-rate-volatility-conditioned-pullback-gap-safe--move-direction-cap-7/20260812_163029_615628_offline_db4d64f82be542b7887795151bd66f7d.json",
+          "run_mode": "offline",
+          "snapshot_id": "356de379708abef05e4f9e051c0e9ab1aeb74002a48752b4c9c1b961e7065fa0",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "cab7069698560f108fa0951f98084f36c5bd06e97591ba03d8d9542d5fd51b36"
+    },
+    {
+      "definition_fingerprint": "199a8b2ad157ed3bac3fbb75fabf6fc699789a4aa447e66ddf2b300a08854056",
+      "experiment_family": "xlf-rate-volatility-conditioned-pullback-gap-safe",
+      "experiment_names": [
+        "xlf-rate-volatility-conditioned-pullback-gap-safe--ungated-pullback-baseline"
+      ],
+      "first_registered_at": "2026-08-12T16:30:31.337668Z",
+      "hypothesis": "The ungated XLF pullback is the distinct simple gap-safe family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T16:30:31.551886Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "ff0598dcbd1b47e5af284ed081a1384b",
+          "observed_at": "2026-08-12T16:30:31.551886Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/xlf-rate-volatility-conditioned-pullback-gap-safe--ungated-pullback-baseline/20260812_163031_478652_offline_55031c0952154fbdaaf13d20f2bddfd6.json",
+          "run_mode": "offline",
+          "snapshot_id": "9215c244786026551c7373531c4cc9af0965f03eee89f55e09c2669010422400",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "8dba8a8872e572ce99fea98fd913d5e6b14e33eb54073eb586d45eb445981718"
     }
   ]
 }

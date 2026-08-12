@@ -69,7 +69,9 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-_No studies._
+| ID | Title | Status | Outcome | Path |
+| --- | --- | --- | --- | --- |
+| `S001` | XLF Gap-Safe Rate-Volatility-Conditioned Pullback Research | `completed` | `fail` | [xlf-rate-volatility-conditioned-pullback-gap-safe--s001](work/studies/xlf-rate-volatility-conditioned-pullback-gap-safe--s001/) |
 
 ### Changes
 
