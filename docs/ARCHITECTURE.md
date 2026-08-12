@@ -192,7 +192,7 @@ Immutable reproducibility evidence and formal run coordination.
 | `store.py` | Snapshot publication, verification, portable bundles, references, and garbage collection. |
 | `definitions.py` | Semantic fingerprints and exact-source definition blobs, including dirty-worktree capture. |
 | `result_schema.py` | Versioned result payloads, computed validity, and legacy compatibility. |
-| `runs.py` | Online, offline, migration, and ephemeral run/publication boundaries. |
+| `runs.py` | Online, offline, migration, and ephemeral run/publication boundaries, including exact workflow-native observation provenance supplied by the CLI. |
 | `migration.py` | Immutable parity-linked migration-result publication. |
 | `parity.py` | Fixed-snapshot parity evidence and immutable parity artifacts. |
 | `trial_registry.py` | Append-only experiment trial identities, observations, and tombstones. |

@@ -70,6 +70,7 @@ None.
 
 | ID | Title | Status | Outcome | Path |
 | --- | --- | --- | --- | --- |
+| `S003` | ACWI Turn-of-Month Integrity Replication | `completed` | `fail` | [acwi-turn-of-month-integrity-replication--s003](work/studies/acwi-turn-of-month-integrity-replication--s003/) |
 | `S001` | ACWI Turn-of-Month Replication | `cancelled` | `-` | [acwi-turn-of-month-replication--s001](work/studies/acwi-turn-of-month-replication--s001/) |
 | `S002` | ACWI Turn-of-Month Replication — Corrected Availability | `completed` | `indeterminate` | [acwi-turn-of-month-replication-revised-availability--s002](work/studies/acwi-turn-of-month-replication-revised-availability--s002/) |
 
