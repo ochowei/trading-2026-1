@@ -12,6 +12,7 @@ from trading.market_data import (
     SignalDecisionTime,
     align_auxiliary,
 )
+from trading.market_data.availability import GapAwareAvailabilityPolicy
 
 
 class FakeCalendar:
@@ -109,6 +110,29 @@ def test_auxiliary_alignment_fails_closed_when_observation_lag_is_excessive() ->
             policy=policy,
             calendar=calendar,
         )
+
+
+def test_auxiliary_alignment_can_mark_excess_lag_decision_unavailable() -> None:
+    calendar = FakeCalendar()
+    policy = GapAwareAvailabilityPolicy(
+        publication_lag_sessions=1,
+        max_observation_lag_sessions=2,
+        publication_time_known=False,
+    )
+
+    aligned = align_auxiliary(
+        [
+            SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+            SignalDecisionTime.for_primary_session(date(2026, 8, 6)),
+        ],
+        frame(["2026-08-03"], [10.0]),
+        policy=policy,
+        calendar=calendar,
+    )
+
+    assert list(aligned["ObservationAvailable"]) == [True, False]
+    assert list(aligned["ObservationLagSessions"]) == [1, 3]
+    assert list(aligned["Close"]) == [10.0, 10.0]
 
 
 def test_market_data_bundle_is_complete_and_read_only() -> None:

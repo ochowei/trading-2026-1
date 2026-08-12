@@ -15,6 +15,7 @@ from trading.market_data import (
     RefreshKind,
     SignalDecisionTime,
 )
+from trading.market_data.availability import GapAwareAvailabilityPolicy
 from trading.research_data import (
     DefinitionBlobRef,
     ImmutableBlobCorruptionError,
@@ -443,6 +444,47 @@ def test_manifest_parser_rejects_non_boolean_availability_flag(tmp_path) -> None
 
     with pytest.raises(SnapshotManifestError, match="publication_time_known"):
         store.load_manifest(malformed_path)
+
+
+def test_manifest_round_trip_preserves_explicit_excess_lag_mode(tmp_path) -> None:
+    cache = CsvMarketDataCache(tmp_path / "cache", tmp_path / "quarantine")
+    primary = MarketDataSeries.yahoo_adjusted_daily("SPY")
+    auxiliary = MarketDataSeries.yahoo_adjusted_daily("^VIX")
+    for series in (primary, auxiliary):
+        cache.publish(
+            series,
+            bars(),
+            refresh_kind=RefreshKind.FULL,
+            refreshed_at=datetime(2026, 8, 5, tzinfo=UTC),
+        )
+    store = ResearchDataStore(tmp_path / "research-data")
+    policy = GapAwareAvailabilityPolicy(
+        1,
+        2,
+        False,
+    )
+    manifest = store.create_snapshot(
+        cache,
+        (
+            MarketDataRequirement(primary, date(2026, 8, 3), role="primary"),
+            MarketDataRequirement(
+                auxiliary,
+                date(2026, 8, 3),
+                role="auxiliary",
+                availability_policy=policy,
+            ),
+        ),
+        SignalDecisionTime.for_primary_session(date(2026, 8, 4)),
+    )
+
+    path = store.write_manifest(manifest, tmp_path / "marked.snapshot.json")
+    loaded = store.load_manifest(path)
+
+    assert loaded.data[1].availability_policy == policy
+    assert (
+        json.loads(path.read_text())["data"][1]["availability_policy"]["excess_lag_mode"]
+        == "mark_unavailable"
+    )
 
 
 def test_manifest_parser_rejects_non_integer_blob_count(tmp_path) -> None:

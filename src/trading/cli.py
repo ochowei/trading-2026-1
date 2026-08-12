@@ -611,11 +611,12 @@ def cmd_research(args: argparse.Namespace) -> None:
         if args.research_command == "snapshot":
             requirements = MarketDataBundle.validate_requirements(requirements_factory())
             service = create_default_market_data_service()
-            for requirement in requirements:
-                refresh_kwargs = {"mode": "full", "start": None, "end": args.decision}
-                if requirement.coverage_policy != MarketDataCoveragePolicy.xnys():
-                    refresh_kwargs["coverage_policy"] = requirement.coverage_policy
-                service.refresh(requirement.series, **refresh_kwargs)
+            if not args.reuse_full_refresh:
+                for requirement in requirements:
+                    refresh_kwargs = {"mode": "full", "start": None, "end": args.decision}
+                    if requirement.coverage_policy != MarketDataCoveragePolicy.xnys():
+                        refresh_kwargs["coverage_policy"] = requirement.coverage_policy
+                    service.refresh(requirement.series, **refresh_kwargs)
             store = create_default_research_data_store()
             manifest = store.create_snapshot(
                 service.cache,
@@ -628,6 +629,8 @@ def cmd_research(args: argparse.Namespace) -> None:
             )
             path = store.write_manifest(manifest, destination)
             print(f"research snapshot {manifest.snapshot_id} published to {path}")
+            if args.reuse_full_refresh:
+                print("  market data: reused the current eligible full-refresh generation")
             print(f"  definition fingerprint: {captured.fingerprint}")
             print(f"  policy set: {captured.policy_set_identity}")
             return
@@ -2158,6 +2161,14 @@ def build_parser() -> argparse.ArgumentParser:
     research_snapshot_p.add_argument("--workflow", type=Path, required=True)
     research_snapshot_p.add_argument("--decision", type=iso_date, required=True)
     research_snapshot_p.add_argument("--manifest", type=Path)
+    research_snapshot_p.add_argument(
+        "--reuse-full-refresh",
+        action="store_true",
+        help=(
+            "Skip provider refresh and reuse the current snapshot-eligible full-refresh "
+            "cache generation"
+        ),
+    )
     research_run_p = research_sub.add_parser(
         "run",
         help="Execute a workflow-native definition against an immutable snapshot",

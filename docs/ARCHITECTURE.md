@@ -86,6 +86,7 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/ARCHITECTURE.md` | This canonical repository map and file-ownership guide. |
 | `docs/market-data.md` | CSV market-data provider, cache, validation, freshness, and CLI contract. |
 | `docs/reproducibility.md` | Immutable blobs, manifests, definitions, bundles, run modes, and garbage collection. |
+| `docs/auxiliary-unavailable-decision-reproducibility.md` | Normative explicit-unavailable auxiliary manifest, replay, audit, and signal-suppression contract. |
 | `docs/result-validity-and-trial-history.md` | Result schemas, validity states, evaluation boundaries, and append-only trial history. |
 | `docs/canonical-sleeve-execution.md` | Canonical sleeve capital, execution-cost scenarios, metrics, and parity evidence. |
 | `docs/manual-execution-ledger.md` | Manual ledger domain, integrity, broker reconciliation, and CLI contract. |
@@ -220,6 +221,8 @@ experiment tree.
 | `execution.py` | Verifies one released workflow and resolves its four exact policy pins into the composite policy set required for definition capture and formal execution. |
 | `daily_bar.py` | Reusable primary-only daily-bar definition seam for declarative workflow-native trials, producing gross candidate trades for canonical sleeve evaluation. |
 | `monthly_calendar.py` | Reusable primary-only monthly-calendar definition seam with frozen XNYS entry-session and fixed-holding semantics for workflow-native trials. |
+| `rate_volatility_pullback.py` | Reusable primary-plus-backward-as-of-auxiliary pullback definition seam with fixed next-open execution and MOVE-direction gating. |
+| `rate_volatility_pullback_gap_safe.py` | Explicitly suppresses workflow-native signals on over-age auxiliary decisions while preserving lag audit evidence. |
 | `_template/` | Starting structure for a workflow-native definition. |
 | `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
 

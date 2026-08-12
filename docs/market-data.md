@@ -41,6 +41,12 @@ the assembled candidate remain corruption.
 Full refresh is the prerequisite for Phase 2 snapshot eligibility. Blob publication, manifests,
 portable bundles, definition evidence, and replay are specified in
 [reproducibility.md](reproducibility.md); the disposable cache itself never becomes evidence.
+For workflow-native families that require multiple definitions to use one exact market-data
+generation, the first `trading research snapshot` performs the full refresh and later snapshots at
+the same cutoff use `--reuse-full-refresh`. Reuse performs no provider access; snapshot publication
+still verifies full-refresh eligibility, coverage, and the exact primary cutoff before copying the
+same canonical cache bytes into content-addressed evidence. The study must compare the resulting
+data-blob identities and stop before ranking if a required common series differs.
 
 ## Validation and corruption
 
@@ -90,6 +96,12 @@ only the latest observation available at each ordered `SignalDecisionTime`. `Mar
 retains the declaration and decision-session sequence, applies that alignment during validated
 construction, and exposes only the policy-aligned auxiliary view—not the raw same-session frame. It
 never selects forward and fails when no eligible observation exists or the maximum lag is exceeded.
+The default excess-lag behavior remains fail-closed for the entire bundle. A research definition
+may instead preregister the explicit `mark_unavailable` mode. That mode preserves the backward-as-of
+row and its actual lag for audit, adds `ObservationAvailable=false`, and requires the definition to
+suppress every signal on that decision; it never treats an over-age observation as current. The
+mode is outcome-relevant, is serialized in the immutable manifest, and cannot be enabled after
+preregistration to repair a failed observation.
 The bundle rejects missing or undeclared series and returns defensive copies so detector code cannot
 mutate it.
 

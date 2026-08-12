@@ -62,16 +62,24 @@ documentation 保持一致。
 
 ## Errata
 
-None.
+The S003 cancellation reason used “replacement S004” as shorthand for the fourth XLF research
+round. Study IDs are scoped to the exact workflow version; no `S004` was allocated. Any restart
+under v004 is its first CLI-allocated study (`S001`) and preserves lineage only through `revisits`.
 
 ## Work index
 
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-_No studies._
+| ID | Title | Status | Outcome | Path |
+| --- | --- | --- | --- | --- |
+| `S001` | XLF Rate-Volatility-Conditioned Pullback Research | `cancelled` | `-` | [xlf-rate-volatility-conditioned-pullback--s001](work/studies/xlf-rate-volatility-conditioned-pullback--s001/) |
+| `S003` | XLF Rate-Volatility-Conditioned Pullback Publication-Lag-Safe Research | `cancelled` | `-` | [xlf-rate-volatility-conditioned-pullback-publication-lag-safe--s003](work/studies/xlf-rate-volatility-conditioned-pullback-publication-lag-safe--s003/) |
+| `S002` | XLF Rate-Volatility-Conditioned Pullback Revised Availability Research | `cancelled` | `-` | [xlf-rate-volatility-conditioned-pullback-revised-availability--s002](work/studies/xlf-rate-volatility-conditioned-pullback-revised-availability--s002/) |
 
 ### Changes
 
-_No changes._
+| ID | Title | Status | Released in | Path |
+| --- | --- | --- | --- | --- |
+| `C001` | Explicit Unavailable Auxiliary Decisions | `released` | `v004` | [explicit-unavailable-auxiliary-decisions--c001](work/changes/explicit-unavailable-auxiliary-decisions--c001/) |
 <!-- GENERATED:WORK_INDEX_END -->
