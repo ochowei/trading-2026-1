@@ -353,6 +353,11 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
         evidence_classification=args.evidence_classification,
         evidence_justification=args.audit_justification,
         trial_history_complete=args.trial_history_complete,
+        development_years=(
+            tuple(args.development_years) if args.development_years is not None else None
+        ),
+        warmup_start=args.warmup_start,
+        warmup_end=args.warmup_end,
     )
     epoch = plan.forward_selection_epoch or getattr(
         plan,
@@ -1946,6 +1951,25 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         nargs="+",
         required=True,
+    )
+    qualification_plan_register_p.add_argument(
+        "--development-years",
+        type=int,
+        nargs="+",
+        help=(
+            "Explicit Development-context years for retrospective role-calendar registration; "
+            "requires both warmup bounds"
+        ),
+    )
+    qualification_plan_register_p.add_argument(
+        "--warmup-start",
+        type=iso_date,
+        help="First warmup-only session bound for an explicit retrospective role calendar",
+    )
+    qualification_plan_register_p.add_argument(
+        "--warmup-end",
+        type=iso_date,
+        help="Last warmup-only session bound for an explicit retrospective role calendar",
     )
     qualification_plan_register_p.add_argument(
         "--maximum-holding-sessions",

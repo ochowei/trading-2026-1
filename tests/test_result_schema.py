@@ -409,6 +409,37 @@ def test_registered_shadow_without_a_checkpoint_remains_valid_non_live_evidence(
     )
     assert retrospective_validity.status is ResultValidityStatus.VALID
 
+    explicit_calendar = json.loads(json.dumps(retrospective))
+    explicit_plan = explicit_calendar["development_summary"]["historical_plan"]
+    explicit_plan["development_years"] = [2015, 2016, 2017]
+    explicit_plan["role_calendar"] = {
+        "development_sessions": [
+            timestamp.date().isoformat() for timestamp in pd.bdate_range("2015-01-01", "2017-12-31")
+        ],
+        "warmup_sessions": [
+            timestamp.date().isoformat() for timestamp in pd.bdate_range("2020-01-01", "2020-12-31")
+        ],
+        "evaluation_sessions": explicit_plan["evaluation_sessions"],
+    }
+    explicit_validity = classify_result(
+        explicit_calendar,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert explicit_validity.status is ResultValidityStatus.VALID
+
+    missing_calendar = json.loads(json.dumps(explicit_calendar))
+    missing_calendar["development_summary"]["historical_plan"].pop("role_calendar")
+    missing_calendar_validity = classify_result(
+        missing_calendar,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert missing_calendar_validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("explicit role calendar" in reason for reason in missing_calendar_validity.reasons)
+
     promoted_retrospective = json.loads(json.dumps(retrospective))
     promoted_retrospective["shadow_evidence"] = payload["shadow_evidence"]
     promoted_validity = classify_result(

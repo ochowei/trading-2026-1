@@ -150,6 +150,15 @@ class EvaluationFold:
 
 
 @dataclass(frozen=True, slots=True)
+class QualificationRoleCalendar:
+    """Exact non-overlapping session roles for a retrospective plan."""
+
+    development_sessions: tuple[date, ...]
+    warmup_sessions: tuple[date, ...]
+    evaluation_sessions: tuple[date, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class HistoricalQualificationPlan:
     """Frozen dates and thresholds established before evaluation outcomes."""
 
@@ -174,6 +183,7 @@ class HistoricalQualificationPlan:
     retrospective_selection_checkpoint: RetrospectiveSelectionCheckpoint | None = None
     evidence_role: str = "historical"
     evidence_audit: EvaluationEvidenceAudit | None = None
+    role_calendar: QualificationRoleCalendar | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -408,6 +418,8 @@ def build_historical_qualification_plan(
     retrospective_selection_checkpoint: RetrospectiveSelectionCheckpoint | None = None,
     evidence_role: str = "historical",
     evidence_audit: EvaluationEvidenceAudit | None = None,
+    development_sessions: tuple[date, ...] | None = None,
+    warmup_sessions: tuple[date, ...] = (),
 ) -> HistoricalQualificationPlan:
     """Freeze annual folds with explicit purge and embargo signal exclusions."""
     if not experiment_family.strip() or not definition_fingerprint.strip():
@@ -459,16 +471,31 @@ def build_historical_qualification_plan(
     validate_cost_scenario_policies(base_cost_policy, stress_cost_policy)
     if len(years) < gate.minimum_evaluation_folds:
         raise ValueError("historical plan requires at least five annual evaluation folds")
-    development_years = tuple(
-        sorted({item.year for item in ordered_sessions if item.year < years[0]})
+    explicit_role_calendar = development_sessions is not None or bool(warmup_sessions)
+    if explicit_role_calendar and evidence_role != "retrospective-confirmatory":
+        raise ValueError("explicit role calendar is only valid for retrospective qualification")
+    if explicit_role_calendar and development_sessions is None:
+        raise ValueError("explicit role calendar requires development sessions")
+    ordered_development_sessions = (
+        tuple(sorted(set(development_sessions)))
+        if development_sessions is not None
+        else tuple(item for item in ordered_sessions if item.year < years[0])
     )
+    ordered_warmup_sessions = tuple(sorted(set(warmup_sessions)))
+    development_years = tuple(sorted({item.year for item in ordered_development_sessions}))
     if len(development_years) < gate.minimum_development_years:
         raise ValueError("historical plan requires at least three development years")
     required_development_years = tuple(range(years[0] - gate.minimum_development_years, years[0]))
-    if not set(required_development_years).issubset(development_years):
+    if not explicit_role_calendar and not set(required_development_years).issubset(
+        development_years
+    ):
         raise ValueError("historical plan requires consecutive development years")
-    for year in required_development_years:
-        _validate_annual_coverage(ordered_sessions, year, "development")
+    if explicit_role_calendar and development_years != tuple(
+        range(development_years[0], development_years[-1] + 1)
+    ):
+        raise ValueError("explicit development years must be consecutive")
+    for year in development_years:
+        _validate_annual_coverage(ordered_development_sessions, year, "development")
     if years != tuple(range(years[0], years[-1] + 1)):
         raise ValueError("historical evaluation folds must be consecutive annual periods")
     folds: list[EvaluationFold] = []
@@ -486,6 +513,31 @@ def build_historical_qualification_plan(
                 signal_start=annual[embargo_sessions],
                 signal_end=annual[-(dependency_sessions + 1)],
             )
+        )
+    evaluation_sessions = tuple(session for session in ordered_sessions if session.year in years)
+    role_calendar = None
+    if explicit_role_calendar:
+        if not ordered_warmup_sessions:
+            raise ValueError("explicit role calendar requires warmup sessions")
+        if len(ordered_warmup_sessions) < dependency_sessions:
+            raise ValueError("explicit warmup inventory does not cover strategy dependencies")
+        if ordered_warmup_sessions[-1] >= evaluation_sessions[0]:
+            raise ValueError("warmup-only sessions must precede retrospective evaluation")
+        if ordered_development_sessions[-1] >= created_at.astimezone(UTC).date():
+            raise ValueError("Development context must be complete before plan freeze")
+        development_set = set(ordered_development_sessions)
+        warmup_set = set(ordered_warmup_sessions)
+        evaluation_set = set(evaluation_sessions)
+        if (
+            development_set & warmup_set
+            or development_set & evaluation_set
+            or warmup_set & evaluation_set
+        ):
+            raise ValueError("qualification role calendar sessions must not overlap")
+        role_calendar = QualificationRoleCalendar(
+            development_sessions=ordered_development_sessions,
+            warmup_sessions=ordered_warmup_sessions,
+            evaluation_sessions=evaluation_sessions,
         )
     if (
         evidence_role == "historical"
@@ -529,9 +581,7 @@ def build_historical_qualification_plan(
         "definition_fingerprint": definition_fingerprint,
         "created_at": timestamp_text(created_at.astimezone(UTC)),
         "development_years": list(development_years),
-        "evaluation_sessions": [
-            session.isoformat() for session in ordered_sessions if session.year in years
-        ],
+        "evaluation_sessions": [session.isoformat() for session in evaluation_sessions],
         "folds": [
             {
                 "fold_id": fold.fold_id,
@@ -571,6 +621,16 @@ def build_historical_qualification_plan(
     if evidence_audit is not None:
         payload["evidence_role"] = evidence_role
         payload["evidence_audit"] = _evidence_audit_payload(evidence_audit)
+    if role_calendar is not None:
+        payload["role_calendar"] = {
+            "development_sessions": [
+                session.isoformat() for session in role_calendar.development_sessions
+            ],
+            "warmup_sessions": [session.isoformat() for session in role_calendar.warmup_sessions],
+            "evaluation_sessions": [
+                session.isoformat() for session in role_calendar.evaluation_sessions
+            ],
+        }
     plan_prefix = "historical-plan-" if evidence_role == "historical" else "retrospective-plan-"
     plan_id = plan_prefix + hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
     return HistoricalQualificationPlan(
@@ -579,7 +639,7 @@ def build_historical_qualification_plan(
         definition_fingerprint=definition_fingerprint,
         created_at=created_at.astimezone(UTC),
         development_years=development_years,
-        evaluation_sessions=tuple(session for session in ordered_sessions if session.year in years),
+        evaluation_sessions=evaluation_sessions,
         folds=tuple(folds),
         maximum_holding_sessions=maximum_holding_sessions,
         execution_lag_sessions=execution_lag_sessions,
@@ -595,6 +655,7 @@ def build_historical_qualification_plan(
         retrospective_selection_checkpoint=retrospective_selection_checkpoint,
         evidence_role=evidence_role,
         evidence_audit=evidence_audit,
+        role_calendar=role_calendar,
     )
 
 

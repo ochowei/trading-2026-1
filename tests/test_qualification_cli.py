@@ -197,11 +197,88 @@ def test_qualification_plan_register_has_no_backdated_clock_input(
     main(argv)
 
     assert captured["evaluation_years"] == (2027, 2028, 2029, 2030, 2031)
+    assert captured["development_years"] is None
+    assert captured["warmup_start"] is None
+    assert captured["warmup_end"] is None
     assert captured["random_samples"] == 1000
     assert "created_at" not in captured
     assert "qualification plan registered: historical-plan-forward" in capsys.readouterr().out
     with pytest.raises(SystemExit):
         build_parser().parse_args([*argv, "--created-at", "2020-01-01T00:00:00Z"])
+
+
+def test_retrospective_plan_cli_routes_explicit_role_calendar(
+    tmp_path, capsys, monkeypatch
+) -> None:
+    captured = {}
+    checkpoint = SimpleNamespace(
+        selected_trial_id="selected-trial",
+        included_trial_ids=("baseline-trial", "selected-trial"),
+        prior_selection_history_incomplete=True,
+    )
+    plan = SimpleNamespace(
+        plan_id="retrospective-plan-explicit-calendar",
+        experiment_family="FXI:retrospective",
+        evaluation_sessions=(date(2010, 1, 4), date(2014, 12, 31)),
+        forward_selection_epoch=None,
+        retrospective_selection_checkpoint=checkpoint,
+        evidence_role="retrospective-confirmatory",
+        evidence_audit=SimpleNamespace(classification="provenance-unknown"),
+    )
+
+    def register(**kwargs):
+        captured.update(kwargs)
+        return plan
+
+    monkeypatch.setattr("trading.cli.register_forward_qualification_plan", register)
+    main(
+        [
+            "qualification",
+            "plan",
+            "register",
+            "--research",
+            "fxi/selected",
+            "--workflow",
+            "workflows/example--v006",
+            "--family-baseline-trial-id",
+            "baseline-trial",
+            "--evaluation-years",
+            "2010",
+            "2011",
+            "2012",
+            "2013",
+            "2014",
+            "--development-years",
+            "2015",
+            "2016",
+            "2017",
+            "--warmup-start",
+            "2009-01-01",
+            "--warmup-end",
+            "2009-12-31",
+            "--maximum-holding-sessions",
+            "20",
+            "--execution-lag-sessions",
+            "1",
+            "--dependency-sessions",
+            "21",
+            "--embargo-sessions",
+            "1",
+            "--random-seed",
+            "20260813",
+            "--evidence-role",
+            "retrospective-confirmatory",
+            "--evidence-classification",
+            "provenance-unknown",
+            "--audit-justification",
+            "Legacy history is incomplete.",
+        ]
+    )
+
+    assert captured["development_years"] == (2015, 2016, 2017)
+    assert captured["warmup_start"] == date(2009, 1, 1)
+    assert captured["warmup_end"] == date(2009, 12, 31)
+    assert "retrospective-plan-explicit-calendar" in capsys.readouterr().out
 
 
 def test_qualification_screen_run_routes_exact_trial_manifests(

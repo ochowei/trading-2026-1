@@ -1,12 +1,12 @@
 ---
 workflow: strategy-forward-replication-research
 title: 策略前瞻驗證流程
-version: v005
+version: v006
 definition: WORKFLOW.md
-supersedes: v004
+supersedes: v005
 derived_from: null
 source_changes:
-- workflows/strategy-forward-replication-research--v004/work/changes/retrospective-confirmatory-evidence--c001
+- workflows/strategy-forward-replication-research--v005/work/changes/explicit-retrospective-role-calendar--c001
 policies:
 - family: us-equity-market
   version: v002
@@ -35,7 +35,7 @@ dependencies:
   role: normative
 - path: docs/canonical-sleeve-execution.md
   role: normative
-- path: docs/historical-qualification-and-shadow-v005.md
+- path: docs/historical-qualification-and-shadow-v006.md
   role: normative
 - path: docs/controlled-followup-cutover.md
   role: normative
@@ -55,11 +55,12 @@ only in the root `workflows/README.md` registry.
 
 ## Authoring basis
 
-本 draft 完整保留 v004 的 clean Historical、Shadow、activation、monitoring、policy、auxiliary
-availability 與 observation-provenance guards，並納入 accepted change
-`strategy-forward-replication-research@v004/C001`。新增的 optional
-`retrospective-confirmatory` checkpoint 對所有資產開放，但只能產生
-`retrospectively-supported`，不能替代 clean Historical 或授予任何 promotion。
+本 draft 完整保留 v005 的 retrospective、clean Historical、Shadow、activation、monitoring、
+policy、auxiliary availability 與 observation-provenance guards，並納入 accepted change
+`strategy-forward-replication-research@v005/C001`。新增 explicit retrospective role calendar，
+使 completed Development context 可位於 retrospective evaluation 之後，同時將 warmup-only、
+Development 與 Evaluation sessions 分別凍結且禁止重疊。這不改變任何 gate 或 promotion
+authority。
 
 ## Errata
 
@@ -70,13 +71,9 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-| ID | Title | Status | Outcome | Path |
-| --- | --- | --- | --- | --- |
-| `S001` | FXI ATR-Band Mean-Reversion Retrospective Confirmation | `paused` | `-` | [fxi-atr-band-mean-reversion-retrospective-confirmation--s001](work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001/) |
+_No studies._
 
 ### Changes
 
-| ID | Title | Status | Released in | Path |
-| --- | --- | --- | --- | --- |
-| `C001` | Explicit retrospective role calendar | `released` | `v006` | [explicit-retrospective-role-calendar--c001](work/changes/explicit-retrospective-role-calendar--c001/) |
+_No changes._
 <!-- GENERATED:WORK_INDEX_END -->

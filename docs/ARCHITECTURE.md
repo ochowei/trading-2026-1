@@ -92,6 +92,7 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/manual-execution-ledger.md` | Manual ledger domain, integrity, broker reconciliation, and CLI contract. |
 | `docs/historical-qualification-and-shadow.md` | Historical folds, benchmark gates, prospective Shadow evidence, and qualification lifecycle. |
 | `docs/historical-qualification-and-shadow-v005.md` | Proposed v005 clean-evidence audit, retrospective-confirmatory checkpoint, workflow-native qualification, and unchanged Shadow boundary. |
+| `docs/historical-qualification-and-shadow-v006.md` | Proposed v006 explicit retrospective role-calendar contract with backward-compatible Historical and Shadow boundaries. |
 | `docs/result-validity-and-trial-history-v005.md` | Proposed v005 result-validity extension for retrospective evidence roles while preserving legacy event verification. |
 | `docs/controlled-followup-cutover.md` | Followup lifecycle, authorization, parity, rollback, and allocation epochs. |
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |

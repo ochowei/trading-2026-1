@@ -1,5 +1,5 @@
 from dataclasses import replace
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -201,6 +201,108 @@ def test_register_plan_resolves_workflow_native_identity_without_legacy_registry
     assert plan.forward_selection_epoch.selected_trial_id == selected_id
     assert plan.evidence_audit is not None
     assert plan.evidence_audit.classification == "verified-clean"
+
+
+def test_register_retrospective_plan_uses_explicit_role_calendar(tmp_path, monkeypatch) -> None:
+    started_at = datetime(2026, 8, 13, 10, tzinfo=UTC)
+    trial_path = tmp_path / "trial-registry.json"
+    selected_fingerprint = "a" * 64
+    baseline_fingerprint = "b" * 64
+    registry = ExperimentTrialRegistry(trial_path)
+    registry.register_trial(
+        "SPY:forward-program",
+        selected_fingerprint,
+        experiment_name="selected",
+        registered_at=datetime(2026, 8, 13, 8, tzinfo=UTC),
+    )
+    baseline_id = registry.register_trial(
+        "SPY:forward-program",
+        baseline_fingerprint,
+        experiment_name="baseline",
+        registered_at=datetime(2026, 8, 13, 8, 1, tzinfo=UTC),
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.get_experiment",
+        lambda _name: _Strategy(selected_fingerprint),
+    )
+
+    plan = register_forward_qualification_plan(
+        experiment_name="selected",
+        workflow_path=Path("workflows/strategy-forward-replication-research--v005"),
+        family_baseline_trial_id=baseline_id,
+        evaluation_years=(2010, 2011, 2012, 2013, 2014),
+        development_years=tuple(range(2015, 2026)),
+        warmup_start=date(2009, 1, 1),
+        warmup_end=date(2009, 12, 31),
+        maximum_holding_sessions=20,
+        execution_lag_sessions=1,
+        dependency_sessions=21,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        random_seed=20260813,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        qualification_registry_path=tmp_path / "qualification-registry.json",
+        trial_registry_path=trial_path,
+        now=lambda: started_at,
+        evidence_role="retrospective-confirmatory",
+        evidence_classification="provenance-unknown",
+        evidence_justification="Legacy selection provenance is incomplete.",
+        trial_history_complete=False,
+    )
+
+    assert plan.development_years == tuple(range(2015, 2026))
+    assert plan.role_calendar is not None
+    assert plan.role_calendar.warmup_sessions[0].year == 2009
+    assert plan.role_calendar.evaluation_sessions == plan.evaluation_sessions
+
+
+def test_register_plan_rejects_partial_explicit_role_calendar(tmp_path, monkeypatch) -> None:
+    trial_path = tmp_path / "trial-registry.json"
+    selected_fingerprint = "a" * 64
+    baseline_fingerprint = "b" * 64
+    registry = ExperimentTrialRegistry(trial_path)
+    registry.register_trial(
+        "SPY:forward-program",
+        selected_fingerprint,
+        experiment_name="selected",
+        registered_at=datetime(2026, 8, 13, 8, tzinfo=UTC),
+    )
+    baseline_id = registry.register_trial(
+        "SPY:forward-program",
+        baseline_fingerprint,
+        experiment_name="baseline",
+        registered_at=datetime(2026, 8, 13, 8, 1, tzinfo=UTC),
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.get_experiment",
+        lambda _name: _Strategy(selected_fingerprint),
+    )
+
+    with pytest.raises(ValueError, match="requires development years and warmup bounds"):
+        register_forward_qualification_plan(
+            experiment_name="selected",
+            workflow_path=Path("workflows/strategy-forward-replication-research--v005"),
+            family_baseline_trial_id=baseline_id,
+            evaluation_years=(2010, 2011, 2012, 2013, 2014),
+            development_years=(2015, 2016, 2017),
+            maximum_holding_sessions=20,
+            execution_lag_sessions=1,
+            dependency_sessions=21,
+            embargo_sessions=1,
+            stress_drawdown_limit="0.20",
+            random_seed=17,
+            random_samples=10,
+            bootstrap_repetitions=20,
+            bootstrap_block_sessions=5,
+            qualification_registry_path=tmp_path / "qualification-registry.json",
+            trial_registry_path=trial_path,
+            now=lambda: datetime(2026, 8, 13, 10, tzinfo=UTC),
+            evidence_role="retrospective-confirmatory",
+            evidence_classification="provenance-unknown",
+            evidence_justification="Legacy selection provenance is incomplete.",
+        )
 
 
 def test_screen_input_replays_workflow_native_identity_without_legacy_registry(

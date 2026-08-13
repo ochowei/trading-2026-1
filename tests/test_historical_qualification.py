@@ -220,6 +220,121 @@ def test_retrospective_plan_accepts_completed_unknown_provenance_without_promoti
     assert _qualification_disposition(plan.evidence_role, False) == "retrospective-screen-failed"
 
 
+def test_retrospective_plan_freezes_explicit_later_development_and_prior_warmup() -> None:
+    evaluation_sessions = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2010-01-01", "2014-12-31")
+    )
+    development_sessions = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2015-01-01", "2025-12-31")
+    )
+    warmup_sessions = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2009-01-01", "2009-12-31")
+    )
+    frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
+
+    plan = build_historical_qualification_plan(
+        experiment_family="fxi:mean-reversion",
+        definition_fingerprint="a" * 64,
+        sessions=evaluation_sessions,
+        evaluation_years=(2010, 2011, 2012, 2013, 2014),
+        maximum_holding_sessions=20,
+        execution_lag_sessions=1,
+        dependency_sessions=21,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id="trial-baseline",
+        random_seed=20260813,
+        random_samples=1000,
+        bootstrap_repetitions=1000,
+        bootstrap_block_sessions=20,
+        created_at=frozen_at,
+        evidence_role="retrospective-confirmatory",
+        retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+            frozen_at=frozen_at,
+            selected_trial_id="trial-selected",
+            included_trial_ids=("trial-baseline", "trial-selected"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="provenance-unknown",
+            frozen_at=frozen_at,
+            justification="Legacy selection provenance is incomplete.",
+            trial_history_complete=False,
+        ),
+        development_sessions=development_sessions,
+        warmup_sessions=warmup_sessions,
+    )
+
+    assert plan.development_years == tuple(range(2015, 2026))
+    assert plan.role_calendar is not None
+    assert plan.role_calendar.development_sessions == development_sessions
+    assert plan.role_calendar.warmup_sessions == warmup_sessions
+    assert plan.role_calendar.evaluation_sessions == evaluation_sessions
+
+
+def test_explicit_role_calendar_rejects_overlapping_or_non_retrospective_roles() -> None:
+    evaluation_sessions = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2010-01-01", "2014-12-31")
+    )
+    development_sessions = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2015-01-01", "2017-12-31")
+    )
+    frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
+    kwargs = {
+        "experiment_family": "fxi:mean-reversion",
+        "definition_fingerprint": "a" * 64,
+        "sessions": evaluation_sessions,
+        "evaluation_years": (2010, 2011, 2012, 2013, 2014),
+        "maximum_holding_sessions": 20,
+        "execution_lag_sessions": 1,
+        "dependency_sessions": 21,
+        "embargo_sessions": 1,
+        "stress_drawdown_limit": "0.20",
+        "family_baseline_trial_id": "trial-baseline",
+        "random_seed": 17,
+        "random_samples": 10,
+        "bootstrap_repetitions": 20,
+        "bootstrap_block_sessions": 5,
+        "created_at": frozen_at,
+        "development_sessions": development_sessions,
+    }
+
+    with pytest.raises(ValueError, match="only valid for retrospective"):
+        build_historical_qualification_plan(
+            **kwargs,
+            warmup_sessions=(date(2009, 1, 2),),
+        )
+
+    checkpoint = RetrospectiveSelectionCheckpoint(
+        frozen_at=frozen_at,
+        selected_trial_id="trial-selected",
+        included_trial_ids=("trial-baseline", "trial-selected"),
+        prior_selection_history_incomplete=True,
+    )
+    audit = EvaluationEvidenceAudit(
+        classification="provenance-unknown",
+        frozen_at=frozen_at,
+        justification="Legacy selection provenance is incomplete.",
+        trial_history_complete=False,
+    )
+    overlapping_development = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2010-01-01", "2012-12-31")
+    )
+    with pytest.raises(ValueError, match="must not overlap"):
+        build_historical_qualification_plan(
+            **{
+                **kwargs,
+                "development_sessions": overlapping_development,
+                "evidence_role": "retrospective-confirmatory",
+                "retrospective_selection_checkpoint": checkpoint,
+                "evidence_audit": audit,
+            },
+            warmup_sessions=tuple(
+                timestamp.date() for timestamp in pd.bdate_range("2009-01-01", "2009-12-31")
+            ),
+        )
+
+
 def test_historical_plan_rejects_sparse_year_labels_that_are_not_annual_periods() -> None:
     sessions = tuple(
         timestamp.date()
