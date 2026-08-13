@@ -62,6 +62,13 @@ SHADOW_ACTIVATION_GATE_NAMES = (
     "critical_drift",
 )
 
+EVIDENCE_CLASSIFICATIONS = (
+    "verified-clean",
+    "known-contaminated",
+    "provenance-unknown",
+)
+EVIDENCE_ROLES = ("historical", "retrospective-confirmatory")
+
 
 @dataclass(frozen=True, slots=True)
 class HistoricalScreenThresholds:
@@ -108,6 +115,26 @@ class ForwardSelectionEpoch:
 
 
 @dataclass(frozen=True, slots=True)
+class EvaluationEvidenceAudit:
+    """Outcome-preinspection classification for one frozen evaluation session inventory."""
+
+    classification: str
+    frozen_at: datetime
+    justification: str
+    trial_history_complete: bool
+
+
+@dataclass(frozen=True, slots=True)
+class RetrospectiveSelectionCheckpoint:
+    """Frozen trial universe established before retrospective outcome inspection."""
+
+    frozen_at: datetime
+    selected_trial_id: str
+    included_trial_ids: tuple[str, ...]
+    prior_selection_history_incomplete: bool
+
+
+@dataclass(frozen=True, slots=True)
 class EvaluationFold:
     """One annual outcome interval and its dependency-safe signal window."""
 
@@ -144,6 +171,9 @@ class HistoricalQualificationPlan:
     benchmarks: HistoricalBenchmarkPolicy
     selection_adjustment: SelectionAdjustmentPolicy
     forward_selection_epoch: ForwardSelectionEpoch | None = None
+    retrospective_selection_checkpoint: RetrospectiveSelectionCheckpoint | None = None
+    evidence_role: str = "historical"
+    evidence_audit: EvaluationEvidenceAudit | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -375,12 +405,33 @@ def build_historical_qualification_plan(
     base_cost_policy: ExecutionCostPolicy = DEFAULT_BASE_COST_POLICY,
     stress_cost_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
     forward_selection_epoch: ForwardSelectionEpoch | None = None,
+    retrospective_selection_checkpoint: RetrospectiveSelectionCheckpoint | None = None,
+    evidence_role: str = "historical",
+    evidence_audit: EvaluationEvidenceAudit | None = None,
 ) -> HistoricalQualificationPlan:
     """Freeze annual folds with explicit purge and embargo signal exclusions."""
     if not experiment_family.strip() or not definition_fingerprint.strip():
         raise ValueError("historical plan requires family and definition identity")
     if created_at.tzinfo is None:
         raise ValueError("historical plan clock must be timezone-aware")
+    if evidence_role not in EVIDENCE_ROLES:
+        raise ValueError("qualification plan has an invalid evidence role")
+    if evidence_role == "retrospective-confirmatory" and evidence_audit is None:
+        raise ValueError("retrospective plan requires a frozen clean-evidence audit")
+    if evidence_role == "retrospective-confirmatory" and retrospective_selection_checkpoint is None:
+        raise ValueError("retrospective plan requires a frozen trial universe")
+    if forward_selection_epoch is not None and retrospective_selection_checkpoint is not None:
+        raise ValueError("qualification plan cannot contain two selection boundaries")
+    if evidence_role == "historical" and retrospective_selection_checkpoint is not None:
+        raise ValueError("Historical Evaluation cannot use a retrospective checkpoint")
+    if evidence_role == "retrospective-confirmatory" and forward_selection_epoch is not None:
+        raise ValueError("retrospective qualification cannot claim a Forward Selection Epoch")
+    if evidence_audit is not None:
+        _validate_evidence_audit(
+            evidence_audit,
+            created_at=created_at.astimezone(UTC),
+            evidence_role=evidence_role,
+        )
     if (
         min(
             maximum_holding_sessions,
@@ -436,8 +487,16 @@ def build_historical_qualification_plan(
                 signal_end=annual[-(dependency_sessions + 1)],
             )
         )
-    if created_at.astimezone(UTC).date() >= folds[0].outcome_start:
+    if (
+        evidence_role == "historical"
+        and created_at.astimezone(UTC).date() >= folds[0].outcome_start
+    ):
         raise ValueError("historical plan must be frozen before evaluation outcomes begin")
+    if (
+        evidence_role == "retrospective-confirmatory"
+        and created_at.astimezone(UTC).date() <= folds[-1].outcome_end
+    ):
+        raise ValueError("retrospective plan requires completed evaluation folds")
     drawdown_limit = to_decimal(
         stress_drawdown_limit,
         "stress_drawdown_limit",
@@ -455,6 +514,12 @@ def build_historical_qualification_plan(
     if forward_selection_epoch is not None:
         _validate_forward_selection_epoch(
             forward_selection_epoch,
+            created_at=created_at.astimezone(UTC),
+            family_baseline_trial_id=family_baseline_trial_id,
+        )
+    if retrospective_selection_checkpoint is not None:
+        _validate_retrospective_selection_checkpoint(
+            retrospective_selection_checkpoint,
             created_at=created_at.astimezone(UTC),
             family_baseline_trial_id=family_baseline_trial_id,
         )
@@ -499,7 +564,15 @@ def build_historical_qualification_plan(
         payload["forward_selection_epoch"] = _forward_selection_epoch_payload(
             forward_selection_epoch
         )
-    plan_id = "historical-plan-" + hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
+    if retrospective_selection_checkpoint is not None:
+        payload["retrospective_selection_checkpoint"] = _retrospective_selection_checkpoint_payload(
+            retrospective_selection_checkpoint
+        )
+    if evidence_audit is not None:
+        payload["evidence_role"] = evidence_role
+        payload["evidence_audit"] = _evidence_audit_payload(evidence_audit)
+    plan_prefix = "historical-plan-" if evidence_role == "historical" else "retrospective-plan-"
+    plan_id = plan_prefix + hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
     return HistoricalQualificationPlan(
         plan_id=plan_id,
         experiment_family=experiment_family,
@@ -519,6 +592,9 @@ def build_historical_qualification_plan(
         benchmarks=benchmarks,
         selection_adjustment=selection_adjustment,
         forward_selection_epoch=forward_selection_epoch,
+        retrospective_selection_checkpoint=retrospective_selection_checkpoint,
+        evidence_role=evidence_role,
+        evidence_audit=evidence_audit,
     )
 
 
@@ -712,7 +788,7 @@ def evaluate_historical_stability_screen(
         selection_adjustment=selection_adjustment,
         gates=gates,
         passed=passed,
-        disposition="shadow-eligible" if passed else "historical-screen-failed",
+        disposition=_qualification_disposition(plan.evidence_role, passed),
     )
 
 
@@ -853,12 +929,75 @@ def _validate_forward_selection_epoch(
         raise ValueError("forward selection epoch baseline must differ from the selected trial")
 
 
+def _validate_evidence_audit(
+    audit: EvaluationEvidenceAudit,
+    *,
+    created_at: datetime,
+    evidence_role: str,
+) -> None:
+    if audit.classification not in EVIDENCE_CLASSIFICATIONS:
+        raise ValueError("clean-evidence audit has an invalid classification")
+    if audit.frozen_at.tzinfo is None or audit.frozen_at.astimezone(UTC) != created_at:
+        raise ValueError("clean-evidence audit must freeze with its qualification plan")
+    if not audit.justification.strip():
+        raise ValueError("clean-evidence audit requires a justification")
+    if evidence_role == "historical" and (
+        audit.classification != "verified-clean" or not audit.trial_history_complete
+    ):
+        raise ValueError("Historical Evaluation requires verified-clean complete provenance")
+
+
+def _validate_retrospective_selection_checkpoint(
+    checkpoint: RetrospectiveSelectionCheckpoint,
+    *,
+    created_at: datetime,
+    family_baseline_trial_id: str,
+) -> None:
+    if checkpoint.frozen_at.tzinfo is None or checkpoint.frozen_at.astimezone(UTC) != created_at:
+        raise ValueError("retrospective selection checkpoint must freeze with its plan")
+    included = checkpoint.included_trial_ids
+    if included != tuple(sorted(set(included))) or not included:
+        raise ValueError("retrospective trial identities must be sorted and unique")
+    if checkpoint.selected_trial_id not in included:
+        raise ValueError("retrospective checkpoint must include its selected trial")
+    if family_baseline_trial_id not in included:
+        raise ValueError("retrospective checkpoint must include its family baseline")
+    if checkpoint.selected_trial_id == family_baseline_trial_id:
+        raise ValueError("retrospective baseline must differ from the selected trial")
+
+
+def _evidence_audit_payload(audit: EvaluationEvidenceAudit) -> dict[str, object]:
+    return {
+        "classification": audit.classification,
+        "frozen_at": timestamp_text(audit.frozen_at.astimezone(UTC)),
+        "justification": audit.justification.strip(),
+        "trial_history_complete": audit.trial_history_complete,
+    }
+
+
+def _qualification_disposition(evidence_role: str, passed: bool) -> str:
+    if evidence_role == "retrospective-confirmatory":
+        return "retrospectively-supported" if passed else "retrospective-screen-failed"
+    return "shadow-eligible" if passed else "historical-screen-failed"
+
+
 def _forward_selection_epoch_payload(epoch: ForwardSelectionEpoch) -> dict[str, object]:
     return {
         "started_at": timestamp_text(epoch.started_at.astimezone(UTC)),
         "selected_trial_id": epoch.selected_trial_id,
         "included_trial_ids": list(epoch.included_trial_ids),
         "prior_selection_history_incomplete": epoch.prior_selection_history_incomplete,
+    }
+
+
+def _retrospective_selection_checkpoint_payload(
+    checkpoint: RetrospectiveSelectionCheckpoint,
+) -> dict[str, object]:
+    return {
+        "frozen_at": timestamp_text(checkpoint.frozen_at.astimezone(UTC)),
+        "selected_trial_id": checkpoint.selected_trial_id,
+        "included_trial_ids": list(checkpoint.included_trial_ids),
+        "prior_selection_history_incomplete": checkpoint.prior_selection_history_incomplete,
     }
 
 

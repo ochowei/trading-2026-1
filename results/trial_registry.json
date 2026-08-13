@@ -7764,6 +7764,62 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "68badeb86f494ab5931630e7c57e36afc501f68faa14cc17229ec0958e4a1118"
+    },
+    {
+      "definition_fingerprint": "0befd904a62c296b734d296fda87566e449940cd11fbba5bae59b4168789b0f8",
+      "experiment_family": "fxi-atr-band-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-band-mean-reversion--pullback-wr-baseline"
+      ],
+      "first_registered_at": "2026-08-13T03:42:12.501439Z",
+      "hypothesis": "A simple pullback and Williams-%R rule is the distinct FXI family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-13T03:42:12.672751Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "a324173714314dd6857f608f44d70b8b",
+          "observed_at": "2026-08-13T03:42:12.672751Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--pullback-wr-baseline/20260813_034212_605499_offline_f2343cba90ab42a9878e410c97e22e69.json",
+          "run_mode": "offline",
+          "snapshot_id": "e40c78874101b58239a2df6e2153a09d438d66f560e2c76ef1551eadf960af3d",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "3462f2c46c8d2e23f4bc4c6bd6bfa42d728f3dce0f5002b81e5369505cefdfdc"
+    },
+    {
+      "definition_fingerprint": "7ddf006e5ceb595659b1aacfb135c06244f581b1135cc10c567d8737d3d74b77",
+      "experiment_family": "fxi-atr-band-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-band-mean-reversion--atr-band-candidate"
+      ],
+      "first_registered_at": "2026-08-13T03:42:12.769636Z",
+      "hypothesis": "A bounded FXI volatility-acceleration state improves next-open reversals.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-13T03:42:12.904756Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "f912c6eccf07430491e321eb1846bb45",
+          "observed_at": "2026-08-13T03:42:12.904756Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--atr-band-candidate/20260813_034212_859811_offline_8d81d389160848c889125a9fe738279f.json",
+          "run_mode": "offline",
+          "snapshot_id": "b84b04c08cfdd8d08390433344f008c93a451632280957c0d69ec1212cabfa8e",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "2492dd0b2de348ee341a94a79256b280fb7ca8519996e6b69450fae7d6b8b315"
     }
   ]
 }

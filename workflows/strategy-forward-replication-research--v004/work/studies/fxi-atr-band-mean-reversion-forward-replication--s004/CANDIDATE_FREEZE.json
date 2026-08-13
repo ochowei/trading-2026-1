@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "study_id": "S004",
+  "study_path": "workflows/strategy-forward-replication-research--v004/work/studies/fxi-atr-band-mean-reversion-forward-replication--s004",
+  "workflow": "strategy-forward-replication-research",
+  "workflow_version": "v004",
+  "approved_at": "2026-08-13T03:55:00Z",
+  "approved_by": "ochowei@gmail.com",
+  "preregistration_sha256": "9b0dd1a1ee83fd528bea7b3eb35e67457c106afb4602ba749c40967d2ab26bad",
+  "hypothesis_sha256": "e16dedee1469b9660a5948a604c67553111026ab710061aadfc975d51c12998c",
+  "plan_sha256": "b61c4c8907a38b5bab665acf9832448f4b73a2620d037b4473f24095e35d81fd",
+  "development_evidence_sha256": "89fb54de9061d166f517f7be0bef0c13f6fb401b0bfdc1514ccc3edf81f33903",
+  "development_gate": {
+    "path": "results/fxi-atr-band-mean-reversion--development-gate/s004.json",
+    "sha256": "bbee4410e89223f5250462f06819f3d6ebd6ccf6e09cf819aa62792021ff5e4f",
+    "eligible": true
+  },
+  "selected_candidate": {
+    "source_identity": "fxi-atr-band-mean-reversion/atr-band-candidate",
+    "trial_id": "2492dd0b2de348ee341a94a79256b280fb7ca8519996e6b69450fae7d6b8b315",
+    "definition_fingerprint": "7ddf006e5ceb595659b1aacfb135c06244f581b1135cc10c567d8737d3d74b77",
+    "definition_snapshot_id": "2e3318651cce783524cb3c4ec328188b737b4e602860252132d07535678a1dea",
+    "development_snapshot_id": "b84b04c08cfdd8d08390433344f008c93a451632280957c0d69ec1212cabfa8e",
+    "development_result_sha256": "8601e36892cc38a057d7fc6c91b01acf9a1c3dd58df4d6d39c5420cd248b5fa2"
+  },
+  "family_baseline": {
+    "source_identity": "fxi-atr-band-mean-reversion/pullback-wr-baseline",
+    "trial_id": "3462f2c46c8d2e23f4bc4c6bd6bfa42d728f3dce0f5002b81e5369505cefdfdc",
+    "definition_fingerprint": "0befd904a62c296b734d296fda87566e449940cd11fbba5bae59b4168789b0f8",
+    "definition_snapshot_id": "de584134de367a0fb97a63e748d1906d6f072aa8e55065b63eec8291775e3b57",
+    "development_snapshot_id": "e40c78874101b58239a2df6e2153a09d438d66f560e2c76ef1551eadf960af3d",
+    "development_result_sha256": "de6ed4222f47a25afdd4688fcdf8f74ffab528b1055f7ebd2a385a513fe3bf1d"
+  },
+  "frozen_trial_budget": 6,
+  "robustness_source_inventory_pinned_by_plan": [
+    "fxi-atr-band-mean-reversion/atr-floor-1p10-robustness",
+    "fxi-atr-band-mean-reversion/atr-ceiling-1p30-robustness",
+    "fxi-atr-band-mean-reversion/hold-18-robustness",
+    "fxi-atr-band-mean-reversion/delay-one-session-robustness"
+  ],
+  "historical_boundary": {
+    "folds": [
+      2027,
+      2028,
+      2029,
+      2030,
+      2031
+    ],
+    "maturity_requirement": "Only after the final 2031 fold is complete",
+    "historical_execution_authorized": false
+  },
+  "authorization_scope": "Freeze the selected candidate and distinct baseline only; no robustness run, Historical access, Shadow registration, broker access, or order authority."
+}

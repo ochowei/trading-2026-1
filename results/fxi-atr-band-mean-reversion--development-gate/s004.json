@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "study": "strategy-forward-replication-research@v004/S004",
+  "stage": "Development",
+  "computed_at": "2026-08-13T03:44:42Z",
+  "frozen_window": {
+    "start": "2015-01-02",
+    "end": "2025-12-31",
+    "leading_warmup_sessions": 21,
+    "trailing_purge_sessions": 21
+  },
+  "shared_market_data": {
+    "FXI": "d050c3ccaaf98a4b420c11b078c7622fa6f63e491168092463bae3c6b9cfdd9e"
+  },
+  "baseline": {
+    "source_identity": "fxi-atr-band-mean-reversion/pullback-wr-baseline",
+    "trial_id": "3462f2c46c8d2e23f4bc4c6bd6bfa42d728f3dce0f5002b81e5369505cefdfdc",
+    "observation_id": "a324173714314dd6857f608f44d70b8b",
+    "snapshot_id": "e40c78874101b58239a2df6e2153a09d438d66f560e2c76ef1551eadf960af3d",
+    "definition_snapshot_id": "de584134de367a0fb97a63e748d1906d6f072aa8e55065b63eec8291775e3b57",
+    "manifest_sha256": "cd56399512704f3944cd03c00f68c3602a763122b4a76316fc67ce0b8b124136",
+    "result_sha256": "de6ed4222f47a25afdd4688fcdf8f74ffab528b1055f7ebd2a385a513fe3bf1d",
+    "metrics": {
+      "raw_signals": 98,
+      "completed_trades": 86,
+      "traded_years": 11,
+      "base_compounded_return": -0.0008807988050020255,
+      "base_profit_factor": 0.9996185981423391,
+      "base_net_sharpe": 0.06771864743932075,
+      "base_max_drawdown": -0.3169520935393094,
+      "stress_compounded_return": -0.24124901531653375,
+      "stress_profit_factor": 0.8867022805321951,
+      "stress_max_drawdown": -0.4461097601165043
+    }
+  },
+  "candidate": {
+    "source_identity": "fxi-atr-band-mean-reversion/atr-band-candidate",
+    "trial_id": "2492dd0b2de348ee341a94a79256b280fb7ca8519996e6b69450fae7d6b8b315",
+    "observation_id": "f912c6eccf07430491e321eb1846bb45",
+    "snapshot_id": "b84b04c08cfdd8d08390433344f008c93a451632280957c0d69ec1212cabfa8e",
+    "definition_snapshot_id": "2e3318651cce783524cb3c4ec328188b737b4e602860252132d07535678a1dea",
+    "manifest_sha256": "5559de2b150a9165b8adb5206b6aa253d06d8d6db9677bff0937b67370f5cdbc",
+    "result_sha256": "8601e36892cc38a057d7fc6c91b01acf9a1c3dd58df4d6d39c5420cd248b5fa2",
+    "metrics": {
+      "raw_signals": 38,
+      "completed_trades": 36,
+      "traded_years": 11,
+      "trades_by_signal_year": {
+        "2015": 3,
+        "2016": 2,
+        "2017": 1,
+        "2018": 4,
+        "2019": 4,
+        "2020": 2,
+        "2021": 3,
+        "2022": 7,
+        "2023": 5,
+        "2024": 1,
+        "2025": 4
+      },
+      "base_compounded_return": 1.2316411073077624,
+      "base_profit_factor": 3.117975309415223,
+      "base_net_sharpe": 0.796945957685436,
+      "base_max_drawdown": -0.1412974182037673,
+      "stress_compounded_return": 0.9888111501003607,
+      "stress_profit_factor": 2.655256459851667,
+      "stress_max_drawdown": -0.16221685989569756,
+      "baseline_sharpe_margin": 0.7292273102461152,
+      "core_baseline_eligible_entries": 386,
+      "atr_floor_unique_suppressions": 96,
+      "atr_floor_suppression_years": [
+        2015,
+        2016,
+        2018,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "atr_ceiling_unique_suppressions": 18,
+      "atr_ceiling_suppression_years": [
+        2015,
+        2016,
+        2019,
+        2020,
+        2021
+      ],
+      "complete_atr_band_unique_suppressions": 245,
+      "complete_atr_band_suppression_years": [
+        2015,
+        2016,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ]
+    },
+    "gates": {
+      "minimum_30_completed_trades": true,
+      "minimum_10_traded_years": true,
+      "positive_base_return": true,
+      "base_profit_factor_above_1_10": true,
+      "positive_stress_return": true,
+      "stress_profit_factor_above_1_00": true,
+      "stress_drawdown_at_most_20_percent": true,
+      "base_return_at_least_90_percent_of_baseline": true,
+      "baseline_sharpe_margin_at_least_0_10": true,
+      "stress_drawdown_no_worse_than_baseline": true,
+      "atr_floor_suppresses_5_entries_across_3_years": true,
+      "atr_ceiling_suppresses_5_entries_across_3_years": true,
+      "complete_atr_band_suppresses_10_entries_across_5_years": true,
+      "exact_identity_data_policy_execution_and_provenance": true
+    },
+    "eligible": true
+  },
+  "selection": "fxi-atr-band-mean-reversion/atr-band-candidate",
+  "trial_registry_sha256": "63c56e6433f61f2d5adc303a6db32e92628e18782fc11ce1ef08e53e93304506",
+  "stage_gate": "candidate-freeze-approval-required",
+  "stopping_rule_applied": "The sole candidate is Development-eligible; stop before robustness or Historical access and obtain separate human candidate-freeze approval."
+}

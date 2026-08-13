@@ -10,9 +10,11 @@ from pathlib import Path
 from trading.core.accounting import parse_timestamp
 from trading.core.qualification import (
     DailyExcessReturn,
+    EvaluationEvidenceAudit,
     ForwardSelectionEpoch,
     HistoricalQualificationPlan,
     HistoricalScreenResult,
+    RetrospectiveSelectionCheckpoint,
     build_historical_qualification_plan,
     evaluate_family_selection_adjustment,
     evaluate_historical_stability_screen,
@@ -34,6 +36,10 @@ from trading.research_data import (
     ResearchDefinitionStore,
 )
 from trading.research_data.trial_registry import formal_trial_id
+from trading.research_definitions import (
+    ResearchDefinitionRegistry,
+    resolve_workflow_policy_set,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,7 +52,9 @@ class QualificationScreenExecution:
 
 def register_forward_qualification_plan(
     *,
-    experiment_name: str,
+    experiment_name: str | None = None,
+    research_identity: str | None = None,
+    workflow_path: Path | None = None,
     family_baseline_trial_id: str,
     evaluation_years: tuple[int, ...],
     maximum_holding_sessions: int,
@@ -63,8 +71,12 @@ def register_forward_qualification_plan(
     now: Callable[[], datetime] | None = None,
     calendar: SessionCalendar | None = None,
     definition_store: ResearchDefinitionStore | None = None,
+    evidence_role: str = "historical",
+    evidence_classification: str | None = None,
+    evidence_justification: str | None = None,
+    trial_history_complete: bool = False,
 ) -> HistoricalQualificationPlan:
-    """Freeze and register one future-only plan without accepting a backdated clock."""
+    """Freeze and register one exact qualification plan without a backdated clock."""
     clock = now or (lambda: datetime.now(UTC))
     started_at = clock()
     if started_at.tzinfo is None:
@@ -74,8 +86,24 @@ def register_forward_qualification_plan(
     if not years:
         raise ValueError("forward qualification plan requires evaluation years")
 
-    strategy = get_experiment(experiment_name)
-    definition = _capture_definition(strategy, definition_store)
+    strategy, policy_set = _resolve_qualification_definition(
+        experiment_name=experiment_name,
+        research_identity=research_identity,
+        workflow_path=workflow_path,
+    )
+    if evidence_role == "retrospective-confirmatory":
+        _require_retrospective_workflow(workflow_path)
+    if research_identity is not None and evidence_classification is None:
+        raise ValueError("workflow-native qualification requires a clean-evidence classification")
+    audit = None
+    if evidence_classification is not None:
+        audit = EvaluationEvidenceAudit(
+            classification=evidence_classification,
+            frozen_at=started_at,
+            justification=(evidence_justification or "").strip(),
+            trial_history_complete=trial_history_complete,
+        )
+    definition = _capture_definition(strategy, definition_store, policy_set=policy_set)
     declaration = _declare_trial(strategy)
     selected_trial_id = formal_trial_id(declaration.family, definition.fingerprint)
     trial_registry = ExperimentTrialRegistry(trial_registry_path)
@@ -101,13 +129,25 @@ def register_forward_qualification_plan(
             date(years[-1], 12, 31),
         )
     )
-    epoch = ForwardSelectionEpoch(
-        started_at=started_at,
-        selected_trial_id=selected_trial_id,
-        included_trial_ids=included_trial_ids,
-        prior_selection_history_incomplete=trial_state.get("selection_history_incomplete")
-        is not False,
+    prior_selection_history_incomplete = (
+        trial_state.get("selection_history_incomplete") is not False
     )
+    epoch = None
+    retrospective_checkpoint = None
+    if evidence_role == "retrospective-confirmatory":
+        retrospective_checkpoint = RetrospectiveSelectionCheckpoint(
+            frozen_at=started_at,
+            selected_trial_id=selected_trial_id,
+            included_trial_ids=included_trial_ids,
+            prior_selection_history_incomplete=prior_selection_history_incomplete,
+        )
+    else:
+        epoch = ForwardSelectionEpoch(
+            started_at=started_at,
+            selected_trial_id=selected_trial_id,
+            included_trial_ids=included_trial_ids,
+            prior_selection_history_incomplete=prior_selection_history_incomplete,
+        )
     plan = build_historical_qualification_plan(
         experiment_family=declaration.family,
         definition_fingerprint=definition.fingerprint,
@@ -127,6 +167,9 @@ def register_forward_qualification_plan(
         base_cost_policy=DEFAULT_BASE_COST_POLICY,
         stress_cost_policy=DEFAULT_STRESS_COST_POLICY,
         forward_selection_epoch=epoch,
+        retrospective_selection_checkpoint=retrospective_checkpoint,
+        evidence_role=evidence_role,
+        evidence_audit=audit,
     )
     QualificationRegistry(
         qualification_registry_path,
@@ -143,6 +186,7 @@ def run_registered_historical_screen(
     trial_registry_path: Path,
     research_data_store: ResearchDataStore,
     definition_store: ResearchDefinitionStore,
+    workflow_path: Path | None = None,
     now: Callable[[], datetime] | None = None,
 ) -> QualificationScreenExecution:
     """Recompute a frozen plan from verified formal trial snapshots and record it once."""
@@ -162,6 +206,7 @@ def run_registered_historical_screen(
             manifest_path,
             research_data_store=research_data_store,
             definition_store=definition_store,
+            workflow_path=workflow_path,
         )
         if experiment_family != plan.experiment_family:
             raise ValueError(f"{experiment_name} belongs to a different experiment family")
@@ -177,9 +222,10 @@ def run_registered_historical_screen(
         )
         inputs[trial_id] = sleeve_input
 
+    selection_boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
     selected_trial_id = (
-        plan.forward_selection_epoch.selected_trial_id
-        if plan.forward_selection_epoch is not None
+        selection_boundary.selected_trial_id
+        if selection_boundary is not None
         else formal_trial_id(plan.experiment_family, plan.definition_fingerprint)
     )
     expected_trial_ids = _registered_family_trial_ids(
@@ -188,6 +234,8 @@ def run_registered_historical_screen(
         epoch_start=(
             plan.forward_selection_epoch.started_at
             if plan.forward_selection_epoch is not None
+            else plan.retrospective_selection_checkpoint.frozen_at
+            if plan.retrospective_selection_checkpoint is not None
             else None
         ),
     )
@@ -197,6 +245,10 @@ def run_registered_historical_screen(
         expected_trial_ids != plan.forward_selection_epoch.included_trial_ids
     ):
         raise ValueError("forward selection epoch trial universe changed after registration")
+    if plan.retrospective_selection_checkpoint is not None and (
+        expected_trial_ids != plan.retrospective_selection_checkpoint.included_trial_ids
+    ):
+        raise ValueError("retrospective trial universe changed after registration")
 
     returns = {
         trial_id: _daily_excess_returns(plan, sleeve_input)
@@ -236,12 +288,14 @@ def run_registered_historical_screen(
 def _capture_definition(
     strategy: object,
     definition_store: ResearchDefinitionStore | None,
+    *,
+    policy_set: object | None = None,
 ) -> ResearchDefinitionSnapshot:
     capture = getattr(strategy, "capture_research_definition", None)
     if not callable(capture):
         raise ValueError("qualification experiment is not snapshot-aware")
     store = definition_store or ResearchDefinitionStore(Path(".research-data/blobs"))
-    definition = capture(store)
+    definition = capture(store, policy_set) if policy_set is not None else capture(store)
     if not isinstance(definition, ResearchDefinitionSnapshot):
         raise ValueError("qualification experiment returned invalid definition evidence")
     return definition
@@ -294,9 +348,14 @@ def _load_trial_input(
     *,
     research_data_store: ResearchDataStore,
     definition_store: ResearchDefinitionStore,
+    workflow_path: Path | None,
 ) -> tuple[str, str, CanonicalSleeveInput, str, date]:
-    strategy = get_experiment(experiment_name)
-    definition = _capture_definition(strategy, definition_store)
+    strategy, policy_set = _resolve_qualification_definition(
+        experiment_name=None if "/" in experiment_name else experiment_name,
+        research_identity=experiment_name if "/" in experiment_name else None,
+        workflow_path=workflow_path,
+    )
+    definition = _capture_definition(strategy, definition_store, policy_set=policy_set)
     declaration = _declare_trial(strategy)
     snapshot = research_data_store.load_snapshot(manifest_path)
     if snapshot.manifest.definition != definition.blob:
@@ -315,6 +374,38 @@ def _load_trial_input(
         snapshot.manifest.snapshot_id,
         snapshot.manifest.decision_time.session,
     )
+
+
+def _resolve_qualification_definition(
+    *,
+    experiment_name: str | None,
+    research_identity: str | None,
+    workflow_path: Path | None,
+) -> tuple[object, object | None]:
+    if (experiment_name is None) == (research_identity is None):
+        raise ValueError(
+            "qualification requires exactly one legacy experiment or research identity"
+        )
+    if research_identity is None:
+        return get_experiment(str(experiment_name)), None
+    if workflow_path is None:
+        raise ValueError("workflow-native qualification requires an exact released workflow")
+    return (
+        ResearchDefinitionRegistry().load(research_identity),
+        resolve_workflow_policy_set(workflow_path),
+    )
+
+
+def _require_retrospective_workflow(workflow_path: Path | None) -> None:
+    if workflow_path is None:
+        raise ValueError("retrospective qualification requires an exact released workflow")
+    contract = Path(workflow_path) / "WORKFLOW.md"
+    try:
+        text = contract.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ValueError(f"cannot read retrospective workflow contract: {exc}") from exc
+    if "### 3. Optional retrospective-confirmatory checkpoint" not in text:
+        raise ValueError("released workflow does not authorize retrospective qualification")
 
 
 def _verify_formal_snapshot_observation(

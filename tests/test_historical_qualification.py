@@ -8,7 +8,10 @@ import pytest
 
 from trading.core.qualification import (
     DailyExcessReturn,
+    EvaluationEvidenceAudit,
     HistoricalScreenThresholds,
+    RetrospectiveSelectionCheckpoint,
+    _qualification_disposition,
     build_historical_qualification_plan,
     evaluate_family_selection_adjustment,
     evaluate_historical_stability_screen,
@@ -142,6 +145,79 @@ def test_historical_plan_must_be_frozen_before_the_first_evaluation_outcome() ->
             base_cost_policy=ExecutionCostPolicy(),
             stress_cost_policy=ExecutionCostPolicy(10, 10, 1),
         )
+
+
+def test_clean_historical_plan_rejects_unknown_or_incomplete_provenance() -> None:
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
+    frozen_at = datetime(2020, 12, 31, 21, tzinfo=UTC)
+
+    with pytest.raises(ValueError, match="verified-clean complete provenance"):
+        build_historical_qualification_plan(
+            experiment_family="spy:mean-reversion",
+            definition_fingerprint="a" * 64,
+            sessions=sessions,
+            evaluation_years=(2021, 2022, 2023, 2024, 2025),
+            maximum_holding_sessions=1,
+            execution_lag_sessions=1,
+            dependency_sessions=2,
+            embargo_sessions=1,
+            stress_drawdown_limit="0.20",
+            family_baseline_trial_id="trial-baseline",
+            random_seed=17,
+            random_samples=10,
+            bootstrap_repetitions=20,
+            bootstrap_block_sessions=5,
+            created_at=frozen_at,
+            evidence_audit=EvaluationEvidenceAudit(
+                classification="provenance-unknown",
+                frozen_at=frozen_at,
+                justification="Legacy selection history cannot be verified.",
+                trial_history_complete=False,
+            ),
+        )
+
+
+def test_retrospective_plan_accepts_completed_unknown_provenance_without_promotion() -> None:
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
+    frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
+
+    plan = build_historical_qualification_plan(
+        experiment_family="spy:mean-reversion",
+        definition_fingerprint="a" * 64,
+        sessions=sessions,
+        evaluation_years=(2021, 2022, 2023, 2024, 2025),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id="trial-baseline",
+        random_seed=17,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        created_at=frozen_at,
+        evidence_role="retrospective-confirmatory",
+        retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+            frozen_at=frozen_at,
+            selected_trial_id="trial-selected",
+            included_trial_ids=("trial-baseline", "trial-selected"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="provenance-unknown",
+            frozen_at=frozen_at,
+            justification="Completed data are useful only for bounded falsification.",
+            trial_history_complete=False,
+        ),
+    )
+
+    assert plan.plan_id.startswith("retrospective-plan-")
+    assert plan.evidence_role == "retrospective-confirmatory"
+    assert plan.evidence_audit is not None
+    assert plan.evidence_audit.classification == "provenance-unknown"
+    assert _qualification_disposition(plan.evidence_role, True) == "retrospectively-supported"
+    assert _qualification_disposition(plan.evidence_role, False) == "retrospective-screen-failed"
 
 
 def test_historical_plan_rejects_sparse_year_labels_that_are_not_annual_periods() -> None:

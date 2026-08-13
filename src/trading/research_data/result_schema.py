@@ -525,10 +525,49 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             return "historical stability folds differ from the frozen qualification plan"
         try:
             first_outcome = date.fromisoformat(str(plan_folds[0].get("outcome_start")))
+            last_outcome = date.fromisoformat(str(plan_folds[-1].get("outcome_end")))
         except (AttributeError, ValueError):
             return "historical qualification fold dates are invalid"
-        if created_at.date() >= first_outcome:
+        evidence_role = plan.get("evidence_role", "historical")
+        if evidence_role not in {"historical", "retrospective-confirmatory"}:
+            return "qualification plan evidence role is invalid"
+        evidence_audit = plan.get("evidence_audit")
+        if evidence_audit is not None:
+            if not isinstance(evidence_audit, Mapping) or not {
+                "classification",
+                "frozen_at",
+                "justification",
+                "trial_history_complete",
+            }.issubset(evidence_audit):
+                return "clean-evidence audit is incomplete"
+            try:
+                audit_frozen_at = parse_timestamp(str(evidence_audit.get("frozen_at")))
+            except ValueError:
+                return "clean-evidence audit timestamp is invalid"
+            if (
+                audit_frozen_at != created_at
+                or evidence_audit.get("classification")
+                not in {"verified-clean", "known-contaminated", "provenance-unknown"}
+                or not isinstance(evidence_audit.get("justification"), str)
+                or not str(evidence_audit.get("justification")).strip()
+                or type(evidence_audit.get("trial_history_complete")) is not bool
+            ):
+                return "clean-evidence audit is inconsistent"
+        if evidence_role == "retrospective-confirmatory" and evidence_audit is None:
+            return "retrospective qualification requires a clean-evidence audit"
+        if (
+            evidence_role == "historical"
+            and isinstance(evidence_audit, Mapping)
+            and (
+                evidence_audit.get("classification") != "verified-clean"
+                or evidence_audit.get("trial_history_complete") is not True
+            )
+        ):
+            return "Historical Evaluation requires verified-clean complete provenance"
+        if evidence_role == "historical" and created_at.date() >= first_outcome:
             return "historical qualification plan was not frozen before outcomes"
+        if evidence_role == "retrospective-confirmatory" and created_at.date() <= last_outcome:
+            return "retrospective qualification folds were not complete at plan freeze"
         forward_epoch = plan.get("forward_selection_epoch")
         if forward_epoch is not None:
             if not isinstance(forward_epoch, Mapping) or not {
@@ -558,6 +597,43 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
                 or type(forward_epoch.get("prior_selection_history_incomplete")) is not bool
             ):
                 return "forward selection epoch is inconsistent"
+        retrospective_checkpoint = plan.get("retrospective_selection_checkpoint")
+        if retrospective_checkpoint is not None:
+            if not isinstance(retrospective_checkpoint, Mapping) or not {
+                "frozen_at",
+                "selected_trial_id",
+                "included_trial_ids",
+                "prior_selection_history_incomplete",
+            }.issubset(retrospective_checkpoint):
+                return "retrospective selection checkpoint is incomplete"
+            retrospective_ids = retrospective_checkpoint.get("included_trial_ids")
+            retrospective_selected = retrospective_checkpoint.get("selected_trial_id")
+            try:
+                retrospective_frozen_at = parse_timestamp(
+                    str(retrospective_checkpoint.get("frozen_at"))
+                )
+            except ValueError:
+                return "retrospective selection checkpoint timestamp is invalid"
+            if (
+                retrospective_frozen_at != created_at
+                or not isinstance(retrospective_ids, list)
+                or not retrospective_ids
+                or retrospective_ids != sorted(set(retrospective_ids))
+                or retrospective_selected not in retrospective_ids
+                or plan_benchmarks.get("family_baseline_trial_id") not in retrospective_ids
+                or retrospective_selected == plan_benchmarks.get("family_baseline_trial_id")
+                or type(retrospective_checkpoint.get("prior_selection_history_incomplete"))
+                is not bool
+            ):
+                return "retrospective selection checkpoint is inconsistent"
+        if forward_epoch is not None and retrospective_checkpoint is not None:
+            return "qualification plan contains conflicting selection boundaries"
+        if evidence_role == "retrospective-confirmatory" and retrospective_checkpoint is None:
+            return "retrospective qualification requires a frozen trial universe"
+        if evidence_role == "retrospective-confirmatory" and forward_epoch is not None:
+            return "retrospective qualification cannot claim a Forward Selection Epoch"
+        if evidence_role == "historical" and retrospective_checkpoint is not None:
+            return "Historical Evaluation cannot use a retrospective checkpoint"
         plan_cost_error = _cost_policies_error(plan.get("cost_policies"))
         if plan_cost_error is not None:
             return plan_cost_error
@@ -584,7 +660,16 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         gates_passed = all(gate.get("passed") is True for gate in screen_gates)
         if screen.get("passed") is not gates_passed:
             return "historical screen pass state conflicts with its gates"
-        if (screen.get("disposition") == "shadow-eligible") is not gates_passed:
+        expected_disposition = (
+            "retrospectively-supported"
+            if evidence_role == "retrospective-confirmatory" and gates_passed
+            else "retrospective-screen-failed"
+            if evidence_role == "retrospective-confirmatory"
+            else "shadow-eligible"
+            if gates_passed
+            else "historical-screen-failed"
+        )
+        if screen.get("disposition") != expected_disposition:
             return "historical screen disposition conflicts with its gates"
         aggregate = screen.get("aggregate")
         benchmarks = screen.get("benchmarks")
@@ -625,6 +710,12 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             or selection.get("included_trial_ids") != forward_epoch.get("included_trial_ids")
         ):
             return "historical screen differs from the forward selection epoch"
+        if isinstance(retrospective_checkpoint, Mapping) and (
+            selection.get("selected_trial_id") != retrospective_checkpoint.get("selected_trial_id")
+            or selection.get("included_trial_ids")
+            != retrospective_checkpoint.get("included_trial_ids")
+        ):
+            return "retrospective screen differs from its frozen trial universe"
         if any(
             not _finite_metric(aggregate.get(name))
             for name in aggregate_fields - {"profit_factor", "stress_profit_factor"}
@@ -703,7 +794,11 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         screen = development.get("historical_screen")
         if not folds or not isinstance(plan, Mapping) or not isinstance(screen, Mapping):
             return "Shadow registration requires passing historical qualification evidence"
-        if screen.get("passed") is not True or screen.get("disposition") != "shadow-eligible":
+        if (
+            plan.get("evidence_role", "historical") != "historical"
+            or screen.get("passed") is not True
+            or screen.get("disposition") != "shadow-eligible"
+        ):
             return "Shadow registration requires a passing historical screen"
         screen_gates = screen.get("gates")
         if (

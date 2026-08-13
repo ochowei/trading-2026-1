@@ -19,6 +19,7 @@ def _config(
     *,
     compound: bool = True,
     holding_sessions: int = 5,
+    entry_lag_sessions: int = 1,
     relative_return_floor: float = -0.08,
 ) -> FXIMeanReversionTrialConfig:
     return FXIMeanReversionTrialConfig(
@@ -26,7 +27,7 @@ def _config(
         history_start=date(2022, 1, 1),
         research_start=date(2023, 1, 2),
         holding_sessions=holding_sessions,
-        entry_lag_sessions=1,
+        entry_lag_sessions=entry_lag_sessions,
         pullback_lookback=10,
         pullback_threshold=-0.05,
         pullback_cap=-0.12,
@@ -186,6 +187,29 @@ def test_time_expiry_is_the_open_after_post_entry_holding_sessions() -> None:
     assert candidate.exit_type == "time_expiry"
 
 
+def test_entry_lag_can_delay_execution_one_additional_session() -> None:
+    index = pd.bdate_range("2023-01-02", periods=9)
+    primary = pd.DataFrame(
+        {
+            "Open": [100.0] * len(index),
+            "High": [101.0] * len(index),
+            "Low": [99.0] * len(index),
+            "Close": [100.0] * len(index),
+        },
+        index=index,
+    )
+
+    candidate = build_fxi_mean_reversion_candidate(
+        primary,
+        0,
+        _config(compound=False, holding_sessions=2, entry_lag_sessions=2),
+    )
+
+    assert candidate.entry_date == index[2].date()
+    assert candidate.exit_date == index[5].date()
+    assert candidate.exit_type == "time_expiry"
+
+
 def test_config_rejects_partial_atr_or_relative_return_declarations() -> None:
     values = _config(compound=False)
 
@@ -224,3 +248,39 @@ def test_registry_loads_six_fixed_identities_and_captures_v004_policy_set(tmp_pa
         _policy_set(),
     )
     assert snapshot.policy_set_identity == _policy_set().identity
+
+
+def test_registry_loads_and_captures_six_primary_only_atr_band_identities(
+    tmp_path: Path,
+) -> None:
+    registry = ResearchDefinitionRegistry()
+    family = "fxi-atr-band-mean-reversion"
+    trials = (
+        "atr-band-candidate",
+        "atr-ceiling-1p30-robustness",
+        "atr-floor-1p10-robustness",
+        "delay-one-session-robustness",
+        "hold-18-robustness",
+        "pullback-wr-baseline",
+    )
+    definitions = [registry.load(f"{family}/{trial}") for trial in trials]
+
+    assert [definition.identity for definition in definitions] == [
+        f"{family}/{trial}" for trial in trials
+    ]
+    assert all(definition.family == family for definition in definitions)
+    assert all(len(definition.market_data_requirements()) == 1 for definition in definitions)
+    assert all(definition.config.anchor_ticker is None for definition in definitions)
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    snapshots = [
+        definition.capture_research_definition(store, _policy_set()) for definition in definitions
+    ]
+    assert all(snapshot.policy_set_identity == _policy_set().identity for snapshot in snapshots)
+
+    candidate = registry.load(f"{family}/atr-band-candidate")
+    baseline = registry.load(f"{family}/pullback-wr-baseline")
+    delayed = registry.load(f"{family}/delay-one-session-robustness")
+    assert candidate.config.atr_ratio_floor == 1.05
+    assert candidate.config.atr_ratio_ceiling == 1.35
+    assert baseline.config.atr_ratio_floor is None
+    assert delayed.config.entry_lag_sessions == 2
