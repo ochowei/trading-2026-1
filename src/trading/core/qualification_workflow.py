@@ -75,6 +75,9 @@ def register_forward_qualification_plan(
     evidence_classification: str | None = None,
     evidence_justification: str | None = None,
     trial_history_complete: bool = False,
+    development_years: tuple[int, ...] | None = None,
+    warmup_start: date | None = None,
+    warmup_end: date | None = None,
 ) -> HistoricalQualificationPlan:
     """Freeze and register one exact qualification plan without a backdated clock."""
     clock = now or (lambda: datetime.now(UTC))
@@ -121,14 +124,57 @@ def register_forward_qualification_plan(
         raise ValueError("family baseline trial must differ from the selected trial")
 
     session_calendar = calendar or PrimaryUSSessionCalendar()
-    first_development_year = years[0] - 3
-    sessions = tuple(
-        timestamp.date()
-        for timestamp in session_calendar.sessions_in_range(
-            date(first_development_year, 1, 1),
-            date(years[-1], 12, 31),
-        )
+    explicit_calendar_inputs = (
+        development_years is not None,
+        warmup_start is not None,
+        warmup_end is not None,
     )
+    if any(explicit_calendar_inputs) and not all(explicit_calendar_inputs):
+        raise ValueError(
+            "explicit retrospective role calendar requires development years and warmup bounds"
+        )
+    if any(explicit_calendar_inputs) and evidence_role != "retrospective-confirmatory":
+        raise ValueError("explicit role calendar is only valid for retrospective qualification")
+    explicit_development_sessions = None
+    explicit_warmup_sessions: tuple[date, ...] = ()
+    if all(explicit_calendar_inputs):
+        assert development_years is not None
+        assert warmup_start is not None
+        assert warmup_end is not None
+        explicit_years = tuple(sorted(set(development_years)))
+        if not explicit_years:
+            raise ValueError("explicit retrospective role calendar requires development years")
+        if explicit_years != tuple(range(explicit_years[0], explicit_years[-1] + 1)):
+            raise ValueError("explicit development years must be consecutive")
+        if warmup_start > warmup_end:
+            raise ValueError("warmup start must not follow warmup end")
+        sessions = tuple(
+            timestamp.date()
+            for timestamp in session_calendar.sessions_in_range(
+                date(years[0], 1, 1),
+                date(years[-1], 12, 31),
+            )
+        )
+        explicit_development_sessions = tuple(
+            timestamp.date()
+            for timestamp in session_calendar.sessions_in_range(
+                date(explicit_years[0], 1, 1),
+                date(explicit_years[-1], 12, 31),
+            )
+        )
+        explicit_warmup_sessions = tuple(
+            timestamp.date()
+            for timestamp in session_calendar.sessions_in_range(warmup_start, warmup_end)
+        )
+    else:
+        first_development_year = years[0] - 3
+        sessions = tuple(
+            timestamp.date()
+            for timestamp in session_calendar.sessions_in_range(
+                date(first_development_year, 1, 1),
+                date(years[-1], 12, 31),
+            )
+        )
     prior_selection_history_incomplete = (
         trial_state.get("selection_history_incomplete") is not False
     )
@@ -170,6 +216,8 @@ def register_forward_qualification_plan(
         retrospective_selection_checkpoint=retrospective_checkpoint,
         evidence_role=evidence_role,
         evidence_audit=audit,
+        development_sessions=explicit_development_sessions,
+        warmup_sessions=explicit_warmup_sessions,
     )
     QualificationRegistry(
         qualification_registry_path,

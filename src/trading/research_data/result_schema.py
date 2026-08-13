@@ -494,6 +494,69 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             or embargo_sessions < execution_lag
         ):
             return "historical qualification dependencies are incomplete"
+        try:
+            parsed_evaluation_sessions = tuple(
+                date.fromisoformat(str(item)) for item in evaluation_sessions
+            )
+        except ValueError:
+            return "historical qualification evaluation sessions are invalid"
+        if parsed_evaluation_sessions != tuple(sorted(set(parsed_evaluation_sessions))):
+            return "historical qualification evaluation sessions are invalid"
+        expected_legacy_years = list(
+            range(
+                parsed_evaluation_sessions[0].year - int(thresholds["minimum_development_years"]),
+                parsed_evaluation_sessions[0].year,
+            )
+        )
+        role_calendar = plan.get("role_calendar")
+        legacy_chronology = (
+            set(expected_legacy_years).issubset(development_years)
+            and max(development_years) < parsed_evaluation_sessions[0].year
+        )
+        if role_calendar is None and not legacy_chronology:
+            return "nonstandard Development chronology requires an explicit role calendar"
+        if role_calendar is not None:
+            if not isinstance(role_calendar, Mapping) or not {
+                "development_sessions",
+                "warmup_sessions",
+                "evaluation_sessions",
+            }.issubset(role_calendar):
+                return "qualification role calendar is incomplete"
+            raw_development_sessions = role_calendar.get("development_sessions")
+            raw_warmup_sessions = role_calendar.get("warmup_sessions")
+            raw_role_evaluation_sessions = role_calendar.get("evaluation_sessions")
+            if not all(
+                isinstance(items, list) and items
+                for items in (
+                    raw_development_sessions,
+                    raw_warmup_sessions,
+                    raw_role_evaluation_sessions,
+                )
+            ):
+                return "qualification role calendar is incomplete"
+            try:
+                role_development = tuple(
+                    date.fromisoformat(str(item)) for item in raw_development_sessions
+                )
+                role_warmup = tuple(date.fromisoformat(str(item)) for item in raw_warmup_sessions)
+                role_evaluation = tuple(
+                    date.fromisoformat(str(item)) for item in raw_role_evaluation_sessions
+                )
+            except ValueError:
+                return "qualification role calendar sessions are invalid"
+            if (
+                role_development != tuple(sorted(set(role_development)))
+                or role_warmup != tuple(sorted(set(role_warmup)))
+                or role_evaluation != parsed_evaluation_sessions
+                or sorted({session.year for session in role_development}) != development_years
+                or set(role_development) & set(role_warmup)
+                or set(role_development) & set(role_evaluation)
+                or set(role_warmup) & set(role_evaluation)
+                or role_warmup[-1] >= role_evaluation[0]
+                or len(role_warmup) < dependency_sessions
+                or role_development[-1] >= created_at.date()
+            ):
+                return "qualification role calendar is inconsistent"
         required_fold_fields = {
             "fold_id",
             "evaluation_year",
@@ -531,6 +594,8 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         evidence_role = plan.get("evidence_role", "historical")
         if evidence_role not in {"historical", "retrospective-confirmatory"}:
             return "qualification plan evidence role is invalid"
+        if role_calendar is not None and evidence_role != "retrospective-confirmatory":
+            return "explicit role calendar is only valid for retrospective qualification"
         evidence_audit = plan.get("evidence_audit")
         if evidence_audit is not None:
             if not isinstance(evidence_audit, Mapping) or not {

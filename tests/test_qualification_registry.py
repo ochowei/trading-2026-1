@@ -19,6 +19,7 @@ from trading.core.qualification import (
     HistoricalScreenResult,
     HistoricalScreenThresholds,
     QualificationGate,
+    QualificationRoleCalendar,
     RetrospectiveSelectionCheckpoint,
     SelectionAdjustmentPolicy,
     SelectionAdjustmentResult,
@@ -132,6 +133,22 @@ def _historical_lifecycle() -> tuple[HistoricalQualificationPlan, HistoricalScre
     return plan, screen
 
 
+def test_legacy_plan_with_additional_earlier_development_year_round_trips(tmp_path) -> None:
+    registry = QualificationRegistry(tmp_path / "qualification_registry.json")
+    plan, _screen = _historical_lifecycle()
+    plan = replace(
+        plan,
+        plan_id="historical-plan-extra-development",
+        development_years=(2017, 2018, 2019, 2020),
+    )
+
+    registry.register_historical_plan(plan)
+
+    assert registry.historical_plan(plan.plan_id) == plan
+    event = registry.read()["events"][0]
+    assert "role_calendar" not in event["payload"]
+
+
 def test_qualification_registry_appends_shadow_lifecycle_idempotently(tmp_path) -> None:
     current_definition = "a" * 64
     registry = QualificationRegistry(
@@ -187,6 +204,11 @@ def test_qualification_registry_appends_shadow_lifecycle_idempotently(tmp_path) 
 
     registry.register_historical_plan(plan)
     registry.register_historical_plan(plan)
+    assert registry.historical_plan(plan.plan_id) == plan
+    historical_event = next(
+        event for event in registry.read()["events"] if event["event_type"] == "historical_plan"
+    )
+    assert "role_calendar" not in historical_event["payload"]
     registry.record_historical_screen(
         screen,
         evaluated_at=datetime(2026, 1, 5, 21, tzinfo=UTC),
@@ -389,6 +411,15 @@ def test_retrospective_registry_round_trip_cannot_register_shadow(tmp_path) -> N
             frozen_at=current_time[0],
             justification="Legacy selection provenance is incomplete.",
             trial_history_complete=False,
+        ),
+        role_calendar=QualificationRoleCalendar(
+            development_sessions=tuple(
+                timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2020-12-31")
+            ),
+            warmup_sessions=tuple(
+                timestamp.date() for timestamp in pd.bdate_range("2017-01-01", "2017-12-31")
+            ),
+            evaluation_sessions=historical_plan.evaluation_sessions,
         ),
     )
     screen = replace(

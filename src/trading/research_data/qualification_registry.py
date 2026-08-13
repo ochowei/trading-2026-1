@@ -29,6 +29,7 @@ from trading.core.qualification import (
     HistoricalQualificationPlan,
     HistoricalScreenResult,
     HistoricalScreenThresholds,
+    QualificationRoleCalendar,
     RetrospectiveSelectionCheckpoint,
     SelectionAdjustmentPolicy,
     ShadowActivationEvaluation,
@@ -194,6 +195,7 @@ class QualificationRegistry:
             raise QualificationRegistryError("historical plan has insufficient development years")
         if len(plan.folds) < plan.thresholds.minimum_evaluation_folds:
             raise QualificationRegistryError("historical plan has insufficient evaluation folds")
+        _validate_plan_role_calendar(plan)
         if plan.evidence_role == "retrospective-confirmatory" and plan.evidence_audit is None:
             raise QualificationRegistryError("retrospective plan requires clean-evidence audit")
         if (
@@ -926,6 +928,65 @@ def _payload(event: dict[str, object]) -> Mapping[str, object]:
     return payload
 
 
+def _validate_plan_role_calendar(plan: HistoricalQualificationPlan) -> None:
+    expected_legacy_years = tuple(
+        range(
+            plan.folds[0].evaluation_year - plan.thresholds.minimum_development_years,
+            plan.folds[0].evaluation_year,
+        )
+    )
+    calendar = plan.role_calendar
+    if calendar is None:
+        legacy_chronology = (
+            set(expected_legacy_years).issubset(plan.development_years)
+            and max(plan.development_years) < plan.folds[0].evaluation_year
+        )
+        if not legacy_chronology:
+            raise QualificationRegistryError(
+                "nonstandard Development chronology requires an explicit role calendar"
+            )
+        return
+    if plan.evidence_role != "retrospective-confirmatory":
+        raise QualificationRegistryError(
+            "explicit role calendar is only valid for retrospective qualification"
+        )
+    if not calendar.development_sessions or not calendar.warmup_sessions:
+        raise QualificationRegistryError("qualification role calendar is incomplete")
+    if calendar.evaluation_sessions != plan.evaluation_sessions:
+        raise QualificationRegistryError(
+            "qualification role calendar evaluation sessions do not match the plan"
+        )
+    if (
+        tuple(sorted(set(calendar.development_sessions))) != calendar.development_sessions
+        or tuple(sorted(set(calendar.warmup_sessions))) != calendar.warmup_sessions
+    ):
+        raise QualificationRegistryError(
+            "qualification role calendar sessions must be unique and chronological"
+        )
+    development_years = tuple(sorted({session.year for session in calendar.development_sessions}))
+    if development_years != plan.development_years:
+        raise QualificationRegistryError(
+            "qualification role calendar Development years do not match the plan"
+        )
+    development = set(calendar.development_sessions)
+    warmup = set(calendar.warmup_sessions)
+    evaluation = set(calendar.evaluation_sessions)
+    if development & warmup or development & evaluation or warmup & evaluation:
+        raise QualificationRegistryError("qualification role calendar sessions overlap")
+    if calendar.warmup_sessions[-1] >= calendar.evaluation_sessions[0]:
+        raise QualificationRegistryError(
+            "qualification role calendar warmup must precede evaluation"
+        )
+    if len(calendar.warmup_sessions) < plan.dependency_sessions:
+        raise QualificationRegistryError(
+            "qualification role calendar warmup does not cover dependencies"
+        )
+    if calendar.development_sessions[-1] >= plan.created_at.date():
+        raise QualificationRegistryError(
+            "qualification role calendar Development context was not complete at plan freeze"
+        )
+
+
 def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, object]:
     thresholds = plan.thresholds
     payload: dict[str, object] = {
@@ -1003,6 +1064,18 @@ def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, obj
             "frozen_at": timestamp_text(plan.evidence_audit.frozen_at),
             "justification": plan.evidence_audit.justification,
             "trial_history_complete": plan.evidence_audit.trial_history_complete,
+        }
+    if plan.role_calendar is not None:
+        payload["role_calendar"] = {
+            "development_sessions": [
+                session.isoformat() for session in plan.role_calendar.development_sessions
+            ],
+            "warmup_sessions": [
+                session.isoformat() for session in plan.role_calendar.warmup_sessions
+            ],
+            "evaluation_sessions": [
+                session.isoformat() for session in plan.role_calendar.evaluation_sessions
+            ],
         }
     return payload
 
@@ -1087,7 +1160,34 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
                 justification=str(audit_payload["justification"]),
                 trial_history_complete=trial_history_complete,
             )
-        return HistoricalQualificationPlan(
+        raw_role_calendar = payload.get("role_calendar")
+        role_calendar = None
+        if raw_role_calendar is not None:
+            calendar_payload = _mapping_value(raw_role_calendar, "qualification role calendar")
+            raw_development_sessions = calendar_payload["development_sessions"]
+            raw_warmup_sessions = calendar_payload["warmup_sessions"]
+            raw_evaluation_sessions = calendar_payload["evaluation_sessions"]
+            if not all(
+                isinstance(items, list)
+                for items in (
+                    raw_development_sessions,
+                    raw_warmup_sessions,
+                    raw_evaluation_sessions,
+                )
+            ):
+                raise ValueError("qualification role calendar sessions are malformed")
+            role_calendar = QualificationRoleCalendar(
+                development_sessions=tuple(
+                    date.fromisoformat(str(item)) for item in raw_development_sessions
+                ),
+                warmup_sessions=tuple(
+                    date.fromisoformat(str(item)) for item in raw_warmup_sessions
+                ),
+                evaluation_sessions=tuple(
+                    date.fromisoformat(str(item)) for item in raw_evaluation_sessions
+                ),
+            )
+        plan = HistoricalQualificationPlan(
             plan_id=str(payload["plan_id"]),
             experiment_family=str(payload["experiment_family"]),
             definition_fingerprint=str(payload["definition_fingerprint"]),
@@ -1138,7 +1238,10 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
             retrospective_selection_checkpoint=retrospective_checkpoint,
             evidence_role=evidence_role,
             evidence_audit=audit,
+            role_calendar=role_calendar,
         )
+        _validate_plan_role_calendar(plan)
+        return plan
     except (KeyError, TypeError, ValueError, InvalidOperation) as exc:
         raise QualificationRegistryError(f"historical plan payload is malformed: {exc}") from exc
 

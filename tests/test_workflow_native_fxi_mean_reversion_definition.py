@@ -7,12 +7,15 @@ import pytest
 
 from trading.policies import PolicyResolver, PolicySet
 from trading.research_data import ResearchDefinitionStore
+from trading.research_definitions.execution import resolve_workflow_policy_set
 from trading.research_definitions.fxi_mean_reversion import (
     FXIMeanReversionTrialConfig,
     build_fxi_mean_reversion_candidate,
     build_fxi_mean_reversion_candidates,
 )
 from trading.research_definitions.registry import ResearchDefinitionRegistry
+
+V005_WORKFLOW = Path("workflows/strategy-forward-replication-research--v005")
 
 
 def _config(
@@ -284,3 +287,73 @@ def test_registry_loads_and_captures_six_primary_only_atr_band_identities(
     assert candidate.config.atr_ratio_ceiling == 1.35
     assert baseline.config.atr_ratio_floor is None
     assert delayed.config.entry_lag_sessions == 2
+
+
+def test_retrospective_family_matches_atr_band_semantics_with_earlier_boundaries(
+    tmp_path: Path,
+) -> None:
+    registry = ResearchDefinitionRegistry()
+    source_family = "fxi-atr-band-mean-reversion"
+    retrospective_family = "fxi-atr-band-mean-reversion-retrospective"
+    trials = (
+        "atr-band-candidate",
+        "atr-ceiling-1p30-robustness",
+        "atr-floor-1p10-robustness",
+        "delay-one-session-robustness",
+        "hold-18-robustness",
+        "pullback-wr-baseline",
+    )
+
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    for trial in trials:
+        source = registry.load(f"{source_family}/{trial}")
+        retrospective = registry.load(f"{retrospective_family}/{trial}")
+        source_config = asdict(source.config)
+        retrospective_config = asdict(retrospective.config)
+
+        assert retrospective.identity == f"{retrospective_family}/{trial}"
+        assert retrospective.family == retrospective_family
+        assert retrospective.config.history_start == date(2009, 1, 2)
+        assert retrospective.config.research_start == date(2010, 1, 4)
+        source_config.pop("history_start")
+        source_config.pop("research_start")
+        retrospective_config.pop("history_start")
+        retrospective_config.pop("research_start")
+        assert retrospective_config == source_config
+        assert len(retrospective.market_data_requirements()) == 1
+        assert retrospective.config.anchor_ticker is None
+
+        source_candidates, source_signals = build_fxi_mean_reversion_candidates(
+            _primary(), None, source.config
+        )
+        retrospective_candidates, retrospective_signals = build_fxi_mean_reversion_candidates(
+            _primary(), None, retrospective.config
+        )
+        assert retrospective_signals == source_signals
+        assert retrospective_candidates == source_candidates
+
+        policy_set = resolve_workflow_policy_set(V005_WORKFLOW)
+        snapshot = retrospective.capture_research_definition(store, policy_set)
+        assert snapshot.policy_set_identity == policy_set.identity
+        assert policy_set.identity == _policy_set().identity
+
+
+def test_retrospective_family_is_complete_and_does_not_mutate_source_family() -> None:
+    registry = ResearchDefinitionRegistry()
+    retrospective = tuple(
+        identity
+        for identity in registry.list_trials()
+        if identity.startswith("fxi-atr-band-mean-reversion-retrospective/")
+    )
+
+    assert retrospective == (
+        "fxi-atr-band-mean-reversion-retrospective/atr-band-candidate",
+        "fxi-atr-band-mean-reversion-retrospective/atr-ceiling-1p30-robustness",
+        "fxi-atr-band-mean-reversion-retrospective/atr-floor-1p10-robustness",
+        "fxi-atr-band-mean-reversion-retrospective/delay-one-session-robustness",
+        "fxi-atr-band-mean-reversion-retrospective/hold-18-robustness",
+        "fxi-atr-band-mean-reversion-retrospective/pullback-wr-baseline",
+    )
+    assert registry.load(
+        "fxi-atr-band-mean-reversion/atr-band-candidate"
+    ).config.research_start == date(2015, 1, 2)
