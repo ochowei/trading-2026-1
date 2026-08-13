@@ -19,14 +19,17 @@ from trading.core.accounting import (
 )
 from trading.core.ledger_storage import atomic_write, locked_file
 from trading.core.qualification import (
+    EVIDENCE_ROLES,
     HISTORICAL_QUALIFICATION_GATE_NAMES,
     SHADOW_ACTIVATION_GATE_NAMES,
+    EvaluationEvidenceAudit,
     EvaluationFold,
     ForwardSelectionEpoch,
     HistoricalBenchmarkPolicy,
     HistoricalQualificationPlan,
     HistoricalScreenResult,
     HistoricalScreenThresholds,
+    RetrospectiveSelectionCheckpoint,
     SelectionAdjustmentPolicy,
     ShadowActivationEvaluation,
     ShadowEvidence,
@@ -191,9 +194,28 @@ class QualificationRegistry:
             raise QualificationRegistryError("historical plan has insufficient development years")
         if len(plan.folds) < plan.thresholds.minimum_evaluation_folds:
             raise QualificationRegistryError("historical plan has insufficient evaluation folds")
+        if plan.evidence_role == "retrospective-confirmatory" and plan.evidence_audit is None:
+            raise QualificationRegistryError("retrospective plan requires clean-evidence audit")
+        if (
+            plan.evidence_role == "retrospective-confirmatory"
+            and plan.retrospective_selection_checkpoint is None
+        ):
+            raise QualificationRegistryError("retrospective plan requires frozen trial universe")
+        if (
+            plan.evidence_role == "historical"
+            and plan.evidence_audit is not None
+            and (
+                plan.evidence_audit.classification != "verified-clean"
+                or not plan.evidence_audit.trial_history_complete
+            )
+        ):
+            raise QualificationRegistryError(
+                "Historical Evaluation requires verified-clean complete provenance"
+            )
         payload = _historical_plan_payload(plan)
         event_id = f"historical-plan:{plan.plan_id}"
-        if plan.forward_selection_epoch is None:
+        selection_boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
+        if selection_boundary is None:
             self._append(
                 event_id=event_id,
                 event_type="historical_plan",
@@ -215,7 +237,7 @@ class QualificationRegistry:
                     elapsed = abs((recorded_at.astimezone(UTC) - plan.created_at).total_seconds())
                     if elapsed > 5:
                         raise QualificationRegistryError(
-                            "forward selection plan must be registered when its epoch begins"
+                            "selection plan must be registered when its trial universe freezes"
                         )
                 open_plan_ids = {
                     event_payload.get("plan_id")
@@ -232,7 +254,7 @@ class QualificationRegistry:
                 }
                 if open_plan_ids - {plan.plan_id}:
                     raise QualificationRegistryError(
-                        "experiment family already has an open forward qualification plan"
+                        "experiment family already has an open forward or retrospective qualification plan"
                     )
                 self._append_unlocked(
                     state,
@@ -282,6 +304,16 @@ class QualificationRegistry:
                 )
             if tuple(gate.name for gate in screen.gates) != HISTORICAL_QUALIFICATION_GATE_NAMES:
                 raise QualificationRegistryError("historical screen gates are incomplete")
+            expected_dispositions = (
+                ("retrospectively-supported", "retrospective-screen-failed")
+                if plan_payload.get("evidence_role", "historical") == "retrospective-confirmatory"
+                else ("shadow-eligible", "historical-screen-failed")
+            )
+            expected_disposition = expected_dispositions[0 if screen.passed else 1]
+            if screen.disposition != expected_disposition:
+                raise QualificationRegistryError(
+                    "qualification screen disposition conflicts with its evidence role"
+                )
             payload = _historical_screen_payload(screen, evaluated_at)
             self._append_unlocked(
                 state,
@@ -340,7 +372,8 @@ class QualificationRegistry:
             selection = screen_payload.get("selection_adjustment")
             evaluated_at = screen_payload.get("evaluated_at")
             if (
-                plan_payload.get("experiment_family") != registration.experiment_family
+                plan_payload.get("evidence_role", "historical") != "historical"
+                or plan_payload.get("experiment_family") != registration.experiment_family
                 or plan_payload.get("definition_fingerprint") != registration.definition_fingerprint
                 or plan_payload.get("cost_policies")
                 != _cost_policy_payload(
@@ -955,6 +988,22 @@ def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, obj
             "included_trial_ids": list(epoch.included_trial_ids),
             "prior_selection_history_incomplete": epoch.prior_selection_history_incomplete,
         }
+    if plan.retrospective_selection_checkpoint is not None:
+        checkpoint = plan.retrospective_selection_checkpoint
+        payload["retrospective_selection_checkpoint"] = {
+            "frozen_at": timestamp_text(checkpoint.frozen_at),
+            "selected_trial_id": checkpoint.selected_trial_id,
+            "included_trial_ids": list(checkpoint.included_trial_ids),
+            "prior_selection_history_incomplete": checkpoint.prior_selection_history_incomplete,
+        }
+    if plan.evidence_audit is not None:
+        payload["evidence_role"] = plan.evidence_role
+        payload["evidence_audit"] = {
+            "classification": plan.evidence_audit.classification,
+            "frozen_at": timestamp_text(plan.evidence_audit.frozen_at),
+            "justification": plan.evidence_audit.justification,
+            "trial_history_complete": plan.evidence_audit.trial_history_complete,
+        }
     return payload
 
 
@@ -1002,6 +1051,41 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
                 selected_trial_id=str(epoch_payload["selected_trial_id"]),
                 included_trial_ids=tuple(str(item) for item in included),
                 prior_selection_history_incomplete=prior_incomplete,
+            )
+        raw_checkpoint = payload.get("retrospective_selection_checkpoint")
+        retrospective_checkpoint = None
+        if raw_checkpoint is not None:
+            checkpoint_payload = _mapping_value(
+                raw_checkpoint,
+                "retrospective selection checkpoint",
+            )
+            included = checkpoint_payload["included_trial_ids"]
+            if not isinstance(included, list):
+                raise ValueError("retrospective trial identities are malformed")
+            prior_incomplete = checkpoint_payload["prior_selection_history_incomplete"]
+            if type(prior_incomplete) is not bool:
+                raise ValueError("retrospective history flag is malformed")
+            retrospective_checkpoint = RetrospectiveSelectionCheckpoint(
+                frozen_at=parse_timestamp(str(checkpoint_payload["frozen_at"])),
+                selected_trial_id=str(checkpoint_payload["selected_trial_id"]),
+                included_trial_ids=tuple(str(item) for item in included),
+                prior_selection_history_incomplete=prior_incomplete,
+            )
+        evidence_role = str(payload.get("evidence_role", "historical"))
+        if evidence_role not in EVIDENCE_ROLES:
+            raise ValueError("plan evidence role is malformed")
+        raw_audit = payload.get("evidence_audit")
+        audit = None
+        if raw_audit is not None:
+            audit_payload = _mapping_value(raw_audit, "clean-evidence audit")
+            trial_history_complete = audit_payload["trial_history_complete"]
+            if type(trial_history_complete) is not bool:
+                raise ValueError("clean-evidence trial-history flag is malformed")
+            audit = EvaluationEvidenceAudit(
+                classification=str(audit_payload["classification"]),
+                frozen_at=parse_timestamp(str(audit_payload["frozen_at"])),
+                justification=str(audit_payload["justification"]),
+                trial_history_complete=trial_history_complete,
             )
         return HistoricalQualificationPlan(
             plan_id=str(payload["plan_id"]),
@@ -1051,6 +1135,9 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
                 block_sessions=int(adjustment_payload["block_sessions"]),
             ),
             forward_selection_epoch=epoch,
+            retrospective_selection_checkpoint=retrospective_checkpoint,
+            evidence_role=evidence_role,
+            evidence_audit=audit,
         )
     except (KeyError, TypeError, ValueError, InvalidOperation) as exc:
         raise QualificationRegistryError(f"historical plan payload is malformed: {exc}") from exc

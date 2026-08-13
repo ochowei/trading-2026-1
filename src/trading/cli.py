@@ -334,6 +334,8 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
     """Freeze and append one forward-dated qualification plan."""
     plan = register_forward_qualification_plan(
         experiment_name=args.experiment,
+        research_identity=args.research,
+        workflow_path=args.workflow,
         family_baseline_trial_id=args.family_baseline_trial_id,
         evaluation_years=tuple(args.evaluation_years),
         maximum_holding_sessions=args.maximum_holding_sessions,
@@ -347,8 +349,16 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
         bootstrap_block_sessions=args.bootstrap_block_sessions,
         qualification_registry_path=args.path,
         trial_registry_path=args.trial_registry_path,
+        evidence_role=args.evidence_role,
+        evidence_classification=args.evidence_classification,
+        evidence_justification=args.audit_justification,
+        trial_history_complete=args.trial_history_complete,
     )
-    epoch = plan.forward_selection_epoch
+    epoch = plan.forward_selection_epoch or getattr(
+        plan,
+        "retrospective_selection_checkpoint",
+        None,
+    )
     print(f"qualification plan registered: {plan.plan_id}")
     print(f"  family: {plan.experiment_family}")
     print(f"  first evaluation session: {plan.evaluation_sessions[0].isoformat()}")
@@ -358,6 +368,12 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
     print(
         "  prior selection history incomplete: "
         f"{str(epoch.prior_selection_history_incomplete).lower() if epoch else 'false'}"
+    )
+    print(f"  evidence role: {getattr(plan, 'evidence_role', 'historical')}")
+    evidence_audit = getattr(plan, "evidence_audit", None)
+    print(
+        "  evidence classification: "
+        f"{evidence_audit.classification if evidence_audit else 'legacy-unspecified'}"
     )
 
 
@@ -379,6 +395,7 @@ def cmd_qualification_screen_run(args: argparse.Namespace) -> None:
         trial_registry_path=args.trial_registry_path,
         research_data_store=create_default_research_data_store(),
         definition_store=create_default_research_definition_store(),
+        workflow_path=args.workflow,
     )
     print(f"historical screen recorded: {execution.event_id}")
     print(f"  disposition: {execution.screen.disposition}")
@@ -1910,7 +1927,19 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("results/trial_registry.json"),
     )
-    qualification_plan_register_p.add_argument("--experiment", required=True)
+    qualification_identity = qualification_plan_register_p.add_mutually_exclusive_group(
+        required=True
+    )
+    qualification_identity.add_argument("--experiment")
+    qualification_identity.add_argument(
+        "--research",
+        help="Workflow-native family/trial research-definition identity",
+    )
+    qualification_plan_register_p.add_argument(
+        "--workflow",
+        type=Path,
+        help="Exact released workflow path; required with --research",
+    )
     qualification_plan_register_p.add_argument("--family-baseline-trial-id", required=True)
     qualification_plan_register_p.add_argument(
         "--evaluation-years",
@@ -1955,6 +1984,17 @@ def build_parser() -> argparse.ArgumentParser:
         type=positive_int,
         default=20,
     )
+    qualification_plan_register_p.add_argument(
+        "--evidence-role",
+        choices=("historical", "retrospective-confirmatory"),
+        default="historical",
+    )
+    qualification_plan_register_p.add_argument(
+        "--evidence-classification",
+        choices=("verified-clean", "known-contaminated", "provenance-unknown"),
+    )
+    qualification_plan_register_p.add_argument("--audit-justification")
+    qualification_plan_register_p.add_argument("--trial-history-complete", action="store_true")
     qualification_screen_p = qualification_sub.add_parser(
         "screen",
         help="Run a completed preregistered Historical Screen",
@@ -1979,10 +2019,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     qualification_screen_run_p.add_argument("--plan-id", required=True)
     qualification_screen_run_p.add_argument(
+        "--workflow",
+        type=Path,
+        help="Exact released workflow path for workflow-native trial identities",
+    )
+    qualification_screen_run_p.add_argument(
         "--trial",
         action="append",
         required=True,
-        help="EXPERIMENT=MANIFEST; repeat for every frozen family trial",
+        help="IDENTITY=MANIFEST; repeat for every frozen family trial",
     )
 
     # tracked workflow authoring and release declarations

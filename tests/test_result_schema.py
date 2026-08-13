@@ -380,6 +380,46 @@ def test_registered_shadow_without_a_checkpoint_remains_valid_non_live_evidence(
 
     assert validity.status is ResultValidityStatus.VALID
 
+    retrospective = json.loads(json.dumps(payload))
+    retrospective_plan = retrospective["development_summary"]["historical_plan"]
+    retrospective_plan["created_at"] = "2026-01-02T21:00:00.000000Z"
+    retrospective_plan["evidence_role"] = "retrospective-confirmatory"
+    retrospective_plan["evidence_audit"] = {
+        "classification": "provenance-unknown",
+        "frozen_at": retrospective_plan["created_at"],
+        "justification": "Legacy selection provenance is incomplete.",
+        "trial_history_complete": False,
+    }
+    retrospective_plan["retrospective_selection_checkpoint"] = {
+        "frozen_at": retrospective_plan["created_at"],
+        "selected_trial_id": "trial-1",
+        "included_trial_ids": ["trial-1", "trial-baseline"],
+        "prior_selection_history_incomplete": True,
+    }
+    retrospective_plan.pop("forward_selection_epoch")
+    retrospective["development_summary"]["historical_screen"]["disposition"] = (
+        "retrospectively-supported"
+    )
+    retrospective["shadow_evidence"] = {}
+    retrospective_validity = classify_result(
+        retrospective,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert retrospective_validity.status is ResultValidityStatus.VALID
+
+    promoted_retrospective = json.loads(json.dumps(retrospective))
+    promoted_retrospective["shadow_evidence"] = payload["shadow_evidence"]
+    promoted_validity = classify_result(
+        promoted_retrospective,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert promoted_validity.status is ResultValidityStatus.UNREPRODUCIBLE
+    assert any("passing historical screen" in reason for reason in promoted_validity.reasons)
+
     changed_epoch = json.loads(json.dumps(payload))
     changed_epoch["development_summary"]["historical_plan"]["forward_selection_epoch"][
         "included_trial_ids"

@@ -1,6 +1,7 @@
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 import pytest
@@ -40,6 +41,19 @@ class _Strategy:
 
     def declare_experiment_trial(self) -> ExperimentTrialDeclaration:
         return ExperimentTrialDeclaration(family="SPY:forward-program")
+
+
+class _WorkflowStrategy(_Strategy):
+    def capture_research_definition(
+        self,
+        _store,
+        policy_set,
+    ) -> ResearchDefinitionSnapshot:
+        assert policy_set == "policy-set"
+        return super().capture_research_definition(_store)
+
+    def run_with_bundle(self, _bundle):
+        return {"canonical_sleeve_input": _empty_input()}
 
 
 def _empty_input() -> CanonicalSleeveInput:
@@ -120,6 +134,141 @@ def test_register_forward_plan_bounds_incomplete_legacy_history(
             qualification_path,
             now=lambda: started_at,
         ).register_historical_plan(replace(plan, plan_id="another-forward-plan"))
+
+
+def test_register_plan_resolves_workflow_native_identity_without_legacy_registry(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    started_at = datetime(2026, 8, 10, 2, tzinfo=UTC)
+    trial_path = tmp_path / "trial-registry.json"
+    selected_fingerprint = "a" * 64
+    baseline_fingerprint = "b" * 64
+    registry = ExperimentTrialRegistry(trial_path)
+    selected_id = registry.register_trial(
+        "SPY:forward-program",
+        selected_fingerprint,
+        experiment_name="spy-forward/selected",
+        registered_at=datetime(2026, 8, 9, tzinfo=UTC),
+    )
+    baseline_id = registry.register_trial(
+        "SPY:forward-program",
+        baseline_fingerprint,
+        experiment_name="spy-forward/baseline",
+        registered_at=datetime(2026, 8, 9, 1, tzinfo=UTC),
+    )
+    definition_registry = type(
+        "DefinitionRegistry",
+        (),
+        {"load": lambda _self, identity: _WorkflowStrategy(selected_fingerprint)},
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+        definition_registry,
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.resolve_workflow_policy_set",
+        lambda _path: "policy-set",
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.get_experiment",
+        lambda _name: pytest.fail("legacy registry must not resolve workflow-native identities"),
+    )
+
+    plan = register_forward_qualification_plan(
+        research_identity="spy-forward/selected",
+        workflow_path=tmp_path / "released-workflow",
+        family_baseline_trial_id=baseline_id,
+        evaluation_years=(2027, 2028, 2029, 2030, 2031),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        random_seed=17,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        qualification_registry_path=tmp_path / "qualification-registry.json",
+        trial_registry_path=trial_path,
+        now=lambda: started_at,
+        evidence_classification="verified-clean",
+        evidence_justification="Append-only audit proves this future period is clean.",
+        trial_history_complete=True,
+    )
+
+    assert plan.forward_selection_epoch is not None
+    assert plan.forward_selection_epoch.selected_trial_id == selected_id
+    assert plan.evidence_audit is not None
+    assert plan.evidence_audit.classification == "verified-clean"
+
+
+def test_screen_input_replays_workflow_native_identity_without_legacy_registry(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    from trading.core.qualification_workflow import _load_trial_input
+
+    strategy = _WorkflowStrategy("a" * 64)
+    definition = strategy.capture_research_definition(object(), "policy-set")
+    definition_registry = type(
+        "DefinitionRegistry",
+        (),
+        {"load": lambda _self, _identity: strategy},
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+        definition_registry,
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.resolve_workflow_policy_set",
+        lambda _path: "policy-set",
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.get_experiment",
+        lambda _name: pytest.fail("legacy registry must not replay workflow-native identities"),
+    )
+    snapshot = SimpleNamespace(
+        manifest=SimpleNamespace(
+            definition=definition.blob,
+            snapshot_id="snapshot-workflow-native",
+            decision_time=SimpleNamespace(session=datetime(2031, 12, 31).date()),
+        ),
+        bundle={},
+    )
+    research_data_store = SimpleNamespace(load_snapshot=lambda _path: snapshot)
+
+    trial_id, family, sleeve_input, snapshot_id, cutoff = _load_trial_input(
+        "spy-forward/selected",
+        Path("selected.snapshot.json"),
+        research_data_store=research_data_store,
+        definition_store=object(),
+        workflow_path=tmp_path / "released-workflow",
+    )
+
+    assert len(trial_id) == 64
+    assert family == "SPY:forward-program"
+    assert isinstance(sleeve_input, CanonicalSleeveInput)
+    assert sleeve_input.calendar == _empty_input().calendar
+    assert snapshot_id == "snapshot-workflow-native"
+    assert cutoff == datetime(2031, 12, 31).date()
+
+
+def test_retrospective_registration_requires_released_contract_capability(tmp_path) -> None:
+    from trading.core.qualification_workflow import _require_retrospective_workflow
+
+    workflow_path = tmp_path / "workflow"
+    workflow_path.mkdir()
+    contract = workflow_path / "WORKFLOW.md"
+    contract.write_text("# Workflow\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="does not authorize"):
+        _require_retrospective_workflow(workflow_path)
+
+    contract.write_text(
+        "# Workflow\n\n### 3. Optional retrospective-confirmatory checkpoint\n",
+        encoding="utf-8",
+    )
+    _require_retrospective_workflow(workflow_path)
 
 
 def test_registered_screen_recomputes_and_records_future_only_evidence(

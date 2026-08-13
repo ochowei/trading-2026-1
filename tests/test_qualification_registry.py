@@ -9,6 +9,7 @@ import pytest
 from trading.core.qualification import (
     HISTORICAL_QUALIFICATION_GATE_NAMES,
     CanonicalSimulatedFill,
+    EvaluationEvidenceAudit,
     EvaluationFold,
     HistoricalAggregateEvidence,
     HistoricalBenchmarkEvidence,
@@ -18,6 +19,7 @@ from trading.core.qualification import (
     HistoricalScreenResult,
     HistoricalScreenThresholds,
     QualificationGate,
+    RetrospectiveSelectionCheckpoint,
     SelectionAdjustmentPolicy,
     SelectionAdjustmentResult,
     ShadowActivationPolicy,
@@ -360,6 +362,67 @@ def test_qualification_registry_rejects_shadow_without_persisted_passing_screen(
     registry.register_historical_plan(plan)
 
     with pytest.raises(QualificationRegistryError, match="historical_screen"):
+        registry.register_shadow(registration)
+
+
+def test_retrospective_registry_round_trip_cannot_register_shadow(tmp_path) -> None:
+    current_time = [datetime(2026, 8, 6, 21, tzinfo=UTC)]
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        definition_verifier=lambda _digest, _size, _fingerprint: None,
+        now=lambda: current_time[0],
+    )
+    historical_plan, historical_screen = _historical_lifecycle()
+    plan = replace(
+        historical_plan,
+        plan_id="retrospective-plan-1",
+        created_at=current_time[0],
+        evidence_role="retrospective-confirmatory",
+        retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+            frozen_at=current_time[0],
+            selected_trial_id="trial-1",
+            included_trial_ids=("trial-1", "trial-baseline"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="provenance-unknown",
+            frozen_at=current_time[0],
+            justification="Legacy selection provenance is incomplete.",
+            trial_history_complete=False,
+        ),
+    )
+    screen = replace(
+        historical_screen,
+        plan_id=plan.plan_id,
+        disposition="retrospectively-supported",
+    )
+    registry.register_historical_plan(plan)
+    registry.record_historical_screen(
+        screen,
+        evaluated_at=datetime(2026, 8, 7, 21, tzinfo=UTC),
+    )
+
+    restored = registry.historical_plan(plan.plan_id)
+    assert restored == plan
+    assert restored.evidence_audit is not None
+    assert restored.evidence_audit.classification == "provenance-unknown"
+
+    registration = ShadowRegistration(
+        shadow_id="shadow-retrospective",
+        trial_id="trial-1",
+        historical_plan_id=plan.plan_id,
+        experiment_family=plan.experiment_family,
+        definition_fingerprint=plan.definition_fingerprint,
+        definition_snapshot_id="d" * 64,
+        definition_snapshot_byte_count=100,
+        prospective_start=datetime(2026, 8, 8, 21, tzinfo=UTC),
+        activation_checkpoint=date(2027, 8, 9),
+        activation_policy=ShadowActivationPolicy(stress_drawdown_limit=Decimal("0.20")),
+        base_cost_policy=plan.base_cost_policy,
+        stress_cost_policy=plan.stress_cost_policy,
+    )
+    current_time[0] = registration.prospective_start
+    with pytest.raises(QualificationRegistryError, match="historical qualification evidence"):
         registry.register_shadow(registration)
 
 

@@ -91,6 +91,8 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/canonical-sleeve-execution.md` | Canonical sleeve capital, execution-cost scenarios, metrics, and parity evidence. |
 | `docs/manual-execution-ledger.md` | Manual ledger domain, integrity, broker reconciliation, and CLI contract. |
 | `docs/historical-qualification-and-shadow.md` | Historical folds, benchmark gates, prospective Shadow evidence, and qualification lifecycle. |
+| `docs/historical-qualification-and-shadow-v005.md` | Proposed v005 clean-evidence audit, retrospective-confirmatory checkpoint, workflow-native qualification, and unchanged Shadow boundary. |
+| `docs/result-validity-and-trial-history-v005.md` | Proposed v005 result-validity extension for retrospective evidence roles while preserving legacy event verification. |
 | `docs/controlled-followup-cutover.md` | Followup lifecycle, authorization, parity, rollback, and allocation epochs. |
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
 | `docs/phase-9-primary-followup-migration.md` | Primary followup migration boundaries, parity evidence, and verification. |
@@ -157,7 +159,7 @@ creating parallel infrastructure.
 | `live_drift.py` | Frozen drift envelopes, metric evaluation, checkpoints, and recovery rules. |
 | `live_drift_registry.py` | Private append-only drift evidence, hash-chain replay, and storage locking. |
 | `qualification.py` | Historical screens, benchmark/selection adjustment, Shadow evidence, and gates. |
-| `qualification_workflow.py` | Forward Selection Epoch registration and historical-screen orchestration. |
+| `qualification_workflow.py` | Workflow-native or frozen-legacy qualification identity resolution, clean/retrospective plan registration, and deterministic screen orchestration. |
 | `workflow_authoring.py` | Versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
 | `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion. |
 | `policy_authoring.py` | Versioned policy registry validation, synchronization, conformance execution, immutable releases, and lifecycle evidence. |

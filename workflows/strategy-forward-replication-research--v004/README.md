@@ -78,5 +78,7 @@ None.
 
 ### Changes
 
-_No changes._
+| ID | Title | Status | Released in | Path |
+| --- | --- | --- | --- | --- |
+| `C001` | Retrospective Confirmatory Evidence Path | `released` | `v005` | [retrospective-confirmatory-evidence--c001](work/changes/retrospective-confirmatory-evidence--c001/) |
 <!-- GENERATED:WORK_INDEX_END -->
