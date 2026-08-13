@@ -71,6 +71,7 @@ None.
 
 | ID | Title | Status | Outcome | Path |
 | --- | --- | --- | --- | --- |
+| `S002` | XLF Close-Armed Profit-Protection Pullback Research | `completed` | `fail` | [xlf-close-armed-profit-protection-pullback--s002](work/studies/xlf-close-armed-profit-protection-pullback--s002/) |
 | `S001` | XLF Gap-Safe Rate-Volatility-Conditioned Pullback Research | `completed` | `fail` | [xlf-rate-volatility-conditioned-pullback-gap-safe--s001](work/studies/xlf-rate-volatility-conditioned-pullback-gap-safe--s001/) |
 
 ### Changes
