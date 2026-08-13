@@ -1,0 +1,226 @@
+from dataclasses import asdict
+from datetime import date
+from pathlib import Path
+
+import pandas as pd
+import pytest
+
+from trading.policies import PolicyResolver, PolicySet
+from trading.research_data import ResearchDefinitionStore
+from trading.research_definitions.fxi_mean_reversion import (
+    FXIMeanReversionTrialConfig,
+    build_fxi_mean_reversion_candidate,
+    build_fxi_mean_reversion_candidates,
+)
+from trading.research_definitions.registry import ResearchDefinitionRegistry
+
+
+def _config(
+    *,
+    compound: bool = True,
+    holding_sessions: int = 5,
+    relative_return_floor: float = -0.08,
+) -> FXIMeanReversionTrialConfig:
+    return FXIMeanReversionTrialConfig(
+        ticker="FXI",
+        history_start=date(2022, 1, 1),
+        research_start=date(2023, 1, 2),
+        holding_sessions=holding_sessions,
+        entry_lag_sessions=1,
+        pullback_lookback=10,
+        pullback_threshold=-0.05,
+        pullback_cap=-0.12,
+        wr_period=10,
+        wr_threshold=-80.0,
+        cooldown_sessions=10,
+        profit_target=0.055,
+        stop_loss=-0.05,
+        close_position_threshold=0.4 if compound else None,
+        atr_short_period=5 if compound else None,
+        atr_long_period=20 if compound else None,
+        atr_ratio_floor=1.05 if compound else None,
+        atr_ratio_ceiling=1.35 if compound else None,
+        anchor_ticker="ASHR" if compound else None,
+        relative_return_lookback=20 if compound else None,
+        relative_return_floor=relative_return_floor if compound else None,
+    )
+
+
+def _primary() -> pd.DataFrame:
+    index = pd.bdate_range("2023-01-02", periods=80)
+    frame = pd.DataFrame(
+        {
+            "Open": [100.0] * len(index),
+            "High": [101.0] * len(index),
+            "Low": [99.0] * len(index),
+            "Close": [100.0] * len(index),
+            "Volume": [1_000.0] * len(index),
+        },
+        index=index,
+    )
+    frame.iloc[30, frame.columns.get_loc("Open")] = 94.0
+    frame.iloc[30, frame.columns.get_loc("High")] = 95.0
+    frame.iloc[30, frame.columns.get_loc("Low")] = 93.0
+    frame.iloc[30, frame.columns.get_loc("Close")] = 94.0
+    frame.iloc[31, frame.columns.get_loc("Open")] = 94.0
+    frame.iloc[31, frame.columns.get_loc("High")] = 100.0
+    frame.iloc[31, frame.columns.get_loc("Low")] = 94.0
+    frame.iloc[31, frame.columns.get_loc("Close")] = 99.0
+    return frame
+
+
+def _auxiliary(primary: pd.DataFrame, *, close: float = 100.0, lag: int = 0) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "Close": [close] * len(primary),
+            "ObservationDate": primary.index,
+            "ObservationLagSessions": [lag] * len(primary),
+        },
+        index=primary.index,
+    )
+
+
+def _policy_set() -> PolicySet:
+    resolver = PolicyResolver()
+    return PolicySet(
+        (
+            resolver.resolve("us-equity-market", "v002"),
+            resolver.resolve("canonical-execution", "v001"),
+            resolver.resolve("firstrade-manual-trading", "v001"),
+            resolver.resolve("portfolio-risk", "v001"),
+        )
+    )
+
+
+def test_compound_candidate_uses_same_session_ashr_and_next_open_execution() -> None:
+    primary = _primary()
+
+    candidates, signals = build_fxi_mean_reversion_candidates(
+        primary,
+        _auxiliary(primary),
+        _config(),
+    )
+
+    assert signals == (primary.index[30].date(),)
+    candidate = candidates[0]
+    assert candidate.entry_date == primary.index[31].date()
+    assert candidate.exit_date == primary.index[31].date()
+    assert candidate.exit_type == "target"
+    assert candidate.exit_price == pytest.approx(94.0 * 1.055)
+
+
+def test_deeper_ashr_divergence_blocks_the_same_primary_signal() -> None:
+    primary = _primary()
+    passing, _ = build_fxi_mean_reversion_candidates(
+        primary,
+        _auxiliary(primary, close=100.0),
+        _config(),
+    )
+    anchor = _auxiliary(primary, close=100.0)
+    anchor.iloc[:11, anchor.columns.get_loc("Close")] = 96.0
+    blocked, signals = build_fxi_mean_reversion_candidates(primary, anchor, _config())
+
+    assert passing
+    assert blocked == ()
+    assert signals == ()
+
+
+def test_pullback_wr_baseline_requires_no_auxiliary_or_compound_gate() -> None:
+    candidates, signals = build_fxi_mean_reversion_candidates(
+        _primary(), None, _config(compound=False)
+    )
+
+    assert signals
+    assert len(candidates) == len(signals)
+
+
+def test_ashr_gate_rejects_nonzero_lag_or_missing_availability_evidence() -> None:
+    primary = _primary()
+
+    with pytest.raises(ValueError, match="same completed session"):
+        build_fxi_mean_reversion_candidates(primary, _auxiliary(primary, lag=1), _config())
+    with pytest.raises(ValueError, match="availability evidence"):
+        build_fxi_mean_reversion_candidates(primary, primary, _config())
+
+
+def test_same_entry_bar_stop_and_target_uses_adverse_stop_first() -> None:
+    index = pd.bdate_range("2023-01-02", periods=8)
+    primary = pd.DataFrame(
+        {
+            "Open": [100.0] * len(index),
+            "High": [101.0, 106.0, 101.0, 101.0, 101.0, 101.0, 101.0, 101.0],
+            "Low": [99.0, 94.0, 99.0, 99.0, 99.0, 99.0, 99.0, 99.0],
+            "Close": [100.0] * len(index),
+        },
+        index=index,
+    )
+
+    candidate = build_fxi_mean_reversion_candidate(
+        primary, 0, _config(compound=False, holding_sessions=2)
+    )
+
+    assert candidate.entry_date == index[1].date()
+    assert candidate.exit_date == index[1].date()
+    assert candidate.exit_price == 95.0
+    assert candidate.exit_type == "stop_loss_pessimistic"
+
+
+def test_time_expiry_is_the_open_after_post_entry_holding_sessions() -> None:
+    index = pd.bdate_range("2023-01-02", periods=8)
+    primary = pd.DataFrame(
+        {
+            "Open": [100.0] * len(index),
+            "High": [101.0] * len(index),
+            "Low": [99.0] * len(index),
+            "Close": [100.0] * len(index),
+        },
+        index=index,
+    )
+
+    candidate = build_fxi_mean_reversion_candidate(
+        primary, 0, _config(compound=False, holding_sessions=2)
+    )
+
+    assert candidate.entry_date == index[1].date()
+    assert candidate.exit_date == index[4].date()
+    assert candidate.exit_type == "time_expiry"
+
+
+def test_config_rejects_partial_atr_or_relative_return_declarations() -> None:
+    values = _config(compound=False)
+
+    with pytest.raises(ValueError, match="ATR-band fields"):
+        FXIMeanReversionTrialConfig(**{**asdict(values), "atr_short_period": 5})
+    with pytest.raises(ValueError, match="relative-return fields"):
+        FXIMeanReversionTrialConfig(**{**asdict(values), "anchor_ticker": "ASHR"})
+
+
+def test_registry_loads_six_fixed_identities_and_captures_v004_policy_set(tmp_path: Path) -> None:
+    registry = ResearchDefinitionRegistry()
+    family = "fxi-atr-divergence-mean-reversion"
+    trials = (
+        "ashr-floor-minus-7-robustness",
+        "ashr-floor-minus-9-robustness",
+        "atr-band-ashr-divergence",
+        "atr-ceiling-1p30-robustness",
+        "hold-18-robustness",
+        "pullback-wr-baseline",
+    )
+    definitions = [registry.load(f"{family}/{trial}") for trial in trials]
+
+    assert [definition.identity for definition in definitions] == [
+        f"{family}/{trial}" for trial in trials
+    ]
+    assert all(definition.family == family for definition in definitions)
+    assert all(definition.config.history_start == date(2013, 11, 6) for definition in definitions)
+    candidate = registry.load(f"{family}/atr-band-ashr-divergence")
+    baseline = registry.load(f"{family}/pullback-wr-baseline")
+    assert len(candidate.market_data_requirements()) == 2
+    assert candidate.market_data_requirements()[1].availability_policy.publication_lag_sessions == 0
+    assert len(baseline.market_data_requirements()) == 1
+
+    snapshot = candidate.capture_research_definition(
+        ResearchDefinitionStore(tmp_path / "research-data"),
+        _policy_set(),
+    )
+    assert snapshot.policy_set_identity == _policy_set().identity

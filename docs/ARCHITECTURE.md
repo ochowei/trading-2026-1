@@ -225,6 +225,7 @@ experiment tree.
 | `rate_volatility_pullback.py` | Reusable primary-plus-backward-as-of-auxiliary pullback definition seam with fixed next-open execution and MOVE-direction gating. |
 | `rate_volatility_pullback_gap_safe.py` | Explicitly suppresses workflow-native signals on over-age auxiliary decisions while preserving lag audit evidence. |
 | `profit_protection_pullback.py` | Reusable primary-only XLF pullback seam with close-armed profit protection, next-open exits, and a fixed occupation lock that preserves paired entry cohorts. |
+| `fxi_mean_reversion.py` | Reusable FXI pullback/WR, ATR-band, and same-session ASHR-divergence definition seam with next-open entry, pessimistic target/stop resolution, cooldown, and fixed expiry semantics. |
 | `_template/` | Starting structure for a workflow-native definition. |
 | `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
 

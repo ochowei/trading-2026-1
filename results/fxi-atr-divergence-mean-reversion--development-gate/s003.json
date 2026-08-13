@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "study": "strategy-forward-replication-research@v004/S003",
+  "stage": "Development",
+  "computed_at": "2026-08-13T01:55:13Z",
+  "frozen_window": {
+    "start": "2015-01-02",
+    "end": "2025-12-31"
+  },
+  "shared_market_data": {
+    "FXI": "3b0ac386be05736e73b6f501a91dd0ff978bafc223f588855a9b7b47d91e31ef",
+    "ASHR": "c83c34a8669a39a6aed4334156e2bf8aaf1031ba63fc0067d38b738b90f60f02"
+  },
+  "baseline": {
+    "source_identity": "fxi-atr-divergence-mean-reversion/pullback-wr-baseline",
+    "trial_id": "fc369cb7130c4695ce963894a52d6c6a05336ddb7ac85f706ba0189b3b12c3e9",
+    "observation_id": "566468efa23242338127be34054295b1",
+    "snapshot_id": "8c961eb540df3c13912dafce04d1ada5e9989750ea6e24211ca0f08ef0659c84",
+    "result_sha256": "f7937906f3d358a2ba61e2f699be5a85ac21b5469f7c22ca1f51bb16188f6c02",
+    "metrics": {
+      "raw_signals": 98,
+      "completed_trades": 86,
+      "traded_years": 11,
+      "base_compounded_return": -0.000880897059830632,
+      "base_profit_factor": 0.9996185556057888,
+      "base_net_sharpe": 0.06771861271205563,
+      "base_max_drawdown": -0.31695240526286916,
+      "stress_compounded_return": -0.24124908993320326,
+      "stress_profit_factor": 0.886702248216489,
+      "stress_max_drawdown": -0.44611001289619245
+    }
+  },
+  "candidate": {
+    "source_identity": "fxi-atr-divergence-mean-reversion/atr-band-ashr-divergence",
+    "trial_id": "68badeb86f494ab5931630e7c57e36afc501f68faa14cc17229ec0958e4a1118",
+    "observation_id": "05e46a5826b1434e90532c94df7580b1",
+    "snapshot_id": "aa66c1529f194fc5ee9a1e7c4c73743bcf45a20f4a7b3b01240ea6ece1e418c2",
+    "result_sha256": "4429dbff84a8d4e107df8322f7516e0f76aa55e6829a987ce2288ca3f237497f",
+    "metrics": {
+      "raw_signals": 34,
+      "completed_trades": 33,
+      "traded_years": 11,
+      "trades_by_entry_year": {
+        "2015": 3,
+        "2016": 2,
+        "2017": 1,
+        "2018": 4,
+        "2019": 3,
+        "2020": 2,
+        "2021": 2,
+        "2022": 6,
+        "2023": 5,
+        "2024": 1,
+        "2025": 4
+      },
+      "base_compounded_return": 1.11816197177839,
+      "base_profit_factor": 3.23061608306693,
+      "base_net_sharpe": 0.7809299518627317,
+      "base_max_drawdown": -0.12467848465221809,
+      "stress_compounded_return": 0.9058889588098764,
+      "stress_profit_factor": 2.7453865264481823,
+      "stress_max_drawdown": -0.15088629536718645,
+      "baseline_sharpe_margin": 0.713211339150676,
+      "maximum_trade_year_concentration": 0.18181818181818182,
+      "maximum_positive_profit_year_concentration": 0.3478627853470095,
+      "baseline_eligible_entries_before_compound_filters": 387,
+      "atr_ceiling_unique_suppressions": 17,
+      "atr_ceiling_suppression_years": [2015, 2016, 2019, 2020, 2021],
+      "ashr_gate_unique_suppressions": 6,
+      "ashr_gate_suppression_years": [2015, 2019, 2021, 2022]
+    },
+    "gates": {
+      "minimum_30_completed_trades": true,
+      "minimum_10_traded_years": true,
+      "positive_base_return": true,
+      "base_profit_factor_above_1_10": true,
+      "positive_stress_return": true,
+      "stress_profit_factor_above_1_00": true,
+      "stress_drawdown_at_most_20_percent": true,
+      "base_return_at_least_90_percent_of_baseline": true,
+      "baseline_sharpe_margin_at_least_0_10": true,
+      "stress_drawdown_no_worse_than_baseline": true,
+      "atr_ceiling_suppresses_10_entries_across_5_years": true,
+      "ashr_gate_suppresses_10_entries_across_5_years": false,
+      "exact_identity_data_policy_execution_and_provenance": true
+    },
+    "eligible": false
+  },
+  "selection": null,
+  "stage_gate": "fail",
+  "stopping_rule_applied": "The ASHR compound filter is non-binding under the frozen Development floor; stop before robustness, candidate freeze, or Historical access."
+}

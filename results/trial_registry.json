@@ -7708,6 +7708,62 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "68110f1d791bb3007a6b076fb7b113ec642f2a237f95bb170baa6d862d441d02"
+    },
+    {
+      "definition_fingerprint": "07c307d96f6295632d16661979661c15e8768e7527501ce58f75333234d57042",
+      "experiment_family": "fxi-atr-divergence-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-divergence-mean-reversion--pullback-wr-baseline"
+      ],
+      "first_registered_at": "2026-08-13T01:51:58.857179Z",
+      "hypothesis": "A simple pullback and Williams-%R rule is the distinct FXI family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-13T01:51:59.012947Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "566468efa23242338127be34054295b1",
+          "observed_at": "2026-08-13T01:51:59.012947Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-divergence-mean-reversion--pullback-wr-baseline/20260813_015158_960648_offline_8773639ef21e422681d3a2778a2a634f.json",
+          "run_mode": "offline",
+          "snapshot_id": "8c961eb540df3c13912dafce04d1ada5e9989750ea6e24211ca0f08ef0659c84",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "fc369cb7130c4695ce963894a52d6c6a05336ddb7ac85f706ba0189b3b12c3e9"
+    },
+    {
+      "definition_fingerprint": "c4d9224c978202c291620393bcbef7d5d4dd07a2418db150d3565d78002609a0",
+      "experiment_family": "fxi-atr-divergence-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-divergence-mean-reversion--atr-band-ashr-divergence"
+      ],
+      "first_registered_at": "2026-08-13T01:52:02.789539Z",
+      "hypothesis": "Bounded FXI volatility acceleration and ASHR divergence improve reversals.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-13T01:52:02.919313Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "05e46a5826b1434e90532c94df7580b1",
+          "observed_at": "2026-08-13T01:52:02.919313Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-divergence-mean-reversion--atr-band-ashr-divergence/20260813_015202_875612_offline_8b3e2834f6024c2e847250e03673edab.json",
+          "run_mode": "offline",
+          "snapshot_id": "aa66c1529f194fc5ee9a1e7c4c73743bcf45a20f4a7b3b01240ea6ece1e418c2",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "68badeb86f494ab5931630e7c57e36afc501f68faa14cc17229ec0958e4a1118"
     }
   ]
 }
