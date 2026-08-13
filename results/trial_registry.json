@@ -7652,6 +7652,62 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "8dba8a8872e572ce99fea98fd913d5e6b14e33eb54073eb586d45eb445981718"
+    },
+    {
+      "definition_fingerprint": "481167b2b2664a460a4308c28cd13d6d986dc51f60e5533c56e9550156b5ca6d",
+      "experiment_family": "xlf-close-armed-profit-protection-pullback",
+      "experiment_names": [
+        "xlf-close-armed-profit-protection-pullback--close-armed-2-floor-0p5"
+      ],
+      "first_registered_at": "2026-08-12T18:19:58.061490Z",
+      "hypothesis": "Close-armed profit protection improves XLF pullback downside control.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T18:19:58.275971Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "f78a00958686450a906e845b74346185",
+          "observed_at": "2026-08-12T18:19:58.275971Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/xlf-close-armed-profit-protection-pullback--close-armed-2-floor-0p5/20260812_181958_204512_offline_bd0fbd95dfe1430e8190610c3396da78.json",
+          "run_mode": "offline",
+          "snapshot_id": "a53e7d14cd403881edf36da8a6a64fcfce2b8d3966a95f57a783c03e7fef6aec",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "c1182cc92d89ce80580575fcac6f3a4c147254ccf737d3a957d1c96c77dc6346"
+    },
+    {
+      "definition_fingerprint": "3b696b87c4308164c4849d89417d6ccbdc07b3d0c7a3bc134f13e8d1941169d5",
+      "experiment_family": "xlf-close-armed-profit-protection-pullback",
+      "experiment_names": [
+        "xlf-close-armed-profit-protection-pullback--fixed-ten-session-baseline"
+      ],
+      "first_registered_at": "2026-08-12T18:20:08.913626Z",
+      "hypothesis": "The fixed ten-session XLF pullback is the distinct simple family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-12T18:20:09.117230Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "83e3844d6e55441faeadcc351fb20aed",
+          "observed_at": "2026-08-12T18:20:09.117230Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/xlf-close-armed-profit-protection-pullback--fixed-ten-session-baseline/20260812_182009_048535_offline_9452bb4a656146f88efe2fa6ab7b5a2f.json",
+          "run_mode": "offline",
+          "snapshot_id": "42ac8896d924c49dbe8299a49d40e5b8ea8e423a490bb394b98ec2caa3e5f8f7",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "68110f1d791bb3007a6b076fb7b113ec642f2a237f95bb170baa6d862d441d02"
     }
   ]
 }

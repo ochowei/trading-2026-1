@@ -224,6 +224,7 @@ experiment tree.
 | `monthly_calendar.py` | Reusable primary-only monthly-calendar definition seam with frozen XNYS entry-session and fixed-holding semantics for workflow-native trials. |
 | `rate_volatility_pullback.py` | Reusable primary-plus-backward-as-of-auxiliary pullback definition seam with fixed next-open execution and MOVE-direction gating. |
 | `rate_volatility_pullback_gap_safe.py` | Explicitly suppresses workflow-native signals on over-age auxiliary decisions while preserving lag audit evidence. |
+| `profit_protection_pullback.py` | Reusable primary-only XLF pullback seam with close-armed profit protection, next-open exits, and a fixed occupation lock that preserves paired entry cohorts. |
 | `_template/` | Starting structure for a workflow-native definition. |
 | `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
 
