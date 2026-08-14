@@ -11,6 +11,7 @@ from trading.core.qualification import (
     CanonicalSimulatedFill,
     EvaluationEvidenceAudit,
     EvaluationFold,
+    ForwardSelectionEpoch,
     HistoricalAggregateEvidence,
     HistoricalBenchmarkEvidence,
     HistoricalBenchmarkPolicy,
@@ -33,6 +34,8 @@ from trading.core.sleeve_engine import ExecutionCostPolicy
 from trading.research_data.qualification_registry import (
     QualificationRegistry,
     QualificationRegistryError,
+    _historical_plan_from_payload,
+    _historical_plan_payload,
 )
 
 
@@ -385,6 +388,54 @@ def test_qualification_registry_rejects_shadow_without_persisted_passing_screen(
 
     with pytest.raises(QualificationRegistryError, match="historical_screen"):
         registry.register_shadow(registration)
+
+
+def test_retrospective_registry_rejects_missing_or_dual_selection_boundaries(tmp_path) -> None:
+    frozen_at = datetime(2026, 8, 6, 21, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    historical_plan, _screen = _historical_lifecycle()
+    checkpoint = RetrospectiveSelectionCheckpoint(
+        frozen_at=frozen_at,
+        selected_trial_id="trial-1",
+        included_trial_ids=("trial-1", "trial-baseline"),
+        prior_selection_history_incomplete=True,
+    )
+    plan = replace(
+        historical_plan,
+        plan_id="retrospective-boundary-plan",
+        created_at=frozen_at,
+        evidence_role="retrospective-confirmatory",
+        retrospective_selection_checkpoint=checkpoint,
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="provenance-unknown",
+            frozen_at=frozen_at,
+            justification="Legacy selection provenance is incomplete.",
+            trial_history_complete=False,
+        ),
+    )
+    dual = replace(
+        plan,
+        forward_selection_epoch=ForwardSelectionEpoch(
+            started_at=frozen_at,
+            selected_trial_id="trial-1",
+            included_trial_ids=("trial-1", "trial-baseline"),
+            prior_selection_history_incomplete=True,
+        ),
+    )
+
+    with pytest.raises(QualificationRegistryError, match="two selection boundaries"):
+        registry.register_historical_plan(dual)
+
+    missing_payload = _historical_plan_payload(plan)
+    missing_payload.pop("retrospective_selection_checkpoint")
+    with pytest.raises(QualificationRegistryError, match="frozen trial universe"):
+        _historical_plan_from_payload(missing_payload)
+
+    with pytest.raises(QualificationRegistryError, match="two selection boundaries"):
+        _historical_plan_from_payload(_historical_plan_payload(dual))
 
 
 def test_retrospective_registry_round_trip_cannot_register_shadow(tmp_path) -> None:

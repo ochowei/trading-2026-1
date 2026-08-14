@@ -1,12 +1,12 @@
 ---
 workflow: strategy-forward-replication-research
 title: 策略前瞻驗證流程
-version: v006
+version: v007
 definition: WORKFLOW.md
-supersedes: v005
+supersedes: v006
 derived_from: null
 source_changes:
-- workflows/strategy-forward-replication-research--v005/work/changes/explicit-retrospective-role-calendar--c001
+- workflows/strategy-forward-replication-research--v006/work/changes/retrospective-selection-boundary-screen-compatibility--c001
 policies:
 - family: us-equity-market
   version: v002
@@ -35,7 +35,7 @@ dependencies:
   role: normative
 - path: docs/canonical-sleeve-execution.md
   role: normative
-- path: docs/historical-qualification-and-shadow-v006.md
+- path: docs/historical-qualification-and-shadow-v007.md
   role: normative
 - path: docs/controlled-followup-cutover.md
   role: normative
@@ -55,12 +55,12 @@ only in the root `workflows/README.md` registry.
 
 ## Authoring basis
 
-本 draft 完整保留 v005 的 retrospective、clean Historical、Shadow、activation、monitoring、
+本 draft 完整保留 v006 的 retrospective、clean Historical、Shadow、activation、monitoring、
 policy、auxiliary availability 與 observation-provenance guards，並納入 accepted change
-`strategy-forward-replication-research@v005/C001`。新增 explicit retrospective role calendar，
-使 completed Development context 可位於 retrospective evaluation 之後，同時將 warmup-only、
-Development 與 Evaluation sessions 分別凍結且禁止重疊。這不改變任何 gate 或 promotion
-authority。
+`strategy-forward-replication-research@v006/C001`。新增共同 frozen selection boundary 語義，
+要求 forward epoch 與 retrospective checkpoint 在 registration、screen coordination 與
+family-wise adjustment 間一致；並要求 provider-free end-to-end release validation。這不改變
+任何 gate、trial family、既有 study 或 promotion authority。
 
 ## Errata
 
@@ -71,13 +71,9 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-| ID | Title | Status | Outcome | Path |
-| --- | --- | --- | --- | --- |
-| `S001` | FXI ATR-Band Mean-Reversion Retrospective Confirmation | `completed` | `indeterminate` | [fxi-atr-band-mean-reversion-retrospective-confirmation--s001](work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001/) |
+_No studies._
 
 ### Changes
 
-| ID | Title | Status | Released in | Path |
-| --- | --- | --- | --- | --- |
-| `C001` | Retrospective selection-boundary screen compatibility | `released` | `v007` | [retrospective-selection-boundary-screen-compatibility--c001](work/changes/retrospective-selection-boundary-screen-compatibility--c001/) |
+_No changes._
 <!-- GENERATED:WORK_INDEX_END -->

@@ -884,16 +884,29 @@ def evaluate_family_selection_adjustment(
     if plan.benchmarks.family_baseline_trial_id not in registered:
         raise ValueError("preregistered family baseline is absent from the trial family")
     history_incomplete = trial_registry_state.get("selection_history_incomplete") is not False
-    epoch = plan.forward_selection_epoch
-    if epoch is not None and epoch.prior_selection_history_incomplete is not history_incomplete:
-        raise ValueError("forward selection epoch history disclosure differs from the registry")
+    selection_boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
+    if (
+        selection_boundary is not None
+        and selection_boundary.prior_selection_history_incomplete is not history_incomplete
+    ):
+        raise ValueError("selection boundary history disclosure differs from the registry")
     if history_incomplete:
-        if epoch is None or not epoch.prior_selection_history_incomplete:
+        if selection_boundary is None or not selection_boundary.prior_selection_history_incomplete:
             raise ValueError("selection adjustment rejects incomplete trial registry history")
-        if registered != epoch.included_trial_ids:
-            raise ValueError("forward selection epoch trial universe changed after registration")
-        if selected_trial_id != epoch.selected_trial_id:
-            raise ValueError("selected trial differs from the forward selection epoch")
+        if registered != selection_boundary.included_trial_ids:
+            raise ValueError("selection boundary trial universe changed after registration")
+        if selected_trial_id != selection_boundary.selected_trial_id:
+            raise ValueError("selected trial differs from the selection boundary")
+        boundary_label = (
+            "forward selection epoch"
+            if isinstance(selection_boundary, ForwardSelectionEpoch)
+            else "retrospective selection checkpoint"
+        )
+        boundary_time = (
+            selection_boundary.started_at
+            if isinstance(selection_boundary, ForwardSelectionEpoch)
+            else selection_boundary.frozen_at
+        )
         for trial in raw_trials:
             if (
                 not isinstance(trial, Mapping)
@@ -902,10 +915,10 @@ def evaluate_family_selection_adjustment(
                 continue
             registered_at = trial.get("first_registered_at")
             if not isinstance(registered_at, str):
-                raise ValueError("forward selection epoch requires trial registration timestamps")
-            if parse_timestamp(registered_at) > epoch.started_at:
+                raise ValueError(f"{boundary_label} requires trial registration timestamps")
+            if parse_timestamp(registered_at) > boundary_time:
                 raise ValueError(
-                    "forward selection epoch contains a trial registered after it began"
+                    f"{boundary_label} contains a trial registered after it was frozen"
                 )
     if set(trial_daily_excess_returns) != set(registered):
         raise ValueError("selection adjustment requires evidence for every registered family trial")
