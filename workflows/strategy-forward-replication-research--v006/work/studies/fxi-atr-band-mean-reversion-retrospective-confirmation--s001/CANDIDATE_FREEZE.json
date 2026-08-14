@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "study_id": "S001",
+  "study_path": "workflows/strategy-forward-replication-research--v006/work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001",
+  "workflow": "strategy-forward-replication-research",
+  "workflow_version": "v006",
+  "approved_at": "2026-08-13T11:03:01.311673Z",
+  "approved_by": "ochowei@gmail.com",
+  "preregistration_sha256": "aba406964360cee027b96e63d5bb5b428dc045d086e6c64ece0fb20868810451",
+  "hypothesis_sha256": "cb7d1c1fbef8e4e3b0d8fbf986f512480257cc68673d6ef11183de5806d11dff",
+  "plan_sha256": "ab45cbf111ed955499f6754415c5584c2aacc929e0b47e7d9f830f670367caad",
+  "workflow_release_sha256": "f58d60322e8a975c7d2c73bcf22fbe947f31806d35cbc5d363b593e0036e0a10",
+  "workflow_sha256": "6b786b506d49a3e02dd88b63171e3697f74be1084ece2764d8c0123dafe78af8",
+  "source_git_head": "41935feee33a11bab7622669bd160dbb458f6ddf",
+  "selection_basis": {
+    "revisits": "workflows/strategy-forward-replication-research--v005/work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001",
+    "prior_candidate_freeze_sha256": "8f7e0e61a86d913da73967865132019ccab058fd7e6a310dc87781eef64165a5",
+    "ancestral_candidate_source": "workflows/strategy-forward-replication-research--v004/work/studies/fxi-atr-band-mean-reversion-forward-replication--s004",
+    "approval_imported": false,
+    "rationale": "Candidate selection remains fixed from the frozen S004 Development context through the cancelled outcome-unexposed v005/S001 lineage; this v006 approval is new and independent."
+  },
+  "policy_set_identity": "cac4973cf0055c772487b069c96f1cd2b488a2457636f8cfe2c812c89ad0f63e",
+  "selected_candidate": {
+    "source_identity": "fxi-atr-band-mean-reversion-retrospective/atr-band-candidate",
+    "trial_id": "697276adf91be9547c38d9197277c97b2c6fdfdb97b2d4c4975e2f325632e674",
+    "definition_fingerprint": "6aa709255f84591960793dc744cbdfaaf3d6652ef9287581a89ace4765521456",
+    "definition_snapshot_id": "f31701169b32bfe2cee41770e01eb9e889b0e673c7b8533a386e7250b3b259ab",
+    "definition_byte_count": 137384
+  },
+  "family_baseline": {
+    "source_identity": "fxi-atr-band-mean-reversion-retrospective/pullback-wr-baseline",
+    "trial_id": "c3c04fd0bcb59ca8ecb250d8fd37e1ed68caa13233c1656d1be3381254918e8c",
+    "definition_fingerprint": "5bfdf7456f4c92a5114601bc2ee388a2e9f52ebea4e4701aa41b352e1adca433",
+    "definition_snapshot_id": "a786086d527f6a0b90f622ee0e556c13ab3dfba2f22a2de72dad0ac366fa9337",
+    "definition_byte_count": 136929
+  },
+  "frozen_trial_budget": 6,
+  "complete_family": [
+    {
+      "source_identity": "fxi-atr-band-mean-reversion-retrospective/atr-band-candidate",
+      "trial_id": "697276adf91be9547c38d9197277c97b2c6fdfdb97b2d4c4975e2f325632e674",
+      "definition_fingerprint": "6aa709255f84591960793dc744cbdfaaf3d6652ef9287581a89ace4765521456",
+      "definition_snapshot_id": "f31701169b32bfe2cee41770e01eb9e889b0e673c7b8533a386e7250b3b259ab"
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion-retrospective/atr-ceiling-1p30-robustness",
+      "trial_id": "059dc99759003284f0df05cbf092c6464eaa6128a0e5468150b169fc8e95b603",
+      "definition_fingerprint": "bde92ea6f397995474b67cb9bdaa4b10ccd7c9c50cfdbaee101abf51e91a5537",
+      "definition_snapshot_id": "9d4501bd98095b1e03f1bc749c189bc31ea2df9a56c5ccb1416d1c68bc911941"
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion-retrospective/atr-floor-1p10-robustness",
+      "trial_id": "fac88cfbaf5068fff2795699fd7f3be10534bcec95c6c0d7f03b3aab91e99ba9",
+      "definition_fingerprint": "48f8b547c1f005e2c2567ce47223c7053ecdcfb2dddabcb952c050e1fae52b96",
+      "definition_snapshot_id": "092cabce848ed9550b0145bd0073b48c9960ee4505d79189454ae67669f65cfe"
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion-retrospective/delay-one-session-robustness",
+      "trial_id": "651f6fa0a12c88b6d45a0ec6b55d917a5a239f38ac1371da9a67e9fe3b71a504",
+      "definition_fingerprint": "a3c49c75fb63cdfc7bcd833a98e3fd26167edec66126d8c0192edee1b5dabb78",
+      "definition_snapshot_id": "d8b58d8931afcfec4dbfa0ba36338e8986a6f340240341d30cad572063ffb444"
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion-retrospective/hold-18-robustness",
+      "trial_id": "ac5b1d5ec5e4db18d69a1a743449d69888a00d4c4c6fc6b57e0230fbfe04f145",
+      "definition_fingerprint": "a066f0e1baf3ace49602e079895a6e74e3923a0f7304ce6befd45fd67649ecd9",
+      "definition_snapshot_id": "f6aa93dda854120e4567cec7214bf73140259d54ef769615964c73862b601fb5"
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion-retrospective/pullback-wr-baseline",
+      "trial_id": "c3c04fd0bcb59ca8ecb250d8fd37e1ed68caa13233c1656d1be3381254918e8c",
+      "definition_fingerprint": "5bfdf7456f4c92a5114601bc2ee388a2e9f52ebea4e4701aa41b352e1adca433",
+      "definition_snapshot_id": "a786086d527f6a0b90f622ee0e556c13ab3dfba2f22a2de72dad0ac366fa9337"
+    }
+  ],
+  "trial_registry_sha256": "beabc8dfc2ee33e0e628760d8b111bc4ab0a4507e02ef571e01e0a77dc50973a",
+  "retrospective_boundary": {
+    "evidence_role": "retrospective-confirmatory",
+    "classification": "provenance-unknown",
+    "folds": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014
+    ],
+    "outcome_inspection_authorized": false
+  },
+  "authorization_scope": "Freeze six source and trial identities and their v006 definition snapshots only; no market-data refresh, market-data snapshot, qualification-plan registration, formal run, screen, outcome inspection, Shadow, broker access, or order authority."
+}

@@ -72,7 +72,7 @@ None.
 
 | ID | Title | Status | Outcome | Path |
 | --- | --- | --- | --- | --- |
-| `S001` | FXI ATR-Band Mean-Reversion Retrospective Confirmation | `paused` | `-` | [fxi-atr-band-mean-reversion-retrospective-confirmation--s001](work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001/) |
+| `S001` | FXI ATR-Band Mean-Reversion Retrospective Confirmation | `cancelled` | `-` | [fxi-atr-band-mean-reversion-retrospective-confirmation--s001](work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001/) |
 
 ### Changes
 
