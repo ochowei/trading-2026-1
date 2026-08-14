@@ -9,6 +9,7 @@ import pytest
 from trading.core.qualification import (
     DailyExcessReturn,
     EvaluationEvidenceAudit,
+    ForwardSelectionEpoch,
     HistoricalScreenThresholds,
     RetrospectiveSelectionCheckpoint,
     _qualification_disposition,
@@ -218,6 +219,56 @@ def test_retrospective_plan_accepts_completed_unknown_provenance_without_promoti
     assert plan.evidence_audit.classification == "provenance-unknown"
     assert _qualification_disposition(plan.evidence_role, True) == "retrospectively-supported"
     assert _qualification_disposition(plan.evidence_role, False) == "retrospective-screen-failed"
+
+
+def test_retrospective_plan_requires_exactly_one_retrospective_boundary() -> None:
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
+    frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
+    audit = EvaluationEvidenceAudit(
+        classification="provenance-unknown",
+        frozen_at=frozen_at,
+        justification="Completed data are retrospective-confirmatory only.",
+        trial_history_complete=False,
+    )
+    kwargs = {
+        "experiment_family": "spy:mean-reversion",
+        "definition_fingerprint": "a" * 64,
+        "sessions": sessions,
+        "evaluation_years": (2021, 2022, 2023, 2024, 2025),
+        "maximum_holding_sessions": 1,
+        "execution_lag_sessions": 1,
+        "dependency_sessions": 2,
+        "embargo_sessions": 1,
+        "stress_drawdown_limit": "0.20",
+        "family_baseline_trial_id": "trial-baseline",
+        "random_seed": 17,
+        "random_samples": 10,
+        "bootstrap_repetitions": 20,
+        "bootstrap_block_sessions": 5,
+        "created_at": frozen_at,
+        "evidence_role": "retrospective-confirmatory",
+        "evidence_audit": audit,
+    }
+
+    with pytest.raises(ValueError, match="frozen trial universe"):
+        build_historical_qualification_plan(**kwargs)
+
+    with pytest.raises(ValueError, match="two selection boundaries"):
+        build_historical_qualification_plan(
+            **kwargs,
+            forward_selection_epoch=ForwardSelectionEpoch(
+                started_at=frozen_at,
+                selected_trial_id="trial-selected",
+                included_trial_ids=("trial-baseline", "trial-selected"),
+                prior_selection_history_incomplete=True,
+            ),
+            retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+                frozen_at=frozen_at,
+                selected_trial_id="trial-selected",
+                included_trial_ids=("trial-baseline", "trial-selected"),
+                prior_selection_history_incomplete=True,
+            ),
+        )
 
 
 def test_retrospective_plan_freezes_explicit_later_development_and_prior_warmup() -> None:
@@ -608,6 +659,140 @@ def test_family_selection_adjustment_fails_closed_for_incomplete_trial_history()
         evaluate_family_selection_adjustment(
             plan,
             selected_trial_id="trial-selected",
+            trial_registry_state=registry_state,
+            trial_daily_excess_returns={
+                "trial-selected": _daily_returns(0.02, plan.evaluation_sessions),
+                "trial-baseline": _daily_returns(0.0, plan.evaluation_sessions),
+            },
+        )
+
+
+def test_family_selection_adjustment_accepts_retrospective_checkpoint() -> None:
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
+    frozen_at = datetime(2026, 1, 2, 21, tzinfo=UTC)
+    plan = build_historical_qualification_plan(
+        experiment_family="spy:mean-reversion",
+        definition_fingerprint="a" * 64,
+        sessions=sessions,
+        evaluation_years=(2021, 2022, 2023, 2024, 2025),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id="trial-baseline",
+        random_seed=17,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        created_at=frozen_at,
+        evidence_role="retrospective-confirmatory",
+        retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+            frozen_at=frozen_at,
+            selected_trial_id="trial-selected",
+            included_trial_ids=("trial-baseline", "trial-selected"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="provenance-unknown",
+            frozen_at=frozen_at,
+            justification="Completed data are retrospective-confirmatory only.",
+            trial_history_complete=False,
+        ),
+    )
+    registry_state = _trial_registry_state("trial-selected", "trial-baseline")
+    registry_state["selection_history_incomplete"] = True
+    for index, trial in enumerate(registry_state["trials"]):
+        trial["first_registered_at"] = f"2020-12-30T{index:02d}:00:00+00:00"
+
+    adjustment = evaluate_family_selection_adjustment(
+        plan,
+        selected_trial_id="trial-selected",
+        trial_registry_state=registry_state,
+        trial_daily_excess_returns={
+            "trial-selected": _daily_returns(0.02, plan.evaluation_sessions),
+            "trial-baseline": _daily_returns(0.0, plan.evaluation_sessions),
+        },
+    )
+
+    assert adjustment.included_trial_ids == ("trial-baseline", "trial-selected")
+    assert adjustment.passed
+
+
+@pytest.mark.parametrize(
+    ("case", "message"),
+    [
+        ("disclosure", "history disclosure"),
+        ("family", "trial universe"),
+        ("selected", "selected trial"),
+        ("missing-timestamp", "registration timestamps"),
+        ("late-timestamp", "registered after it was frozen"),
+    ],
+)
+def test_family_selection_adjustment_rejects_invalid_retrospective_boundary(
+    case: str,
+    message: str,
+) -> None:
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
+    frozen_at = datetime(2026, 1, 2, 21, tzinfo=UTC)
+    plan = build_historical_qualification_plan(
+        experiment_family="spy:mean-reversion",
+        definition_fingerprint="a" * 64,
+        sessions=sessions,
+        evaluation_years=(2021, 2022, 2023, 2024, 2025),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id="trial-baseline",
+        random_seed=17,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        created_at=frozen_at,
+        evidence_role="retrospective-confirmatory",
+        retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+            frozen_at=frozen_at,
+            selected_trial_id="trial-selected",
+            included_trial_ids=("trial-baseline", "trial-selected"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="provenance-unknown",
+            frozen_at=frozen_at,
+            justification="Completed data are retrospective-confirmatory only.",
+            trial_history_complete=False,
+        ),
+    )
+    registry_state = _trial_registry_state("trial-selected", "trial-baseline")
+    registry_state["selection_history_incomplete"] = True
+    for index, trial in enumerate(registry_state["trials"]):
+        trial["first_registered_at"] = f"2020-12-30T{index:02d}:00:00+00:00"
+    selected_trial_id = "trial-selected"
+    if case == "disclosure":
+        registry_state["selection_history_incomplete"] = False
+    elif case == "family":
+        registry_state["trials"].append(
+            {
+                "trial_id": "trial-extra",
+                "experiment_family": "spy:mean-reversion",
+                "legacy": False,
+                "selection_history_incomplete": False,
+                "first_registered_at": "2020-12-30T02:00:00+00:00",
+            }
+        )
+    elif case == "selected":
+        selected_trial_id = "trial-baseline"
+    elif case == "missing-timestamp":
+        registry_state["trials"][0].pop("first_registered_at")
+    elif case == "late-timestamp":
+        registry_state["trials"][0]["first_registered_at"] = "2026-01-03T00:00:00+00:00"
+
+    with pytest.raises(ValueError, match=message):
+        evaluate_family_selection_adjustment(
+            plan,
+            selected_trial_id=selected_trial_id,
             trial_registry_state=registry_state,
             trial_daily_excess_returns={
                 "trial-selected": _daily_returns(0.02, plan.evaluation_sessions),

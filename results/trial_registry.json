@@ -7825,96 +7825,174 @@
       "definition_fingerprint": "6aa709255f84591960793dc744cbdfaaf3d6652ef9287581a89ace4765521456",
       "experiment_family": "fxi-atr-band-mean-reversion-retrospective",
       "experiment_names": [
-        "fxi-atr-band-mean-reversion-retrospective/atr-band-candidate"
+        "fxi-atr-band-mean-reversion-retrospective/atr-band-candidate",
+        "fxi-atr-band-mean-reversion-retrospective--atr-band-candidate"
       ],
       "first_registered_at": "2026-08-13T09:51:51.635464Z",
       "hypothesis": "A bounded FXI volatility-acceleration state improves retrospective reversals.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": null,
+      "last_observed_at": "2026-08-14T02:16:41.385757Z",
       "legacy": false,
-      "observations": [],
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "97578a8d98a944b8a02a2238bad16cdf",
+          "observed_at": "2026-08-14T02:16:41.385757Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion-retrospective--atr-band-candidate/20260814_021641_365555_offline_df8279f1117246b8b7a4a8c4ddf0a474.json",
+          "run_mode": "offline",
+          "snapshot_id": "ef53df95e92f2f862f0985dce2916239cfcf0947849a57af7a074b85c7666d93",
+          "validity_status": "valid"
+        }
+      ],
       "selection_history_incomplete": false,
-      "status": "registered",
+      "status": "active",
       "trial_id": "697276adf91be9547c38d9197277c97b2c6fdfdb97b2d4c4975e2f325632e674"
     },
     {
       "definition_fingerprint": "bde92ea6f397995474b67cb9bdaa4b10ccd7c9c50cfdbaee101abf51e91a5537",
       "experiment_family": "fxi-atr-band-mean-reversion-retrospective",
       "experiment_names": [
-        "fxi-atr-band-mean-reversion-retrospective/atr-ceiling-1p30-robustness"
+        "fxi-atr-band-mean-reversion-retrospective/atr-ceiling-1p30-robustness",
+        "fxi-atr-band-mean-reversion-retrospective--atr-ceiling-1p30-robustness"
       ],
       "first_registered_at": "2026-08-13T09:51:51.689769Z",
       "hypothesis": "The retrospective candidate remains viable with an ATR ceiling of 1.30.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": null,
+      "last_observed_at": "2026-08-14T02:16:58.405573Z",
       "legacy": false,
-      "observations": [],
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "1dbf4d48b74d4088a7ec92e795db960e",
+          "observed_at": "2026-08-14T02:16:58.405573Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion-retrospective--atr-ceiling-1p30-robustness/20260814_021658_385324_offline_38d5713019244efdae2201f1d039f4cd.json",
+          "run_mode": "offline",
+          "snapshot_id": "d5e6025bc4f5436401c3a6e67a1395ab9cdbfc749ac8726b993b3a798088e764",
+          "validity_status": "valid"
+        }
+      ],
       "selection_history_incomplete": false,
-      "status": "registered",
+      "status": "active",
       "trial_id": "059dc99759003284f0df05cbf092c6464eaa6128a0e5468150b169fc8e95b603"
     },
     {
       "definition_fingerprint": "48f8b547c1f005e2c2567ce47223c7053ecdcfb2dddabcb952c050e1fae52b96",
       "experiment_family": "fxi-atr-band-mean-reversion-retrospective",
       "experiment_names": [
-        "fxi-atr-band-mean-reversion-retrospective/atr-floor-1p10-robustness"
+        "fxi-atr-band-mean-reversion-retrospective/atr-floor-1p10-robustness",
+        "fxi-atr-band-mean-reversion-retrospective--atr-floor-1p10-robustness"
       ],
       "first_registered_at": "2026-08-13T09:51:51.745073Z",
       "hypothesis": "The retrospective candidate remains viable with an ATR floor of 1.10.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": null,
+      "last_observed_at": "2026-08-14T02:16:59.770048Z",
       "legacy": false,
-      "observations": [],
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "883fe36f603d4cd09dd90719ed178066",
+          "observed_at": "2026-08-14T02:16:59.770048Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion-retrospective--atr-floor-1p10-robustness/20260814_021659_749793_offline_b2b6ad056ba1465f97959b12877724bb.json",
+          "run_mode": "offline",
+          "snapshot_id": "73f57dfcc86411b43c4fc7c3efe02d5ab2b8952c0690a8573d9064803e8eb192",
+          "validity_status": "valid"
+        }
+      ],
       "selection_history_incomplete": false,
-      "status": "registered",
+      "status": "active",
       "trial_id": "fac88cfbaf5068fff2795699fd7f3be10534bcec95c6c0d7f03b3aab91e99ba9"
     },
     {
       "definition_fingerprint": "a3c49c75fb63cdfc7bcd833a98e3fd26167edec66126d8c0192edee1b5dabb78",
       "experiment_family": "fxi-atr-band-mean-reversion-retrospective",
       "experiment_names": [
-        "fxi-atr-band-mean-reversion-retrospective/delay-one-session-robustness"
+        "fxi-atr-band-mean-reversion-retrospective/delay-one-session-robustness",
+        "fxi-atr-band-mean-reversion-retrospective--delay-one-session-robustness"
       ],
       "first_registered_at": "2026-08-13T09:51:51.804129Z",
       "hypothesis": "The retrospective candidate remains viable with one extra entry-lag session.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": null,
+      "last_observed_at": "2026-08-14T02:17:01.123096Z",
       "legacy": false,
-      "observations": [],
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "54c971d680024085a097856e1d37d9bd",
+          "observed_at": "2026-08-14T02:17:01.123096Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion-retrospective--delay-one-session-robustness/20260814_021701_100395_offline_b2a4709ff078428dab5f1e256cade822.json",
+          "run_mode": "offline",
+          "snapshot_id": "88becb5be9a90a6dd84ebeb1b7a0933bf844490b391450d87f8661accbf05fcd",
+          "validity_status": "valid"
+        }
+      ],
       "selection_history_incomplete": false,
-      "status": "registered",
+      "status": "active",
       "trial_id": "651f6fa0a12c88b6d45a0ec6b55d917a5a239f38ac1371da9a67e9fe3b71a504"
     },
     {
       "definition_fingerprint": "a066f0e1baf3ace49602e079895a6e74e3923a0f7304ce6befd45fd67649ecd9",
       "experiment_family": "fxi-atr-band-mean-reversion-retrospective",
       "experiment_names": [
-        "fxi-atr-band-mean-reversion-retrospective/hold-18-robustness"
+        "fxi-atr-band-mean-reversion-retrospective/hold-18-robustness",
+        "fxi-atr-band-mean-reversion-retrospective--hold-18-robustness"
       ],
       "first_registered_at": "2026-08-13T09:51:51.859035Z",
       "hypothesis": "The retrospective candidate remains viable with an eighteen-session holding.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": null,
+      "last_observed_at": "2026-08-14T02:17:02.486879Z",
       "legacy": false,
-      "observations": [],
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "1cc9508e777a48cdbd8d06dced9c7a7b",
+          "observed_at": "2026-08-14T02:17:02.486879Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion-retrospective--hold-18-robustness/20260814_021702_466119_offline_38a34532bf2b49f796050ef5d37cd495.json",
+          "run_mode": "offline",
+          "snapshot_id": "43e6fea51e9f86d62f7ab8f9219012293d8bf138584f7b9eb4d789064178694e",
+          "validity_status": "valid"
+        }
+      ],
       "selection_history_incomplete": false,
-      "status": "registered",
+      "status": "active",
       "trial_id": "ac5b1d5ec5e4db18d69a1a743449d69888a00d4c4c6fc6b57e0230fbfe04f145"
     },
     {
       "definition_fingerprint": "5bfdf7456f4c92a5114601bc2ee388a2e9f52ebea4e4701aa41b352e1adca433",
       "experiment_family": "fxi-atr-band-mean-reversion-retrospective",
       "experiment_names": [
-        "fxi-atr-band-mean-reversion-retrospective/pullback-wr-baseline"
+        "fxi-atr-band-mean-reversion-retrospective/pullback-wr-baseline",
+        "fxi-atr-band-mean-reversion-retrospective--pullback-wr-baseline"
       ],
       "first_registered_at": "2026-08-13T09:51:51.917389Z",
       "hypothesis": "A pullback and Williams-%R rule is the retrospective family baseline.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": null,
+      "last_observed_at": "2026-08-14T02:17:03.911688Z",
       "legacy": false,
-      "observations": [],
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "cf0cfa0facac4093b1bf7ad1da6ac6c3",
+          "observed_at": "2026-08-14T02:17:03.911688Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion-retrospective--pullback-wr-baseline/20260814_021703_870965_offline_816aa70566254c4fa00891f6bb71fb25.json",
+          "run_mode": "offline",
+          "snapshot_id": "37232c8733a42f5a6343a27c78833f7c551e5595a729d4a048720be10de0fdcb",
+          "validity_status": "valid"
+        }
+      ],
       "selection_history_incomplete": false,
-      "status": "registered",
+      "status": "active",
       "trial_id": "c3c04fd0bcb59ca8ecb250d8fd37e1ed68caa13233c1656d1be3381254918e8c"
     }
   ]

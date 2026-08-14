@@ -3,17 +3,17 @@ id: S001
 title: FXI ATR-Band Mean-Reversion Retrospective Confirmation
 workflow: strategy-forward-replication-research
 workflow_version: v006
-status: running
-outcome: null
+status: completed
+outcome: indeterminate
 created_at: '2026-08-13T10:45:48.158221Z'
 created_by: codex-primary-researcher-fxi-mean-reversion
-status_changed_at: '2026-08-13T11:02:28.405465Z'
-status_changed_by: codex-primary-researcher-fxi-mean-reversion
+status_changed_at: '2026-08-14T02:54:44.868787Z'
+status_changed_by: ochowei@gmail.com
 status_reason: null
 preregistered_at: '2026-08-13T10:55:28.086456Z'
 preregistered_by: ochowei@gmail.com
-completed_at: null
-reviewed_by: null
+completed_at: '2026-08-14T02:54:44.868787Z'
+reviewed_by: ochowei@gmail.com
 revisits: workflows/strategy-forward-replication-research--v005/work/studies/fxi-atr-band-mean-reversion-retrospective-confirmation--s001
 ---
 # FXI ATR-Band Mean-Reversion Retrospective Confirmation

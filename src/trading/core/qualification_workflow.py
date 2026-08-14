@@ -114,7 +114,7 @@ def register_forward_qualification_plan(
     included_trial_ids = _registered_family_trial_ids(
         trial_state,
         experiment_family=declaration.family,
-        epoch_start=started_at,
+        boundary_time=started_at,
     )
     if selected_trial_id not in included_trial_ids:
         raise ValueError("selected experiment trial is not formally registered")
@@ -279,7 +279,7 @@ def run_registered_historical_screen(
     expected_trial_ids = _registered_family_trial_ids(
         trial_registry_state,
         experiment_family=plan.experiment_family,
-        epoch_start=(
+        boundary_time=(
             plan.forward_selection_epoch.started_at
             if plan.forward_selection_epoch is not None
             else plan.retrospective_selection_checkpoint.frozen_at
@@ -363,7 +363,7 @@ def _registered_family_trial_ids(
     state: Mapping[str, object],
     *,
     experiment_family: str,
-    epoch_start: datetime | None,
+    boundary_time: datetime | None,
 ) -> tuple[str, ...]:
     raw_trials = state.get("trials")
     if not isinstance(raw_trials, list):
@@ -377,12 +377,12 @@ def _registered_family_trial_ids(
         trial_id = trial.get("trial_id")
         if not isinstance(trial_id, str) or not trial_id:
             raise ValueError("selected family contains an invalid trial identity")
-        if epoch_start is not None:
+        if boundary_time is not None:
             registered_at = trial.get("first_registered_at")
             if not isinstance(registered_at, str):
-                raise ValueError("forward selection epoch requires trial registration timestamps")
-            if parse_timestamp(registered_at) > epoch_start:
-                raise ValueError("selected family contains a trial registered after the epoch")
+                raise ValueError("selection boundary requires trial registration timestamps")
+            if parse_timestamp(registered_at) > boundary_time:
+                raise ValueError("selected family contains a trial registered after the boundary")
         trial_ids.append(trial_id)
     registered = tuple(sorted(set(trial_ids)))
     if len(registered) != len(trial_ids) or not registered:

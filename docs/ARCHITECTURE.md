@@ -341,3 +341,8 @@ application architecture and is not a source of project rules.
 | Change followup selection or reporting | `src/trading/followup.py` / `followup_backtest.py` | Followup tests and relevant experiment/result docs. |
 | Change a repository workflow contract | `workflows/` | Use `trading-author-workflow`; generated indexes and release evidence must remain valid. |
 | Change repository layout or ownership | Affected paths | Update this document in the same change. |
+
+Versioned Phase 6 workflow contracts live at
+`docs/historical-qualification-and-shadow-vNNN.md`. Each file is an immutable normative dependency
+for the workflow version that pins it; behavioral changes create a new document version instead of
+rewriting a document pinned by a released workflow.

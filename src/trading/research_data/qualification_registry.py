@@ -196,13 +196,9 @@ class QualificationRegistry:
         if len(plan.folds) < plan.thresholds.minimum_evaluation_folds:
             raise QualificationRegistryError("historical plan has insufficient evaluation folds")
         _validate_plan_role_calendar(plan)
+        _validate_plan_selection_boundaries(plan)
         if plan.evidence_role == "retrospective-confirmatory" and plan.evidence_audit is None:
             raise QualificationRegistryError("retrospective plan requires clean-evidence audit")
-        if (
-            plan.evidence_role == "retrospective-confirmatory"
-            and plan.retrospective_selection_checkpoint is None
-        ):
-            raise QualificationRegistryError("retrospective plan requires frozen trial universe")
         if (
             plan.evidence_role == "historical"
             and plan.evidence_audit is not None
@@ -1240,10 +1236,32 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
             evidence_audit=audit,
             role_calendar=role_calendar,
         )
+        _validate_plan_selection_boundaries(plan)
         _validate_plan_role_calendar(plan)
         return plan
     except (KeyError, TypeError, ValueError, InvalidOperation) as exc:
         raise QualificationRegistryError(f"historical plan payload is malformed: {exc}") from exc
+
+
+def _validate_plan_selection_boundaries(plan: HistoricalQualificationPlan) -> None:
+    if (
+        plan.forward_selection_epoch is not None
+        and plan.retrospective_selection_checkpoint is not None
+    ):
+        raise QualificationRegistryError(
+            "qualification plan cannot contain two selection boundaries"
+        )
+    if plan.evidence_role == "retrospective-confirmatory":
+        if plan.retrospective_selection_checkpoint is None:
+            raise QualificationRegistryError("retrospective plan requires frozen trial universe")
+        if plan.forward_selection_epoch is not None:
+            raise QualificationRegistryError(
+                "retrospective qualification cannot claim a Forward Selection Epoch"
+            )
+    elif plan.retrospective_selection_checkpoint is not None:
+        raise QualificationRegistryError(
+            "Historical Evaluation cannot use a retrospective checkpoint"
+        )
 
 
 def _mapping_value(value: object, name: str) -> Mapping[str, object]:
