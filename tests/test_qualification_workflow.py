@@ -1,4 +1,7 @@
-from dataclasses import replace
+import hashlib
+import threading
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -8,21 +11,31 @@ import pytest
 
 from trading.core.qualification import (
     ForwardSelectionEpoch,
+    StudyQualificationIdentity,
     build_historical_qualification_plan,
 )
+from trading.core.qualification_transaction import (
+    publish_qualification_plan_transaction,
+    recover_qualification_plan_transaction,
+)
 from trading.core.qualification_workflow import (
+    _verify_formal_snapshot_observation,
+    _verify_snapshot_cutoff,
     register_forward_qualification_plan,
     run_registered_historical_screen,
 )
 from trading.core.sleeve_engine import CanonicalSleeveInput
+from trading.core.study_qualification import compile_study_qualification_plan
 from trading.research_data import (
     DefinitionBlobRef,
     ExperimentTrialDeclaration,
     ExperimentTrialRegistry,
+    OutcomeFreeTrialRegistration,
     QualificationRegistry,
     ResearchDefinitionSnapshot,
 )
 from trading.research_data.qualification_registry import QualificationRegistryError
+from trading.research_data.trial_registry import formal_trial_id
 
 
 class _Strategy:
@@ -54,6 +67,11 @@ class _WorkflowStrategy(_Strategy):
 
     def run_with_bundle(self, _bundle):
         return {"canonical_sleeve_input": _empty_input()}
+
+
+@dataclass(frozen=True)
+class _StudySpecStub:
+    study_identity: StudyQualificationIdentity
 
 
 def _empty_input() -> CanonicalSleeveInput:
@@ -216,6 +234,350 @@ def test_register_forward_plan_bounds_incomplete_legacy_history(
         ).register_historical_plan(replace(plan, plan_id="another-forward-plan"))
 
 
+def test_cross_registry_plan_transaction_recovers_after_second_write_failure(tmp_path) -> None:
+    started_at = datetime(2026, 8, 15, 2, tzinfo=UTC)
+    registrations = (
+        OutcomeFreeTrialRegistration("SPY:transaction", "a" * 64, "candidate"),
+        OutcomeFreeTrialRegistration("SPY:transaction", "b" * 64, "baseline"),
+    )
+    candidate_id = formal_trial_id("SPY:transaction", "a" * 64)
+    baseline_id = formal_trial_id("SPY:transaction", "b" * 64)
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2024-01-01", "2031-12-31"))
+    plan = build_historical_qualification_plan(
+        experiment_family="SPY:transaction",
+        definition_fingerprint="a" * 64,
+        sessions=sessions,
+        evaluation_years=(2027, 2028, 2029, 2030, 2031),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id=baseline_id,
+        random_seed=7,
+        random_samples=10,
+        bootstrap_repetitions=10,
+        bootstrap_block_sessions=5,
+        created_at=started_at,
+        forward_selection_epoch=ForwardSelectionEpoch(
+            started_at=started_at,
+            selected_trial_id=candidate_id,
+            included_trial_ids=tuple(sorted((candidate_id, baseline_id))),
+            prior_selection_history_incomplete=True,
+        ),
+    )
+    trial_path = tmp_path / "trials.json"
+    qualification_path = tmp_path / "qualification.json"
+
+    def fail_after_trial_commit() -> None:
+        raise RuntimeError("injected second-write fault")
+
+    with pytest.raises(RuntimeError, match="second-write fault"):
+        publish_qualification_plan_transaction(
+            plan=plan,
+            registrations=registrations,
+            registered_at=started_at,
+            trial_registry_path=trial_path,
+            qualification_registry_path=qualification_path,
+            after_trial_commit=fail_after_trial_commit,
+        )
+
+    assert len(ExperimentTrialRegistry(trial_path).read()["trials"]) == 2
+    assert not qualification_path.exists()
+    assert recover_qualification_plan_transaction(qualification_path) == plan
+    assert QualificationRegistry(qualification_path).historical_plan(plan.plan_id) == plan
+    assert recover_qualification_plan_transaction(qualification_path) is None
+
+
+def test_cross_registry_plan_transaction_serializes_concurrent_retries(tmp_path) -> None:
+    started_at = datetime(2026, 8, 15, 3, tzinfo=UTC)
+    registrations = (
+        OutcomeFreeTrialRegistration("SPY:concurrent", "a" * 64, "candidate"),
+        OutcomeFreeTrialRegistration("SPY:concurrent", "b" * 64, "baseline"),
+    )
+    candidate_id = formal_trial_id("SPY:concurrent", "a" * 64)
+    baseline_id = formal_trial_id("SPY:concurrent", "b" * 64)
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2024-01-01", "2031-12-31"))
+    plan = build_historical_qualification_plan(
+        experiment_family="SPY:concurrent",
+        definition_fingerprint="a" * 64,
+        sessions=sessions,
+        evaluation_years=(2027, 2028, 2029, 2030, 2031),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id=baseline_id,
+        random_seed=7,
+        random_samples=10,
+        bootstrap_repetitions=10,
+        bootstrap_block_sessions=5,
+        created_at=started_at,
+        forward_selection_epoch=ForwardSelectionEpoch(
+            started_at=started_at,
+            selected_trial_id=candidate_id,
+            included_trial_ids=tuple(sorted((candidate_id, baseline_id))),
+            prior_selection_history_incomplete=True,
+        ),
+    )
+    trial_path = tmp_path / "trials.json"
+    qualification_path = tmp_path / "qualification.json"
+
+    def publish() -> tuple[str, ...]:
+        return publish_qualification_plan_transaction(
+            plan=plan,
+            registrations=registrations,
+            registered_at=started_at,
+            trial_registry_path=trial_path,
+            qualification_registry_path=qualification_path,
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = tuple(executor.map(lambda _item: publish(), range(2)))
+
+    assert results[0] == results[1]
+    state = QualificationRegistry(qualification_path).read()
+    assert [event["event_id"] for event in state["events"]] == [f"historical-plan:{plan.plan_id}"]
+
+
+def test_cross_registry_plan_transaction_blocks_concurrent_family_mutation(tmp_path) -> None:
+    started_at = datetime(2026, 8, 15, 3, tzinfo=UTC)
+    registrations = (
+        OutcomeFreeTrialRegistration("SPY:locked-family", "a" * 64, "candidate"),
+        OutcomeFreeTrialRegistration("SPY:locked-family", "b" * 64, "baseline"),
+    )
+    candidate_id = formal_trial_id("SPY:locked-family", "a" * 64)
+    baseline_id = formal_trial_id("SPY:locked-family", "b" * 64)
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2024-01-01", "2031-12-31"))
+    plan = build_historical_qualification_plan(
+        experiment_family="SPY:locked-family",
+        definition_fingerprint="a" * 64,
+        sessions=sessions,
+        evaluation_years=(2027, 2028, 2029, 2030, 2031),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id=baseline_id,
+        random_seed=7,
+        random_samples=10,
+        bootstrap_repetitions=10,
+        bootstrap_block_sessions=5,
+        created_at=started_at,
+        forward_selection_epoch=ForwardSelectionEpoch(
+            started_at=started_at,
+            selected_trial_id=candidate_id,
+            included_trial_ids=tuple(sorted((candidate_id, baseline_id))),
+            prior_selection_history_incomplete=False,
+        ),
+    )
+    trial_path = tmp_path / "trials.json"
+    qualification_path = tmp_path / "qualification.json"
+    callback_entered = threading.Event()
+    release_callback = threading.Event()
+    mutation_finished = threading.Event()
+
+    def hold_plan_commit() -> None:
+        callback_entered.set()
+        assert release_callback.wait(timeout=5)
+
+    def publish() -> tuple[str, ...]:
+        return publish_qualification_plan_transaction(
+            plan=plan,
+            registrations=registrations,
+            registered_at=started_at,
+            trial_registry_path=trial_path,
+            qualification_registry_path=qualification_path,
+            after_trial_commit=hold_plan_commit,
+        )
+
+    def register_later_family_member() -> str:
+        trial_id = ExperimentTrialRegistry(trial_path).register_trial(
+            "SPY:locked-family",
+            "c" * 64,
+            experiment_name="later-member",
+            registered_at=started_at.replace(second=1),
+        )
+        mutation_finished.set()
+        return trial_id
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        plan_future = executor.submit(publish)
+        assert callback_entered.wait(timeout=5)
+        mutation_future = executor.submit(register_later_family_member)
+        assert not mutation_finished.wait(timeout=0.1)
+        release_callback.set()
+        assert plan_future.result(timeout=5) == tuple(sorted((candidate_id, baseline_id)))
+        extra_id = mutation_future.result(timeout=5)
+
+    assert QualificationRegistry(qualification_path).historical_plan(plan.plan_id) == plan
+    assert extra_id not in plan.forward_selection_epoch.included_trial_ids
+
+
+def test_public_study_registration_retry_recovers_exact_pending_operation(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    study = tmp_path / "workflows" / "example--v001" / "work" / "studies" / "x--s001"
+    study.mkdir(parents=True)
+    relative_study = study.relative_to(tmp_path).as_posix()
+    trial_path = tmp_path / "trials.json"
+    qualification_path = tmp_path / "qualification.json"
+    started_at = datetime(2026, 8, 15, 3, tzinfo=UTC)
+    candidate_id = formal_trial_id("SPY:retry", "a" * 64)
+    baseline_id = formal_trial_id("SPY:retry", "b" * 64)
+    identity = StudyQualificationIdentity(
+        study_path=relative_study,
+        preregistration_sha256="1" * 64,
+        plan_sha256="2" * 64,
+        candidate_freeze_sha256="3" * 64,
+        qualification_spec_sha256="4" * 64,
+        workflow_release_sha256="5" * 64,
+    )
+    spec = _StudySpecStub(study_identity=identity)
+    sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2024-01-01", "2031-12-31"))
+    compile_calls = 0
+
+    monkeypatch.setattr(
+        "trading.core.study_qualification.load_frozen_study_qualification_spec",
+        lambda _study: spec,
+    )
+    monkeypatch.setattr(
+        "trading.core.study_qualification._verify_frozen_definitions",
+        lambda _spec, **_kwargs: None,
+    )
+
+    def fail_first_compile(approved_spec, **_kwargs):
+        nonlocal compile_calls
+        compile_calls += 1
+        approved_identity = approved_spec.study_identity
+        plan = build_historical_qualification_plan(
+            experiment_family="SPY:retry",
+            definition_fingerprint="a" * 64,
+            sessions=sessions,
+            evaluation_years=(2027, 2028, 2029, 2030, 2031),
+            maximum_holding_sessions=1,
+            execution_lag_sessions=1,
+            dependency_sessions=2,
+            embargo_sessions=1,
+            stress_drawdown_limit="0.20",
+            family_baseline_trial_id=baseline_id,
+            random_seed=7,
+            random_samples=10,
+            bootstrap_repetitions=10,
+            bootstrap_block_sessions=5,
+            created_at=started_at,
+            forward_selection_epoch=ForwardSelectionEpoch(
+                started_at=started_at,
+                selected_trial_id=candidate_id,
+                included_trial_ids=tuple(sorted((candidate_id, baseline_id))),
+                prior_selection_history_incomplete=False,
+            ),
+            study_identity=approved_identity,
+        )
+        publish_qualification_plan_transaction(
+            plan=plan,
+            registrations=(
+                OutcomeFreeTrialRegistration("SPY:retry", "a" * 64, "candidate"),
+                OutcomeFreeTrialRegistration("SPY:retry", "b" * 64, "baseline"),
+            ),
+            registered_at=started_at,
+            trial_registry_path=trial_path,
+            qualification_registry_path=qualification_path,
+            after_trial_commit=lambda: (_ for _ in ()).throw(RuntimeError("injected")),
+        )
+
+    monkeypatch.setattr(
+        "trading.core.study_qualification._compile_spec",
+        fail_first_compile,
+    )
+    clock_calls = iter((started_at, started_at.replace(minute=5)))
+    kwargs = {
+        "study_path": study,
+        "qualification_registry_path": qualification_path,
+        "trial_registry_path": trial_path,
+        "dry_run": False,
+        "approved_by": "reviewer@example.com",
+        "contamination_declaration": "Historical access cannot be excluded.",
+        "now": lambda: next(clock_calls),
+    }
+
+    with pytest.raises(RuntimeError, match="injected"):
+        compile_study_qualification_plan(**kwargs)
+
+    recovered = compile_study_qualification_plan(**kwargs)
+
+    assert compile_calls == 1
+    assert recovered.study_identity is not None
+    assert recovered.study_identity.operation_approved_by == "reviewer@example.com"
+    assert recovered.study_identity.operation_approved_at == started_at
+    assert recovered.study_identity.contamination_declaration == (
+        "Historical access cannot be excluded."
+    )
+    assert recovered.study_identity.trial_registry_path == str(trial_path.resolve())
+    assert recovered.study_identity.qualification_registry_path == str(qualification_path.resolve())
+    assert QualificationRegistry(qualification_path).historical_plan(recovered.plan_id) == recovered
+
+    with pytest.raises(ValueError, match="different operation"):
+        compile_study_qualification_plan(**{**kwargs, "approved_by": "other@example.com"})
+    with pytest.raises(ValueError, match="different operation"):
+        compile_study_qualification_plan(
+            **{**kwargs, "contamination_declaration": "Different declaration."}
+        )
+    with pytest.raises(ValueError, match="different operation"):
+        compile_study_qualification_plan(
+            **{**kwargs, "trial_registry_path": tmp_path / "other-trials.json"}
+        )
+
+
+def test_public_study_registration_reloads_freeze_after_serialization_lock(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    study = tmp_path / "workflows" / "example--v001" / "work" / "studies" / "x--s001"
+    study.mkdir(parents=True)
+    identity = StudyQualificationIdentity(
+        study_path=study.relative_to(tmp_path).as_posix(),
+        preregistration_sha256="1" * 64,
+        plan_sha256="2" * 64,
+        candidate_freeze_sha256="3" * 64,
+        qualification_spec_sha256="4" * 64,
+        workflow_release_sha256="5" * 64,
+    )
+    spec = _StudySpecStub(study_identity=identity)
+    loads = 0
+
+    def load_after_interleaving(_study):
+        nonlocal loads
+        loads += 1
+        if loads == 1:
+            return spec
+        raise ValueError("candidate freeze disappeared while waiting")
+
+    monkeypatch.setattr(
+        "trading.core.study_qualification.load_frozen_study_qualification_spec",
+        load_after_interleaving,
+    )
+    monkeypatch.setattr(
+        "trading.core.study_qualification._verify_frozen_definitions",
+        lambda _spec, **_kwargs: None,
+    )
+
+    with pytest.raises(ValueError, match="candidate freeze disappeared"):
+        compile_study_qualification_plan(
+            study_path=study,
+            qualification_registry_path=tmp_path / "qualification.json",
+            trial_registry_path=tmp_path / "trials.json",
+            dry_run=False,
+            approved_by="reviewer@example.com",
+            contamination_declaration="Historical access cannot be excluded.",
+        )
+
+    assert loads == 2
+
+
 def test_register_plan_resolves_workflow_native_identity_without_legacy_registry(
     tmp_path,
     monkeypatch,
@@ -281,6 +643,114 @@ def test_register_plan_resolves_workflow_native_identity_without_legacy_registry
     assert plan.forward_selection_epoch.selected_trial_id == selected_id
     assert plan.evidence_audit is not None
     assert plan.evidence_audit.classification == "verified-clean"
+
+
+def test_complete_family_dry_run_then_atomic_clean_calendar_registration(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    started_at = datetime(2026, 8, 15, 2, tzinfo=UTC)
+    trial_path = tmp_path / "trial-registry.json"
+    qualification_path = tmp_path / "qualification-registry.json"
+    identities = tuple(f"spy-forward/trial-{letter}" for letter in "abcdef")
+    fingerprints = {
+        identity: letter * 64 for identity, letter in zip(identities, "abcdef", strict=True)
+    }
+    source_paths = {}
+    for identity in identities:
+        path = tmp_path / "definitions" / identity.replace("/", "--") / "definition.py"
+        path.parent.mkdir(parents=True)
+        path.write_text(f"# {identity}\n", encoding="utf-8")
+        source_paths[identity] = path
+    registry = ExperimentTrialRegistry(trial_path)
+    selected_id = registry.register_trial(
+        "SPY:forward-program",
+        fingerprints[identities[0]],
+        experiment_name=identities[0],
+        registered_at=datetime(2026, 8, 13, 8, tzinfo=UTC),
+    )
+    baseline_id = registry.register_trial(
+        "SPY:forward-program",
+        fingerprints[identities[1]],
+        experiment_name=identities[1],
+        registered_at=datetime(2026, 8, 13, 9, tzinfo=UTC),
+    )
+    registry.seed_legacy(["unknown-old-trial"], seeded_at=datetime(2026, 8, 13, 10, tzinfo=UTC))
+
+    definition_registry = type(
+        "DefinitionRegistry",
+        (),
+        {
+            "load": lambda _self, identity: _WorkflowStrategy(fingerprints[identity]),
+            "resolve": lambda _self, identity: source_paths[identity],
+        },
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+        definition_registry,
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.resolve_workflow_policy_set",
+        lambda _path: "policy-set",
+    )
+
+    kwargs = {
+        "research_identity": identities[0],
+        "workflow_path": tmp_path / "released-workflow",
+        "family_baseline_trial_id": baseline_id,
+        "evaluation_years": (2027, 2028, 2029, 2030, 2031),
+        "development_years": tuple(range(2015, 2026)),
+        "warmup_start": date(2014, 1, 1),
+        "warmup_end": date(2014, 12, 31),
+        "quarantine_years": (2026,),
+        "maximum_holding_sessions": 1,
+        "execution_lag_sessions": 1,
+        "dependency_sessions": 2,
+        "embargo_sessions": 1,
+        "stress_drawdown_limit": "0.20",
+        "random_seed": 17,
+        "random_samples": 10,
+        "bootstrap_repetitions": 20,
+        "bootstrap_block_sessions": 5,
+        "qualification_registry_path": qualification_path,
+        "trial_registry_path": trial_path,
+        "now": lambda: started_at,
+        "evidence_classification": "verified-clean",
+        "evidence_justification": "Append-only audit reserves the future folds.",
+        "trial_history_complete": True,
+        "family_research_identities": identities,
+        "family_source_sha256": {
+            identity: hashlib.sha256(source_paths[identity].read_bytes()).hexdigest()
+            for identity in identities
+        },
+        "maximum_family_trials": 6,
+        "study_identity": StudyQualificationIdentity(
+            study_path="workflows/example--v004/work/studies/example--s001",
+            preregistration_sha256="1" * 64,
+            plan_sha256="2" * 64,
+            candidate_freeze_sha256="3" * 64,
+            qualification_spec_sha256=None,
+            workflow_release_sha256="4" * 64,
+        ),
+    }
+
+    preview = register_forward_qualification_plan(**kwargs, dry_run=True)
+
+    assert len(registry.read()["trials"]) == 3  # two formal identities plus one legacy disclosure
+    assert not qualification_path.exists()
+    assert preview.forward_selection_epoch is not None
+    assert len(preview.forward_selection_epoch.included_trial_ids) == 6
+    assert preview.forward_selection_epoch.prior_selection_history_incomplete is True
+
+    plan = register_forward_qualification_plan(**kwargs)
+
+    formal_trials = [item for item in registry.read()["trials"] if item["legacy"] is False]
+    assert len(formal_trials) == 6
+    assert all(item["observations"] == [] for item in formal_trials[2:])
+    assert {item["first_registered_at"] for item in formal_trials[2:]} == {"2026-08-15T02:00:00Z"}
+    assert plan.forward_selection_epoch is not None
+    assert plan.forward_selection_epoch.selected_trial_id == selected_id
+    assert QualificationRegistry(qualification_path).historical_plan(plan.plan_id) == plan
 
 
 def test_register_retrospective_plan_uses_explicit_role_calendar(tmp_path, monkeypatch) -> None:
@@ -451,6 +921,67 @@ def test_retrospective_registration_requires_released_contract_capability(tmp_pa
         encoding="utf-8",
     )
     _require_retrospective_workflow(workflow_path)
+
+
+def test_structured_evidence_contract_rejects_online_observation() -> None:
+    state = {
+        "trials": [
+            {
+                "trial_id": "trial-1",
+                "observations": [
+                    {
+                        "event": "observation",
+                        "snapshot_id": "snapshot-1",
+                        "run_mode": "online",
+                        "outcome_status": "succeeded",
+                        "validity_status": "valid",
+                        "observed_at": "2026-01-02T00:00:00.000000Z",
+                    }
+                ],
+            }
+        ]
+    }
+    with pytest.raises(ValueError, match="no valid formal observation"):
+        _verify_formal_snapshot_observation(
+            state,
+            trial_id="trial-1",
+            snapshot_id="snapshot-1",
+            minimum_observation_date=date(2026, 1, 1),
+            allowed_run_modes=frozenset({"offline"}),
+        )
+
+    state["trials"][0]["observations"][0]["run_mode"] = "offline"
+    _verify_formal_snapshot_observation(
+        state,
+        trial_id="trial-1",
+        snapshot_id="snapshot-1",
+        minimum_observation_date=date(2026, 1, 1),
+        allowed_run_modes=frozenset({"offline"}),
+    )
+
+
+def test_structured_evidence_contract_requires_exact_snapshot_cutoff() -> None:
+    evaluation_end = date(2026, 12, 31)
+    _verify_snapshot_cutoff(
+        data_cutoff=evaluation_end,
+        evaluation_end=evaluation_end,
+        experiment_name="candidate",
+        exact=True,
+    )
+    with pytest.raises(ValueError, match="cutoff differs"):
+        _verify_snapshot_cutoff(
+            data_cutoff=date(2027, 1, 4),
+            evaluation_end=evaluation_end,
+            experiment_name="candidate",
+            exact=True,
+        )
+
+    _verify_snapshot_cutoff(
+        data_cutoff=date(2027, 1, 4),
+        evaluation_end=evaluation_end,
+        experiment_name="legacy-candidate",
+        exact=False,
+    )
 
 
 @pytest.mark.parametrize("retrospective", [False, True])

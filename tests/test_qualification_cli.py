@@ -281,6 +281,135 @@ def test_retrospective_plan_cli_routes_explicit_role_calendar(
     assert "retrospective-plan-explicit-calendar" in capsys.readouterr().out
 
 
+def test_qualification_cli_rejects_caller_supplied_complete_family() -> None:
+    with pytest.raises(SystemExit, match="register-study"):
+        main(
+            [
+                "qualification",
+                "plan",
+                "register",
+                "--research",
+                "fxi/candidate",
+                "--workflow",
+                "workflows/example--v004",
+                "--family-research",
+                "fxi/candidate",
+                "--family-research",
+                "fxi/baseline",
+                "--family-source-sha",
+                f"fxi/candidate={'a' * 64}",
+                "--family-source-sha",
+                f"fxi/baseline={'b' * 64}",
+                "--family-trial-budget",
+                "2",
+                "--dry-run",
+                "--family-baseline-trial-id",
+                "baseline-trial",
+                "--evaluation-years",
+                "2027",
+                "2028",
+                "2029",
+                "2030",
+                "2031",
+                "--maximum-holding-sessions",
+                "1",
+                "--execution-lag-sessions",
+                "1",
+                "--dependency-sessions",
+                "2",
+                "--embargo-sessions",
+                "1",
+                "--random-seed",
+                "17",
+            ]
+        )
+
+
+def test_qualification_cli_rejects_generic_registration_for_structured_workflow(
+    tmp_path,
+) -> None:
+    workflow = tmp_path / "workflows" / "example--v008"
+    workflow.mkdir(parents=True)
+    (workflow / "RELEASE.json").write_text(
+        json.dumps({"capabilities": ["study-time-retrospective-v1"]}) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SystemExit, match="register-study"):
+        main(
+            [
+                "qualification",
+                "plan",
+                "register",
+                "--research",
+                "fxi/candidate",
+                "--workflow",
+                str(workflow),
+                "--family-baseline-trial-id",
+                "baseline-trial",
+                "--evaluation-years",
+                "2027",
+                "2028",
+                "2029",
+                "2030",
+                "2031",
+                "--maximum-holding-sessions",
+                "1",
+                "--execution-lag-sessions",
+                "1",
+                "--dependency-sessions",
+                "2",
+                "--embargo-sessions",
+                "1",
+                "--random-seed",
+                "17",
+            ]
+        )
+
+
+def test_qualification_cli_routes_only_exact_study_inputs(capsys, monkeypatch) -> None:
+    captured = {}
+    boundary = SimpleNamespace(included_trial_ids=("one", "two"))
+    plan = SimpleNamespace(
+        plan_id="historical-plan-study",
+        study_identity=SimpleNamespace(study_path="workflows/example--v001/work/studies/x--s001"),
+        experiment_family="FXI:family",
+        evidence_role="historical",
+        forward_selection_epoch=boundary,
+        retrospective_selection_checkpoint=None,
+    )
+
+    def compile_plan(**kwargs):
+        captured.update(kwargs)
+        return plan
+
+    monkeypatch.setattr("trading.cli.compile_study_qualification_plan", compile_plan)
+    main(
+        [
+            "qualification",
+            "plan",
+            "register-study",
+            "--study",
+            "workflows/example--v001/work/studies/x--s001",
+            "--path",
+            "qualification.json",
+            "--trial-registry-path",
+            "trials.json",
+            "--dry-run",
+        ]
+    )
+
+    assert captured == {
+        "study_path": Path("workflows/example--v001/work/studies/x--s001"),
+        "qualification_registry_path": Path("qualification.json"),
+        "trial_registry_path": Path("trials.json"),
+        "dry_run": True,
+        "approved_by": None,
+        "contamination_declaration": None,
+    }
+    assert "study qualification plan compiled (dry-run)" in capsys.readouterr().out
+
+
 def test_qualification_screen_run_routes_exact_trial_manifests(
     tmp_path,
     capsys,

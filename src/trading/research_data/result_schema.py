@@ -525,6 +525,7 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             raw_development_sessions = role_calendar.get("development_sessions")
             raw_warmup_sessions = role_calendar.get("warmup_sessions")
             raw_role_evaluation_sessions = role_calendar.get("evaluation_sessions")
+            raw_quarantined_sessions = role_calendar.get("quarantined_sessions", [])
             if not all(
                 isinstance(items, list) and items
                 for items in (
@@ -534,6 +535,8 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
                 )
             ):
                 return "qualification role calendar is incomplete"
+            if not isinstance(raw_quarantined_sessions, list):
+                return "qualification role calendar is incomplete"
             try:
                 role_development = tuple(
                     date.fromisoformat(str(item)) for item in raw_development_sessions
@@ -542,16 +545,23 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
                 role_evaluation = tuple(
                     date.fromisoformat(str(item)) for item in raw_role_evaluation_sessions
                 )
+                role_quarantined = tuple(
+                    date.fromisoformat(str(item)) for item in raw_quarantined_sessions
+                )
             except ValueError:
                 return "qualification role calendar sessions are invalid"
             if (
                 role_development != tuple(sorted(set(role_development)))
                 or role_warmup != tuple(sorted(set(role_warmup)))
                 or role_evaluation != parsed_evaluation_sessions
+                or role_quarantined != tuple(sorted(set(role_quarantined)))
                 or sorted({session.year for session in role_development}) != development_years
                 or set(role_development) & set(role_warmup)
                 or set(role_development) & set(role_evaluation)
                 or set(role_warmup) & set(role_evaluation)
+                or set(role_quarantined) & set(role_development)
+                or set(role_quarantined) & set(role_warmup)
+                or set(role_quarantined) & set(role_evaluation)
                 or role_warmup[-1] >= role_evaluation[0]
                 or len(role_warmup) < dependency_sessions
                 or role_development[-1] >= created_at.date()
@@ -592,10 +602,12 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         except (AttributeError, ValueError):
             return "historical qualification fold dates are invalid"
         evidence_role = plan.get("evidence_role", "historical")
-        if evidence_role not in {"historical", "retrospective-confirmatory"}:
+        retrospective_roles = {
+            "retrospective-confirmatory",
+            "study-time-retrospective",
+        }
+        if evidence_role not in {"historical", *retrospective_roles}:
             return "qualification plan evidence role is invalid"
-        if role_calendar is not None and evidence_role != "retrospective-confirmatory":
-            return "explicit role calendar is only valid for retrospective qualification"
         evidence_audit = plan.get("evidence_audit")
         if evidence_audit is not None:
             if not isinstance(evidence_audit, Mapping) or not {
@@ -618,7 +630,7 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
                 or type(evidence_audit.get("trial_history_complete")) is not bool
             ):
                 return "clean-evidence audit is inconsistent"
-        if evidence_role == "retrospective-confirmatory" and evidence_audit is None:
+        if evidence_role in retrospective_roles and evidence_audit is None:
             return "retrospective qualification requires a clean-evidence audit"
         if (
             evidence_role == "historical"
@@ -629,10 +641,32 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             )
         ):
             return "Historical Evaluation requires verified-clean complete provenance"
+        if (
+            evidence_role == "study-time-retrospective"
+            and isinstance(evidence_audit, Mapping)
+            and evidence_audit.get("classification") == "verified-clean"
+        ):
+            return "study-time retrospective evaluation cannot claim verified-clean provenance"
         if evidence_role == "historical" and created_at.date() >= first_outcome:
             return "historical qualification plan was not frozen before outcomes"
-        if evidence_role == "retrospective-confirmatory" and created_at.date() <= last_outcome:
+        if evidence_role in retrospective_roles and created_at.date() <= last_outcome:
             return "retrospective qualification folds were not complete at plan freeze"
+        if (
+            evidence_role == "study-time-retrospective"
+            and role_calendar is not None
+            and role_development[-1] >= role_evaluation[0]
+        ):
+            return "study-time retrospective Development must precede evaluation"
+        if (
+            evidence_role == "historical"
+            and role_calendar is not None
+            and role_quarantined
+            and (
+                role_development[-1] >= role_quarantined[0]
+                or role_quarantined[-1] >= role_evaluation[0]
+            )
+        ):
+            return "clean Historical quarantine chronology is invalid"
         forward_epoch = plan.get("forward_selection_epoch")
         if forward_epoch is not None:
             if not isinstance(forward_epoch, Mapping) or not {
@@ -693,9 +727,9 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
                 return "retrospective selection checkpoint is inconsistent"
         if forward_epoch is not None and retrospective_checkpoint is not None:
             return "qualification plan contains conflicting selection boundaries"
-        if evidence_role == "retrospective-confirmatory" and retrospective_checkpoint is None:
+        if evidence_role in retrospective_roles and retrospective_checkpoint is None:
             return "retrospective qualification requires a frozen trial universe"
-        if evidence_role == "retrospective-confirmatory" and forward_epoch is not None:
+        if evidence_role in retrospective_roles and forward_epoch is not None:
             return "retrospective qualification cannot claim a Forward Selection Epoch"
         if evidence_role == "historical" and retrospective_checkpoint is not None:
             return "Historical Evaluation cannot use a retrospective checkpoint"
@@ -727,9 +761,9 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
             return "historical screen pass state conflicts with its gates"
         expected_disposition = (
             "retrospectively-supported"
-            if evidence_role == "retrospective-confirmatory" and gates_passed
+            if evidence_role in retrospective_roles and gates_passed
             else "retrospective-screen-failed"
-            if evidence_role == "retrospective-confirmatory"
+            if evidence_role in retrospective_roles
             else "shadow-eligible"
             if gates_passed
             else "historical-screen-failed"

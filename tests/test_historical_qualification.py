@@ -221,6 +221,105 @@ def test_retrospective_plan_accepts_completed_unknown_provenance_without_promoti
     assert _qualification_disposition(plan.evidence_role, False) == "retrospective-screen-failed"
 
 
+def test_explicit_clean_calendar_preserves_development_quarantine_and_future_evaluation() -> None:
+    frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
+    evaluation = tuple(timestamp.date() for timestamp in pd.bdate_range("2027-01-01", "2031-12-31"))
+    development = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2015-01-01", "2025-12-31")
+    )
+    warmup = tuple(timestamp.date() for timestamp in pd.bdate_range("2014-01-01", "2014-12-31"))
+    quarantine = tuple(timestamp.date() for timestamp in pd.bdate_range("2026-01-01", "2026-12-31"))
+
+    plan = build_historical_qualification_plan(
+        experiment_family="spy:mean-reversion",
+        definition_fingerprint="a" * 64,
+        sessions=evaluation,
+        evaluation_years=(2027, 2028, 2029, 2030, 2031),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id="trial-baseline",
+        random_seed=17,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        created_at=frozen_at,
+        forward_selection_epoch=ForwardSelectionEpoch(
+            started_at=frozen_at,
+            selected_trial_id="trial-selected",
+            included_trial_ids=("trial-baseline", "trial-selected"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="verified-clean",
+            frozen_at=frozen_at,
+            justification="Append-only evidence reserves the future folds.",
+            trial_history_complete=True,
+        ),
+        development_sessions=development,
+        warmup_sessions=warmup,
+        quarantined_sessions=quarantine,
+    )
+
+    assert plan.evidence_role == "historical"
+    assert plan.development_years == tuple(range(2015, 2026))
+    assert plan.role_calendar is not None
+    assert plan.role_calendar.quarantined_sessions == quarantine
+    assert not (
+        set(plan.role_calendar.quarantined_sessions) & set(plan.role_calendar.evaluation_sessions)
+    )
+
+
+def test_study_time_retrospective_uses_development_before_completed_evaluation() -> None:
+    frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
+    evaluation = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2022-12-31"))
+    development = tuple(
+        timestamp.date() for timestamp in pd.bdate_range("2015-01-01", "2017-12-31")
+    )
+    checkpoint = RetrospectiveSelectionCheckpoint(
+        frozen_at=frozen_at,
+        selected_trial_id="trial-selected",
+        included_trial_ids=("trial-baseline", "trial-selected"),
+        prior_selection_history_incomplete=True,
+    )
+    audit = EvaluationEvidenceAudit(
+        classification="provenance-unknown",
+        frozen_at=frozen_at,
+        justification="The completed holdout has no qualifying clean provenance.",
+        trial_history_complete=False,
+    )
+
+    plan = build_historical_qualification_plan(
+        experiment_family="spy:mean-reversion",
+        definition_fingerprint="a" * 64,
+        sessions=evaluation,
+        evaluation_years=(2018, 2019, 2020, 2021, 2022),
+        maximum_holding_sessions=1,
+        execution_lag_sessions=1,
+        dependency_sessions=2,
+        embargo_sessions=1,
+        stress_drawdown_limit="0.20",
+        family_baseline_trial_id="trial-baseline",
+        random_seed=17,
+        random_samples=10,
+        bootstrap_repetitions=20,
+        bootstrap_block_sessions=5,
+        created_at=frozen_at,
+        evidence_role="study-time-retrospective",
+        retrospective_selection_checkpoint=checkpoint,
+        evidence_audit=audit,
+        development_sessions=development,
+        warmup_sessions=tuple(
+            timestamp.date() for timestamp in pd.bdate_range("2014-01-01", "2014-12-31")
+        ),
+    )
+
+    assert plan.evidence_role == "study-time-retrospective"
+    assert _qualification_disposition(plan.evidence_role, True) == "retrospectively-supported"
+
+
 def test_retrospective_plan_requires_exactly_one_retrospective_boundary() -> None:
     sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
     frozen_at = datetime(2026, 8, 13, 7, tzinfo=UTC)
@@ -350,7 +449,7 @@ def test_explicit_role_calendar_rejects_overlapping_or_non_retrospective_roles()
         "development_sessions": development_sessions,
     }
 
-    with pytest.raises(ValueError, match="only valid for retrospective"):
+    with pytest.raises(ValueError, match="warmup inventory"):
         build_historical_qualification_plan(
             **kwargs,
             warmup_sessions=(date(2009, 1, 2),),

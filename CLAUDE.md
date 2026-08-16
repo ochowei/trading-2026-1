@@ -108,6 +108,8 @@ uv run trading qualification status
 
 # 註冊 forward-only qualification plan；created_at 固定取當下 UTC，不接受回填
 uv run trading qualification plan register --help
+# Capability-scoped workflow study 一律由 exact frozen study 編譯；dry-run 不寫 registry
+uv run trading qualification plan register-study --study <study-path> --dry-run
 
 # 最後一個 frozen fold 完成後，以每個 family trial 的 exact manifest 重算 screen
 uv run trading qualification screen run --help
@@ -156,11 +158,17 @@ uv run trading workflow release <version-path> --approved-by <human-id>
 
 # 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC
 uv run trading workflow study init <version-path> --slug <study-slug> \
-  --title <title> --created-by <identity>
+  --title <title> --created-by <identity> \
+  --route <clean-historical|retrospective-confirmatory|study-time-retrospective>
 uv run trading workflow study preregister <study-path> --approved-by <human-id>
 
-# 依 frozen plan 推進 study；pause/cancel 必須附 reason
-uv run trading workflow study transition <study-path> --to running --by <identity>
+# 依 frozen plan 推進 study；首次 Development 另需 human stage approval；pause/cancel 必須附 reason
+uv run trading workflow study transition <study-path> --to running --by <identity> \
+  --approved-by <human-id>
+# Development selection JSON contains only selected_candidate, family_baseline, and complete_family;
+# guarded writer adds current-time approval and exact frozen study identities add-only.
+uv run trading workflow study freeze-candidate <study-path> \
+  --selection <development-selection.json> --approved-by <human-id>
 uv run trading workflow study transition <study-path> --to awaiting-review --by <identity>
 
 # 獨立 reviewer 確認後凍結 evidence、conclusion 與 outcome

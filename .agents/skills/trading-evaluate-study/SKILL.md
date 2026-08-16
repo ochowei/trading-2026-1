@@ -34,9 +34,22 @@ definitions of:
 - `insufficient-evidence`
 - `indeterminate`
 
-Use `insufficient-evidence` when required evidence is absent or unusable. Use `indeterminate` when
-valid evidence exists but the frozen rules cannot distinguish pass from fail. Do not weaken gates
-or repair the study retrospectively.
+Apply the exact pinned workflow's mapping rather than a generic preference. `insufficient-evidence`
+is available only when that workflow explicitly permits it for an open, still-accumulating
+prospective checkpoint. For a v008 `study-time-retrospective` fixed completed-data checkpoint,
+missing, conflicting, or unverifiable required evidence is `indeterminate`, not
+`insufficient-evidence`; do not gather or repair evidence retrospectively.
+
+For that v008 route the only valid terminal tuples are:
+
+- `pass` / `retrospectively-supported` / `retrospective-evaluation`;
+- `fail` / `development-selection-failed` / `development`;
+- `fail` / `retrospective-screen-failed` / `retrospective-evaluation`; or
+- `indeterminate` / no disposition / the exact stage where the decision became indeterminate.
+
+Recompute and replay the tracked terminal package through the repository validator. Do not treat a
+manifest assertion, mutable registry head, untracked file, absolute-path lookalike, or missing
+terminal identity as evidence authority.
 
 ## Confirm and record the conclusion
 
@@ -49,9 +62,14 @@ After confirmation, write only `CONCLUSION.md`, then run:
 ```bash
 uv run trading workflow study complete <study-path> \
   --outcome <pass|fail|insufficient-evidence|indeterminate> \
-  --reviewed-by <identity>
+  --reviewed-by <identity> \
+  --disposition <workflow-defined-disposition> \
+  --decision-stage <workflow-defined-stage>
 uv run trading workflow validate --all
 ```
+
+For v008 `study-time-retrospective`, omit `--disposition` only for `indeterminate`; always supply
+`--decision-stage`. Older routes that do not define these typed fields must continue to omit them.
 
 The command generates `COMPLETION.json`, freezing preregistration, evidence, conclusion, outcome,
 time, and reviewer identity. Never edit completed artifacts. New evidence requires a new study,

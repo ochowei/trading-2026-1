@@ -86,6 +86,7 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/ARCHITECTURE.md` | This canonical repository map and file-ownership guide. |
 | `docs/market-data.md` | CSV market-data provider, cache, validation, freshness, and CLI contract. |
 | `docs/reproducibility.md` | Immutable blobs, manifests, definitions, bundles, run modes, and garbage collection. |
+| `docs/reproducibility-v008.md` | Normative v008 addendum for structured routes, human authority artifacts, deterministic exact-session derivation, tracked terminal evidence, and compatibility. |
 | `docs/auxiliary-unavailable-decision-reproducibility.md` | Normative explicit-unavailable auxiliary manifest, replay, audit, and signal-suppression contract. |
 | `docs/result-validity-and-trial-history.md` | Result schemas, validity states, evaluation boundaries, and append-only trial history. |
 | `docs/canonical-sleeve-execution.md` | Canonical sleeve capital, execution-cost scenarios, metrics, and parity evidence. |
@@ -93,6 +94,10 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/historical-qualification-and-shadow.md` | Historical folds, benchmark gates, prospective Shadow evidence, and qualification lifecycle. |
 | `docs/historical-qualification-and-shadow-v005.md` | Proposed v005 clean-evidence audit, retrospective-confirmatory checkpoint, workflow-native qualification, and unchanged Shadow boundary. |
 | `docs/historical-qualification-and-shadow-v006.md` | Proposed v006 explicit retrospective role-calendar contract with backward-compatible Historical and Shadow boundaries. |
+| `docs/historical-qualification-and-shadow-v007.md` | Released v007 frozen selection-boundary contract for clean and retrospective qualification. |
+| `docs/historical-qualification-and-shadow-v008.md` | Versioned v008 exact-study readiness, explicit clean-calendar, study-time retrospective terminal-evidence, and unchanged Shadow-authority contract. |
+| `docs/research-evidence-stages-and-outcomes.md` | Stable pointer to the full plus plain-language stage/outcome companion beside v008. |
+| `docs/research-evidence-preservation.md` | Reference explanation of tracked content-addressed candidate-freeze/qualification evidence, recoverable publication, and permanent-retention implementation. |
 | `docs/result-validity-and-trial-history-v005.md` | Proposed v005 result-validity extension for retrospective evidence roles while preserving legacy event verification. |
 | `docs/controlled-followup-cutover.md` | Followup lifecycle, authorization, parity, rollback, and allocation epochs. |
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
@@ -161,8 +166,11 @@ creating parallel infrastructure.
 | `live_drift_registry.py` | Private append-only drift evidence, hash-chain replay, and storage locking. |
 | `qualification.py` | Historical screens, benchmark/selection adjustment, Shadow evidence, and gates. |
 | `qualification_workflow.py` | Workflow-native or frozen-legacy qualification identity resolution, clean/retrospective plan registration, and deterministic screen orchestration. |
+| `qualification_transaction.py` | Durable journal, idempotent recovery, shared journal identity, and serialized publication for one complete-family trial registration plus its exact qualification plan. |
+| `study_qualification.py` | Exact-study qualification compiler, structured preregistration spec, release-capability enforcement, and backward-compatible v004/S004 adapter. |
+| `study_terminal_evidence.py` | Terminal study-time evidence linkage across frozen study artifacts, typed canonical qualification plan/screen replay, current-head Development absence proofs, and independently supported required-challenge observations. |
 | `workflow_authoring.py` | Versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
-| `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion. |
+| `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion, including serialization of Development terminal failure against qualification registration. |
 | `policy_authoring.py` | Versioned policy registry validation, synchronization, conformance execution, immutable releases, and lifecycle evidence. |
 | `legacy_experiments.py` | Closed-inventory scan and monotonic-removal guard for legacy experiment identities. |
 | `__init__.py` | Package marker; shared APIs are normally imported from their defining modules. |
@@ -192,6 +200,7 @@ Immutable reproducibility evidence and formal run coordination.
 | File | Purpose |
 |---|---|
 | `artifacts.py` | Shared immutable publication, checksums, and semantic verification. |
+| `evidence.py` | Add-only publication and digest resolution for tracked candidate-freeze evidence and replayable source-identified qualification registry/checkpoint snapshots. |
 | `models.py` | Typed blob, manifest, definition, run, and garbage-collection values. |
 | `manifest_codec.py` | Strict canonical manifest encoding and snapshot identity. |
 | `store.py` | Snapshot publication, verification, portable bundles, references, and garbage collection. |
@@ -201,7 +210,7 @@ Immutable reproducibility evidence and formal run coordination.
 | `migration.py` | Immutable parity-linked migration-result publication. |
 | `parity.py` | Fixed-snapshot parity evidence and immutable parity artifacts. |
 | `trial_registry.py` | Append-only experiment trial identities, observations, and tombstones. |
-| `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence. |
+| `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence, including canonical single plan/screen identities and empty-registry initialization for authoritative absence proofs. |
 | `__init__.py` | Curated public research-data API exports. |
 
 ### `src/trading/policies/`
@@ -222,7 +231,7 @@ experiment tree.
 | Pattern | Purpose |
 |---|---|
 | `registry.py` | Resolves and explicitly loads lowercase `<family>/<trial>` source identities without importing legacy experiments. |
-| `execution.py` | Verifies one released workflow and resolves its four exact policy pins into the composite policy set required for definition capture and formal execution. |
+| `execution.py` | Verifies one released workflow and resolves its four exact policy pins into the composite policy set required for definition capture and formal execution; also provides release-local policy resolution for nested study validation without recursively re-entering study validation. |
 | `daily_bar.py` | Reusable primary-only daily-bar definition seam for declarative workflow-native trials, producing gross candidate trades for canonical sleeve evaluation. |
 | `monthly_calendar.py` | Reusable primary-only monthly-calendar definition seam with frozen XNYS entry-session and fixed-holding semantics for workflow-native trials. |
 | `rate_volatility_pullback.py` | Reusable primary-plus-backward-as-of-auxiliary pullback definition seam with fixed next-open execution and MOVE-direction gating. |
@@ -284,6 +293,9 @@ trading data must never be placed in `tests/` or committed anywhere.
 | `results/<experiment_name>/<snapshot_id>.snapshot.json` | Retained immutable snapshot manifest used for reproducible formal execution. |
 | `results/<experiment_name>/<timestamp>.json` | Historical run output; most such files are ignored unless explicitly retained by repository policy. |
 | `results/<research-family>--<stage>-gate/<study-id>.json` | Tracked workflow-study stage-gate calculation that binds frozen rules to exact formal observation identities and checksums. |
+| `results/research-evidence/<sha256>.md` | Permanently retained, tracked, content-addressed pre-freeze research evidence referenced by immutable candidate-freeze records. |
+| `results/qualification-evidence/<sha256>.json` | Permanently retained, tracked, self-contained source-identified qualification registry/checkpoint snapshot replayed through the authoritative hash-chain reader for terminal study decisions and Development absence proofs. |
+| `results/study-evidence/**` | Permanently retained, tracked Development gates, typed challenge manifests, and distinct challenge evidence artifacts used by terminal study-time review. |
 | `results/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
 
 Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data
@@ -298,7 +310,8 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/README.md` | Version lifecycle authority and generated registry index. |
 | `workflows/<slug>--vNNN/README.md` | Version metadata, state, checksums, release evidence, and generated study/change indexes. |
 | `workflows/<slug>--vNNN/WORKFLOW.md` | Self-contained workflow contract pinned by studies. |
-| `workflows/<slug>--vNNN/work/studies/<study>/` | Preregistered plan, metadata, evidence, conclusion, and outcome for a workflow study when present. |
+| `workflows/<slug>--vNNN/STAGES_AND_OUTCOMES.md` | Optional version companion containing full and plain-language stage/outcome guidance; when declared `reference` plus `pinned: true`, release evidence fixes its exact bytes while `WORKFLOW.md` remains the sole behavioral authority. |
+| `workflows/<slug>--vNNN/work/studies/<study>/` | Route/spec, preregistered plan, add-only Development authorization, candidate freeze, metadata, evidence, conclusion, and outcome for a workflow study when present. |
 | `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or

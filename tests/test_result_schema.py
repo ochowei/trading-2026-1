@@ -429,6 +429,29 @@ def test_registered_shadow_without_a_checkpoint_remains_valid_non_live_evidence(
     )
     assert explicit_validity.status is ResultValidityStatus.VALID
 
+    study_time = json.loads(json.dumps(explicit_calendar))
+    study_time_plan = study_time["development_summary"]["historical_plan"]
+    study_time_plan["evidence_role"] = "study-time-retrospective"
+    study_time_validity = classify_result(
+        study_time,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert study_time_validity.status is ResultValidityStatus.VALID
+
+    falsely_clean_study_time = json.loads(json.dumps(study_time))
+    falsely_clean_study_time["development_summary"]["historical_plan"]["evidence_audit"][
+        "classification"
+    ] = "verified-clean"
+    falsely_clean_validity = classify_result(
+        falsely_clean_study_time,
+        store=store,
+        current_definition_fingerprint=payload["definition_fingerprint"],
+        now=datetime(2026, 8, 5, 12, tzinfo=UTC),
+    )
+    assert falsely_clean_validity.status is ResultValidityStatus.UNREPRODUCIBLE
+
     missing_calendar = json.loads(json.dumps(explicit_calendar))
     missing_calendar["development_summary"]["historical_plan"].pop("role_calendar")
     missing_calendar_validity = classify_result(

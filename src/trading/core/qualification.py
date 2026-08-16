@@ -8,7 +8,8 @@ import random
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, replace
 from datetime import UTC, date, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
 import pandas as pd
 
@@ -67,7 +68,12 @@ EVIDENCE_CLASSIFICATIONS = (
     "known-contaminated",
     "provenance-unknown",
 )
-EVIDENCE_ROLES = ("historical", "retrospective-confirmatory")
+EVIDENCE_ROLES = (
+    "historical",
+    "retrospective-confirmatory",
+    "study-time-retrospective",
+)
+RETROSPECTIVE_EVIDENCE_ROLES = frozenset({"retrospective-confirmatory", "study-time-retrospective"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -151,11 +157,34 @@ class EvaluationFold:
 
 @dataclass(frozen=True, slots=True)
 class QualificationRoleCalendar:
-    """Exact non-overlapping session roles for a retrospective plan."""
+    """Exact non-overlapping session roles for an explicit qualification plan."""
 
     development_sessions: tuple[date, ...]
     warmup_sessions: tuple[date, ...]
     evaluation_sessions: tuple[date, ...]
+    quarantined_sessions: tuple[date, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class StudyQualificationIdentity:
+    """Exact frozen study artifacts that authorize one qualification plan."""
+
+    study_path: str
+    preregistration_sha256: str
+    plan_sha256: str
+    candidate_freeze_sha256: str
+    qualification_spec_sha256: str | None
+    workflow_release_sha256: str
+    development_authorization_sha256: str | None = None
+    operation_approved_by: str | None = None
+    operation_approved_at: datetime | None = None
+    contamination_declaration: str | None = None
+    trial_registry_path: str | None = None
+    qualification_registry_path: str | None = None
+    trial_registry_identity: str | None = None
+    qualification_registry_identity: str | None = None
+    policy_set_identity: str | None = None
+    evidence_contract_sha256: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,6 +213,7 @@ class HistoricalQualificationPlan:
     evidence_role: str = "historical"
     evidence_audit: EvaluationEvidenceAudit | None = None
     role_calendar: QualificationRoleCalendar | None = None
+    study_identity: StudyQualificationIdentity | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -420,6 +450,8 @@ def build_historical_qualification_plan(
     evidence_audit: EvaluationEvidenceAudit | None = None,
     development_sessions: tuple[date, ...] | None = None,
     warmup_sessions: tuple[date, ...] = (),
+    quarantined_sessions: tuple[date, ...] = (),
+    study_identity: StudyQualificationIdentity | None = None,
 ) -> HistoricalQualificationPlan:
     """Freeze annual folds with explicit purge and embargo signal exclusions."""
     if not experiment_family.strip() or not definition_fingerprint.strip():
@@ -428,15 +460,15 @@ def build_historical_qualification_plan(
         raise ValueError("historical plan clock must be timezone-aware")
     if evidence_role not in EVIDENCE_ROLES:
         raise ValueError("qualification plan has an invalid evidence role")
-    if evidence_role == "retrospective-confirmatory" and evidence_audit is None:
+    if evidence_role in RETROSPECTIVE_EVIDENCE_ROLES and evidence_audit is None:
         raise ValueError("retrospective plan requires a frozen clean-evidence audit")
-    if evidence_role == "retrospective-confirmatory" and retrospective_selection_checkpoint is None:
+    if evidence_role in RETROSPECTIVE_EVIDENCE_ROLES and retrospective_selection_checkpoint is None:
         raise ValueError("retrospective plan requires a frozen trial universe")
     if forward_selection_epoch is not None and retrospective_selection_checkpoint is not None:
         raise ValueError("qualification plan cannot contain two selection boundaries")
     if evidence_role == "historical" and retrospective_selection_checkpoint is not None:
         raise ValueError("Historical Evaluation cannot use a retrospective checkpoint")
-    if evidence_role == "retrospective-confirmatory" and forward_selection_epoch is not None:
+    if evidence_role in RETROSPECTIVE_EVIDENCE_ROLES and forward_selection_epoch is not None:
         raise ValueError("retrospective qualification cannot claim a Forward Selection Epoch")
     if evidence_audit is not None:
         _validate_evidence_audit(
@@ -444,6 +476,8 @@ def build_historical_qualification_plan(
             created_at=created_at.astimezone(UTC),
             evidence_role=evidence_role,
         )
+    if study_identity is not None:
+        validate_study_qualification_identity(study_identity)
     if (
         min(
             maximum_holding_sessions,
@@ -471,9 +505,9 @@ def build_historical_qualification_plan(
     validate_cost_scenario_policies(base_cost_policy, stress_cost_policy)
     if len(years) < gate.minimum_evaluation_folds:
         raise ValueError("historical plan requires at least five annual evaluation folds")
-    explicit_role_calendar = development_sessions is not None or bool(warmup_sessions)
-    if explicit_role_calendar and evidence_role != "retrospective-confirmatory":
-        raise ValueError("explicit role calendar is only valid for retrospective qualification")
+    explicit_role_calendar = (
+        development_sessions is not None or bool(warmup_sessions) or bool(quarantined_sessions)
+    )
     if explicit_role_calendar and development_sessions is None:
         raise ValueError("explicit role calendar requires development sessions")
     ordered_development_sessions = (
@@ -482,6 +516,7 @@ def build_historical_qualification_plan(
         else tuple(item for item in ordered_sessions if item.year < years[0])
     )
     ordered_warmup_sessions = tuple(sorted(set(warmup_sessions)))
+    ordered_quarantined_sessions = tuple(sorted(set(quarantined_sessions)))
     development_years = tuple(sorted({item.year for item in ordered_development_sessions}))
     if len(development_years) < gate.minimum_development_years:
         raise ValueError("historical plan requires at least three development years")
@@ -522,22 +557,39 @@ def build_historical_qualification_plan(
         if len(ordered_warmup_sessions) < dependency_sessions:
             raise ValueError("explicit warmup inventory does not cover strategy dependencies")
         if ordered_warmup_sessions[-1] >= evaluation_sessions[0]:
-            raise ValueError("warmup-only sessions must precede retrospective evaluation")
+            raise ValueError("warmup-only sessions must precede evaluation")
         if ordered_development_sessions[-1] >= created_at.astimezone(UTC).date():
             raise ValueError("Development context must be complete before plan freeze")
         development_set = set(ordered_development_sessions)
         warmup_set = set(ordered_warmup_sessions)
         evaluation_set = set(evaluation_sessions)
+        quarantined_set = set(ordered_quarantined_sessions)
         if (
             development_set & warmup_set
             or development_set & evaluation_set
             or warmup_set & evaluation_set
+            or quarantined_set & development_set
+            or quarantined_set & warmup_set
+            or quarantined_set & evaluation_set
         ):
             raise ValueError("qualification role calendar sessions must not overlap")
+        if evidence_role == "study-time-retrospective" and (
+            ordered_development_sessions[-1] >= evaluation_sessions[0]
+        ):
+            raise ValueError("study-time retrospective Development must precede evaluation")
+        if evidence_role == "historical" and ordered_quarantined_sessions:
+            if (
+                ordered_development_sessions[-1] >= ordered_quarantined_sessions[0]
+                or ordered_quarantined_sessions[-1] >= evaluation_sessions[0]
+            ):
+                raise ValueError(
+                    "clean Historical quarantine must follow Development and precede evaluation"
+                )
         role_calendar = QualificationRoleCalendar(
             development_sessions=ordered_development_sessions,
             warmup_sessions=ordered_warmup_sessions,
             evaluation_sessions=evaluation_sessions,
+            quarantined_sessions=ordered_quarantined_sessions,
         )
     if (
         evidence_role == "historical"
@@ -545,7 +597,7 @@ def build_historical_qualification_plan(
     ):
         raise ValueError("historical plan must be frozen before evaluation outcomes begin")
     if (
-        evidence_role == "retrospective-confirmatory"
+        evidence_role in RETROSPECTIVE_EVIDENCE_ROLES
         and created_at.astimezone(UTC).date() <= folds[-1].outcome_end
     ):
         raise ValueError("retrospective plan requires completed evaluation folds")
@@ -622,7 +674,7 @@ def build_historical_qualification_plan(
         payload["evidence_role"] = evidence_role
         payload["evidence_audit"] = _evidence_audit_payload(evidence_audit)
     if role_calendar is not None:
-        payload["role_calendar"] = {
+        role_calendar_payload = {
             "development_sessions": [
                 session.isoformat() for session in role_calendar.development_sessions
             ],
@@ -631,6 +683,50 @@ def build_historical_qualification_plan(
                 session.isoformat() for session in role_calendar.evaluation_sessions
             ],
         }
+        if role_calendar.quarantined_sessions:
+            role_calendar_payload["quarantined_sessions"] = [
+                session.isoformat() for session in role_calendar.quarantined_sessions
+            ]
+        payload["role_calendar"] = role_calendar_payload
+    if study_identity is not None:
+        payload["study_identity"] = {
+            "study_path": study_identity.study_path,
+            "preregistration_sha256": study_identity.preregistration_sha256,
+            "plan_sha256": study_identity.plan_sha256,
+            "candidate_freeze_sha256": study_identity.candidate_freeze_sha256,
+            "qualification_spec_sha256": study_identity.qualification_spec_sha256,
+            "workflow_release_sha256": study_identity.workflow_release_sha256,
+        }
+        if study_identity.development_authorization_sha256 is not None:
+            payload["study_identity"]["development_authorization_sha256"] = (
+                study_identity.development_authorization_sha256
+            )
+        if study_identity.trial_registry_identity is not None:
+            payload["study_identity"]["trial_registry_identity"] = (
+                study_identity.trial_registry_identity
+            )
+            payload["study_identity"]["qualification_registry_identity"] = (
+                study_identity.qualification_registry_identity
+            )
+        if study_identity.policy_set_identity is not None:
+            payload["study_identity"]["policy_set_identity"] = study_identity.policy_set_identity
+            payload["study_identity"]["evidence_contract_sha256"] = (
+                study_identity.evidence_contract_sha256
+            )
+        if study_identity.operation_approved_by is not None:
+            payload["study_identity"]["operation_approved_by"] = (
+                study_identity.operation_approved_by
+            )
+            payload["study_identity"]["operation_approved_at"] = timestamp_text(
+                study_identity.operation_approved_at.astimezone(UTC)
+            )
+            payload["study_identity"]["contamination_declaration"] = (
+                study_identity.contamination_declaration
+            )
+            payload["study_identity"]["trial_registry_path"] = study_identity.trial_registry_path
+            payload["study_identity"]["qualification_registry_path"] = (
+                study_identity.qualification_registry_path
+            )
     plan_prefix = "historical-plan-" if evidence_role == "historical" else "retrospective-plan-"
     plan_id = plan_prefix + hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
     return HistoricalQualificationPlan(
@@ -656,7 +752,72 @@ def build_historical_qualification_plan(
         evidence_role=evidence_role,
         evidence_audit=evidence_audit,
         role_calendar=role_calendar,
+        study_identity=study_identity,
     )
+
+
+def validate_study_qualification_identity(identity: StudyQualificationIdentity) -> None:
+    """Validate exact study linkage and its optional durable human authorization."""
+    if not identity.study_path.strip():
+        raise ValueError("study qualification identity requires an exact study path")
+    digests = (
+        identity.preregistration_sha256,
+        identity.plan_sha256,
+        identity.candidate_freeze_sha256,
+        identity.workflow_release_sha256,
+    )
+    if any(
+        len(item) != 64 or any(char not in "0123456789abcdef" for char in item) for item in digests
+    ):
+        raise ValueError("study qualification identity contains an invalid SHA-256 digest")
+    spec = identity.qualification_spec_sha256
+    if spec is not None and (
+        len(spec) != 64 or any(char not in "0123456789abcdef" for char in spec)
+    ):
+        raise ValueError("study qualification spec digest is invalid")
+    development_authorization = identity.development_authorization_sha256
+    if development_authorization is not None and (
+        len(development_authorization) != 64
+        or any(char not in "0123456789abcdef" for char in development_authorization)
+    ):
+        raise ValueError("Development authorization digest is invalid")
+    approval_values = (
+        identity.operation_approved_by,
+        identity.operation_approved_at,
+        identity.contamination_declaration,
+        identity.trial_registry_path,
+        identity.qualification_registry_path,
+    )
+    if any(value is not None for value in approval_values):
+        if (
+            not str(identity.operation_approved_by or "").strip()
+            or identity.operation_approved_at is None
+            or identity.operation_approved_at.tzinfo is None
+            or not str(identity.contamination_declaration or "").strip()
+            or not str(identity.trial_registry_path or "").strip()
+            or not str(identity.qualification_registry_path or "").strip()
+        ):
+            raise ValueError("study qualification operation approval is incomplete")
+    registry_identities = (
+        identity.trial_registry_identity,
+        identity.qualification_registry_identity,
+    )
+    if any(value is not None for value in registry_identities):
+        if any(
+            not str(value or "").strip()
+            or Path(str(value)).is_absolute()
+            or ".." in Path(str(value)).parts
+            for value in registry_identities
+        ):
+            raise ValueError("study qualification registry identity is invalid")
+    runtime_identities = (identity.policy_set_identity, identity.evidence_contract_sha256)
+    if any(value is not None for value in runtime_identities) and any(
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(char not in "0123456789abcdef" for char in value)
+        for value in runtime_identities
+    ):
+        raise ValueError("study qualification runtime contract identity is invalid")
 
 
 def evaluate_historical_stability_screen(
@@ -710,10 +871,6 @@ def evaluate_historical_stability_screen(
         base_policy=base_policy,
         stress_policy=stress_policy,
     )
-    random_threshold = _percentile(
-        tuple(sample.cumulative_return for sample in random_samples),
-        0.90,
-    )
     completed_trades = sum(fold.completed_trades for fold in folds)
     traded_folds = sum(fold.traded for fold in folds)
     positive_folds = sum(fold.positive for fold in folds)
@@ -740,30 +897,76 @@ def evaluate_historical_stability_screen(
         if gross_profit
         else 0.0
     )
+    aggregate = HistoricalAggregateEvidence(
+        completed_trades=completed_trades,
+        traded_folds=traded_folds,
+        positive_traded_fold_rate=positive_rate,
+        cumulative_return=cumulative_return,
+        profit_factor="Infinity" if math.isinf(profit_factor) else str(profit_factor),
+        stress_cumulative_return=stress_cumulative_return,
+        stress_profit_factor=(
+            "Infinity" if math.isinf(stress_profit_factor) else str(stress_profit_factor)
+        ),
+        stress_max_drawdown=stress_drawdown,
+        trade_fold_concentration=trade_concentration,
+        profit_fold_concentration=profit_concentration,
+    )
+    benchmarks = HistoricalBenchmarkEvidence(
+        cash_return=0.0,
+        family_baseline_return=baseline_return,
+        random_entry_samples=random_samples,
+    )
+    gates = historical_screen_gates(plan, aggregate, benchmarks, selection_adjustment)
+    passed = all(gate.passed for gate in gates)
+    return HistoricalScreenResult(
+        plan_id=plan.plan_id,
+        folds=folds,
+        aggregate=aggregate,
+        benchmarks=benchmarks,
+        selection_adjustment=selection_adjustment,
+        gates=gates,
+        passed=passed,
+        disposition=_qualification_disposition(plan.evidence_role, passed),
+    )
+
+
+def historical_screen_gates(
+    plan: HistoricalQualificationPlan,
+    aggregate: HistoricalAggregateEvidence,
+    benchmarks: HistoricalBenchmarkEvidence,
+    selection_adjustment: SelectionAdjustmentResult,
+) -> tuple[QualificationGate, ...]:
+    """Recompute every frozen historical gate from persisted typed evidence."""
     thresholds = plan.thresholds
-    gates = (
+    profit_factor = _ratio_value(aggregate.profit_factor, "aggregate profit factor")
+    stress_profit_factor = _ratio_value(
+        aggregate.stress_profit_factor,
+        "stress profit factor",
+    )
+    random_threshold = _percentile(benchmarks.random_entry_returns, 0.90)
+    return (
         _gate(
             "completed_trades",
-            completed_trades >= thresholds.minimum_completed_trades,
-            completed_trades,
+            aggregate.completed_trades >= thresholds.minimum_completed_trades,
+            aggregate.completed_trades,
             thresholds.minimum_completed_trades,
         ),
         _gate(
             "traded_folds",
-            traded_folds >= thresholds.minimum_traded_folds,
-            traded_folds,
+            aggregate.traded_folds >= thresholds.minimum_traded_folds,
+            aggregate.traded_folds,
             thresholds.minimum_traded_folds,
         ),
         _gate(
             "positive_traded_folds",
-            _decimal(positive_rate) >= thresholds.minimum_positive_fold_rate,
-            positive_rate,
+            _decimal(aggregate.positive_traded_fold_rate) >= thresholds.minimum_positive_fold_rate,
+            aggregate.positive_traded_fold_rate,
             thresholds.minimum_positive_fold_rate,
         ),
         _gate(
             "aggregate_cumulative_return",
-            _decimal(cumulative_return) > thresholds.minimum_cumulative_return,
-            cumulative_return,
+            _decimal(aggregate.cumulative_return) > thresholds.minimum_cumulative_return,
+            aggregate.cumulative_return,
             thresholds.minimum_cumulative_return,
         ),
         _gate(
@@ -774,8 +977,9 @@ def evaluate_historical_stability_screen(
         ),
         _gate(
             "stress_cumulative_return",
-            _decimal(stress_cumulative_return) > thresholds.minimum_stress_cumulative_return,
-            stress_cumulative_return,
+            _decimal(aggregate.stress_cumulative_return)
+            > thresholds.minimum_stress_cumulative_return,
+            aggregate.stress_cumulative_return,
             thresholds.minimum_stress_cumulative_return,
         ),
         _gate(
@@ -787,33 +991,38 @@ def evaluate_historical_stability_screen(
         ),
         _gate(
             "stress_drawdown",
-            _decimal(stress_drawdown) >= -plan.stress_drawdown_limit,
-            stress_drawdown,
+            _decimal(aggregate.stress_max_drawdown) >= -plan.stress_drawdown_limit,
+            aggregate.stress_max_drawdown,
             -plan.stress_drawdown_limit,
         ),
         _gate(
             "trade_fold_concentration",
-            _decimal(trade_concentration) <= thresholds.maximum_fold_concentration,
-            trade_concentration,
+            _decimal(aggregate.trade_fold_concentration) <= thresholds.maximum_fold_concentration,
+            aggregate.trade_fold_concentration,
             thresholds.maximum_fold_concentration,
         ),
         _gate(
             "profit_fold_concentration",
-            _decimal(profit_concentration) <= thresholds.maximum_fold_concentration,
-            profit_concentration,
+            _decimal(aggregate.profit_fold_concentration) <= thresholds.maximum_fold_concentration,
+            aggregate.profit_fold_concentration,
             thresholds.maximum_fold_concentration,
         ),
-        _gate("cash_benchmark", cumulative_return > 0, cumulative_return, 0),
+        _gate(
+            "cash_benchmark",
+            aggregate.cumulative_return > benchmarks.cash_return,
+            aggregate.cumulative_return - benchmarks.cash_return,
+            0,
+        ),
         _gate(
             "family_baseline_benchmark",
-            cumulative_return > baseline_return,
-            cumulative_return - baseline_return,
+            aggregate.cumulative_return > benchmarks.family_baseline_return,
+            aggregate.cumulative_return - benchmarks.family_baseline_return,
             0,
         ),
         _gate(
             "random_entry_benchmark",
-            cumulative_return > random_threshold,
-            cumulative_return,
+            aggregate.cumulative_return > random_threshold,
+            aggregate.cumulative_return,
             random_threshold,
         ),
         _gate(
@@ -823,34 +1032,116 @@ def evaluate_historical_stability_screen(
             thresholds.selection_confidence,
         ),
     )
-    passed = all(gate.passed for gate in gates)
-    return HistoricalScreenResult(
-        plan_id=plan.plan_id,
-        folds=folds,
-        aggregate=HistoricalAggregateEvidence(
-            completed_trades=completed_trades,
-            traded_folds=traded_folds,
-            positive_traded_fold_rate=positive_rate,
-            cumulative_return=cumulative_return,
-            profit_factor="Infinity" if math.isinf(profit_factor) else str(profit_factor),
-            stress_cumulative_return=stress_cumulative_return,
-            stress_profit_factor=(
-                "Infinity" if math.isinf(stress_profit_factor) else str(stress_profit_factor)
-            ),
-            stress_max_drawdown=stress_drawdown,
-            trade_fold_concentration=trade_concentration,
-            profit_fold_concentration=profit_concentration,
-        ),
-        benchmarks=HistoricalBenchmarkEvidence(
-            cash_return=0.0,
-            family_baseline_return=baseline_return,
-            random_entry_samples=random_samples,
-        ),
-        selection_adjustment=selection_adjustment,
-        gates=gates,
-        passed=passed,
-        disposition=_qualification_disposition(plan.evidence_role, passed),
+
+
+def validate_historical_screen_result(
+    plan: HistoricalQualificationPlan,
+    screen: HistoricalScreenResult,
+) -> None:
+    """Fail closed unless persisted screen evidence fully reproduces its frozen plan."""
+    if screen.plan_id != plan.plan_id:
+        raise ValueError("historical screen belongs to a different plan")
+    if tuple((fold.fold_id, fold.evaluation_year) for fold in screen.folds) != tuple(
+        (fold.fold_id, fold.evaluation_year) for fold in plan.folds
+    ):
+        raise ValueError("historical screen folds differ from the frozen plan")
+    if any(
+        min(fold.signal_count, fold.candidate_count, fold.completed_trades) < 0
+        for fold in screen.folds
+    ):
+        raise ValueError("historical screen fold counts are invalid")
+    completed_trades = sum(fold.completed_trades for fold in screen.folds)
+    traded_folds = sum(fold.traded for fold in screen.folds)
+    positive_rate = (
+        sum(fold.positive for fold in screen.folds) / traded_folds if traded_folds else 0.0
     )
+    gross_profit = sum(fold.gross_profit for fold in screen.folds)
+    gross_loss = sum(fold.gross_loss for fold in screen.folds)
+    stress_gross_profit = sum(fold.stress_gross_profit for fold in screen.folds)
+    stress_gross_loss = sum(fold.stress_gross_loss for fold in screen.folds)
+    profit_factor = gross_profit / gross_loss if gross_loss else (math.inf if gross_profit else 0.0)
+    stress_profit_factor = (
+        stress_gross_profit / stress_gross_loss
+        if stress_gross_loss
+        else (math.inf if stress_gross_profit else 0.0)
+    )
+    expected_aggregate = HistoricalAggregateEvidence(
+        completed_trades=completed_trades,
+        traded_folds=traded_folds,
+        positive_traded_fold_rate=positive_rate,
+        cumulative_return=_compound_return(fold.cumulative_return for fold in screen.folds),
+        profit_factor="Infinity" if math.isinf(profit_factor) else str(profit_factor),
+        stress_cumulative_return=_compound_return(
+            fold.stress_cumulative_return for fold in screen.folds
+        ),
+        stress_profit_factor=(
+            "Infinity" if math.isinf(stress_profit_factor) else str(stress_profit_factor)
+        ),
+        stress_max_drawdown=min((fold.stress_max_drawdown for fold in screen.folds), default=0.0),
+        trade_fold_concentration=(
+            max((fold.completed_trades for fold in screen.folds), default=0) / completed_trades
+            if completed_trades
+            else 0.0
+        ),
+        profit_fold_concentration=(
+            max((fold.gross_profit for fold in screen.folds), default=0.0) / gross_profit
+            if gross_profit
+            else 0.0
+        ),
+    )
+    if screen.aggregate != expected_aggregate:
+        raise ValueError("historical screen aggregate does not reproduce its folds")
+    if screen.benchmarks.cash_return != 0.0:
+        raise ValueError("historical screen cash benchmark is malformed")
+    samples = screen.benchmarks.random_entry_samples
+    if (
+        len(samples) != plan.benchmarks.random_samples
+        or tuple(sample.sample_index for sample in samples) != tuple(range(len(samples)))
+        or any(
+            sample.completed_trades != completed_trades
+            or len(sample.entry_months) != completed_trades
+            or len(sample.holding_sessions) != completed_trades
+            for sample in samples
+        )
+    ):
+        raise ValueError("historical screen random-entry benchmark is incomplete")
+    boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
+    if (
+        boundary is None
+        or screen.selection_adjustment.selected_trial_id != boundary.selected_trial_id
+        or screen.selection_adjustment.included_trial_ids != boundary.included_trial_ids
+        or screen.selection_adjustment.repetitions != plan.selection_adjustment.repetitions
+        or screen.selection_adjustment.block_sessions != plan.selection_adjustment.block_sessions
+        or screen.selection_adjustment.passed
+        != (screen.selection_adjustment.adjusted_confidence >= plan.thresholds.selection_confidence)
+    ):
+        raise ValueError("historical screen selection adjustment is inconsistent")
+    expected_gates = historical_screen_gates(
+        plan,
+        screen.aggregate,
+        screen.benchmarks,
+        screen.selection_adjustment,
+    )
+    if len(screen.gates) != len(expected_gates) or any(
+        actual.name != expected.name
+        or actual.passed != expected.passed
+        or not _gate_value_equal(actual.actual, expected.actual)
+        or not _gate_value_equal(actual.threshold, expected.threshold)
+        for actual, expected in zip(screen.gates, expected_gates, strict=True)
+    ):
+        mismatch = next(
+            (
+                (actual, expected)
+                for actual, expected in zip(screen.gates, expected_gates, strict=False)
+                if actual != expected
+            ),
+            (len(screen.gates), len(expected_gates)),
+        )
+        raise ValueError(f"historical screen gates do not reproduce frozen evidence: {mismatch}")
+    if screen.passed != all(gate.passed for gate in screen.gates):
+        raise ValueError("historical screen pass state conflicts with its gates")
+    if screen.disposition != _qualification_disposition(plan.evidence_role, screen.passed):
+        raise ValueError("historical screen disposition conflicts with its evidence role")
 
 
 def evaluate_family_selection_adjustment(
@@ -1019,6 +1310,10 @@ def _validate_evidence_audit(
         audit.classification != "verified-clean" or not audit.trial_history_complete
     ):
         raise ValueError("Historical Evaluation requires verified-clean complete provenance")
+    if evidence_role == "study-time-retrospective" and audit.classification == "verified-clean":
+        raise ValueError(
+            "study-time retrospective evaluation cannot claim verified-clean provenance"
+        )
 
 
 def _validate_retrospective_selection_checkpoint(
@@ -1050,7 +1345,7 @@ def _evidence_audit_payload(audit: EvaluationEvidenceAudit) -> dict[str, object]
 
 
 def _qualification_disposition(evidence_role: str, passed: bool) -> str:
-    if evidence_role == "retrospective-confirmatory":
+    if evidence_role in RETROSPECTIVE_EVIDENCE_ROLES:
         return "retrospectively-supported" if passed else "retrospective-screen-failed"
     return "shadow-eligible" if passed else "historical-screen-failed"
 
@@ -1697,6 +1992,27 @@ def _compound_return(values) -> float:
 
 def _decimal(value: float) -> Decimal:
     return Decimal(str(value))
+
+
+def _ratio_value(value: str, label: str) -> float:
+    if value == "Infinity":
+        return math.inf
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} is malformed") from exc
+    if not math.isfinite(parsed) or parsed < 0:
+        raise ValueError(f"{label} is malformed")
+    return parsed
+
+
+def _gate_value_equal(actual: str, expected: str) -> bool:
+    if actual == expected:
+        return True
+    try:
+        return Decimal(actual) == Decimal(expected)
+    except InvalidOperation:
+        return False
 
 
 def _gate(name: str, passed: bool, actual: object, threshold: object) -> QualificationGate:

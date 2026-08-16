@@ -4,7 +4,38 @@ from datetime import UTC, datetime
 
 import pytest
 
-from trading.research_data.trial_registry import ExperimentTrialRegistry, TrialRegistryError
+from trading.research_data.trial_registry import (
+    ExperimentTrialRegistry,
+    OutcomeFreeTrialRegistration,
+    TrialRegistryError,
+)
+
+
+def test_atomic_outcome_free_family_registration_has_one_truthful_boundary(tmp_path) -> None:
+    path = tmp_path / "registry.json"
+    registry = ExperimentTrialRegistry(path)
+    earlier = datetime(2026, 8, 1, 12, tzinfo=UTC)
+    boundary = datetime(2026, 8, 15, 3, tzinfo=UTC)
+    registry.register_trial(
+        "spy:family",
+        "a" * 64,
+        experiment_name="spy/candidate",
+        registered_at=earlier,
+    )
+    registrations = (
+        OutcomeFreeTrialRegistration("spy:family", "a" * 64, "spy/candidate"),
+        OutcomeFreeTrialRegistration("spy:family", "b" * 64, "spy/robustness"),
+    )
+
+    preview = registry.preview_registration_state(registrations, registered_at=boundary)
+
+    assert len(registry.read()["trials"]) == 1
+    assert len(preview["trials"]) == 2
+    registry.register_trials_atomically(registrations, registered_at=boundary)
+    trials = sorted(registry.read()["trials"], key=lambda item: item["definition_fingerprint"])
+    assert trials[0]["first_registered_at"] == "2026-08-01T12:00:00Z"
+    assert trials[1]["first_registered_at"] == "2026-08-15T03:00:00Z"
+    assert trials[1]["observations"] == []
 
 
 def test_same_definition_on_new_data_adds_observation_not_trial(tmp_path) -> None:

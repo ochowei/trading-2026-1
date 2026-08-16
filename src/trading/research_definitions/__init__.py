@@ -3,6 +3,7 @@
 from trading.research_definitions.execution import (
     WorkflowNativeExecutionError,
     resolve_workflow_policy_set,
+    resolve_workflow_policy_set_from_release,
 )
 from trading.research_definitions.registry import (
     ResearchDefinitionRegistry,
@@ -14,4 +15,5 @@ __all__ = [
     "ResearchDefinitionRegistryError",
     "WorkflowNativeExecutionError",
     "resolve_workflow_policy_set",
+    "resolve_workflow_policy_set_from_release",
 ]

@@ -28,6 +28,7 @@ from trading.core.qualification import (
     ShadowEvidence,
     ShadowPaperProposal,
     ShadowRegistration,
+    StudyQualificationIdentity,
     evaluate_shadow_activation,
 )
 from trading.core.sleeve_engine import ExecutionCostPolicy
@@ -438,7 +439,14 @@ def test_retrospective_registry_rejects_missing_or_dual_selection_boundaries(tmp
         _historical_plan_from_payload(_historical_plan_payload(dual))
 
 
-def test_retrospective_registry_round_trip_cannot_register_shadow(tmp_path) -> None:
+@pytest.mark.parametrize(
+    "evidence_role",
+    ("retrospective-confirmatory", "study-time-retrospective"),
+)
+def test_retrospective_registry_round_trip_cannot_register_shadow(
+    tmp_path,
+    evidence_role: str,
+) -> None:
     current_time = [datetime(2026, 8, 6, 21, tzinfo=UTC)]
     registry = QualificationRegistry(
         tmp_path / "qualification_registry.json",
@@ -450,7 +458,7 @@ def test_retrospective_registry_round_trip_cannot_register_shadow(tmp_path) -> N
         historical_plan,
         plan_id="retrospective-plan-1",
         created_at=current_time[0],
-        evidence_role="retrospective-confirmatory",
+        evidence_role=evidence_role,
         retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
             frozen_at=current_time[0],
             selected_trial_id="trial-1",
@@ -471,6 +479,18 @@ def test_retrospective_registry_round_trip_cannot_register_shadow(tmp_path) -> N
                 timestamp.date() for timestamp in pd.bdate_range("2017-01-01", "2017-12-31")
             ),
             evaluation_sessions=historical_plan.evaluation_sessions,
+        ),
+        study_identity=(
+            StudyQualificationIdentity(
+                study_path="workflows/example--v001/work/studies/example--s001",
+                preregistration_sha256="1" * 64,
+                plan_sha256="2" * 64,
+                candidate_freeze_sha256="3" * 64,
+                qualification_spec_sha256="4" * 64,
+                workflow_release_sha256="5" * 64,
+            )
+            if evidence_role == "study-time-retrospective"
+            else None
         ),
     )
     screen = replace(
