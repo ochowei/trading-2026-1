@@ -21,21 +21,31 @@ from trading.core.ledger_storage import atomic_write, locked_file
 from trading.core.qualification import (
     EVIDENCE_ROLES,
     HISTORICAL_QUALIFICATION_GATE_NAMES,
+    RETROSPECTIVE_EVIDENCE_ROLES,
     SHADOW_ACTIVATION_GATE_NAMES,
     EvaluationEvidenceAudit,
     EvaluationFold,
+    ExposureMatchedRandomSample,
     ForwardSelectionEpoch,
+    HistoricalAggregateEvidence,
+    HistoricalBenchmarkEvidence,
     HistoricalBenchmarkPolicy,
+    HistoricalFoldEvidence,
     HistoricalQualificationPlan,
     HistoricalScreenResult,
     HistoricalScreenThresholds,
+    QualificationGate,
     QualificationRoleCalendar,
     RetrospectiveSelectionCheckpoint,
     SelectionAdjustmentPolicy,
+    SelectionAdjustmentResult,
     ShadowActivationEvaluation,
     ShadowEvidence,
     ShadowRegistration,
+    StudyQualificationIdentity,
+    validate_historical_screen_result,
     validate_historical_thresholds,
+    validate_study_qualification_identity,
 )
 from trading.core.sleeve_engine import ExecutionCostPolicy
 from trading.research_data.definitions import ResearchDefinitionStore
@@ -83,6 +93,16 @@ class QualificationRegistry:
 
     def read(self) -> dict[str, object]:
         return copy.deepcopy(self._load_unlocked())
+
+    def initialize(self) -> dict[str, object]:
+        """Materialize an empty verified registry/checkpoint without adding an event."""
+        with locked_file(self.lock_path, self.lock_timeout_seconds):
+            state = self._load_unlocked()
+            if not self.path.exists():
+                content = canonical_json_bytes(state)
+                atomic_write(self.path, content, replace=False)
+                _write_head_checkpoint(self.checkpoint_path, content, [])
+            return copy.deepcopy(state)
 
     def result_sections(
         self,
@@ -185,31 +205,41 @@ class QualificationRegistry:
         )
         return _historical_plan_from_payload(_payload(event))
 
+    def historical_screen(self, plan_id: str) -> HistoricalScreenResult:
+        """Return one fully rehydrated and recomputed historical screen."""
+        state = self._load_unlocked()
+        event = _event_for_identity(
+            state,
+            event_type="historical_screen",
+            identity_name="plan_id",
+            identity=plan_id,
+        )
+        payload = _payload(event)
+        plan = _historical_plan_from_payload(
+            _payload(
+                _event_for_identity(
+                    state,
+                    event_type="historical_plan",
+                    identity_name="plan_id",
+                    identity=plan_id,
+                )
+            )
+        )
+        screen = _historical_screen_from_payload(payload)
+        try:
+            evaluated_at = parse_timestamp(str(payload["evaluated_at"]))
+            if evaluated_at.date() <= plan.folds[-1].outcome_end:
+                raise ValueError("historical screen predates complete fold outcomes")
+            validate_historical_screen_result(plan, screen)
+        except (KeyError, TypeError, ValueError, InvalidOperation) as exc:
+            raise QualificationRegistryError(
+                f"historical screen payload is malformed: {exc}"
+            ) from exc
+        return screen
+
     def register_historical_plan(self, plan: HistoricalQualificationPlan) -> str:
         """Persist frozen folds and thresholds before recording their outcomes."""
-        try:
-            validate_historical_thresholds(plan.thresholds)
-        except ValueError as exc:
-            raise QualificationRegistryError(str(exc)) from exc
-        if len(plan.development_years) < plan.thresholds.minimum_development_years:
-            raise QualificationRegistryError("historical plan has insufficient development years")
-        if len(plan.folds) < plan.thresholds.minimum_evaluation_folds:
-            raise QualificationRegistryError("historical plan has insufficient evaluation folds")
-        _validate_plan_role_calendar(plan)
-        _validate_plan_selection_boundaries(plan)
-        if plan.evidence_role == "retrospective-confirmatory" and plan.evidence_audit is None:
-            raise QualificationRegistryError("retrospective plan requires clean-evidence audit")
-        if (
-            plan.evidence_role == "historical"
-            and plan.evidence_audit is not None
-            and (
-                plan.evidence_audit.classification != "verified-clean"
-                or not plan.evidence_audit.trial_history_complete
-            )
-        ):
-            raise QualificationRegistryError(
-                "Historical Evaluation requires verified-clean complete provenance"
-            )
+        self.validate_historical_plan_registration(plan)
         payload = _historical_plan_payload(plan)
         event_id = f"historical-plan:{plan.plan_id}"
         selection_boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
@@ -222,38 +252,7 @@ class QualificationRegistry:
         else:
             with locked_file(self.lock_path, self.lock_timeout_seconds):
                 state = self._load_unlocked()
-                existing = next(
-                    (event for event in _events(state) if event.get("event_id") == event_id),
-                    None,
-                )
-                if existing is None:
-                    recorded_at = self.now()
-                    if recorded_at.tzinfo is None:
-                        raise QualificationRegistryError(
-                            "qualification registry clock must be timezone-aware"
-                        )
-                    elapsed = abs((recorded_at.astimezone(UTC) - plan.created_at).total_seconds())
-                    if elapsed > 5:
-                        raise QualificationRegistryError(
-                            "selection plan must be registered when its trial universe freezes"
-                        )
-                open_plan_ids = {
-                    event_payload.get("plan_id")
-                    for event in _events(state)
-                    if event.get("event_type") == "historical_plan"
-                    and isinstance((event_payload := event.get("payload")), Mapping)
-                    and event_payload.get("experiment_family") == plan.experiment_family
-                    and not any(
-                        screen.get("event_type") == "historical_screen"
-                        and isinstance(screen.get("payload"), Mapping)
-                        and screen["payload"].get("plan_id") == event_payload.get("plan_id")
-                        for screen in _events(state)
-                    )
-                }
-                if open_plan_ids - {plan.plan_id}:
-                    raise QualificationRegistryError(
-                        "experiment family already has an open forward or retrospective qualification plan"
-                    )
+                self._validate_plan_state_for_registration(state, plan, event_id)
                 self._append_unlocked(
                     state,
                     event_id=event_id,
@@ -261,6 +260,79 @@ class QualificationRegistry:
                     payload=payload,
                 )
         return plan.plan_id
+
+    def validate_historical_plan_registration(self, plan: HistoricalQualificationPlan) -> None:
+        """Check a complete plan and current registry state without appending an event."""
+        try:
+            validate_historical_thresholds(plan.thresholds)
+        except ValueError as exc:
+            raise QualificationRegistryError(str(exc)) from exc
+        if len(plan.development_years) < plan.thresholds.minimum_development_years:
+            raise QualificationRegistryError("historical plan has insufficient development years")
+        if len(plan.folds) < plan.thresholds.minimum_evaluation_folds:
+            raise QualificationRegistryError("historical plan has insufficient evaluation folds")
+        _validate_plan_role_calendar(plan)
+        _validate_plan_selection_boundaries(plan)
+        if plan.evidence_role in RETROSPECTIVE_EVIDENCE_ROLES and plan.evidence_audit is None:
+            raise QualificationRegistryError("retrospective plan requires clean-evidence audit")
+        if plan.evidence_role == "study-time-retrospective" and plan.study_identity is None:
+            raise QualificationRegistryError("study-time plan requires exact frozen study linkage")
+        if (
+            plan.evidence_role == "historical"
+            and plan.evidence_audit is not None
+            and (
+                plan.evidence_audit.classification != "verified-clean"
+                or not plan.evidence_audit.trial_history_complete
+            )
+        ):
+            raise QualificationRegistryError(
+                "Historical Evaluation requires verified-clean complete provenance"
+            )
+        event_id = f"historical-plan:{plan.plan_id}"
+        selection_boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
+        if selection_boundary is not None:
+            with locked_file(self.lock_path, self.lock_timeout_seconds):
+                state = self._load_unlocked()
+                self._validate_plan_state_for_registration(state, plan, event_id)
+
+    def _validate_plan_state_for_registration(
+        self,
+        state: Mapping[str, object],
+        plan: HistoricalQualificationPlan,
+        event_id: str,
+    ) -> None:
+        existing = next(
+            (event for event in _events(state) if event.get("event_id") == event_id),
+            None,
+        )
+        if existing is None:
+            recorded_at = self.now()
+            if recorded_at.tzinfo is None:
+                raise QualificationRegistryError(
+                    "qualification registry clock must be timezone-aware"
+                )
+            elapsed = abs((recorded_at.astimezone(UTC) - plan.created_at).total_seconds())
+            if elapsed > 5:
+                raise QualificationRegistryError(
+                    "selection plan must be registered when its trial universe freezes"
+                )
+        open_plan_ids = {
+            event_payload.get("plan_id")
+            for event in _events(state)
+            if event.get("event_type") == "historical_plan"
+            and isinstance((event_payload := event.get("payload")), Mapping)
+            and event_payload.get("experiment_family") == plan.experiment_family
+            and not any(
+                screen.get("event_type") == "historical_screen"
+                and isinstance(screen.get("payload"), Mapping)
+                and screen["payload"].get("plan_id") == event_payload.get("plan_id")
+                for screen in _events(state)
+            )
+        }
+        if open_plan_ids - {plan.plan_id}:
+            raise QualificationRegistryError(
+                "experiment family already has an open forward or retrospective qualification plan"
+            )
 
     def record_historical_screen(
         self,
@@ -304,7 +376,7 @@ class QualificationRegistry:
                 raise QualificationRegistryError("historical screen gates are incomplete")
             expected_dispositions = (
                 ("retrospectively-supported", "retrospective-screen-failed")
-                if plan_payload.get("evidence_role", "historical") == "retrospective-confirmatory"
+                if plan_payload.get("evidence_role", "historical") in RETROSPECTIVE_EVIDENCE_ROLES
                 else ("shadow-eligible", "historical-screen-failed")
             )
             expected_disposition = expected_dispositions[0 if screen.passed else 1]
@@ -743,7 +815,7 @@ def _write_head_checkpoint(
         "schema_version": 1,
         "event_count": len(events),
         "registry_checksum": hashlib.sha256(content).hexdigest(),
-        "head_hash": events[-1]["event_hash"],
+        "head_hash": events[-1]["event_hash"] if events else _GENESIS_HASH,
     }
     atomic_write(path, canonical_json_bytes(payload), replace=True)
 
@@ -753,10 +825,6 @@ def _verify_head_checkpoint(
     content: bytes,
     events: list[dict[str, object]],
 ) -> None:
-    if not events:
-        raise QualificationRegistryError(
-            "qualification registry head checkpoint does not match history"
-        )
     try:
         payload = json.loads(path.read_bytes())
     except (OSError, json.JSONDecodeError) as exc:
@@ -768,7 +836,7 @@ def _verify_head_checkpoint(
         or payload.get("schema_version") != 1
         or payload.get("event_count") != len(events)
         or payload.get("registry_checksum") != hashlib.sha256(content).hexdigest()
-        or payload.get("head_hash") != events[-1].get("event_hash")
+        or payload.get("head_hash") != (events[-1].get("event_hash") if events else _GENESIS_HASH)
     ):
         raise QualificationRegistryError(
             "qualification registry head checkpoint does not match history"
@@ -846,11 +914,23 @@ def _validate_lifecycle(events: list[dict[str, object]]) -> None:
             plan_id = payload.get("plan_id")
             if not isinstance(plan_id, str) or not plan_id:
                 raise QualificationRegistryError("historical plan identity is malformed")
+            if event.get("event_id") != f"historical-plan:{plan_id}":
+                raise QualificationRegistryError("historical plan event identity is not canonical")
+            if plan_id in plans:
+                raise QualificationRegistryError("qualification registry repeats a historical plan")
             plans.add(plan_id)
         elif event_type == "historical_screen":
             plan_id = payload.get("plan_id")
             if plan_id not in plans:
                 raise QualificationRegistryError("historical screen precedes its frozen plan")
+            if event.get("event_id") != f"historical-screen:{plan_id}":
+                raise QualificationRegistryError(
+                    "historical screen event identity is not canonical"
+                )
+            if plan_id in screens:
+                raise QualificationRegistryError(
+                    "qualification registry repeats a historical screen"
+                )
             screens.add(plan_id)
         elif event_type == "shadow_registration":
             shadow_id = payload.get("shadow_id")
@@ -942,10 +1022,6 @@ def _validate_plan_role_calendar(plan: HistoricalQualificationPlan) -> None:
                 "nonstandard Development chronology requires an explicit role calendar"
             )
         return
-    if plan.evidence_role != "retrospective-confirmatory":
-        raise QualificationRegistryError(
-            "explicit role calendar is only valid for retrospective qualification"
-        )
     if not calendar.development_sessions or not calendar.warmup_sessions:
         raise QualificationRegistryError("qualification role calendar is incomplete")
     if calendar.evaluation_sessions != plan.evaluation_sessions:
@@ -955,6 +1031,7 @@ def _validate_plan_role_calendar(plan: HistoricalQualificationPlan) -> None:
     if (
         tuple(sorted(set(calendar.development_sessions))) != calendar.development_sessions
         or tuple(sorted(set(calendar.warmup_sessions))) != calendar.warmup_sessions
+        or tuple(sorted(set(calendar.quarantined_sessions))) != calendar.quarantined_sessions
     ):
         raise QualificationRegistryError(
             "qualification role calendar sessions must be unique and chronological"
@@ -967,7 +1044,15 @@ def _validate_plan_role_calendar(plan: HistoricalQualificationPlan) -> None:
     development = set(calendar.development_sessions)
     warmup = set(calendar.warmup_sessions)
     evaluation = set(calendar.evaluation_sessions)
-    if development & warmup or development & evaluation or warmup & evaluation:
+    quarantined = set(calendar.quarantined_sessions)
+    if (
+        development & warmup
+        or development & evaluation
+        or warmup & evaluation
+        or quarantined & development
+        or quarantined & warmup
+        or quarantined & evaluation
+    ):
         raise QualificationRegistryError("qualification role calendar sessions overlap")
     if calendar.warmup_sessions[-1] >= calendar.evaluation_sessions[0]:
         raise QualificationRegistryError(
@@ -981,6 +1066,20 @@ def _validate_plan_role_calendar(plan: HistoricalQualificationPlan) -> None:
         raise QualificationRegistryError(
             "qualification role calendar Development context was not complete at plan freeze"
         )
+    if plan.evidence_role == "study-time-retrospective" and (
+        calendar.development_sessions[-1] >= calendar.evaluation_sessions[0]
+    ):
+        raise QualificationRegistryError(
+            "study-time retrospective Development must precede evaluation"
+        )
+    if plan.evidence_role == "historical" and calendar.quarantined_sessions:
+        if (
+            calendar.development_sessions[-1] >= calendar.quarantined_sessions[0]
+            or calendar.quarantined_sessions[-1] >= calendar.evaluation_sessions[0]
+        ):
+            raise QualificationRegistryError(
+                "clean Historical quarantine must follow Development and precede evaluation"
+            )
 
 
 def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, object]:
@@ -1062,7 +1161,7 @@ def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, obj
             "trial_history_complete": plan.evidence_audit.trial_history_complete,
         }
     if plan.role_calendar is not None:
-        payload["role_calendar"] = {
+        role_calendar_payload = {
             "development_sessions": [
                 session.isoformat() for session in plan.role_calendar.development_sessions
             ],
@@ -1073,7 +1172,60 @@ def _historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, obj
                 session.isoformat() for session in plan.role_calendar.evaluation_sessions
             ],
         }
+        if plan.role_calendar.quarantined_sessions:
+            role_calendar_payload["quarantined_sessions"] = [
+                session.isoformat() for session in plan.role_calendar.quarantined_sessions
+            ]
+        payload["role_calendar"] = role_calendar_payload
+    if plan.study_identity is not None:
+        payload["study_identity"] = {
+            "study_path": plan.study_identity.study_path,
+            "preregistration_sha256": plan.study_identity.preregistration_sha256,
+            "plan_sha256": plan.study_identity.plan_sha256,
+            "candidate_freeze_sha256": plan.study_identity.candidate_freeze_sha256,
+            "qualification_spec_sha256": plan.study_identity.qualification_spec_sha256,
+            "workflow_release_sha256": plan.study_identity.workflow_release_sha256,
+        }
+        if plan.study_identity.development_authorization_sha256 is not None:
+            payload["study_identity"]["development_authorization_sha256"] = (
+                plan.study_identity.development_authorization_sha256
+            )
+        if plan.study_identity.trial_registry_identity is not None:
+            payload["study_identity"]["trial_registry_identity"] = (
+                plan.study_identity.trial_registry_identity
+            )
+            payload["study_identity"]["qualification_registry_identity"] = (
+                plan.study_identity.qualification_registry_identity
+            )
+        if plan.study_identity.policy_set_identity is not None:
+            payload["study_identity"]["policy_set_identity"] = (
+                plan.study_identity.policy_set_identity
+            )
+            payload["study_identity"]["evidence_contract_sha256"] = (
+                plan.study_identity.evidence_contract_sha256
+            )
+        if plan.study_identity.operation_approved_by is not None:
+            payload["study_identity"]["operation_approved_by"] = (
+                plan.study_identity.operation_approved_by
+            )
+            payload["study_identity"]["operation_approved_at"] = timestamp_text(
+                plan.study_identity.operation_approved_at
+            )
+            payload["study_identity"]["contamination_declaration"] = (
+                plan.study_identity.contamination_declaration
+            )
+            payload["study_identity"]["trial_registry_path"] = (
+                plan.study_identity.trial_registry_path
+            )
+            payload["study_identity"]["qualification_registry_path"] = (
+                plan.study_identity.qualification_registry_path
+            )
     return payload
+
+
+def historical_plan_payload(plan: HistoricalQualificationPlan) -> dict[str, object]:
+    """Return the canonical persisted payload for transaction coordination."""
+    return _historical_plan_payload(plan)
 
 
 def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQualificationPlan:
@@ -1163,12 +1315,14 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
             raw_development_sessions = calendar_payload["development_sessions"]
             raw_warmup_sessions = calendar_payload["warmup_sessions"]
             raw_evaluation_sessions = calendar_payload["evaluation_sessions"]
+            raw_quarantined_sessions = calendar_payload.get("quarantined_sessions", [])
             if not all(
                 isinstance(items, list)
                 for items in (
                     raw_development_sessions,
                     raw_warmup_sessions,
                     raw_evaluation_sessions,
+                    raw_quarantined_sessions,
                 )
             ):
                 raise ValueError("qualification role calendar sessions are malformed")
@@ -1181,6 +1335,79 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
                 ),
                 evaluation_sessions=tuple(
                     date.fromisoformat(str(item)) for item in raw_evaluation_sessions
+                ),
+                quarantined_sessions=tuple(
+                    date.fromisoformat(str(item)) for item in raw_quarantined_sessions
+                ),
+            )
+        raw_study_identity = payload.get("study_identity")
+        study_identity = None
+        if raw_study_identity is not None:
+            identity_payload = _mapping_value(raw_study_identity, "study qualification identity")
+            qualification_spec_sha256 = identity_payload.get("qualification_spec_sha256")
+            if qualification_spec_sha256 is not None and not isinstance(
+                qualification_spec_sha256, str
+            ):
+                raise ValueError("study qualification spec digest is malformed")
+            development_authorization_sha256 = identity_payload.get(
+                "development_authorization_sha256"
+            )
+            if development_authorization_sha256 is not None and not isinstance(
+                development_authorization_sha256, str
+            ):
+                raise ValueError("Development authorization digest is malformed")
+            study_identity = StudyQualificationIdentity(
+                study_path=str(identity_payload["study_path"]),
+                preregistration_sha256=str(identity_payload["preregistration_sha256"]),
+                plan_sha256=str(identity_payload["plan_sha256"]),
+                candidate_freeze_sha256=str(identity_payload["candidate_freeze_sha256"]),
+                qualification_spec_sha256=qualification_spec_sha256,
+                workflow_release_sha256=str(identity_payload["workflow_release_sha256"]),
+                development_authorization_sha256=development_authorization_sha256,
+                operation_approved_by=(
+                    str(identity_payload["operation_approved_by"])
+                    if identity_payload.get("operation_approved_by") is not None
+                    else None
+                ),
+                operation_approved_at=(
+                    parse_timestamp(str(identity_payload["operation_approved_at"]))
+                    if identity_payload.get("operation_approved_at") is not None
+                    else None
+                ),
+                contamination_declaration=(
+                    str(identity_payload["contamination_declaration"])
+                    if identity_payload.get("contamination_declaration") is not None
+                    else None
+                ),
+                trial_registry_path=(
+                    str(identity_payload["trial_registry_path"])
+                    if identity_payload.get("trial_registry_path") is not None
+                    else None
+                ),
+                qualification_registry_path=(
+                    str(identity_payload["qualification_registry_path"])
+                    if identity_payload.get("qualification_registry_path") is not None
+                    else None
+                ),
+                trial_registry_identity=(
+                    str(identity_payload["trial_registry_identity"])
+                    if identity_payload.get("trial_registry_identity") is not None
+                    else None
+                ),
+                qualification_registry_identity=(
+                    str(identity_payload["qualification_registry_identity"])
+                    if identity_payload.get("qualification_registry_identity") is not None
+                    else None
+                ),
+                policy_set_identity=(
+                    str(identity_payload["policy_set_identity"])
+                    if identity_payload.get("policy_set_identity") is not None
+                    else None
+                ),
+                evidence_contract_sha256=(
+                    str(identity_payload["evidence_contract_sha256"])
+                    if identity_payload.get("evidence_contract_sha256") is not None
+                    else None
                 ),
             )
         plan = HistoricalQualificationPlan(
@@ -1235,6 +1462,7 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
             evidence_role=evidence_role,
             evidence_audit=audit,
             role_calendar=role_calendar,
+            study_identity=study_identity,
         )
         _validate_plan_selection_boundaries(plan)
         _validate_plan_role_calendar(plan)
@@ -1243,7 +1471,127 @@ def _historical_plan_from_payload(payload: Mapping[str, object]) -> HistoricalQu
         raise QualificationRegistryError(f"historical plan payload is malformed: {exc}") from exc
 
 
+def historical_plan_from_payload(
+    payload: Mapping[str, object],
+) -> HistoricalQualificationPlan:
+    """Rehydrate one canonical plan payload for transaction recovery."""
+    return _historical_plan_from_payload(payload)
+
+
+def _historical_screen_from_payload(
+    payload: Mapping[str, object],
+) -> HistoricalScreenResult:
+    raw_folds = payload.get("folds")
+    if not isinstance(raw_folds, list) or not raw_folds:
+        raise QualificationRegistryError("historical screen folds are malformed")
+    aggregate = _mapping_value(payload.get("aggregate"), "historical screen aggregate")
+    benchmarks = _mapping_value(payload.get("benchmarks"), "historical screen benchmarks")
+    selection = _mapping_value(
+        payload.get("selection_adjustment"),
+        "historical screen selection adjustment",
+    )
+    raw_samples = benchmarks.get("random_entry_samples")
+    raw_gates = payload.get("gates")
+    if not isinstance(raw_samples, list) or not isinstance(raw_gates, list):
+        raise QualificationRegistryError("historical screen benchmarks or gates are malformed")
+    try:
+        return HistoricalScreenResult(
+            plan_id=_required_string(payload.get("plan_id"), "historical screen plan"),
+            folds=tuple(
+                HistoricalFoldEvidence(
+                    fold_id=_required_string(item.get("fold_id"), "historical fold"),
+                    evaluation_year=_strict_int(item.get("evaluation_year")),
+                    signal_count=_strict_int(item.get("signal_count")),
+                    candidate_count=_strict_int(item.get("candidate_count")),
+                    completed_trades=_strict_int(item.get("completed_trades")),
+                    cumulative_return=_finite_float(item.get("cumulative_return")),
+                    stress_cumulative_return=_finite_float(item.get("stress_cumulative_return")),
+                    stress_max_drawdown=_finite_float(item.get("stress_max_drawdown")),
+                    gross_profit=_finite_float(item.get("gross_profit")),
+                    gross_loss=_finite_float(item.get("gross_loss")),
+                    stress_gross_profit=_finite_float(item.get("stress_gross_profit")),
+                    stress_gross_loss=_finite_float(item.get("stress_gross_loss")),
+                )
+                for item in _mapping_list(raw_folds, "historical screen folds")
+            ),
+            aggregate=HistoricalAggregateEvidence(
+                completed_trades=_strict_int(aggregate.get("completed_trades")),
+                traded_folds=_strict_int(aggregate.get("traded_folds")),
+                positive_traded_fold_rate=_finite_float(aggregate.get("positive_traded_fold_rate")),
+                cumulative_return=_finite_float(aggregate.get("cumulative_return")),
+                profit_factor=_required_string(
+                    aggregate.get("profit_factor"), "aggregate profit factor"
+                ),
+                stress_cumulative_return=_finite_float(aggregate.get("stress_cumulative_return")),
+                stress_profit_factor=_required_string(
+                    aggregate.get("stress_profit_factor"), "stress profit factor"
+                ),
+                stress_max_drawdown=_finite_float(aggregate.get("stress_max_drawdown")),
+                trade_fold_concentration=_finite_float(aggregate.get("trade_fold_concentration")),
+                profit_fold_concentration=_finite_float(aggregate.get("profit_fold_concentration")),
+            ),
+            benchmarks=HistoricalBenchmarkEvidence(
+                cash_return=_finite_float(benchmarks.get("cash_return")),
+                family_baseline_return=_finite_float(benchmarks.get("family_baseline_return")),
+                random_entry_samples=tuple(
+                    ExposureMatchedRandomSample(
+                        sample_index=_strict_int(item.get("sample_index")),
+                        cumulative_return=_finite_float(item.get("cumulative_return")),
+                        completed_trades=_strict_int(item.get("completed_trades")),
+                        entry_months=_int_tuple(item.get("entry_months")),
+                        holding_sessions=_int_tuple(item.get("holding_sessions")),
+                    )
+                    for item in _mapping_list(
+                        raw_samples,
+                        "historical screen random-entry samples",
+                    )
+                ),
+            ),
+            selection_adjustment=SelectionAdjustmentResult(
+                selected_trial_id=_required_string(
+                    selection.get("selected_trial_id"), "selected trial"
+                ),
+                included_trial_ids=_string_tuple(selection.get("included_trial_ids")),
+                observed_mean_excess_return=Decimal(
+                    _required_string(
+                        selection.get("observed_mean_excess_return"),
+                        "observed mean excess return",
+                    )
+                ),
+                adjusted_confidence=Decimal(
+                    _required_string(
+                        selection.get("adjusted_confidence"),
+                        "adjusted confidence",
+                    )
+                ),
+                repetitions=_strict_int(selection.get("repetitions")),
+                block_sessions=_strict_int(selection.get("block_sessions")),
+                passed=_strict_bool(selection.get("passed")),
+            ),
+            gates=tuple(
+                QualificationGate(
+                    name=_required_string(item.get("name"), "historical gate"),
+                    passed=_strict_bool(item.get("passed")),
+                    actual=_required_string(item.get("actual"), "historical gate actual"),
+                    threshold=_required_string(item.get("threshold"), "historical gate threshold"),
+                )
+                for item in _mapping_list(raw_gates, "historical screen gates")
+            ),
+            passed=_strict_bool(payload.get("passed")),
+            disposition=_required_string(
+                payload.get("disposition"), "historical screen disposition"
+            ),
+        )
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise QualificationRegistryError(f"historical screen payload is malformed: {exc}") from exc
+
+
 def _validate_plan_selection_boundaries(plan: HistoricalQualificationPlan) -> None:
+    if plan.study_identity is not None:
+        try:
+            validate_study_qualification_identity(plan.study_identity)
+        except ValueError as exc:
+            raise QualificationRegistryError(str(exc)) from exc
     if (
         plan.forward_selection_epoch is not None
         and plan.retrospective_selection_checkpoint is not None
@@ -1251,7 +1599,7 @@ def _validate_plan_selection_boundaries(plan: HistoricalQualificationPlan) -> No
         raise QualificationRegistryError(
             "qualification plan cannot contain two selection boundaries"
         )
-    if plan.evidence_role == "retrospective-confirmatory":
+    if plan.evidence_role in RETROSPECTIVE_EVIDENCE_ROLES:
         if plan.retrospective_selection_checkpoint is None:
             raise QualificationRegistryError("retrospective plan requires frozen trial universe")
         if plan.forward_selection_epoch is not None:
@@ -1268,6 +1616,51 @@ def _mapping_value(value: object, name: str) -> Mapping[str, object]:
     if not isinstance(value, Mapping):
         raise ValueError(f"{name} must be an object")
     return value
+
+
+def _mapping_list(value: object, name: str) -> list[Mapping[str, object]]:
+    if not isinstance(value, list) or not all(isinstance(item, Mapping) for item in value):
+        raise ValueError(f"{name} must be a list of objects")
+    return value
+
+
+def _strict_int(value: object) -> int:
+    if type(value) is not int:
+        raise ValueError("historical screen integer field is malformed")
+    return value
+
+
+def _strict_bool(value: object) -> bool:
+    if type(value) is not bool:
+        raise ValueError("historical screen boolean field is malformed")
+    return value
+
+
+def _finite_float(value: object) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError("historical screen numeric field is malformed")
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError("historical screen numeric field is not finite")
+    return parsed
+
+
+def _required_string(value: object, name: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{name} must be a nonempty string")
+    return value
+
+
+def _int_tuple(value: object) -> tuple[int, ...]:
+    if not isinstance(value, list) or not all(type(item) is int for item in value):
+        raise ValueError("historical screen integer inventory is malformed")
+    return tuple(value)
+
+
+def _string_tuple(value: object) -> tuple[str, ...]:
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        raise ValueError("historical screen identity inventory is malformed")
+    return tuple(value)
 
 
 def _mapping_field(payload: Mapping[str, object], name: str) -> Mapping[str, object]:

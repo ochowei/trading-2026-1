@@ -214,6 +214,10 @@ results/**/*.json
 !results/**/*.snapshot.json
 !results/trial_registry.json
 !results/*--*-gate/*.json
+!results/qualification-evidence/
+!results/qualification-evidence/*.json
+!results/study-evidence/
+!results/study-evidence/**/*.json
 results/**/.trial_registry.json.lock
 
 # Local trading runtime data (never commit provider cache, protected blobs, or state)

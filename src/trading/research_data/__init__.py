@@ -5,6 +5,7 @@ from trading.research_data.definitions import (
     ResearchDefinitionError,
     ResearchDefinitionStore,
 )
+from trading.research_data.evidence import QualificationEvidenceStore, ResearchEvidenceStore
 from trading.research_data.manifest_codec import SnapshotManifestError
 from trading.research_data.migration import (
     MIGRATION_RESULT_SCHEMA_VERSION,
@@ -51,6 +52,7 @@ from trading.research_data.store import (
 )
 from trading.research_data.trial_registry import (
     ExperimentTrialRegistry,
+    OutcomeFreeTrialRegistration,
     TrialRegistryError,
     formal_trial_id,
     legacy_trial_id,
@@ -62,6 +64,7 @@ __all__ = [
     "CURRENT_RESULT_SCHEMA_VERSION",
     "ExperimentTrialDeclaration",
     "ExperimentTrialRegistry",
+    "OutcomeFreeTrialRegistration",
     "GarbageCollectionReport",
     "ImmutableBlobCorruptionError",
     "MIGRATION_RESULT_SCHEMA_VERSION",
@@ -71,6 +74,8 @@ __all__ = [
     "MigrationResultError",
     "MigrationResultStore",
     "ResearchDataStore",
+    "ResearchEvidenceStore",
+    "QualificationEvidenceStore",
     "ResearchDefinitionError",
     "ResearchDefinitionSnapshot",
     "ResearchDefinitionStore",

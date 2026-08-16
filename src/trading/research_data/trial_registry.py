@@ -11,6 +11,7 @@ import threading
 import uuid
 from collections.abc import Callable, Iterable
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -39,6 +40,16 @@ except ImportError:  # pragma: no cover
 
 class TrialRegistryError(RuntimeError):
     """The registry is malformed, conflicting, or cannot be published safely."""
+
+
+@dataclass(frozen=True, slots=True)
+class OutcomeFreeTrialRegistration:
+    """One semantic trial identity prepared without an outcome observation."""
+
+    experiment_family: str
+    definition_fingerprint: str
+    experiment_name: str
+    hypothesis: str = ""
 
 
 _THREAD_LOCKS: dict[Path, threading.RLock] = {}
@@ -138,6 +149,59 @@ class ExperimentTrialRegistry:
             return trial_id
 
         return self._update(update)
+
+    def preview_registration_state(
+        self,
+        registrations: Iterable[OutcomeFreeTrialRegistration],
+        *,
+        registered_at: datetime,
+    ) -> dict[str, object]:
+        """Return the exact post-registration state without changing the registry."""
+        timestamp = _timestamp(registered_at)
+        prepared = _prepare_registrations(registrations)
+        with self._locked():
+            state = copy.deepcopy(self._load_unlocked())
+        _apply_outcome_free_registrations(state, prepared, timestamp)
+        return state
+
+    def register_trials_atomically(
+        self,
+        registrations: Iterable[OutcomeFreeTrialRegistration],
+        *,
+        registered_at: datetime,
+    ) -> tuple[str, ...]:
+        """Register a complete outcome-free family in one locked registry update."""
+        timestamp = _timestamp(registered_at)
+        prepared = _prepare_registrations(registrations)
+
+        def update(state: dict[str, object]) -> tuple[str, ...]:
+            return _apply_outcome_free_registrations(state, prepared, timestamp)
+
+        return self._update(update)
+
+    def register_trials_with_locked_callback(
+        self,
+        registrations: Iterable[OutcomeFreeTrialRegistration],
+        *,
+        registered_at: datetime,
+        callback: Callable[[dict[str, object], tuple[str, ...]], None],
+    ) -> tuple[str, ...]:
+        """Commit registrations and invoke a coordinator callback while retaining the lock.
+
+        The trial bytes are durable before the callback runs. If the callback fails, an external
+        transaction journal can recover idempotently, while no concurrent family mutation can
+        interleave between the exact-universe check and the coordinated second write.
+        """
+        timestamp = _timestamp(registered_at)
+        prepared = _prepare_registrations(registrations)
+        with self._locked():
+            state = self._load_unlocked()
+            before = canonical_json_bytes(state)
+            trial_ids = _apply_outcome_free_registrations(state, prepared, timestamp)
+            if before != canonical_json_bytes(state):
+                self._write_unlocked(state)
+            callback(copy.deepcopy(state), trial_ids)
+            return copy.deepcopy(trial_ids)
 
     def record_observation(
         self,
@@ -370,6 +434,76 @@ def formal_trial_id(experiment_family: str, definition_fingerprint: str) -> str:
             }
         )
     ).hexdigest()
+
+
+def _prepare_registrations(
+    registrations: Iterable[OutcomeFreeTrialRegistration],
+) -> tuple[OutcomeFreeTrialRegistration, ...]:
+    prepared = tuple(registrations)
+    if not prepared:
+        raise TrialRegistryError("atomic trial registration requires at least one identity")
+    identities: set[str] = set()
+    for item in prepared:
+        _require_text(item.experiment_family, "experiment_family")
+        _require_text(item.definition_fingerprint, "definition_fingerprint")
+        _require_text(item.experiment_name, "experiment_name")
+        if not isinstance(item.hypothesis, str):
+            raise TrialRegistryError("hypothesis must be text")
+        trial_id = formal_trial_id(item.experiment_family, item.definition_fingerprint)
+        if trial_id in identities:
+            raise TrialRegistryError("atomic trial registration contains duplicate identities")
+        identities.add(trial_id)
+    return tuple(
+        sorted(
+            prepared,
+            key=lambda item: formal_trial_id(
+                item.experiment_family,
+                item.definition_fingerprint,
+            ),
+        )
+    )
+
+
+def _apply_outcome_free_registrations(
+    state: dict[str, object],
+    registrations: tuple[OutcomeFreeTrialRegistration, ...],
+    timestamp: str,
+) -> tuple[str, ...]:
+    trials = _trials(state)
+    identities: list[str] = []
+    for item in registrations:
+        trial_id = formal_trial_id(item.experiment_family, item.definition_fingerprint)
+        identities.append(trial_id)
+        existing = _find_trial(trials, trial_id)
+        if existing is None:
+            trials.append(
+                {
+                    "trial_id": trial_id,
+                    "identity_kind": "semantic-definition",
+                    "experiment_family": item.experiment_family,
+                    "definition_fingerprint": item.definition_fingerprint,
+                    "experiment_names": [item.experiment_name],
+                    "hypothesis": item.hypothesis,
+                    "first_registered_at": timestamp,
+                    "last_observed_at": None,
+                    "status": "registered",
+                    "legacy": False,
+                    "selection_history_incomplete": False,
+                    "observations": [],
+                }
+            )
+            continue
+        _verify_formal_identity(
+            existing,
+            item.experiment_family,
+            item.definition_fingerprint,
+        )
+        names = _experiment_names(existing)
+        if item.experiment_name not in names:
+            names.append(item.experiment_name)
+        if item.hypothesis and not existing.get("hypothesis"):
+            existing["hypothesis"] = item.hypothesis
+    return tuple(identities)
 
 
 def legacy_trial_id(experiment_name: str) -> str:

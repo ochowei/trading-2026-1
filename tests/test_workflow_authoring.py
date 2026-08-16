@@ -1,6 +1,9 @@
 import copy
 import hashlib
 import json
+import shutil
+import subprocess
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -8,6 +11,7 @@ import pytest
 
 from trading.cli import build_parser, main
 from trading.core.policy_authoring import PolicyRepository
+from trading.core.study_qualification import REQUIRED_STUDY_TIME_CHALLENGES
 from trading.core.workflow_authoring import (
     MarkdownDocument,
     WorkflowAuthoringError,
@@ -16,6 +20,8 @@ from trading.core.workflow_authoring import (
     render_markdown_document,
 )
 from trading.core.workflow_studies import WorkflowStudyService
+from trading.research_data import ResearchDefinitionStore, formal_trial_id
+from trading.research_definitions import ResearchDefinitionRegistry, resolve_workflow_policy_set
 
 FIXED_TIME = datetime(2026, 8, 11, 4, 5, 6, tzinfo=UTC)
 
@@ -70,6 +76,135 @@ def _initialize_root(tmp_path: Path) -> tuple[Path, WorkflowRepository]:
     return root, WorkflowRepository(root, now=lambda: FIXED_TIME)
 
 
+def test_candidate_freeze_evidence_requires_canonical_content_addressed_bytes(tmp_path) -> None:
+    root, _repository = _initialize_root(tmp_path)
+    indexed: set[Path] = set()
+    repository = WorkflowRepository(
+        root,
+        now=lambda: FIXED_TIME,
+        git_index_checker=lambda path: path.resolve() in indexed,
+    )
+    freeze = (
+        root
+        / "example-workflow--v001"
+        / "work"
+        / "studies"
+        / "example--s001"
+        / "CANDIDATE_FREEZE.json"
+    )
+    content = b"# Exact evidence\n"
+    digest = hashlib.sha256(content).hexdigest()
+    freeze.parent.mkdir(parents=True)
+    freeze.write_text(
+        json.dumps({"schema_version": 1, "development_evidence_sha256": digest}) + "\n",
+        encoding="utf-8",
+    )
+
+    issues = []
+    repository._validate_candidate_freeze_evidence(issues)
+    assert len(issues) == 1
+    assert "missing research evidence" in issues[0].message
+
+    artifact = tmp_path / "results" / "research-evidence" / f"{digest}.md"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes(content)
+    issues = []
+    repository._validate_candidate_freeze_evidence(issues)
+    assert len(issues) == 1
+    assert "not in the Git index" in issues[0].message
+
+    indexed.add(artifact.resolve())
+    issues = []
+    repository._validate_candidate_freeze_evidence(issues)
+    assert issues == []
+
+    artifact.write_bytes(b"drifted\n")
+    issues = []
+    repository._validate_candidate_freeze_evidence(issues)
+    assert len(issues) == 1
+    assert "checksum has changed" in issues[0].message
+
+
+def test_candidate_freeze_evidence_survives_git_gc_and_fresh_clone(tmp_path) -> None:
+    source = tmp_path / "source"
+    root, _repository = _initialize_root(source)
+    content = b"# Fresh-clone evidence\n"
+    digest = hashlib.sha256(content).hexdigest()
+    freeze = root / "example--v001" / "work" / "studies" / "example--s001" / "CANDIDATE_FREEZE.json"
+    freeze.parent.mkdir(parents=True)
+    freeze.write_text(
+        json.dumps({"schema_version": 1, "development_evidence_sha256": digest}) + "\n",
+        encoding="utf-8",
+    )
+    artifact = source / "results" / "research-evidence" / f"{digest}.md"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes(content)
+    subprocess.run(["git", "init", "-q"], cwd=source, check=True)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=source, check=True)
+    subprocess.run(["git", "config", "user.name", "Test"], cwd=source, check=True)
+    subprocess.run(["git", "add", "."], cwd=source, check=True)
+    subprocess.run(["git", "commit", "-qm", "fixture"], cwd=source, check=True)
+    subprocess.run(["git", "gc", "--prune=now"], cwd=source, check=True)
+
+    clone = tmp_path / "clone"
+    subprocess.run(["git", "clone", "-q", str(source), str(clone)], check=True)
+    issues: list = []
+    WorkflowRepository(clone / "workflows")._validate_candidate_freeze_evidence(issues)
+    assert issues == []
+
+
+def test_git_index_check_rejects_worktree_bytes_that_differ_from_staged_blob(tmp_path) -> None:
+    root, _repository = _initialize_root(tmp_path)
+    freeze = root / "example--v001" / "work" / "studies" / "example--s001" / "CANDIDATE_FREEZE.json"
+    current = b"worktree bytes\n"
+    digest = hashlib.sha256(current).hexdigest()
+    artifact = tmp_path / "results" / "research-evidence" / f"{digest}.md"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_bytes(b"staged bytes\n")
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "add", str(artifact.relative_to(tmp_path))], cwd=tmp_path, check=True)
+    artifact.write_bytes(current)
+    freeze.parent.mkdir(parents=True)
+    freeze.write_text(
+        json.dumps({"schema_version": 1, "development_evidence_sha256": digest}) + "\n",
+        encoding="utf-8",
+    )
+    # Canonical path for the worktree bytes exists in the index, but its staged bytes differ.
+    issues = []
+    WorkflowRepository(root)._validate_candidate_freeze_evidence(issues)
+    assert len(issues) == 1
+    assert "not in the Git index" in issues[0].message
+
+
+@pytest.mark.parametrize(
+    "relative",
+    [
+        "results/qualification-evidence/" + "a" * 64 + ".json",
+        "results/study-evidence/example--s001/challenges/cash.json",
+    ],
+)
+def test_repository_gitignore_tracks_terminal_evidence_namespaces(
+    tmp_path,
+    relative: str,
+) -> None:
+    (tmp_path / ".gitignore").write_text(
+        Path(".gitignore").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    artifact = tmp_path / relative
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    artifact.write_text("{}\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+
+    result = subprocess.run(
+        ["git", "check-ignore", "--no-index", "-q", relative],
+        cwd=tmp_path,
+        check=False,
+    )
+
+    assert result.returncode == 1
+
+
 def _register_version(
     root: Path,
     *,
@@ -81,6 +216,7 @@ def _register_version(
     source_changes: list[str] | None = None,
     dependencies: list[dict[str, str]] | None = None,
     policies: list[dict[str, str]] | None = None,
+    capabilities: list[str] | None = None,
 ) -> Path:
     registry_path = root / "README.md"
     registry_document = read_markdown_document(registry_path)
@@ -104,6 +240,7 @@ def _register_version(
             "source_changes": source_changes or [],
             "dependencies": dependencies or [],
             **({"policies": policies} if policies is not None else {}),
+            **({"capabilities": capabilities} if capabilities is not None else {}),
         },
         _version_body(title),
     )
@@ -203,6 +340,55 @@ def test_repository_with_policy_registry_rejects_unpinned_workflow_release(tmp_p
 
     with pytest.raises(WorkflowAuthoringError, match="explicit policy pins"):
         repository.release(version, approved_by="research-owner")
+
+
+def test_pinned_reference_companion_digest_is_released_and_drift_checked(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    companion = tmp_path / "docs" / "stages.md"
+    companion.parent.mkdir()
+    companion.write_text("# Stages\n\nExplanatory only.\n", encoding="utf-8")
+    version = _register_version(
+        root,
+        dependencies=[{"path": "docs/stages.md", "role": "reference", "pinned": True}],
+    )
+    repository.sync()
+
+    release = repository.release(version, approved_by="research-owner")
+
+    assert release["dependencies"] == [
+        {
+            "path": "docs/stages.md",
+            "role": "reference",
+            "pinned": True,
+            "sha256": hashlib.sha256(companion.read_bytes()).hexdigest(),
+        }
+    ]
+    companion.write_text("# Stages\n\nChanged after release.\n", encoding="utf-8")
+    assert any(
+        "active pinned dependency digest has changed" in issue.message
+        for issue in repository.validate_all()
+    )
+
+
+def test_retired_release_still_rejects_pinned_reference_drift(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    companion = tmp_path / "docs" / "stages.md"
+    companion.parent.mkdir()
+    companion.write_text("# Stages\n\nPinned bytes.\n", encoding="utf-8")
+    version = _register_version(
+        root,
+        dependencies=[{"path": "docs/stages.md", "role": "reference", "pinned": True}],
+    )
+    repository.sync()
+    repository.release(version, approved_by="research-owner")
+    repository.transition_version(version, "retired", approved_by="research-owner")
+
+    companion.write_text("# Stages\n\nDrifted after retirement.\n", encoding="utf-8")
+
+    assert any(
+        "released pinned dependency digest has changed" in issue.message
+        for issue in repository.validate_all()
+    )
 
 
 def _create_change(version_path: Path, *, number: int = 1) -> Path:
@@ -362,7 +548,7 @@ def test_release_supersedes_active_version_and_releases_source_changes(tmp_path)
 
     dependency.write_text("# Qualification\n\nChanged normative rules.\n", encoding="utf-8")
     assert any(
-        "active normative dependency digest has changed" in issue.message
+        "active pinned dependency digest has changed" in issue.message
         for issue in repository.validate_all()
     )
 
@@ -393,7 +579,7 @@ def test_replacement_release_can_pin_an_intentionally_updated_normative_dependen
 
     dependency.write_text("# Qualification\n\nApproved replacement gates.\n", encoding="utf-8")
     assert any(
-        "active normative dependency digest has changed" in issue.message
+        "active pinned dependency digest has changed" in issue.message
         for issue in repository.validate_all()
     )
 
@@ -490,6 +676,231 @@ def test_cli_has_no_backdated_release_clock(tmp_path) -> None:
         )
 
 
+def test_cli_exposes_guarded_candidate_freeze_without_backdated_clock() -> None:
+    args = build_parser().parse_args(
+        [
+            "workflow",
+            "study",
+            "freeze-candidate",
+            "workflows/example--v001/work/studies/example--s001",
+            "--selection",
+            "development-selection.json",
+            "--approved-by",
+            "owner@example.com",
+        ]
+    )
+    assert args.workflow_study_command == "freeze-candidate"
+    assert not hasattr(args, "approved_at")
+
+
+def test_cli_dispatches_guarded_candidate_freeze(tmp_path, capsys, monkeypatch) -> None:
+    captured = {}
+
+    def freeze_candidate(_self, study_path, *, selection_path, approved_by):
+        captured.update(
+            study_path=study_path,
+            selection_path=selection_path,
+            approved_by=approved_by,
+        )
+        return {"study_id": "S001"}
+
+    monkeypatch.setattr(WorkflowStudyService, "freeze_candidate", freeze_candidate)
+    main(
+        [
+            "workflow",
+            "--root",
+            str(tmp_path / "workflows"),
+            "study",
+            "freeze-candidate",
+            "workflows/example--v001/work/studies/example--s001",
+            "--selection",
+            "development-selection.json",
+            "--approved-by",
+            "owner@example.com",
+        ]
+    )
+
+    assert captured == {
+        "study_path": Path("workflows/example--v001/work/studies/example--s001"),
+        "selection_path": Path("development-selection.json"),
+        "approved_by": "owner@example.com",
+    }
+    assert "workflow candidate frozen: S001" in capsys.readouterr().out
+
+
+def test_public_cli_dry_run_compiles_real_structured_study_end_to_end(
+    tmp_path,
+    capsys,
+) -> None:
+    """Exercise release -> study freeze -> exact compiler without provider access or mocks."""
+    current_v008 = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata
+    (tmp_path / "policies").symlink_to(Path("policies").resolve(), target_is_directory=True)
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests", tmp_path / "tests")
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(
+        root,
+        policies=copy.deepcopy(current_v008["policies"]),
+        capabilities=["study-time-retrospective-v1"],
+    )
+    (version / "WORKFLOW.md").write_text(
+        _workflow_definition("Example Workflow")
+        + "\n## Retrospective route\n\nstudy-time-retrospective is authorized.\n",
+        encoding="utf-8",
+    )
+    repository.sync()
+    repository.release(version, approved_by="owner@example.com")
+
+    service = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    study = service.initialize(
+        version,
+        study_slug="structured-public-path",
+        title="Structured public path",
+        created_by="researcher@example.com",
+        route="study-time-retrospective",
+    )
+    _complete_study_plan(study)
+
+    identities = (
+        "fxi-atr-band-mean-reversion/atr-band-candidate",
+        "fxi-atr-band-mean-reversion/pullback-wr-baseline",
+    )
+    source_registry = ResearchDefinitionRegistry()
+    policy_set = resolve_workflow_policy_set(version)
+    definition_store = ResearchDefinitionStore(tmp_path / "definition-store", publish=False)
+    frozen_family = []
+    for identity in identities:
+        strategy = source_registry.load(identity)
+        snapshot = strategy.capture_research_definition(definition_store, policy_set)
+        declaration = strategy.declare_experiment_trial()
+        frozen_family.append(
+            {
+                "source_identity": identity,
+                "trial_id": formal_trial_id(declaration.family, snapshot.fingerprint),
+                "definition_fingerprint": snapshot.fingerprint,
+            }
+        )
+
+    spec_path = study / "QUALIFICATION_SPEC.json"
+    spec = json.loads(spec_path.read_text(encoding="utf-8"))
+    spec.update(
+        evidence_justification="Historical outcomes may have been inspected before this study.",
+        prior_selection_history_incomplete=False,
+    )
+    spec["calendar"] = {
+        "warmup_start": "2009-01-01",
+        "warmup_end": "2009-12-31",
+        "development_years": [2010, 2011, 2012],
+        "quarantine_years": [2013],
+        "evaluation_years": [2014, 2015, 2016, 2017, 2018],
+    }
+    spec["family"] = {
+        "maximum_trials": len(identities),
+        "baseline_identity": identities[1],
+        "members": [
+            {
+                "identity": identity,
+                "source_sha256": hashlib.sha256(
+                    source_registry.resolve(identity).read_bytes()
+                ).hexdigest(),
+                "role": "selection-candidate" if index == 0 else "family-baseline",
+            }
+            for index, identity in enumerate(identities)
+        ],
+        "shared_sources": [],
+    }
+    spec["execution"] = {
+        "maximum_holding_sessions": 20,
+        "execution_lag_sessions": 1,
+        "dependency_sessions": 21,
+        "embargo_sessions": 1,
+        "stress_drawdown_limit": "0.20",
+    }
+    spec["benchmarks"] = {
+        "random_seed": 7,
+        "random_samples": 100,
+        "bootstrap_repetitions": 100,
+        "bootstrap_block_sessions": 20,
+    }
+    spec["required_challenges"] = [
+        {
+            "id": challenge,
+            "evidence_identity": f"{challenge}-evidence",
+            "applies_to": {
+                "kind": (
+                    "benchmark"
+                    if challenge in {"cash", "random-entry"}
+                    else "trial"
+                    if challenge == "family-baseline"
+                    else "method"
+                ),
+                "identities": [
+                    challenge
+                    if challenge in {"cash", "random-entry"}
+                    else identities[1]
+                    if challenge == "family-baseline"
+                    else f"{challenge}-method"
+                ],
+            },
+            "gate": {"metric": "passed", "operator": "=", "threshold": True},
+        }
+        for challenge in sorted(REQUIRED_STUDY_TIME_CHALLENGES)
+    ]
+    spec_path.write_text(json.dumps(spec, sort_keys=True) + "\n", encoding="utf-8")
+
+    service.preregister(study, approved_by="owner@example.com")
+    service.transition(
+        study,
+        "running",
+        actor="researcher@example.com",
+        approved_by="owner@example.com",
+    )
+    selection_path = tmp_path / "development-selection.json"
+    selection_path.write_text(
+        json.dumps(
+            {
+                "selected_candidate": frozen_family[0],
+                "family_baseline": frozen_family[1],
+                "complete_family": frozen_family,
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    service.freeze_candidate(
+        study,
+        selection_path=selection_path,
+        approved_by="owner@example.com",
+    )
+
+    qualification_registry = tmp_path / "state" / "qualification-registry.json"
+    trial_registry = tmp_path / "results" / "trial_registry.json"
+    main(
+        [
+            "qualification",
+            "plan",
+            "register-study",
+            "--study",
+            str(study),
+            "--path",
+            str(qualification_registry),
+            "--trial-registry-path",
+            str(trial_registry),
+            "--dry-run",
+        ]
+    )
+
+    output = capsys.readouterr().out
+    assert "study qualification plan compiled (dry-run)" in output
+    assert "frozen family trials: 2" in output
+    assert "evidence role: study-time-retrospective" in output
+    assert not qualification_registry.exists()
+    assert not trial_registry.exists()
+
+
 def test_study_lifecycle_freezes_plan_evidence_and_conclusion(tmp_path) -> None:
     root, repository = _initialize_root(tmp_path)
     version = _register_version(root)
@@ -561,6 +972,102 @@ def test_study_lifecycle_freezes_plan_evidence_and_conclusion(tmp_path) -> None:
     )
 
 
+def test_capability_scoped_study_requires_explicit_route_at_creation(tmp_path, monkeypatch) -> None:
+    root, repository = _initialize_root(tmp_path)
+    version = _register_version(
+        root,
+        capabilities=["study-time-retrospective-v1"],
+    )
+    repository.sync()
+    repository.release(version, approved_by="research-owner")
+    monkeypatch.setattr(
+        "trading.core.workflow_studies.structured_qualification_runtime_contract",
+        lambda _path: {
+            "policy_set": {"identity": "a" * 64, "releases": []},
+            "cost_policies": {},
+            "evidence_contract": {},
+        },
+    )
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+
+    with pytest.raises(WorkflowAuthoringError, match="explicit study route"):
+        studies.initialize(
+            version,
+            study_slug="missing-route",
+            title="Missing route",
+            created_by="research-agent",
+        )
+
+    study = studies.initialize(
+        version,
+        study_slug="clean-route",
+        title="Clean route",
+        created_by="research-agent",
+        route="clean-historical",
+    )
+
+    metadata = read_markdown_document(study / "README.md").metadata
+    assert metadata["route"] == "clean-historical"
+    assert (study / "QUALIFICATION_SPEC.json").is_file()
+
+
+def test_first_development_transition_requires_separate_human_authorization(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    root, repository = _initialize_root(tmp_path)
+    version = root / "example-workflow--v001"
+    version.mkdir()
+    (version / "RELEASE.json").write_text(
+        json.dumps({"capabilities": ["study-time-retrospective-v1"]}) + "\n",
+        encoding="utf-8",
+    )
+    study = version / "work" / "studies" / "example--s001"
+    study.mkdir(parents=True)
+    (study / "PREREGISTRATION.json").write_text("{}\n", encoding="utf-8")
+    document = MarkdownDocument(
+        {
+            "status": "preregistered",
+            "route": "study-time-retrospective",
+            "preregistered_by": "owner@example.com",
+        },
+        "# Study\n",
+    )
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    monkeypatch.setattr(repository, "_require_structurally_valid", lambda: None)
+    monkeypatch.setattr(studies.repository, "_require_structurally_valid", lambda: None)
+    monkeypatch.setattr(studies.repository, "sync", lambda: None)
+    monkeypatch.setattr(studies.repository, "_require_valid", lambda: None)
+    monkeypatch.setattr(
+        studies,
+        "_study_context",
+        lambda _path: (study, version, {"status": "active"}, document),
+    )
+    monkeypatch.setattr(studies, "_write_study_readme", lambda *_args: None)
+
+    with pytest.raises(WorkflowAuthoringError, match="approved-by"):
+        studies.transition(study, "running", actor="research-agent")
+    with pytest.raises(WorkflowAuthoringError, match="preregistered human owner"):
+        studies.transition(
+            study,
+            "running",
+            actor="research-agent",
+            approved_by="other@example.com",
+        )
+
+    studies.transition(
+        study,
+        "running",
+        actor="research-agent",
+        approved_by="owner@example.com",
+    )
+    authorization = json.loads(
+        (study / "DEVELOPMENT_AUTHORIZATION.json").read_text(encoding="utf-8")
+    )
+    assert authorization["approved_by"] == "owner@example.com"
+    assert authorization["authorized_operator"] == "research-agent"
+
+
 def test_study_transitions_are_guarded_and_require_reasons(tmp_path) -> None:
     root, repository = _initialize_root(tmp_path)
     version = _register_version(root)
@@ -604,6 +1111,147 @@ def test_study_transitions_are_guarded_and_require_reasons(tmp_path) -> None:
         reason="The proposed question duplicates an existing study",
     )
     assert repository.validate_all() == ()
+
+
+@pytest.mark.parametrize(
+    ("outcome", "disposition", "stage"),
+    [
+        ("pass", "retrospectively-supported", "retrospective-evaluation"),
+        ("fail", "development-selection-failed", "development"),
+        ("fail", "retrospective-screen-failed", "retrospective-evaluation"),
+        ("indeterminate", None, "candidate-freeze"),
+    ],
+)
+def test_study_time_retrospective_terminal_mapping(
+    outcome: str,
+    disposition: str | None,
+    stage: str,
+) -> None:
+    WorkflowStudyService._validate_terminal_decision(
+        route="study-time-retrospective",
+        outcome=outcome,
+        disposition=disposition,
+        decision_stage=stage,
+    )
+
+
+def test_study_time_retrospective_rejects_insufficient_evidence() -> None:
+    with pytest.raises(WorkflowAuthoringError, match="outcome, disposition"):
+        WorkflowStudyService._validate_terminal_decision(
+            route="study-time-retrospective",
+            outcome="insufficient-evidence",
+            disposition=None,
+            decision_stage="retrospective-evaluation",
+        )
+
+
+@pytest.mark.parametrize(
+    ("outcome", "disposition", "stage", "requires_current"),
+    [
+        ("pass", "retrospectively-supported", "retrospective-evaluation", False),
+        ("fail", "development-selection-failed", "development", True),
+        ("fail", "retrospective-screen-failed", "retrospective-evaluation", False),
+        ("indeterminate", None, "candidate-freeze", False),
+    ],
+)
+def test_every_study_time_completion_holds_study_registration_lock_through_commit(
+    tmp_path,
+    monkeypatch,
+    outcome: str,
+    disposition: str | None,
+    stage: str,
+    requires_current: bool,
+) -> None:
+    study = tmp_path / "workflows" / "example--v001" / "work" / "studies" / "x--s001"
+    study.mkdir(parents=True)
+    service = WorkflowStudyService.__new__(WorkflowStudyService)
+    service.repository = type(
+        "RepositoryStub",
+        (),
+        {"_require_structurally_valid": lambda _self: None},
+    )()
+    document = MarkdownDocument(
+        {
+            "status": "awaiting-review",
+            "route": "study-time-retrospective",
+        },
+        "body",
+    )
+    monkeypatch.setattr(
+        service,
+        "_study_context",
+        lambda _path: (study, study.parents[2], {}, document),
+    )
+    monkeypatch.setattr(service, "_required_identity", lambda value, _label: value)
+    monkeypatch.setattr(service, "_validate_terminal_decision", lambda **_kwargs: None)
+    monkeypatch.setattr(
+        "trading.core.workflow_studies.frozen_study_qualification_registry_path",
+        lambda _path: tmp_path / "state" / "qualification.json",
+    )
+    held = False
+
+    @contextmanager
+    def controlled_lock(_path, _timeout):
+        nonlocal held
+        held = True
+        try:
+            yield
+        finally:
+            held = False
+
+    monkeypatch.setattr("trading.core.workflow_studies.locked_file", controlled_lock)
+
+    def complete_while_locked(**_kwargs):
+        assert held is True
+        assert _kwargs["require_current_registry"] is requires_current
+        return {"outcome": outcome}
+
+    monkeypatch.setattr(service, "_complete_locked", complete_while_locked)
+
+    result = service.complete(
+        study,
+        outcome=outcome,
+        reviewed_by="reviewer@example.com",
+        disposition=disposition,
+        decision_stage=stage,
+    )
+
+    assert result == {"outcome": outcome}
+    assert held is False
+
+
+def test_study_time_completion_rejects_untracked_terminal_evidence_before_writes(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    study = tmp_path / "workflows" / "example--v001" / "work" / "studies" / "x--s001"
+    study.mkdir(parents=True)
+    service = WorkflowStudyService.__new__(WorkflowStudyService)
+
+    class RepositoryStub:
+        @staticmethod
+        def _validate_study_time_terminal(_metadata, _readme, issues) -> None:
+            issues.append(type("Issue", (), {"message": "artifact is not in the Git index"})())
+
+    service.repository = RepositoryStub()
+    monkeypatch.setattr(
+        "trading.core.workflow_studies.validate_study_time_terminal_evidence",
+        lambda **_kwargs: "a" * 64,
+    )
+
+    with pytest.raises(WorkflowAuthoringError, match="before completion"):
+        service._complete_locked(
+            path=study,
+            metadata={"route": "study-time-retrospective"},
+            document=MarkdownDocument({}, "# Study\n"),
+            outcome="pass",
+            reviewer="reviewer@example.com",
+            disposition="retrospectively-supported",
+            decision_stage="retrospective-evaluation",
+            require_current_registry=False,
+        )
+
+    assert not (study / "COMPLETION.json").exists()
 
 
 def test_study_creation_and_preregistration_require_active_workflow(tmp_path) -> None:

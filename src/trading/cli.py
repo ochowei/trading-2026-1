@@ -40,6 +40,10 @@ from trading.core.qualification_workflow import (
     run_registered_historical_screen,
 )
 from trading.core.results import compare_experiments, inspect_result, save_result
+from trading.core.study_qualification import (
+    STUDY_QUALIFICATION_CAPABILITY,
+    compile_study_qualification_plan,
+)
 from trading.core.workflow_authoring import WorkflowAuthoringError, WorkflowRepository
 from trading.core.workflow_studies import WorkflowStudyService
 from trading.experiments import get_experiment, list_experiments
@@ -55,6 +59,7 @@ from trading.market_data import (
 from trading.research_data import (
     ExperimentTrialDeclaration,
     ExperimentTrialRegistry,
+    QualificationEvidenceStore,
     QualificationRegistry,
     ResearchDataStore,
     ResearchDefinitionSnapshot,
@@ -332,6 +337,37 @@ def cmd_qualification_status(args: argparse.Namespace) -> None:
 
 def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
     """Freeze and append one forward-dated qualification plan."""
+    if args.workflow is not None:
+        release_path = Path(args.workflow) / "RELEASE.json"
+        try:
+            release = json.loads(release_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            release = {}
+        if isinstance(release, dict) and STUDY_QUALIFICATION_CAPABILITY in release.get(
+            "capabilities", []
+        ):
+            raise ValueError(
+                "capability-scoped workflow qualification requires "
+                "`qualification plan register-study --study ...`"
+            )
+    if (
+        args.family_research
+        or args.evidence_role == "study-time-retrospective"
+        or (args.evidence_role == "historical" and args.development_years is not None)
+    ):
+        raise ValueError(
+            "complete-family, study-time, and explicit clean calendars require "
+            "`qualification plan register-study --study ...`"
+        )
+    family_source_sha256: dict[str, str] = {}
+    for assignment in args.family_source_sha or ():
+        identity, separator, digest = assignment.partition("=")
+        if separator != "=" or not identity.strip() or not digest.strip():
+            raise ValueError("--family-source-sha must use IDENTITY=SHA256")
+        identity = identity.strip()
+        if identity in family_source_sha256:
+            raise ValueError(f"duplicate family source digest: {identity}")
+        family_source_sha256[identity] = digest.strip()
     plan = register_forward_qualification_plan(
         experiment_name=args.experiment,
         research_identity=args.research,
@@ -358,13 +394,21 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
         ),
         warmup_start=args.warmup_start,
         warmup_end=args.warmup_end,
+        quarantine_years=(
+            tuple(args.quarantine_years) if args.quarantine_years is not None else None
+        ),
+        family_research_identities=tuple(args.family_research or ()),
+        dry_run=args.dry_run,
+        family_source_sha256=family_source_sha256,
+        maximum_family_trials=args.family_trial_budget,
     )
     epoch = plan.forward_selection_epoch or getattr(
         plan,
         "retrospective_selection_checkpoint",
         None,
     )
-    print(f"qualification plan registered: {plan.plan_id}")
+    action = "compiled (dry-run)" if args.dry_run else "registered"
+    print(f"qualification plan {action}: {plan.plan_id}")
     print(f"  family: {plan.experiment_family}")
     print(f"  first evaluation session: {plan.evaluation_sessions[0].isoformat()}")
     print(f"  last evaluation session: {plan.evaluation_sessions[-1].isoformat()}")
@@ -380,6 +424,36 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
         "  evidence classification: "
         f"{evidence_audit.classification if evidence_audit else 'legacy-unspecified'}"
     )
+
+
+def cmd_qualification_plan_register_study(args: argparse.Namespace) -> None:
+    """Compile or register one exact frozen study without caller-supplied study inputs."""
+    plan = compile_study_qualification_plan(
+        study_path=args.study,
+        qualification_registry_path=args.path,
+        trial_registry_path=args.trial_registry_path,
+        dry_run=args.dry_run,
+        approved_by=args.approved_by,
+        contamination_declaration=args.contamination_declaration,
+    )
+    boundary = plan.forward_selection_epoch or plan.retrospective_selection_checkpoint
+    action = "compiled (dry-run)" if args.dry_run else "registered"
+    print(f"study qualification plan {action}: {plan.plan_id}")
+    print(f"  study: {plan.study_identity.study_path if plan.study_identity else '-'}")
+    print(f"  family: {plan.experiment_family}")
+    print(f"  frozen family trials: {len(boundary.included_trial_ids) if boundary else 0}")
+    print(f"  evidence role: {plan.evidence_role}")
+
+
+def cmd_qualification_evidence_snapshot(args: argparse.Namespace) -> None:
+    """Publish one verified immutable qualification-registry snapshot."""
+    path, digest = QualificationEvidenceStore(args.output_root).publish_registry(
+        args.path,
+        repository_root=Path.cwd(),
+        source_registry_identity=args.source_registry_identity,
+    )
+    print(f"qualification evidence published: {path}")
+    print(f"  sha256: {digest}")
 
 
 def cmd_qualification_screen_run(args: argparse.Namespace) -> None:
@@ -414,6 +488,10 @@ def cmd_qualification(args: argparse.Namespace) -> None:
             cmd_qualification_status(args)
         elif args.qualification_command == "plan" and args.plan_command == "register":
             cmd_qualification_plan_register(args)
+        elif args.qualification_command == "plan" and args.plan_command == "register-study":
+            cmd_qualification_plan_register_study(args)
+        elif args.qualification_command == "evidence-snapshot":
+            cmd_qualification_evidence_snapshot(args)
         elif args.qualification_command == "screen" and args.screen_command == "run":
             cmd_qualification_screen_run(args)
     except (KeyError, RuntimeError, ValueError) as exc:
@@ -463,6 +541,7 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                     title=args.title,
                     created_by=args.created_by,
                     revisits=args.revisits,
+                    route=args.route,
                 )
                 print(f"workflow study initialized: {path}")
             elif args.workflow_study_command == "preregister":
@@ -474,13 +553,23 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                     args.status,
                     actor=args.actor,
                     reason=args.reason,
+                    approved_by=args.approved_by,
                 )
                 print(f"workflow study transitioned to {args.status}: {args.path}")
+            elif args.workflow_study_command == "freeze-candidate":
+                freeze = studies.freeze_candidate(
+                    args.path,
+                    selection_path=args.selection,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow candidate frozen: {freeze['study_id']}")
             elif args.workflow_study_command == "complete":
                 completion = studies.complete(
                     args.path,
                     outcome=args.outcome,
                     reviewed_by=args.reviewed_by,
+                    disposition=args.disposition,
+                    decision_stage=args.decision_stage,
                 )
                 print(
                     f"workflow study completed: {completion['study_id']} ({completion['outcome']})"
@@ -1910,6 +1999,25 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
     )
+    qualification_evidence_p = qualification_sub.add_parser(
+        "evidence-snapshot",
+        help="Publish a verified content-addressed qualification registry snapshot",
+    )
+    qualification_evidence_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_evidence_p.add_argument(
+        "--output-root",
+        type=Path,
+        default=Path("results/qualification-evidence"),
+    )
+    qualification_evidence_p.add_argument(
+        "--source-registry-identity",
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH.as_posix(),
+        help="Preregistered repository-relative identity of the captured registry",
+    )
     qualification_plan_p = qualification_sub.add_parser(
         "plan",
         help="Manage preregistered forward qualification plans",
@@ -1921,6 +2029,30 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_plan_register_p = qualification_plan_sub.add_parser(
         "register",
         help="Freeze a future-only selection epoch and Historical Screen plan",
+    )
+    qualification_plan_study_p = qualification_plan_sub.add_parser(
+        "register-study",
+        help="Compile or register a complete plan derived from one exact frozen study",
+    )
+    qualification_plan_study_p.add_argument("--study", type=Path, required=True)
+    qualification_plan_study_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_plan_study_p.add_argument(
+        "--trial-registry-path",
+        type=Path,
+        default=Path("results/trial_registry.json"),
+    )
+    qualification_plan_study_p.add_argument("--dry-run", action="store_true")
+    qualification_plan_study_p.add_argument(
+        "--approved-by",
+        help="Separate current human approval; required for registry mutation",
+    )
+    qualification_plan_study_p.add_argument(
+        "--contamination-declaration",
+        help="Current human provenance/contamination declaration; required for mutation",
     )
     qualification_plan_register_p.add_argument(
         "--path",
@@ -1939,6 +2071,29 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_identity.add_argument(
         "--research",
         help="Workflow-native family/trial research-definition identity",
+    )
+    qualification_plan_register_p.add_argument(
+        "--family-research",
+        action="append",
+        help=(
+            "Outcome-free family/trial source identity; repeat to freeze the complete family "
+            "in one current-time registration"
+        ),
+    )
+    qualification_plan_register_p.add_argument(
+        "--family-source-sha",
+        action="append",
+        help="Frozen IDENTITY=SHA256 source bytes; repeat for every --family-research identity",
+    )
+    qualification_plan_register_p.add_argument(
+        "--family-trial-budget",
+        type=positive_int,
+        help="Frozen maximum trial count; must equal the complete prepared family",
+    )
+    qualification_plan_register_p.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Compile and print the exact plan without changing trial or qualification registries",
     )
     qualification_plan_register_p.add_argument(
         "--workflow",
@@ -1970,6 +2125,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--warmup-end",
         type=iso_date,
         help="Last warmup-only session bound for an explicit retrospective role calendar",
+    )
+    qualification_plan_register_p.add_argument(
+        "--quarantine-years",
+        type=int,
+        nargs="*",
+        help=(
+            "Explicit whole-year quarantine inventory; pass the flag with no years to freeze "
+            "an intentionally empty quarantine"
+        ),
     )
     qualification_plan_register_p.add_argument(
         "--maximum-holding-sessions",
@@ -2010,7 +2174,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     qualification_plan_register_p.add_argument(
         "--evidence-role",
-        choices=("historical", "retrospective-confirmatory"),
+        choices=(
+            "historical",
+            "retrospective-confirmatory",
+            "study-time-retrospective",
+        ),
         default="historical",
     )
     qualification_plan_register_p.add_argument(
@@ -2130,6 +2298,15 @@ def build_parser() -> argparse.ArgumentParser:
     workflow_study_init_p.add_argument("--title", required=True)
     workflow_study_init_p.add_argument("--created-by", required=True)
     workflow_study_init_p.add_argument(
+        "--route",
+        choices=(
+            "clean-historical",
+            "retrospective-confirmatory",
+            "study-time-retrospective",
+        ),
+        help="Preregistration route; the released workflow must authorize it",
+    )
+    workflow_study_init_p.add_argument(
         "--revisits",
         help="Repository-relative path of an earlier study being revisited",
     )
@@ -2151,7 +2328,26 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("running", "paused", "awaiting-review", "cancelled"),
     )
     workflow_study_transition_p.add_argument("--by", dest="actor", required=True)
+    workflow_study_transition_p.add_argument(
+        "--approved-by",
+        help=(
+            "Current human approval for the first preregistered-to-running Development "
+            "transition when required by the released workflow"
+        ),
+    )
     workflow_study_transition_p.add_argument("--reason")
+    workflow_study_freeze_candidate_p = workflow_study_sub.add_parser(
+        "freeze-candidate",
+        help="Freeze the Development-selected candidate and complete family with human approval",
+    )
+    workflow_study_freeze_candidate_p.add_argument("path", type=Path)
+    workflow_study_freeze_candidate_p.add_argument(
+        "--selection",
+        type=Path,
+        required=True,
+        help="Development selection JSON without approval or frozen study identity fields",
+    )
+    workflow_study_freeze_candidate_p.add_argument("--approved-by", required=True)
     workflow_study_complete_p = workflow_study_sub.add_parser(
         "complete",
         help="Freeze an independently reviewed conclusion and outcome",
@@ -2163,6 +2359,23 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("pass", "fail", "insufficient-evidence", "indeterminate"),
     )
     workflow_study_complete_p.add_argument("--reviewed-by", required=True)
+    workflow_study_complete_p.add_argument(
+        "--disposition",
+        choices=(
+            "retrospectively-supported",
+            "development-selection-failed",
+            "retrospective-screen-failed",
+        ),
+    )
+    workflow_study_complete_p.add_argument(
+        "--decision-stage",
+        choices=(
+            "development",
+            "candidate-freeze",
+            "retrospective-evaluation",
+            "independent-review",
+        ),
+    )
     workflow_release_p = workflow_sub.add_parser(
         "release",
         help="Prepare an approved release declaration and intended registry state",

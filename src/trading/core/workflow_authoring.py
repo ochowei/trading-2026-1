@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import tempfile
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
@@ -48,6 +49,9 @@ STUDY_STATUSES = frozenset(
     }
 )
 STUDY_OUTCOMES = frozenset({"pass", "fail", "insufficient-evidence", "indeterminate"})
+STUDY_ROUTES = frozenset(
+    {"clean-historical", "retrospective-confirmatory", "study-time-retrospective"}
+)
 
 _CHANGE_TRANSITIONS: dict[str, frozenset[str]] = {
     "draft": frozenset({"proposed", "withdrawn"}),
@@ -201,10 +205,12 @@ class WorkflowRepository:
         root: Path = Path("workflows"),
         *,
         now: Callable[[], datetime] | None = None,
+        git_index_checker: Callable[[Path], bool] | None = None,
     ) -> None:
         self.root = root
         self.repo_root = root.parent
         self.now = now or (lambda: datetime.now(UTC))
+        self.git_index_checker = git_index_checker or self._is_git_indexed
 
     @property
     def registry_path(self) -> Path:
@@ -304,7 +310,84 @@ class WorkflowRepository:
                         )
                 except WorkflowAuthoringError as exc:
                     issues.append(ValidationIssue(version_readme, str(exc)))
+        self._validate_candidate_freeze_evidence(issues)
         return tuple(issues)
+
+    def _validate_candidate_freeze_evidence(
+        self,
+        issues: list[ValidationIssue],
+    ) -> None:
+        """Verify every tracked candidate-freeze evidence digest from canonical bytes."""
+        freezes = sorted(self.root.glob("*/work/studies/*/CANDIDATE_FREEZE.json"))
+        referenced_paths: dict[Path, str] = {}
+        for freeze in freezes:
+            try:
+                payload = json.loads(freeze.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                issues.append(ValidationIssue(freeze, f"invalid candidate freeze JSON: {exc}"))
+                continue
+            if not isinstance(payload, dict):
+                issues.append(ValidationIssue(freeze, "candidate freeze payload must be an object"))
+                continue
+            digest = payload.get("development_evidence_sha256")
+            if digest is None:
+                continue
+            if not isinstance(digest, str) or not SHA256_PATTERN.fullmatch(digest):
+                issues.append(
+                    ValidationIssue(
+                        freeze,
+                        "development_evidence_sha256 must be a SHA-256 digest",
+                    )
+                )
+                continue
+            artifact = self.repo_root / "results" / "research-evidence" / f"{digest}.md"
+            prior = referenced_paths.get(artifact)
+            if prior is not None and prior != digest:
+                issues.append(ValidationIssue(artifact, "research-evidence digest collision"))
+                continue
+            referenced_paths[artifact] = digest
+            if not artifact.is_file():
+                issues.append(
+                    ValidationIssue(
+                        artifact,
+                        f"candidate freeze {freeze} references missing research evidence",
+                    )
+                )
+                continue
+            if not self.git_index_checker(artifact):
+                issues.append(
+                    ValidationIssue(
+                        artifact,
+                        f"candidate freeze {freeze} research evidence is not in the Git index",
+                    )
+                )
+                continue
+            if _sha256(artifact) != digest:
+                issues.append(
+                    ValidationIssue(
+                        artifact,
+                        f"candidate freeze {freeze} research evidence checksum has changed",
+                    )
+                )
+
+    def _is_git_indexed(self, path: Path) -> bool:
+        try:
+            relative = path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        except ValueError:
+            return False
+        completed = subprocess.run(
+            ["git", "show", f":{relative}"],
+            cwd=self.repo_root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        if completed.returncode != 0:
+            return False
+        try:
+            return completed.stdout == path.read_bytes()
+        except OSError:
+            return False
 
     def validate_path(self, path: Path) -> tuple[ValidationIssue, ...]:
         """Validate one path while retaining registry-level consistency checks."""
@@ -561,6 +644,15 @@ class WorkflowRepository:
             "dependencies": dependencies,
             "policies": policies,
         }
+        capabilities = metadata.get("capabilities", [])
+        if not isinstance(capabilities, list) or not all(
+            isinstance(item, str) and item.strip() for item in capabilities
+        ):
+            raise WorkflowAuthoringError("workflow capabilities must be a list of identifiers")
+        if len(capabilities) != len(set(capabilities)):
+            raise WorkflowAuthoringError("workflow capabilities must be unique")
+        if capabilities:
+            release["capabilities"] = capabilities
 
         _atomic_write(release_path, canonical_json_bytes(release), replace=False)
         for change_path, change_document in change_documents:
@@ -821,6 +913,9 @@ class WorkflowRepository:
             issues.append(ValidationIssue(path, "release source_changes differ from README"))
         if payload.get("derived_from") != metadata.get("derived_from"):
             issues.append(ValidationIssue(path, "release derived_from differs from README"))
+        expected_capabilities = metadata.get("capabilities", [])
+        if payload.get("capabilities", []) != expected_capabilities:
+            issues.append(ValidationIssue(path, "release capabilities differ from README"))
         approved_by = payload.get("approved_by")
         if not isinstance(approved_by, str) or not approved_by.strip():
             issues.append(ValidationIssue(path, "release approved_by is required"))
@@ -843,7 +938,11 @@ class WorkflowRepository:
             return
         expected_dependencies = metadata.get("dependencies")
         comparable_release = [
-            {"path": item.get("path"), "role": item.get("role")}
+            {
+                "path": item.get("path"),
+                "role": item.get("role"),
+                **({"pinned": True} if item.get("pinned") is True else {}),
+            }
             for item in release_dependencies
             if isinstance(item, dict)
         ]
@@ -853,7 +952,7 @@ class WorkflowRepository:
             if not isinstance(dependency, dict):
                 issues.append(ValidationIssue(path, "release dependency must be a mapping"))
                 continue
-            if dependency.get("role") != "normative":
+            if dependency.get("role") != "normative" and dependency.get("pinned") is not True:
                 continue
             dependency_path = dependency.get("path")
             digest = dependency.get("sha256")
@@ -863,10 +962,11 @@ class WorkflowRepository:
                 or not SHA256_PATTERN.fullmatch(digest)
             ):
                 issues.append(
-                    ValidationIssue(path, "normative release dependency needs a SHA-256 digest")
+                    ValidationIssue(path, "pinned release dependency needs a SHA-256 digest")
                 )
                 continue
-            if status != "active" or not check_active_dependency_digest:
+            pinned_reference = dependency.get("pinned") is True
+            if not pinned_reference and (status != "active" or not check_active_dependency_digest):
                 continue
             try:
                 resolved = self._resolve_repo_reference(dependency_path)
@@ -874,9 +974,15 @@ class WorkflowRepository:
                 issues.append(ValidationIssue(path, str(exc)))
                 continue
             if resolved.is_file() and _sha256(resolved) != digest:
-                issues.append(
-                    ValidationIssue(resolved, "active normative dependency digest has changed")
-                )
+                if pinned_reference:
+                    label = (
+                        "active pinned dependency"
+                        if status == "active"
+                        else "released pinned dependency"
+                    )
+                else:
+                    label = "active pinned dependency"
+                issues.append(ValidationIssue(resolved, f"{label} digest has changed"))
         release_policies = payload.get("policies")
         if (self.repo_root / "policies" / "README.md").is_file():
             if not isinstance(release_policies, list):
@@ -1024,6 +1130,7 @@ class WorkflowRepository:
                 continue
             dependency_path = dependency.get("path")
             role = dependency.get("role")
+            pinned = dependency.get("pinned", False)
             if not isinstance(dependency_path, str) or not dependency_path:
                 issues.append(ValidationIssue(path, "dependency path is required"))
                 continue
@@ -1033,6 +1140,12 @@ class WorkflowRepository:
             if role not in {"normative", "reference"}:
                 issues.append(
                     ValidationIssue(path, f"dependency role must be normative or reference: {role}")
+                )
+            if type(pinned) is not bool:
+                issues.append(ValidationIssue(path, "dependency pinned flag must be boolean"))
+            if pinned is True and role != "reference":
+                issues.append(
+                    ValidationIssue(path, "only a reference dependency may use pinned: true")
                 )
             try:
                 resolved = self._resolve_repo_reference(dependency_path)
@@ -1208,6 +1321,16 @@ class WorkflowRepository:
         root = version_path / "work" / "studies"
         if not root.exists():
             return
+        structured_routes = False
+        release_path = version_path / "RELEASE.json"
+        if release_path.is_file():
+            try:
+                release_payload = json.loads(release_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                release_payload = {}
+            structured_routes = isinstance(
+                release_payload, dict
+            ) and "study-time-retrospective-v1" in release_payload.get("capabilities", [])
         ids: set[str] = set()
         for study_path in sorted(path for path in root.iterdir() if path.is_dir()):
             match = STUDY_DIRECTORY_PATTERN.fullmatch(study_path.name)
@@ -1260,6 +1383,19 @@ class WorkflowRepository:
                 issues.append(ValidationIssue(readme, "study workflow identity is inconsistent"))
             if not isinstance(metadata.get("title"), str) or not str(metadata.get("title")).strip():
                 issues.append(ValidationIssue(readme, "study title must be a non-empty string"))
+            route = metadata.get("route")
+            if structured_routes and route is None:
+                issues.append(ValidationIssue(readme, "released workflow requires a study route"))
+            if route is not None and route not in STUDY_ROUTES:
+                issues.append(ValidationIssue(readme, f"invalid study route: {route}"))
+            qualification_spec = study_path / "QUALIFICATION_SPEC.json"
+            if structured_routes and not qualification_spec.is_file():
+                issues.append(
+                    ValidationIssue(
+                        qualification_spec,
+                        "capability-scoped study requires QUALIFICATION_SPEC.json",
+                    )
+                )
             if not _is_canonical_utc_timestamp(metadata.get("created_at")):
                 issues.append(ValidationIssue(readme, "study created_at must be canonical UTC"))
             if (
@@ -1314,6 +1450,31 @@ class WorkflowRepository:
                             readme, "completed study needs completion time and reviewer"
                         )
                     )
+            development_authorization = study_path / "DEVELOPMENT_AUTHORIZATION.json"
+            authorization_required = status in {
+                "running",
+                "paused",
+                "awaiting-review",
+                "completed",
+            } or (status == "cancelled" and development_authorization.exists())
+            if structured_routes and authorization_required:
+                self._validate_development_authorization(
+                    development_authorization,
+                    metadata,
+                    study_path,
+                    issues,
+                )
+            elif development_authorization.exists():
+                issues.append(
+                    ValidationIssue(
+                        development_authorization,
+                        "Development authorization exists before the study starts",
+                    )
+                )
+            candidate_freeze = study_path / "CANDIDATE_FREEZE.json"
+            if structured_routes and candidate_freeze.exists():
+                self._validate_guarded_candidate_freeze(candidate_freeze, study_path, issues)
+            if status == "completed":
                 if metadata.get("status_changed_at") != metadata.get(
                     "completed_at"
                 ) or metadata.get("status_changed_by") != metadata.get("reviewed_by"):
@@ -1424,9 +1585,107 @@ class WorkflowRepository:
                     )
                 else:
                     self._validate_completion(completion, metadata, study_path, issues)
+                if route == "study-time-retrospective":
+                    self._validate_study_time_terminal(metadata, readme, issues)
             elif completion.exists():
                 issues.append(
                     ValidationIssue(completion, "unfinished study must not have COMPLETION.json")
+                )
+
+    def _validate_study_time_terminal(
+        self,
+        metadata: Mapping[str, Any],
+        readme: Path,
+        issues: list[ValidationIssue],
+    ) -> None:
+        outcome = metadata.get("outcome")
+        disposition = metadata.get("disposition")
+        stage = metadata.get("decision_stage")
+        valid = False
+        if outcome == "pass":
+            valid = (
+                disposition == "retrospectively-supported" and stage == "retrospective-evaluation"
+            )
+        elif outcome == "fail":
+            valid = (disposition, stage) in {
+                ("development-selection-failed", "development"),
+                ("retrospective-screen-failed", "retrospective-evaluation"),
+            }
+        elif outcome == "indeterminate":
+            valid = disposition is None and stage in {
+                "development",
+                "candidate-freeze",
+                "retrospective-evaluation",
+                "independent-review",
+            }
+        if not valid:
+            issues.append(
+                ValidationIssue(
+                    readme,
+                    "study-time retrospective outcome, disposition, and decision stage conflict",
+                )
+            )
+            return
+        try:
+            from trading.core.study_terminal_evidence import (
+                validate_study_time_terminal_evidence,
+            )
+
+            validate_study_time_terminal_evidence(
+                study_path=readme.parent,
+                outcome=str(outcome),
+                disposition=disposition if isinstance(disposition, str) else None,
+                decision_stage=str(stage),
+            )
+        except ValueError as exc:
+            issues.append(ValidationIssue(readme.parent / "TERMINAL_EVIDENCE.json", str(exc)))
+            return
+        terminal_path = readme.parent / "TERMINAL_EVIDENCE.json"
+        try:
+            terminal = json.loads(terminal_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return
+        references: list[str] = []
+        if isinstance(terminal, dict):
+            for field in (
+                "qualification_evidence",
+                "qualification_absence_evidence",
+                "challenge_manifest",
+                "development_gate",
+            ):
+                reference = terminal.get(field)
+                if isinstance(reference, dict) and isinstance(reference.get("path"), str):
+                    references.append(reference["path"])
+        challenge_reference = (
+            terminal.get("challenge_manifest") if isinstance(terminal, dict) else None
+        )
+        if isinstance(challenge_reference, dict) and isinstance(
+            challenge_reference.get("path"), str
+        ):
+            challenge_path = self.repo_root / challenge_reference["path"]
+            try:
+                challenge_manifest = json.loads(challenge_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                challenge_manifest = {}
+            gates = (
+                challenge_manifest.get("gates") if isinstance(challenge_manifest, dict) else None
+            )
+            if isinstance(gates, list):
+                references.extend(
+                    evidence["path"]
+                    for gate in gates
+                    if isinstance(gate, dict)
+                    and isinstance((evidence := gate.get("evidence")), dict)
+                    and isinstance(evidence.get("path"), str)
+                )
+        for reference in references:
+            artifact = (self.repo_root / reference).resolve()
+            if not self.git_index_checker(artifact):
+                issues.append(
+                    ValidationIssue(
+                        artifact,
+                        "terminal study evidence is not in the Git index",
+                    )
                 )
 
     def _validate_preregistration(
@@ -1456,6 +1715,8 @@ class WorkflowRepository:
             "approved_by": metadata.get("preregistered_by"),
             "revisits": metadata.get("revisits"),
         }
+        if "route" in metadata or "route" in payload:
+            expected["route"] = metadata.get("route")
         for field, value in expected.items():
             if payload.get(field) != value:
                 issues.append(ValidationIssue(path, f"preregistration {field} is inconsistent"))
@@ -1463,6 +1724,8 @@ class WorkflowRepository:
             "hypothesis_sha256": study_path / "HYPOTHESIS.md",
             "plan_sha256": study_path / "PLAN.md",
         }
+        if (study_path / "QUALIFICATION_SPEC.json").is_file():
+            digests["qualification_spec_sha256"] = study_path / "QUALIFICATION_SPEC.json"
         for field, artifact in digests.items():
             digest = payload.get(field)
             if not isinstance(digest, str) or not SHA256_PATTERN.fullmatch(digest):
@@ -1481,6 +1744,68 @@ class WorkflowRepository:
                 issues.append(
                     ValidationIssue(path, "preregistration workflow digest differs from release")
                 )
+
+    def _validate_development_authorization(
+        self,
+        path: Path,
+        metadata: Mapping[str, Any],
+        study_path: Path,
+        issues: list[ValidationIssue],
+    ) -> None:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            issues.append(ValidationIssue(path, f"invalid Development authorization: {exc}"))
+            return
+        if not isinstance(payload, dict):
+            issues.append(ValidationIssue(path, "Development authorization must be an object"))
+            return
+        relative_study = study_path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        expected = {
+            "schema_version": 1,
+            "study_path": relative_study,
+            "route": metadata.get("route"),
+            "preregistration_sha256": _sha256(study_path / "PREREGISTRATION.json"),
+        }
+        if any(payload.get(field) != value for field, value in expected.items()):
+            issues.append(
+                ValidationIssue(path, "Development authorization differs from frozen study")
+            )
+        authorized_at = payload.get("authorized_at")
+        if not _is_canonical_utc_timestamp(authorized_at):
+            issues.append(ValidationIssue(path, "Development authorization time is invalid"))
+        elif isinstance(metadata.get("preregistered_at"), str) and authorized_at < metadata.get(
+            "preregistered_at"
+        ):
+            issues.append(
+                ValidationIssue(path, "Development authorization predates preregistration")
+            )
+        for field in ("approved_by", "authorized_operator", "authorization_scope"):
+            if not isinstance(payload.get(field), str) or not str(payload[field]).strip():
+                issues.append(ValidationIssue(path, f"Development authorization needs {field}"))
+        if payload.get("approved_by") != metadata.get("preregistered_by"):
+            issues.append(
+                ValidationIssue(
+                    path,
+                    "Development authorization approver differs from the human owner",
+                )
+            )
+
+    @staticmethod
+    def _validate_guarded_candidate_freeze(
+        path: Path,
+        study_path: Path,
+        issues: list[ValidationIssue],
+    ) -> None:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(payload, dict):
+                raise ValueError("candidate freeze must be an object")
+            from trading.core.study_qualification import validate_candidate_freeze_for_study
+
+            validate_candidate_freeze_for_study(study_path, payload)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            issues.append(ValidationIssue(path, f"invalid guarded candidate freeze: {exc}"))
 
     def _validate_completion(
         self,
@@ -1509,6 +1834,9 @@ class WorkflowRepository:
             "completed_at": metadata.get("completed_at"),
             "reviewed_by": metadata.get("reviewed_by"),
         }
+        for field in ("route", "disposition", "decision_stage"):
+            if field in metadata or field in payload:
+                expected[field] = metadata.get(field)
         for field, value in expected.items():
             if payload.get(field) != value:
                 issues.append(ValidationIssue(path, f"completion {field} is inconsistent"))
@@ -1517,6 +1845,8 @@ class WorkflowRepository:
             "evidence_sha256": study_path / "EVIDENCE.md",
             "conclusion_sha256": study_path / "CONCLUSION.md",
         }
+        if metadata.get("route") == "study-time-retrospective":
+            digests["terminal_evidence_sha256"] = study_path / "TERMINAL_EVIDENCE.json"
         for field, artifact in digests.items():
             digest = payload.get(field)
             if not isinstance(digest, str) or not SHA256_PATTERN.fullmatch(digest):
@@ -1533,13 +1863,20 @@ class WorkflowRepository:
                 raise WorkflowAuthoringError("dependency must be a mapping")
             path_text = dependency.get("path")
             role = dependency.get("role")
+            pinned = dependency.get("pinned", False)
             if not isinstance(path_text, str) or role not in {"normative", "reference"}:
                 raise WorkflowAuthoringError("dependency needs path and normative/reference role")
+            if type(pinned) is not bool or (pinned and role != "reference"):
+                raise WorkflowAuthoringError(
+                    "dependency pinned flag must be true only for a reference dependency"
+                )
             path = self._resolve_repo_reference(path_text)
             if not path.is_file():
                 raise WorkflowAuthoringError(f"dependency file does not exist: {path_text}")
             item = {"path": path_text, "role": role}
-            if role == "normative":
+            if pinned:
+                item["pinned"] = True
+            if role == "normative" or pinned:
                 item["sha256"] = _sha256(path)
             result.append(item)
         return result

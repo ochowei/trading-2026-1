@@ -305,6 +305,21 @@ uv run trading workflow study complete <study-path> --outcome <outcome> \
   --reviewed-by <identity>
 ```
 
+When a released capability requires route-scoped qualification, initialization must include the
+exact `--route`, first Development must include its separate `--approved-by`, and candidate freeze
+must use the add-only current-time writer rather than a hand-authored artifact:
+
+```bash
+uv run trading workflow study freeze-candidate <study-path> \
+  --selection <development-selection.json> --approved-by <human-id>
+```
+
+The selection input may contain only the outcome-derived selected candidate, distinct baseline,
+and ordered complete family. Approval time, scope, exact study digests, and trial budget belong to
+the guarded writer. Exact-study qualification plans must persist repository-relative registry
+identities separately from operational absolute paths so tracked fresh-clone replay never depends
+on path-suffix matching.
+
 When a new version replaces or retires an active version, first move every unfinished study to a
 safe state. The CLI permits the version boundary only when each study is `paused`, `completed`, or
 `cancelled`. The change impact must assign every paused old study one explicit disposition:
@@ -339,6 +354,10 @@ Classify every shared link:
   affecting the active workflow requires a new workflow version.
 - `reference`: background or implementation detail. It may point to the current document and does
   not define workflow validity.
+
+A reference companion whose exact released bytes must remain stable uses `pinned: true`. Release
+preparation records its SHA-256 and validation rejects later drift, while its `reference` role
+continues to mean that `WORKFLOW.md` alone defines behavior.
 
 Use versioned policy pins—not mutable document dependencies—for reusable market, broker,
 execution, and portfolio constraints. Different workflows may select different released policy

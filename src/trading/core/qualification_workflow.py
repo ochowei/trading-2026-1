@@ -2,27 +2,33 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from trading.core.accounting import parse_timestamp
 from trading.core.qualification import (
+    RETROSPECTIVE_EVIDENCE_ROLES,
     DailyExcessReturn,
     EvaluationEvidenceAudit,
     ForwardSelectionEpoch,
     HistoricalQualificationPlan,
     HistoricalScreenResult,
     RetrospectiveSelectionCheckpoint,
+    StudyQualificationIdentity,
     build_historical_qualification_plan,
     evaluate_family_selection_adjustment,
     evaluate_historical_stability_screen,
 )
+from trading.core.qualification_transaction import publish_qualification_plan_transaction
 from trading.core.sleeve_engine import (
     DEFAULT_BASE_COST_POLICY,
     DEFAULT_STRESS_COST_POLICY,
     CanonicalSleeveInput,
+    ExecutionCostPolicy,
     evaluate_canonical_sleeve_input,
 )
 from trading.experiments import get_experiment
@@ -30,6 +36,7 @@ from trading.market_data import PrimaryUSSessionCalendar, SessionCalendar
 from trading.research_data import (
     ExperimentTrialDeclaration,
     ExperimentTrialRegistry,
+    OutcomeFreeTrialRegistration,
     QualificationRegistry,
     ResearchDataStore,
     ResearchDefinitionSnapshot,
@@ -78,8 +85,33 @@ def register_forward_qualification_plan(
     development_years: tuple[int, ...] | None = None,
     warmup_start: date | None = None,
     warmup_end: date | None = None,
+    quarantine_years: tuple[int, ...] | None = None,
+    family_research_identities: tuple[str, ...] = (),
+    dry_run: bool = False,
+    family_source_sha256: Mapping[str, str] | None = None,
+    maximum_family_trials: int | None = None,
+    study_identity: StudyQualificationIdentity | None = None,
+    base_cost_policy: ExecutionCostPolicy = DEFAULT_BASE_COST_POLICY,
+    stress_cost_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
 ) -> HistoricalQualificationPlan:
     """Freeze and register one exact qualification plan without a backdated clock."""
+    exact_study_required = (
+        bool(family_research_identities)
+        or evidence_role == "study-time-retrospective"
+        or (
+            evidence_role == "historical"
+            and any(
+                value is not None
+                for value in (development_years, warmup_start, warmup_end, quarantine_years)
+            )
+        )
+    )
+    if exact_study_required and study_identity is None:
+        raise ValueError("this qualification route requires an exact frozen study identity")
+    temporary_definition_store: TemporaryDirectory[str] | None = None
+    if dry_run and definition_store is None:
+        temporary_definition_store = TemporaryDirectory(prefix="qualification-dry-run-")
+        definition_store = ResearchDefinitionStore(Path(temporary_definition_store.name))
     clock = now or (lambda: datetime.now(UTC))
     started_at = clock()
     if started_at.tzinfo is None:
@@ -94,8 +126,8 @@ def register_forward_qualification_plan(
         research_identity=research_identity,
         workflow_path=workflow_path,
     )
-    if evidence_role == "retrospective-confirmatory":
-        _require_retrospective_workflow(workflow_path)
+    if evidence_role in RETROSPECTIVE_EVIDENCE_ROLES:
+        _require_retrospective_workflow(workflow_path, evidence_role=evidence_role)
     if research_identity is not None and evidence_classification is None:
         raise ValueError("workflow-native qualification requires a clean-evidence classification")
     audit = None
@@ -110,12 +142,66 @@ def register_forward_qualification_plan(
     declaration = _declare_trial(strategy)
     selected_trial_id = formal_trial_id(declaration.family, definition.fingerprint)
     trial_registry = ExperimentTrialRegistry(trial_registry_path)
-    trial_state = trial_registry.read()
+    registrations: tuple[OutcomeFreeTrialRegistration, ...] = ()
+    expected_family_trial_ids: tuple[str, ...] | None = None
+    if family_research_identities:
+        if research_identity is None or workflow_path is None:
+            raise ValueError("complete-family preparation requires --research and --workflow")
+        identities = tuple(sorted(set(family_research_identities)))
+        if len(identities) != len(family_research_identities):
+            raise ValueError("complete-family preparation contains duplicate source identities")
+        if research_identity not in identities:
+            raise ValueError("complete-family preparation must include the selected identity")
+        if maximum_family_trials != len(identities):
+            raise ValueError("complete-family preparation must match the frozen trial budget")
+        expected_source_hashes = dict(family_source_sha256 or {})
+        if set(expected_source_hashes) != set(identities):
+            raise ValueError("complete-family preparation requires every frozen source digest")
+        prepared: list[OutcomeFreeTrialRegistration] = []
+        expected_ids: list[str] = []
+        source_registry = ResearchDefinitionRegistry()
+        for identity in identities:
+            source_path = source_registry.resolve(identity)
+            actual_source_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
+            if expected_source_hashes[identity] != actual_source_sha:
+                raise ValueError(f"complete-family source digest differs for {identity}")
+            family_strategy = source_registry.load(identity)
+            family_definition = _capture_definition(
+                family_strategy,
+                definition_store,
+                policy_set=policy_set,
+            )
+            family_declaration = _declare_trial(family_strategy)
+            if family_declaration.family != declaration.family:
+                raise ValueError("complete-family preparation crosses trial families")
+            trial_id = formal_trial_id(
+                family_declaration.family,
+                family_definition.fingerprint,
+            )
+            expected_ids.append(trial_id)
+            prepared.append(
+                OutcomeFreeTrialRegistration(
+                    experiment_family=family_declaration.family,
+                    definition_fingerprint=family_definition.fingerprint,
+                    experiment_name=identity,
+                    hypothesis=family_declaration.hypothesis,
+                )
+            )
+        registrations = tuple(prepared)
+        expected_family_trial_ids = tuple(sorted(expected_ids))
+        trial_state = trial_registry.preview_registration_state(
+            registrations,
+            registered_at=started_at,
+        )
+    else:
+        trial_state = trial_registry.read()
     included_trial_ids = _registered_family_trial_ids(
         trial_state,
         experiment_family=declaration.family,
         boundary_time=started_at,
     )
+    if expected_family_trial_ids is not None and included_trial_ids != expected_family_trial_ids:
+        raise ValueError("complete-family preparation differs from the registered family universe")
     if selected_trial_id not in included_trial_ids:
         raise ValueError("selected experiment trial is not formally registered")
     if family_baseline_trial_id not in included_trial_ids:
@@ -133,10 +219,11 @@ def register_forward_qualification_plan(
         raise ValueError(
             "explicit retrospective role calendar requires development years and warmup bounds"
         )
-    if any(explicit_calendar_inputs) and evidence_role != "retrospective-confirmatory":
-        raise ValueError("explicit role calendar is only valid for retrospective qualification")
+    if any(explicit_calendar_inputs) and evidence_role == "historical" and quarantine_years is None:
+        raise ValueError("explicit clean role calendar requires declared quarantine years")
     explicit_development_sessions = None
     explicit_warmup_sessions: tuple[date, ...] = ()
+    explicit_quarantined_sessions: tuple[date, ...] = ()
     if all(explicit_calendar_inputs):
         assert development_years is not None
         assert warmup_start is not None
@@ -166,6 +253,17 @@ def register_forward_qualification_plan(
             timestamp.date()
             for timestamp in session_calendar.sessions_in_range(warmup_start, warmup_end)
         )
+        if quarantine_years is not None:
+            quarantine = tuple(sorted(set(quarantine_years)))
+            if quarantine and quarantine != tuple(range(quarantine[0], quarantine[-1] + 1)):
+                raise ValueError("explicit quarantine years must be consecutive")
+            explicit_quarantined_sessions = tuple(
+                timestamp.date()
+                for year in quarantine
+                for timestamp in session_calendar.sessions_in_range(
+                    date(year, 1, 1), date(year, 12, 31)
+                )
+            )
     else:
         first_development_year = years[0] - 3
         sessions = tuple(
@@ -180,7 +278,7 @@ def register_forward_qualification_plan(
     )
     epoch = None
     retrospective_checkpoint = None
-    if evidence_role == "retrospective-confirmatory":
+    if evidence_role in RETROSPECTIVE_EVIDENCE_ROLES:
         retrospective_checkpoint = RetrospectiveSelectionCheckpoint(
             frozen_at=started_at,
             selected_trial_id=selected_trial_id,
@@ -210,19 +308,38 @@ def register_forward_qualification_plan(
         bootstrap_repetitions=bootstrap_repetitions,
         bootstrap_block_sessions=bootstrap_block_sessions,
         created_at=started_at,
-        base_cost_policy=DEFAULT_BASE_COST_POLICY,
-        stress_cost_policy=DEFAULT_STRESS_COST_POLICY,
+        base_cost_policy=base_cost_policy,
+        stress_cost_policy=stress_cost_policy,
         forward_selection_epoch=epoch,
         retrospective_selection_checkpoint=retrospective_checkpoint,
         evidence_role=evidence_role,
         evidence_audit=audit,
         development_sessions=explicit_development_sessions,
         warmup_sessions=explicit_warmup_sessions,
+        quarantined_sessions=explicit_quarantined_sessions,
+        study_identity=study_identity,
     )
-    QualificationRegistry(
+    if dry_run:
+        if temporary_definition_store is not None:
+            temporary_definition_store.cleanup()
+        return plan
+    qualification_registry = QualificationRegistry(
         qualification_registry_path,
         now=lambda: started_at,
-    ).register_historical_plan(plan)
+    )
+    qualification_registry.validate_historical_plan_registration(plan)
+    if registrations:
+        committed_ids = publish_qualification_plan_transaction(
+            plan=plan,
+            registrations=registrations,
+            registered_at=started_at,
+            trial_registry_path=trial_registry_path,
+            qualification_registry_path=qualification_registry_path,
+        )
+        if tuple(sorted(committed_ids)) != expected_family_trial_ids:
+            raise ValueError("atomic family registration produced an unexpected trial universe")
+    else:
+        qualification_registry.register_historical_plan(plan)
     return plan
 
 
@@ -246,6 +363,15 @@ def run_registered_historical_screen(
     registry = QualificationRegistry(qualification_registry_path)
     plan = registry.historical_plan(plan_id)
     trial_registry_state = ExperimentTrialRegistry(trial_registry_path).read()
+    allowed_observation_run_modes = (
+        frozenset({"offline"})
+        if plan.study_identity is not None
+        and plan.study_identity.evidence_contract_sha256 is not None
+        else frozenset({"offline", "online"})
+    )
+    exact_snapshot_cutoff = (
+        plan.study_identity is not None and plan.study_identity.evidence_contract_sha256 is not None
+    )
 
     inputs: dict[str, CanonicalSleeveInput] = {}
     for experiment_name, manifest_path in trial_manifests.items():
@@ -260,13 +386,18 @@ def run_registered_historical_screen(
             raise ValueError(f"{experiment_name} belongs to a different experiment family")
         if trial_id in inputs:
             raise ValueError(f"duplicate trial identity in screen inputs: {trial_id}")
-        if data_cutoff < plan.evaluation_sessions[-1]:
-            raise ValueError(f"{experiment_name} snapshot does not cover the frozen evaluation")
+        _verify_snapshot_cutoff(
+            data_cutoff=data_cutoff,
+            evaluation_end=plan.evaluation_sessions[-1],
+            experiment_name=experiment_name,
+            exact=exact_snapshot_cutoff,
+        )
         _verify_formal_snapshot_observation(
             trial_registry_state,
             trial_id=trial_id,
             snapshot_id=snapshot_id,
             minimum_observation_date=plan.evaluation_sessions[-1],
+            allowed_run_modes=allowed_observation_run_modes,
         )
         inputs[trial_id] = sleeve_input
 
@@ -444,7 +575,11 @@ def _resolve_qualification_definition(
     )
 
 
-def _require_retrospective_workflow(workflow_path: Path | None) -> None:
+def _require_retrospective_workflow(
+    workflow_path: Path | None,
+    *,
+    evidence_role: str = "retrospective-confirmatory",
+) -> None:
     if workflow_path is None:
         raise ValueError("retrospective qualification requires an exact released workflow")
     contract = Path(workflow_path) / "WORKFLOW.md"
@@ -452,7 +587,12 @@ def _require_retrospective_workflow(workflow_path: Path | None) -> None:
         text = contract.read_text(encoding="utf-8")
     except OSError as exc:
         raise ValueError(f"cannot read retrospective workflow contract: {exc}") from exc
-    if "### 3. Optional retrospective-confirmatory checkpoint" not in text:
+    required_marker = (
+        "study-time-retrospective"
+        if evidence_role == "study-time-retrospective"
+        else "Optional retrospective-confirmatory checkpoint"
+    )
+    if required_marker not in text:
         raise ValueError("released workflow does not authorize retrospective qualification")
 
 
@@ -462,6 +602,7 @@ def _verify_formal_snapshot_observation(
     trial_id: str,
     snapshot_id: str,
     minimum_observation_date: date,
+    allowed_run_modes: frozenset[str],
 ) -> None:
     raw_trials = state.get("trials")
     if not isinstance(raw_trials, list):
@@ -479,7 +620,7 @@ def _verify_formal_snapshot_observation(
         isinstance(observation, Mapping)
         and observation.get("event") == "observation"
         and observation.get("snapshot_id") == snapshot_id
-        and observation.get("run_mode") in {"online", "offline"}
+        and observation.get("run_mode") in allowed_run_modes
         and observation.get("outcome_status") == "succeeded"
         and observation.get("validity_status") == "valid"
         and isinstance(observation.get("observed_at"), str)
@@ -489,6 +630,21 @@ def _verify_formal_snapshot_observation(
         raise ValueError(
             f"trial {trial_id} has no valid formal observation for snapshot {snapshot_id}"
         )
+
+
+def _verify_snapshot_cutoff(
+    *,
+    data_cutoff: date,
+    evaluation_end: date,
+    experiment_name: str,
+    exact: bool,
+) -> None:
+    if exact and data_cutoff != evaluation_end:
+        raise ValueError(
+            f"{experiment_name} snapshot cutoff differs from the frozen evaluation end"
+        )
+    if not exact and data_cutoff < evaluation_end:
+        raise ValueError(f"{experiment_name} snapshot does not cover the frozen evaluation")
 
 
 def _daily_excess_returns(

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 from trading.core.workflow_authoring import WorkflowRepository, read_markdown_document
@@ -21,9 +23,36 @@ def resolve_workflow_policy_set(version_path: Path) -> PolicySet:
     issues = repository.validate_path(path)
     if issues:
         raise WorkflowNativeExecutionError(str(issues[0]))
-    raw_pins = read_markdown_document(path / "README.md").metadata.get("policies")
+    return resolve_workflow_policy_set_from_release(path)
+
+
+def resolve_workflow_policy_set_from_release(version_path: Path) -> PolicySet:
+    """Resolve exact policy pins without recursively validating the workflow's studies."""
+    path = Path(version_path).resolve()
+    readme_path = path / "README.md"
+    release_path = path / "RELEASE.json"
+    definition_path = path / "WORKFLOW.md"
+    if not readme_path.is_file() or not release_path.is_file() or not definition_path.is_file():
+        raise WorkflowNativeExecutionError("workflow version is not a released version directory")
+    metadata = read_markdown_document(readme_path).metadata
+    try:
+        release = json.loads(release_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise WorkflowNativeExecutionError(f"workflow release is unreadable: {exc}") from exc
+    if not isinstance(release, dict) or release.get("schema_version") != 1:
+        raise WorkflowNativeExecutionError("workflow release is malformed")
+    if release.get("workflow") != metadata.get("workflow") or release.get(
+        "version"
+    ) != metadata.get("version"):
+        raise WorkflowNativeExecutionError("workflow release identity differs from README")
+    workflow_digest = hashlib.sha256(definition_path.read_bytes()).hexdigest()
+    if release.get("workflow_sha256") != workflow_digest:
+        raise WorkflowNativeExecutionError("released workflow definition digest has changed")
+    raw_pins = metadata.get("policies")
     if not isinstance(raw_pins, list) or len(raw_pins) != 4:
         raise WorkflowNativeExecutionError("workflow must pin exactly four policy families")
+    if release.get("policies") != raw_pins:
+        raise WorkflowNativeExecutionError("workflow release policy pins differ from README")
     resolver = PolicyResolver(path.parent.parent / "policies")
     releases = []
     for pin in raw_pins:
