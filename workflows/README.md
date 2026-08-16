@@ -36,12 +36,14 @@ workflows:
         status_changed_by: ochowei@gmail.com
       v007:
         path: strategy-forward-replication-research--v007
-        status: active
-        status_changed_at: '2026-08-14T06:36:20.963928Z'
+        status: superseded
+        status_changed_at: '2026-08-16T15:38:20.431520Z'
         status_changed_by: ochowei@gmail.com
       v008:
         path: strategy-forward-replication-research--v008
-        status: draft
+        status: active
+        status_changed_at: '2026-08-16T15:38:20.431520Z'
+        status_changed_by: ochowei@gmail.com
 ---
 # Research Workflows
 
@@ -63,6 +65,6 @@ study conclusions. Use `uv run trading workflow validate --all` for deterministi
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v004` | `superseded` | [strategy-forward-replication-research--v004](strategy-forward-replication-research--v004/) |
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v005` | `superseded` | [strategy-forward-replication-research--v005](strategy-forward-replication-research--v005/) |
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v006` | `superseded` | [strategy-forward-replication-research--v006](strategy-forward-replication-research--v006/) |
-| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v007` | `active` | [strategy-forward-replication-research--v007](strategy-forward-replication-research--v007/) |
-| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v008` | `draft` | [strategy-forward-replication-research--v008](strategy-forward-replication-research--v008/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v007` | `superseded` | [strategy-forward-replication-research--v007](strategy-forward-replication-research--v007/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v008` | `active` | [strategy-forward-replication-research--v008](strategy-forward-replication-research--v008/) |
 <!-- GENERATED:WORKFLOW_INDEX_END -->
