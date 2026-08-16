@@ -77,6 +77,6 @@ _No studies._
 
 | ID | Title | Status | Released in | Path |
 | --- | --- | --- | --- | --- |
-| `C001` | Frozen Historical Plan Preservation and Readiness | `accepted` | `-` | [frozen-historical-plan-readiness--c001](work/changes/frozen-historical-plan-readiness--c001/) |
-| `C002` | Study-Time Retrospective Evaluation | `accepted` | `-` | [study-time-retrospective-evaluation--c002](work/changes/study-time-retrospective-evaluation--c002/) |
+| `C001` | Frozen Historical Plan Preservation and Readiness | `released` | `v008` | [frozen-historical-plan-readiness--c001](work/changes/frozen-historical-plan-readiness--c001/) |
+| `C002` | Study-Time Retrospective Evaluation | `released` | `v008` | [study-time-retrospective-evaluation--c002](work/changes/study-time-retrospective-evaluation--c002/) |
 <!-- GENERATED:WORK_INDEX_END -->
