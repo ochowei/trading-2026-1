@@ -95,7 +95,7 @@ None.
 
 | ID | Title | Status | Outcome | Path |
 | --- | --- | --- | --- | --- |
-| `S001` | FXI ATR-Band Mean-Reversion Study-Time Retrospective Evaluation | `awaiting-review` | `-` | [fxi-atr-band-mean-reversion-study-time-retrospective--s001](work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001/) |
+| `S001` | FXI ATR-Band Mean-Reversion Study-Time Retrospective Evaluation | `completed` | `fail` | [fxi-atr-band-mean-reversion-study-time-retrospective--s001](work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001/) |
 
 ### Changes
 
