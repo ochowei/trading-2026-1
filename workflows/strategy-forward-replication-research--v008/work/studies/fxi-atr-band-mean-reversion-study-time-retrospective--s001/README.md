@@ -3,12 +3,12 @@ id: S001
 title: FXI ATR-Band Mean-Reversion Study-Time Retrospective Evaluation
 workflow: strategy-forward-replication-research
 workflow_version: v008
-status: preregistered
+status: awaiting-review
 outcome: null
 created_at: '2026-08-16T17:14:11.643606Z'
 created_by: codex-primary-researcher-fxi-mean-reversion
-status_changed_at: '2026-08-17T01:42:23.397421Z'
-status_changed_by: ochowei@gmail.com
+status_changed_at: '2026-08-17T02:02:29.031887Z'
+status_changed_by: codex-primary-researcher-fxi-mean-reversion
 status_reason: null
 preregistered_at: '2026-08-17T01:42:23.397421Z'
 preregistered_by: ochowei@gmail.com

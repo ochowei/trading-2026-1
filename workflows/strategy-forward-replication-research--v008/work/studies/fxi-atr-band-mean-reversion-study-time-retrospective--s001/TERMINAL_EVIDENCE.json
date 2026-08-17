@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "study_path": "workflows/strategy-forward-replication-research--v008/work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001",
+  "route": "study-time-retrospective",
+  "decision_stage": "development",
+  "preregistration_sha256": "fc40e8cb8aaac2ca99e3abed21fcbb7e6af2d45dff9141312faf3b6c677ea857",
+  "qualification_spec_sha256": "2444284c6a9dc66a87a777f082bcb6b6be0ca484d7d9e4a2c2641c2e3340c7e2",
+  "development_authorization_sha256": "4db201bc337712ffd17c1e7d7aac0186672529bf53b95e3a1c25ca1fc6abe832",
+  "development_gate": {
+    "path": "results/study-evidence/fxi-atr-band-mean-reversion-study-time-retrospective--s001/development-gate.json",
+    "sha256": "c247a6e6807be7dae930e0287ef2df2c99939b20252db6ff620a4d7ed46605e3"
+  },
+  "qualification_absence_evidence": {
+    "path": "results/qualification-evidence/7ce55dc19227a6093b28ad5236e129d01df2d33029b138423a45eb442d15e8fe.json",
+    "sha256": "7ce55dc19227a6093b28ad5236e129d01df2d33029b138423a45eb442d15e8fe"
+  }
+}

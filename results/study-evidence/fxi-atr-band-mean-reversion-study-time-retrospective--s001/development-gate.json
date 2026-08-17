@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "study_path": "workflows/strategy-forward-replication-research--v008/work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001",
+  "route": "study-time-retrospective",
+  "preregistration_sha256": "fc40e8cb8aaac2ca99e3abed21fcbb7e6af2d45dff9141312faf3b6c677ea857",
+  "qualification_spec_sha256": "2444284c6a9dc66a87a777f082bcb6b6be0ca484d7d9e4a2c2641c2e3340c7e2",
+  "development_authorization_sha256": "4db201bc337712ffd17c1e7d7aac0186672529bf53b95e3a1c25ca1fc6abe832",
+  "evidence_generated_at": "2026-08-17T01:59:13Z",
+  "execution_git_head": "db3c53c9c1e681892562454d08e7164b0f70b435",
+  "policy_set_identity": "cac4973cf0055c772487b069c96f1cd2b488a2457636f8cfe2c812c89ad0f63e",
+  "data_cutoff": "2019-12-31",
+  "complete": true,
+  "trustworthy": true,
+  "eligible_candidate": null,
+  "disposition": "development-selection-failed",
+  "trial_budget_exhausted": true,
+  "trial_budget": {
+    "maximum_trials": 6,
+    "complete_family_trials": 6
+  },
+  "candidate_eligibility": {
+    "identity": "fxi-atr-band-mean-reversion/atr-band-candidate",
+    "trial_id": "2492dd0b2de348ee341a94a79256b280fb7ca8519996e6b69450fae7d6b8b315",
+    "all_gates_passed": false,
+    "gates": [
+      {
+        "metric": "completed_trades",
+        "operator": ">=",
+        "threshold": 20,
+        "observed": 14,
+        "passed": false
+      },
+      {
+        "metric": "traded_development_years",
+        "operator": ">=",
+        "threshold": 3,
+        "observed": 5,
+        "passed": true
+      },
+      {
+        "metric": "base_compounded_return",
+        "operator": ">",
+        "threshold": 0,
+        "observed": 0.13941239848550957,
+        "passed": true
+      },
+      {
+        "metric": "stress_compounded_return",
+        "operator": ">",
+        "threshold": 0,
+        "observed": 0.08949318043613563,
+        "passed": true
+      },
+      {
+        "metric": "base_profit_factor",
+        "operator": ">",
+        "threshold": 1.1,
+        "observed": 1.5049156403002681,
+        "passed": true
+      },
+      {
+        "metric": "stress_profit_factor",
+        "operator": ">",
+        "threshold": 1.0,
+        "observed": 1.3085931261164285,
+        "passed": true
+      },
+      {
+        "metric": "stress_max_drawdown_absolute",
+        "operator": "<=",
+        "threshold": 0.2,
+        "observed": 0.16221686533163182,
+        "passed": true
+      },
+      {
+        "metric": "valid_complete_family_observations",
+        "operator": "=",
+        "threshold": true,
+        "observed": true,
+        "passed": true
+      }
+    ]
+  },
+  "profit_factor_method": "For each completed canonical-sleeve net trade, net P&L equals quantity times executed exit price minus exit fee, less quantity times executed entry price plus entry fee. Profit factor is total positive net P&L divided by absolute total negative net P&L.",
+  "complete_family": [
+    {
+      "source_identity": "fxi-atr-band-mean-reversion/atr-band-candidate",
+      "role": "selection-candidate",
+      "source_sha256": "a964aaf3e166becc24d4c66a9e00467bc77e05e8534da4b5b9ba6a0c4e67cc08",
+      "trial_id": "2492dd0b2de348ee341a94a79256b280fb7ca8519996e6b69450fae7d6b8b315",
+      "definition_fingerprint": "7ddf006e5ceb595659b1aacfb135c06244f581b1135cc10c567d8737d3d74b77",
+      "manifest": {
+        "path": "results/fxi-atr-band-mean-reversion--atr-band-candidate/2591e691d999453069ac14da9ebc4ee02668689b2301da42ee17976e071f515c.snapshot.json",
+        "snapshot_id": "2591e691d999453069ac14da9ebc4ee02668689b2301da42ee17976e071f515c",
+        "sha256": "25381209b8c94171ac2ca1852aead48bf4b38578a22bc5bac100ba94917fd5aa"
+      },
+      "observation": {
+        "observation_id": "52002f72015146c98c4f114ef8ac5672",
+        "observed_at": "2026-08-17T01:54:06.786677Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/fxi-atr-band-mean-reversion--atr-band-candidate/20260817_015406_763994_offline_592d2b9be6b94919969ff4513265bea6.json",
+        "result_sha256": "899cdf4f5b3d7d4813e3399c557143c5ec45452ec410cfc13a70d13b609b083c"
+      },
+      "metrics": {
+        "completed_trades": 14,
+        "traded_years": [2015, 2016, 2017, 2018, 2019],
+        "base_return": 0.13941239848550957,
+        "base_profit_factor": 1.5049156403002681,
+        "base_sharpe": 0.3283063578876789,
+        "base_max_drawdown": -0.14129723147627904,
+        "stress_return": 0.08949318043613563,
+        "stress_profit_factor": 1.3085931261164285,
+        "stress_max_drawdown": -0.16221686533163182
+      }
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion/pullback-wr-baseline",
+      "role": "family-baseline",
+      "source_sha256": "3a838b5460befdb37de57a6744339a2d0b1101d4972bd34a81da1bcde4fc2ba4",
+      "trial_id": "3462f2c46c8d2e23f4bc4c6bd6bfa42d728f3dce0f5002b81e5369505cefdfdc",
+      "definition_fingerprint": "0befd904a62c296b734d296fda87566e449940cd11fbba5bae59b4168789b0f8",
+      "manifest": {
+        "path": "results/fxi-atr-band-mean-reversion--pullback-wr-baseline/764bd2b5d0ff949c17e60f0f18c9471dcb495eeb7d4240f44eb803fee79dd848.snapshot.json",
+        "snapshot_id": "764bd2b5d0ff949c17e60f0f18c9471dcb495eeb7d4240f44eb803fee79dd848",
+        "sha256": "ca126edf2a50e0efa04b9d359149cffc849f4268e632a2a53b99b2bc917324bd"
+      },
+      "observation": {
+        "observation_id": "fdf6907fa49d44d5aaddb4cf9d99be60",
+        "observed_at": "2026-08-17T01:54:08.578796Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/fxi-atr-band-mean-reversion--pullback-wr-baseline/20260817_015408_555159_offline_5406a64c71084145b4793fe1c9c918cf.json",
+        "result_sha256": "028350a69fd2e84060eeaeaf0235fd22b5ef67f09da2037a110778b1cce7e553"
+      },
+      "metrics": {
+        "completed_trades": 33,
+        "traded_years": [2015, 2016, 2017, 2018, 2019],
+        "base_return": 0.24096034903815178,
+        "base_profit_factor": 1.350000099449947,
+        "base_sharpe": 0.40643039986774737,
+        "base_max_drawdown": -0.18359629490826768,
+        "stress_return": 0.11659668102101017,
+        "stress_profit_factor": 1.1665211025091606,
+        "stress_max_drawdown": -0.21811256253808786
+      }
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion/atr-floor-1p10-robustness",
+      "role": "robustness",
+      "source_sha256": "1eb19a0ed7cae4ccdbbdd1d81ae4af99b8a5379b2c7de3296d9119d029bf015f",
+      "trial_id": "a380a5b680d85cf1b4213e56a3f3fba5cbda01324f99abd8338e9221cdbd5262",
+      "definition_fingerprint": "1cf546efa3f158bf6d5d0a25fce01d1e31cd1f2b4d3682ffc13d99047edd6db1",
+      "manifest": {
+        "path": "results/fxi-atr-band-mean-reversion--atr-floor-1p10-robustness/89d960fb46a02226a11085976147ee86970c4ee4be19fbaa4c0aef4e05f0cfb9.snapshot.json",
+        "snapshot_id": "89d960fb46a02226a11085976147ee86970c4ee4be19fbaa4c0aef4e05f0cfb9",
+        "sha256": "0ceb0dd9d69361ca815453bae54943f50277982a4deb132694792369040088a0"
+      },
+      "observation": {
+        "observation_id": "81e1a5ec1ed14c0e9e05869d571a9171",
+        "observed_at": "2026-08-17T01:54:10.153939Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/fxi-atr-band-mean-reversion--atr-floor-1p10-robustness/20260817_015410_133140_offline_b82e760c3bbc4c42b25aeb676d7237e7.json",
+        "result_sha256": "a8aa69c81a2352249b162c441380e069db5db5edb4a10b46856fe80352d2c589"
+      },
+      "metrics": {
+        "completed_trades": 13,
+        "traded_years": [2015, 2016, 2017, 2018, 2019],
+        "base_return": 0.09334665784002905,
+        "base_profit_factor": 1.3380774452287116,
+        "base_sharpe": 0.24679539936842856,
+        "base_max_drawdown": -0.11543397138969025,
+        "stress_return": 0.04879643295787317,
+        "stress_profit_factor": 1.1682613548475531,
+        "stress_max_drawdown": -0.13836177928778648
+      }
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion/atr-ceiling-1p30-robustness",
+      "role": "robustness",
+      "source_sha256": "499f034fc8f3bc0207f5e4bebae669d0c45624390e241499d95cb44f3f3a31ed",
+      "trial_id": "7eb0da5535e4b6328b81dd1343bf10da30a26c6b18253c561f120cd95b6afe3e",
+      "definition_fingerprint": "c89252011a8c2a2f63af70a29ef10c9c4f2307acf2ef8f1035ebfc36eed1c90c",
+      "manifest": {
+        "path": "results/fxi-atr-band-mean-reversion--atr-ceiling-1p30-robustness/db175eb9986260dd7fbe7d8d5deb4cf95bbe5ac2bd9457c7373c19afc57196ac.snapshot.json",
+        "snapshot_id": "db175eb9986260dd7fbe7d8d5deb4cf95bbe5ac2bd9457c7373c19afc57196ac",
+        "sha256": "1072b05a20a69be59d64fc2fb064869ef80389fb438e680ec7ec3d0bcc3516ce"
+      },
+      "observation": {
+        "observation_id": "247c10a7435d48cb8c31d51c071247c0",
+        "observed_at": "2026-08-17T01:54:11.761314Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/fxi-atr-band-mean-reversion--atr-ceiling-1p30-robustness/20260817_015411_734978_offline_44c69f39f09c4e19867a4b2d3a50168b.json",
+        "result_sha256": "3f5213fd11d9178c8305e2fbfe1c4498895fa7395db45d6ec02399a1f8e92184"
+      },
+      "metrics": {
+        "completed_trades": 14,
+        "traded_years": [2015, 2016, 2017, 2018, 2019],
+        "base_return": 0.13941239848550957,
+        "base_profit_factor": 1.5049156403002681,
+        "base_sharpe": 0.3283063578876789,
+        "base_max_drawdown": -0.14129723147627904,
+        "stress_return": 0.08949318043613563,
+        "stress_profit_factor": 1.3085931261164285,
+        "stress_max_drawdown": -0.16221686533163182
+      }
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion/hold-18-robustness",
+      "role": "robustness",
+      "source_sha256": "8b60508760f6b16c79d5aa7348e59fa0d21609e37f61c561750f10e62f869021",
+      "trial_id": "7366c663e42250f59297a3b2586926919f7ab9b7880157834ca57153d6c0b022",
+      "definition_fingerprint": "0c45c30dde995693f971c90e67e1a8a883b6ad9ae26417d69e49ddc51885bcb2",
+      "manifest": {
+        "path": "results/fxi-atr-band-mean-reversion--hold-18-robustness/53edd21b747da2e8a8a0745c2c7d2f14b5531d8288896af5c5e0311a9975cd16.snapshot.json",
+        "snapshot_id": "53edd21b747da2e8a8a0745c2c7d2f14b5531d8288896af5c5e0311a9975cd16",
+        "sha256": "df817d04ff9378224f844df491d437670fdb3c43e153bb449c2228064bc87947"
+      },
+      "observation": {
+        "observation_id": "b2dcea3664b842d997a6ecf41cbd39c5",
+        "observed_at": "2026-08-17T01:54:13.376616Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/fxi-atr-band-mean-reversion--hold-18-robustness/20260817_015413_351336_offline_303a748fc776435da376db4aedda1f40.json",
+        "result_sha256": "3dcbc154805461ca82f24c3bda9fe9e77e5272047c9cc6a85fe5fd40585ed9c9"
+      },
+      "metrics": {
+        "completed_trades": 14,
+        "traded_years": [2015, 2016, 2017, 2018, 2019],
+        "base_return": 0.102149429390473,
+        "base_profit_factor": 1.3875773415636241,
+        "base_sharpe": 0.2593575275221726,
+        "base_max_drawdown": -0.14129723147627904,
+        "stress_return": 0.05386275306338839,
+        "stress_profit_factor": 1.193956226085787,
+        "stress_max_drawdown": -0.156370436180012
+      }
+    },
+    {
+      "source_identity": "fxi-atr-band-mean-reversion/delay-one-session-robustness",
+      "role": "robustness",
+      "source_sha256": "784f91d0b40b9f3a6b071cfe2cb08a8ba135631244ff0f5b08ec2e26c93d8df2",
+      "trial_id": "da05516060207d5ea963490dc11a38ba31b901143d639355233a5decb51a2a7c",
+      "definition_fingerprint": "fd9bc77a7bc6f77679fd44f6535aaf833161bbe7ad8c3c5bb4178fb59382401d",
+      "manifest": {
+        "path": "results/fxi-atr-band-mean-reversion--delay-one-session-robustness/6bdb0a8284cd4d592d46426b293be252e2940b108c2b097e717ff45abaebec72.snapshot.json",
+        "snapshot_id": "6bdb0a8284cd4d592d46426b293be252e2940b108c2b097e717ff45abaebec72",
+        "sha256": "722fc1af999ac4004ac7914dbfe3dbd465f7963476bcbb2a5beb7b6cff8c3242"
+      },
+      "observation": {
+        "observation_id": "d60131a951514e71b6d76df07ebb45db",
+        "observed_at": "2026-08-17T01:54:14.960187Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/fxi-atr-band-mean-reversion--delay-one-session-robustness/20260817_015414_939115_offline_64b84b68a7ff4c1b83efcfb2ee01287f.json",
+        "result_sha256": "3929e073fb6dd5eaba4cc439f04a00863ca861efbc86cf238472e4a4fd3e9b94"
+      },
+      "metrics": {
+        "completed_trades": 14,
+        "traded_years": [2015, 2016, 2017, 2018, 2019],
+        "base_return": 0.1270900803854682,
+        "base_profit_factor": 1.4519357375026114,
+        "base_sharpe": 0.3295361854877504,
+        "base_max_drawdown": -0.16077715953353933,
+        "stress_return": 0.07771071997229906,
+        "stress_profit_factor": 1.2634462761101977,
+        "stress_max_drawdown": -0.18460209069364164
+      }
+    }
+  ],
+  "trial_registry": {
+    "path": "results/trial_registry.json",
+    "sha256": "c64c327800ac742b6983ce393020f341aee9ad949bd6afcf810809373d55c710"
+  },
+  "prohibited_artifacts_absent": {
+    "candidate_freeze": true,
+    "qualification_plan_for_study": true,
+    "qualification_screen_for_study": true,
+    "evaluation_results": true
+  }
+}
