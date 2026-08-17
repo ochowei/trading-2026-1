@@ -93,7 +93,9 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-_No studies._
+| ID | Title | Status | Outcome | Path |
+| --- | --- | --- | --- | --- |
+| `S001` | FXI ATR-Band Mean-Reversion Study-Time Retrospective Evaluation | `preregistered` | `-` | [fxi-atr-band-mean-reversion-study-time-retrospective--s001](work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001/) |
 
 ### Changes
 

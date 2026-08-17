@@ -1,0 +1,288 @@
+{
+  "benchmarks": {
+    "bootstrap_block_sessions": 20,
+    "bootstrap_repetitions": 1000,
+    "random_samples": 1000,
+    "random_seed": 20260817
+  },
+  "calendar": {
+    "development_years": [
+      2015,
+      2016,
+      2017,
+      2018,
+      2019
+    ],
+    "evaluation_years": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "quarantine_years": [
+      2020
+    ],
+    "warmup_end": "2014-12-31",
+    "warmup_start": "2013-11-06"
+  },
+  "cost_policies": {
+    "base": {
+      "entry_slippage_bps": 5.0,
+      "exit_slippage_bps": 5.0,
+      "fee_bps_per_side": 1.0
+    },
+    "stress": {
+      "entry_slippage_bps": 20.0,
+      "exit_slippage_bps": 20.0,
+      "fee_bps_per_side": 2.0
+    }
+  },
+  "evidence_classification": "known-contaminated",
+  "evidence_contract": {
+    "observation": {
+      "allowed_run_modes": [
+        "offline"
+      ],
+      "observed_at_floor": "frozen-evaluation-end",
+      "outcome_status": "succeeded",
+      "validity_status": "valid"
+    },
+    "schema_version": 1,
+    "snapshot": {
+      "data_cutoff": "frozen-evaluation-end",
+      "definition_binding": "exact",
+      "evaluation_coverage": "all-frozen-evaluation-sessions",
+      "kind": "immutable-research-data-manifest"
+    }
+  },
+  "evidence_justification": "Legacy FXI research and the prior v004-v006 lineage may have inspected or been influenced by 2021-2025 outcomes. These folds are therefore fixed as known-contaminated, non-promotional study-time retrospective evidence and can never be relabelled verified-clean.",
+  "execution": {
+    "dependency_sessions": 21,
+    "embargo_sessions": 1,
+    "execution_lag_sessions": 1,
+    "maximum_holding_sessions": 20,
+    "stress_drawdown_limit": "0.20"
+  },
+  "family": {
+    "baseline_identity": "fxi-atr-band-mean-reversion/pullback-wr-baseline",
+    "maximum_trials": 6,
+    "members": [
+      {
+        "identity": "fxi-atr-band-mean-reversion/atr-band-candidate",
+        "role": "selection-candidate",
+        "source_sha256": "a964aaf3e166becc24d4c66a9e00467bc77e05e8534da4b5b9ba6a0c4e67cc08"
+      },
+      {
+        "identity": "fxi-atr-band-mean-reversion/pullback-wr-baseline",
+        "role": "family-baseline",
+        "source_sha256": "3a838b5460befdb37de57a6744339a2d0b1101d4972bd34a81da1bcde4fc2ba4"
+      },
+      {
+        "identity": "fxi-atr-band-mean-reversion/atr-floor-1p10-robustness",
+        "role": "robustness",
+        "source_sha256": "1eb19a0ed7cae4ccdbbdd1d81ae4af99b8a5379b2c7de3296d9119d029bf015f"
+      },
+      {
+        "identity": "fxi-atr-band-mean-reversion/atr-ceiling-1p30-robustness",
+        "role": "robustness",
+        "source_sha256": "499f034fc8f3bc0207f5e4bebae669d0c45624390e241499d95cb44f3f3a31ed"
+      },
+      {
+        "identity": "fxi-atr-band-mean-reversion/hold-18-robustness",
+        "role": "robustness",
+        "source_sha256": "8b60508760f6b16c79d5aa7348e59fa0d21609e37f61c561750f10e62f869021"
+      },
+      {
+        "identity": "fxi-atr-band-mean-reversion/delay-one-session-robustness",
+        "role": "robustness",
+        "source_sha256": "784f91d0b40b9f3a6b071cfe2cb08a8ba135631244ff0f5b08ec2e26c93d8df2"
+      }
+    ],
+    "shared_sources": [
+      {
+        "path": "src/trading/research_definitions/fxi_mean_reversion.py",
+        "sha256": "120df54dde206dd16f6293bff7bf4f042b396d8970fd644458eadba677e2be7e"
+      }
+    ]
+  },
+  "policy_set": {
+    "identity": "cac4973cf0055c772487b069c96f1cd2b488a2457636f8cfe2c812c89ad0f63e",
+    "releases": [
+      {
+        "config_digest": "fd7cbb7bfd77887b557c2c9075124adb6a1b77e6789bd6cf91971e44646be5f8",
+        "family": "canonical-execution",
+        "path": "policies/canonical-execution--v001",
+        "release_digest": "e6a745aeb4d7bdbad6ed53f25ff5a41fed0a447200edf51b545c7163d5d50925",
+        "version": "v001"
+      },
+      {
+        "config_digest": "beb47a951fbae842ebea79353f6c31dcf784a74537d48d1e8e8c696d0618ec28",
+        "family": "firstrade-manual-trading",
+        "path": "policies/firstrade-manual-trading--v001",
+        "release_digest": "0b40404f668dc1bfb15e21558bbdc221f68742093d0ecc99856be9f0031470d9",
+        "version": "v001"
+      },
+      {
+        "config_digest": "0c1f786cfe686ec9633c6d0ff70d2d1fab9053fd5040c4f0487c6d047aabb9dc",
+        "family": "portfolio-risk",
+        "path": "policies/portfolio-risk--v001",
+        "release_digest": "63e565e6eebbfe55dc9ffb4914af28706d6164a029447fcc52f8825d5da57b69",
+        "version": "v001"
+      },
+      {
+        "config_digest": "7acaaf98ac31a31fcc5f8603e8a4df2232ea25c0adb6c6372da24191fb29e44d",
+        "family": "us-equity-market",
+        "path": "policies/us-equity-market--v002",
+        "release_digest": "9c4feb8ec5bea92f0df9c30f31ea9553b4ef338b7740fcfbecb72cc1090d5978",
+        "version": "v002"
+      }
+    ]
+  },
+  "prior_selection_history_incomplete": true,
+  "registries": {
+    "qualification_registry_path": "state/qualification-registry.json",
+    "trial_registry_path": "results/trial_registry.json"
+  },
+  "required_challenges": [
+    {
+      "applies_to": {
+        "identities": [
+          "cash"
+        ],
+        "kind": "benchmark"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-cash-v1",
+      "gate": {
+        "metric": "candidate_base_compounded_return_minus_cash",
+        "operator": ">",
+        "threshold": 0
+      },
+      "id": "cash"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-study-time-delayed-entry-one-session-v1"
+        ],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-delayed-entry-v1",
+      "gate": {
+        "metric": "all_frozen_numeric_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "delayed-entry"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-mean-reversion/pullback-wr-baseline"
+        ],
+        "kind": "trial"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-family-baseline-v1",
+      "gate": {
+        "metric": "candidate_base_daily_equity_sharpe_minus_baseline",
+        "operator": ">=",
+        "threshold": 0.1
+      },
+      "id": "family-baseline"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-study-time-higher-costs-20bps-v1"
+        ],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-higher-costs-v1",
+      "gate": {
+        "metric": "all_frozen_numeric_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "higher-costs"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-study-time-annual-fold-regimes-v1"
+        ],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-market-regimes-v1",
+      "gate": {
+        "metric": "all_frozen_numeric_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "market-regimes"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-study-time-seeded-missed-entry-10pct-v1"
+        ],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-missed-entries-v1",
+      "gate": {
+        "metric": "all_frozen_numeric_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "missed-entries"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-study-time-atr-bounds-and-hold-v1"
+        ],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-parameter-perturbation-v1",
+      "gate": {
+        "metric": "all_frozen_numeric_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "parameter-perturbation"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "random-entry"
+        ],
+        "kind": "benchmark"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-random-entry-v1",
+      "gate": {
+        "metric": "candidate_base_compounded_return_minus_random_p90",
+        "operator": ">",
+        "threshold": 0
+      },
+      "id": "random-entry"
+    },
+    {
+      "applies_to": {
+        "identities": [
+          "fxi-atr-band-study-time-canonical-adverse-fill-v1"
+        ],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-atr-band-study-time-worse-fills-v1",
+      "gate": {
+        "metric": "all_frozen_numeric_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "worse-fills"
+    }
+  ],
+  "route": "study-time-retrospective",
+  "schema_version": 1,
+  "study_path": "workflows/strategy-forward-replication-research--v008/work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001",
+  "trial_history_complete": false
+}
