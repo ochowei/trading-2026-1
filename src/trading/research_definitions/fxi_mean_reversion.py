@@ -72,20 +72,26 @@ class FXIMeanReversionTrialConfig:
             0 <= self.close_position_threshold <= 1
         ):
             raise ValueError("close-position threshold must be between zero and one")
-        atr_fields = (
+        atr_required_fields = (
             self.atr_short_period,
             self.atr_long_period,
             self.atr_ratio_floor,
-            self.atr_ratio_ceiling,
         )
-        if any(item is not None for item in atr_fields) and not all(
-            item is not None for item in atr_fields
+        if any(item is not None for item in atr_required_fields) and not all(
+            item is not None for item in atr_required_fields
         ):
-            raise ValueError("ATR-band fields must be declared together")
+            raise ValueError("ATR floor fields must be declared together")
+        if self.atr_ratio_ceiling is not None and self.atr_ratio_floor is None:
+            raise ValueError("ATR ceiling requires a declared ATR floor")
         if self.atr_short_period is not None:
             if self.atr_short_period <= 0 or self.atr_long_period <= self.atr_short_period:
                 raise ValueError("ATR periods must be positive and ordered")
-            if self.atr_ratio_floor < 0 or self.atr_ratio_ceiling <= self.atr_ratio_floor:
+            if self.atr_ratio_floor < 0:
+                raise ValueError("ATR ratio floor is invalid")
+            if (
+                self.atr_ratio_ceiling is not None
+                and self.atr_ratio_ceiling <= self.atr_ratio_floor
+            ):
                 raise ValueError("ATR ratio band is invalid")
         relative_fields = (
             self.anchor_ticker,
@@ -208,7 +214,8 @@ def build_fxi_mean_reversion_candidates(
         eligible &= indicators["ClosePos"].ge(config.close_position_threshold)
     if config.atr_ratio_floor is not None:
         eligible &= indicators["ATR_Ratio"].gt(config.atr_ratio_floor)
-        eligible &= indicators["ATR_Ratio"].le(config.atr_ratio_ceiling)
+        if config.atr_ratio_ceiling is not None:
+            eligible &= indicators["ATR_Ratio"].le(config.atr_ratio_ceiling)
     if config.relative_return_floor is not None:
         eligible &= indicators["RelativeReturn"].ge(config.relative_return_floor)
 
