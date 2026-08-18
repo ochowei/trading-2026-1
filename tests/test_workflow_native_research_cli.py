@@ -49,8 +49,92 @@ def test_research_cli_parses_explicit_workflow_snapshot_and_run_modes() -> None:
     )
 
     assert snapshot.decision.isoformat() == "2025-12-31"
+    assert snapshot.cache_root is None
     assert snapshot.reuse_full_refresh is False
     assert run.offline is True
+
+
+def test_research_snapshot_can_use_an_isolated_market_data_cache(
+    monkeypatch, capsys, tmp_path
+) -> None:
+    requirement = MarketDataRequirement(
+        MarketDataSeries.yahoo_adjusted_daily("FXI"),
+        history_start=date(2013, 11, 6),
+        role="primary",
+    )
+    blob = DefinitionBlobRef(digest="a" * 64, byte_count=1, fingerprint="b" * 64)
+    captured = ResearchDefinitionSnapshot(
+        fingerprint=blob.fingerprint,
+        blob=blob,
+        policy_set_identity="c" * 64,
+    )
+
+    class Definition:
+        result_name = "fxi-test"
+
+        @staticmethod
+        def market_data_requirements():
+            return (requirement,)
+
+        @staticmethod
+        def capture_research_definition(_store, _policy_set):
+            return captured
+
+    class Service:
+        cache = object()
+
+        @staticmethod
+        def refresh(*_args, **_kwargs):
+            return None
+
+    class Store:
+        @staticmethod
+        def create_snapshot(_cache, _requirements, _decision_time, *, definition=None):
+            assert definition == blob
+            return SimpleNamespace(snapshot_id="d" * 64)
+
+        @staticmethod
+        def write_manifest(_manifest, path):
+            return path
+
+    service_calls = []
+
+    def service_factory(**kwargs):
+        service_calls.append(kwargs)
+        return Service()
+
+    monkeypatch.setattr(
+        "trading.cli._workflow_native_context",
+        lambda _identity, _workflow: (Definition(), object()),
+    )
+    monkeypatch.setattr("trading.cli.create_default_market_data_service", service_factory)
+    monkeypatch.setattr("trading.cli.create_default_research_data_store", Store)
+    monkeypatch.setattr("trading.cli.create_default_research_definition_store", object)
+    cache_root = tmp_path / "s003-development"
+
+    main(
+        [
+            "research",
+            "snapshot",
+            "family/trial",
+            "--workflow",
+            str(WORKFLOW),
+            "--decision",
+            "2019-12-31",
+            "--manifest",
+            str(tmp_path / "isolated.snapshot.json"),
+            "--cache-root",
+            str(cache_root),
+        ]
+    )
+
+    assert service_calls == [
+        {
+            "cache_root": cache_root,
+            "quarantine_root": tmp_path / "s003-development-quarantine",
+        }
+    ]
+    assert "research snapshot" in capsys.readouterr().out
 
 
 def test_research_snapshot_can_reuse_eligible_full_refresh_without_provider_access(

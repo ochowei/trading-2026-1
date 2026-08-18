@@ -48,6 +48,13 @@ still verifies full-refresh eligibility, coverage, and the exact primary cutoff 
 same canonical cache bytes into content-addressed evidence. The study must compare the resulting
 data-blob identities and stop before ranking if a required common series differs.
 
+When an authorized historical study needs a cutoff earlier than the monotonic active cache,
+`trading research snapshot --cache-root <isolated-path>` performs that full refresh in an explicit
+disposable cache namespace. Its quarantine root is the sibling path with `-quarantine` appended.
+Later family snapshots must use the same `--cache-root` together with `--reuse-full-refresh` so they
+remain provider-free and bind the identical generation. The cache path is operational only and
+does not become evidence; immutable manifests still carry the exact data-blob identity.
+
 ## Validation and corruption
 
 Before publication and on active-cache use, validation checks:

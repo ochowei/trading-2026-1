@@ -96,9 +96,12 @@ None.
 | ID | Title | Status | Outcome | Path |
 | --- | --- | --- | --- | --- |
 | `S001` | FXI ATR-Band Mean-Reversion Study-Time Retrospective Evaluation | `completed` | `fail` | [fxi-atr-band-mean-reversion-study-time-retrospective--s001](work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001/) |
+| `S003` | FXI No-ClosePos ATR-Floor Mean-Reversion Study-Time Retrospective Evaluation | `running` | `-` | [fxi-no-closepos-atr-floor-mean-reversion-study-time-retrospective--s003](work/studies/fxi-no-closepos-atr-floor-mean-reversion-study-time-retrospective--s003/) |
 | `S002` | FXI Volume-Stratified ATR-Floor Mean-Reversion Study-Time Retrospective Evaluation | `completed` | `fail` | [fxi-volume-stratified-atr-floor-mean-reversion-study-time-retrospective--s002](work/studies/fxi-volume-stratified-atr-floor-mean-reversion-study-time-retrospective--s002/) |
 
 ### Changes
 
-_No changes._
+| ID | Title | Status | Released in | Path |
+| --- | --- | --- | --- | --- |
+| `C001` | Guarded Challenge-Only Execution | `draft` | `-` | [guarded-challenge-only-execution--c001](work/changes/guarded-challenge-only-execution--c001/) |
 <!-- GENERATED:WORK_INDEX_END -->

@@ -1,0 +1,285 @@
+{
+  "benchmarks": {
+    "bootstrap_block_sessions": 20,
+    "bootstrap_repetitions": 1000,
+    "random_samples": 1000,
+    "random_seed": 20260818
+  },
+  "calendar": {
+    "development_years": [2015, 2016, 2017, 2018, 2019],
+    "evaluation_years": [2021, 2022, 2023, 2024, 2025],
+    "quarantine_years": [2020],
+    "warmup_end": "2014-12-31",
+    "warmup_start": "2013-11-06"
+  },
+  "cost_policies": {
+    "base": {
+      "entry_slippage_bps": 5.0,
+      "exit_slippage_bps": 5.0,
+      "fee_bps_per_side": 1.0
+    },
+    "stress": {
+      "entry_slippage_bps": 20.0,
+      "exit_slippage_bps": 20.0,
+      "fee_bps_per_side": 2.0
+    }
+  },
+  "evidence_classification": "known-contaminated",
+  "evidence_contract": {
+    "observation": {
+      "allowed_run_modes": ["offline"],
+      "observed_at_floor": "frozen-evaluation-end",
+      "outcome_status": "succeeded",
+      "validity_status": "valid"
+    },
+    "schema_version": 1,
+    "snapshot": {
+      "data_cutoff": "frozen-evaluation-end",
+      "definition_binding": "exact",
+      "evaluation_coverage": "all-frozen-evaluation-sessions",
+      "kind": "immutable-research-data-manifest"
+    }
+  },
+  "evidence_justification": "Legacy FXI research and the completed v008/S001 and v008/S002 lineages may have inspected or been influenced by 2021-2025 outcomes. These folds are fixed as known-contaminated, non-promotional study-time retrospective evidence and can never be relabelled verified-clean.",
+  "execution": {
+    "dependency_sessions": 21,
+    "embargo_sessions": 1,
+    "execution_lag_sessions": 1,
+    "maximum_holding_sessions": 20,
+    "stress_drawdown_limit": "0.20"
+  },
+  "family": {
+    "baseline_identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+    "maximum_trials": 6,
+    "members": [
+      {
+        "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+        "role": "selection-candidate",
+        "source_sha256": "9e4d355b27517f389d1daf34c76b0bfbfa28cfd10f206d18de64f2f3a1810f6b"
+      },
+      {
+        "identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+        "role": "family-baseline",
+        "source_sha256": "f2a80bcb33700832a20b80af7b71c247db58da2c258a5fb82b562035e8dd6bb9"
+      },
+      {
+        "identity": "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+        "role": "robustness",
+        "source_sha256": "149714e85b1e922ba310e5db944b07691401c51751cefdf4a8ac40db9fd3a18c"
+      },
+      {
+        "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+        "role": "robustness",
+        "source_sha256": "d9a5a0d95e4537c5b1c8045ce9b8e9ce4b71aa29640b266a27654bc52851e7d9"
+      },
+      {
+        "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+        "role": "robustness",
+        "source_sha256": "0e685eb68323bf38c5de9082cd204791f45e503473706857ef6a191d7f6d8de3"
+      },
+      {
+        "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+        "role": "robustness",
+        "source_sha256": "a9e5895399b23894a878dc0823ca9590f79c36772242c954f24f8731a4269fcb"
+      }
+    ],
+    "shared_sources": [
+      {
+        "path": "src/trading/research_definitions/fxi_mean_reversion.py",
+        "sha256": "e091fce410709eeceb9b45f5bb753154866eff07f0a1bc0484611133367266d5"
+      }
+    ]
+  },
+  "policy_set": {
+    "identity": "cac4973cf0055c772487b069c96f1cd2b488a2457636f8cfe2c812c89ad0f63e",
+    "releases": [
+      {
+        "config_digest": "fd7cbb7bfd77887b557c2c9075124adb6a1b77e6789bd6cf91971e44646be5f8",
+        "family": "canonical-execution",
+        "path": "policies/canonical-execution--v001",
+        "release_digest": "e6a745aeb4d7bdbad6ed53f25ff5a41fed0a447200edf51b545c7163d5d50925",
+        "version": "v001"
+      },
+      {
+        "config_digest": "beb47a951fbae842ebea79353f6c31dcf784a74537d48d1e8e8c696d0618ec28",
+        "family": "firstrade-manual-trading",
+        "path": "policies/firstrade-manual-trading--v001",
+        "release_digest": "0b40404f668dc1bfb15e21558bbdc221f68742093d0ecc99856be9f0031470d9",
+        "version": "v001"
+      },
+      {
+        "config_digest": "0c1f786cfe686ec9633c6d0ff70d2d1fab9053fd5040c4f0487c6d047aabb9dc",
+        "family": "portfolio-risk",
+        "path": "policies/portfolio-risk--v001",
+        "release_digest": "63e565e6eebbfe55dc9ffb4914af28706d6164a029447fcc52f8825d5da57b69",
+        "version": "v001"
+      },
+      {
+        "config_digest": "7acaaf98ac31a31fcc5f8603e8a4df2232ea25c0adb6c6372da24191fb29e44d",
+        "family": "us-equity-market",
+        "path": "policies/us-equity-market--v002",
+        "release_digest": "9c4feb8ec5bea92f0df9c30f31ea9553b4ef338b7740fcfbecb72cc1090d5978",
+        "version": "v002"
+      }
+    ]
+  },
+  "prior_selection_history_incomplete": true,
+  "registries": {
+    "qualification_registry_path": "state/qualification-registry.json",
+    "trial_registry_path": "results/trial_registry.json"
+  },
+  "required_challenges": [
+    {
+      "applies_to": {"identities": ["cash"], "kind": "benchmark"},
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-cash-v1",
+      "gate": {
+        "metric": "candidate_base_compounded_return_minus_cash",
+        "operator": ">",
+        "threshold": 0
+      },
+      "id": "cash"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-study-time-delayed-entry-one-session-v1"],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-delayed-entry-v1",
+      "gate": {
+        "metric": "all_frozen_delayed_entry_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "delayed-entry"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline"],
+        "kind": "trial"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-family-baseline-v1",
+      "gate": {
+        "metric": "candidate_base_daily_equity_sharpe_minus_baseline",
+        "operator": ">=",
+        "threshold": 0.1
+      },
+      "id": "family-baseline"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-study-time-higher-costs-20bps-v1"],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-higher-costs-v1",
+      "gate": {
+        "metric": "all_frozen_higher_cost_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "higher-costs"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-study-time-annual-and-volume-tercile-regimes-v1"],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-market-regimes-v1",
+      "gate": {
+        "metric": "all_frozen_annual_and_volume_regime_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "market-regimes"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-study-time-seeded-missed-entry-10pct-v1"],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-missed-entries-v1",
+      "gate": {
+        "metric": "all_frozen_missed_entry_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "missed-entries"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-study-time-closepos-atr-and-cooldown-v1"],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-parameter-perturbation-v1",
+      "gate": {
+        "metric": "all_frozen_parameter_perturbation_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "parameter-perturbation"
+    },
+    {
+      "applies_to": {"identities": ["random-entry"], "kind": "benchmark"},
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-random-entry-v1",
+      "gate": {
+        "metric": "candidate_base_compounded_return_minus_random_p90",
+        "operator": ">",
+        "threshold": 0
+      },
+      "id": "random-entry"
+    },
+    {
+      "applies_to": {
+        "identities": ["fxi-no-closepos-atr-floor-study-time-canonical-adverse-fill-v1"],
+        "kind": "method"
+      },
+      "evidence_identity": "fxi-no-closepos-atr-floor-study-time-worse-fills-v1",
+      "gate": {
+        "metric": "all_frozen_adverse_fill_constraints_satisfied",
+        "operator": "=",
+        "threshold": true
+      },
+      "id": "worse-fills"
+    }
+  ],
+  "route": "study-time-retrospective",
+  "schema_version": 1,
+  "signal_funnel": {
+    "candidate_stages": [
+      "completed-decision-sessions",
+      "inclusive-pullback",
+      "williams-r",
+      "atr-floor",
+      "cooldown",
+      "position-conflict",
+      "executable-entry",
+      "completed-trade"
+    ],
+    "closepos_reference_effect": "s002-reference-only-fixed-threshold-0.40",
+    "evidence_mode": "provider-free-replay-from-frozen-indicators-raw-signals-raw-candidates-and-canonical-sleeve-evidence",
+    "post_hoc_thresholds": "prohibited",
+    "selection_effect": "none-beyond-frozen-development-eligibility"
+  },
+  "study_path": "workflows/strategy-forward-replication-research--v008/work/studies/fxi-no-closepos-atr-floor-mean-reversion-study-time-retrospective--s003",
+  "trial_history_complete": false,
+  "volume_stability": {
+    "accepted_trade_removal_behavior": "fixed-ledger-cash-interval-no-replacement-signals",
+    "concentration_limit": "0.50",
+    "corporate_action_handling": "single-common-full-refresh-generation-no-cross-generation-stitching-or-post-hoc-rebasing",
+    "coverage_required": "1.00",
+    "high_exclusion_base_return_operator": ">0",
+    "high_exclusion_stress_return_operator": ">0",
+    "minimum_qualified_terciles": 2,
+    "minimum_traded_folds_per_qualified_tercile": 2,
+    "minimum_trades_per_qualified_tercile": 5,
+    "percentile_formula": "(count(reference_volume < signal_volume) + 0.5 * count(reference_volume == signal_volume)) / 252",
+    "positive_profit_basis": "sum(max(base_net_trade_pnl,0))",
+    "reference_sessions": 252,
+    "signal_acceptance_effect": "none",
+    "terciles": {
+      "high": ">2/3",
+      "low": "<1/3",
+      "normal": ">=1/3 and <=2/3"
+    },
+    "valid_volume": "present-finite-strictly-positive"
+  }
+}

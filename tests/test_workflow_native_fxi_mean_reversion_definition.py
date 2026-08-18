@@ -336,6 +336,75 @@ def test_registry_loads_six_primary_only_atr_floor_identities(tmp_path: Path) ->
     assert baseline.config.atr_ratio_floor is None
 
 
+def test_registry_loads_six_no_closepos_atr_floor_successor_identities(
+    tmp_path: Path,
+) -> None:
+    registry = ResearchDefinitionRegistry()
+    family = "fxi-no-closepos-atr-floor-mean-reversion"
+    trials = (
+        "no-closepos-atr-floor-1p10-robustness",
+        "no-closepos-atr-floor-candidate",
+        "no-closepos-cooldown-7-robustness",
+        "no-closepos-delay-one-session-robustness",
+        "pullback-wr-baseline",
+        "s002-closepos-reference",
+    )
+    definitions = [registry.load(f"{family}/{trial}") for trial in trials]
+
+    assert [definition.identity for definition in definitions] == [
+        f"{family}/{trial}" for trial in trials
+    ]
+    assert all(definition.family == family for definition in definitions)
+    assert all(len(definition.market_data_requirements()) == 1 for definition in definitions)
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    snapshots = [
+        definition.capture_research_definition(store, _policy_set()) for definition in definitions
+    ]
+    assert all(snapshot.policy_set_identity == _policy_set().identity for snapshot in snapshots)
+
+    candidate = registry.load(f"{family}/no-closepos-atr-floor-candidate")
+    stricter = registry.load(f"{family}/no-closepos-atr-floor-1p10-robustness")
+    shorter_cooldown = registry.load(f"{family}/no-closepos-cooldown-7-robustness")
+    delayed = registry.load(f"{family}/no-closepos-delay-one-session-robustness")
+    reference = registry.load(f"{family}/s002-closepos-reference")
+    predecessor = registry.load("fxi-atr-floor-mean-reversion/atr-floor-candidate")
+    baseline = registry.load(f"{family}/pullback-wr-baseline")
+
+    assert candidate.config.close_position_threshold is None
+    assert candidate.config.atr_ratio_floor == 1.05
+    assert candidate.config.atr_ratio_ceiling is None
+    assert stricter.config.close_position_threshold is None
+    assert stricter.config.atr_ratio_floor == 1.10
+    assert shorter_cooldown.config.close_position_threshold is None
+    assert shorter_cooldown.config.cooldown_sessions == 7
+    assert delayed.config.close_position_threshold is None
+    assert delayed.config.entry_lag_sessions == 2
+    assert asdict(reference.config) == asdict(predecessor.config)
+    assert baseline.config.close_position_threshold is None
+    assert baseline.config.atr_ratio_floor is None
+
+
+def test_no_closepos_successor_accepts_signal_excluded_by_s002_reference() -> None:
+    registry = ResearchDefinitionRegistry()
+    family = "fxi-no-closepos-atr-floor-mean-reversion"
+    primary = _primary()
+    primary.iloc[30, primary.columns.get_loc("Close")] = 93.2
+
+    candidate = registry.load(f"{family}/no-closepos-atr-floor-candidate")
+    reference = registry.load(f"{family}/s002-closepos-reference")
+    candidate_trades, candidate_signals = build_fxi_mean_reversion_candidates(
+        primary, None, candidate.config
+    )
+    reference_trades, reference_signals = build_fxi_mean_reversion_candidates(
+        primary, None, reference.config
+    )
+
+    assert candidate_signals == (primary.index[30].date(),)
+    assert len(candidate_trades) == 1
+    assert reference_signals == ()
+    assert reference_trades == ()
+
+
 def test_retrospective_family_matches_atr_band_semantics_with_earlier_boundaries(
     tmp_path: Path,
 ) -> None:
