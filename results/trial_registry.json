@@ -7774,7 +7774,7 @@
       "first_registered_at": "2026-08-13T03:42:12.501439Z",
       "hypothesis": "A simple pullback and Williams-%R rule is the distinct FXI family baseline.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-08-13T03:42:12.672751Z",
+      "last_observed_at": "2026-08-17T01:54:08.578796Z",
       "legacy": false,
       "observations": [
         {
@@ -7786,6 +7786,17 @@
           "result_path": "results/fxi-atr-band-mean-reversion--pullback-wr-baseline/20260813_034212_605499_offline_f2343cba90ab42a9878e410c97e22e69.json",
           "run_mode": "offline",
           "snapshot_id": "e40c78874101b58239a2df6e2153a09d438d66f560e2c76ef1551eadf960af3d",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "fdf6907fa49d44d5aaddb4cf9d99be60",
+          "observed_at": "2026-08-17T01:54:08.578796Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--pullback-wr-baseline/20260817_015408_555159_offline_5406a64c71084145b4793fe1c9c918cf.json",
+          "run_mode": "offline",
+          "snapshot_id": "764bd2b5d0ff949c17e60f0f18c9471dcb495eeb7d4240f44eb803fee79dd848",
           "validity_status": "valid"
         }
       ],
@@ -7802,7 +7813,7 @@
       "first_registered_at": "2026-08-13T03:42:12.769636Z",
       "hypothesis": "A bounded FXI volatility-acceleration state improves next-open reversals.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-08-13T03:42:12.904756Z",
+      "last_observed_at": "2026-08-17T01:54:06.786677Z",
       "legacy": false,
       "observations": [
         {
@@ -7814,6 +7825,17 @@
           "result_path": "results/fxi-atr-band-mean-reversion--atr-band-candidate/20260813_034212_859811_offline_8d81d389160848c889125a9fe738279f.json",
           "run_mode": "offline",
           "snapshot_id": "b84b04c08cfdd8d08390433344f008c93a451632280957c0d69ec1212cabfa8e",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "52002f72015146c98c4f114ef8ac5672",
+          "observed_at": "2026-08-17T01:54:06.786677Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--atr-band-candidate/20260817_015406_763994_offline_592d2b9be6b94919969ff4513265bea6.json",
+          "run_mode": "offline",
+          "snapshot_id": "2591e691d999453069ac14da9ebc4ee02668689b2301da42ee17976e071f515c",
           "validity_status": "valid"
         }
       ],
@@ -7994,6 +8016,286 @@
       "selection_history_incomplete": false,
       "status": "active",
       "trial_id": "c3c04fd0bcb59ca8ecb250d8fd37e1ed68caa13233c1656d1be3381254918e8c"
+    },
+    {
+      "definition_fingerprint": "1cf546efa3f158bf6d5d0a25fce01d1e31cd1f2b4d3682ffc13d99047edd6db1",
+      "experiment_family": "fxi-atr-band-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-band-mean-reversion--atr-floor-1p10-robustness"
+      ],
+      "first_registered_at": "2026-08-17T01:54:10.087985Z",
+      "hypothesis": "The FXI candidate remains viable with a stricter ATR-ratio floor of 1.10.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T01:54:10.153939Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "81e1a5ec1ed14c0e9e05869d571a9171",
+          "observed_at": "2026-08-17T01:54:10.153939Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--atr-floor-1p10-robustness/20260817_015410_133140_offline_b82e760c3bbc4c42b25aeb676d7237e7.json",
+          "run_mode": "offline",
+          "snapshot_id": "89d960fb46a02226a11085976147ee86970c4ee4be19fbaa4c0aef4e05f0cfb9",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "a380a5b680d85cf1b4213e56a3f3fba5cbda01324f99abd8338e9221cdbd5262"
+    },
+    {
+      "definition_fingerprint": "c89252011a8c2a2f63af70a29ef10c9c4f2307acf2ef8f1035ebfc36eed1c90c",
+      "experiment_family": "fxi-atr-band-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-band-mean-reversion--atr-ceiling-1p30-robustness"
+      ],
+      "first_registered_at": "2026-08-17T01:54:11.688729Z",
+      "hypothesis": "The FXI candidate remains viable with an ATR-ratio ceiling of 1.30.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T01:54:11.761314Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "247c10a7435d48cb8c31d51c071247c0",
+          "observed_at": "2026-08-17T01:54:11.761314Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--atr-ceiling-1p30-robustness/20260817_015411_734978_offline_44c69f39f09c4e19867a4b2d3a50168b.json",
+          "run_mode": "offline",
+          "snapshot_id": "db175eb9986260dd7fbe7d8d5deb4cf95bbe5ac2bd9457c7373c19afc57196ac",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "7eb0da5535e4b6328b81dd1343bf10da30a26c6b18253c561f120cd95b6afe3e"
+    },
+    {
+      "definition_fingerprint": "0c45c30dde995693f971c90e67e1a8a883b6ad9ae26417d69e49ddc51885bcb2",
+      "experiment_family": "fxi-atr-band-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-band-mean-reversion--hold-18-robustness"
+      ],
+      "first_registered_at": "2026-08-17T01:54:13.305703Z",
+      "hypothesis": "The FXI candidate remains viable with an eighteen-session maximum holding.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T01:54:13.376616Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "b2dcea3664b842d997a6ecf41cbd39c5",
+          "observed_at": "2026-08-17T01:54:13.376616Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--hold-18-robustness/20260817_015413_351336_offline_303a748fc776435da376db4aedda1f40.json",
+          "run_mode": "offline",
+          "snapshot_id": "53edd21b747da2e8a8a0745c2c7d2f14b5531d8288896af5c5e0311a9975cd16",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "7366c663e42250f59297a3b2586926919f7ab9b7880157834ca57153d6c0b022"
+    },
+    {
+      "definition_fingerprint": "fd9bc77a7bc6f77679fd44f6535aaf833161bbe7ad8c3c5bb4178fb59382401d",
+      "experiment_family": "fxi-atr-band-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-band-mean-reversion--delay-one-session-robustness"
+      ],
+      "first_registered_at": "2026-08-17T01:54:14.892827Z",
+      "hypothesis": "The FXI candidate remains viable when entry is delayed one additional session.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T01:54:14.960187Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "d60131a951514e71b6d76df07ebb45db",
+          "observed_at": "2026-08-17T01:54:14.960187Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-band-mean-reversion--delay-one-session-robustness/20260817_015414_939115_offline_64b84b68a7ff4c1b83efcfb2ee01287f.json",
+          "run_mode": "offline",
+          "snapshot_id": "6bdb0a8284cd4d592d46426b293be252e2940b108c2b097e717ff45abaebec72",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "da05516060207d5ea963490dc11a38ba31b901143d639355233a5decb51a2a7c"
+    },
+    {
+      "definition_fingerprint": "37095d89d34c193191e019fbac20abc16358d17d55565002be31d1e1ae8ce143",
+      "experiment_family": "fxi-atr-floor-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-floor-mean-reversion--atr-floor-candidate"
+      ],
+      "first_registered_at": "2026-08-17T09:45:07.490800Z",
+      "hypothesis": "An open-ended FXI volatility-acceleration floor supports next-open reversals.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T09:45:07.562242Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "b9a007c4fd424d1cb9683463b6af54ed",
+          "observed_at": "2026-08-17T09:45:07.562242Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-floor-mean-reversion--atr-floor-candidate/20260817_094507_541417_offline_d8ea8540298148089a9277eea13bee8d.json",
+          "run_mode": "offline",
+          "snapshot_id": "39af03d9db7f6cbd1880bac25871343c0510de9cebdd8addd6850022ea980c76",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "0290ddaa50cdb3f0596aaa1a83c738356c232a1fc61280e7eb6d6a6723eaef10"
+    },
+    {
+      "definition_fingerprint": "57ea269dd3f2445ed5efcacfb354f45f708fbc85da5eef36440c5843b82ab4d1",
+      "experiment_family": "fxi-atr-floor-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-floor-mean-reversion--pullback-wr-baseline"
+      ],
+      "first_registered_at": "2026-08-17T09:45:09.041061Z",
+      "hypothesis": "A simple pullback and Williams-%R rule is the distinct FXI family baseline.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T09:45:09.112130Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "75c68c84cc74414bbc1ad3220c79c230",
+          "observed_at": "2026-08-17T09:45:09.112130Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-floor-mean-reversion--pullback-wr-baseline/20260817_094509_090692_offline_e82b0953abdd49f78142d2d216abed9d.json",
+          "run_mode": "offline",
+          "snapshot_id": "15e3748880ec3180447b72a92e83fee8545a2e6bb0464ce9dc9ca540fc132184",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "e1c657d8f9ecf042640040284030478279f5e2c5d1bfa3b726659d5fd1edfe03"
+    },
+    {
+      "definition_fingerprint": "5978f1355d8692e2265d1543fc8e5287f47f6385be07feee0d6d0cd9b0a4842a",
+      "experiment_family": "fxi-atr-floor-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-floor-mean-reversion--s001-atr-band-reference"
+      ],
+      "first_registered_at": "2026-08-17T09:45:10.559388Z",
+      "hypothesis": "The exact S001 ATR band is a non-selectable robustness reference.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T09:45:10.633875Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "0cc6c36ac64144f3b4d1427ab73242ab",
+          "observed_at": "2026-08-17T09:45:10.633875Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-floor-mean-reversion--s001-atr-band-reference/20260817_094510_608756_offline_b6ca14efbbd04634b8c60a459ebf58bd.json",
+          "run_mode": "offline",
+          "snapshot_id": "263625bffeb0ac8016759f6cda87c0346e886ba93bb1e3570b9b412da2e227f6",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "fd54b0c430d9755e091011763ae6393cb2e58ca47c0e26a03bd646c851ad82e0"
+    },
+    {
+      "definition_fingerprint": "4bacf4ca6024dd8bde71c0180fcf84e408f001997939159ac29869498c43ba8e",
+      "experiment_family": "fxi-atr-floor-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-floor-mean-reversion--atr-floor-1p10-robustness"
+      ],
+      "first_registered_at": "2026-08-17T09:45:12.091289Z",
+      "hypothesis": "The FXI candidate remains viable with a stricter ATR-ratio floor of 1.10.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T09:45:12.161844Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "2e1e4565a878442c95717a4e712d2b81",
+          "observed_at": "2026-08-17T09:45:12.161844Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-floor-mean-reversion--atr-floor-1p10-robustness/20260817_094512_140785_offline_5d0f69d82f6e46678ce83669095f47ed.json",
+          "run_mode": "offline",
+          "snapshot_id": "d368a7f6873bf06c27bfa14a38845d4878625f918ac0031db702fc35d10586c9",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "e298485ac30ce421fdc9ed53b2620626a011282bc8d3b9450e532c477ecea9c0"
+    },
+    {
+      "definition_fingerprint": "664ad39a0f7f4441f514fa80d3d8b9efcb4280f2520cfad10d56ec061f8532ee",
+      "experiment_family": "fxi-atr-floor-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-floor-mean-reversion--hold-18-robustness"
+      ],
+      "first_registered_at": "2026-08-17T09:45:13.624773Z",
+      "hypothesis": "The FXI candidate remains viable with an eighteen-session maximum holding.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T09:45:13.690365Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "33f12fa143f54dbe8e2f5f02409cd6ee",
+          "observed_at": "2026-08-17T09:45:13.690365Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-floor-mean-reversion--hold-18-robustness/20260817_094513_670031_offline_d5205f4d8fae4f0cac1e3d7dcb2fd9c6.json",
+          "run_mode": "offline",
+          "snapshot_id": "be240abecb116c5c87b219e47837d8c9375b28372a2670fc9cb210ec9521b6b5",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "8a112b7b7ad6cb8da011504f0fee12ffbd968c8ea9db37b3d8e1c3f948ccc7b3"
+    },
+    {
+      "definition_fingerprint": "700143936579885229526bb40be55e71a95e4dbb96de2e7da0dbdaf1c0cbaaea",
+      "experiment_family": "fxi-atr-floor-mean-reversion",
+      "experiment_names": [
+        "fxi-atr-floor-mean-reversion--delay-one-session-robustness"
+      ],
+      "first_registered_at": "2026-08-17T09:45:15.144830Z",
+      "hypothesis": "The FXI candidate remains viable when entry is delayed one additional session.",
+      "identity_kind": "semantic-definition",
+      "last_observed_at": "2026-08-17T09:45:15.217782Z",
+      "legacy": false,
+      "observations": [
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "0a148b322c1e45bbb6f1ea56b03e381a",
+          "observed_at": "2026-08-17T09:45:15.217782Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/fxi-atr-floor-mean-reversion--delay-one-session-robustness/20260817_094515_192570_offline_3a1caf7c62084546b443654f4252e19f.json",
+          "run_mode": "offline",
+          "snapshot_id": "330d3f4da992eb1ae742a4e15c1ae1aae9f16eda353d3c2bd05e6079a3b4ef76",
+          "validity_status": "valid"
+        }
+      ],
+      "selection_history_incomplete": false,
+      "status": "active",
+      "trial_id": "a613179d6fa6162dd6f890fdb923e174b9eb9cd07925b26cfba46565f5610f55"
     }
   ]
 }

@@ -213,11 +213,22 @@ def test_entry_lag_can_delay_execution_one_additional_session() -> None:
     assert candidate.exit_type == "time_expiry"
 
 
-def test_config_rejects_partial_atr_or_relative_return_declarations() -> None:
+def test_config_supports_floor_only_atr_and_rejects_partial_declarations() -> None:
     values = _config(compound=False)
 
-    with pytest.raises(ValueError, match="ATR-band fields"):
+    with pytest.raises(ValueError, match="ATR floor fields"):
         FXIMeanReversionTrialConfig(**{**asdict(values), "atr_short_period": 5})
+    floor_only = FXIMeanReversionTrialConfig(
+        **{
+            **asdict(_config()),
+            "atr_ratio_ceiling": None,
+            "anchor_ticker": None,
+            "relative_return_lookback": None,
+            "relative_return_floor": None,
+        }
+    )
+    assert floor_only.atr_ratio_floor == 1.05
+    assert floor_only.atr_ratio_ceiling is None
     with pytest.raises(ValueError, match="relative-return fields"):
         FXIMeanReversionTrialConfig(**{**asdict(values), "anchor_ticker": "ASHR"})
 
@@ -287,6 +298,42 @@ def test_registry_loads_and_captures_six_primary_only_atr_band_identities(
     assert candidate.config.atr_ratio_ceiling == 1.35
     assert baseline.config.atr_ratio_floor is None
     assert delayed.config.entry_lag_sessions == 2
+
+
+def test_registry_loads_six_primary_only_atr_floor_identities(tmp_path: Path) -> None:
+    registry = ResearchDefinitionRegistry()
+    family = "fxi-atr-floor-mean-reversion"
+    trials = (
+        "atr-floor-1p10-robustness",
+        "atr-floor-candidate",
+        "delay-one-session-robustness",
+        "hold-18-robustness",
+        "pullback-wr-baseline",
+        "s001-atr-band-reference",
+    )
+    definitions = [registry.load(f"{family}/{trial}") for trial in trials]
+
+    assert [definition.identity for definition in definitions] == [
+        f"{family}/{trial}" for trial in trials
+    ]
+    assert all(definition.family == family for definition in definitions)
+    assert all(len(definition.market_data_requirements()) == 1 for definition in definitions)
+    store = ResearchDefinitionStore(tmp_path / "research-data")
+    snapshots = [
+        definition.capture_research_definition(store, _policy_set()) for definition in definitions
+    ]
+    assert all(snapshot.policy_set_identity == _policy_set().identity for snapshot in snapshots)
+
+    candidate = registry.load(f"{family}/atr-floor-candidate")
+    stricter = registry.load(f"{family}/atr-floor-1p10-robustness")
+    reference = registry.load(f"{family}/s001-atr-band-reference")
+    baseline = registry.load(f"{family}/pullback-wr-baseline")
+    assert candidate.config.atr_ratio_floor == 1.05
+    assert candidate.config.atr_ratio_ceiling is None
+    assert stricter.config.atr_ratio_floor == 1.10
+    assert stricter.config.atr_ratio_ceiling is None
+    assert reference.config.atr_ratio_ceiling == 1.35
+    assert baseline.config.atr_ratio_floor is None
 
 
 def test_retrospective_family_matches_atr_band_semantics_with_earlier_boundaries(

@@ -93,7 +93,10 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-_No studies._
+| ID | Title | Status | Outcome | Path |
+| --- | --- | --- | --- | --- |
+| `S001` | FXI ATR-Band Mean-Reversion Study-Time Retrospective Evaluation | `completed` | `fail` | [fxi-atr-band-mean-reversion-study-time-retrospective--s001](work/studies/fxi-atr-band-mean-reversion-study-time-retrospective--s001/) |
+| `S002` | FXI Volume-Stratified ATR-Floor Mean-Reversion Study-Time Retrospective Evaluation | `completed` | `fail` | [fxi-volume-stratified-atr-floor-mean-reversion-study-time-retrospective--s002](work/studies/fxi-volume-stratified-atr-floor-mean-reversion-study-time-retrospective--s002/) |
 
 ### Changes
 
