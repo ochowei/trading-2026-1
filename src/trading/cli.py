@@ -721,7 +721,14 @@ def cmd_research(args: argparse.Namespace) -> None:
             )
         if args.research_command == "snapshot":
             requirements = MarketDataBundle.validate_requirements(requirements_factory())
-            service = create_default_market_data_service()
+            service_kwargs: dict[str, Path] = {}
+            if args.cache_root is not None:
+                service_kwargs = {
+                    "cache_root": args.cache_root,
+                    "quarantine_root": args.cache_root.parent
+                    / f"{args.cache_root.name}-quarantine",
+                }
+            service = create_default_market_data_service(**service_kwargs)
             if not args.reuse_full_refresh:
                 for requirement in requirements:
                     refresh_kwargs = {"mode": "full", "start": None, "end": args.decision}
@@ -2443,6 +2450,14 @@ def build_parser() -> argparse.ArgumentParser:
     research_snapshot_p.add_argument("--workflow", type=Path, required=True)
     research_snapshot_p.add_argument("--decision", type=iso_date, required=True)
     research_snapshot_p.add_argument("--manifest", type=Path)
+    research_snapshot_p.add_argument(
+        "--cache-root",
+        type=Path,
+        help=(
+            "Optional isolated disposable market-data cache root; its quarantine root is "
+            "a sibling with the '-quarantine' suffix"
+        ),
+    )
     research_snapshot_p.add_argument(
         "--reuse-full-refresh",
         action="store_true",
