@@ -50,7 +50,7 @@ released `WORKFLOW.md`、既有 study、research definition、研究 outcome、q
 ### 停止使用 workflow
 
 ```text
-unregistered local draft → 只有 never-tracked/unreferenced 才能 exact-path deletion，需明確確認
+unregistered local draft → 回報 exact path/Git status 並保持 untouched；實體刪除不在本計劃自動化
 registered draft          → abandon
 active workflow           → terminal retire，需 human approval、safe-study check 與 close dispositions
 released terminal history → 永久保留，不實體刪除
@@ -77,7 +77,7 @@ released terminal history → 永久保留，不實體刪除
 - `workflows/README.md` frontmatter 繼續作 lifecycle authority，不搬移 registry storage。Task 8
   在同一 PR 將 repository 的 root registry 由 schema 1 升為 schema 2；這是唯一 metadata schema
   migration，不重寫任何 version、release、change 或 study bytes。
-- 不新增可任意刪除 registered workflow history 的 CLI。
+- 不新增可任意刪除 workflow bytes 的 CLI；unregistered local draft 的實體刪除亦明確延後。
 - 不編輯 `pm/`。
 - 新增 public CLI、重複檔案 pattern、generated retirement evidence 或 local-only transaction
   state boundary 時，同一 task 更新
@@ -91,13 +91,14 @@ released terminal history → 永久保留，不實體刪除
 1. **Legacy read compatibility is permanent.** 既有
    `README.md + PROPOSAL.md + IMPACT.md + VALIDATION.md + DECISION.md` 不遷移、不重寫。
 2. **New writes use schema v2 only.** 新 change directory 以 `CHANGE.md` 作唯一 author-edited
-   authority；human decision 後只允許 writer 另建 add-only generated decision-event sidecars。
+   authority；human decision 後只允許 writer 另建 content-addressed decision-event sidecars。新 event
+   在 exact event 與對應 `CHANGE.md` bytes 進入 current `HEAD` 前是 `unanchored`，不得授權後續操作。
 3. **No mixed representation.** 同一 change directory 同時出現 legacy 與 v2 authority 時，
    validation fail closed。
 4. **Source-change paths remain directory paths.** Version metadata 與 release evidence 的
    `source_changes` 繼續指向 change directory，不因內部格式改變而破壞 lineage；schema-v2
-   release 另保存每個 terminal `CHANGE.md` 與 decision-event manifest 的 digest，形成 directory
-   path 外部的 immutable anchor。
+   release 另保存每個 terminal `CHANGE.md` 與 decision-event manifest 的 digest；event 先由 exact
+   current-`HEAD` tree anchor 建立不可改寫邊界，release 再 pin terminal authority manifest。
 5. **Registered history is never physically deleted.** `abandoned`、`superseded`、`retired` 與
    released entries 永久留在 registry。
 6. **Old CLI command names remain available, not unsafe argument forms.** 新 happy-path commands
@@ -113,13 +114,13 @@ released terminal history → 永久保留，不實體刪除
 9. **Semantic completeness remains human-reviewed.** CLI 只驗證可機械判斷的結構、identity、
    schema、path、placeholder 與 lifecycle；11 項 workflow semantic coverage 仍由 Agent preview
    與 human confirmation 判斷。
-10. **Never-used allocation includes history and concurrency.** Allocator 在同一 repository lock
-    內掃描 registry、現存 paths、current inbound references、Git path history，以及 Git 歷史內容
-    中的 exact repository-relative identity references。曾 tracked 或 referenced 的 identity 永不因
-    目錄刪除而重用。
+10. **Never-used allocation includes reachable history and concurrency.** Allocator 在同一
+    repository lock 內掃描 registry、現存 paths、current inbound references、stage-0 index、
+    untracked non-ignored files，以及所有已枚舉 locally reachable refs 的 Git path/blob history。
+    在這個 proof universe 內出現過的 identity 不因目錄刪除而重用。
 11. **Initial identity is always v001.** 新 family 只能建立 `v001`。若同 slug 的 `v001` 曾出現在
-    registry、filesystem、Git path/history content 或 inbound reference，CLI 視為 collision／
-    governance repair，而不是建立 initial `v002`。
+    registry、current filesystem/index/inbound references 或 enumerated reachable-ref path/blob
+    history，CLI 視為 collision／governance repair，而不是建立 initial `v002`。
 12. **Retirement is terminal in this plan.** 純 retirement 不建立 replacement version，也不接受
     continue/restart dispositions。未來若要復活 retired family，必須另立 lifecycle 設計。
 13. **Dispositions are machine-enforced authorization.** Replacement/retirement dispositions 不只是
@@ -128,19 +129,25 @@ released terminal history → 永久保留，不實體刪除
 14. **Unknown capabilities fail closed for new authoring.** 新 draft/release 的 capability 必須存在於
     single canonical supported registry；legacy bytes 維持讀取相容。Release 另驗證恰有 market、
     broker、execution 與 portfolio-risk 四種 resolved policy kinds。
-15. **Never-used proof requires complete local Git history.** Allocation 在 non-Git、shallow clone、
-    Git timeout/non-zero 或無法掃描所有 locally reachable refs 時 fail closed；不得把不確定性當成
-    identity 可用。
+15. **Never-used proof requires complete reachable-ref enumeration.** Allocation 在 non-Git、
+    shallow clone、Git timeout/non-zero 或無法掃描所有 locally reachable refs 時 fail closed；
+    deleted-branch/reflog-only、GC-pruned 或尚未 fetch 的 commits 明確不在證明範圍。若日後恢復的
+    ref 含有可辨識的 divergent canonical allocation，validator 必須在下一次 mutation 前 fail
+    closed；其他恢復 evidence 只擴大後續 proof universe，不宣稱能追溯 allocation 當時不可見的 ref。
 16. **Release readers are dual-schema before v2 writes.** Task 7 在任何 schema-v2 release 可成為
     active 前，先讓 authoring、workflow-native execution、research CLI 與 qualification readers
     共用 closed-schema v1/v2 parser；schema v1 沒有 dispositions 只代表不能授權新的跨版本 revisit。
-17. **Revisit actions have machine meaning.** Same-version source 必須是 `draft`、`cancelled` 或
-    `completed`；其他 open states fail closed。Cross-version `continue` 只可源自 `paused` study，
+17. **Revisit actions have machine meaning.** Same-version source 必須是 terminal `cancelled` 或
+    `completed`；`draft` 與其他 open states 均 fail closed。Cross-version `continue` 只可源自
+    `paused` study，
     並要求新 study preregistration 時的 hypothesis bytes 與 source frozen hypothesis 完全一致；
     `restart` 亦只可源自 `paused`，但允許新 hypothesis/plan。兩者都建立新的 preregistration、
     evidence 與 outcome identity；`close-invalidated` 不可消耗。
 18. **Authoring basis is audit provenance.** Draft 可在受控 update 中替換 authoring basis；release
     schema v2 必須複製 normalized basis 並 pin canonical JSON digest，之後不得漂移。
+19. **Unregistered physical deletion is deferred.** Remove mode 可分類並回報 unregistered local
+    draft，但不得刪除它；本計劃不新增 deletion-specific proof API、reservation ledger 或 direct
+    filesystem deletion path。
 
 ## Task 1: Establish authoring compatibility baselines
 
@@ -219,8 +226,8 @@ Expected: current behavior 與現存 atomicity gap 都被固定記錄；Task 1 �
 - 原 `workflow-authoring-contract.md` 暫時保留為短 compatibility pointer，列出新 canonical
   references 並明確要求 caller 改用對應 mode；它不複製 normative content。
 - Complete sources may be converted into one draft preview plus an unresolved-decision list.
-- Identity, deletion, retirement, release, authority, and research-validity decisions remain
-  individually confirmed; low-risk editorial decisions may be confirmed together.
+- Identity、unregistered-local classification、retirement、release、authority and research-validity
+  decisions remain individually confirmed; low-risk editorial decisions may be confirmed together.
 
 - [ ] 先做 rule inventory：對每條現有說明標示 `keep`、`remove-generic`、`remove-duplicated`、
   `enforced-by-code` 或 `move-to-reference`。只保留會改變 Agent 決策的非顯而易見 invariants；
@@ -231,6 +238,9 @@ Expected: current behavior 與現存 atomicity gap 都被固定記錄；Task 1 �
   同時斷言它們不載入彼此無關的 authoring mode files。
 - [ ] Preserve repository precedence, immutable released workflow behavior, source disposition,
   study scope separation, and release authority.
+- [ ] Replace the old absolute “any committed identity” wording in the author skill/compatibility
+  contract with the exact current/index/untracked-nonignored plus enumerated-reachable-ref guarantee;
+  document deleted/ref-only/GC/unfetched exclusions and do not imply a durable reservation ledger.
 - [ ] Update skill frontmatter `description` so review、create、evolve、abandon、retire 與 release
   都可被正確選擇；同步更新 default prompt，但不把 UI prompt 當成 discovery authority。
 - [ ] Update both maintained study skills to the new study-governance reference, then use `rg` to
@@ -293,10 +303,11 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
   releasing the boundary midway.
 - Every scoped writer uses one `enter_workflow_mutation()` invariant: acquire the shared lock;
   inspect the pending authoring journal; automatically execute the deterministic action already
-  selected by a valid `prepared`/`commit-decided` phase; fail closed with the status/recover command
-  for corrupt/foreign/conflicting journals; then re-read registry, exact version, study inventory,
-  and caller-specific lifecycle preconditions. Release/retire cannot rely on a safe-study check made
-  before the lock; study init/resume cannot rely on an active-version check made before the lock.
+  selected by a valid pristine `prepared`/`commit-decided`/`complete` phase; durably mark a prepared
+  mismatch as `prepared-conflicted`; fail closed with the status/recover/abort guidance for
+  corrupt、foreign or conflicted journals; then re-read registry, exact version, study inventory, and
+  caller-specific lifecycle preconditions. Release/retire cannot rely on a safe-study check made before
+  the lock; study init/resume cannot rely on an active-version check made before the lock.
 - Global lock ordering is `workflow repository lock -> qualification lock`. Study completion paths
   that also need qualification state and non-dry-run `compile_study_qualification_plan()` must be
   refactored to acquire them in this order; no code path may acquire the qualification lock and then
@@ -322,7 +333,8 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
 - The first implementation supports only the operations this plan needs: regular-file replace,
   add-only regular file, and creation of a previously absent directory tree from an exact leaf-file
   manifest. It does not replace/delete arbitrary non-empty directories, follow symlinks, or expose a
-  generic tree transaction API. Manual never-tracked local-draft deletion remains outside it.
+  generic tree transaction API. Unregistered local-draft physical deletion is deferred, not another
+  transaction operation.
 - The crash model includes caught exceptions, process kill, and host/power loss under normal local
   filesystem fsync/atomic-rename guarantees. The protocol ordering is fixed:
   1. acquire the shared lock and recover or reject any prior operation;
@@ -334,8 +346,9 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
      canonical paths explicitly instead of treating a plain shadow copy as another Git worktree;
   5. durably write and fsync the `prepared` journal plus its parent directory;
   6. compare-and-swap recheck every target's before-state and every assert-only read-set entry.
-     Any mismatch leaves canonical bytes untouched, retains `prepared`, and reports the conflicting
-     target/input path;
+     Any mismatch leaves canonical bytes untouched, durably changes the phase to
+     `prepared-conflicted`, records exact conflict paths and detection time, fsyncs the journal parent,
+     and reports the conflict;
   7. durably replace the phase with `commit-decided` and fsync the journal parent;
   8. before publishing each still-unpublished target, confirm it still matches before-state; already
      published targets must match after-state. A third state fails closed instead of overwriting an
@@ -351,13 +364,15 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
       bytes.
 - A local-only journal under `state/workflow-authoring/` stores schema version, repository identity,
   operation ID/type, complete target manifest, assert-only validation read-set, before/after values,
-  staged paths, and phase.
-  `prepared` recovery never writes canonical targets: because publication has not begun, it may
-  discard staging/journal only when every target still matches recorded before-state; any other state
-  fails closed instead of overwriting an external update. `commit-decided` recovery rolls forward
+  virtual proof tokens, staged paths, phase, and any conflict paths/time.
+  `prepared` recovery never writes canonical targets and may discard staging/journal only when every
+  target still matches recorded before-state **and** every assert-only read-set/virtual proof token
+  still matches. Any mismatch durably becomes `prepared-conflicted` before returning. A
+  `prepared-conflicted` journal never auto-cleans or returns to `prepared`, even if bytes later drift
+  back; only the audited discard command below may remove it. `commit-decided` recovery rolls forward
   the exact after-state and cannot be aborted. `complete` recovery requires every target to match
-  after-state, then performs cleanup only; missing staging is already-clean and does not fail.
-  Any phase/target combination outside these rules fails closed with the exact conflicting path.
+  after-state, then performs cleanup only; missing staging is already-clean and does not fail. Any
+  phase/state combination outside these rules fails closed with the exact conflicting path.
 - Orphan staging created before a durable `prepared` journal may be removed only after proving no
   journal references it. A corrupt, foreign-repository, or incompatible journal blocks every new
   mutation; callers cannot replace its operation or inputs.
@@ -389,11 +404,13 @@ uv run trading workflow authoring abort-prepared <operation-id> \
 recorded; it never accepts replacement operation inputs or a caller-selected rollback direction.
 Normal authoring and study writers automatically recover a valid journal through the same mutation
 entry invariant; explicit `recover` exists for diagnosis/retry after an operator has resolved a
-reported conflicting target. `abort-prepared` is the only discard path: it requires the exact
-operation ID、stable actor and reason, is legal only while phase is `prepared`, never changes
-canonical targets, appends a local-only audit record, then removes journal/staging durably. It is
-used only after the operator accepts abandoning an operation whose targets/read-set conflicted.
-`commit-decided` cannot be aborted; corrupt or conflicting journals are never auto-rewritten.
+reported conflict. `abort-prepared` is the only audited discard path: it requires the exact operation
+ID、stable actor and reason, is legal only while phase is `prepared` or `prepared-conflicted`, and
+rechecks that no target was published and every target still matches its recorded before-state. The
+read-set/proof token need not still match because the operation is being discarded. It never changes
+canonical targets, appends and durably fsyncs a local-only audit record, then removes journal/staging
+durably. `commit-decided` cannot be aborted; corrupt journals and `prepared-conflicted` journals are
+never auto-rewritten or auto-cleaned.
 
 **Identity proof contract:**
 
@@ -413,9 +430,13 @@ used only after the operator accepts abandoning an operation whose targets/read-
   unreadable objects, or inability to enumerate `git rev-list --all` fail closed with an actionable
   “cannot prove never-used” error. No exception/timeout is converted to an empty history result.
 - The guarantee covers complete locally reachable `--all` history; canonical CI performs the same
-  check in a non-shallow clone. Allocation does not claim knowledge of commits never fetched into
-  any local ref.
-- Historical path and textual-content proofs are separate. Complete path history comes from one
+  check over the refs fetched into its non-shallow clone. Allocation does not claim knowledge of
+  deleted-branch/reflog-only、GC-pruned or never-fetched commits. Restored refs join the next proof;
+  validator rejects detectable divergent canonical allocations (for example independent add roots for
+  the same canonical identity path), but does not claim retroactive knowledge of an unavailable ref.
+  This plan does not add a durable identity ledger.
+- Historical path and textual-content proofs are separate. Complete path history for the enumerated
+  reachable refs comes from one
   NUL-delimited `git log --all --name-status --format=` traversal; parser handles both old/new names
   for rename/copy records and every added、modified、deleted path. Historical textual content uses
   `git rev-list --objects --all` only to enumerate object IDs, confirms object type, de-duplicates
@@ -444,11 +465,14 @@ used only after the operator accepts abandoning an operation whose targets/read-
   decision, roll-forward after commit decision, corrupt journal, wrong repository identity,
   changed staged bytes, a canonical target matching neither digest, orphan staging, idempotent
   recovery, and incompatible retry. Add crash-after-complete、journal-unlink、staging-unlink and
-  parent-fsync boundaries; prove prepared recovery never writes canonical bytes and complete recovery
-  performs cleanup only.
+  parent-fsync boundaries; prove pristine prepared recovery cleans only when targets、read-set and
+  virtual proof tokens all match, prepared-conflicted never auto-cleans, and complete recovery performs
+  cleanup only.
 - [ ] Add read-set tests covering dependency、policy release、study-precondition and evidence drift,
-  plus target-before-state tests for source changes, before commit decision; each must abort without
-  canonical mutation. Drift after
+  plus target-before-state tests for source changes, before commit decision; each must write a durable
+  `prepared-conflicted` marker without canonical mutation. Prove later byte reversion still cannot
+  trigger auto-cleanup, while audited abort succeeds only when every target remains before-state.
+  Drift after
   commit decision must not prevent a fully published journal from completing, but full validation
   must report the repository health failure.
 - [ ] Reject undeclared normative reads in operation planners and target/read-set overlap. Add a
@@ -459,9 +483,10 @@ used only after the operator accepts abandoning an operation whose targets/read-
   no canonical mutation and post-decision third-state conflict fails closed without overwriting it.
 - [ ] Inject failure before and after every publication boundary for `sync`, `transition_change`,
   `transition_version`, and `release`, including process-kill tests at every phase switch; start a
-  fresh repository process and prove deterministic recovery reaches exactly the before- or
-  after-state selected by the journal phase. Verify file and parent-directory fsync ordering with
-  a recording filesystem adapter rather than relying only on happy-path integration tests.
+  fresh repository process and prove deterministic recovery reaches exactly the before-/after-state
+  selected by the journal phase, or remains durably `prepared-conflicted` without canonical writes.
+  Verify file and parent-directory fsync ordering with a recording filesystem adapter rather than
+  relying only on happy-path integration tests.
 - [ ] In Task 3, test concurrent reservation primitives and existing study allocation without
   depending on not-yet-added create/evolve commands. Tasks 5–6 add end-to-end concurrent
   create/change/evolve tests using the same scanner and lock.
@@ -474,10 +499,11 @@ used only after the operator accepts abandoning an operation whose targets/read-
   index bytes.
 - [ ] Route non-dry-run `compile_study_qualification_plan()` through the same mutation entry, then
   acquire its existing qualification lock. Add races against release、retire and study completion;
-  add pending prepared/commit-decided/complete journal tests and prove registration only proceeds
-  after in-lock active/running/consumption validation.
-- [ ] After a crash at every prepared/commit-decided/publication phase, immediately invoke each
-  study writer and prove it first completes the selected authoring recovery or fails without writing.
+  add pending prepared/prepared-conflicted/commit-decided/complete journal tests and prove registration
+  only proceeds after in-lock active/running/consumption validation.
+- [ ] After a crash at every prepared/prepared-conflicted/commit-decided/publication phase,
+  immediately invoke each study writer and prove it first completes the selected authoring recovery or
+  fails without writing.
 - [ ] Add reservation tests for all canonical path/text spellings, version-scoped local IDs,
   non-Git/shallow repositories, Git timeout/non-zero, missing objects, and `Sxxx` historical/inbound
   references; preserve permanent local scoping between unrelated workflow versions. Include the
@@ -485,12 +511,15 @@ used only after the operator accepts abandoning an operation whose targets/read-
   index、untracked-nonignored reference、ignored-file exclusion and ref/index/inventory CAS drift.
   Add cache hit/invalidation、blob de-duplication、token-boundary and deterministic timeout diagnostics.
 - [ ] Add parser/dispatch tests for `workflow authoring status/recover/abort-prepared`, including clean
-  state, prepared cleanup without canonical rollback, explicit audited prepared abort,
-  commit-decided roll-forward, complete cleanup, corrupt journal refusal, and read-only status.
+  state, fully pristine prepared cleanup, durable prepared-to-conflicted transition, no automatic
+  conflicted cleanup after drift reversion, explicit audited prepared/conflicted abort with target
+  precondition, commit-decided roll-forward, complete cleanup, corrupt journal refusal, and read-only
+  status.
 - [ ] Update `.github/workflows/lint.yml` to checkout with `fetch-depth: 0`, assert
   `git rev-parse --is-shallow-repository` is `false`, and run workflow authoring transaction、identity、
   study lifecycle、study qualification and qualification workflow suites in addition to existing
-  authoring/policy validation. CI must exercise the same fail-closed history proof as local tests.
+  authoring/policy validation. CI must exercise the same fail-closed proof over refs fetched into the
+  CI clone as local tests; it does not claim knowledge of never-fetched/deleted refs.
 - [ ] Retrofit existing authoring mutations before adding new schema-v2 writers or happy-path CLI.
 - [ ] Replace Task 1 characterization expectations with crash-safe assertions once the coordinator
   is active.
@@ -621,18 +650,29 @@ released_in: null
   and delimiters; `snapshot_sha256` covers the canonical serialized snapshot. A later proposal or
   decision may replace the working Validation section but never edits/removes prior Decision
   snapshots, so every historical rationale is replayable without relying on Git commit timing.
-- Each human decision/withdrawal transaction also creates one add-only canonical-JSON event at
+- Each human decision/withdrawal transaction also creates one content-addressed canonical-JSON event at
   `decision-events/DNNN-<event-sha256>.json`. The event contains exactly `schema_version`、canonical
   change identity/path、sequence、status、recorded_at、recorded_by、the exact Validation/Decision input
   bytes or null where withdrawal permits it, their digests, and `snapshot_sha256`; `event_sha256`
   hashes the complete canonical event bytes and determines the filename. The event is a generated
-  immutable anchor, not a second authoring surface. CHANGE history and rendered snapshot must match
-  it byte-for-byte.
-- Validator rejects modification/removal of any current event, a filename/content digest mismatch,
-  duplicate sequence, or disappearance of an event path that appears in the stage-0 index or locally
-  reachable Git path history. Thus rewriting `CHANGE.md` and recomputing every digest still fails
-  against the add-only event. Non-Git、shallow、unmerged-index or incomplete-history proof fails closed
-  for schema-v2 decision mutation/validation.
+  record, not a second authoring surface. Immediately after publication it is `unanchored`; neither
+  stage-0 index presence nor another ref makes it authoritative.
+- An event becomes `HEAD-anchored` only when `git ls-tree HEAD` proves the exact event path/blob and
+  the current matching `CHANGE.md` blob are both present in the current `HEAD` tree. The tool never
+  stages or commits automatically; after every decision/withdrawal it reports the pending Git anchor.
+  Before deferred reproposal/decision、withdrawal、accepted-change create/evolve/release use, every
+  prior event and the current pre-mutation `CHANGE.md` must match exact `HEAD` blobs. Otherwise the
+  guarded operation fails without writes and reports that the records must first be reviewed and
+  committed. Every schema-v2 mutation that changes `CHANGE.md` leaves the new current blob unanchored
+  and reports the required commit; a later decision additionally produces a new unanchored event.
+  Deferred reproposal therefore adds no event but still requires its new proposed `CHANGE.md` blob in
+  current HEAD before another decision.
+- Validator rejects filename/content digest mismatch、duplicate sequence, or modification/removal of
+  a previously HEAD-anchored event. Before its first HEAD anchor, an event is not claimed immutable and
+  cannot authorize downstream work; human/PR review plus the exact HEAD commit establishes the
+  boundary. After anchoring, current-path/history validation rejects disappearance or rewrite, while
+  schema-v2 release pins terminal `CHANGE.md` and every event. Non-Git、shallow、unmerged-index or
+  incomplete reachable-ref proof fails closed for schema-v2 decision mutation/validation.
 - `withdrawn`: `status_changed_at` is current time, current `decided_at/decided_by` and
   `released_in` are null, and the last history item is a withdrawal snapshot with actor and reason.
   Withdrawal does not masquerade as a human accept/reject/defer decision.
@@ -656,7 +696,8 @@ uv run trading workflow change withdraw <change-path> \
 ```
 
 `change decide` writes the latest Validation body, appends an exact Validation/Decision snapshot、
-creates its add-only event and publishes lifecycle metadata/history in one authoring transaction.
+creates its content-addressed unanchored event and publishes lifecycle metadata/history in one
+authoring transaction, then reports the required exact-HEAD anchor.
 `change withdraw` does the equivalent for its withdrawal snapshot/event; it records an actor but is
 not human approval of a research decision. The legacy low-level `change transition` remains
 available for pre-authored legacy-format content.
@@ -664,7 +705,9 @@ available for pre-authored legacy-format content.
 For schema v2, low-level transition handles only `draft -> proposed` and `deferred -> proposed`.
 Accepted/rejected/deferred decisions must use `change decide`; withdrawal must use
 `change withdraw`. Callers can never pre-author or override history metadata or generated snapshots.
-This restriction applies only to schema-v2 writes and does not rewrite legacy records.
+The transition reports that its new `CHANGE.md` blob needs a current-HEAD anchor before a decision;
+the deferred branch also requires the prior event and pre-transition `CHANGE.md` to be anchored before
+it writes. This restriction applies only to schema-v2 writes and does not rewrite legacy records.
 
 `--validation` and `--decision` are substantive UTF-8 Markdown body fragments, not complete
 documents. They must be regular non-symlink files, contain no YAML frontmatter, reserved four-section
@@ -675,8 +718,12 @@ The same input boundary applies to `change decide` and `change withdraw`.
   section, and the complete section/metadata state matrix above, including first proposal,
   multiple deferred reproposals, terminal decision uniqueness, withdrawal after deferral, strict
   timestamp/sequence ordering, exact snapshot/event replay, tampered snapshot/digest/event rejection,
-  historically tracked event deletion/rename, and release. Include a test that tampers with
-  `CHANGE.md` and recomputes every in-file digest but still fails against the event anchor.
+  historically HEAD-anchored event deletion/rename, and release. Prove stage-0-only or other-ref-only
+  presence does not anchor an event; deferred reproposal/decision、withdrawal and accepted-change
+  downstream use fail without writes until exact event plus current `CHANGE.md` bytes are in current
+  HEAD. Prove reproposal changes only `CHANGE.md` but still requires that new blob to be committed before
+  the next decision. After anchoring, include a test that tampers with `CHANGE.md` and recomputes every
+  in-file digest but still fails against the anchored event/history contract.
 - [ ] Write failing tests for mixed legacy/v2 representation, unknown schema version, identity/path
   mismatch, duplicate ID, placeholder content, missing decision approval, illegal lifecycle, and
   invalid `released_in`.
@@ -844,9 +891,9 @@ decision.
   scenarios that check all 11 contract concerns even when headings are translated; CLI tests cover
   only machine-verifiable bytes/schema/identity rules.
 - [ ] Make `create_initial_draft()` allocate exactly `v001`. Under the Task 3 lock, reject the slug
-  if the shared fail-closed identity scanner finds that family/version in registry、disk、any
-  canonical current/historical path or textual reference; propagate non-Git/shallow/timeout/error
-  proof failures and report collision/governance repair instead of
+  if the shared fail-closed identity scanner finds that family/version in registry、current disk/index/
+  inbound references or any enumerated reachable-ref path/blob; propagate non-Git/shallow/timeout/
+  error proof failures and report collision/governance repair instead of
   silently creating an initial `v002`. Stage the complete version directory, service-rendered README
   including Authoring basis, registry draft entry, and indexes, then validate and publish all state
   as one logical mutation.
@@ -925,7 +972,8 @@ permanent released evidence.
 
 - [ ] Write failing tests for no accepted changes, omitted accepted changes, unresolved draft or
   proposed changes, accidental overwrite without `--update`, update of the wrong/non-draft version,
-  version-number reuse including historical-content references, metadata identity override,
+  version-number reuse including enumerated reachable-ref historical-content references, metadata
+  identity override,
   missing/unknown/wrongly typed schema fields, invalid capabilities/policies/dependencies,
   source-mode/input mismatch, path/symlink escape, and structurally invalid replacement inputs.
 - [ ] Write passing tests proving `--update` retains the existing draft version number, refreshes
@@ -1032,7 +1080,8 @@ file's closed-schema/path checks.
 - `source_change_evidence` is ordered one-to-one with `source_changes`. Each item contains exactly
   `path`、`format`, and `files`; `files` is the sorted complete authority manifest of exact
   repository-relative file paths and SHA-256 values. Legacy entries pin README/PROPOSAL/IMPACT/
-  VALIDATION/DECISION. Schema-v2 entries pin terminal `CHANGE.md` and every add-only decision-event
+  VALIDATION/DECISION. Schema-v2 entries pin terminal `CHANGE.md` and every content-addressed
+  decision-event
   sidecar. Missing/extra/reordered paths、event deletion or digest drift invalidate release evidence.
 - `study_dispositions` is the normalized ordered array from the guarded input; each item contains
   exactly `source_study_path`、`action`, and `target_version_path`. Target path always equals the
@@ -1050,9 +1099,9 @@ file's closed-schema/path checks.
 **Revisit branches:**
 
 - Same-version revisit: when source and target study workflow-version paths are identical, source
-  status must be `draft`、`cancelled` or `completed`. This preserves draft redesign、cancel/recreate
-  and completed follow-up without allowing two open preregistered/running/paused/awaiting-review
-  branches. No release disposition or consumption artifact is required; new metadata records null
+  status must be terminal `cancelled` or `completed`. Draft redesign therefore uses the existing
+  canonical sequence “cancel source, then create revisiting study”; `draft` and every other open state
+  fail closed. No release disposition or consumption artifact is required; new metadata records null
   action/consumption.
 - Direct cross-version revisit: when paths differ, the exact active target release must authorize the
   exact source study with continue/restart. Close-invalidated、missing、wrong-target or schema-v1
@@ -1067,6 +1116,12 @@ file's closed-schema/path checks.
 - Repository validation treats `revisits` as a directed graph, requires every path to exist and stay
   in the same workflow family, and rejects self-reference or cycles. Manual metadata edits cannot
   manufacture a circular continuation chain.
+- Study initialization and every later source-study mutation re-read inbound `revisits` edges inside
+  the shared workflow lock. Once referenced, a source must remain in the terminal state that made the
+  edge legal; attempts to transition or mutate it fail before writes. Cancelling the revisiting study
+  retains its directory and edge. There is no governed study-deletion path; manual disappearance of a
+  registered/indexed revisiting study invalidates the repository and blocks every later mutation
+  rather than freeing the source lineage.
 
 **Study metadata and durable consumption:**
 
@@ -1111,8 +1166,13 @@ file's closed-schema/path checks.
   active-release reader path, not rely on the later full-suite handoff.
 - [ ] Add same-version、direct cross-version and cross-then-same-version revisit tests, plus missing/
   close/wrong-target authorization、graph cycle and cross-family rejection. Cover allowed same-version
-  draft/cancelled/completed sources、rejection of all open outcome-relevant sources, and mechanical
-  continue hypothesis equality versus restart freedom.
+  cancelled/completed sources、rejection of `draft` and every other open source with no changed bytes,
+  explicit cancel-then-create success, and mechanical continue hypothesis equality versus restart
+  freedom. Update the existing draft-source fixture to cancel the source before revisit.
+- [ ] Add in-lock inbound-edge guard tests for every source mutation path. Prove manual/corrupt source
+  drift fails validation, mutation fails before writes, cancellation retains the edge, and unsupported
+  manual disappearance of a revisiting study invalidates the repository rather than freeing the source
+  lineage.
 - [ ] Add atomic consumption tests for pre-decision rollback、commit-decided recovery、single-use,
   cancellation permanence、deleted-study invalidity and concurrent double-init.
 - [ ] Update only the canonical version-boundary reference with these rules; impact/study governance
@@ -1129,8 +1189,9 @@ uv run ruff format --check src/ tests/
 uv run trading workflow validate --all
 ```
 
-Expected: version-boundary dispositions become durable, auditable, single-use machine authority
-without changing same-version study redesigns or rewriting old study bytes.
+Expected: version-boundary dispositions become durable, auditable, single-use machine authority;
+same-version redesign follows cancel-then-create or a completed follow-up, with inbound edges guarded
+under the same lock and no old study bytes rewritten.
 
 ## Task 8: Simplify abandon, retire, and deletion semantics
 
@@ -1203,7 +1264,7 @@ sugar over that guarded branch.
   `schema_version`、`from_schema`、`to_schema`、`before_sha256`、`after_sha256`、`migrated_at`, and
   `migrated_by`; it pins the before/after root-registry bytes and the current-time stable actor.
   Schema-v1 parsing exists only as input to this guarded migration and frozen legacy parser fixtures.
-  Once this marker exists—or the complete Git path-history proof shows it was ever tracked—
+  Once this marker exists—or current/enumerated-reachable-ref path history shows it was tracked—
   `validate --all`、sync and every mutation reject a missing/changed marker or root-registry downgrade.
   No ordinary CLI can add a grandfathered record or expand an allowlist. This provides a mechanical
   boundary instead of interpreting field absence as both legacy and illegal new retirement.
@@ -1238,20 +1299,18 @@ sugar over that guarded branch.
 - [ ] Prove `abandon` accepts only a registered draft and permanently retains its registry entry.
 - [ ] Prove superseded, retired, abandoned, or released versions cannot be physically deleted by
   either command.
-- [ ] Keep unregistered local-draft deletion outside the generic CLI. The skill must show the exact
-  path and use the shared identity scanner to prove it is absent from every canonical current/
-  historical path and textual reference. Non-Git、shallow、timeout/error or incomplete-history proof
-  fails closed. The skill resolves current Git status, warns about recoverability, and obtains
-  separate explicit confirmation before direct deletion. If it was ever tracked or referenced,
-  refuse physical deletion and leave the path untouched; this plan does not invent an implicit
-  tombstone/adoption mutation. If such a path is already missing, the Task 3 historical reservation
-  scan still permanently blocks identity reuse and reports governance repair.
-- [ ] Prove an ever-tracked/referenced unregistered path is refused without mutation, and that an
-  already-missing historical identity still blocks create/evolve allocation. A future
-  adopt-as-abandoned repair API is outside this simplification unless separately designed and
-  approved.
-- [ ] Ensure the skill reports whether the user's word “delete” was resolved to local deletion,
-  abandon, retire, or refusal.
+- [ ] Keep unregistered local-draft physical deletion outside both the generic CLI and skill
+  automation. The skill reports its exact path and current Git status, labels it
+  `unregistered-local/manual-work-outside-plan`, and leaves it untouched; it does not attempt the
+  logically impossible proof that a present target is absent from the current path universe, nor add
+  a deletion-specific public proof API、reservation ledger、implicit tombstone/adoption mutation or
+  direct filesystem removal path.
+- [ ] Prove remove mode leaves an unregistered local path byte-identical and emits the bounded manual-
+  work classification. Separately prove an already-missing identity found within Task 3's stated
+  current/reachable-ref proof universe blocks create/evolve allocation; a future deletion or
+  adopt-as-abandoned repair API requires separate design and approval.
+- [ ] Ensure the skill reports whether the user's word “delete” was resolved to unregistered-local
+  manual work、abandon、retire, or refusal.
 - [ ] Run:
 
 ```bash
@@ -1262,8 +1321,8 @@ uv run ruff format --check src/ tests/
 uv run trading workflow validate --all
 ```
 
-Expected: users can ask to remove a workflow without first knowing lifecycle vocabulary, while the
-repository preserves every registered or released historical identity.
+Expected: users can ask to remove a workflow without first knowing lifecycle vocabulary; governed
+states map to abandon/retire/refusal, and an unregistered local draft is reported but not mutated.
 
 ## Task 9: Full history-compatible verification and handoff
 
@@ -1312,14 +1371,18 @@ git status --short
      policy kinds and only supported capabilities; reject missing/duplicate kinds and unknown
      capability;
   2. create a schema-v2 change, defer/repropose it more than once, replay every exact decision
-     snapshot/event, then accept it; separately exercise explicit withdrawal and prove rewriting
-     CHANGE plus all in-file digests cannot bypass the add-only event anchor;
+     snapshot/event, require exact event plus current `CHANGE.md` in current HEAD before each guarded
+     follow-up, then accept it; separately exercise explicit withdrawal, prove stage-0/other-ref-only
+     records do not authorize use, and prove rewriting anchored authority cannot bypass the contract;
   3. aggregate two accepted changes into one replacement draft;
   4. accept another change and update the same replacement draft identity in place;
-  5. abandon a draft and prove registry、all canonical path/text references、complete Git path/blob
-     history、stage-0 index and concurrent allocation cannot reuse its number; prove shared-blob
+  5. abandon a draft and prove registry、all canonical path/text references、Git path/blob history over
+     every enumerated locally reachable ref、stage-0 index and concurrent allocation cannot reuse its
+     number; prove restored refs with divergent canonical allocation roots fail closed before mutation,
+     and prove shared-blob
      multiple paths、unmerged index、non-Git、shallow and Git-error cases fail closed for v/C/S;
-  6. preserve the exact allowed same-version source-state matrix without disposition, then release a
+  6. allow same-version revisit only from cancelled/completed sources, prove draft and every other open
+     source fail without writes, and guard referenced sources on every later mutation; then release a
      schema-v2 replacement with typed exact-target dispositions and prove workflow-native execution/
      qualification can read it; atomically consume each cross-version continue/restart exactly once,
      enforce their different hypothesis rules, preserve consumption after cancellation/deletion, and
@@ -1334,9 +1397,10 @@ git status --short
      pending-journal gate recovers first or writes nothing; verify workflow-before-qualification lock
      ordering;
   10. inject external target and validation-read-set changes before commit decision and between
-      publications, proving CAS behavior、prepared cleanup/abort、commit-decided roll-forward、complete
-      cleanup、fresh-process status/recover and fsync ordering; prove post-decision non-target drift
-      reports invalidity without retaining a completed journal;
+      publications, proving durable `prepared-conflicted` marking、no auto-cleanup after byte reversion、
+      audited abort preconditions、commit-decided roll-forward、complete cleanup、fresh-process status/
+      recover and fsync ordering; prove post-decision non-target drift reports invalidity without
+      retaining a completed journal;
   11. validate a mixed repository containing legacy and schema-v2 changes;
   12. verify legacy index links and schema-v2 direct `CHANGE.md` links.
 - [ ] Perform read-only skill behavior checks for review, create, evolve, remove, and release modes;
@@ -1374,15 +1438,19 @@ The plan is complete only when all of the following are true:
 - WAL records and CAS-checks every assert-only validation input that determines after-state.
   Post-decision non-target drift may fail repository health validation but cannot permanently retain
   an otherwise complete journal.
-- Prepared recovery never writes canonical targets, commit-decided recovery only rolls forward, and
-  complete recovery only cleans up; an explicit audited abort exists only for prepared operations.
+- Prepared recovery never writes canonical targets and cleans only if targets/read-set/proof tokens
+  remain pristine; any mismatch durably becomes `prepared-conflicted` and never auto-cleans.
+  Commit-decided recovery only rolls forward, complete recovery only cleans up, and explicit audited
+  abort is limited to prepared/prepared-conflicted operations whose targets all remain before-state.
 - A complete new workflow can reach a validated v001 draft without manual ID allocation, template
   copying, registry editing, sync invocation, or partial cleanup.
-- A new family is always `v001`; any same-slug registry/path/current-or-historical reference is a
-  collision or governance-repair condition, never permission to create an initial `v002`.
+- A new family is always `v001`; any same-slug reference in registry、current paths or the enumerated
+  reachable-ref proof universe is a collision or governance-repair condition, never permission to
+  create an initial `v002`.
 - A new change uses exactly one author-edited `CHANGE.md`; only guarded decisions add generated,
-  content-addressed event sidecars. It retains proposal、impact、validation、decision and release
-  semantics while providing an external immutable audit anchor.
+  content-addressed event sidecars. A new event is unanchored and cannot authorize follow-up until its
+  exact event plus matching current `CHANGE.md` bytes are in current HEAD; the tool never stages or
+  commits automatically. It retains proposal、impact、validation、decision and release semantics.
 - Deferred/reproposal history preserves replayable exact Validation/Decision snapshots with legal
   event sequence and timestamps; withdrawal has one explicit guarded CLI path.
 - A replacement draft is allocated and wired from all accepted changes atomically.
@@ -1396,18 +1464,23 @@ The plan is complete only when all of the following are true:
 - Continue/restart authorization is enforced and single-use at study initialization;
   consumption is durable even if the created study is cancelled/deleted, and close-invalidated
   studies cannot be revisited, while their historical paused bytes remain intact. Same-version
-  cancel/recreate revisits remain valid without a release disposition.
+  cancel/recreate and completed follow-up revisits remain valid without a release disposition;
+  `draft` and every other open same-version source are rejected, and inbound edges guard all later
+  source mutations inside the lock.
 - `retire` and `version transition --to retired` use one evidence-producing method; neither provides
   a reason/disposition bypass.
 - Root registry schema 2 and its add-only migration marker make every new retired state require an
   exact retirement-evidence digest; schema downgrade or a newly omitted digest fails closed.
 - Existing v001–v008 workflows, releases, studies, and legacy changes validate without migration.
 - No registered or released workflow history is physically deleted.
-- Never-used allocation includes registry、disk、inbound references、complete Git path history、
-  de-duplicated historical blob content、stage-0 index and concurrent reservations. Grammar preserves
-  per-version scoping; path proof never relies on the optional path attached to a de-duplicated blob,
-  and ref/index/inventory proof tokens are CAS-checked before commit. Non-Git、shallow、unmerged-index、
-  timeout or Git-error proof fails closed for v/C/S IDs.
+- Never-used allocation includes registry、disk、inbound references、complete path history and
+  de-duplicated blob content over every enumerated locally reachable ref、stage-0 index、untracked
+  non-ignored files and concurrent reservations. Grammar preserves per-version scoping; path proof
+  never relies on the optional path attached to a de-duplicated blob, and ref/index/inventory proof
+  tokens are CAS-checked before commit. Non-Git、shallow、unmerged-index、timeout or Git-error proof
+  fails closed for v/C/S IDs. Deleted-branch/reflog-only、GC-pruned and never-fetched commits are outside
+  the proof; restored refs join future proof, and detectable divergent canonical allocations block the
+  next mutation without implying retroactive knowledge of previously unavailable refs.
 - Initial/replacement metadata has one closed schema, preserves service-verified authoring
   provenance, and defines capability/policy/dependency types, uniqueness, and draft null-digest
   behavior.
@@ -1415,8 +1488,9 @@ The plan is complete only when all of the following are true:
   execution and portfolio-risk policy kind through the authoritative policy inspector; legacy
   workflow bytes remain migration-free.
 - Schema-v2 change metadata rejects unknown/stale decision state and preserves deferred/reproposal
-  history through append-only, byte-replayable decision snapshots and content-addressed event anchors;
-  schema-v2 release pins the complete terminal source-change authority manifest.
+  history through byte-replayable snapshots and content-addressed events; every guarded follow-up
+  requires exact current-HEAD anchoring, and schema-v2 release pins the complete terminal
+  source-change authority manifest.
 - Schema-v2 release is accepted by the same closed dual-schema parser in authoring、workflow-native
   execution、research CLI and qualification consumers, and pins normalized authoring provenance.
 - All focused tests, full tests, Ruff, skill validation, workflow validation, and diff checks pass.
@@ -1428,6 +1502,8 @@ The plan is complete only when all of the following are true:
 - Rewriting existing changes into schema v2.
 - Removing existing low-level transition/sync commands.
 - Adding a generic destructive `workflow remove` CLI.
+- Automating physical deletion of an unregistered local draft, including any deletion-specific proof
+  API, reservation ledger, tombstone/adoption flow or direct filesystem removal path.
 - Adding a lifecycle that revives a retired workflow family.
 - Adding an adopt/register-tombstone repair API for unregistered historical drafts.
 - Changing unrelated study lifecycle states, approvals, evaluation, completion, qualification,
@@ -1445,12 +1521,13 @@ foundation is merged and green:
    compatibility pointer, and update author/operate/evaluate callers.
 2. **PR 2 — Transaction and identity foundation:** Task 3 only. Add the common pending-journal gate,
    workflow-before-qualification lock ordering, bounded WAL target operations, target/read-set CAS,
-   cached fail-closed v/C/S identity proof; retrofit sync、transitions、release and study writers
-   without adding schema-v2 or create/evolve commands yet.
+   explicit prepared-conflicted handling, and cached fail-closed v/C/S identity proof over enumerated
+   reachable refs; retrofit sync、transitions、release and study writers without adding schema-v2 or
+   create/evolve commands yet.
 3. **PR 3 — Change schema v2:** Task 4 only. Add normalized dual reader、direct index targets、
-   replayable decision snapshots、content-addressed add-only event anchors、`change decide`, and
-   explicit `change withdraw`; keep legacy assets until final caller verification. This PR does not
-   expose `change create` yet.
+   replayable decision snapshots、content-addressed events with exact current-HEAD anchoring、
+   `change decide`, and explicit `change withdraw`; keep legacy assets until final caller verification.
+   This PR does not expose `change create` yet.
 4. **PR 4 — Draft authoring happy paths:** Tasks 5–6. Add `change create`, strict closed metadata and
    authoring provenance, supported-capability/four-policy validation, exact-v001/never-used
    allocation, replacement draft creation, and in-place `--update`; do not enable version-boundary
