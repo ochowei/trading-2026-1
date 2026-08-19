@@ -7,9 +7,9 @@ workflow/change history 的完整相容性。
 **Architecture:** 先將 skill 改為 progressive disclosure，但保留舊 authoring-contract 路徑作
 相容入口，並同步更新 study operation/evaluation callers。接著建立 crash-safe authoring
 transaction substrate，再讓 repository 同時讀取 legacy 五檔 change records 與新的單一
-`CHANGE.md`。所有既有與新增 authoring mutation，以及所有會寫入 `workflows/` 的 study mutation，
-都共用 repository lock；authoring mutations 再透過 durable journal、shadow validation 與
-deterministic recovery 發布。
+author-edited `CHANGE.md`。所有既有與新增 authoring mutation、所有會寫入 `workflows/` 的 study
+mutation，以及 non-dry-run qualification study registration，都共用 repository lock；authoring
+mutations 再透過 durable journal、shadow validation 與 deterministic recovery 發布。
 最後加入 create/change/evolve happy paths，自動配置 identity、更新 registry、同步 index 並驗證。
 停止使用 workflow 時依 lifecycle 映射成 abandon 或 terminal retire；任何
 registered/released history 都不做實體刪除。
@@ -68,13 +68,15 @@ released terminal history → 永久保留，不實體刪除
   retirement 只能將 paused studies 標為 `close-invalidated`。
 - 新增與修改操作不得接受 caller 指定 allocated `Cxxx`、`vNNN` 或 current-time evidence。
 - 每個 authoring mutation（包括既有 change/version transition、release、standalone sync，以及
-  新 create/evolve）與每個 `WorkflowStudyService` write 都必須使用同一 repository-scoped lock。
-  所有 writer 取得 lock 後必須先處理 pending authoring journal，再重讀 lifecycle preconditions；
-  study writer 不得繞過 crash recovery gate。Authoring mutation 另使用 durable transaction
-  protocol。捕捉到的 exception、process crash、host/power loss 或重新啟動後，不得留下不可判讀的
-  partial state。Study lifecycle 語意不因此改變。
-- `workflows/README.md` frontmatter 繼續作 lifecycle authority，不搬移 registry storage；只允許
-  Task 7 為 retirement evidence 增加向後相容的 optional digest field。
+  新 create/evolve）、每個 `WorkflowStudyService` write，以及 non-dry-run
+  `qualification plan register-study` 都必須使用同一 repository-scoped lock。所有 writer 取得
+  lock 後必須先處理 pending authoring journal，再重讀 lifecycle preconditions；任何
+  outcome-relevant writer 都不得繞過 crash recovery gate。Authoring mutation 另使用 durable
+  transaction protocol。捕捉到的 exception、process crash、host/power loss 或重新啟動後，不得
+  留下不可判讀的 partial state。既有 study lifecycle states 與 outcome authority 不因此改變。
+- `workflows/README.md` frontmatter 繼續作 lifecycle authority，不搬移 registry storage。Task 8
+  在同一 PR 將 repository 的 root registry 由 schema 1 升為 schema 2；這是唯一 metadata schema
+  migration，不重寫任何 version、release、change 或 study bytes。
 - 不新增可任意刪除 registered workflow history 的 CLI。
 - 不編輯 `pm/`。
 - 新增 public CLI、重複檔案 pattern、generated retirement evidence 或 local-only transaction
@@ -88,11 +90,14 @@ released terminal history → 永久保留，不實體刪除
 
 1. **Legacy read compatibility is permanent.** 既有
    `README.md + PROPOSAL.md + IMPACT.md + VALIDATION.md + DECISION.md` 不遷移、不重寫。
-2. **New writes use schema v2 only.** 新 change directory 只包含 `CHANGE.md`。
+2. **New writes use schema v2 only.** 新 change directory 以 `CHANGE.md` 作唯一 author-edited
+   authority；human decision 後只允許 writer 另建 add-only generated decision-event sidecars。
 3. **No mixed representation.** 同一 change directory 同時出現 legacy 與 v2 authority 時，
    validation fail closed。
 4. **Source-change paths remain directory paths.** Version metadata 與 release evidence 的
-   `source_changes` 繼續指向 change directory，不因內部格式改變而破壞 lineage。
+   `source_changes` 繼續指向 change directory，不因內部格式改變而破壞 lineage；schema-v2
+   release 另保存每個 terminal `CHANGE.md` 與 decision-event manifest 的 digest，形成 directory
+   path 外部的 immutable anchor。
 5. **Registered history is never physically deleted.** `abandoned`、`superseded`、`retired` 與
    released entries 永久留在 registry。
 6. **Old CLI command names remain available, not unsafe argument forms.** 新 happy-path commands
@@ -126,6 +131,16 @@ released terminal history → 永久保留，不實體刪除
 15. **Never-used proof requires complete local Git history.** Allocation 在 non-Git、shallow clone、
     Git timeout/non-zero 或無法掃描所有 locally reachable refs 時 fail closed；不得把不確定性當成
     identity 可用。
+16. **Release readers are dual-schema before v2 writes.** Task 7 在任何 schema-v2 release 可成為
+    active 前，先讓 authoring、workflow-native execution、research CLI 與 qualification readers
+    共用 closed-schema v1/v2 parser；schema v1 沒有 dispositions 只代表不能授權新的跨版本 revisit。
+17. **Revisit actions have machine meaning.** Same-version source 必須是 `draft`、`cancelled` 或
+    `completed`；其他 open states fail closed。Cross-version `continue` 只可源自 `paused` study，
+    並要求新 study preregistration 時的 hypothesis bytes 與 source frozen hypothesis 完全一致；
+    `restart` 亦只可源自 `paused`，但允許新 hypothesis/plan。兩者都建立新的 preregistration、
+    evidence 與 outcome identity；`close-invalidated` 不可消耗。
+18. **Authoring basis is audit provenance.** Draft 可在受控 update 中替換 authoring basis；release
+    schema v2 必須複製 normalized basis 並 pin canonical JSON digest，之後不得漂移。
 
 ## Task 1: Establish authoring compatibility baselines
 
@@ -174,6 +189,7 @@ Expected: current behavior 與現存 atomicity gap 都被固定記錄；Task 1 �
 - Create: `.agents/skills/trading-author-workflow/references/release.md`
 - Create: `.agents/skills/trading-author-workflow/references/impact.md`
 - Create: `.agents/rules/workflow-study-governance.md`
+- Create: `.agents/rules/workflow-version-boundary.md`
 - Modify: `.agents/skills/trading-operate-workflow/SKILL.md`
 - Modify: `.agents/skills/trading-evaluate-study/SKILL.md`
 - Modify: `.agents/skills/trading-author-workflow/agents/openai.yaml`
@@ -196,6 +212,10 @@ Expected: current behavior 與現存 atomicity gap 都被固定記錄；Task 1 �
 - `trading-operate-workflow` 與 `trading-evaluate-study` 改讀 shared canonical
   `.agents/rules/workflow-study-governance.md`，不再要求
   載入 authoring create/evolve/remove/release 規則。
+- Exact version-boundary safety、same/cross-version revisit、disposition、consumption 與 retirement
+  closure 只存在於 `.agents/rules/workflow-version-boundary.md`。`impact.md`、shared study governance
+  與 operate skill只在相關情境路由到它，不複製 normative rules；ordinary study operation/review
+  不載入它。
 - 原 `workflow-authoring-contract.md` 暫時保留為短 compatibility pointer，列出新 canonical
   references 並明確要求 caller 改用對應 mode；它不複製 normative content。
 - Complete sources may be converted into one draft preview plus an unresolved-decision list.
@@ -207,6 +227,8 @@ Expected: current behavior 與現存 atomicity gap 都被固定記錄；Task 1 �
   不把整份舊 contract 機械拆成六份。
 - [ ] 每條保留規則只存在於一個 canonical reference；`SKILL.md` 與 compatibility pointer 不
   重複 normative text。
+- [ ] Routing tests允許 author impact與 study revisit情境共同載入 version-boundary reference，
+  同時斷言它們不載入彼此無關的 authoring mode files。
 - [ ] Preserve repository precedence, immutable released workflow behavior, source disposition,
   study scope separation, and release authority.
 - [ ] Update skill frontmatter `description` so review、create、evolve、abandon、retire 與 release
@@ -216,11 +238,11 @@ Expected: current behavior 與現存 atomicity gap 都被固定記錄；Task 1 �
 - [ ] Run the skill validator:
 
 ```bash
-python3 /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+uv run --no-sync python /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/trading-author-workflow
-python3 /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+uv run --no-sync python /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/trading-operate-workflow
-python3 /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+uv run --no-sync python /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/trading-evaluate-study
 rg -n 'workflow-authoring-contract\.md' .agents/skills
 ```
@@ -251,34 +273,52 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
 - Create: `tests/test_workflow_identity.py`
 - Modify: `src/trading/core/workflow_authoring.py`
 - Modify: `src/trading/core/workflow_studies.py`
+- Modify: `src/trading/core/study_qualification.py`
 - Modify: `tests/test_workflow_authoring.py`
 - Create: `tests/test_workflow_studies.py`
 - Modify: `tests/test_study_qualification.py`
+- Modify: `tests/test_qualification_workflow.py`
 - Modify: `src/trading/cli.py`
+- Modify: `.github/workflows/lint.yml`
 - Modify: `CLAUDE.md`
 - Modify: `.gitignore` only if the existing `state/` rule does not already cover the journal
 - Modify: `docs/ARCHITECTURE.md`
 
 **Lock and durability contract:**
 
-- One repository-scoped filesystem lock serializes identity allocation, every authoring write, and
-  every `WorkflowStudyService` mutation that writes under `workflows/`. The lock implementation
-  supports an explicitly passed/re-entrant lease so a study mutation can call index sync without
-  deadlocking or releasing the boundary midway.
-- Every workflow writer uses one `enter_workflow_mutation()` invariant: acquire the shared lock;
+- One repository-scoped filesystem lock serializes identity allocation、every authoring write、every
+  `WorkflowStudyService` mutation that writes under `workflows/`, and non-dry-run study qualification
+  registration. The lock implementation supports an explicitly passed/re-entrant lease so a study
+  mutation can call index sync or qualification code can take its inner lock without deadlocking or
+  releasing the boundary midway.
+- Every scoped writer uses one `enter_workflow_mutation()` invariant: acquire the shared lock;
   inspect the pending authoring journal; automatically execute the deterministic action already
   selected by a valid `prepared`/`commit-decided` phase; fail closed with the status/recover command
   for corrupt/foreign/conflicting journals; then re-read registry, exact version, study inventory,
   and caller-specific lifecycle preconditions. Release/retire cannot rely on a safe-study check made
   before the lock; study init/resume cannot rely on an active-version check made before the lock.
 - Global lock ordering is `workflow repository lock -> qualification lock`. Study completion paths
-  that also need qualification state must be refactored to acquire them in this order; no code path
-  may acquire the qualification lock and then wait for the workflow lock.
+  that also need qualification state and non-dry-run `compile_study_qualification_plan()` must be
+  refactored to acquire them in this order; no code path may acquire the qualification lock and then
+  wait for the workflow lock. Dry-run qualification compilation remains read-only and acquires
+  neither writer lock.
+- Inside both locks, qualification registration re-reads the exact workflow registry、release、study
+  README、frozen spec and completion state. It only registers a `running` study under the unique
+  active version; a cross-version-created study must also have a valid release authorization、
+  consumption artifact and pinned consumption digest. Superseded/retired versions、paused or
+  terminal studies and missing/mismatched consumption fail before qualification registry mutation.
 - A transaction computes the complete post-state in memory, including registry bytes, generated
   root/version indexes, lifecycle metadata, release/change artifacts, directory creates, and any
   allowed deletions. Each target records its repository-relative path, before/after kind
   (`absent`, regular file, or directory), POSIX mode where relevant, exact SHA-256, recoverable
   before bytes, and staged after location. Symlink targets fail closed.
+- The plan also records a disjoint, assert-only validation read-set for every non-target byte whose
+  value affects the computed after-state or guarded precondition: workflow definition、normative/
+  pinned dependencies、policy registry/config/RELEASE evidence、study metadata and external immutable
+  evidence. Each entry records path kind、mode and SHA-256. Source-change/registry/index metadata
+  modified by release is protected by its complete target before-state instead of appearing twice.
+  A path modified by the transaction must be a target, never both target and read assertion; metadata
+  being rewritten by the operation cannot also serve as its own normative dependency.
 - The first implementation supports only the operations this plan needs: regular-file replace,
   add-only regular file, and creation of a previously absent directory tree from an exact leaf-file
   manifest. It does not replace/delete arbitrary non-empty directories, follow symlinks, or expose a
@@ -293,22 +333,31 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
      overlay; Git-index evidence checks are injected against the real repository/index and map
      canonical paths explicitly instead of treating a plain shadow copy as another Git worktree;
   5. durably write and fsync the `prepared` journal plus its parent directory;
-  6. compare-and-swap recheck every canonical target's kind、mode and digest against the recorded
-     before-state. Any mismatch leaves canonical bytes untouched, retains `prepared`, and reports
-     the conflicting path;
+  6. compare-and-swap recheck every target's before-state and every assert-only read-set entry.
+     Any mismatch leaves canonical bytes untouched, retains `prepared`, and reports the conflicting
+     target/input path;
   7. durably replace the phase with `commit-decided` and fsync the journal parent;
   8. before publishing each still-unpublished target, confirm it still matches before-state; already
      published targets must match after-state. A third state fails closed instead of overwriting an
      editor/Git/uncoordinated writer change;
   9. publish each target idempotently, fsync every written file and affected parent directory, then
      verify exact after kinds/modes/digests;
-  10. run full canonical validation, durably mark `complete`, and only then remove journal/staging
-     bytes and fsync their parents.
+  10. verify transaction-owned target invariants and exact after-state, durably mark `complete`,
+      then remove journal/staging bytes and fsync their parents. A crash may therefore leave a
+      `complete` journal with absent or partially removed staging, but canonical publication is done;
+  11. run full canonical repository validation as post-commit health reporting. Non-target drift
+      occurring after commit decision may make the repository invalid and must be reported, but it
+      does not reopen/retain an otherwise fully published journal or repeatedly roll forward stale
+      bytes.
 - A local-only journal under `state/workflow-authoring/` stores schema version, repository identity,
-  operation ID/type, complete target manifest, before/after values, staged paths, and phase.
-  `prepared` recovery restores the exact before-state; `commit-decided` recovery rolls forward the
-  exact after-state. If any canonical target matches neither its recorded before nor after state,
-  recovery fails closed and reports the exact conflicting path.
+  operation ID/type, complete target manifest, assert-only validation read-set, before/after values,
+  staged paths, and phase.
+  `prepared` recovery never writes canonical targets: because publication has not begun, it may
+  discard staging/journal only when every target still matches recorded before-state; any other state
+  fails closed instead of overwriting an external update. `commit-decided` recovery rolls forward
+  the exact after-state and cannot be aborted. `complete` recovery requires every target to match
+  after-state, then performs cleanup only; missing staging is already-clean and does not fail.
+  Any phase/target combination outside these rules fails closed with the exact conflicting path.
 - Orphan staging created before a durable `prepared` journal may be removed only after proving no
   journal references it. A corrupt, foreign-repository, or incompatible journal blocks every new
   mutation; callers cannot replace its operation or inputs.
@@ -322,43 +371,89 @@ Expected: ordinary authoring 只載入相關 mode，study operation/evaluation �
 - `WorkflowAuthoringTransaction.commit()`
 - `WorkflowAuthoringTransaction.recover()`
 - `WorkflowRepository.recover_pending_authoring_transaction()`
+- `WorkflowRepository.abort_prepared_authoring_transaction(...)`
 - `WorkflowRepository.authoring_transaction_status()`
 - Shared `WorkflowRepositoryMutationLock` lease used by `WorkflowRepository` and
-  `WorkflowStudyService`.
+  `WorkflowStudyService`, and passed into non-dry-run study qualification registration.
 
 **Operational CLI:**
 
 ```bash
 uv run trading workflow authoring status
 uv run trading workflow authoring recover
+uv run trading workflow authoring abort-prepared <operation-id> \
+  --reason <reason> --by <stable-operator-id>
 ```
 
 `status` is read-only. `recover` requires the shared lock and only applies the phase already durably
 recorded; it never accepts replacement operation inputs or a caller-selected rollback direction.
 Normal authoring and study writers automatically recover a valid journal through the same mutation
 entry invariant; explicit `recover` exists for diagnosis/retry after an operator has resolved a
-reported conflicting target. Corrupt or conflicting journals are never auto-rewritten.
+reported conflicting target. `abort-prepared` is the only discard path: it requires the exact
+operation ID、stable actor and reason, is legal only while phase is `prepared`, never changes
+canonical targets, appends a local-only audit record, then removes journal/staging durably. It is
+used only after the operator accepts abandoning an operation whose targets/read-set conflicted.
+`commit-decided` cannot be aborted; corrupt or conflicting journals are never auto-rewritten.
 
 **Identity proof contract:**
 
 - `workflow_identity.py` provides one fail-closed reservation scanner for `vNNN`、`Cxxx`, and
-  `Sxxx`. It searches current registry/filesystem plus every locally reachable commit/ref using:
-  exact `workflows/<slug>--vNNN` and `<slug>--vNNN` paths; canonical `<slug>@vNNN`; exact change
-  directory paths/basenames; canonical `<slug>@vNNN/Cxxx`; and local `Cxxx` references only in
-  documents structurally scoped/pinned to that source version. Study reservation likewise covers
-  exact study paths/basenames and `<slug>@vNNN/Sxxx` or version-scoped `Sxxx` references.
+  `Sxxx`. It searches current registry/filesystem、stage-0 Git index plus every locally reachable
+  commit/ref with
+  kind-specific grammar and token boundaries:
+  - version: exact `workflows/<slug>--vNNN` path or standalone canonical `<slug>@vNNN` token;
+  - change: a `*--cNNN` basename counts only when its complete parent path parses under the exact
+    source version; canonical `<slug>@vNNN/Cxxx` counts in any UTF-8 text blob; bare `Cxxx` counts
+    only when the same Markdown/YAML/JSON document has unambiguous workflow+source-version metadata;
+  - study: the equivalent complete parent-path rule, canonical `<slug>@vNNN/Sxxx`, or bare `Sxxx`
+    only with unambiguous workflow+workflow-version metadata in the same document.
+  Basenames are never reserved globally across unrelated versions, and narrative bare IDs without
+  version scope do not reserve another family's local number.
 - Non-Git worktrees, `git rev-parse --is-shallow-repository == true`, command timeout/non-zero,
   unreadable objects, or inability to enumerate `git rev-list --all` fail closed with an actionable
   “cannot prove never-used” error. No exception/timeout is converted to an empty history result.
 - The guarantee covers complete locally reachable `--all` history; canonical CI performs the same
   check in a non-shallow clone. Allocation does not claim knowledge of commits never fetched into
   any local ref.
+- Historical path and textual-content proofs are separate. Complete path history comes from one
+  NUL-delimited `git log --all --name-status --format=` traversal; parser handles both old/new names
+  for rename/copy records and every added、modified、deleted path. Historical textual content uses
+  `git rev-list --objects --all` only to enumerate object IDs, confirms object type, de-duplicates
+  blob OIDs, and reads bytes through `git cat-file --batch`; the optional path printed beside a blob
+  OID is never treated as a complete path inventory.
+- Current proof enumerates tracked paths with `git ls-files -z`, stage-0 index paths/OIDs/modes with
+  `git ls-files --stage -z`, and untracked non-ignored paths with
+  `git ls-files --others --exclude-standard -z`. Any unmerged index stage、symlink encountered where
+  regular-file content is required、command error or undecodable claimed text fails closed. Path
+  grammar scans every enumerated path; textual grammar scans every regular UTF-8 file/blob and skips
+  only bytes classified as binary by a documented NUL/type rule. Ignored files、`.git/` and local
+  `state/` are outside the reservation universe.
+- A local-only cache under `state/workflow-authoring/identity-scan-v1.json` separately stores the
+  complete historical-path result and de-duplicated textual-blob result, keyed by repository
+  identity、scanner schema and SHA-256 of sorted ref-name/OID pairs. Current worktree、stage-0 index、
+  untracked-nonignored paths and registry always rescan. The default historical scan budget is 120
+  seconds; timeout errors report stage、path/object count and cache/ref fingerprint, fail closed, and
+  never publish a partial reservation result.
+- The reservation proof returns virtual CAS assertions for sorted ref tips、the complete stage-0
+  index tuple set and relevant current directory/path inventory. Immediately before commit decision,
+  allocation reruns the proof against the planned overlay and requires the same proof token except
+  for declared transaction targets; ref、index or inventory drift aborts without publication.
 
 - [ ] Write failing tests for exclusive/re-entrant lease behavior, exact path kind/mode/absence and
   before/after plans, staged shadow validation with real-index mapping, rollback before commit
   decision, roll-forward after commit decision, corrupt journal, wrong repository identity,
   changed staged bytes, a canonical target matching neither digest, orphan staging, idempotent
-  recovery, and incompatible retry.
+  recovery, and incompatible retry. Add crash-after-complete、journal-unlink、staging-unlink and
+  parent-fsync boundaries; prove prepared recovery never writes canonical bytes and complete recovery
+  performs cleanup only.
+- [ ] Add read-set tests covering dependency、policy release、study-precondition and evidence drift,
+  plus target-before-state tests for source changes, before commit decision; each must abort without
+  canonical mutation. Drift after
+  commit decision must not prevent a fully published journal from completing, but full validation
+  must report the repository health failure.
+- [ ] Reject undeclared normative reads in operation planners and target/read-set overlap. Add a
+  release fixture proving generated registry/index/change targets cannot be selected as their own
+  normative dependency.
 - [ ] Add CAS tests where an editor/uncoordinated process changes a target during shadow validation,
   immediately before commit decision, and between publications. Prove pre-decision mismatch causes
   no canonical mutation and post-decision third-state conflict fails closed without overwriting it.
@@ -377,13 +472,25 @@ reported conflicting target. Corrupt or conflicting journals are never auto-rewr
   authoring-vs-study race tests proving release/retire cannot be crossed by concurrent study init or
   paused-to-running resume, and concurrent study sync cannot overwrite a transaction's planned
   index bytes.
+- [ ] Route non-dry-run `compile_study_qualification_plan()` through the same mutation entry, then
+  acquire its existing qualification lock. Add races against release、retire and study completion;
+  add pending prepared/commit-decided/complete journal tests and prove registration only proceeds
+  after in-lock active/running/consumption validation.
 - [ ] After a crash at every prepared/commit-decided/publication phase, immediately invoke each
   study writer and prove it first completes the selected authoring recovery or fails without writing.
 - [ ] Add reservation tests for all canonical path/text spellings, version-scoped local IDs,
   non-Git/shallow repositories, Git timeout/non-zero, missing objects, and `Sxxx` historical/inbound
-  references; preserve permanent local scoping between unrelated workflow versions.
-- [ ] Add parser/dispatch tests for `workflow authoring status/recover`, including clean state,
-  prepared rollback, commit-decided roll-forward, corrupt journal refusal, and read-only status.
+  references; preserve permanent local scoping between unrelated workflow versions. Include the
+  same blob OID at multiple historical paths、rename/delete history、stage-0-only reference、unmerged
+  index、untracked-nonignored reference、ignored-file exclusion and ref/index/inventory CAS drift.
+  Add cache hit/invalidation、blob de-duplication、token-boundary and deterministic timeout diagnostics.
+- [ ] Add parser/dispatch tests for `workflow authoring status/recover/abort-prepared`, including clean
+  state, prepared cleanup without canonical rollback, explicit audited prepared abort,
+  commit-decided roll-forward, complete cleanup, corrupt journal refusal, and read-only status.
+- [ ] Update `.github/workflows/lint.yml` to checkout with `fetch-depth: 0`, assert
+  `git rev-parse --is-shallow-repository` is `false`, and run workflow authoring transaction、identity、
+  study lifecycle、study qualification and qualification workflow suites in addition to existing
+  authoring/policy validation. CI must exercise the same fail-closed history proof as local tests.
 - [ ] Retrofit existing authoring mutations before adding new schema-v2 writers or happy-path CLI.
 - [ ] Replace Task 1 characterization expectations with crash-safe assertions once the coordinator
   is active.
@@ -393,15 +500,19 @@ reported conflicting target. Corrupt or conflicting journals are never auto-rewr
 
 ```bash
 uv run pytest tests/test_workflow_authoring_transaction.py tests/test_workflow_identity.py \
-  tests/test_workflow_authoring.py tests/test_workflow_studies.py tests/test_study_qualification.py
+  tests/test_workflow_authoring.py tests/test_workflow_studies.py tests/test_study_qualification.py \
+  tests/test_qualification_workflow.py
+uv run ruff check src/ tests/
+uv run ruff format --check src/ tests/
 uv run trading workflow validate --all
 ```
 
-Expected: every existing authoring mutation is serialized and recoverable across exceptions,
-process restarts, and the documented filesystem crash model; study writers share the same safe
-version boundary before new create/evolve behavior is introduced.
+Expected: every existing authoring mutation is serialized and recoverable across exceptions、
+process restarts and the documented filesystem crash model; study writers and non-dry-run
+qualification registration share the same safe version boundary before new create/evolve behavior
+is introduced.
 
-## Task 4: Add schema-v2 single-file change records
+## Task 4: Add schema-v2 single-authority change records
 
 **Files:**
 
@@ -410,6 +521,7 @@ version boundary before new create/evolve behavior is introduced.
 - Modify: `tests/test_workflow_authoring.py`
 - Retain temporarily: `.agents/skills/trading-author-workflow/assets/change/` legacy five-file assets
 - Create: `.agents/skills/trading-author-workflow/assets/change-v2/CHANGE.md`
+- Generated pattern: `<change-path>/decision-events/DNNN-<event-sha256>.json`
 - Modify: `.agents/skills/trading-author-workflow/references/evolve.md`
 - Modify: `.agents/skills/trading-author-workflow/references/impact.md`
 - Modify: `CLAUDE.md`
@@ -460,8 +572,10 @@ released_in: null
 
 **Section completeness by state:**
 
-- All schema-v2 files always contain exactly the four headings `Proposal`, `Impact`, `Validation`,
-  and `Decision` in that order.
+- Every schema-v2 `CHANGE.md` has exactly four level-2 authority sections named `Proposal`, `Impact`,
+  `Validation`, and `Decision` in that order. It may have one title H1 and writer-generated
+  `### DNNN — <status>` snapshots under Decision. Caller-authored inputs may not add another H2 or
+  use the reserved DNNN H3 grammar.
 - `draft`: sections may be empty, but scaffold tokens (`REPLACE_ME`, `[TODO`, `TODO:`) are invalid.
 - `proposed`: `Proposal` and `Impact` must be substantive; `Validation` may be empty. `Decision` is
   empty on first proposal but remains substantive when a deferred decision snapshot already exists.
@@ -492,11 +606,11 @@ released_in: null
   human identity, `released_in` is null, and the last history item exactly matches the current
   decision.
 - Each `decision_history` item has exactly `sequence`, `status`, `recorded_at`, `recorded_by`,
-  `validation_sha256`, `decision_sha256`, and `snapshot_sha256`. Status is `accepted`、`rejected`、
-  `deferred`, or `withdrawn`; withdrawal has null `validation_sha256`, while all other digests are
-  exact 64-hex values. Sequence begins at 1 without gaps, timestamps are canonical current-time UTC
-  and strictly increase, and frontmatter items must exactly match the generated snapshots in the
-  Decision section.
+  `validation_sha256`, `decision_sha256`, `snapshot_sha256`, `event_path`, and `event_sha256`.
+  Status is `accepted`、`rejected`、`deferred`, or `withdrawn`; withdrawal has null
+  `validation_sha256`, while all other digests are exact 64-hex values. Sequence begins at 1 without
+  gaps, timestamps are canonical current-time UTC and strictly increase, and frontmatter items must
+  exactly match both the generated Decision snapshot and its decision-event sidecar.
 - Legal history is zero or more `deferred` items followed by at most one terminal
   `accepted`、`rejected`, or `withdrawn` item. Deferred reproposal does not append an event. Released
   changes require the unique terminal item to be `accepted`; terminal items can never be followed by
@@ -507,6 +621,18 @@ released_in: null
   and delimiters; `snapshot_sha256` covers the canonical serialized snapshot. A later proposal or
   decision may replace the working Validation section but never edits/removes prior Decision
   snapshots, so every historical rationale is replayable without relying on Git commit timing.
+- Each human decision/withdrawal transaction also creates one add-only canonical-JSON event at
+  `decision-events/DNNN-<event-sha256>.json`. The event contains exactly `schema_version`、canonical
+  change identity/path、sequence、status、recorded_at、recorded_by、the exact Validation/Decision input
+  bytes or null where withdrawal permits it, their digests, and `snapshot_sha256`; `event_sha256`
+  hashes the complete canonical event bytes and determines the filename. The event is a generated
+  immutable anchor, not a second authoring surface. CHANGE history and rendered snapshot must match
+  it byte-for-byte.
+- Validator rejects modification/removal of any current event, a filename/content digest mismatch,
+  duplicate sequence, or disappearance of an event path that appears in the stage-0 index or locally
+  reachable Git path history. Thus rewriting `CHANGE.md` and recomputing every digest still fails
+  against the add-only event. Non-Git、shallow、unmerged-index or incomplete-history proof fails closed
+  for schema-v2 decision mutation/validation.
 - `withdrawn`: `status_changed_at` is current time, current `decided_at/decided_by` and
   `released_in` are null, and the last history item is a withdrawal snapshot with actor and reason.
   Withdrawal does not masquerade as a human accept/reject/defer decision.
@@ -529,10 +655,10 @@ uv run trading workflow change withdraw <change-path> \
   --decision <withdrawal-body-md> --by <identity>
 ```
 
-`change decide` writes the latest Validation body, appends an exact Validation/Decision snapshot,
-and publishes lifecycle metadata/history in one authoring transaction. `change withdraw` appends an
-exact withdrawal snapshot and publishes withdrawn metadata in one transaction; it records an actor
-but is not human approval of a research decision. The legacy low-level `change transition` remains
+`change decide` writes the latest Validation body, appends an exact Validation/Decision snapshot、
+creates its add-only event and publishes lifecycle metadata/history in one authoring transaction.
+`change withdraw` does the equivalent for its withdrawal snapshot/event; it records an actor but is
+not human approval of a research decision. The legacy low-level `change transition` remains
 available for pre-authored legacy-format content.
 
 For schema v2, low-level transition handles only `draft -> proposed` and `deferred -> proposed`.
@@ -548,7 +674,9 @@ The same input boundary applies to `change decide` and `change withdraw`.
 - [ ] Write failing tests for a valid v2 change, exact allowed frontmatter keys/types, every required
   section, and the complete section/metadata state matrix above, including first proposal,
   multiple deferred reproposals, terminal decision uniqueness, withdrawal after deferral, strict
-  timestamp/sequence ordering, exact snapshot replay, tampered snapshot/digest rejection, and release.
+  timestamp/sequence ordering, exact snapshot/event replay, tampered snapshot/digest/event rejection,
+  historically tracked event deletion/rename, and release. Include a test that tampers with
+  `CHANGE.md` and recomputes every in-file digest but still fails against the event anchor.
 - [ ] Write failing tests for mixed legacy/v2 representation, unknown schema version, identity/path
   mismatch, duplicate ID, placeholder content, missing decision approval, illegal lifecycle, and
   invalid `released_in`.
@@ -564,18 +692,21 @@ The same input boundary applies to `change decide` and `change withdraw`.
   representation and marks them released in their native format.
 - [ ] Update generated work indexes to render identical columns/status while linking each format to
   its normalized presentation target; add snapshot assertions for both links.
-- [ ] Keep legacy assets until the schema-v2 writer and all maintained skill callers pass Task 8
+- [ ] Keep legacy assets until the schema-v2 writer and all maintained skill callers pass Task 9
   verification. New writes use only `assets/change-v2/CHANGE.md` and never copy unfinished tokens
   into a proposed change.
 - [ ] Run:
 
 ```bash
 uv run pytest tests/test_workflow_authoring.py
+uv run ruff check src/ tests/
+uv run ruff format --check src/ tests/
 uv run trading workflow validate --all
 ```
 
-Expected: old bytes remain authoritative and valid; new changes use one file and have equivalent
-lifecycle, impact, decision, release, and audit semantics.
+Expected: old bytes remain authoritative and valid; new changes use one author-edited authority plus
+writer-generated immutable decision events and have equivalent lifecycle、impact、decision、release
+and stronger audit semantics.
 
 ## Task 5: Add atomic change creation and workflow draft creation
 
@@ -583,8 +714,16 @@ lifecycle, impact, decision, release, and audit semantics.
 
 - Modify: `src/trading/core/workflow_authoring.py`
 - Create: `src/trading/core/workflow_capabilities.py`
+- Modify: `src/trading/core/workflow_studies.py`
+- Modify: `src/trading/core/study_qualification.py`
+- Modify: `src/trading/core/policy_authoring.py`
+- Modify: `src/trading/policies/resolver.py`
 - Modify: `src/trading/cli.py`
 - Modify: `tests/test_workflow_authoring.py`
+- Modify: `tests/test_workflow_studies.py`
+- Modify: `tests/test_study_qualification.py`
+- Modify: `tests/test_policy_authoring.py`
+- Modify: `tests/policies/test_policy_resolver.py`
 - Modify: `.agents/skills/trading-author-workflow/references/create.md`
 - Modify: `.agents/skills/trading-author-workflow/references/evolve.md`
 - Modify: `CLAUDE.md`
@@ -630,10 +769,11 @@ uv run trading workflow change create <active-version-path> \
   all three must resolve to the same registered existing version.
 - `capabilities` is an ordered list of unique lowercase kebab-case strings found in the single
   canonical supported registry in `workflow_capabilities.py`. New authoring rejects unknown values;
-  `WorkflowStudyService` imports the same registry for behavior gates. Permanent legacy readers do
-  not rewrite or retroactively reject already released/superseded/retired historical bytes solely
-  for an unknown legacy capability, but every draft entering the new release path must use supported
-  values.
+  `WorkflowRepository`、`WorkflowStudyService`、study qualification and CLI all import the same
+  registry and behavior lookup. No capability literal or second supported set remains in those
+  consumers. Permanent legacy readers do not rewrite or retroactively reject already released/
+  superseded/retired historical bytes solely for an unknown legacy capability, but every draft
+  entering the new release path must use supported values.
 - Every policy item contains exactly `family`, `version`, `path`, and `release_digest`; family values
   are unique lowercase kebab-case identities, version/path must agree with the policy registry, and
   duplicate policy families fail closed. `release_digest` is either the exact 64-hex digest of a
@@ -643,20 +783,32 @@ uv run trading workflow change create <active-version-path> \
   resolved `market`, `broker`, `execution`, and `portfolio-risk` kind, with no missing/duplicate/extra
   kind; draft null-digest selections must still resolve through the policy registry so their kind is
   known before release.
+- `PolicyResolver.inspect_registered(family, version)` is the single read-only authority for draft
+  and released selection metadata. It validates registry status/path and closed policy config keys
+  `schema_version`、`family`、`version`、`kind`、`values`, confirms identity/path agreement, and returns
+  exact status/kind without treating a draft as executable. Existing `resolve()` remains the only
+  API that authorizes active/superseded executable policy use. Workflow authoring must not add a
+  second YAML parser or infer kind from family names.
 - Every dependency contains exactly `path`, `role`, and optionally `pinned`; paths are unique, role
   is `normative` or `reference`, `pinned` is a boolean allowed only for reference dependencies, and
   normative dependency digests remain release-evidence output rather than caller metadata.
-- `authoring_basis` contains exactly `mode` and `confirmed_decisions`. Mode is
+- Input `authoring_basis` contains exactly `mode` and `confirmed_decisions`. Mode is
   `repository-source`、`pasted-source`、`guided`, or `accepted-changes`; decisions are an ordered list
   of unique, non-empty UTF-8 strings. `repository-source` and `pasted-source` require `--source`;
   `guided` forbids it. Initial family creation forbids `accepted-changes`.
+- Persisted version metadata replaces that input object with exactly `mode`、`confirmed_decisions`、
+  `source_path`、`source_commit`, and `source_sha256`. Computed source fields are null when not
+  applicable; repository source path is normalized repo-relative, complete commit is recorded only
+  when it actually contains the supplied bytes, and any supplied source has an exact 64-hex digest.
 - `--source` is a regular non-symlink read-only input containing the exact pre-transformation source.
   For `repository-source` it must be inside the repository; for `pasted-source` it may be a temporary
-  extracted input. The service, not caller JSON, computes and renders the persisted README
-  `Authoring basis`: mode, repository-relative source path when applicable, current complete source
-  commit when tracked, exact source SHA-256 when supplied, and confirmed decision summary. A tracked
-  source with index/worktree drift records the exact worktree digest and does not falsely claim that
-  the commit contains those bytes.
+  extracted input. The service, not caller JSON, computes the normalized audit-provenance object and
+  persists it as version README frontmatter while rendering the same facts in the human-readable
+  `Authoring basis` block: mode、repository-relative source path when applicable、current complete
+  source commit when tracked、exact source SHA-256 when supplied and confirmed decision summary. A
+  tracked source with index/worktree drift records the exact worktree digest and does not falsely
+  claim that the commit contains those bytes. Task 7 release evidence copies and pins this normalized
+  object; the prose block is not a second authority.
 - Repository-relative metadata paths must be normalized, contain no `..`, resolve inside the
   repository root, and may not traverse symlinks.
 - `--metadata` and `--definition` must be regular, non-symlink input files. Definition bytes are
@@ -681,6 +833,13 @@ decision.
   source-mode/input mismatch, source provenance digest/commit rendering, YAML/frontmatter or symlink
   inputs, path escape, missing/extra change-body headings, scaffold tokens, stale indexes, and failed
   transaction recovery.
+- [ ] Add focused policy-authoring/resolver tests for closed config keys、known kind values、draft
+  inspection、identity/path mismatch, and the boundary that `inspect_registered()` does not make a
+  draft executable through `resolve()`.
+- [ ] Move every capability constant、supported-set check and capability-to-behavior lookup into
+  `workflow_capabilities.py`; update authoring、study service、qualification and CLI consumers in the
+  same PR. Add an `rg`-based test/assertion that rejects hard-coded maintained capability literals
+  outside the canonical module and explicit legacy fixtures.
 - [ ] Keep workflow semantic completeness out of structural CLI tests. Add Agent/fixture review
   scenarios that check all 11 contract concerns even when headings are translated; CLI tests cover
   only machine-verifiable bytes/schema/identity rules.
@@ -706,7 +865,9 @@ decision.
 - [ ] Run:
 
 ```bash
-uv run pytest tests/test_workflow_authoring.py
+uv run pytest tests/test_workflow_authoring.py tests/test_workflow_studies.py \
+  tests/test_study_qualification.py
+uv run pytest tests/test_policy_authoring.py tests/policies/test_policy_resolver.py
 uv run trading workflow validate --all
 uv run ruff check src/ tests/
 uv run ruff format --check src/ tests/
@@ -720,14 +881,10 @@ template replacement, registry editing, index synchronization, or partial-state 
 **Files:**
 
 - Modify: `src/trading/core/workflow_authoring.py`
-- Modify: `src/trading/core/workflow_studies.py`
 - Modify: `src/trading/cli.py`
 - Modify: `tests/test_workflow_authoring.py`
-- Modify: `tests/test_workflow_studies.py`
 - Modify: `.agents/skills/trading-author-workflow/references/evolve.md`
 - Modify: `.agents/skills/trading-author-workflow/references/impact.md`
-- Modify: `.agents/skills/trading-operate-workflow/SKILL.md`
-- Modify: `.agents/rules/workflow-study-governance.md`
 - Modify: `CLAUDE.md`
 - Modify: `docs/ARCHITECTURE.md`
 
@@ -766,38 +923,6 @@ preserved, and the complete accepted `source_changes` set is regenerated. Becaus
 a draft, the transaction journal supplies rollback history; superseded draft text is not promoted to
 permanent released evidence.
 
-**Replacement-boundary disposition contract:**
-
-- Release preparation for `v002+` accepts
-  `--dispositions <replacement-dispositions.json>` whenever the superseded active version has
-  paused studies. Keys are exact old study paths; each value is an object containing exactly
-  `action` and `target_version_path`.
-- `action` is `continue`、`restart`, or `close-invalidated`. Continue/restart require
-  `target_version_path` to equal the exact registered replacement draft path; close-invalidated
-  requires null. No disposition claims a target study identity before that study is separately
-  CLI-allocated under the released replacement.
-- Every paused old study appears exactly once; completed/cancelled studies and unknown paths are
-  forbidden. Release evidence stores the normalized ordered mapping as normative authorization. A
-  later continue/restart
-  creates a new study under the replacement and records the exact old `revisits` path through
-  `trading-operate-workflow`; authoring never moves or resumes the old study.
-- Initial release forbids the input. Replacement release with no paused studies accepts no file and
-  records an empty mapping. The guarded release service validates this mapping under the shared
-  Task 3 lock immediately before commit decision.
-- `WorkflowStudyService.initialize()` enforces the mapping inside the common mutation-entry gate.
-  A non-null `revisits` path is allowed only when an immutable release disposition targeting the
-  exact active version authorizes `continue` or `restart`; `close-invalidated` is permanently
-  ineligible. The service derives and records the authorized action in the new study metadata rather
-  than accepting it from the caller.
-- Each continue/restart authorization is single-use. Under the lock, initialization scans the target
-  version's studies and rejects a second study with the same exact `revisits`; repository validation
-  also detects duplicates, action/mapping mismatch, wrong target version, or a revisit from any
-  close-invalidated ancestor. Cross-version continuity then proceeds through the newly created study
-  path, not by repeatedly consuming the original mapping.
-- Old source-version study bytes remain unchanged. After replacement they may remain historically
-  `paused`, but release/retirement evidence governs whether a new study may revisit them; neither the
-  version transition nor validator pretends the old study lifecycle itself became terminal.
-
 - [ ] Write failing tests for no accepted changes, omitted accepted changes, unresolved draft or
   proposed changes, accidental overwrite without `--update`, update of the wrong/non-draft version,
   version-number reuse including historical-content references, metadata identity override,
@@ -812,14 +937,6 @@ permanent released evidence.
 - [ ] Permit multiple accepted changes to feed one replacement draft. The skill must present
   combined impact analysis before draft write/update and again before release preparation; CLI
   verifies source-change identity/status but does not guess semantic coverage.
-- [ ] Add release parser/service/evidence tests for the typed replacement dispositions, exact target
-  version path, one-to-one paused-study coverage, forbidden target study preallocation, and
-  authoring-vs-study races under the shared lock.
-- [ ] Add study-init and repository-validation tests proving exact-target continue/restart is
-  single-use, close-invalidated cannot be revisited, missing/mismatched mapping fails, authorized
-  action is service-derived, and historical paused bytes remain unchanged. Update the operate skill
-  and shared governance reference to describe this enforced handoff without granting authoring
-  permission to create the new study.
 - [ ] Do not end or migrate old studies while creating a draft; version-boundary safety remains a
   release-time check because the active version is still authoritative.
 - [ ] Publish replacement create/update, registry bytes, and generated indexes through the Task 3
@@ -828,12 +945,194 @@ permanent released evidence.
 - [ ] Add concurrent evolve/evolve and evolve/change tests proving version allocation、draft update
   and accepted-change refresh remain serialized without lost updates.
 - [ ] Ensure abandoning a replacement draft does not recycle its version number.
-- [ ] Run focused authoring tests and full workflow validation.
+- [ ] Run:
+
+```bash
+uv run pytest tests/test_workflow_authoring.py tests/test_workflow_identity.py \
+  tests/test_policy_authoring.py tests/policies/test_policy_resolver.py
+uv run ruff check src/ tests/
+uv run ruff format --check src/ tests/
+uv run trading workflow validate --all
+```
 
 Expected: modifying a workflow requires one accepted change set and one complete replacement
 contract, without manual version allocation, copying, registry edits, or source-change wiring.
 
-## Task 7: Simplify abandon, retire, and deletion semantics
+## Task 7: Add persisted version-boundary authorization and consumption
+
+**Files:**
+
+- Create: `src/trading/core/workflow_release.py`
+- Modify: `src/trading/core/workflow_authoring.py`
+- Modify: `src/trading/core/workflow_studies.py`
+- Modify: `src/trading/core/study_qualification.py`
+- Modify: `src/trading/research_definitions/execution.py`
+- Modify: `src/trading/cli.py`
+- Create: `tests/test_workflow_release.py`
+- Modify: `tests/test_workflow_authoring.py`
+- Modify: `tests/test_workflow_studies.py`
+- Modify: `tests/test_study_qualification.py`
+- Modify: `tests/test_qualification_workflow.py`
+- Modify: `tests/test_workflow_native_research_cli.py`
+- Modify: `.github/workflows/lint.yml`
+- Modify: `.agents/skills/trading-author-workflow/references/evolve.md`
+- Modify: `.agents/skills/trading-author-workflow/references/impact.md`
+- Modify: `.agents/skills/trading-author-workflow/references/release.md`
+- Modify: `.agents/rules/workflow-version-boundary.md`
+- Modify: `CLAUDE.md`
+- Modify: `docs/ARCHITECTURE.md`
+
+**Replacement disposition input:**
+
+```json
+{
+  "schema_version": 1,
+  "source_version_path": "workflows/example--v001",
+  "target_version_path": "workflows/example--v002",
+  "studies": [
+    {
+      "source_study_path": "workflows/example--v001/work/studies/example--s001",
+      "action": "restart"
+    }
+  ]
+}
+```
+
+The object and each study item use exactly the shown keys. Study paths are unique, ordered,
+repository-relative, regular directories under the exact source version; action is `continue`、
+`restart`, or `close-invalidated`. Every paused source study appears exactly once, while completed/
+cancelled studies are absent. Initial release forbids this input. Every replacement release requires
+the file even when no paused study exists; that case supplies an empty `studies` list, eliminating an
+ambiguous omitted-input branch.
+
+**Repository and CLI contract:**
+
+- `WorkflowRepository.release(version_path: Path, *, approved_by: str, dispositions_path: Path | None) -> Path`
+
+```bash
+uv run trading workflow release <version-path> \
+  --approved-by <human-id> [--dispositions <replacement-dispositions.json>]
+```
+
+The service, not the parser, enforces that initial release must omit `dispositions_path` and every
+replacement release must provide it. Both the existing command and skill happy path dispatch to this
+one method; no lower-level release writer accepts an already-normalized mapping or bypasses the
+file's closed-schema/path checks.
+
+**Release schema v2:**
+
+- All new release writes use schema version 2. Its exact top-level keys are the existing schema-v1
+  keys `approved_at`、`approved_by`、`capabilities`、`dependencies`、`derived_from`、`policies`、
+  `prepared_at`、`schema_version`、`source_changes`、`supersedes`、`version`、`workflow`、
+  `workflow_sha256`, plus `authoring_basis`、`authoring_basis_sha256`、
+  `source_change_evidence`, and `study_dispositions`.
+- `authoring_basis` is the exact normalized audit-provenance object persisted by the version README;
+  `authoring_basis_sha256` hashes its canonical JSON serialization. Release validation rejects any
+  later basis drift while allowing guarded draft updates before release.
+- `source_change_evidence` is ordered one-to-one with `source_changes`. Each item contains exactly
+  `path`、`format`, and `files`; `files` is the sorted complete authority manifest of exact
+  repository-relative file paths and SHA-256 values. Legacy entries pin README/PROPOSAL/IMPACT/
+  VALIDATION/DECISION. Schema-v2 entries pin terminal `CHANGE.md` and every add-only decision-event
+  sidecar. Missing/extra/reordered paths、event deletion or digest drift invalidate release evidence.
+- `study_dispositions` is the normalized ordered array from the guarded input; each item contains
+  exactly `source_study_path`、`action`, and `target_version_path`. Target path always equals the
+  released replacement; it is retained even for close-invalidated so the boundary identity is
+  explicit. The release SHA-256 makes the authorization immutable.
+- Existing schema-v1 releases remain readable without migration. Absence of `study_dispositions` in
+  schema v1 means “no new machine-consumable cross-version authorization”; it does not invalidate
+  historical studies or permit a new cross-version revisit.
+- `workflow_release.py` owns the only closed-schema v1/v2 parser and normalized release model.
+  Authoring validation、`WorkflowStudyService`、workflow-native execution、research CLI、study
+  qualification and qualification workflow import it instead of checking schema numbers or keys
+  independently. Execution resolves the same exact policy pins for v1 and v2; the shared parser
+  rejects unknown governance fields before any consumer uses the release.
+
+**Revisit branches:**
+
+- Same-version revisit: when source and target study workflow-version paths are identical, source
+  status must be `draft`、`cancelled` or `completed`. This preserves draft redesign、cancel/recreate
+  and completed follow-up without allowing two open preregistered/running/paused/awaiting-review
+  branches. No release disposition or consumption artifact is required; new metadata records null
+  action/consumption.
+- Direct cross-version revisit: when paths differ, the exact active target release must authorize the
+  exact source study with continue/restart. Close-invalidated、missing、wrong-target or schema-v1
+  absence fail closed.
+- `continue` and `restart` both require an exact `paused` source and a new target preregistration.
+  `continue` additionally pins the source `PREREGISTRATION.json` and frozen hypothesis digest in the
+  consumption artifact; target preregistration fails unless its `HYPOTHESIS.md` bytes have that exact
+  digest. Its plan、execution and evidence are new under the replacement workflow. `restart` records
+  source identity but permits a new hypothesis and plan and begins with no carried evidence.
+- After a consumed cross-version handoff, later same-version redesigns under the target version use
+  the same-version branch and revisit the newest study; they do not consume the old boundary again.
+- Repository validation treats `revisits` as a directed graph, requires every path to exist and stay
+  in the same workflow family, and rejects self-reference or cycles. Manual metadata edits cannot
+  manufacture a circular continuation chain.
+
+**Study metadata and durable consumption:**
+
+- After Task 7, every newly written study README includes `revisit_action`、
+  `disposition_consumption`, and `disposition_consumption_sha256`, each null for no/same-version
+  revisit. For an authorized cross-version revisit they equal the release action、exact consumption
+  artifact path and its 64-hex digest. Studies pinned to a schema-v2 workflow release must contain
+  all three keys. Studies already pinned to schema-v1 releases may omit all three as legacy-compatible
+  bytes; the post-Task-7 writer still emits null fields for new same-version studies under those
+  releases and never rewrites old studies.
+- Cross-version init atomically creates the study directory、generated index changes and an add-only
+  consumption artifact at
+  `<target-version>/work/disposition-consumptions/<sha256(source-study-path + NUL + target-version-path)>.json`.
+  The artifact has exactly `schema_version`、`source_study_path`、`source_version_path`、
+  `target_version_path`、`action`、`authorization_release_path`、
+  `authorization_release_sha256`、`source_preregistration_sha256`、
+  `source_hypothesis_sha256`、`created_study_path`、`consumed_at`, and `consumed_by`. The two source
+  digests are required 64-hex for `continue` and null for `restart`.
+  Time is writer-generated current UTC; actor is the stable study initializer identity. Caller input
+  cannot provide either field or the artifact digest.
+- The deterministic artifact key is the single-use authority. Init before commit decision that
+  fails/rolls back creates neither study nor consumption; commit-decided recovery rolls both forward.
+  Once committed, cancellation or deletion of the created study never releases authorization.
+  Deleting the study instead makes repository validation fail because the immutable consumption
+  references a missing created path; there is no reclaim/reuse command.
+- Validator requires one-to-one agreement among release mapping、consumption artifact、new study
+  `revisits`/metadata/digest and target version. A source+target boundary has at most one consumption;
+  artifact byte tampering fails the study's pinned digest.
+- Non-dry-run qualification registration revalidates this agreement inside the shared workflow then
+  qualification locks; a cross-version study with missing/drifted consumption can never register an
+  outcome-relevant qualification plan.
+
+- [ ] Add release parser/writer/validator tests for exact schema-v1/v2 closed keys、legacy schema-v1
+  omission、complete paused-study coverage、wrong target、authoring-basis pin、complete source-change
+  authority manifest and immutable release authorization digest.
+- [ ] Add one real schema-v2 release fixture that passes `resolve_workflow_policy_set()`、workflow-
+  native research CLI context construction and structured study/qualification runtime-contract
+  checks. Prove v1 and v2 resolve identical policy sets and unknown/malformed v2 fields fail in every
+  consumer through the shared parser.
+- [ ] Extend the canonical CI focused command with `tests/test_workflow_release.py` and
+  `tests/test_workflow_native_research_cli.py`; PR 5 must be independently green with a real v2
+  active-release reader path, not rely on the later full-suite handoff.
+- [ ] Add same-version、direct cross-version and cross-then-same-version revisit tests, plus missing/
+  close/wrong-target authorization、graph cycle and cross-family rejection. Cover allowed same-version
+  draft/cancelled/completed sources、rejection of all open outcome-relevant sources, and mechanical
+  continue hypothesis equality versus restart freedom.
+- [ ] Add atomic consumption tests for pre-decision rollback、commit-decided recovery、single-use,
+  cancellation permanence、deleted-study invalidity and concurrent double-init.
+- [ ] Update only the canonical version-boundary reference with these rules; impact/study governance
+  references route to it without restating schemas or lifecycle logic.
+- [ ] Run:
+
+```bash
+uv run pytest tests/test_workflow_release.py tests/test_workflow_authoring.py \
+  tests/test_workflow_studies.py \
+  tests/test_study_qualification.py tests/test_qualification_workflow.py \
+  tests/test_workflow_authoring_transaction.py tests/test_workflow_native_research_cli.py
+uv run ruff check src/ tests/
+uv run ruff format --check src/ tests/
+uv run trading workflow validate --all
+```
+
+Expected: version-boundary dispositions become durable, auditable, single-use machine authority
+without changing same-version study redesigns or rewriting old study bytes.
+
+## Task 8: Simplify abandon, retire, and deletion semantics
 
 **Files:**
 
@@ -842,16 +1141,20 @@ contract, without manual version allocation, copying, registry edits, or source-
 - Modify: `src/trading/cli.py`
 - Modify: `tests/test_workflow_authoring.py`
 - Modify: `tests/test_workflow_studies.py`
+- Modify: `tests/test_qualification_workflow.py`
 - Modify: `.agents/skills/trading-author-workflow/references/remove.md`
 - Modify: `.agents/skills/trading-author-workflow/references/impact.md`
-- Modify: `.agents/skills/trading-operate-workflow/SKILL.md`
-- Modify: `.agents/rules/workflow-study-governance.md`
+- Modify: `.agents/rules/workflow-version-boundary.md`
 - Modify: `CLAUDE.md`
-- Modify: `docs/ARCHITECTURE.md` if public entry-point documentation lists the new aliases
+- Modify: `workflows/README.md`
+- Create: `workflows/REGISTRY_MIGRATION.json`
+- Modify: `docs/ARCHITECTURE.md`
 
 **CLI aliases:**
 
 ```bash
+uv run trading workflow registry migrate-v2 --by <stable-operator-id>
+
 uv run trading workflow abandon <draft-version-path>
 uv run trading workflow retire <active-version-path> \
   --dispositions <retirement-dispositions.json> \
@@ -862,6 +1165,12 @@ uv run trading workflow version transition <active-version-path> --to retired \
   --reason <reason> --approved-by <human-id>
 ```
 
+`WorkflowRepository.migrate_root_registry_v2(*, migrated_by: str) -> Path` is a one-time guarded
+transaction. It requires exact valid schema-1 input、no migration marker and the repository's empty
+legacy-retirement set; it computes both registry digests、uses current UTC and publishes schema-2
+registry plus marker atomically. It rejects caller timestamps/digests, a second migration, or any
+schema-1 retired entry because this repository has no approved grandfathered omission.
+
 The existing `workflow version transition` command remains available, but its retired branch now
 requires exactly the same reason/disposition/approval inputs as the alias. Both parsers dispatch to
 one evidence-producing repository method; there is no optional unsafe retirement path. The
@@ -870,29 +1179,46 @@ sugar over that guarded branch.
 
 **Retirement disposition contract:**
 
-- `retirement-dispositions.json` is a closed input object whose keys are exact repository-relative
-  paused-study paths under the active version and whose values are exactly `close-invalidated`.
+- `retirement-dispositions.json` has exactly `schema_version`、`version_path`, and `studies`.
+  `schema_version` is 1; version path is the exact active version; studies is an ordered array whose
+  items contain exactly `source_study_path` and `action`, with unique exact paused-study paths under
+  that version and action always `close-invalidated`.
   Pure retirement is terminal: it has no replacement target and therefore rejects continue/restart
-  spellings or target version/study paths. Continue/restart must use the Task 6 replacement-release
+  spellings or target version/study paths. Continue/restart must use the Task 7 replacement-release
   disposition contract instead.
 - Every paused study must appear exactly once; completed/cancelled studies must not appear. Unknown,
   duplicate JSON key/path, absolute, symlinked, outside-version, or status-mismatched paths fail
   closed.
-- Successful retirement creates immutable `RETIREMENT.json` under the retired version. It records
-  schema version, workflow/version/path, exact release digest, current-time `retired_at`, stable
-  `retired_by`, reason, and the ordered exact dispositions.
-- The root registry version record stores the exact retirement-evidence SHA-256 beside the retired
-  lifecycle state. This is an additive registry schema extension, not a registry-storage migration.
+- Successful retirement creates immutable schema-v1 `RETIREMENT.json` with exactly
+  `schema_version`、`workflow`、`version`、`version_path`、`release_path`、`release_sha256`、
+  `retired_at`、`retired_by`、`reason`, and `study_dispositions`. The final array repeats normalized
+  items with exact source path and close-invalidated action.
+- Task 8 atomically upgrades the root registry to schema version 2 before exposing retirement.
+  Schema-v2 non-retired version records retain exactly the existing keys and reject
+  `retirement_evidence_sha256`; every `retired` record requires that additional key with the exact
+  64-hex digest of its `RETIREMENT.json`. Missing/null evidence is never a valid schema-v2 retired
+  state. The repository currently has no retired entries, so its closed grandfather allowlist is
+  empty and no omission branch exists.
+- The same transaction creates add-only `workflows/REGISTRY_MIGRATION.json` with exactly
+  `schema_version`、`from_schema`、`to_schema`、`before_sha256`、`after_sha256`、`migrated_at`, and
+  `migrated_by`; it pins the before/after root-registry bytes and the current-time stable actor.
+  Schema-v1 parsing exists only as input to this guarded migration and frozen legacy parser fixtures.
+  Once this marker exists—or the complete Git path-history proof shows it was ever tracked—
+  `validate --all`、sync and every mutation reject a missing/changed marker or root-registry downgrade.
+  No ordinary CLI can add a grandfathered record or expand an allowlist. This provides a mechanical
+  boundary instead of interpreting field absence as both legacy and illegal new retirement.
 - `RETIREMENT.json` is add-only and digest-pinned. Retirement does not modify the released
   `WORKFLOW.md` or existing `RELEASE.json`; validation treats later retirement evidence as separate
   lifecycle evidence rather than a rewrite of release bytes.
 - Retirement dispositions are normative close authorizations. Old studies remain historically
   paused, but `WorkflowStudyService.initialize()` and repository validation reject every future
   `revisits` chain that names a study closed by immutable retirement evidence.
+- The canonical version-boundary reference owns this schema and closure rule. Remove/impact mode
+  references only route to it; they do not duplicate the normative content.
 - Retirement artifact, registry transition, indexes, and disposition validation publish through
   the Task 3 transaction coordinator.
 
-- [ ] Add parser and dispatch tests for `abandon`、`retire`, and both branches of
+- [ ] Add parser and dispatch tests for one-time `registry migrate-v2`、`abandon`、`retire`, and both branches of
   `version transition`, including no-backdated-clock, closed disposition-input schema, required
   retirement evidence args, rejection of the old bypass form, and rejection of retirement-only args
   on abandon.
@@ -905,6 +1231,10 @@ sugar over that guarded branch.
   `close-invalidated`; explicitly reject continue/restart and any claimed replacement target.
 - [ ] Prove artifact, registry digest, lifecycle state, and indexes recover together across injected
   failures and a fresh process restart.
+- [ ] Add root-registry schema 1 -> 2 migration、schema downgrade、missing/null/malformed retirement
+  digest、missing/changed/historically-deleted migration marker and hand-edited active-to-retired
+  bypass tests. Prove the current empty grandfather set cannot be extended through metadata or CLI
+  input.
 - [ ] Prove `abandon` accepts only a registered draft and permanently retains its registry entry.
 - [ ] Prove superseded, retired, abandoned, or released versions cannot be physically deleted by
   either command.
@@ -914,7 +1244,7 @@ sugar over that guarded branch.
   fails closed. The skill resolves current Git status, warns about recoverability, and obtains
   separate explicit confirmation before direct deletion. If it was ever tracked or referenced,
   refuse physical deletion and leave the path untouched; this plan does not invent an implicit
-  tombstone/adoption mutation. If such a path is already missing, the Task 5/6 historical reservation
+  tombstone/adoption mutation. If such a path is already missing, the Task 3 historical reservation
   scan still permanently blocks identity reuse and reports governance repair.
 - [ ] Prove an ever-tracked/referenced unregistered path is refused without mutation, and that an
   already-missing historical identity still blocks create/evolve allocation. A future
@@ -922,15 +1252,24 @@ sugar over that guarded branch.
   approved.
 - [ ] Ensure the skill reports whether the user's word “delete” was resolved to local deletion,
   abandon, retire, or refusal.
+- [ ] Run:
+
+```bash
+uv run pytest tests/test_workflow_authoring.py tests/test_workflow_studies.py \
+  tests/test_qualification_workflow.py tests/test_workflow_authoring_transaction.py
+uv run ruff check src/ tests/
+uv run ruff format --check src/ tests/
+uv run trading workflow validate --all
+```
 
 Expected: users can ask to remove a workflow without first knowing lifecycle vocabulary, while the
 repository preserves every registered or released historical identity.
 
-## Task 8: Full migration-free verification and handoff
+## Task 9: Full history-compatible verification and handoff
 
 **Files:**
 
-- Verify all files changed in Tasks 1–7.
+- Verify all files changed in Tasks 1–8.
 - Modify: `docs/ARCHITECTURE.md`
 - Modify: `CLAUDE.md`
 - Modify: `workflows/README.md`
@@ -945,17 +1284,21 @@ repository preserves every registered or released historical identity.
 - [ ] Run:
 
 ```bash
-python3 /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+uv run --no-sync python /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/trading-author-workflow
-python3 /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+uv run --no-sync python /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/trading-operate-workflow
-python3 /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+uv run --no-sync python /Users/william/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
   .agents/skills/trading-evaluate-study
+uv run pytest tests/test_workflow_release.py
 uv run pytest tests/test_workflow_authoring.py
 uv run pytest tests/test_workflow_authoring_transaction.py
 uv run pytest tests/test_workflow_identity.py
 uv run pytest tests/test_workflow_studies.py
 uv run pytest tests/test_study_qualification.py
+uv run pytest tests/test_qualification_workflow.py
+uv run pytest tests/test_workflow_native_research_cli.py
+uv run pytest tests/test_policy_authoring.py tests/policies/test_policy_resolver.py
 uv run pytest
 uv run ruff check src/ tests/
 uv run ruff format --check src/ tests/
@@ -969,25 +1312,31 @@ git status --short
      policy kinds and only supported capabilities; reject missing/duplicate kinds and unknown
      capability;
   2. create a schema-v2 change, defer/repropose it more than once, replay every exact decision
-     snapshot, then accept it; separately exercise explicit withdrawal;
+     snapshot/event, then accept it; separately exercise explicit withdrawal and prove rewriting
+     CHANGE plus all in-file digests cannot bypass the add-only event anchor;
   3. aggregate two accepted changes into one replacement draft;
   4. accept another change and update the same replacement draft identity in place;
-  5. abandon a draft and prove registry、all canonical path/text references、Git history and
-     concurrent allocation cannot reuse its number; prove non-Git、shallow and Git-error cases fail
-     closed for vNNN/Cxxx/Sxxx;
-  6. release a replacement with typed exact-target dispositions; prove study init consumes each
-     continue/restart exactly once, derives the action, and rejects close/missing/wrong-target
-     revisits;
-  7. separately retire an active workflow through both alias and low-level command, prove byte-
-     identical evidence, and reject the old no-reason/no-disposition bypass plus running/open/
-     incomplete cases;
-  8. race study init/resume/sync against release and retirement, proving the shared lock and in-lock
-     precondition reread preserve the version boundary;
+  5. abandon a draft and prove registry、all canonical path/text references、complete Git path/blob
+     history、stage-0 index and concurrent allocation cannot reuse its number; prove shared-blob
+     multiple paths、unmerged index、non-Git、shallow and Git-error cases fail closed for v/C/S;
+  6. preserve the exact allowed same-version source-state matrix without disposition, then release a
+     schema-v2 replacement with typed exact-target dispositions and prove workflow-native execution/
+     qualification can read it; atomically consume each cross-version continue/restart exactly once,
+     enforce their different hypothesis rules, preserve consumption after cancellation/deletion, and
+     reject close/missing/wrong-target/cyclic revisits;
+  7. atomically migrate the root registry to schema 2, then separately retire an active workflow
+     through both alias and low-level command; prove byte-identical evidence and reject schema
+     downgrade、marker removal、the old no-reason/no-disposition bypass plus open/incomplete cases;
+  8. race study init/resume/sync and non-dry-run qualification registration against release、
+     retirement and completion, proving the shared lock and in-lock precondition reread preserve the
+     version boundary;
   9. crash at every transaction phase and immediately invoke every study writer, proving the common
      pending-journal gate recovers first or writes nothing; verify workflow-before-qualification lock
      ordering;
-  10. inject external target changes before commit decision and between publications, proving CAS
-      behavior, fresh-process rollback/roll-forward, status/recover, and fsync ordering;
+  10. inject external target and validation-read-set changes before commit decision and between
+      publications, proving CAS behavior、prepared cleanup/abort、commit-decided roll-forward、complete
+      cleanup、fresh-process status/recover and fsync ordering; prove post-decision non-target drift
+      reports invalidity without retaining a completed journal;
   11. validate a mixed repository containing legacy and schema-v2 changes;
   12. verify legacy index links and schema-v2 direct `CHANGE.md` links.
 - [ ] Perform read-only skill behavior checks for review, create, evolve, remove, and release modes;
@@ -1001,8 +1350,9 @@ git status --short
 - [ ] Delete legacy skill assets only after `rg` proves no maintained writer/caller references them;
   retain permanent legacy on-disk reader coverage in tests.
 
-Expected: the simplified authoring experience is additive, deterministic, migration-free, and
-fully compatible with existing workflow history.
+Expected: the simplified authoring experience is additive and deterministic; the one root-registry
+schema migration is explicit and atomic, while every existing workflow、release、study and legacy
+change byte remains fully compatible without per-object migration.
 
 ## Completion criteria
 
@@ -1011,18 +1361,28 @@ The plan is complete only when all of the following are true:
 - A normal review does not load unrelated create/evolve/remove/release instructions.
 - `trading-operate-workflow` and `trading-evaluate-study` load the canonical study-governance
   reference without depending on deleted/moved authoring-mode details.
+- Author impact and study revisit flows share one canonical version-boundary reference without
+  duplicating its rules or loading unrelated authoring modes.
 - Existing and new authoring writes recover deterministically across exceptions, process restart,
   and the documented host/filesystem crash model under one durable journal; all study writers share
   the same mutation-entry gate, recover/reject pending journals first, follow workflow-before-
   qualification lock ordering, and re-read lifecycle preconditions inside the lock.
+- Non-dry-run qualification registration uses the same workflow-before-qualification gate and can
+  proceed only for an active running study with valid version-boundary consumption where applicable.
 - Commit decision requires a full before-state CAS recheck; publication never overwrites a target
   whose kind/mode/digest moved outside the recorded before/after states.
+- WAL records and CAS-checks every assert-only validation input that determines after-state.
+  Post-decision non-target drift may fail repository health validation but cannot permanently retain
+  an otherwise complete journal.
+- Prepared recovery never writes canonical targets, commit-decided recovery only rolls forward, and
+  complete recovery only cleans up; an explicit audited abort exists only for prepared operations.
 - A complete new workflow can reach a validated v001 draft without manual ID allocation, template
   copying, registry editing, sync invocation, or partial cleanup.
 - A new family is always `v001`; any same-slug registry/path/current-or-historical reference is a
   collision or governance-repair condition, never permission to create an initial `v002`.
-- A new change uses exactly one `CHANGE.md` and retains the same proposal, impact, validation,
-  decision, release, and audit semantics as the legacy representation.
+- A new change uses exactly one author-edited `CHANGE.md`; only guarded decisions add generated,
+  content-addressed event sidecars. It retains proposal、impact、validation、decision and release
+  semantics while providing an external immutable audit anchor.
 - Deferred/reproposal history preserves replayable exact Validation/Decision snapshots with legal
   event sequence and timestamps; withdrawal has one explicit guarded CLI path.
 - A replacement draft is allocated and wired from all accepted changes atomically.
@@ -1034,21 +1394,31 @@ The plan is complete only when all of the following are true:
   retirement persists immutable evidence that covers every paused study exactly once as
   `close-invalidated` and never promises continuation/restart.
 - Continue/restart authorization is enforced and single-use at study initialization;
-  close-invalidated studies cannot be revisited, while their historical paused bytes remain intact.
+  consumption is durable even if the created study is cancelled/deleted, and close-invalidated
+  studies cannot be revisited, while their historical paused bytes remain intact. Same-version
+  cancel/recreate revisits remain valid without a release disposition.
 - `retire` and `version transition --to retired` use one evidence-producing method; neither provides
   a reason/disposition bypass.
+- Root registry schema 2 and its add-only migration marker make every new retired state require an
+  exact retirement-evidence digest; schema downgrade or a newly omitted digest fails closed.
 - Existing v001–v008 workflows, releases, studies, and legacy changes validate without migration.
 - No registered or released workflow history is physically deleted.
-- Never-used allocation includes registry、disk、inbound references、Git path history 與 concurrent
-  reservations, including version-scoped canonical textual identities and exact references found
-  only in Git historical content. Non-Git、shallow or Git-error proof fails closed for v/C/S IDs.
+- Never-used allocation includes registry、disk、inbound references、complete Git path history、
+  de-duplicated historical blob content、stage-0 index and concurrent reservations. Grammar preserves
+  per-version scoping; path proof never relies on the optional path attached to a de-duplicated blob,
+  and ref/index/inventory proof tokens are CAS-checked before commit. Non-Git、shallow、unmerged-index、
+  timeout or Git-error proof fails closed for v/C/S IDs.
 - Initial/replacement metadata has one closed schema, preserves service-verified authoring
   provenance, and defines capability/policy/dependency types, uniqueness, and draft null-digest
   behavior.
 - New authoring rejects unknown capabilities, and release resolves exactly one market、broker、
-  execution and portfolio-risk policy kind; legacy workflow bytes remain migration-free.
+  execution and portfolio-risk policy kind through the authoritative policy inspector; legacy
+  workflow bytes remain migration-free.
 - Schema-v2 change metadata rejects unknown/stale decision state and preserves deferred/reproposal
-  history through append-only, byte-replayable, digest-pinned decision snapshots.
+  history through append-only, byte-replayable decision snapshots and content-addressed event anchors;
+  schema-v2 release pins the complete terminal source-change authority manifest.
+- Schema-v2 release is accepted by the same closed dual-schema parser in authoring、workflow-native
+  execution、research CLI and qualification consumers, and pins normalized authoring provenance.
 - All focused tests, full tests, Ruff, skill validation, workflow validation, and diff checks pass.
 
 ## Explicitly deferred work
@@ -1061,7 +1431,7 @@ The plan is complete only when all of the following are true:
 - Adding a lifecycle that revives a retired workflow family.
 - Adding an adopt/register-tombstone repair API for unregistered historical drafts.
 - Changing unrelated study lifecycle states, approvals, evaluation, completion, qualification,
-  Shadow, activation, or trading authority. Tasks 3 and 6 only add the shared mutation gate,
+  Shadow, activation, or trading authority. Tasks 3 and 7 only add the shared mutation gate,
   lock-order correction, and enforcement of version-boundary disposition authority; they do not
   alter frozen plans, evidence, outcomes, or existing study bytes.
 - Releasing or retiring any actual repository workflow as part of the authoring-tool improvement.
@@ -1074,16 +1444,21 @@ foundation is merged and green:
 1. **PR 1 — Skill routing compatibility:** Tasks 1–2 only. Add progressive disclosure, retain the
    compatibility pointer, and update author/operate/evaluate callers.
 2. **PR 2 — Transaction and identity foundation:** Task 3 only. Add the common pending-journal gate,
-   workflow-before-qualification lock ordering, bounded WAL target operations, CAS rechecks, and
-   fail-closed v/C/S identity proof; retrofit sync、transitions、release and study writers without
-   adding schema-v2 or create/evolve commands yet.
-3. **PR 3 — Change schema v2:** Task 4 only. Add normalized dual reader, direct index targets,
-   append-only replayable decision snapshots, `change decide`, and explicit `change withdraw`; keep
-   legacy assets until final caller verification. This PR does not expose `change create` yet.
+   workflow-before-qualification lock ordering, bounded WAL target operations, target/read-set CAS,
+   cached fail-closed v/C/S identity proof; retrofit sync、transitions、release and study writers
+   without adding schema-v2 or create/evolve commands yet.
+3. **PR 3 — Change schema v2:** Task 4 only. Add normalized dual reader、direct index targets、
+   replayable decision snapshots、content-addressed add-only event anchors、`change decide`, and
+   explicit `change withdraw`; keep legacy assets until final caller verification. This PR does not
+   expose `change create` yet.
 4. **PR 4 — Draft authoring happy paths:** Tasks 5–6. Add `change create`, strict closed metadata and
    authoring provenance, supported-capability/four-policy validation, exact-v001/never-used
-   allocation, replacement draft creation, machine-enforced single-use replacement dispositions,
-   and in-place `--update`.
-5. **PR 5 — Lifecycle UX and final migration-free verification:** Tasks 7–8. Add retirement
-   evidence, safe low-level transition parity, abandon/retire aliases, documentation, forward tests,
-   and remove obsolete writer assets only after inbound-link checks pass.
+   allocation, replacement draft creation, and in-place `--update`; do not enable version-boundary
+   authorization yet.
+5. **PR 5 — Persisted version-boundary authorization:** Task 7 only. Add the shared dual-schema
+   release parser before any v2 write、source-change/provenance pins、exact same/cross-version revisit
+   branches、add-only durable consumption and cycle/single-use validation.
+6. **PR 6 — Lifecycle UX and history-compatible verification:** Tasks 8–9. Atomically migrate the
+   root registry to schema 2 with an add-only marker, add retirement evidence、safe low-level
+   transition parity、abandon/retire aliases、documentation and forward tests, then remove obsolete
+   writer assets only after inbound-link checks pass.
