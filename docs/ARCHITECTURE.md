@@ -104,8 +104,6 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/phase-9-primary-followup-migration.md` | Primary followup migration boundaries, parity evidence, and verification. |
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
 | `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
-| `docs/workflow-authoring-governance.html` | Standalone interactive C4-style overview of the planned workflow-authoring governance, lifecycle paths, and recovery gates. |
-| `docs/workflow-authoring-activity-sequence.html` | Standalone interactive activity and sequence diagrams for the planned workflow-authoring mutation and effective-release flow. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |
 | `docs/superpowers/plans/YYYY-MM-DD-*.md` | Historical approved implementation plans retained as execution context. |
