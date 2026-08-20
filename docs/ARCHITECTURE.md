@@ -314,6 +314,7 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/<slug>--vNNN/STAGES_AND_OUTCOMES.md` | Optional version companion containing full and plain-language stage/outcome guidance; when declared `reference` plus `pinned: true`, release evidence fixes its exact bytes while `WORKFLOW.md` remains the sole behavioral authority. |
 | `workflows/<slug>--vNNN/work/studies/<study>/` | Route/spec, preregistered plan, add-only Development authorization, candidate freeze, metadata, evidence, conclusion, and outcome for a workflow study when present. |
 | `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
+| `workflows/.authoring.lock` | Ignored local advisory lock shared only by workflow authoring writers; it is not lifecycle evidence or repository authority. |
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or
 their repository skills, not hand-edited casually.
@@ -324,6 +325,14 @@ not tracked lifecycle authority: callers supply confirmed content and exact pins
 allocates `vNNN`/`Cxxx`, writes the existing schema-1 and five-file formats, synchronizes indexes,
 and validates. Low-level transition, sync, and release commands remain compatibility and diagnostic
 entry points.
+
+High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
+only the workflow tree into a system temporary directory, applies and validates the complete staged
+after-tree against canonical repository dependencies, then rechecks target digests before atomic
+per-file publication. Ordinary in-process publication failures restore the exact before bytes and
+revalidate. A process crash can still leave a partial worktree; the next authoring writer fails
+closed on structural validation and requires manual inspection. This bounded mechanism is not a
+durable journal and does not coordinate study or qualification writers.
 
 Workflow releases pin exact released policy family/version identities and `RELEASE.json` digests.
 Studies inherit those immutable selections from their workflow version and record the composite
@@ -337,6 +346,7 @@ normal.
 | Path | Purpose |
 |---|---|
 | `.venv/` | Local `uv` Python environment. |
+| `workflows/.authoring.lock` | Local workflow-authoring coordination file; safe to recreate and never tracked. |
 | `.cache/market-data/` | Validated active provider CSV data and metadata sidecars. |
 | `.cache/market-data-quarantine/` | Corrupt or rejected cache generations retained for diagnosis. |
 | `.research-data/blobs/` | Protected content-addressed data and research-definition blobs referenced by manifests. |

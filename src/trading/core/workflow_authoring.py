@@ -7,9 +7,12 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
-from collections.abc import Callable, Mapping
+import threading
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,6 +21,7 @@ from typing import Any
 import yaml
 
 from trading.core.accounting import canonical_json_bytes, parse_timestamp, timestamp_text
+from trading.core.ledger_storage import FileLockTimeout, locked_file
 
 ROOT_INDEX_START = "<!-- GENERATED:WORKFLOW_INDEX_START -->"
 ROOT_INDEX_END = "<!-- GENERATED:WORKFLOW_INDEX_END -->"
@@ -63,6 +67,10 @@ _CHANGE_TRANSITIONS: dict[str, frozenset[str]] = {
     "released": frozenset(),
 }
 _DECISION_STATUSES = frozenset({"accepted", "rejected", "deferred"})
+
+_AUTHORING_MUTEXES_GUARD = threading.Lock()
+_AUTHORING_MUTEXES: dict[str, threading.RLock] = {}
+_AUTHORING_DEPTH = threading.local()
 
 
 class WorkflowAuthoringError(ValueError):
@@ -275,6 +283,7 @@ class WorkflowFileMutation:
     action: str
     path: str
     content: bytes
+    before_sha256: str | None
 
 
 @dataclass(frozen=True)
@@ -308,7 +317,12 @@ class WorkflowMutationPlan:
             "dependencies": copy.deepcopy(list(self.dependencies)),
             "authoring_basis": self.authoring_basis,
             "changes": [
-                {"action": mutation.action, "path": mutation.path} for mutation in self.mutations
+                {
+                    "action": mutation.action,
+                    "path": mutation.path,
+                    "before_sha256": mutation.before_sha256,
+                }
+                for mutation in self.mutations
             ],
             "warnings": list(self.warnings),
             "blocking_issues": [],
@@ -499,15 +513,59 @@ class WorkflowRepository:
         *,
         now: Callable[[], datetime] | None = None,
         git_index_checker: Callable[[Path], bool] | None = None,
+        lock_timeout_seconds: float = 5.0,
+        publish_hook: Callable[[str, Path, int], None] | None = None,
+        stage_hook: Callable[[Path], None] | None = None,
+        _repository_root: Path | None = None,
+        _canonical_workflow_root: Path | None = None,
     ) -> None:
         self.root = root
-        self.repo_root = root.parent
+        self.repo_root = _repository_root or root.parent
+        self.canonical_workflow_root = _canonical_workflow_root or root
         self.now = now or (lambda: datetime.now(UTC))
         self.git_index_checker = git_index_checker or self._is_git_indexed
+        self.lock_timeout_seconds = lock_timeout_seconds
+        self.publish_hook = publish_hook or (lambda _phase, _path, _index: None)
+        self.stage_hook = stage_hook or (lambda _path: None)
 
     @property
     def registry_path(self) -> Path:
         return self.root / "README.md"
+
+    @property
+    def authoring_lock_path(self) -> Path:
+        """Return the local-only lock shared by repository authoring writers."""
+        return self.root / ".authoring.lock"
+
+    @contextmanager
+    def authoring_lease(self) -> Iterator[None]:
+        """Hold the bounded cross-thread/process authoring lease re-entrantly."""
+        key = str(self.authoring_lock_path.resolve())
+        with _AUTHORING_MUTEXES_GUARD:
+            mutex = _AUTHORING_MUTEXES.setdefault(key, threading.RLock())
+        if not mutex.acquire(timeout=self.lock_timeout_seconds):
+            raise WorkflowAuthoringError(
+                f"timed out waiting for workflow authoring lock: {self.authoring_lock_path}"
+            )
+        depths = getattr(_AUTHORING_DEPTH, "values", {})
+        depth = depths.get(key, 0)
+        depths[key] = depth + 1
+        _AUTHORING_DEPTH.values = depths
+        try:
+            if depth:
+                yield
+                return
+            try:
+                with locked_file(self.authoring_lock_path, self.lock_timeout_seconds):
+                    yield
+            except FileLockTimeout as exc:
+                raise WorkflowAuthoringError(str(exc)) from exc
+        finally:
+            if depth:
+                depths[key] = depth
+            else:
+                depths.pop(key, None)
+            mutex.release()
 
     def validate_all(
         self,
@@ -752,17 +810,17 @@ class WorkflowRepository:
             authoring_basis=request.authoring_basis,
         )
         mutations = (
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action="create",
                 path=self._repo_relative(target / "README.md"),
                 content=render_markdown_document(MarkdownDocument(metadata, readme_body)),
             ),
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action="create",
                 path=self._repo_relative(target / "WORKFLOW.md"),
                 content=definition.read_bytes(),
             ),
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action="update",
                 path=self._repo_relative(self.registry_path),
                 content=render_markdown_document(
@@ -868,7 +926,7 @@ class WorkflowRepository:
                         f"{filename} must be completed before immediate proposal"
                     )
         mutations = [
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action="create",
                 path=self._repo_relative(target / filename),
                 content=contents[filename],
@@ -892,7 +950,7 @@ class WorkflowRepository:
             ),
         )
         mutations.append(
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action="update",
                 path=self._repo_relative(version_path / "README.md"),
                 content=render_markdown_document(
@@ -995,7 +1053,7 @@ class WorkflowRepository:
             "dependencies": dependencies,
         }
         mutations: list[WorkflowFileMutation] = [
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action=action,
                 path=self._repo_relative(target / "README.md"),
                 content=render_markdown_document(
@@ -1008,7 +1066,7 @@ class WorkflowRepository:
                     )
                 ),
             ),
-            WorkflowFileMutation(
+            self._planned_mutation(
                 action=action,
                 path=self._repo_relative(target / "WORKFLOW.md"),
                 content=definition.read_bytes(),
@@ -1016,7 +1074,7 @@ class WorkflowRepository:
         ]
         if update_registry:
             mutations.append(
-                WorkflowFileMutation(
+                self._planned_mutation(
                     action="update",
                     path=self._repo_relative(self.registry_path),
                     content=render_markdown_document(
@@ -1040,33 +1098,138 @@ class WorkflowRepository:
 
     def apply(self, plan: WorkflowMutationPlan) -> WorkflowMutationResult:
         """Apply one already-previewed authoring plan through existing validators."""
-        self._require_structurally_valid()
+        with self.authoring_lease():
+            self._require_structurally_valid()
+            self._require_plan_targets_unchanged(plan)
+            publication = self._stage_after_tree(plan)
+            self._require_plan_targets_unchanged(plan)
+            before = {
+                path: path.read_bytes() if path.is_file() else None
+                for path, _content in publication
+            }
+            try:
+                for index, (path, content) in enumerate(publication):
+                    self.publish_hook("before", path, index)
+                    _atomic_write(path, content, replace=path.exists())
+                    self.publish_hook("after", path, index)
+                self._require_valid()
+            except Exception as exc:
+                self._rollback_publication(before)
+                try:
+                    self._require_valid()
+                except WorkflowAuthoringError as rollback_error:
+                    raise WorkflowAuthoringError(
+                        "authoring publish failed and rollback validation also failed: "
+                        f"{rollback_error}"
+                    ) from exc
+                raise WorkflowAuthoringError(
+                    f"authoring publish failed and was rolled back: {exc}"
+                ) from exc
+            return WorkflowMutationResult(
+                operation=plan.operation,
+                workflow=plan.workflow,
+                version=plan.version,
+                target=self._resolve_repo_reference(plan.target),
+            )
+
+    def _require_plan_targets_unchanged(self, plan: WorkflowMutationPlan) -> None:
         for mutation in plan.mutations:
             path = self._resolve_repo_reference(mutation.path)
-            if mutation.action == "create":
-                _atomic_write(path, mutation.content, replace=False)
-            elif mutation.action == "update":
-                _atomic_write(path, mutation.content)
-            else:
-                raise WorkflowAuthoringError(
-                    f"unsupported workflow mutation action: {mutation.action}"
-                )
-        self.sync()
-        self._require_valid()
-        if plan.post_transition is not None:
-            self.transition_change(
-                self._resolve_repo_reference(plan.target),
-                plan.post_transition,
+            current_digest = _sha256(path) if path.is_file() else None
+            if current_digest != mutation.before_sha256:
+                raise WorkflowAuthoringError(f"authoring target drift: {mutation.path}")
+
+    def _stage_after_tree(self, plan: WorkflowMutationPlan) -> tuple[tuple[Path, bytes], ...]:
+        """Build and validate the complete after-tree outside the canonical workflow root."""
+        with tempfile.TemporaryDirectory(prefix="workflow-authoring-stage-") as temporary_name:
+            staging_root = Path(temporary_name) / self.root.name
+            shutil.copytree(
+                self.root,
+                staging_root,
+                ignore=shutil.ignore_patterns(self.authoring_lock_path.name),
             )
-        return WorkflowMutationResult(
-            operation=plan.operation,
-            workflow=plan.workflow,
-            version=plan.version,
-            target=self._resolve_repo_reference(plan.target),
-        )
+            staged = WorkflowRepository(
+                staging_root,
+                now=self.now,
+                git_index_checker=self.git_index_checker,
+                lock_timeout_seconds=self.lock_timeout_seconds,
+                _repository_root=self.repo_root,
+                _canonical_workflow_root=self.root,
+            )
+            for mutation in plan.mutations:
+                canonical = self._resolve_repo_reference(mutation.path)
+                try:
+                    relative = canonical.relative_to(self.root.resolve())
+                except ValueError as exc:
+                    raise WorkflowAuthoringError(
+                        f"authoring mutation escapes workflow root: {mutation.path}"
+                    ) from exc
+                target = staging_root / relative
+                if mutation.action == "create":
+                    _atomic_write(target, mutation.content, replace=False)
+                elif mutation.action == "update":
+                    _atomic_write(target, mutation.content)
+                else:
+                    raise WorkflowAuthoringError(
+                        f"unsupported workflow mutation action: {mutation.action}"
+                    )
+            try:
+                staged.sync()
+                if plan.post_transition is not None:
+                    staged.transition_change(
+                        staged._resolve_repo_reference(plan.target),
+                        plan.post_transition,
+                    )
+                staged._require_valid()
+            except WorkflowAuthoringError as exc:
+                raise WorkflowAuthoringError(f"staged workflow validation failed: {exc}") from exc
+            self.stage_hook(Path(temporary_name))
+
+            planned_paths = {
+                self._resolve_repo_reference(mutation.path) for mutation in plan.mutations
+            }
+            publication: list[tuple[Path, bytes]] = []
+            for staged_path in sorted(path for path in staging_root.rglob("*") if path.is_file()):
+                if staged_path.name == staged.authoring_lock_path.name:
+                    continue
+                relative = staged_path.relative_to(staging_root)
+                canonical = self.root.resolve() / relative
+                content = staged_path.read_bytes()
+                if canonical.is_file() and canonical.read_bytes() == content:
+                    continue
+                if canonical not in planned_paths:
+                    raise WorkflowAuthoringError(
+                        f"staged workflow changed an unplanned target: {canonical}"
+                    )
+                publication.append((canonical, content))
+            return tuple(publication)
+
+    def _rollback_publication(self, before: Mapping[Path, bytes | None]) -> None:
+        for path, content in reversed(tuple(before.items())):
+            if content is None:
+                path.unlink(missing_ok=True)
+            else:
+                _atomic_write(path, content)
+        for path, content in reversed(tuple(before.items())):
+            if content is not None:
+                continue
+            parent = path.parent
+            while parent != self.root.resolve() and parent.is_relative_to(self.root.resolve()):
+                try:
+                    parent.rmdir()
+                except OSError:
+                    break
+                parent = parent.parent
 
     def sync(self) -> None:
         """Regenerate root and per-version human-readable indexes from metadata."""
+        with self.authoring_lease():
+            self._require_structurally_valid()
+            self._sync_locked()
+            self._require_valid()
+
+    def _sync_locked(self) -> None:
+        """Regenerate indexes while the caller holds the authoring lease."""
         document = read_markdown_document(self.registry_path)
         issues: list[ValidationIssue] = []
         workflows = self._validate_registry_metadata(document.metadata, issues)
@@ -1115,6 +1278,21 @@ class WorkflowRepository:
         approved_by: str | None = None,
     ) -> None:
         """Apply one legal change lifecycle transition with current-time evidence."""
+        with self.authoring_lease():
+            self._transition_change_locked(
+                change_path,
+                target_status,
+                approved_by=approved_by,
+            )
+
+    def _transition_change_locked(
+        self,
+        change_path: Path,
+        target_status: str,
+        *,
+        approved_by: str | None = None,
+    ) -> None:
+        """Transition a change while the caller holds the authoring lease."""
         path = self._resolve_input(change_path)
         self._require_structurally_valid()
         version_path = self._containing_version(path)
@@ -1167,6 +1345,21 @@ class WorkflowRepository:
         approved_by: str | None = None,
     ) -> None:
         """Abandon an unreleased draft or retire the active version."""
+        with self.authoring_lease():
+            self._transition_version_locked(
+                version_path,
+                target_status,
+                approved_by=approved_by,
+            )
+
+    def _transition_version_locked(
+        self,
+        version_path: Path,
+        target_status: str,
+        *,
+        approved_by: str | None = None,
+    ) -> None:
+        """Transition a version while the caller holds the authoring lease."""
         path = self._resolve_input(version_path)
         self._require_structurally_valid()
         registry, _slug, _version, record = self._registered_version(path)
@@ -1193,6 +1386,11 @@ class WorkflowRepository:
 
     def release(self, version_path: Path, *, approved_by: str) -> dict[str, Any]:
         """Prepare an approved release declaration and intended canonical registry state."""
+        with self.authoring_lease():
+            return self._release_locked(version_path, approved_by=approved_by)
+
+    def _release_locked(self, version_path: Path, *, approved_by: str) -> dict[str, Any]:
+        """Prepare a release while the caller holds the authoring lease."""
         if not approved_by.strip():
             raise WorkflowAuthoringError("workflow release requires --approved-by")
         path = self._resolve_input(version_path)
@@ -2694,6 +2892,21 @@ class WorkflowRepository:
         except ValueError as exc:
             raise WorkflowAuthoringError(f"path is outside repository root: {path}") from exc
 
+    def _planned_mutation(
+        self,
+        *,
+        action: str,
+        path: str,
+        content: bytes,
+    ) -> WorkflowFileMutation:
+        target = self._resolve_repo_reference(path)
+        return WorkflowFileMutation(
+            action=action,
+            path=path,
+            content=content,
+            before_sha256=_sha256(target) if target.is_file() else None,
+        )
+
     def _registered_version(
         self,
         version_path: Path,
@@ -2757,6 +2970,9 @@ class WorkflowRepository:
         resolved = (self.repo_root / relative).resolve()
         if not resolved.is_relative_to(resolved_root):
             raise WorkflowAuthoringError(f"repository reference escapes root: {value}")
+        canonical_root = self.canonical_workflow_root.resolve()
+        if resolved.is_relative_to(canonical_root):
+            return self.root.resolve() / resolved.relative_to(canonical_root)
         return resolved
 
     def _current_time(self) -> datetime:

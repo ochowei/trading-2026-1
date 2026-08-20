@@ -3,7 +3,10 @@ import hashlib
 import json
 import shutil
 import subprocess
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -13,6 +16,9 @@ from trading.cli import build_parser, main
 from trading.core.policy_authoring import PolicyRepository
 from trading.core.study_qualification import REQUIRED_STUDY_TIME_CHALLENGES
 from trading.core.workflow_authoring import (
+    CreateChangeRequest,
+    CreateWorkflowRequest,
+    EvolveWorkflowRequest,
     MarkdownDocument,
     WorkflowAuthoringError,
     WorkflowRepository,
@@ -269,6 +275,25 @@ def test_repository_gitignore_tracks_terminal_evidence_namespaces(
     assert result.returncode == 1
 
 
+def test_repository_gitignore_excludes_local_authoring_lock(tmp_path) -> None:
+    (tmp_path / ".gitignore").write_text(
+        Path(".gitignore").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    lock = tmp_path / "workflows" / ".authoring.lock"
+    lock.parent.mkdir()
+    lock.write_text("", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+
+    result = subprocess.run(
+        ["git", "check-ignore", "--no-index", "-q", "workflows/.authoring.lock"],
+        cwd=tmp_path,
+        check=False,
+    )
+
+    assert result.returncode == 0
+
+
 def _register_version(
     root: Path,
     *,
@@ -504,6 +529,29 @@ def test_empty_registry_is_valid_and_cli_reports_success(tmp_path, capsys) -> No
     assert "workflow validation passed" in capsys.readouterr().out
 
 
+def test_authoring_lease_is_reentrant_and_serializes_repository_writers(tmp_path) -> None:
+    root, first = _initialize_root(tmp_path)
+    second = WorkflowRepository(root)
+    entered = threading.Event()
+    completed = threading.Event()
+
+    def synchronize() -> None:
+        entered.set()
+        second.sync()
+        completed.set()
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        with first.authoring_lease():
+            first.sync()
+            future = executor.submit(synchronize)
+            assert entered.wait(timeout=2)
+            assert not completed.wait(timeout=0.1)
+        future.result(timeout=2)
+
+    assert completed.is_set()
+    assert first.validate_all() == ()
+
+
 def test_cli_create_previews_then_creates_initial_workflow(tmp_path, capsys) -> None:
     shutil.copytree("policies", tmp_path / "policies")
     shutil.copytree("src", tmp_path / "src")
@@ -559,9 +607,21 @@ def test_cli_create_previews_then_creates_initial_workflow(tmp_path, capsys) -> 
         "dependencies": [],
         "authoring_basis": "Confirmed test request with a complete workflow definition.",
         "changes": [
-            {"action": "create", "path": "workflows/example-workflow--v001/README.md"},
-            {"action": "create", "path": "workflows/example-workflow--v001/WORKFLOW.md"},
-            {"action": "update", "path": "workflows/README.md"},
+            {
+                "action": "create",
+                "path": "workflows/example-workflow--v001/README.md",
+                "before_sha256": None,
+            },
+            {
+                "action": "create",
+                "path": "workflows/example-workflow--v001/WORKFLOW.md",
+                "before_sha256": None,
+            },
+            {
+                "action": "update",
+                "path": "workflows/README.md",
+                "before_sha256": hashlib.sha256(registry_before).hexdigest(),
+            },
         ],
         "warnings": [],
         "blocking_issues": [],
@@ -649,6 +709,474 @@ def test_create_request_rejects_authority_fields_and_invalid_pins(tmp_path) -> N
         main(["workflow", "--root", str(root), "create", "--request", str(request), "--dry-run"])
 
 
+def test_apply_rejects_target_drift_without_mutation(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed request before a concurrent registry edit.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+    registry = root / "README.md"
+    registry.write_bytes(registry.read_bytes() + b"\nConcurrent note.\n")
+    drifted = registry.read_bytes()
+
+    with pytest.raises(WorkflowAuthoringError, match="target drift"):
+        repository.apply(plan)
+
+    assert registry.read_bytes() == drifted
+    assert not (root / "example-workflow--v001").exists()
+
+
+def test_apply_validates_complete_staged_tree_before_canonical_mutation(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed request with intentionally corrupted planned bytes.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+    corrupted = replace(plan.mutations[0], content=b"# Missing frontmatter\n")
+    invalid_plan = replace(
+        plan,
+        mutations=(corrupted, *plan.mutations[1:]),
+    )
+    registry_before = (root / "README.md").read_bytes()
+
+    with pytest.raises(WorkflowAuthoringError, match="staged workflow validation failed"):
+        repository.apply(invalid_plan)
+
+    assert (root / "README.md").read_bytes() == registry_before
+    assert not (root / "example-workflow--v001").exists()
+
+
+def test_authoring_stage_contains_only_the_workflow_overlay(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    for private_root in (
+        "credentials",
+        "broker-imports",
+        "results",
+        ".research-data",
+        "state",
+    ):
+        path = tmp_path / private_root / "private.txt"
+        path.parent.mkdir(parents=True)
+        path.write_text("must not enter authoring staging\n", encoding="utf-8")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed request for bounded staging inspection.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+    staged_entries: set[str] = set()
+
+    def inspect_stage(path: Path) -> None:
+        staged_entries.update(item.relative_to(path).as_posix() for item in path.rglob("*"))
+
+    WorkflowRepository(root, stage_hook=inspect_stage).apply(plan)
+
+    assert staged_entries
+    assert all(entry == "workflows" or entry.startswith("workflows/") for entry in staged_entries)
+    assert not any("private.txt" in entry for entry in staged_entries)
+
+
+def test_apply_rechecks_target_drift_after_staging_before_publish(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed request before post-stage drift.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+    registry = root / "README.md"
+
+    def introduce_drift(_stage: Path) -> None:
+        registry.write_bytes(registry.read_bytes() + b"\nConcurrent post-stage note.\n")
+
+    with pytest.raises(WorkflowAuthoringError, match="target drift"):
+        WorkflowRepository(root, stage_hook=introduce_drift).apply(plan)
+
+    assert registry.read_bytes().endswith(b"Concurrent post-stage note.\n")
+    assert not (root / "example-workflow--v001").exists()
+
+
+def test_apply_rolls_back_exact_bytes_for_every_publish_failure_point(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed request for rollback verification.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+
+    def snapshot() -> dict[str, bytes]:
+        return {
+            path.relative_to(root).as_posix(): path.read_bytes()
+            for path in root.rglob("*")
+            if path.is_file() and path.name != ".authoring.lock"
+        }
+
+    before = snapshot()
+    for phase in ("before", "after"):
+        for index in range(3):
+
+            def fail(
+                selected_phase: str,
+                _path: Path,
+                selected_index: int,
+                expected_phase: str = phase,
+                expected_index: int = index,
+            ) -> None:
+                if (selected_phase, selected_index) == (expected_phase, expected_index):
+                    raise RuntimeError(
+                        f"injected {expected_phase} publish failure {expected_index}"
+                    )
+
+            failing = WorkflowRepository(root, publish_hook=fail)
+            with pytest.raises(WorkflowAuthoringError, match="rolled back"):
+                failing.apply(plan)
+            assert snapshot() == before
+            assert WorkflowRepository(root).validate_all() == ()
+
+
+def test_simulated_process_crash_leaves_partial_tree_that_blocks_next_writer(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed request for crash-boundary characterization.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+
+    class SimulatedProcessCrash(BaseException):
+        pass
+
+    def crash_after_first_publish(phase: str, _path: Path, index: int) -> None:
+        if (phase, index) == ("after", 0):
+            raise SimulatedProcessCrash
+
+    crashing = WorkflowRepository(root, publish_hook=crash_after_first_publish)
+    with pytest.raises(SimulatedProcessCrash):
+        crashing.apply(plan)
+
+    assert WorkflowRepository(root).validate_all()
+    with pytest.raises(WorkflowAuthoringError):
+        WorkflowRepository(root).sync()
+
+
+def test_concurrent_create_plans_publish_one_identity_and_one_conflict(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request_path = tmp_path / "create-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed concurrent create request.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_create(CreateWorkflowRequest.from_path(request_path))
+
+    def apply() -> str:
+        try:
+            WorkflowRepository(root).apply(plan)
+        except WorkflowAuthoringError as exc:
+            return str(exc)
+        return "success"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _item: apply(), range(2)))
+
+    assert results.count("success") == 1
+    assert sum("target drift" in result for result in results) == 1
+    assert WorkflowRepository(root).validate_all() == ()
+
+
+def test_concurrent_change_plans_publish_one_identity_and_one_conflict(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    active = _register_version(root)
+    repository.sync()
+    repository.release(active, approved_by="research-owner")
+    proposal = tmp_path / "docs" / "proposal.md"
+    impact = tmp_path / "docs" / "impact.md"
+    proposal.parent.mkdir()
+    proposal.write_text(
+        "# Proposal\n\nTighten the threshold under the exact active workflow version.\n",
+        encoding="utf-8",
+    )
+    impact.write_text(
+        "# Impact\n\nPause affected studies until their version disposition is explicit.\n",
+        encoding="utf-8",
+    )
+    request_path = tmp_path / "change-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "example-workflow",
+                "slug": "tighten-threshold",
+                "title": "Tighten threshold",
+                "proposal_path": "docs/proposal.md",
+                "impact_path": "docs/impact.md",
+                "validation_path": None,
+                "decision_path": None,
+                "propose": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_change(CreateChangeRequest.from_path(request_path))
+
+    def apply() -> str:
+        try:
+            WorkflowRepository(root).apply(plan)
+        except WorkflowAuthoringError as exc:
+            return str(exc)
+        return "success"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _item: apply(), range(2)))
+
+    assert results.count("success") == 1
+    assert sum("target drift" in result for result in results) == 1
+    changes = list((active / "work" / "changes").glob("*--c001"))
+    assert len(changes) == 1
+    assert WorkflowRepository(root).validate_all() == ()
+
+
+def test_concurrent_evolve_plans_publish_one_draft_and_one_conflict(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    root, repository = _initialize_root(tmp_path)
+    active = _register_version(root, policies=policies)
+    repository.sync()
+    repository.release(active, approved_by="research-owner")
+    change = _create_change(active)
+    repository.sync()
+    repository.transition_change(change, "proposed")
+    repository.transition_change(change, "accepted", approved_by="research-owner")
+    definition = tmp_path / "docs" / "replacement.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow v2"), encoding="utf-8")
+    request_path = tmp_path / "evolve-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/replacement.md",
+                "authoring_basis": "Accepted C001 with combined impact review.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_evolve(EvolveWorkflowRequest.from_path(request_path))
+
+    def apply() -> str:
+        try:
+            WorkflowRepository(root).apply(plan)
+        except WorkflowAuthoringError as exc:
+            return str(exc)
+        return "success"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _item: apply(), range(2)))
+
+    assert results.count("success") == 1
+    assert sum("target drift" in result for result in results) == 1
+    assert (root / "example-workflow--v002").is_dir()
+    assert not (root / "example-workflow--v003").exists()
+    assert WorkflowRepository(root).validate_all() == ()
+
+
+def test_concurrent_sync_and_release_leave_one_success_and_explicit_lock_conflict(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    draft = _register_version(root)
+    repository.sync()
+    sync_holds_lock = threading.Event()
+    allow_sync = threading.Event()
+
+    def synchronize() -> None:
+        synchronizer = WorkflowRepository(root)
+        with synchronizer.authoring_lease():
+            sync_holds_lock.set()
+            assert allow_sync.wait(timeout=2)
+            synchronizer.sync()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        synchronized = executor.submit(synchronize)
+        assert sync_holds_lock.wait(timeout=2)
+        released = executor.submit(
+            WorkflowRepository(root, lock_timeout_seconds=0.05).release,
+            draft,
+            approved_by="research-owner",
+        )
+        with pytest.raises(WorkflowAuthoringError, match="authoring lock"):
+            released.result(timeout=2)
+        allow_sync.set()
+        synchronized.result(timeout=5)
+
+    assert (
+        read_markdown_document(root / "README.md").metadata["workflows"]["example-workflow"][
+            "versions"
+        ]["v001"]["status"]
+        == "draft"
+    )
+    assert not (draft / "RELEASE.json").exists()
+    assert WorkflowRepository(root).validate_all() == ()
+
+
 def test_cli_change_create_allocates_next_identity_and_preserves_draft(tmp_path, capsys) -> None:
     root, repository = _initialize_root(tmp_path)
     active = _register_version(root)
@@ -706,9 +1234,15 @@ def test_cli_change_create_allocates_next_identity_and_preserves_draft(tmp_path,
     assert preview["version"] == "v001"
     assert preview["target"] == target
     assert preview["changes"] == [
-        {"action": "create", "path": f"{target}/{filename}"}
+        {"action": "create", "path": f"{target}/{filename}", "before_sha256": None}
         for filename in ("README.md", "PROPOSAL.md", "IMPACT.md", "VALIDATION.md", "DECISION.md")
-    ] + [{"action": "update", "path": "workflows/example-workflow--v001/README.md"}]
+    ] + [
+        {
+            "action": "update",
+            "path": "workflows/example-workflow--v001/README.md",
+            "before_sha256": hashlib.sha256(active_readme_before).hexdigest(),
+        }
+    ]
     assert not (active / "work" / "changes" / "tighten-threshold--c003").exists()
     assert (active / "README.md").read_bytes() == active_readme_before
 

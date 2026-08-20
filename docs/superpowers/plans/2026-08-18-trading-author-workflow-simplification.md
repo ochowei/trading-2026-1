@@ -234,7 +234,8 @@ Implementation evidence (2026-08-20): the public CLI and `WorkflowRepository` te
 requests, full previews, zero-write dry runs, initial creation, automatic `Cxxx` allocation,
 optional guarded proposal, accepted-change aggregation, existing-draft update, collisions, missing
 human decisions, and invalid policy/dependency pins. Focused tests and repository validation pass;
-WP3 locking, target-drift checks, staging, rollback, and concurrency remain intentionally deferred.
+locking, target-drift checks, staging, rollback, and concurrency were deferred to and completed in
+WP3 below.
 
 **Verification**
 
@@ -255,16 +256,22 @@ uv run ruff format --check src/trading/core/workflow_authoring.py src/trading/cl
 - Modify: `.gitignore` only if the chosen temporary path is not already local-only
 - Modify: `docs/ARCHITECTURE.md`
 
-- [ ] 新增 authoring-scoped repository lock 與 re-entrant lease，避免同一 authoring process deadlock。
-- [ ] 所有 authoring writers 在 lock 內重讀 preconditions；study/qualification writers 維持現狀。
-- [ ] Stage complete after tree，對 overlay 執行與 canonical 相同的 validator。
-- [ ] 發布前比較 planned target digests；任何 target drift 都 zero mutation fail closed。
-- [ ] Inject failure before/after each publish step，證明同-process exception 可回復 exact before bytes。
-- [ ] Process-crash characterization test 固定 MVP 邊界：partial worktree 必須被下一次 validation 擋住，
+- [x] 新增 authoring-scoped repository lock 與 re-entrant lease，避免同一 authoring process deadlock。
+- [x] 所有 authoring writers 在 lock 內重讀 preconditions；study/qualification writers 維持現狀。
+- [x] Stage complete after tree，對 overlay 執行與 canonical 相同的 validator。
+- [x] 發布前比較 planned target digests；任何 target drift 都 zero mutation fail closed。
+- [x] Inject failure before/after each publish step，證明同-process exception 可回復 exact before bytes。
+- [x] Process-crash characterization test 固定 MVP 邊界：partial worktree 必須被下一次 validation 擋住，
   不宣稱 durable recovery。
-- [ ] 測試 concurrent create/create、change/change、evolve/evolve 與 sync/release；結果只能是一個成功、
+- [x] 測試 concurrent create/create、change/change、evolve/evolve 與 sync/release；結果只能是一個成功、
   另一個以可解釋 conflict 失敗，不得產生 duplicate identity。
-- [ ] Temporary staging 不得包含 credentials、broker exports、private ledgers、market data 或 results。
+- [x] Temporary staging 不得包含 credentials、broker exports、private ledgers、market data 或 results。
+
+Implementation evidence (2026-08-20): focused tests cover re-entrant cross-instance serialization,
+pre- and post-staging target-drift rejection, complete staged validation, exact rollback for every
+before/after publish failure point, the documented process-crash boundary, concurrent
+create/change/evolve allocation, serialized sync/release, and workflow-only temporary staging.
+The authoring lock remains deliberately separate from study and qualification coordination.
 
 **Verification**
 

@@ -80,5 +80,10 @@ uv run trading workflow sync
 uv run trading workflow validate --all
 ```
 
+High-level authoring previews pin the current target digests. If apply reports target drift or an
+invalid partial worktree, do not bypass the guard: inspect the repository, regenerate a fresh
+preview, and obtain confirmation again when its resolved changes differ. The authoring lock does
+not grant authority and does not coordinate study or qualification operations.
+
 CI must fail closed on validation issues. Release preparation does not authorize commit, push,
 merge, study execution, promotion, or trading.
