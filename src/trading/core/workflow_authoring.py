@@ -88,6 +88,292 @@ class MarkdownDocument:
     body: str
 
 
+@dataclass(frozen=True)
+class CreateWorkflowRequest:
+    """Closed input for creating one initial workflow-family draft."""
+
+    slug: str
+    title: str
+    definition_path: str
+    authoring_basis: str
+    policies: tuple[dict[str, Any], ...]
+    dependencies: tuple[dict[str, Any], ...]
+    capabilities: tuple[str, ...]
+    derived_from: dict[str, Any] | None
+
+    @classmethod
+    def from_path(cls, path: Path) -> CreateWorkflowRequest:
+        payload = _read_closed_request(
+            path,
+            allowed={
+                "schema_version",
+                "slug",
+                "title",
+                "definition_path",
+                "authoring_basis",
+                "policies",
+                "dependencies",
+                "capabilities",
+                "derived_from",
+            },
+            required={
+                "schema_version",
+                "slug",
+                "title",
+                "definition_path",
+                "authoring_basis",
+                "policies",
+                "dependencies",
+                "capabilities",
+                "derived_from",
+            },
+        )
+        if payload["schema_version"] != 1:
+            raise WorkflowAuthoringError("create request schema_version must be 1")
+        for field in ("slug", "title", "definition_path", "authoring_basis"):
+            if not isinstance(payload[field], str) or not payload[field].strip():
+                raise WorkflowAuthoringError(f"create request {field} must be non-empty text")
+        if not SLUG_PATTERN.fullmatch(payload["slug"]):
+            raise WorkflowAuthoringError("create request slug must be lowercase kebab-case")
+        policies = _request_mapping_list(payload["policies"], field="policies")
+        dependencies = _request_dependencies(payload["dependencies"])
+        capabilities = payload["capabilities"]
+        if not isinstance(capabilities, list) or not all(
+            isinstance(item, str) and item.strip() for item in capabilities
+        ):
+            raise WorkflowAuthoringError(
+                "create request capabilities must be a list of identifiers"
+            )
+        if len(capabilities) != len(set(capabilities)):
+            raise WorkflowAuthoringError("create request capabilities must be unique")
+        derived_from = payload["derived_from"]
+        if derived_from is not None and not isinstance(derived_from, dict):
+            raise WorkflowAuthoringError("create request derived_from must be null or a mapping")
+        return cls(
+            slug=payload["slug"],
+            title=payload["title"].strip(),
+            definition_path=payload["definition_path"],
+            authoring_basis=payload["authoring_basis"].strip(),
+            policies=tuple(policies),
+            dependencies=tuple(dependencies),
+            capabilities=tuple(capabilities),
+            derived_from=copy.deepcopy(derived_from),
+        )
+
+
+@dataclass(frozen=True)
+class CreateChangeRequest:
+    """Closed input for creating one change under the active version."""
+
+    workflow: str
+    slug: str
+    title: str
+    proposal_path: str
+    impact_path: str
+    validation_path: str | None
+    decision_path: str | None
+    propose: bool
+
+    @classmethod
+    def from_path(cls, path: Path) -> CreateChangeRequest:
+        fields = {
+            "schema_version",
+            "workflow",
+            "slug",
+            "title",
+            "proposal_path",
+            "impact_path",
+            "validation_path",
+            "decision_path",
+            "propose",
+        }
+        payload = _read_closed_request(path, allowed=fields, required=fields)
+        if payload["schema_version"] != 1:
+            raise WorkflowAuthoringError("change request schema_version must be 1")
+        for field in ("workflow", "slug"):
+            value = payload[field]
+            if not isinstance(value, str) or not SLUG_PATTERN.fullmatch(value):
+                raise WorkflowAuthoringError(f"change request {field} must be lowercase kebab-case")
+        for field in ("title", "proposal_path", "impact_path"):
+            if not isinstance(payload[field], str) or not payload[field].strip():
+                raise WorkflowAuthoringError(f"change request {field} must be non-empty text")
+        for field in ("validation_path", "decision_path"):
+            value = payload[field]
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                raise WorkflowAuthoringError(
+                    f"change request {field} must be null or non-empty text"
+                )
+        if not isinstance(payload["propose"], bool):
+            raise WorkflowAuthoringError("change request propose must be boolean")
+        return cls(
+            workflow=payload["workflow"],
+            slug=payload["slug"],
+            title=payload["title"].strip(),
+            proposal_path=payload["proposal_path"],
+            impact_path=payload["impact_path"],
+            validation_path=payload["validation_path"],
+            decision_path=payload["decision_path"],
+            propose=payload["propose"],
+        )
+
+
+@dataclass(frozen=True)
+class EvolveWorkflowRequest:
+    """Closed input for building the next draft from accepted changes."""
+
+    workflow: str
+    title: str
+    definition_path: str
+    authoring_basis: str
+    policies: tuple[dict[str, Any], ...]
+    dependencies: tuple[dict[str, Any], ...]
+    capabilities: tuple[str, ...]
+
+    @classmethod
+    def from_path(cls, path: Path) -> EvolveWorkflowRequest:
+        fields = {
+            "schema_version",
+            "workflow",
+            "title",
+            "definition_path",
+            "authoring_basis",
+            "policies",
+            "dependencies",
+            "capabilities",
+        }
+        payload = _read_closed_request(path, allowed=fields, required=fields)
+        if payload["schema_version"] != 1:
+            raise WorkflowAuthoringError("evolve request schema_version must be 1")
+        workflow = payload["workflow"]
+        if not isinstance(workflow, str) or not SLUG_PATTERN.fullmatch(workflow):
+            raise WorkflowAuthoringError("evolve request workflow must be lowercase kebab-case")
+        for field in ("title", "definition_path", "authoring_basis"):
+            if not isinstance(payload[field], str) or not payload[field].strip():
+                raise WorkflowAuthoringError(f"evolve request {field} must be non-empty text")
+        capabilities = payload["capabilities"]
+        if not isinstance(capabilities, list) or not all(
+            isinstance(item, str) and item.strip() for item in capabilities
+        ):
+            raise WorkflowAuthoringError("evolve request capabilities must be identifiers")
+        if len(capabilities) != len(set(capabilities)):
+            raise WorkflowAuthoringError("evolve request capabilities must be unique")
+        return cls(
+            workflow=workflow,
+            title=payload["title"].strip(),
+            definition_path=payload["definition_path"],
+            authoring_basis=payload["authoring_basis"].strip(),
+            policies=tuple(_request_mapping_list(payload["policies"], field="policies")),
+            dependencies=tuple(_request_dependencies(payload["dependencies"])),
+            capabilities=tuple(capabilities),
+        )
+
+
+@dataclass(frozen=True)
+class WorkflowFileMutation:
+    """One deterministic file change in a workflow-authoring plan."""
+
+    action: str
+    path: str
+    content: bytes
+
+
+@dataclass(frozen=True)
+class WorkflowMutationPlan:
+    """A read-only preview and exact file set for one authoring operation."""
+
+    operation: str
+    workflow: str
+    version: str
+    target: str
+    mutations: tuple[WorkflowFileMutation, ...]
+    source_version: str | None = None
+    source_changes: tuple[str, ...] = ()
+    policies: tuple[dict[str, Any], ...] = ()
+    dependencies: tuple[dict[str, Any], ...] = ()
+    authoring_basis: str = ""
+    warnings: tuple[str, ...] = ()
+    remaining_decisions: tuple[str, ...] = ()
+    post_transition: str | None = None
+
+    def preview(self) -> dict[str, Any]:
+        return {
+            "schema_version": 1,
+            "operation": self.operation,
+            "workflow": self.workflow,
+            "version": self.version,
+            "target": self.target,
+            "source_version": self.source_version,
+            "source_changes": list(self.source_changes),
+            "policies": copy.deepcopy(list(self.policies)),
+            "dependencies": copy.deepcopy(list(self.dependencies)),
+            "authoring_basis": self.authoring_basis,
+            "changes": [
+                {"action": mutation.action, "path": mutation.path} for mutation in self.mutations
+            ],
+            "warnings": list(self.warnings),
+            "blocking_issues": [],
+            "remaining_decisions": list(self.remaining_decisions),
+            **(
+                {"post_transition": self.post_transition}
+                if self.post_transition is not None
+                else {}
+            ),
+        }
+
+
+@dataclass(frozen=True)
+class WorkflowMutationResult:
+    """The identity and path produced by an applied authoring plan."""
+
+    operation: str
+    workflow: str
+    version: str
+    target: Path
+
+
+def _read_closed_request(
+    path: Path,
+    *,
+    allowed: set[str],
+    required: set[str],
+) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise WorkflowAuthoringError(f"cannot read authoring request {path}: {exc}") from exc
+    if not isinstance(payload, dict) or not all(isinstance(key, str) for key in payload):
+        raise WorkflowAuthoringError("authoring request must be a string-keyed object")
+    unknown = set(payload).difference(allowed)
+    if unknown:
+        raise WorkflowAuthoringError(
+            f"unknown authoring request fields: {', '.join(sorted(unknown))}"
+        )
+    missing = required.difference(payload)
+    if missing:
+        raise WorkflowAuthoringError(
+            f"missing authoring request fields: {', '.join(sorted(missing))}"
+        )
+    return payload
+
+
+def _request_mapping_list(value: Any, *, field: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
+        raise WorkflowAuthoringError(f"authoring request {field} must be a list of mappings")
+    return copy.deepcopy(value)
+
+
+def _request_dependencies(value: Any) -> list[dict[str, Any]]:
+    dependencies = _request_mapping_list(value, field="dependencies")
+    for dependency in dependencies:
+        unknown = set(dependency).difference({"path", "role", "pinned"})
+        if unknown:
+            raise WorkflowAuthoringError("unknown dependency fields: " + ", ".join(sorted(unknown)))
+        missing = {"path", "role"}.difference(dependency)
+        if missing:
+            raise WorkflowAuthoringError("missing dependency fields: " + ", ".join(sorted(missing)))
+    return dependencies
+
+
 def read_markdown_document(path: Path) -> MarkdownDocument:
     """Read a Markdown file with a required YAML frontmatter mapping."""
     try:
@@ -179,6 +465,13 @@ def _is_substantive(path: Path) -> bool:
     if not path.exists():
         return False
     text = path.read_text(encoding="utf-8").strip()
+    return (
+        len(text) >= 40 and "[TODO" not in text and "TODO:" not in text and "REPLACE_ME" not in text
+    )
+
+
+def _substantive_bytes(content: bytes) -> bool:
+    text = content.decode("utf-8").strip()
     return (
         len(text) >= 40 and "[TODO" not in text and "TODO:" not in text and "REPLACE_ME" not in text
     )
@@ -405,6 +698,372 @@ class WorkflowRepository:
             if resolved.is_dir() and issue_resolved.is_relative_to(resolved):
                 selected.append(issue)
         return tuple(selected)
+
+    def plan_create(self, request: CreateWorkflowRequest) -> WorkflowMutationPlan:
+        """Plan one initial v001 draft without mutating the repository."""
+        self._require_structurally_valid()
+        registry_document = read_markdown_document(self.registry_path)
+        registry = copy.deepcopy(registry_document.metadata)
+        workflows = registry.get("workflows")
+        if not isinstance(workflows, dict):
+            raise WorkflowAuthoringError("workflow registry has no workflows mapping")
+        if request.slug in workflows:
+            raise WorkflowAuthoringError(
+                f"workflow family already exists; use evolve: {request.slug}"
+            )
+        target = self.root / f"{request.slug}--v001"
+        if target.exists() or any(self.root.glob(f"{request.slug}--v*")):
+            raise WorkflowAuthoringError(f"workflow identity already exists: {target.name}")
+
+        definition = self._resolve_repo_reference(request.definition_path)
+        if not _is_substantive(definition):
+            raise WorkflowAuthoringError(
+                "create request definition must be a complete Markdown file"
+            )
+        policies = self._authoring_policies(request.policies)
+        dependencies = [copy.deepcopy(item) for item in request.dependencies]
+        dependency_issues: list[ValidationIssue] = []
+        self._validate_dependencies(dependencies, self.registry_path, dependency_issues)
+        if dependency_issues:
+            raise WorkflowAuthoringError("; ".join(str(issue) for issue in dependency_issues))
+        derived_issues: list[ValidationIssue] = []
+        self._validate_derived_from(request.derived_from, self.registry_path, derived_issues)
+        if derived_issues:
+            raise WorkflowAuthoringError("; ".join(str(issue) for issue in derived_issues))
+
+        workflows[request.slug] = {
+            "title": request.title,
+            "versions": {"v001": {"path": target.name, "status": "draft"}},
+        }
+        metadata = {
+            "workflow": request.slug,
+            "title": request.title,
+            "version": "v001",
+            "definition": "WORKFLOW.md",
+            "supersedes": None,
+            "derived_from": copy.deepcopy(request.derived_from),
+            "source_changes": [],
+            "capabilities": list(request.capabilities),
+            "policies": policies,
+            "dependencies": dependencies,
+        }
+        readme_body = self._initial_version_body(
+            title=request.title,
+            authoring_basis=request.authoring_basis,
+        )
+        mutations = (
+            WorkflowFileMutation(
+                action="create",
+                path=self._repo_relative(target / "README.md"),
+                content=render_markdown_document(MarkdownDocument(metadata, readme_body)),
+            ),
+            WorkflowFileMutation(
+                action="create",
+                path=self._repo_relative(target / "WORKFLOW.md"),
+                content=definition.read_bytes(),
+            ),
+            WorkflowFileMutation(
+                action="update",
+                path=self._repo_relative(self.registry_path),
+                content=render_markdown_document(
+                    MarkdownDocument(registry, registry_document.body)
+                ),
+            ),
+        )
+        return WorkflowMutationPlan(
+            operation="create",
+            workflow=request.slug,
+            version="v001",
+            target=self._repo_relative(target),
+            mutations=mutations,
+            policies=tuple(copy.deepcopy(policies)),
+            dependencies=tuple(copy.deepcopy(dependencies)),
+            authoring_basis=request.authoring_basis,
+        )
+
+    def plan_change(self, request: CreateChangeRequest) -> WorkflowMutationPlan:
+        """Plan one legacy five-file change record under the unique active version."""
+        self._require_structurally_valid()
+        registry = read_markdown_document(self.registry_path).metadata
+        family = self._family(registry, request.workflow)
+        versions = self._versions(family, request.workflow)
+        active = [
+            (version, record)
+            for version, record in versions.items()
+            if isinstance(record, dict) and record.get("status") == "active"
+        ]
+        if len(active) != 1:
+            raise WorkflowAuthoringError(
+                f"workflow family must have exactly one active version: {request.workflow}"
+            )
+        version, record = active[0]
+        version_path = self.root / str(record["path"])
+        changes_root = version_path / "work" / "changes"
+        allocated = (
+            max(
+                (
+                    int(match.group("number"))
+                    for path in changes_root.iterdir()
+                    if path.is_dir()
+                    and (match := CHANGE_DIRECTORY_PATTERN.fullmatch(path.name)) is not None
+                ),
+                default=0,
+            )
+            + 1
+            if changes_root.exists()
+            else 1
+        )
+        change_id = f"C{allocated:03d}"
+        target = changes_root / f"{request.slug}--{change_id.lower()}"
+        if target.exists():
+            raise WorkflowAuthoringError(f"workflow change identity already exists: {target}")
+
+        proposal = self._resolve_repo_reference(request.proposal_path)
+        impact = self._resolve_repo_reference(request.impact_path)
+        for label, path in (("proposal", proposal), ("impact", impact)):
+            if not path.is_file():
+                raise WorkflowAuthoringError(f"change request {label} file does not exist: {path}")
+        optional = {
+            "VALIDATION.md": request.validation_path,
+            "DECISION.md": request.decision_path,
+        }
+        metadata = {
+            "id": change_id,
+            "title": request.title,
+            "workflow": request.workflow,
+            "source_version": version,
+            "status": "draft",
+            "created_at": self._current_time().date().isoformat(),
+            "status_changed_at": None,
+            "decided_at": None,
+            "decided_by": None,
+            "released_in": None,
+        }
+        readme_asset = self._authoring_asset("change", "README.md")
+        readme_body = read_markdown_document(readme_asset).body
+        readme_body = (
+            readme_body.replace("REPLACE_ME_CHANGE_TITLE", request.title)
+            .replace("REPLACE_ME_WORKFLOW_SLUG", request.workflow)
+            .replace("REPLACE_ME_SOURCE_VERSION", version)
+        )
+        contents = {
+            "README.md": render_markdown_document(MarkdownDocument(metadata, readme_body)),
+            "PROPOSAL.md": proposal.read_bytes(),
+            "IMPACT.md": impact.read_bytes(),
+        }
+        for filename, source in optional.items():
+            if source is None:
+                contents[filename] = self._authoring_asset("change", filename).read_bytes()
+                continue
+            source_path = self._resolve_repo_reference(source)
+            if not source_path.is_file():
+                raise WorkflowAuthoringError(
+                    f"change request {filename} file does not exist: {source_path}"
+                )
+            contents[filename] = source_path.read_bytes()
+        if request.propose:
+            for filename in ("PROPOSAL.md", "IMPACT.md"):
+                if not _substantive_bytes(contents[filename]):
+                    raise WorkflowAuthoringError(
+                        f"{filename} must be completed before immediate proposal"
+                    )
+        mutations = [
+            WorkflowFileMutation(
+                action="create",
+                path=self._repo_relative(target / filename),
+                content=contents[filename],
+            )
+            for filename in (
+                "README.md",
+                "PROPOSAL.md",
+                "IMPACT.md",
+                "VALIDATION.md",
+                "DECISION.md",
+            )
+        ]
+        version_document = read_markdown_document(version_path / "README.md")
+        indexed_body = _replace_generated_region(
+            version_document.body,
+            WORK_INDEX_START,
+            WORK_INDEX_END,
+            self._render_work_index(
+                version_path,
+                planned_changes=((target.name, metadata),),
+            ),
+        )
+        mutations.append(
+            WorkflowFileMutation(
+                action="update",
+                path=self._repo_relative(version_path / "README.md"),
+                content=render_markdown_document(
+                    MarkdownDocument(version_document.metadata, indexed_body)
+                ),
+            )
+        )
+        version_metadata = version_document.metadata
+        return WorkflowMutationPlan(
+            operation="change-create",
+            workflow=request.workflow,
+            version=version,
+            target=self._repo_relative(target),
+            mutations=tuple(mutations),
+            source_version=version,
+            policies=tuple(copy.deepcopy(version_metadata.get("policies", []))),
+            dependencies=tuple(copy.deepcopy(version_metadata.get("dependencies", []))),
+            authoring_basis=(f"proposal={request.proposal_path}; impact={request.impact_path}"),
+            remaining_decisions=("change decision and approval",),
+            post_transition="proposed" if request.propose else None,
+        )
+
+    def plan_evolve(self, request: EvolveWorkflowRequest) -> WorkflowMutationPlan:
+        """Plan the unique next-version draft from every accepted active change."""
+        self._require_structurally_valid()
+        registry_document = read_markdown_document(self.registry_path)
+        registry = copy.deepcopy(registry_document.metadata)
+        family = self._family(registry, request.workflow)
+        if family.get("title") != request.title:
+            raise WorkflowAuthoringError("evolve request title must match the workflow family")
+        versions = self._versions(family, request.workflow)
+        active = [
+            (version, record)
+            for version, record in versions.items()
+            if isinstance(record, dict) and record.get("status") == "active"
+        ]
+        if len(active) != 1:
+            raise WorkflowAuthoringError(
+                f"workflow family must have exactly one active version: {request.workflow}"
+            )
+        active_version, active_record = active[0]
+        active_path = self.root / str(active_record["path"])
+        changes_root = active_path / "work" / "changes"
+        accepted: list[Path] = []
+        if changes_root.exists():
+            for change in sorted(path for path in changes_root.iterdir() if path.is_dir()):
+                metadata = read_markdown_document(change / "README.md").metadata
+                if metadata.get("status") == "accepted":
+                    accepted.append(change)
+        if not accepted:
+            raise WorkflowAuthoringError(
+                "evolve requires at least one accepted change with a human decision"
+            )
+        definition = self._resolve_repo_reference(request.definition_path)
+        if not _is_substantive(definition):
+            raise WorkflowAuthoringError("evolve request definition must be complete Markdown")
+        policies = self._authoring_policies(request.policies)
+        dependencies = [copy.deepcopy(item) for item in request.dependencies]
+        dependency_issues: list[ValidationIssue] = []
+        self._validate_dependencies(dependencies, self.registry_path, dependency_issues)
+        if dependency_issues:
+            raise WorkflowAuthoringError("; ".join(str(issue) for issue in dependency_issues))
+
+        drafts = [
+            (version, record)
+            for version, record in versions.items()
+            if isinstance(record, dict) and record.get("status") == "draft"
+        ]
+        if len(drafts) > 1:
+            raise WorkflowAuthoringError("workflow family has more than one draft")
+        if drafts:
+            version, record = drafts[0]
+            target = self.root / str(record["path"])
+            action = "update"
+            update_registry = False
+        else:
+            used = {_version_number(item) for item in versions if VERSION_PATTERN.fullmatch(item)}
+            used.update(
+                _version_number(match.group("version"))
+                for path in self.root.glob(f"{request.workflow}--v*")
+                if (match := WORKFLOW_DIRECTORY_PATTERN.fullmatch(path.name)) is not None
+            )
+            version = f"v{max(used, default=0) + 1:03d}"
+            target = self.root / f"{request.workflow}--{version}"
+            versions[version] = {"path": target.name, "status": "draft"}
+            action = "create"
+            update_registry = True
+
+        source_changes = [self._repo_relative(change) for change in accepted]
+        metadata = {
+            "workflow": request.workflow,
+            "title": request.title,
+            "version": version,
+            "definition": "WORKFLOW.md",
+            "supersedes": active_version,
+            "derived_from": None,
+            "source_changes": source_changes,
+            "capabilities": list(request.capabilities),
+            "policies": policies,
+            "dependencies": dependencies,
+        }
+        mutations: list[WorkflowFileMutation] = [
+            WorkflowFileMutation(
+                action=action,
+                path=self._repo_relative(target / "README.md"),
+                content=render_markdown_document(
+                    MarkdownDocument(
+                        metadata,
+                        self._initial_version_body(
+                            title=request.title,
+                            authoring_basis=request.authoring_basis,
+                        ),
+                    )
+                ),
+            ),
+            WorkflowFileMutation(
+                action=action,
+                path=self._repo_relative(target / "WORKFLOW.md"),
+                content=definition.read_bytes(),
+            ),
+        ]
+        if update_registry:
+            mutations.append(
+                WorkflowFileMutation(
+                    action="update",
+                    path=self._repo_relative(self.registry_path),
+                    content=render_markdown_document(
+                        MarkdownDocument(registry, registry_document.body)
+                    ),
+                )
+            )
+        return WorkflowMutationPlan(
+            operation="evolve",
+            workflow=request.workflow,
+            version=version,
+            target=self._repo_relative(target),
+            mutations=tuple(mutations),
+            source_version=active_version,
+            source_changes=tuple(source_changes),
+            policies=tuple(copy.deepcopy(policies)),
+            dependencies=tuple(copy.deepcopy(dependencies)),
+            authoring_basis=request.authoring_basis,
+            remaining_decisions=("replacement release approval",),
+        )
+
+    def apply(self, plan: WorkflowMutationPlan) -> WorkflowMutationResult:
+        """Apply one already-previewed authoring plan through existing validators."""
+        self._require_structurally_valid()
+        for mutation in plan.mutations:
+            path = self._resolve_repo_reference(mutation.path)
+            if mutation.action == "create":
+                _atomic_write(path, mutation.content, replace=False)
+            elif mutation.action == "update":
+                _atomic_write(path, mutation.content)
+            else:
+                raise WorkflowAuthoringError(
+                    f"unsupported workflow mutation action: {mutation.action}"
+                )
+        self.sync()
+        self._require_valid()
+        if plan.post_transition is not None:
+            self.transition_change(
+                self._resolve_repo_reference(plan.target),
+                plan.post_transition,
+            )
+        return WorkflowMutationResult(
+            operation=plan.operation,
+            workflow=plan.workflow,
+            version=plan.version,
+            target=self._resolve_repo_reference(plan.target),
+        )
 
     def sync(self) -> None:
         """Regenerate root and per-version human-readable indexes from metadata."""
@@ -1047,6 +1706,35 @@ class WorkflowRepository:
                     f"policy pin does not match release: {family}@{version}"
                 )
             released.append(dict(item))
+        return released
+
+    def _authoring_policies(
+        self,
+        raw: tuple[dict[str, Any], ...],
+    ) -> list[dict[str, str]]:
+        policy_registry = self.repo_root / "policies" / "README.md"
+        if not policy_registry.is_file():
+            raise WorkflowAuthoringError("workflow authoring requires a policy registry")
+        released = self._release_policies(list(raw))
+        from trading.policies import PolicyResolutionError, PolicyResolver
+
+        resolver = PolicyResolver(self.repo_root / "policies")
+        kinds: set[str] = set()
+        for item in released:
+            try:
+                resolved = resolver.resolve(item["family"], item["version"])
+            except PolicyResolutionError as exc:
+                raise WorkflowAuthoringError(str(exc)) from exc
+            if resolved.kind in kinds:
+                raise WorkflowAuthoringError(f"duplicate policy kind: {resolved.kind}")
+            kinds.add(resolved.kind)
+        required = {"market", "broker", "execution", "portfolio-risk"}
+        if kinds != required:
+            missing = ", ".join(sorted(required.difference(kinds))) or "none"
+            extra = ", ".join(sorted(kinds.difference(required))) or "none"
+            raise WorkflowAuthoringError(
+                f"workflow authoring requires four policy kinds; missing: {missing}; extra: {extra}"
+            )
         return released
 
     def _validate_source_changes(
@@ -1903,7 +2591,12 @@ class WorkflowRepository:
             return "_No workflow versions registered._"
         return "\n".join(rows)
 
-    def _render_work_index(self, version_path: Path) -> str:
+    def _render_work_index(
+        self,
+        version_path: Path,
+        *,
+        planned_changes: tuple[tuple[str, Mapping[str, Any]], ...] = (),
+    ) -> str:
         sections: list[str] = ["### Studies", ""]
         studies = version_path / "work" / "studies"
         study_rows: list[str] = []
@@ -1949,6 +2642,13 @@ class WorkflowRepository:
                     f"`{metadata.get('released_in') or '-'}` | "
                     f"[{path.name}](work/changes/{path.name}/) |"
                 )
+        for name, metadata in planned_changes:
+            change_rows.append(
+                f"| `{metadata.get('id', '-')}` | {metadata.get('title', name)} | "
+                f"`{metadata.get('status', '-')}` | "
+                f"`{metadata.get('released_in') or '-'}` | "
+                f"[{name}](work/changes/{name}/) |"
+            )
         if change_rows:
             sections.extend(
                 [
@@ -1967,6 +2667,32 @@ class WorkflowRepository:
             self.registry_path,
             render_markdown_document(MarkdownDocument(metadata, document.body)),
         )
+
+    def _initial_version_body(self, *, title: str, authoring_basis: str) -> str:
+        asset = self._authoring_asset("workflow-version", "README.md")
+        body = read_markdown_document(asset).body
+        return body.replace("REPLACE_ME_WORKFLOW_TITLE", title).replace(
+            "REPLACE_ME_SUMMARIZE_CONFIRMED_DECISIONS_AND_SOURCE",
+            authoring_basis,
+        )
+
+    @staticmethod
+    def _authoring_asset(group: str, filename: str) -> Path:
+        return (
+            Path(__file__).resolve().parents[3]
+            / ".agents"
+            / "skills"
+            / "trading-author-workflow"
+            / "assets"
+            / group
+            / filename
+        )
+
+    def _repo_relative(self, path: Path) -> str:
+        try:
+            return path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        except ValueError as exc:
+            raise WorkflowAuthoringError(f"path is outside repository root: {path}") from exc
 
     def _registered_version(
         self,

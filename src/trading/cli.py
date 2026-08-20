@@ -44,7 +44,13 @@ from trading.core.study_qualification import (
     STUDY_QUALIFICATION_CAPABILITY,
     compile_study_qualification_plan,
 )
-from trading.core.workflow_authoring import WorkflowAuthoringError, WorkflowRepository
+from trading.core.workflow_authoring import (
+    CreateChangeRequest,
+    CreateWorkflowRequest,
+    EvolveWorkflowRequest,
+    WorkflowAuthoringError,
+    WorkflowRepository,
+)
 from trading.core.workflow_studies import WorkflowStudyService
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
@@ -502,7 +508,25 @@ def cmd_workflow(args: argparse.Namespace) -> None:
     """Dispatch tracked workflow authoring validation and lifecycle operations."""
     repository = WorkflowRepository(args.root)
     try:
-        if args.workflow_command == "validate":
+        if args.workflow_command == "create":
+            request = CreateWorkflowRequest.from_path(args.request)
+            plan = repository.plan_create(request)
+            if args.dry_run:
+                print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
+            else:
+                result = repository.apply(plan)
+                print(f"workflow created: {result.workflow}@{result.version}")
+                print(f"  path: {result.target}")
+        elif args.workflow_command == "evolve":
+            request = EvolveWorkflowRequest.from_path(args.request)
+            plan = repository.plan_evolve(request)
+            if args.dry_run:
+                print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
+            else:
+                result = repository.apply(plan)
+                print(f"workflow draft evolved: {result.workflow}@{result.version}")
+                print(f"  path: {result.target}")
+        elif args.workflow_command == "validate":
             if args.all and args.path is not None:
                 raise WorkflowAuthoringError("validate accepts a path or --all, not both")
             issues = (
@@ -519,12 +543,23 @@ def cmd_workflow(args: argparse.Namespace) -> None:
             repository.sync()
             print("workflow indexes synchronized")
         elif args.workflow_command == "change":
-            repository.transition_change(
-                args.path,
-                args.status,
-                approved_by=args.approved_by,
-            )
-            print(f"workflow change transitioned to {args.status}: {args.path}")
+            if args.workflow_change_command == "create":
+                request = CreateChangeRequest.from_path(args.request)
+                plan = repository.plan_change(request)
+                if args.dry_run:
+                    print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
+                else:
+                    result = repository.apply(plan)
+                    identity = result.target.name.rsplit("--", 1)[-1].upper()
+                    print(f"workflow change created: {identity}")
+                    print(f"  path: {result.target}")
+            elif args.workflow_change_command == "transition":
+                repository.transition_change(
+                    args.path,
+                    args.status,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow change transitioned to {args.status}: {args.path}")
         elif args.workflow_command == "version":
             repository.transition_version(
                 args.path,
@@ -2241,6 +2276,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Tracked workflow registry root (default: workflows)",
     )
     workflow_sub = workflow_p.add_subparsers(dest="workflow_command", required=True)
+    workflow_create_p = workflow_sub.add_parser(
+        "create",
+        help="Preview or create an initial workflow-family draft from a closed request",
+    )
+    workflow_create_p.add_argument("--request", type=Path, required=True)
+    workflow_create_p.add_argument("--dry-run", action="store_true")
+    workflow_evolve_p = workflow_sub.add_parser(
+        "evolve",
+        help="Preview or build the next draft from accepted changes",
+    )
+    workflow_evolve_p.add_argument("--request", type=Path, required=True)
+    workflow_evolve_p.add_argument("--dry-run", action="store_true")
     workflow_validate_p = workflow_sub.add_parser(
         "validate",
         help="Read-only validation of workflow metadata, indexes, and immutable evidence",
@@ -2268,6 +2315,12 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("proposed", "accepted", "rejected", "deferred", "withdrawn"),
     )
     workflow_change_transition_p.add_argument("--approved-by")
+    workflow_change_create_p = workflow_change_sub.add_parser(
+        "create",
+        help="Preview or create a change under the active workflow version",
+    )
+    workflow_change_create_p.add_argument("--request", type=Path, required=True)
+    workflow_change_create_p.add_argument("--dry-run", action="store_true")
     workflow_version_p = workflow_sub.add_parser(
         "version",
         help="Abandon a draft or retire an active workflow version",

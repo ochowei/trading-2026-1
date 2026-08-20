@@ -25,8 +25,11 @@ Never claim an imported workflow was historically active.
 ## Draft creation
 
 Map confirmed decisions into every required `WORKFLOW.md` section. Use
-`assets/workflow-version/`, replace every placeholder, register the draft in
-`workflows/README.md`, synchronize generated indexes, and validate the complete repository.
+`assets/requests/create.json` as the closed request shape and put the complete mapped contract at
+its `definition_path`. Preview with `trading workflow create --request <path> --dry-run`; after the
+user confirms that exact preview, run the same command without `--dry-run`. The façade allocates
+`v001`, uses `assets/workflow-version/`, registers the draft, synchronizes indexes, and validates.
+Do not add allocated IDs, lifecycle status, or timestamps to the request.
 
 Do not create empty placeholder directories. Leave study creation to
 `trading-operate-workflow`. A draft has no study, release, promotion, broker, or trading authority.

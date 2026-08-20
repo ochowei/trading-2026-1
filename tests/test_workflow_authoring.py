@@ -504,6 +504,378 @@ def test_empty_registry_is_valid_and_cli_reports_success(tmp_path, capsys) -> No
     assert "workflow validation passed" in capsys.readouterr().out
 
 
+def test_cli_create_previews_then_creates_initial_workflow(tmp_path, capsys) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, _repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    current_v008 = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata
+    request = tmp_path / "create-request.json"
+    request.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/example-workflow.md",
+                "authoring_basis": "Confirmed test request with a complete workflow definition.",
+                "policies": current_v008["policies"],
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    registry_before = (root / "README.md").read_bytes()
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "create",
+            "--request",
+            str(request),
+            "--dry-run",
+        ]
+    )
+
+    preview = json.loads(capsys.readouterr().out)
+    assert preview == {
+        "schema_version": 1,
+        "operation": "create",
+        "workflow": "example-workflow",
+        "version": "v001",
+        "target": "workflows/example-workflow--v001",
+        "source_version": None,
+        "source_changes": [],
+        "policies": current_v008["policies"],
+        "dependencies": [],
+        "authoring_basis": "Confirmed test request with a complete workflow definition.",
+        "changes": [
+            {"action": "create", "path": "workflows/example-workflow--v001/README.md"},
+            {"action": "create", "path": "workflows/example-workflow--v001/WORKFLOW.md"},
+            {"action": "update", "path": "workflows/README.md"},
+        ],
+        "warnings": [],
+        "blocking_issues": [],
+        "remaining_decisions": [],
+    }
+    assert not (root / "example-workflow--v001").exists()
+    assert (root / "README.md").read_bytes() == registry_before
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "create",
+            "--request",
+            str(request),
+        ]
+    )
+
+    assert "workflow created: example-workflow@v001" in capsys.readouterr().out
+    version = root / "example-workflow--v001"
+    metadata = read_markdown_document(version / "README.md").metadata
+    assert metadata["workflow"] == "example-workflow"
+    assert metadata["version"] == "v001"
+    assert metadata["source_changes"] == []
+    assert metadata["policies"] == current_v008["policies"]
+    assert (version / "WORKFLOW.md").read_bytes() == definition.read_bytes()
+    assert WorkflowRepository(root).validate_all() == ()
+    with pytest.raises(SystemExit, match="workflow family already exists"):
+        main(
+            [
+                "workflow",
+                "--root",
+                str(root),
+                "create",
+                "--request",
+                str(request),
+                "--dry-run",
+            ]
+        )
+
+
+def test_create_request_rejects_authority_fields_and_invalid_pins(tmp_path) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, _repository = _initialize_root(tmp_path)
+    definition = tmp_path / "docs" / "example-workflow.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow"), encoding="utf-8")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    request = tmp_path / "create-request.json"
+    base = {
+        "schema_version": 1,
+        "slug": "example-workflow",
+        "title": "Example Workflow",
+        "definition_path": "docs/example-workflow.md",
+        "authoring_basis": "Confirmed request with a complete workflow definition.",
+        "policies": policies,
+        "dependencies": [],
+        "capabilities": [],
+        "derived_from": None,
+    }
+
+    request.write_text(json.dumps({**base, "status": "active"}), encoding="utf-8")
+    with pytest.raises(SystemExit, match="unknown authoring request fields: status"):
+        main(["workflow", "--root", str(root), "create", "--request", str(request), "--dry-run"])
+
+    request.write_text(json.dumps({**base, "policies": policies[:-1]}), encoding="utf-8")
+    with pytest.raises(SystemExit, match="requires four policy kinds"):
+        main(["workflow", "--root", str(root), "create", "--request", str(request), "--dry-run"])
+
+    request.write_text(
+        json.dumps(
+            {
+                **base,
+                "dependencies": [{"path": "docs/missing.md", "role": "normative"}],
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit, match="dependency file does not exist"):
+        main(["workflow", "--root", str(root), "create", "--request", str(request), "--dry-run"])
+
+
+def test_cli_change_create_allocates_next_identity_and_preserves_draft(tmp_path, capsys) -> None:
+    root, repository = _initialize_root(tmp_path)
+    active = _register_version(root)
+    repository.sync()
+    repository.release(active, approved_by="research-owner")
+    _create_change(active, number=2)
+    repository.sync()
+    active_readme_before = (active / "README.md").read_bytes()
+    proposal = tmp_path / "docs" / "proposal.md"
+    impact = tmp_path / "docs" / "impact.md"
+    proposal.parent.mkdir()
+    proposal.write_text(
+        "# Proposal\n\nTighten the frozen threshold to prevent weak evidence from advancing.\n",
+        encoding="utf-8",
+    )
+    impact.write_text(
+        "# Impact\n\nPause open studies until a human records the version-boundary decision.\n",
+        encoding="utf-8",
+    )
+    request = tmp_path / "change-request.json"
+    request.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "example-workflow",
+                "slug": "tighten-threshold",
+                "title": "Tighten threshold",
+                "proposal_path": "docs/proposal.md",
+                "impact_path": "docs/impact.md",
+                "validation_path": None,
+                "decision_path": None,
+                "propose": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "change",
+            "create",
+            "--request",
+            str(request),
+            "--dry-run",
+        ]
+    )
+
+    preview = json.loads(capsys.readouterr().out)
+    target = "workflows/example-workflow--v001/work/changes/tighten-threshold--c003"
+    assert preview["operation"] == "change-create"
+    assert preview["workflow"] == "example-workflow"
+    assert preview["version"] == "v001"
+    assert preview["target"] == target
+    assert preview["changes"] == [
+        {"action": "create", "path": f"{target}/{filename}"}
+        for filename in ("README.md", "PROPOSAL.md", "IMPACT.md", "VALIDATION.md", "DECISION.md")
+    ] + [{"action": "update", "path": "workflows/example-workflow--v001/README.md"}]
+    assert not (active / "work" / "changes" / "tighten-threshold--c003").exists()
+    assert (active / "README.md").read_bytes() == active_readme_before
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "change",
+            "create",
+            "--request",
+            str(request),
+        ]
+    )
+
+    assert "workflow change created: C003" in capsys.readouterr().out
+    change = active / "work" / "changes" / "tighten-threshold--c003"
+    metadata = read_markdown_document(change / "README.md").metadata
+    assert metadata["status"] == "draft"
+    assert metadata["created_at"] == datetime.now(UTC).date().isoformat()
+    assert (change / "PROPOSAL.md").read_bytes() == proposal.read_bytes()
+    assert (change / "IMPACT.md").read_bytes() == impact.read_bytes()
+    assert WorkflowRepository(root).validate_all() == ()
+
+    payload = json.loads(request.read_text(encoding="utf-8"))
+    payload.update({"slug": "tighten-threshold-again", "propose": True})
+    request.write_text(json.dumps(payload), encoding="utf-8")
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "change",
+            "create",
+            "--request",
+            str(request),
+        ]
+    )
+    proposed = active / "work" / "changes" / "tighten-threshold-again--c004"
+    assert read_markdown_document(proposed / "README.md").metadata["status"] == "proposed"
+
+
+def test_cli_evolve_aggregates_accepted_changes_and_updates_existing_draft(
+    tmp_path, capsys
+) -> None:
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    policies = read_markdown_document(
+        Path("workflows/strategy-forward-replication-research--v008/README.md")
+    ).metadata["policies"]
+    root, repository = _initialize_root(tmp_path)
+    active = _register_version(root, policies=policies)
+    repository.sync()
+    repository.release(active, approved_by="research-owner")
+    changes = [_create_change(active, number=number) for number in (1, 2)]
+    repository.sync()
+    for change in changes:
+        repository.transition_change(change, "proposed")
+        repository.transition_change(change, "accepted", approved_by="research-owner")
+    definition = tmp_path / "docs" / "replacement.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow v2"), encoding="utf-8")
+    request = tmp_path / "evolve-request.json"
+
+    def write_request(authoring_basis: str) -> None:
+        request.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "workflow": "example-workflow",
+                    "title": "Example Workflow",
+                    "definition_path": "docs/replacement.md",
+                    "authoring_basis": authoring_basis,
+                    "policies": policies,
+                    "dependencies": [],
+                    "capabilities": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    write_request("Accepted C001 and C002 with combined impact review.")
+    registry_before = (root / "README.md").read_bytes()
+    active_readme_before = (active / "README.md").read_bytes()
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "evolve",
+            "--request",
+            str(request),
+            "--dry-run",
+        ]
+    )
+    preview = json.loads(capsys.readouterr().out)
+    assert preview["operation"] == "evolve"
+    assert preview["version"] == "v002"
+    assert preview["target"] == "workflows/example-workflow--v002"
+    assert not (root / "example-workflow--v002").exists()
+    assert (root / "README.md").read_bytes() == registry_before
+    assert (active / "README.md").read_bytes() == active_readme_before
+
+    main(["workflow", "--root", str(root), "evolve", "--request", str(request)])
+    assert "workflow draft evolved: example-workflow@v002" in capsys.readouterr().out
+    draft = root / "example-workflow--v002"
+    metadata = read_markdown_document(draft / "README.md").metadata
+    assert metadata["supersedes"] == "v001"
+    assert metadata["source_changes"] == [
+        "workflows/example-workflow--v001/work/changes/tighten-threshold--c001",
+        "workflows/example-workflow--v001/work/changes/tighten-threshold--c002",
+    ]
+
+    write_request("Updated wording for accepted C001 and C002 after combined review.")
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "evolve",
+            "--request",
+            str(request),
+            "--dry-run",
+        ]
+    )
+    update_preview = json.loads(capsys.readouterr().out)
+    assert update_preview["version"] == "v002"
+    assert {item["action"] for item in update_preview["changes"]} == {"update"}
+    main(["workflow", "--root", str(root), "evolve", "--request", str(request)])
+    assert not (root / "example-workflow--v003").exists()
+    assert WorkflowRepository(root).validate_all() == ()
+
+
+def test_evolve_rejects_change_without_human_decision(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    active = _register_version(root)
+    repository.sync()
+    repository.release(active, approved_by="research-owner")
+    change = _create_change(active)
+    repository.sync()
+    repository.transition_change(change, "proposed")
+    definition = tmp_path / "docs" / "replacement.md"
+    definition.parent.mkdir()
+    definition.write_text(_workflow_definition("Example Workflow v2"), encoding="utf-8")
+    request = tmp_path / "evolve-request.json"
+    request.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "example-workflow",
+                "title": "Example Workflow",
+                "definition_path": "docs/replacement.md",
+                "authoring_basis": "Proposal awaits a human decision.",
+                "policies": [],
+                "dependencies": [],
+                "capabilities": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SystemExit, match="human decision"):
+        main(["workflow", "--root", str(root), "evolve", "--request", str(request), "--dry-run"])
+    assert not (root / "example-workflow--v002").exists()
+
+
 def test_sync_rebuilds_stale_root_and_version_indexes(tmp_path) -> None:
     root, repository = _initialize_root(tmp_path)
     _register_version(root)

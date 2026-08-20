@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "workflow": "REPLACE_ME_WORKFLOW_SLUG",
+  "slug": "REPLACE_ME_CHANGE_SLUG",
+  "title": "REPLACE_ME_CHANGE_TITLE",
+  "proposal_path": "REPLACE_ME_REPOSITORY_RELATIVE_PROPOSAL_MD",
+  "impact_path": "REPLACE_ME_REPOSITORY_RELATIVE_IMPACT_MD",
+  "validation_path": null,
+  "decision_path": null,
+  "propose": false
+}

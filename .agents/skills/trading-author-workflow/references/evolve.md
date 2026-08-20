@@ -37,6 +37,12 @@ Complete proposal and impact before `proposed`. Complete validation and decision
 workflow release may set `released` and `released_in`. Use guarded CLI transitions rather than
 editing lifecycle metadata.
 
+For a new record, fill the closed shape in `assets/requests/change.json`, preview with
+`trading workflow change create --request <path> --dry-run`, and apply the same request only after
+confirmation. The CLI resolves the unique active version, allocates the next `Cxxx`, and writes the
+legacy five-file record. `propose: true` is allowed only when proposal and impact are complete; it
+uses the existing guarded `draft -> proposed` transition.
+
 ## Replacement draft
 
 After one or more changes are accepted, create or update the single next-version draft. Every
@@ -47,3 +53,8 @@ Keep the replacement complete and self-contained. Do not implement inherited var
 source change records into it; its metadata links back to the records under the version they
 modify. Do not end, move, execute, or reinterpret studies while authoring the draft. Read
 `impact.md` for version-boundary requirements.
+
+Use `assets/requests/evolve.json` and `trading workflow evolve --request <path> --dry-run`. The CLI
+collects every accepted change under the active version and either creates the next registered draft
+or updates the unique existing draft. It rejects changes without a human decision and never accepts
+caller-supplied version IDs, status, approval, or timestamps.

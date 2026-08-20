@@ -170,7 +170,7 @@ creating parallel infrastructure.
 | `qualification_transaction.py` | Durable journal, idempotent recovery, shared journal identity, and serialized publication for one complete-family trial registration plus its exact qualification plan. |
 | `study_qualification.py` | Exact-study qualification compiler, structured preregistration spec, release-capability enforcement, and backward-compatible v004/S004 adapter. |
 | `study_terminal_evidence.py` | Terminal study-time evidence linkage across frozen study artifacts, typed canonical qualification plan/screen replay, current-head Development absence proofs, and independently supported required-challenge observations. |
-| `workflow_authoring.py` | Versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
+| `workflow_authoring.py` | Closed high-level create/change/evolve requests, deterministic mutation previews, versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
 | `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion, including serialization of Development terminal failure against qualification registration. |
 | `policy_authoring.py` | Versioned policy registry validation, synchronization, conformance execution, immutable releases, and lifecycle evidence. |
 | `legacy_experiments.py` | Closed-inventory scan and monotonic-removal guard for legacy experiment identities. |
@@ -317,6 +317,13 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or
 their repository skills, not hand-edited casually.
+
+`trading workflow create`, `trading workflow change create`, and `trading workflow evolve` are the
+public happy-path authoring façade. Their closed JSON request files are ephemeral operation inputs,
+not tracked lifecycle authority: callers supply confirmed content and exact pins, while the CLI
+allocates `vNNN`/`Cxxx`, writes the existing schema-1 and five-file formats, synchronizes indexes,
+and validates. Low-level transition, sync, and release commands remain compatibility and diagnostic
+entry points.
 
 Workflow releases pin exact released policy family/version identities and `RELEASE.json` digests.
 Studies inherit those immutable selections from their workflow version and record the composite

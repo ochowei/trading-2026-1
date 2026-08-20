@@ -216,19 +216,25 @@ rg -n 'workflow-authoring-contract\.md' .agents/skills
 - Modify: `CLAUDE.md`
 - Modify: `docs/ARCHITECTURE.md`
 
-- [ ] 定義 closed request dataclasses/parsers 與 deterministic `WorkflowMutationPlan`。
-- [ ] 實作 `plan_create()`：檢查 slug collision、固定 `v001`、解析四類 policy pins、建立既有
+- [x] 定義 closed request dataclasses/parsers 與 deterministic `WorkflowMutationPlan`。
+- [x] 實作 `plan_create()`：檢查 slug collision、固定 `v001`、解析四類 policy pins、建立既有
   workflow-version template、registry entry 與 indexes。
-- [ ] 實作 `plan_change()`：解析 unique active version、自動配置下一個 `Cxxx`、建立完整 legacy
+- [x] 實作 `plan_change()`：解析 unique active version、自動配置下一個 `Cxxx`、建立完整 legacy
   five-file change record；預設保持 `draft`，只有完整 confirmed request 可選擇建立後立即走既有
   `draft -> proposed` transition。
-- [ ] 實作 `plan_evolve()`：只接受 accepted changes；若已有唯一 registered draft 則原地更新，否則
+- [x] 實作 `plan_evolve()`：只接受 accepted changes；若已有唯一 registered draft 則原地更新，否則
   配置下一個未使用 version；所有 substantive rules 必須 trace 到 source changes。
-- [ ] `--dry-run` 顯示完整 deterministic preview 且 zero mutation。
-- [ ] Non-dry-run apply 完成 registry/index/file writes 後執行既有 validation。
-- [ ] 保留所有低階 commands；新 façade 不接受 caller-supplied IDs、status 或 timestamps。
-- [ ] 加入 initial create、active change、multi-change evolve、existing-draft update、collision、missing
+- [x] `--dry-run` 顯示完整 deterministic preview 且 zero mutation。
+- [x] Non-dry-run apply 完成 registry/index/file writes 後執行既有 validation。
+- [x] 保留所有低階 commands；新 façade 不接受 caller-supplied IDs、status 或 timestamps。
+- [x] 加入 initial create、active change、multi-change evolve、existing-draft update、collision、missing
   decision、policy/dependency error 與 dry-run tests。
+
+Implementation evidence (2026-08-20): the public CLI and `WorkflowRepository` tests cover closed
+requests, full previews, zero-write dry runs, initial creation, automatic `Cxxx` allocation,
+optional guarded proposal, accepted-change aggregation, existing-draft update, collisions, missing
+human decisions, and invalid policy/dependency pins. Focused tests and repository validation pass;
+WP3 locking, target-drift checks, staging, rollback, and concurrency remain intentionally deferred.
 
 **Verification**
 
