@@ -26,6 +26,70 @@ from trading.research_definitions import ResearchDefinitionRegistry, resolve_wor
 FIXED_TIME = datetime(2026, 8, 11, 4, 5, 6, tzinfo=UTC)
 
 
+def test_tracked_workflow_history_validates_without_format_migration() -> None:
+    repository = WorkflowRepository(Path("workflows"))
+
+    assert repository.validate_all() == ()
+
+    change_directories = sorted(Path("workflows").glob("*/work/changes/*--c[0-9][0-9][0-9]"))
+    assert change_directories
+    for change_directory in change_directories:
+        assert {
+            "README.md",
+            "PROPOSAL.md",
+            "IMPACT.md",
+            "VALIDATION.md",
+            "DECISION.md",
+        }.issubset(path.name for path in change_directory.iterdir())
+        assert not (change_directory / "CHANGE.md").exists()
+
+
+def test_authoring_skill_routes_modes_to_progressive_disclosure_references() -> None:
+    skill_root = Path(".agents/skills/trading-author-workflow")
+    skill_text = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+    required_references = {
+        "core.md",
+        "create.md",
+        "evolve.md",
+        "remove.md",
+        "release.md",
+        "impact.md",
+    }
+
+    assert required_references == {
+        path.name
+        for path in (skill_root / "references").glob("*.md")
+        if path.name != "workflow-authoring-contract.md"
+    }
+    assert "Read `references/core.md`" in skill_text
+    assert "Read `references/create.md`" in skill_text
+    assert "Read `references/evolve.md`" in skill_text
+    assert "Read `references/remove.md`" in skill_text
+    assert "Read `references/release.md`" in skill_text
+    assert "Read `references/impact.md`" in skill_text
+    assert "Read\n[`references/workflow-authoring-contract.md`]" not in skill_text
+
+    compatibility_pointer = (
+        skill_root / "references" / "workflow-authoring-contract.md"
+    ).read_text(encoding="utf-8")
+    assert len(compatibility_pointer.splitlines()) <= 30
+    for reference in sorted(required_references):
+        assert reference in compatibility_pointer
+
+
+def test_study_skills_use_shared_study_governance_reference() -> None:
+    shared_reference = Path(".agents/rules/workflow-study-governance.md")
+    assert shared_reference.is_file()
+
+    for skill_path in (
+        Path(".agents/skills/trading-operate-workflow/SKILL.md"),
+        Path(".agents/skills/trading-evaluate-study/SKILL.md"),
+    ):
+        text = skill_path.read_text(encoding="utf-8")
+        assert ".agents/rules/workflow-study-governance.md" in text
+        assert "workflow-authoring-contract.md" not in text
+
+
 def _write_document(path: Path, metadata: dict, body: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(render_markdown_document(MarkdownDocument(metadata, body)))

@@ -179,14 +179,18 @@ prepared-conflicted state、abort audit 或跨 subsystem recovery。
 - Modify: `tests/test_workflow_authoring.py`
 - Modify: `docs/ARCHITECTURE.md`
 
-- [ ] 固定 legacy five-file change、schema 1 registry、release invariants 與 v001-v008 validation
+- [x] 固定 legacy five-file change、schema 1 registry、release invariants 與 v001-v008 validation
   regression。
-- [ ] 對舊 skill rules 作 inventory，只保留會改變 Agent 決策的規則；不機械複製整份 contract。
-- [ ] 實作 mode-specific routing，普通 review/create/evolve 不載入無關 reference。
-- [ ] 保留 repository precedence、released immutability、study scope separation、source disposition
+- [x] 對舊 skill rules 作 inventory，只保留會改變 Agent 決策的規則；不機械複製整份 contract。
+- [x] 實作 mode-specific routing，普通 review/create/evolve 不載入無關 reference。
+- [x] 保留 repository precedence、released immutability、study scope separation、source disposition
   與 release authority。
-- [ ] 更新 operate/evaluate skill 只讀 shared study governance。
-- [ ] 驗證 skill package 與 maintained inbound links。
+- [x] 更新 operate/evaluate skill 只讀 shared study governance。
+- [x] 驗證 skill package 與 maintained inbound links。
+
+Implementation evidence (2026-08-20): `tests/test_workflow_authoring.py` contains tracked-history,
+progressive-routing, and shared-governance regressions. All 39 focused tests, three skill package
+validators, workflow validation, Ruff check/format, link search, and diff checks passed.
 
 **Verification**
 

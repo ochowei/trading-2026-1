@@ -57,10 +57,11 @@ Repository-owned Agent knowledge and skills.
 | `.agents/context/cross_asset_lessons.md` | Compact cross-asset lessons, prohibited directions, parameter-scaling guidance, and freshness metadata. |
 | `.agents/context/cross_asset_evidence.md` | Detailed evidence supporting the compact cross-asset lessons. |
 | `.agents/rules/execution-model.md` | Mandatory execution-model contract for non-grandfathered experiments. |
+| `.agents/rules/workflow-study-governance.md` | Shared canonical workflow-study identity, lifecycle, authority-separation, evidence, privacy, and version-boundary rules used by operator and reviewer skills. |
 | `.agents/skills/trading-*/SKILL.md` | Workflow instructions for a specific repository research task. |
 | `.agents/skills/trading-*/agents/openai.yaml` | Skill discovery metadata and default Agent presentation. |
 | `.agents/skills/trading-*/assets/` | Templates copied or adapted by a skill, currently used by workflow authoring. |
-| `.agents/skills/trading-*/references/` | Detailed contracts loaded by a skill only when its workflow needs them. |
+| `.agents/skills/trading-*/references/` | Detailed mode-specific contracts loaded through progressive disclosure only when a skill workflow needs them; compatibility pointers may retain old reference paths without duplicating authority. |
 
 ### `.claude/commands/`
 

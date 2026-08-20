@@ -5,10 +5,10 @@ description: Start, preregister, run, pause, resume, cancel, and submit reposito
 
 # Operate Trading Workflows
 
-Read `CLAUDE.md` and
-`.agents/skills/trading-author-workflow/references/workflow-authoring-contract.md` completely before
-starting. Read `workflows/README.md`, the exact released workflow version, and the study when one
-already exists.
+Read `CLAUDE.md` and `.agents/rules/workflow-study-governance.md` completely before starting. Read
+`workflows/README.md`, the exact released workflow version, and the study when one already exists.
+Do not load workflow creation, evolution, removal, or release-preparation references unless the
+user separately asks to author a workflow change.
 
 ## Orient first
 
