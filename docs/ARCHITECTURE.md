@@ -323,8 +323,11 @@ their repository skills, not hand-edited casually.
 public happy-path authoring façade. Their closed JSON request files are ephemeral operation inputs,
 not tracked lifecycle authority: callers supply confirmed content and exact pins, while the CLI
 allocates `vNNN`/`Cxxx`, writes the existing schema-1 and five-file formats, synchronizes indexes,
-and validates. Low-level transition, sync, and release commands remain compatibility and diagnostic
-entry points.
+and validates. The façade reads and retains request/source files; moving, replacing with a pointer,
+or removing a source is a separate exact-path operation that requires individual human confirmation.
+Low-level transition and sync commands remain compatibility/diagnostic entry points, while guarded
+decision and release commands remain separate human-authority seams rather than alternate authoring
+happy paths.
 
 High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
 only the workflow tree into a system temporary directory, applies and validates the complete staged

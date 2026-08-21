@@ -153,13 +153,14 @@ uv run trading workflow create --request authoring-request.json --dry-run
 uv run trading workflow change create --request change-request.json --dry-run
 uv run trading workflow evolve --request evolve-request.json --dry-run
 # 人類確認 preview 後，移除 --dry-run 執行同一 request；decision/release 仍使用下列獨立命令
+# façade 只讀且預設保留 request 與來源文件；move/pointer/remove 是另一次 exact-path 人類確認
 
-# 依合法生命週期轉換 workflow change 或 version
+# 低階 compatibility/diagnostic seam：依既有 guard 轉換 change/version，不取代上述 authoring happy path
 uv run trading workflow change transition <change-path> --to proposed
 uv run trading workflow version transition <version-path> --to retired \
   --approved-by <human-id>
 
-# 準備經人類批准的 workflow release；合併 canonical branch 後才生效
+# 獨立 human-authority seam：準備 release；合併 canonical branch 後才生效
 uv run trading workflow release <version-path> --approved-by <human-id>
 
 # 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC

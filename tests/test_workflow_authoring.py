@@ -83,6 +83,19 @@ def test_authoring_skill_routes_modes_to_progressive_disclosure_references() -> 
         assert reference in compatibility_pointer
 
 
+def test_source_disposition_defaults_to_keep_and_requires_separate_confirmation() -> None:
+    guidance = Path(".agents/skills/trading-author-workflow/references/create.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "Keep the source by default" in guidance
+    assert "authoring façade never performs these disposition actions" in guidance
+    assert "For every non-`keep` choice" in guidance
+    assert "exact source path" in guidance
+    assert "separate explicit human confirmation" in guidance
+    assert "without globs" in guidance
+
+
 def test_study_skills_use_shared_study_governance_reference() -> None:
     shared_reference = Path(".agents/rules/workflow-study-governance.md")
     assert shared_reference.is_file()
@@ -138,6 +151,19 @@ Determine whether the documented research decision may proceed under fixed evide
 
 This fixture is a complete structural contract and does not submit orders.
 """
+
+
+def _snapshot_file_bytes(*roots: Path) -> dict[str, bytes]:
+    """Capture exact regular-file bytes without following repository-external state."""
+    snapshot: dict[str, bytes] = {}
+    for root in roots:
+        if root.is_file():
+            snapshot[str(root)] = root.read_bytes()
+            continue
+        for path in sorted(root.rglob("*")):
+            if path.is_file():
+                snapshot[str(path)] = path.read_bytes()
+    return snapshot
 
 
 def _initialize_root(tmp_path: Path) -> tuple[Path, WorkflowRepository]:
@@ -1377,6 +1403,214 @@ def test_cli_evolve_aggregates_accepted_changes_and_updates_existing_draft(
     assert WorkflowRepository(root).validate_all() == ()
 
 
+def test_public_authoring_happy_path_is_end_to_end_and_keeps_sources(
+    tmp_path,
+    capsys,
+) -> None:
+    """Accept create -> change -> decision -> evolve -> release through public seams."""
+    released_roots = tuple(
+        Path(f"workflows/strategy-forward-replication-research--v{number:03d}")
+        for number in range(1, 9)
+    )
+    released_bytes_before = _snapshot_file_bytes(*released_roots)
+    shutil.copytree("policies", tmp_path / "policies")
+    shutil.copytree("src", tmp_path / "src")
+    shutil.copytree("tests/policies", tmp_path / "tests" / "policies")
+    root, _repository = _initialize_root(tmp_path)
+    policies = read_markdown_document(released_roots[-1] / "README.md").metadata["policies"]
+
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    source_documents = {
+        "initial.md": _workflow_definition("Acceptance Workflow"),
+        "proposal.md": (
+            "# Proposal\n\nRequire explicit boundary evidence before a candidate advances.\n"
+        ),
+        "impact.md": (
+            "# Impact\n\nNo studies exist; future studies use the stricter boundary rule.\n"
+        ),
+        "validation.md": (
+            "# Validation\n\nExercise complete, missing, and conflicting boundary evidence.\n"
+        ),
+        "decision.md": (
+            "# Decision\n\nAccept after human review because the rule closes an evidence gap.\n"
+        ),
+        "replacement.md": _workflow_definition("Acceptance Workflow v2"),
+    }
+    for filename, content in source_documents.items():
+        (docs / filename).write_text(content, encoding="utf-8")
+
+    create_request = tmp_path / "create-request.json"
+    create_request.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "slug": "acceptance-workflow",
+                "title": "Acceptance Workflow",
+                "definition_path": "docs/initial.md",
+                "authoring_basis": "Confirmed end-to-end acceptance request.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+                "derived_from": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    change_request = tmp_path / "change-request.json"
+    change_request.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "acceptance-workflow",
+                "slug": "require-boundary-evidence",
+                "title": "Require boundary evidence",
+                "proposal_path": "docs/proposal.md",
+                "impact_path": "docs/impact.md",
+                "validation_path": "docs/validation.md",
+                "decision_path": "docs/decision.md",
+                "propose": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+    evolve_request = tmp_path / "evolve-request.json"
+    evolve_request.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "acceptance-workflow",
+                "title": "Acceptance Workflow",
+                "definition_path": "docs/replacement.md",
+                "authoring_basis": "Accepted C001 after combined impact review.",
+                "policies": policies,
+                "dependencies": [],
+                "capabilities": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    source_bytes_before = _snapshot_file_bytes(docs, create_request, change_request, evolve_request)
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "create",
+            "--request",
+            str(create_request),
+            "--dry-run",
+        ]
+    )
+    assert json.loads(capsys.readouterr().out)["operation"] == "create"
+    main(["workflow", "--root", str(root), "create", "--request", str(create_request)])
+    capsys.readouterr()
+    v1 = root / "acceptance-workflow--v001"
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "release",
+            str(v1),
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    capsys.readouterr()
+    immutable_v1_bytes = _snapshot_file_bytes(v1 / "WORKFLOW.md", v1 / "RELEASE.json")
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "change",
+            "create",
+            "--request",
+            str(change_request),
+            "--dry-run",
+        ]
+    )
+    assert json.loads(capsys.readouterr().out)["operation"] == "change-create"
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "change",
+            "create",
+            "--request",
+            str(change_request),
+        ]
+    )
+    capsys.readouterr()
+    change = v1 / "work" / "changes" / "require-boundary-evidence--c001"
+    assert read_markdown_document(change / "README.md").metadata["status"] == "proposed"
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "change",
+            "transition",
+            str(change),
+            "--to",
+            "accepted",
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    capsys.readouterr()
+
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "evolve",
+            "--request",
+            str(evolve_request),
+            "--dry-run",
+        ]
+    )
+    assert json.loads(capsys.readouterr().out)["operation"] == "evolve"
+    main(["workflow", "--root", str(root), "evolve", "--request", str(evolve_request)])
+    capsys.readouterr()
+    v2 = root / "acceptance-workflow--v002"
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "release",
+            str(v2),
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    release_output = capsys.readouterr().out
+
+    versions = read_markdown_document(root / "README.md").metadata["workflows"][
+        "acceptance-workflow"
+    ]["versions"]
+    change_metadata = read_markdown_document(change / "README.md").metadata
+    assert versions["v001"]["status"] == "superseded"
+    assert versions["v002"]["status"] == "active"
+    assert change_metadata["status"] == "released"
+    assert change_metadata["released_in"] == "v002"
+    assert "workflow release prepared: acceptance-workflow@v002" in release_output
+    assert "effective only after merge to the canonical branch" in release_output
+    assert _snapshot_file_bytes(v1 / "WORKFLOW.md", v1 / "RELEASE.json") == (immutable_v1_bytes)
+    assert _snapshot_file_bytes(docs, create_request, change_request, evolve_request) == (
+        source_bytes_before
+    )
+    assert not list(root.glob("*/work/studies/*"))
+    assert WorkflowRepository(root).validate_all() == ()
+    assert _snapshot_file_bytes(*released_roots) == released_bytes_before
+
+
 def test_evolve_rejects_change_without_human_decision(tmp_path) -> None:
     root, repository = _initialize_root(tmp_path)
     active = _register_version(root)
@@ -1590,12 +1824,27 @@ def test_release_refuses_unresolved_changes_without_partial_mutation(tmp_path) -
     assert read_markdown_document(omitted / "README.md").metadata["status"] == "accepted"
 
 
-def test_version_abandon_and_retire_are_guarded_transitions(tmp_path) -> None:
+def test_version_abandon_and_retire_remain_guarded_low_level_transitions(
+    tmp_path,
+    capsys,
+) -> None:
     root, repository = _initialize_root(tmp_path)
     draft = _register_version(root)
     repository.sync()
 
-    repository.transition_version(draft, "abandoned")
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "version",
+            "transition",
+            str(draft),
+            "--to",
+            "abandoned",
+        ]
+    )
+    assert "workflow version transitioned to abandoned" in capsys.readouterr().out
     registry = read_markdown_document(root / "README.md").metadata
     assert registry["workflows"]["example-workflow"]["versions"]["v001"]["status"] == ("abandoned")
 
@@ -1610,7 +1859,21 @@ def test_version_abandon_and_retire_are_guarded_transitions(tmp_path) -> None:
     with pytest.raises(WorkflowAuthoringError, match="resolve draft change"):
         repository2.transition_version(active, "retired", approved_by="research-owner")
     repository2.transition_change(open_change, "withdrawn")
-    repository2.transition_version(active, "retired", approved_by="research-owner")
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root2),
+            "version",
+            "transition",
+            str(active),
+            "--to",
+            "retired",
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    assert "workflow version transitioned to retired" in capsys.readouterr().out
     assert repository2.validate_all() == ()
 
 

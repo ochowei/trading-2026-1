@@ -43,6 +43,8 @@ Keep the source by default. Only after the draft validates, offer:
 - `replace-with-pointer`; or
 - `remove`.
 
-Before removal, show the exact path and Git status. Warn when untracked content is not recoverable
-from Git, obtain explicit confirmation, and operate on the exact path without globs. Never treat
-source-file disposition as permission to delete a workflow identity directory.
+The authoring façade never performs these disposition actions. For every non-`keep` choice, show
+the exact source path, Git status, and exact destination or pointer target when applicable, then
+obtain a separate explicit human confirmation before acting without globs. Before removal, warn
+when untracked content is not recoverable from Git. Never treat source-file disposition as
+permission to delete a workflow identity directory.

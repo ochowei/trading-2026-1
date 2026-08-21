@@ -291,12 +291,22 @@ uv run ruff format --check src/ tests/test_workflow_authoring.py
 - Modify: `docs/ARCHITECTURE.md`
 - Modify: `workflows/README.md` human-facing command guidance only if generated metadata is unchanged
 
-- [ ] 在 isolated temporary repository 驗證 create → change → decision → evolve → release preparation。
-- [ ] 驗證 abandon 與 retire 繼續使用既有低階安全行為；MVP 不新增 lifecycle semantics。
-- [ ] 驗證 legacy v001-v008、所有既有 changes/studies/releases bytes 未被修改。
-- [ ] 驗證 source disposition 預設 keep；move/pointer/remove 仍需 exact path 與個別確認。
-- [ ] 驗證新文件只描述 happy paths，低階 commands 保留 compatibility/diagnostic 說明。
-- [ ] 執行 full workflow validation、focused tests、full tests、Ruff、skill validation 與 diff audit。
+- [x] 在 isolated temporary repository 驗證 create → change → decision → evolve → release preparation。
+- [x] 驗證 abandon 與 retire 繼續使用既有低階安全行為；MVP 不新增 lifecycle semantics。
+- [x] 驗證 legacy v001-v008、所有既有 changes/studies/releases bytes 未被修改。
+- [x] 驗證 source disposition 預設 keep；move/pointer/remove 仍需 exact path 與個別確認。
+- [x] 驗證新文件只描述 happy paths，低階 commands 保留 compatibility/diagnostic 說明。
+- [x] 執行 full workflow validation、focused tests、full tests、Ruff、skill validation 與 diff audit。
+
+Implementation evidence (2026-08-21): an isolated public-CLI acceptance test completes create,
+initial release preparation, proposed change creation, guarded human acceptance, evolve preview/apply,
+and replacement release preparation without creating a study. It proves request/source files and
+released definition/evidence bytes stay exact, and snapshots the tracked v001-v008 trees before and
+after the flow. Public CLI coverage also keeps the existing guarded abandon/retire semantics. Source
+guidance now makes `keep` the non-mutating default and requires a separate exact-path confirmation
+for every non-keep disposition. All 58 focused authoring tests and all 1,467 repository tests passed;
+full Ruff, workflow validation, skill validation, `git diff --check`, and the released-path diff audit
+also passed with no changes under v001-v008.
 
 **Verification**
 
