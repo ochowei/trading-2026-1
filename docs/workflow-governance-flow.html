@@ -1046,6 +1046,110 @@ html&gt;body{padding:0}&lt;/style&gt;
       text-align: center;
     }
 
+    #workflow-governance-flow .wg-state-stack {
+      display: grid;
+      gap: 0;
+      min-width: 0;
+    }
+
+    #workflow-governance-flow .wg-state-tier {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    #workflow-governance-flow .wg-state-label {
+      display: grid;
+      gap: 3px;
+      padding-top: 8px;
+    }
+
+    #workflow-governance-flow .wg-state-label span,
+    #workflow-governance-flow .wg-state-note {
+      color: var(--muted-foreground);
+    }
+
+    #workflow-governance-flow .wg-state-content {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    #workflow-governance-flow .wg-state-path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    #workflow-governance-flow .wg-state-node {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--viz-series-1) 9%, transparent);
+      text-align: center;
+      min-width: 0;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    #workflow-governance-flow .wg-tier-l2 .wg-state-node {
+      background: color-mix(in srgb, var(--viz-series-3) 10%, transparent);
+    }
+
+    #workflow-governance-flow .wg-tier-l3 .wg-state-node {
+      background: color-mix(in srgb, var(--viz-series-2) 10%, transparent);
+    }
+
+    #workflow-governance-flow .wg-state-arrow {
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
+    #workflow-governance-flow .wg-state-note code {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    #workflow-governance-flow .wg-state-branches {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    #workflow-governance-flow .wg-state-branch {
+      display: grid;
+      gap: 7px;
+      align-content: start;
+    }
+
+    #workflow-governance-flow .wg-state-handoff {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 14px;
+      padding: 8px 0;
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
+    #workflow-governance-flow .wg-state-outcomes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    #workflow-governance-flow .wg-state-feedback {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
     @media (max-width: 520px) {
       #workflow-governance-flow {
         gap: 22px;
@@ -1062,15 +1166,39 @@ html&gt;body{padding:0}&lt;/style&gt;
       #workflow-governance-flow .wg-mobile-only {
         display: grid;
       }
+
+      #workflow-governance-flow .wg-state-tier,
+      #workflow-governance-flow .wg-state-handoff {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      #workflow-governance-flow .wg-state-label {
+        padding-top: 0;
+      }
+
+      #workflow-governance-flow .wg-state-path {
+        width: 100%;
+        align-items: stretch;
+      }
+
+      #workflow-governance-flow .wg-state-note code {
+        padding-inline: 2px;
+      }
+
+      #workflow-governance-flow .wg-state-branches,
+      #workflow-governance-flow .wg-state-outcomes {
+        grid-template-columns: 1fr;
+      }
     }
   &lt;/style&gt;
 
   &lt;header class=&quot;wg-header&quot;&gt;
     &lt;h1&gt;Workflow 治理流程&lt;/h1&gt;
     &lt;div class=&quot;wg-legend&quot; aria-label=&quot;治理角色圖例&quot;&gt;
-      &lt;span class=&quot;viz-badge&quot;&gt;Authoring：意圖、preview、draft&lt;/span&gt;
-      &lt;span class=&quot;viz-badge&quot;&gt;Authority：human decision、release、merge&lt;/span&gt;
-      &lt;span class=&quot;viz-badge&quot;&gt;Study：凍結計畫、執行、獨立審查&lt;/span&gt;
+      &lt;span class=&quot;viz-badge&quot;&gt;L1 Authoring：產生 draft&lt;/span&gt;
+      &lt;span class=&quot;viz-badge&quot;&gt;L2 Authority：status active ≠ effective authority&lt;/span&gt;
+      &lt;span class=&quot;viz-badge&quot;&gt;L3 Study：產生 outcome&lt;/span&gt;
     &lt;/div&gt;
     &lt;div id=&quot;wg-render-status&quot; class=&quot;wg-status text-small&quot; aria-live=&quot;polite&quot;&gt;
       正在整理治理圖…
@@ -1082,54 +1210,46 @@ html&gt;body{padding:0}&lt;/style&gt;
     &lt;pre class=&quot;mermaid wg-diagram wg-desktop-only&quot; data-diagram=&quot;sequence&quot;&gt;
 sequenceDiagram
     autonumber
-    actor H as 人類 Author / Owner
-    participant A as Authoring façade
-    participant R as Repository + Git
+    actor H as Human Author / Owner
+    participant W as Workflow Service
+    participant G as Canonical Git
     participant O as Study Operator
     participant V as Independent Reviewer
 
-    H-&gt;&gt;A: 提交 closed request + --dry-run
-    A-&gt;&gt;R: plan create / change / evolve
-    R--&gt;&gt;A: deterministic preview（ID、pins、diff、blockers）
-    A--&gt;&gt;H: 顯示 preview；零 mutation
-
-    alt 未確認或需修訂
-        H-&gt;&gt;H: 修改 request / source（來源預設保留）
-    else 確認 exact preview
-        H-&gt;&gt;A: 套用同一 request
-        A-&gt;&gt;R: authoring lock + precondition recheck
-        R-&gt;&gt;R: stage complete after-tree + validate
-        R--&gt;&gt;A: atomic publish draft + indexes
-        A--&gt;&gt;H: draft path / allocated identity
+    Note over H,W: L1 Authoring｜initial create 與 replacement evolve 是不同路徑
+    alt Initial family
+        H-&gt;&gt;W: Create request → dry-run / confirm / apply
+        W--&gt;&gt;H: v001 validated draft
+    else Replacement version
+        H-&gt;&gt;W: Change-create request → dry-run / apply
+        W--&gt;&gt;H: Proposed Cxxx change
+        H-&gt;&gt;W: Guarded change decision → accepted
+        H-&gt;&gt;W: Evolve request → dry-run / confirm / apply
+        W--&gt;&gt;H: Replacement validated draft
     end
 
-    H-&gt;&gt;A: guarded change decision + human identity
-    A-&gt;&gt;R: accepted / rejected / deferred / withdrawn
-    H-&gt;&gt;A: evolve accepted changes + --dry-run / apply
-    A-&gt;&gt;R: 建立 next-version draft；released bytes 不變
-    H-&gt;&gt;A: release --approved-by human-id
-    A-&gt;&gt;R: 檢查 impact、open work、policy pins
-    R--&gt;&gt;H: prepared RELEASE.json；尚未生效
-    H-&gt;&gt;R: merge prepared commit to canonical branch
-    R--&gt;&gt;O: active version + immutable workflow / policy pins
+    Note over H,G: L2 Authority｜prepared status 與 effective authority 分離
+    H-&gt;&gt;W: Human release approval
+    W--&gt;&gt;H: Prepared branch：registry status = active，authority 尚未生效
+    H-&gt;&gt;G: Merge prepared commit to canonical
+    G--&gt;&gt;H: Effective canonical authority
 
-    O-&gt;&gt;R: init → preregister → run → awaiting-review
-    R--&gt;&gt;V: frozen hypothesis、plan、evidence、outcome rules
-    V-&gt;&gt;R: independent conclusion + terminal outcome
-    R--&gt;&gt;H: pass / fail / insufficient-evidence / indeterminate
+    Note over G,V: L3 Study｜operator 執行，reviewer 判定
+    G--&gt;&gt;O: Active version + immutable pins
+    O-&gt;&gt;W: Preregister → execute → submit evidence
+    W--&gt;&gt;V: Frozen plan + exact evidence
+    V--&gt;&gt;H: Terminal outcome
     &lt;/pre&gt;
     &lt;ol class=&quot;wg-mobile-only wg-mobile-sequence&quot; aria-label=&quot;手機版權限交接 sequence diagram&quot;&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Author → Façade&lt;/strong&gt;&lt;span&gt;Closed request，以 &lt;code&gt;--dry-run&lt;/code&gt; 預覽。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Façade → Repository&lt;/strong&gt;&lt;span&gt;配置 ID、解析 pins、計算 deterministic diff。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Repository → Author&lt;/strong&gt;&lt;span&gt;回傳 preview；worktree 維持零 mutation。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Author → Façade&lt;/strong&gt;&lt;span&gt;確認 exact preview 後套用同一 request。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Façade → Repository&lt;/strong&gt;&lt;span&gt;Lock、recheck、stage、validate、atomic publish draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Human Owner → Repository&lt;/strong&gt;&lt;span&gt;記錄 change decision；operator 不自行批准。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Author → Repository&lt;/strong&gt;&lt;span&gt;由 accepted changes 演進 next-version draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Human Owner → Repository&lt;/strong&gt;&lt;span&gt;批准 release preparation；尚未生效。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Canonical Git → Study Operator&lt;/strong&gt;&lt;span&gt;Merge 後才成為 active，交付 immutable pins。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Operator → Reviewer&lt;/strong&gt;&lt;span&gt;執行 frozen plan，提交 exact evidence。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;11&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Independent Reviewer → Repository&lt;/strong&gt;&lt;span&gt;依 frozen rules 寫入 conclusion 與 terminal outcome。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;L1A｜Initial create&lt;/strong&gt;&lt;span&gt;Create request → dry-run / confirm / apply → v001 draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;L1B｜Replacement change&lt;/strong&gt;&lt;span&gt;Change-create request → proposed Cxxx。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Owner → Workflow Service&lt;/strong&gt;&lt;span&gt;Guarded change decision → accepted。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Author → Workflow Service&lt;/strong&gt;&lt;span&gt;Evolve request → dry-run / confirm / apply → replacement draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;L2｜Owner → Workflow Service&lt;/strong&gt;&lt;span&gt;Human release approval → prepared branch；registry status 已是 active，但 authority 尚未生效。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Owner → Canonical Git&lt;/strong&gt;&lt;span&gt;Merge prepared commit 後，effective authority 才生效。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;L3｜Git → Study Operator&lt;/strong&gt;&lt;span&gt;交付 active version 與 immutable pins。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Operator → Reviewer&lt;/strong&gt;&lt;span&gt;依 frozen plan 執行並提交 exact evidence。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Reviewer → Owner&lt;/strong&gt;&lt;span&gt;獨立判定 terminal outcome。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
     &lt;/ol&gt;
   &lt;/section&gt;
 
@@ -1137,55 +1257,111 @@ sequenceDiagram
     &lt;h2 id=&quot;wg-activity-title&quot;&gt;Activity diagram｜生命週期與治理閘門&lt;/h2&gt;
     &lt;pre class=&quot;mermaid wg-diagram wg-desktop-only&quot; data-diagram=&quot;activity&quot;&gt;
 flowchart TD
-    START([Authoring intent]) --&gt; MODE{新 family 或既有 active family?}
-    MODE --&gt;|新 family| CREATE[Closed create request]
-    MODE --&gt;|既有 family| CHANGE[建立 Cxxx change → proposed]
-    CHANGE --&gt; DECIDE{Human change decision}
-    DECIDE --&gt;|rejected / withdrawn| CEND([Change terminal])
-    DECIDE --&gt;|deferred| DEFER([修訂後重新 proposed])
-    DECIDE --&gt;|accepted| EVOLVE[Closed evolve request]
-    CREATE --&gt; PREVIEW[Dry-run：ID + pins + diff + blockers]
-    EVOLVE --&gt; PREVIEW
-    PREVIEW --&gt; CONFIRM{確認 exact preview?}
-    CONFIRM --&gt;|否| REVISE([修訂輸入；source / request 保留])
-    CONFIRM --&gt;|是| APPLY[Lock → recheck → stage → validate → publish]
-    APPLY --&gt; DRAFT[Registered draft version]
-    DRAFT --&gt;|不再採用| ABANDON([abandoned])
-    DRAFT --&gt; GATE{Impact / open work 已解決&lt;br/&gt;且 human 批准 release?}
-    GATE --&gt;|否| HOLD([維持 draft；先解決 governance blocker])
-    GATE --&gt;|是| PREPARE[Prepare RELEASE.json；尚未生效]
-    PREPARE --&gt; MERGE{Merged to canonical branch?}
-    MERGE --&gt;|否| NOAUTH([Prepared only；無執行權限])
-    MERGE --&gt;|是| ACTIVE[active released version]
-    ACTIVE --&gt;|retire approval + no blocker| RETIRED([retired])
-    ACTIVE --&gt; INIT[init + human preregistration]
-    INIT --&gt; RUN[執行 frozen plan + exact evidence]
-    RUN --&gt; REVIEWQ[awaiting-review]
-    REVIEWQ --&gt; REVIEW[Independent evidence review]
-    REVIEW --&gt; OUTCOME([pass / fail / insufficient-evidence / indeterminate])
+    ROOT([Workflow governance])
+
+    subgraph L1[L1｜Authoring]
+      A0{Initial 或 replacement?}
+      A0 --&gt;|Initial| A1[Create request] --&gt; A2[Dry-run + confirm] --&gt; A3[v001 draft]
+      A0 --&gt;|Replacement| A4[Change create] --&gt; A5[Human decision → accepted] --&gt; A6[Evolve + dry-run + confirm] --&gt; A7[Replacement draft]
+    end
+
+    subgraph L2[L2｜Human / Release Authority]
+      direction LR
+      B1[Human release approval] --&gt; B2[Prepared branch：registry status = active&lt;br/&gt;authority not effective] --&gt; B3[Canonical merge] --&gt; B4[Effective authority]
+    end
+
+    subgraph L3[L3｜Study / Independent Review]
+      direction LR
+      C1[Preregister] --&gt; C2[Execute + evidence] --&gt; C3[Independent outcome]
+    end
+
+    ROOT --&gt; A0
+    A3 --&gt;|draft handoff| B1
+    A7 --&gt;|draft handoff| B1
+    B4 --&gt;|immutable pins| C1
     &lt;/pre&gt;
     &lt;div class=&quot;wg-mobile-only wg-mobile-flow&quot; role=&quot;img&quot; aria-label=&quot;手機版 workflow activity diagram&quot;&gt;
-      &lt;div class=&quot;wg-flow-node&quot;&gt;Authoring intent&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node wg-flow-decision&quot;&gt;Create request，或 active version 下建立 change&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ accepted change 才能 evolve&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node&quot;&gt;Dry-run：ID、pins、diff、blockers&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ exact preview confirmed&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node&quot;&gt;Lock → recheck → stage → validate → publish&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node&quot;&gt;Registered draft&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-branches&quot; aria-label=&quot;Draft 分支&quot;&gt;
-        &lt;div class=&quot;wg-flow-branch&quot;&gt;不採用 → abandoned&lt;/div&gt;
-        &lt;div class=&quot;wg-flow-branch&quot;&gt;繼續 → impact / open work gate&lt;/div&gt;
+      &lt;div class=&quot;wg-flow-node&quot;&gt;&lt;strong&gt;L1｜Authoring&lt;/strong&gt;&lt;br&gt;Initial 與 replacement 分開治理&lt;/div&gt;
+      &lt;div class=&quot;wg-flow-branches&quot; aria-label=&quot;Authoring 路徑&quot;&gt;
+        &lt;div class=&quot;wg-flow-branch&quot;&gt;Initial&lt;br&gt;Create → preview/apply → v001 draft&lt;/div&gt;
+        &lt;div class=&quot;wg-flow-branch&quot;&gt;Replacement&lt;br&gt;Change → accepted → evolve → draft&lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ human release approval&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node wg-flow-authority&quot;&gt;Prepared release；尚未生效&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ canonical merge&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node wg-flow-authority&quot;&gt;Active released version&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ exact workflow + policy pins&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node&quot;&gt;Init → preregister → run → awaiting-review&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ independent review&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node wg-flow-decision&quot;&gt;pass / fail / insufficient-evidence / indeterminate&lt;/div&gt;
+      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ draft handoff&lt;/div&gt;
+      &lt;div class=&quot;wg-flow-node wg-flow-authority&quot;&gt;&lt;strong&gt;L2｜Human / Release Authority&lt;/strong&gt;&lt;br&gt;Release approval → prepared branch（registry status = active；authority not effective）→ canonical merge → effective authority&lt;/div&gt;
+      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ immutable pins&lt;/div&gt;
+      &lt;div class=&quot;wg-flow-node wg-flow-decision&quot;&gt;&lt;strong&gt;L3｜Study / Independent Review&lt;/strong&gt;&lt;br&gt;Preregister → execute + evidence → independent outcome&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;wg-panel&quot; aria-labelledby=&quot;wg-state-title&quot;&gt;
+    &lt;h2 id=&quot;wg-state-title&quot;&gt;State relationship diagram｜L1–L3 狀態階層&lt;/h2&gt;
+    &lt;div class=&quot;wg-state-stack&quot; role=&quot;img&quot; aria-label=&quot;L1 Authoring、L2 Release Authority、L3 Study lifecycle 的狀態關係圖&quot;&gt;
+      &lt;div class=&quot;wg-state-tier wg-tier-l1&quot;&gt;
+        &lt;div class=&quot;wg-state-label&quot;&gt;&lt;strong&gt;L1｜Authoring&lt;/strong&gt;&lt;span&gt;輸出：registered draft&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;wg-state-content&quot;&gt;
+          &lt;div class=&quot;wg-state-path&quot;&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;intent / source&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;preview&lt;br&gt;&lt;small&gt;zero mutation&lt;/small&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ confirm →&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;apply&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wg-state-branches&quot;&gt;
+            &lt;div class=&quot;wg-state-branch&quot;&gt;
+              &lt;strong&gt;Initial path&lt;/strong&gt;
+              &lt;div class=&quot;wg-state-path&quot;&gt;&lt;span class=&quot;wg-state-node&quot;&gt;version &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→&lt;/span&gt;&lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;abandoned&lt;/code&gt;&lt;/span&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;wg-state-branch&quot;&gt;
+              &lt;strong&gt;Replacement path&lt;/strong&gt;
+              &lt;div class=&quot;wg-state-path&quot;&gt;&lt;span class=&quot;wg-state-node&quot;&gt;change &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→&lt;/span&gt;&lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;proposed&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ human →&lt;/span&gt;&lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;accepted&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ evolve →&lt;/span&gt;&lt;span class=&quot;wg-state-node&quot;&gt;version &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;/div&gt;
+              &lt;div class=&quot;wg-state-note text-small&quot;&gt;&lt;code&gt;proposed&lt;/code&gt; → &lt;code&gt;rejected&lt;/code&gt;；&lt;code&gt;proposed&lt;/code&gt; → &lt;code&gt;deferred&lt;/code&gt; → &lt;code&gt;proposed&lt;/code&gt;；&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;proposed&lt;/code&gt; / &lt;code&gt;deferred&lt;/code&gt; → &lt;code&gt;withdrawn&lt;/code&gt;。&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wg-state-note text-small&quot;&gt;Target drift / invalid partial state → apply blocked → fresh preview；不留下 mutation。&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;wg-state-handoff&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;strong&gt;↓ registered version &lt;code&gt;draft&lt;/code&gt;&lt;/strong&gt;&lt;/div&gt;
+
+      &lt;div class=&quot;wg-state-tier wg-tier-l2&quot;&gt;
+        &lt;div class=&quot;wg-state-label&quot;&gt;&lt;strong&gt;L2｜Authority&lt;/strong&gt;&lt;span&gt;輸出：effective active&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;wg-state-content&quot;&gt;
+          &lt;div class=&quot;wg-state-path&quot;&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;version &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ release guards + human approval →&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;prepared branch&lt;br&gt;&lt;code&gt;status = active&lt;/code&gt;&lt;br&gt;&lt;small&gt;authority = ineffective&lt;/small&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ canonical merge →&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;effective authority&lt;br&gt;&lt;code&gt;active&lt;/code&gt;&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wg-state-branches&quot;&gt;
+            &lt;div class=&quot;wg-state-note&quot;&gt;Release side effects：previous active → &lt;code&gt;superseded&lt;/code&gt;；accepted changes → &lt;code&gt;released&lt;/code&gt;。&lt;/div&gt;
+            &lt;div class=&quot;wg-state-note&quot;&gt;Guarded terminal：version &lt;code&gt;active&lt;/code&gt; → human approval + safe studies → &lt;code&gt;retired&lt;/code&gt;。&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;wg-state-handoff&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;strong&gt;↓ effective active version + immutable workflow / policy pins&lt;/strong&gt;&lt;/div&gt;
+
+      &lt;div class=&quot;wg-state-tier wg-tier-l3&quot;&gt;
+        &lt;div class=&quot;wg-state-label&quot;&gt;&lt;strong&gt;L3｜Study&lt;/strong&gt;&lt;span&gt;輸出：terminal outcome&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;wg-state-content&quot;&gt;
+          &lt;div class=&quot;wg-state-path&quot;&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ human preregistration →&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;preregistered&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;running&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;awaiting-review&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wg-state-arrow&quot;&gt;→ independent reviewer →&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;completed&lt;/code&gt;&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wg-state-branches&quot;&gt;
+            &lt;div class=&quot;wg-state-note&quot;&gt;&lt;code&gt;running&lt;/code&gt; ↔ &lt;code&gt;paused&lt;/code&gt;；reviewer 可將 &lt;code&gt;awaiting-review&lt;/code&gt; → &lt;code&gt;running&lt;/code&gt;。&lt;/div&gt;
+            &lt;div class=&quot;wg-state-note&quot;&gt;&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;preregistered&lt;/code&gt; / &lt;code&gt;running&lt;/code&gt; / &lt;code&gt;paused&lt;/code&gt; → &lt;code&gt;cancelled&lt;/code&gt;。&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wg-state-outcomes&quot; aria-label=&quot;Terminal outcomes&quot;&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;pass&lt;/code&gt;&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;fail&lt;/code&gt;&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;insufficient-evidence&lt;/code&gt;&lt;/span&gt;
+            &lt;span class=&quot;wg-state-node&quot;&gt;&lt;code&gt;indeterminate&lt;/code&gt;&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;wg-state-feedback&quot;&gt;↺ Version boundary feedback：L2 supersede / retire 前，L3 unfinished studies 必須先到 &lt;code&gt;paused&lt;/code&gt;、&lt;code&gt;completed&lt;/code&gt; 或 &lt;code&gt;cancelled&lt;/code&gt;。&lt;/div&gt;
     &lt;/div&gt;
   &lt;/section&gt;
 
@@ -1281,7 +1457,7 @@ flowchart TD
           svg.removeAttribute(&quot;height&quot;);
         });
       }
-      status.textContent = &quot;治理責任分離：authoring 建立 draft；人類決定與 merge 授權；study operator 執行；independent reviewer 判定 outcome。&quot;;
+      status.textContent = &quot;已區分 initial / replacement authoring，以及 prepared branch 的 active status / canonical effective authority。&quot;;
     } catch (error) {
       console.error(error);
       status.textContent = &quot;治理圖載入失敗；下方保留可讀的 diagram source。&quot;;
