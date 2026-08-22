@@ -104,7 +104,8 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
 | `docs/phase-9-primary-followup-migration.md` | Primary followup migration boundaries, parity evidence, and verification. |
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
-| `docs/workflow-governance-flow.html` | Standalone browser visualization of workflow authoring, release authority, study operation, and independent review governance. |
+| `docs/workflow-governance-flow.html` | Standalone sequence and activity visualization of workflow authoring, release, study-operation, and review handoffs. |
+| `docs/workflow-governance-layers.html` | Standalone A1 inter-layer handoff and A2 internal-lifecycle visualization for workflow design, release authority, and study review. |
 | `docs/workflow-governance-diagram-review.md` | Review-status ledger for governance-diagram fidelity findings, evidence, and remaining closure work. |
 | `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |

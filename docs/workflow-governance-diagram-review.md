@@ -1,8 +1,10 @@
 # Workflow Governance Diagram Review Status
 
-此文件追蹤 [`workflow-governance-flow.html`](workflow-governance-flow.html) 與 Work Package
-1–4 治理實作之間的審查問題。它是視覺化文件的待辦紀錄，不是 workflow contract、release
-authority 或 study outcome 的權威來源。
+此文件追蹤 [`workflow-governance-flow.html`](workflow-governance-flow.html) 的 sequence／activity
+圖、[`workflow-governance-layers.html`](workflow-governance-layers.html) 的 A1 層級交接與 A2
+各層內部流程圖，
+以及 Work Package 1–4 治理實作之間的審查問題。它是視覺化文件的待辦紀錄，不是 workflow
+contract、release authority 或 study outcome 的權威來源。
 
 - Last reviewed: 2026-08-21
 - Review basis: current repository worktree
@@ -14,10 +16,10 @@ authority 或 study outcome 的權威來源。
 
 | Status | Count | Items |
 |---|---:|---|
-| `resolved` | 3 | GD-001, GD-002, GD-006 |
-| `open-partial` | 3 | GD-003, GD-004, GD-005 |
+| `resolved` | 4 | GD-001, GD-002, GD-004, GD-006 |
+| `open-partial` | 2 | GD-003, GD-005 |
 
-目前仍需處理的是 **GD-003、GD-004、GD-005**。
+目前仍需處理的是 **GD-003、GD-005**。
 
 ## Findings
 
@@ -26,7 +28,7 @@ authority 或 study outcome 的權威來源。
 - Priority: P1
 - Status: `resolved`
 - Required order: `change create → human decision → accepted → evolve → replacement draft → release`
-- Current evidence: sequence、activity 與 L1 state relationship diagram 都先完成 change decision，
+- Current evidence: sequence、activity 與 A2 的 L1 內部流程都先完成 change decision，
   再進入 evolve 與 replacement draft。
 - Governing evidence:
   [`tests/test_workflow_authoring.py`](../tests/test_workflow_authoring.py)、
@@ -39,7 +41,7 @@ authority 或 study outcome 的權威來源。
 - Status: `resolved`
 - Required distinction: prepared branch 中 registry status 已為 `active`，但只有 commit 進入
   canonical branch 後才具 effective authority。
-- Current evidence: sequence、activity 與 L2 state relationship diagram 均明確拆分 prepared
+- Current evidence: sequence、activity 與 A2 的 L2 內部流程均明確拆分 prepared
   `status = active`、canonical merge 與 effective authority。
 - Governing evidence:
   [`workflow_authoring.py`](../src/trading/core/workflow_authoring.py)、
@@ -64,24 +66,21 @@ authority 或 study outcome 的權威來源。
 ### GD-004 — Mandatory release guards
 
 - Priority: P1
-- Status: `open-partial`
-- Already visible: generic `release guards + human approval`、immutable workflow/policy pins，以及
-  unfinished studies 在 version boundary 前必須進入安全狀態。
-- Still missing: 視覺化尚未逐項呈現 complete self-contained contract、accepted source changes
-  與 combined impact、被取代的 exact active version、exact released market/broker/execution/
-  portfolio policy pins、normative dependencies 與 pinned reference companions，以及不存在
-  unresolved/omitted accepted changes。
+- Status: `resolved`
+- Current evidence: A1 已將 complete self-contained contract、accepted changes 與 combined
+  impact、exact active target、safe unfinished studies、exact released policy pins、normative
+  dependencies／pinned companions、無遺漏 changes，以及 explicit human approval 展開為 release
+  checklist；並分別呈現未核准、unsafe studies 與未 canonical merge 的 fail-closed 路徑。
 - Governing evidence:
   [`release.md`](../.agents/skills/trading-author-workflow/references/release.md)、
   [`impact.md`](../.agents/skills/trading-author-workflow/references/impact.md)
-- Recommended closure: 將 `release guards` 展開為一個簡短 checklist 或 guarded decision node；
-  不要讓 human approval 看起來是唯一 release gate。
+- Remaining action: none.
 
 ### GD-005 — Activity diagram lifecycle scope
 
 - Priority: P2
 - Status: `open-partial`
-- Already visible elsewhere: L1–L3 state relationship diagram 已涵蓋 change
+- Already visible elsewhere: A2 各層內部流程已涵蓋 change
   `rejected/deferred/withdrawn`、study pause/cancel/reviewer-return，以及 version
   `abandoned/retired`。
 - Still missing: Activity diagram 本身仍只呈現 happy path，但標題仍為「生命週期與治理閘門」，
@@ -90,7 +89,7 @@ authority 或 study outcome 的權威來源。
   [`remove.md`](../.agents/skills/trading-author-workflow/references/remove.md)、
   [`workflow-study-governance.md`](../.agents/rules/workflow-study-governance.md)
 - Recommended closure: 保持簡圖並將標題改為 `Activity diagram｜Happy-path handoff`，同時指向
-  L1–L3 state relationship diagram 作為完整狀態補充；若仍稱 lifecycle，則必須補齊所有分支。
+  A2 各層內部流程作為完整狀態補充；若仍稱 lifecycle，則必須補齊所有分支。
 
 ### GD-006 — Stale-preview fail-closed gate
 
@@ -98,7 +97,7 @@ authority 或 study outcome 的權威來源。
 - Status: `resolved`
 - Required behavior: target drift 或 invalid partial state 必須阻止 apply、保持 zero mutation，
   並要求 fresh preview。
-- Current evidence: L1 state relationship diagram 已明示
+- Current evidence: A2 的 L1 內部流程已明示
   `Target drift / invalid partial state → apply blocked → fresh preview`，並標記不留下 mutation。
 - Governing evidence:
   [`core.md`](../.agents/skills/trading-author-workflow/references/core.md)
