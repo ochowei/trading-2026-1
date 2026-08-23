@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Workflow Governance Layers</title>
+<title>Workflow 治理圖集</title>
 <style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
 </head>
 <body>
-<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" title="Workflow Governance Layers" srcdoc="&lt;!doctype html&gt;
+<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" title="Workflow 治理圖集" srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;utf-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
 &lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
 &lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
-&lt;title&gt;Workflow Governance Layers&lt;/title&gt;
+&lt;title&gt;Workflow 治理圖集&lt;/title&gt;
 &lt;style&gt;:root {
   color-scheme: light dark;
   background-color: var(
@@ -949,13 +949,52 @@ html&gt;body{padding:0}&lt;/style&gt;
       margin: 0 auto;
     }
 
-    #workflow-governance-layers .wgl-mermaid-mobile {
-      display: none;
-    }
-
     #workflow-governance-layers .wgl-render-status {
       color: var(--muted-foreground);
       text-align: center;
+    }
+
+    #workflow-governance-layers .wgl-node-link {
+      cursor: pointer;
+    }
+
+    #workflow-governance-layers .wgl-node-link:focus-visible .node &gt; :first-child {
+      stroke: var(--ring);
+      stroke-width: 3px;
+    }
+
+    #workflow-governance-layers .wgl-a1-layout,
+    #workflow-governance-layers .wgl-a1-figure,
+    #workflow-governance-layers .wgl-a1-explorer,
+    #workflow-governance-layers .wgl-a1-detail-grid {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    #workflow-governance-layers .wgl-a1-detail-grid {
+      grid-template-columns: 1fr;
+      margin: 0;
+    }
+
+    #workflow-governance-layers .wgl-a1-caption {
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
+    #workflow-governance-layers .wgl-a1-detail-grid div {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    #workflow-governance-layers .wgl-a1-detail-grid dt {
+      color: var(--muted-foreground);
+    }
+
+    #workflow-governance-layers .wgl-a1-detail-grid dd {
+      margin: 0;
+      overflow-wrap: anywhere;
     }
 
     #workflow-governance-layers .wgl-stack {
@@ -1039,6 +1078,110 @@ html&gt;body{padding:0}&lt;/style&gt;
       gap: 6px;
     }
 
+    #workflow-governance-layers .wgl-b-mobile-only {
+      display: none;
+    }
+
+    #workflow-governance-layers .wgl-b-mobile-sequence,
+    #workflow-governance-layers .wgl-b-mobile-flow {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #workflow-governance-layers .wgl-b-mobile-sequence {
+      gap: 0;
+    }
+
+    #workflow-governance-layers .wgl-b-mobile-sequence li {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr);
+      gap: 10px;
+      position: relative;
+      padding-bottom: 14px;
+      text-align: left;
+    }
+
+    #workflow-governance-layers .wgl-b-mobile-sequence li:not(:last-child)::after {
+      content: &quot;&quot;;
+      position: absolute;
+      left: 14px;
+      top: 28px;
+      bottom: 0;
+      border-left: 1px solid var(--border);
+    }
+
+    #workflow-governance-layers .wgl-b-step-number {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      font-variant-numeric: tabular-nums;
+    }
+
+    #workflow-governance-layers .wgl-b-message {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    #workflow-governance-layers .wgl-b-message span,
+    #workflow-governance-layers .wgl-b-flow-arrow {
+      color: var(--muted-foreground);
+    }
+
+    #workflow-governance-layers .wgl-b-mobile-flow {
+      justify-items: stretch;
+      gap: 6px;
+    }
+
+    #workflow-governance-layers .wgl-b-flow-node {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--viz-series-1) 10%, transparent);
+      text-align: center;
+    }
+
+    #workflow-governance-layers .wgl-b-flow-decision {
+      background: color-mix(in srgb, var(--viz-series-2) 12%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-b-flow-authority {
+      background: color-mix(in srgb, var(--viz-series-3) 12%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-b-flow-arrow {
+      text-align: center;
+    }
+
+    #workflow-governance-layers .wgl-b-flow-branches {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    #workflow-governance-layers .wgl-b-flow-branch {
+      padding: 8px;
+      border-radius: 8px;
+      background: var(--muted);
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      #workflow-governance-layers .wgl-b-desktop-only {
+        display: none;
+      }
+
+      #workflow-governance-layers .wgl-b-mobile-only {
+        display: grid;
+      }
+    }
+
     @media (max-width: 520px) {
       #workflow-governance-layers {
         gap: 16px;
@@ -1047,14 +1190,6 @@ html&gt;body{padding:0}&lt;/style&gt;
       #workflow-governance-layers .wgl-tier {
         grid-template-columns: 1fr;
         gap: 6px;
-      }
-
-      #workflow-governance-layers .wgl-mermaid-desktop {
-        display: none;
-      }
-
-      #workflow-governance-layers .wgl-mermaid-mobile {
-        display: block;
       }
 
       #workflow-governance-layers .wgl-label {
@@ -1075,43 +1210,81 @@ html&gt;body{padding:0}&lt;/style&gt;
         grid-template-columns: 1fr;
       }
     }
+
+    @media (min-width: 700px) {
+      #workflow-governance-layers .wgl-a1-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      #workflow-governance-layers .wgl-a1-explorer {
+        align-content: start;
+        position: sticky;
+        top: 10px;
+      }
+    }
   &lt;/style&gt;
 
   &lt;header class=&quot;wgl-header&quot;&gt;
-    &lt;h1&gt;Workflow 治理層級&lt;/h1&gt;
+    &lt;h1&gt;Workflow 治理圖集&lt;/h1&gt;
   &lt;/header&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-switch-title&quot;&gt;
     &lt;h2 id=&quot;wgl-switch-title&quot;&gt;A1｜L1–L3 切換與交接&lt;/h2&gt;
-    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-desktop&quot; data-diagram=&quot;a1-desktop&quot;&gt;
+    &lt;div class=&quot;wgl-a1-layout&quot;&gt;
+      &lt;div class=&quot;wgl-a1-figure&quot;&gt;
+        &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a1&quot; data-diagram=&quot;a1-main&quot;&gt;
 flowchart TB
-  INPUT[&quot;L1 輸入來源&lt;br/&gt;① 首次建立：新需求／治理意圖／來源文件&lt;br/&gt;② 版本變更：active workflow＋change request＋人類 decision&lt;br/&gt;③ 研究回饋：L3 conclusion → 新 change request&quot;]
-  INPUT --&gt; L1[&quot;L1｜流程設計&lt;br/&gt;closed request → preview → confirm → apply&lt;br/&gt;產生完整、已驗證的 registered draft&quot;]
-  L1 --&gt;|草稿交接| C1[&quot;L2 發布檢查 1／2&lt;br/&gt;完整 self-contained contract&lt;br/&gt;accepted changes＋combined impact＋無遺漏&lt;br/&gt;被取代的 exact active version&quot;]
-  C1 --&gt; C2[&quot;L2 發布檢查 2／2&lt;br/&gt;unfinished studies 安全&lt;br/&gt;exact released policy pins&lt;br/&gt;normative dependencies＋pinned companions&lt;br/&gt;當下明確人類核准＋stable identity&quot;]
-  C2 --&gt; G{&quot;L2｜全部檢查&lt;br/&gt;都通過？&quot;}
-  G --&gt;|通過| P[&quot;Prepared branch&lt;br/&gt;registry status = active&lt;br/&gt;authority 尚未生效&quot;]
-  G --&gt;|未通過| R{&quot;阻擋原因&quot;}
-  R --&gt;|L1 缺口／未核准| FIX[&quot;停止發布，回 L1 修正&lt;br/&gt;resolved changes 不同時&lt;br/&gt;fresh preview＋重新確認&quot;]
-  R --&gt;|study 不安全| SAFE[&quot;L3 → paused／completed／cancelled&lt;br/&gt;記錄 continue／restart／close&lt;br/&gt;再重試 L2&quot;]
-  P --&gt;|prepared commit| M[&quot;Canonical branch merge&lt;br/&gt;effective authority 生效&quot;]
-  P --&gt;|尚未 merge| BLOCK[&quot;authority 無效&lt;br/&gt;禁止新的 L3 study&quot;]
-  M --&gt; L3[&quot;L3｜研究與審查&lt;br/&gt;只能使用 exact active version&lt;br/&gt;＋immutable pins 建立新 study&quot;]
-  L3 --&gt; FEEDBACK[&quot;若研究結論需要修改 workflow&lt;br/&gt;只能建立新 change request 回到 L1&lt;br/&gt;不得自動修改 L1 或 L2&quot;]
-    &lt;/pre&gt;
-    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-mobile&quot; data-diagram=&quot;a1-mobile&quot;&gt;
+  N1[&quot;A1-N1&lt;br/&gt;可能的輸入&quot;] --&gt; N2[&quot;A1-N2&lt;br/&gt;AI 預覽與檢查&quot;]
+  N2 --&gt; N3[&quot;A1-N3&lt;br/&gt;人工確認&quot;]
+  N3 --&gt; N4[&quot;A1-N4&lt;br/&gt;建立／修正草稿&quot;]
+  N4 --&gt; N5[&quot;A1-N5&lt;br/&gt;AI 發布檢查&quot;]
+  N5 --&gt; N6[&quot;A1-N6&lt;br/&gt;人工發布核准&quot;]
+  N6 --&gt; N7[&quot;A1-N7&lt;br/&gt;準備發布&quot;]
+  N7 --&gt; N8[&quot;A1-N8&lt;br/&gt;合併正式分支&quot;]
+  N8 --&gt; N9[&quot;A1-N9&lt;br/&gt;研究與獨立審查&quot;]
+        &lt;/pre&gt;
+        &lt;div class=&quot;wgl-a1-caption text-small&quot;&gt;例外路徑｜依觸發條件分別處理&lt;/div&gt;
+        &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a1&quot; data-diagram=&quot;a1-exceptions&quot;&gt;
 flowchart TB
-  INPUT[&quot;L1 輸入&lt;br/&gt;① 新需求／來源文件&lt;br/&gt;② active workflow＋change request＋人類 decision&lt;br/&gt;③ L3 conclusion → 新 change request&quot;]
-  INPUT --&gt; L1[&quot;L1｜流程設計&lt;br/&gt;preview → confirm → apply&lt;br/&gt;registered draft&quot;]
-  L1 --&gt; C1[&quot;L2 檢查 1／2&lt;br/&gt;完整 contract&lt;br/&gt;accepted changes＋impact＋無遺漏&lt;br/&gt;exact active version&quot;]
-  C1 --&gt; C2[&quot;L2 檢查 2／2&lt;br/&gt;安全 unfinished studies&lt;br/&gt;exact policy／dependency pins&lt;br/&gt;當下人類核准＋stable identity&quot;]
-  C2 --&gt; G[&quot;L2 Gate｜是否全部通過？&lt;br/&gt;否：L1 缺口／未核准 → 停止、回 L1 修正&lt;br/&gt;必要時 fresh preview＋重新確認&lt;br/&gt;否：study 不安全 → L3 進入安全狀態&lt;br/&gt;記錄 impact decision，再重試 L2&quot;]
-  G --&gt;|全部通過| P[&quot;Prepared branch&lt;br/&gt;registry status = active&lt;br/&gt;authority 尚未生效&lt;br/&gt;未 merge：禁止新 L3 study&quot;]
-  P --&gt;|canonical merge| M[&quot;Effective authority 生效&quot;]
-  M --&gt; L3[&quot;L3｜研究與審查&lt;br/&gt;exact active version&lt;br/&gt;＋immutable pins&quot;]
-  L3 --&gt; FEEDBACK[&quot;需改 workflow？&lt;br/&gt;建立新 change request 回 L1&lt;br/&gt;不得自動修改&quot;]
-    &lt;/pre&gt;
-    &lt;div id=&quot;wgl-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1…&lt;/div&gt;
+  R1[&quot;A1-R1｜檢查未通過&lt;br/&gt;返回 L1&quot;]
+  R1 ~~~ R2[&quot;A1-R2｜study 不安全&lt;br/&gt;研究先安全化&quot;]
+  R2 ~~~ R3[&quot;A1-R3｜尚未合併&lt;br/&gt;阻止新研究&quot;]
+  R3 ~~~ R4[&quot;A1-R4｜需要改流程&lt;br/&gt;提出新變更&quot;]
+        &lt;/pre&gt;
+        &lt;div id=&quot;wgl-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1…&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;wgl-a1-explorer&quot;&gt;
+      &lt;div class=&quot;viz-controls&quot;&gt;
+        &lt;label class=&quot;form-label&quot; for=&quot;wgl-a1-detail-select&quot;&gt;查看節點說明&lt;/label&gt;
+        &lt;select id=&quot;wgl-a1-detail-select&quot; class=&quot;form-select&quot;&gt;
+          &lt;option value=&quot;N1&quot;&gt;A1-N1｜可能的輸入&lt;/option&gt;
+          &lt;option value=&quot;N2&quot;&gt;A1-N2｜AI 預覽與檢查&lt;/option&gt;
+          &lt;option value=&quot;N3&quot;&gt;A1-N3｜人工確認&lt;/option&gt;
+          &lt;option value=&quot;N4&quot;&gt;A1-N4｜建立／修正草稿&lt;/option&gt;
+          &lt;option value=&quot;N5&quot;&gt;A1-N5｜AI 發布檢查&lt;/option&gt;
+          &lt;option value=&quot;N6&quot;&gt;A1-N6｜人工發布核准&lt;/option&gt;
+          &lt;option value=&quot;N7&quot;&gt;A1-N7｜準備發布&lt;/option&gt;
+          &lt;option value=&quot;N8&quot;&gt;A1-N8｜合併正式分支&lt;/option&gt;
+          &lt;option value=&quot;N9&quot;&gt;A1-N9｜研究與獨立審查&lt;/option&gt;
+          &lt;option value=&quot;R1&quot;&gt;A1-R1｜返回 L1&lt;/option&gt;
+          &lt;option value=&quot;R2&quot;&gt;A1-R2｜研究先安全化&lt;/option&gt;
+          &lt;option value=&quot;R3&quot;&gt;A1-R3｜阻止新研究&lt;/option&gt;
+          &lt;option value=&quot;R4&quot;&gt;A1-R4｜提出新變更&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/div&gt;
+      &lt;section id=&quot;wgl-a1-detail-panel&quot; class=&quot;card&quot; aria-live=&quot;polite&quot; aria-labelledby=&quot;wgl-a1-detail-title&quot;&gt;
+        &lt;h3 id=&quot;wgl-a1-detail-title&quot;&gt;A1-N1｜可能的輸入&lt;/h3&gt;
+        &lt;p id=&quot;wgl-a1-detail-summary&quot;&gt;整理首次建立、版本變更、研究回饋與 L2 退回的修正需求。&lt;/p&gt;
+        &lt;dl class=&quot;wgl-a1-detail-grid text-small&quot;&gt;
+          &lt;div&gt;&lt;dt&gt;輸入&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-input&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
+          &lt;div&gt;&lt;dt&gt;下一步&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-next&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
+          &lt;div&gt;&lt;dt&gt;限制／失敗處理&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-guard&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
+        &lt;/dl&gt;
+      &lt;/section&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
   &lt;/section&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-internal-title&quot;&gt;
@@ -1181,13 +1354,216 @@ flowchart TB
     &lt;/div&gt;
   &lt;/section&gt;
 
+  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-sequence-title&quot;&gt;
+    &lt;h2 id=&quot;wgl-sequence-title&quot;&gt;B1｜Sequence diagram：權限與交接&lt;/h2&gt;
+    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-b wgl-b-desktop-only&quot; data-diagram=&quot;b1-sequence&quot;&gt;
+sequenceDiagram
+    autonumber
+    actor H as Human Author / Owner
+    participant W as Workflow Service
+    participant G as Canonical Git
+    participant O as Study Operator
+    participant V as Independent Reviewer
+
+    Note over H,W: L1 流程設計｜首次建立與版本替換分開處理
+    alt Initial family
+        H-&gt;&gt;W: Create request → dry-run / confirm / apply
+        W--&gt;&gt;H: v001 validated draft
+    else Replacement version
+        H-&gt;&gt;W: Change-create request → dry-run / apply
+        W--&gt;&gt;H: Proposed Cxxx change
+        H-&gt;&gt;W: Guarded change decision → accepted
+        H-&gt;&gt;W: Evolve request → dry-run / confirm / apply
+        W--&gt;&gt;H: Replacement validated draft
+    end
+
+    Note over H,G: L2 發布授權｜準備完成不等於正式生效
+    H-&gt;&gt;W: Human release approval
+    W--&gt;&gt;H: Prepared branch：registry status = active，authority 尚未生效
+    H-&gt;&gt;G: Merge prepared commit to canonical
+    G--&gt;&gt;H: Effective canonical authority
+
+    Note over G,V: L3 研究與審查｜執行者做研究，審查者判定結果
+    G--&gt;&gt;O: Active version + immutable pins
+    O-&gt;&gt;W: Preregister → execute → submit evidence
+    W--&gt;&gt;V: Frozen plan + exact evidence
+    V--&gt;&gt;H: Terminal outcome
+    &lt;/pre&gt;
+    &lt;ol class=&quot;wgl-b-mobile-only wgl-b-mobile-sequence&quot; aria-label=&quot;B1：精簡版權限交接 sequence diagram&quot;&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;L1A｜流程設計：首次建立&lt;/strong&gt;&lt;span&gt;Create request → dry-run / confirm / apply → v001 draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;L1B｜流程設計：版本變更&lt;/strong&gt;&lt;span&gt;Change-create request → proposed Cxxx。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;Owner → Workflow Service&lt;/strong&gt;&lt;span&gt;Guarded change decision → accepted。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;Author → Workflow Service&lt;/strong&gt;&lt;span&gt;Evolve request → dry-run / confirm / apply → replacement draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;L2｜發布授權&lt;/strong&gt;&lt;span&gt;Human release approval → prepared branch；registry status 已是 active，但 authority 尚未生效。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;Owner → Canonical Git&lt;/strong&gt;&lt;span&gt;Merge prepared commit 後，effective authority 才生效。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;7&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;L3｜研究與審查&lt;/strong&gt;&lt;span&gt;交付 active version 與 immutable pins。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;Operator → Reviewer&lt;/strong&gt;&lt;span&gt;依 frozen plan 執行並提交 exact evidence。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-b-step-number&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;wgl-b-message&quot;&gt;&lt;strong&gt;Reviewer → Owner&lt;/strong&gt;&lt;span&gt;獨立判定 terminal outcome。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-activity-title&quot;&gt;
+    &lt;h2 id=&quot;wgl-activity-title&quot;&gt;B2｜Activity diagram：生命週期與治理閘門&lt;/h2&gt;
+    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-b wgl-b-desktop-only&quot; data-diagram=&quot;b2-activity&quot;&gt;
+flowchart TD
+    ROOT([Workflow governance])
+
+    subgraph L1[L1｜流程設計]
+      A0{Initial 或 replacement?}
+      A0 --&gt;|Initial| A1[Create request] --&gt; A2[Dry-run + confirm] --&gt; A3[v001 draft]
+      A0 --&gt;|Replacement| A4[Change create] --&gt; A5[Human decision → accepted] --&gt; A6[Evolve + dry-run + confirm] --&gt; A7[Replacement draft]
+    end
+
+    subgraph L2[L2｜發布授權]
+      direction LR
+      B1[Human release approval] --&gt; B2[Prepared branch：registry status = active&lt;br/&gt;authority not effective] --&gt; B3[Canonical merge] --&gt; B4[Effective authority]
+    end
+
+    subgraph L3[L3｜研究與獨立審查]
+      direction LR
+      C1[Preregister] --&gt; C2[Execute + evidence] --&gt; C3[Independent outcome]
+    end
+
+    ROOT --&gt; A0
+    A3 --&gt;|draft handoff| B1
+    A7 --&gt;|draft handoff| B1
+    B4 --&gt;|immutable pins| C1
+    &lt;/pre&gt;
+    &lt;div class=&quot;wgl-b-mobile-only wgl-b-mobile-flow&quot; role=&quot;img&quot; aria-label=&quot;B2：精簡版 workflow activity diagram&quot;&gt;
+      &lt;div class=&quot;wgl-b-flow-node&quot;&gt;&lt;strong&gt;L1｜流程設計&lt;/strong&gt;&lt;br&gt;建立或修改流程，產生草稿&lt;/div&gt;
+      &lt;div class=&quot;wgl-b-flow-branches&quot; aria-label=&quot;Authoring 路徑&quot;&gt;
+        &lt;div class=&quot;wgl-b-flow-branch&quot;&gt;Initial&lt;br&gt;Create → preview/apply → v001 draft&lt;/div&gt;
+        &lt;div class=&quot;wgl-b-flow-branch&quot;&gt;Replacement&lt;br&gt;Change → accepted → evolve → draft&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;wgl-b-flow-arrow&quot;&gt;↓ draft handoff&lt;/div&gt;
+      &lt;div class=&quot;wgl-b-flow-node wgl-b-flow-authority&quot;&gt;&lt;strong&gt;L2｜發布授權&lt;/strong&gt;&lt;br&gt;核准版本；prepared branch 尚未生效，canonical merge 後才有正式權威&lt;/div&gt;
+      &lt;div class=&quot;wgl-b-flow-arrow&quot;&gt;↓ immutable pins&lt;/div&gt;
+      &lt;div class=&quot;wgl-b-flow-node wgl-b-flow-decision&quot;&gt;&lt;strong&gt;L3｜研究與審查&lt;/strong&gt;&lt;br&gt;依核准版本研究，由獨立審查者判定結果&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
   &lt;script type=&quot;module&quot;&gt;
     const root = document.getElementById(&quot;workflow-governance-layers&quot;);
     const status = root.querySelector(&quot;#wgl-mermaid-status&quot;);
     const isMobileLayout = window.matchMedia(&quot;(max-width: 520px)&quot;).matches;
-    const diagram = root.querySelector(
-      isMobileLayout ? &quot;.wgl-mermaid-mobile&quot; : &quot;.wgl-mermaid-desktop&quot;
-    );
+    const a1Diagrams = [...root.querySelectorAll(&quot;.wgl-mermaid-a1&quot;)];
+    const bDiagrams = [...root.querySelectorAll(&quot;.wgl-mermaid-b&quot;)];
+    const diagrams = isMobileLayout ? a1Diagrams : [...a1Diagrams, ...bDiagrams];
+    const detailSelect = root.querySelector(&quot;#wgl-a1-detail-select&quot;);
+    const detailTitle = root.querySelector(&quot;#wgl-a1-detail-title&quot;);
+    const detailSummary = root.querySelector(&quot;#wgl-a1-detail-summary&quot;);
+    const detailInput = root.querySelector(&quot;#wgl-a1-detail-input&quot;);
+    const detailNext = root.querySelector(&quot;#wgl-a1-detail-next&quot;);
+    const detailGuard = root.querySelector(&quot;#wgl-a1-detail-guard&quot;);
+    const detailPanel = root.querySelector(&quot;#wgl-a1-detail-panel&quot;);
+
+    const details = {
+      N1: {
+        title: &quot;A1-N1｜可能的輸入&quot;,
+        summary: &quot;整理所有可能觸發 L1 authoring 的來源。&quot;,
+        input: &quot;首次建立的新需求或來源文件；active workflow 的變更需求與人類 change decision；L3 conclusion 形成的新 change request；以及 L2 退回的缺口。&quot;,
+        next: &quot;形成 closed create／change request，交給 AI 預覽與檢查。&quot;,
+        guard: &quot;研究結論與 L2 退回都只能成為修正輸入，不能自動改動 workflow。&quot;
+      },
+      N2: {
+        title: &quot;A1-N2｜AI 預覽與檢查&quot;,
+        summary: &quot;AI 解析 repository facts、來源與預期修改，先產生不寫檔的 preview。&quot;,
+        input: &quot;Closed request、目前 workflow registry、active version、來源文件與相關規則。&quot;,
+        next: &quot;把 resolved changes、目標路徑、來源處置與驗證計畫交給人工確認。&quot;,
+        guard: &quot;Target drift 或 invalid partial state 必須 fail closed；零 mutation，重新產生 fresh preview。&quot;
+      },
+      N3: {
+        title: &quot;A1-N3｜人工確認&quot;,
+        summary: &quot;人類確認 AI 已解析出的實際修改內容與範圍。&quot;,
+        input: &quot;完整 preview、resolved changes、exact paths、source disposition 與 validation plan。&quot;,
+        next: &quot;僅授權依該 preview 套用，建立或修正 registered draft。&quot;,
+        guard: &quot;若 resolved changes 改變，原確認失效，必須 fresh preview 並重新確認；此確認不是 release approval。&quot;
+      },
+      N4: {
+        title: &quot;A1-N4｜建立／修正草稿&quot;,
+        summary: &quot;依已確認的 preview 套用變更並形成完整的 registered draft。&quot;,
+        input: &quot;首次建立 request，或已 accepted change 經 evolve 形成的 replacement draft。&quot;,
+        next: &quot;交給 L2 進行發布檢查。&quot;,
+        guard: &quot;Draft 沒有 effective authority，也不能供新的 L3 study 使用。&quot;
+      },
+      N5: {
+        title: &quot;A1-N5｜AI 發布檢查&quot;,
+        summary: &quot;CLI 與 Agent 檢查 release guards 是否全部滿足。&quot;,
+        input: &quot;完整 contract、accepted changes 與 combined impact、exact active version、unfinished-study state、exact policy／dependency pins。&quot;,
+        next: &quot;全部通過後交給人類進行當下的發布核准。&quot;,
+        guard: &quot;Contract／change／pins 缺口退回 L1；不安全 study 先由 L3 進入安全狀態並記錄 impact decision。&quot;
+      },
+      N6: {
+        title: &quot;A1-N6｜人工發布核准&quot;,
+        summary: &quot;人類以 stable identity 明確批准目前這一次 release preparation。&quot;,
+        input: &quot;AI 發布檢查結果、完整 release scope 與 impact。&quot;,
+        next: &quot;允許 guarded release command 準備 immutable release evidence。&quot;,
+        guard: &quot;未核准就停止並返回 L1；核准只允許準備發布，不授權 commit、push、merge 或研究。&quot;
+      },
+      N7: {
+        title: &quot;A1-N7｜準備發布&quot;,
+        summary: &quot;Guarded release 產生 RELEASE.json 並準備 registry transition。&quot;,
+        input: &quot;通過全部 guards 的 draft 與當下明確的人類發布核准。&quot;,
+        next: &quot;Prepared branch 的 registry status 會是 active，等待 commit 進入 canonical branch。&quot;,
+        guard: &quot;此時 authority 尚未生效；尚未 canonical merge 時禁止新的 L3 study。&quot;
+      },
+      N8: {
+        title: &quot;A1-N8｜合併正式分支&quot;,
+        summary: &quot;Prepared release commit 進入 repository canonical branch。&quot;,
+        input: &quot;已準備完成且通過 repository review／merge 流程的 release commit。&quot;,
+        next: &quot;Workflow version 取得 effective authority，可供新的 study 精確 pinning。&quot;,
+        guard: &quot;Prepared branch 上的 active registry 狀態不能取代 canonical merge。&quot;
+      },
+      N9: {
+        title: &quot;A1-N9｜研究與獨立審查&quot;,
+        summary: &quot;L3 使用 exact active version 與 immutable pins 建立、執行及審查 study。&quot;,
+        input: &quot;Effective canonical workflow authority、exact policies／dependencies，以及各階段必要的人類授權。&quot;,
+        next: &quot;Operator 提交 evidence；獨立 reviewer 經人工確認後產生 terminal outcome。&quot;,
+        guard: &quot;各階段 authority 不可互相推導；研究結論不能自動修改 workflow。&quot;
+      },
+      R1: {
+        title: &quot;A1-R1｜返回 L1&quot;,
+        summary: &quot;處理 contract、accepted change、impact、pins 或人類核准不足。&quot;,
+        input: &quot;L2 的 fail-closed 缺口報告或未取得核准的結果。&quot;,
+        next: &quot;回到 AI 預覽與檢查，修正後重新走人工確認與 L2。&quot;,
+        guard: &quot;若修正後的 resolved changes 不同，必須 fresh preview 並重新確認。&quot;
+      },
+      R2: {
+        title: &quot;A1-R2｜研究先安全化&quot;,
+        summary: &quot;在版本邊界前先讓 unfinished studies 到達合法安全狀態。&quot;,
+        input: &quot;Running、preregistered、draft 或 awaiting-review study 對 release 形成阻擋。&quot;,
+        next: &quot;由 L3 合法進入 paused、completed 或 cancelled；記錄 continue、restart 或 close impact decision 後重試 L2。&quot;,
+        guard: &quot;Workflow author 只能評估 impact，不能代替 operator／reviewer 操作、完成或重解釋 study。&quot;
+      },
+      R3: {
+        title: &quot;A1-R3｜阻止新研究&quot;,
+        summary: &quot;Prepared release 尚未進入 canonical branch 時維持 fail closed。&quot;,
+        input: &quot;Registry 已在 prepared branch 顯示 active，但 commit 尚未 canonical merge。&quot;,
+        next: &quot;等待正常 repository merge 流程；不建立新的 L3 study。&quot;,
+        guard: &quot;不得把 prepared registry active 誤認為 effective authority。&quot;
+      },
+      R4: {
+        title: &quot;A1-R4｜提出新變更&quot;,
+        summary: &quot;把 L3 的研究結論轉成新的 workflow change request。&quot;,
+        input: &quot;Pass、fail、insufficient-evidence 或 indeterminate conclusion 所揭示的流程改善需求。&quot;,
+        next: &quot;回到 L1，建立獨立 change record 並重新經過 authoring 與 release governance。&quot;,
+        guard: &quot;不得直接覆寫 released workflow，也不得讓 study outcome 自動變更 L1 或 L2。&quot;
+      }
+    };
+
+    const showDetail = (nodeId) =&gt; {
+      const detail = details[nodeId];
+      if (!detail) return;
+      detailSelect.value = nodeId;
+      detailTitle.textContent = detail.title;
+      detailSummary.textContent = detail.summary;
+      detailInput.textContent = detail.input;
+      detailNext.textContent = detail.next;
+      detailGuard.textContent = detail.guard;
+    };
+
+    detailSelect.addEventListener(&quot;change&quot;, (event) =&gt; showDetail(event.target.value));
+    showDetail(detailSelect.value);
 
     const colorCanvas = document.createElement(&quot;canvas&quot;);
     colorCanvas.width = 1;
@@ -1235,7 +1611,20 @@ flowchart TB
           clusterBkg: readColor(&quot;--background&quot;),
           clusterBorder: readColor(&quot;--border&quot;),
           edgeLabelBackground: readColor(&quot;--background&quot;),
-          fontSize: &quot;14px&quot;
+          actorBkg: readColor(&quot;--card&quot;),
+          actorBorder: readColor(&quot;--border&quot;),
+          actorTextColor: readColor(&quot;--card-foreground&quot;),
+          actorLineColor: readColor(&quot;--border&quot;),
+          signalColor: readColor(&quot;--foreground&quot;),
+          signalTextColor: readColor(&quot;--foreground&quot;),
+          labelBoxBkgColor: readColor(&quot;--muted&quot;),
+          labelBoxBorderColor: readColor(&quot;--border&quot;),
+          labelTextColor: readColor(&quot;--foreground&quot;),
+          loopTextColor: readColor(&quot;--foreground&quot;),
+          noteBkgColor: readColor(&quot;--accent&quot;),
+          noteBorderColor: readColor(&quot;--border&quot;),
+          noteTextColor: readColor(&quot;--accent-foreground&quot;),
+          fontSize: &quot;13px&quot;
         },
         flowchart: {
           curve: &quot;basis&quot;,
@@ -1244,18 +1633,58 @@ flowchart TB
           rankSpacing: isMobileLayout ? 28 : 34,
           padding: 10,
           useMaxWidth: true
+        },
+        sequence: {
+          useMaxWidth: true,
+          actorMargin: 28,
+          messageMargin: 24,
+          diagramMarginX: 8,
+          diagramMarginY: 8
         }
       });
 
-      await mermaid.run({ nodes: [diagram] });
-      const svg = diagram.querySelector(&quot;svg&quot;);
-      svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
-      svg.setAttribute(
-        &quot;aria-label&quot;,
-        &quot;A1：輸入進入 L1 形成草稿，L2 全部發布檢查通過且合併 canonical branch 後，才把固定版本交給 L3&quot;
-      );
-      svg.removeAttribute(&quot;height&quot;);
-      status.textContent = &quot;A1 由 Mermaid.js 渲染。&quot;;
+      await mermaid.run({ nodes: diagrams });
+      const svgs = diagrams.map((item) =&gt; item.querySelector(&quot;svg&quot;));
+      svgs.forEach((svg, index) =&gt; {
+        const diagramName = diagrams[index].dataset.diagram;
+        svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
+        const labels = {
+          &quot;a1-main&quot;: &quot;A1：簡化節點顯示 L1 authoring、L2 release authority 與 L3 research review；每個節點可開啟詳細說明&quot;,
+          &quot;a1-exceptions&quot;: &quot;A1：L2 返回、研究安全化、阻止新研究與提出新變更的例外路徑；每個節點可開啟詳細說明&quot;,
+          &quot;b1-sequence&quot;: &quot;B1：Human Author、Workflow Service、Canonical Git、Study Operator 與 Independent Reviewer 的權限交接順序&quot;,
+          &quot;b2-activity&quot;: &quot;B2：L1 流程設計、L2 發布授權與 L3 研究審查的生命週期與治理閘門&quot;
+        };
+        svg.setAttribute(&quot;aria-label&quot;, labels[diagramName]);
+        svg.removeAttribute(&quot;height&quot;);
+      });
+
+      Object.entries(details).forEach(([nodeId, detail]) =&gt; {
+        const node = svgs
+          .flatMap((svg) =&gt; [...svg.querySelectorAll(&quot;g.node&quot;)])
+          .find((candidate) =&gt; candidate.id.startsWith(`flowchart-${nodeId}-`));
+        if (!node) return;
+        const link = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;a&quot;);
+        const title = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;title&quot;);
+        title.textContent = `查看 ${detail.title} 的詳細說明`;
+        link.setAttribute(&quot;href&quot;, &quot;#wgl-a1-detail-panel&quot;);
+        link.setAttribute(&quot;aria-label&quot;, title.textContent);
+        link.classList.add(&quot;wgl-node-link&quot;);
+        node.parentNode.insertBefore(link, node);
+        link.append(title, node);
+        link.addEventListener(&quot;pointerenter&quot;, () =&gt; {
+          if (window.matchMedia(&quot;(hover: hover)&quot;).matches) showDetail(nodeId);
+        });
+        link.addEventListener(&quot;focus&quot;, () =&gt; showDetail(nodeId));
+        link.addEventListener(&quot;click&quot;, (event) =&gt; {
+          event.preventDefault();
+          showDetail(nodeId);
+          if (isMobileLayout) detailPanel.scrollIntoView({ block: &quot;start&quot; });
+        });
+      });
+
+      status.textContent = isMobileLayout
+        ? &quot;點選 A1 節點，可在下方查看詳細說明。&quot;
+        : &quot;將滑鼠移到、聚焦或點選 A1 節點，可在右欄查看詳細說明。&quot;;
     } catch (error) {
       console.error(error);
       status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
