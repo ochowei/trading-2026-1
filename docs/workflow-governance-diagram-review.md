@@ -6,7 +6,7 @@
 以及 Work Package 1–4 治理實作之間的審查問題。它是視覺化文件的待辦紀錄，不是 workflow
 contract、release authority 或 study outcome 的權威來源。
 
-- Last reviewed: 2026-08-21
+- Last reviewed: 2026-08-23
 - Review basis: current repository worktree
 - Status vocabulary:
   - `resolved`: 原始問題已在目前視覺化中可見且語意正確。
@@ -97,8 +97,9 @@ contract、release authority 或 study outcome 的權威來源。
 - Status: `resolved`
 - Required behavior: target drift 或 invalid partial state 必須阻止 apply、保持 zero mutation，
   並要求 fresh preview。
-- Current evidence: A2 的 L1 內部流程已明示
-  `Target drift / invalid partial state → apply blocked → fresh preview`，並標記不留下 mutation。
+- Current evidence: A1 已直接畫出 preview 失敗後修正輸入並回到 fresh preview 的路徑；A2 的
+  L1 內部流程也明示 `Target drift / invalid partial state → apply blocked → fresh preview`，並標記
+  不留下 mutation。
 - Governing evidence:
   [`core.md`](../.agents/skills/trading-author-workflow/references/core.md)
 - Remaining action: none. 此 gate 不需重複塞入維持簡化的 happy-path diagram。
