@@ -53,7 +53,7 @@ implementation and tests directly while following [CLAUDE.md](CLAUDE.md).
   `docs/ARCHITECTURE.md` in the same change. Also update it for new repeated file patterns, public
   entry points, generated artifacts, or local-only data boundaries. Routine additions that already
   fit a documented pattern do not need per-instance entries.
-- Do not edit `pm/` unless the user explicitly designates the task as `HUMAN_PM_HELPER`.
+- Do not edit `docs/pm/` unless the user explicitly designates the task as `HUMAN_PM_HELPER`.
 - Use the required execution model for every non-grandfathered experiment.
 - Preserve the freshness metadata when changing experiment context or cross-asset lessons.
 - Do not add or rename a package under `src/trading/experiments/`; that tree is a closed legacy

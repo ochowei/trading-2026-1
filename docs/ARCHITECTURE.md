@@ -114,15 +114,15 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |
 | `docs/superpowers/plans/YYYY-MM-DD-*.md` | Historical approved implementation plans retained as execution context. |
 
-### `pm/`
+### `docs/pm/`
 
 Human-maintained product-management material. Agents must not edit this directory unless the user
 explicitly designates the task as `HUMAN_PM_HELPER`.
 
 | Path | Purpose |
 |---|---|
-| `pm/HUMAN_PM_MEMO.md` | Watch list, strategy ideas, execution notes, and human-maintained change history. |
-| `pm/USE_CASES.md` | Human workflows and common-operation index. |
+| `docs/pm/HUMAN_PM_MEMO.md` | Watch list, strategy ideas, execution notes, and human-maintained change history. |
+| `docs/pm/USE_CASES.md` | Human workflows and common-operation index. |
 
 ## Application source
 
