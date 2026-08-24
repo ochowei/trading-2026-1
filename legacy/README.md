@@ -27,6 +27,13 @@ locations contain the same identity, the canonical result wins and diagnostics r
 The related identity is recorded for historical navigation, not as a claim that the archived result
 has the same semantics as the final package occupying that numbered identity.
 
+## Archived agent workflows
+
+`claude/commands/` and `agent-skills/` preserve the former Claude command definitions and their
+matching Codex skills for the closed legacy experiment workflow. They are archival copies only and
+are intentionally outside the active `.claude/` and `.agents/skills/` discovery paths. New research
+must use a released workflow and `trading-operate-workflow`.
+
 ### Superseded result-directory names
 
 | Archived result directory | Related archived identity or disposition |

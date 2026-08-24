@@ -62,16 +62,15 @@ Repository-owned Agent knowledge and skills.
 | `.agents/context/cross_asset_evidence.md` | Detailed evidence supporting the compact cross-asset lessons. |
 | `.agents/rules/execution-model.md` | Mandatory execution-model contract for non-grandfathered experiments. |
 | `.agents/rules/workflow-study-governance.md` | Shared canonical workflow-study identity, lifecycle, authority-separation, evidence, privacy, and version-boundary rules used by operator and reviewer skills. |
-| `.agents/skills/trading-*/SKILL.md` | Workflow instructions for a specific repository research task. |
+| `.agents/skills/trading-*/SKILL.md` | Active workflow instructions for a specific repository research task. Legacy experiment skills are archived under `legacy/agent-skills/`. |
 | `.agents/skills/trading-*/agents/openai.yaml` | Skill discovery metadata and default Agent presentation. |
-| `.agents/skills/trading-*/assets/` | Templates copied or adapted by a skill, currently used by workflow authoring. |
-| `.agents/skills/trading-*/references/` | Detailed mode-specific contracts loaded through progressive disclosure only when a skill workflow needs them; compatibility pointers may retain old reference paths without duplicating authority. |
+| `.agents/skills/trading-*/assets/` | Templates copied or adapted by an active skill, currently used by workflow authoring. |
+| `.agents/skills/trading-*/references/` | Detailed mode-specific contracts loaded through progressive disclosure only when an active skill workflow needs them. |
 
 ### `.claude/commands/`
 
-Compatibility command definitions for the experiment lifecycle. Files such as
-`new-experiment.md`, `run-experiment.md`, and `evaluate-best.md` route older Claude command flows to
-the corresponding repository behavior. New cross-Agent workflows should normally live in
+Active Claude command definitions are no longer kept here. The former legacy experiment commands
+are archived under `legacy/claude/commands/`; new cross-Agent workflows should normally live in
 `.agents/skills/trading-*/`.
 
 ### `.github/workflows/`
