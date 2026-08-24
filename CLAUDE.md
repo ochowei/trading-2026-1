@@ -24,7 +24,6 @@
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **架構文件是唯一權威**：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 是專案檔案、資料夾用途與 ownership boundary 的 canonical map。
 - **自動維護架構文件**：新增、刪除、搬移、重新命名或改變 tracked 檔案／資料夾用途時，必須在同一個 change 更新 `docs/ARCHITECTURE.md`。新增 public entry point、重複性檔案模式、generated artifact 或 local-only data boundary 時亦同。若只是新增符合文件既有 pattern 的 experiment、result、test、ADR 或 workflow study，無須逐一列出，除非 pattern 或責任本身改變。
-- **新增實驗時**：更新 `.github/workflows/tqqq-backtest.yml` 的實驗選項，以及對應資產的 `src/trading/experiments/EXPERIMENTS_<TICKER>.md`。若是全新資產，建立該總覽文件並在本文件的「按需參考」保留通用查找方式，不要新增逐一列舉且容易過期的資產清單。
 - **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
 - **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
@@ -60,7 +59,9 @@ uv run ruff format --check src/
 uv run ruff check src/ --fix && uv run ruff format src/
 ```
 
-> CI（GitHub Action `lint.yml`）會在每次 push / PR 自動執行上述檢查，未通過則 block merge。
+> CI（GitHub Action `ci.yml`）會在 pull request 與 `main` push 執行上述檢查，並驗證
+> workflow、policy、legacy experiment inventory 與 market-data migration contracts。是否阻擋
+> merge 由 GitHub branch protection 設定決定。
 
 ## 成交模型（新實驗必讀）
 
