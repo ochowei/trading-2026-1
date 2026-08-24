@@ -963,6 +963,46 @@ html&gt;body{padding:0}&lt;/style&gt;
       stroke-width: 3px;
     }
 
+    #workflow-governance-layers .wgl-node-link .node &gt; :first-child {
+      stroke: var(--border);
+    }
+
+    #workflow-governance-layers .wgl-node-l1 .node &gt; :first-child {
+      fill: color-mix(in srgb, var(--viz-series-1) 12%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-node-l2 .node &gt; :first-child {
+      fill: color-mix(in srgb, var(--viz-series-3) 12%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-node-l3 .node &gt; :first-child {
+      fill: color-mix(in srgb, var(--viz-series-2) 12%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-node-l1.wgl-node-decision .node &gt; :first-child {
+      fill: color-mix(in srgb, var(--viz-series-1) 22%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-node-l2.wgl-node-decision .node &gt; :first-child {
+      fill: color-mix(in srgb, var(--viz-series-3) 22%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-node-l3.wgl-node-decision .node &gt; :first-child {
+      fill: color-mix(in srgb, var(--viz-series-2) 22%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-cluster-l1 &gt; rect {
+      fill: color-mix(in srgb, var(--viz-series-1) 5%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-cluster-l2 &gt; rect {
+      fill: color-mix(in srgb, var(--viz-series-3) 5%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-cluster-l3 &gt; rect {
+      fill: color-mix(in srgb, var(--viz-series-2) 5%, transparent);
+    }
+
     #workflow-governance-layers .wgl-a1-layout,
     #workflow-governance-layers .wgl-a1-figure,
     #workflow-governance-layers .wgl-a1-explorer,
@@ -1293,6 +1333,7 @@ flowchart TB
     const detailNext = root.querySelector(&quot;#wgl-a1-detail-next&quot;);
     const detailGuard = root.querySelector(&quot;#wgl-a1-detail-guard&quot;);
     const detailPanel = root.querySelector(&quot;#wgl-a1-detail-panel&quot;);
+    const decisionNodes = new Set([&quot;L1N3&quot;, &quot;L1N4&quot;, &quot;L2N2&quot;, &quot;L2N3&quot;, &quot;L2N5&quot;, &quot;L3N4&quot;]);
 
     const details = {
       L1N1: {
@@ -1508,6 +1549,12 @@ flowchart TB
         svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
         svg.setAttribute(&quot;aria-label&quot;, &quot;A1：L1 流程設計、L2 發布授權與 L3 研究審查的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;);
         svg.removeAttribute(&quot;height&quot;);
+        svg.querySelectorAll(&quot;g.cluster&quot;).forEach((cluster) =&gt; {
+          const label = cluster.textContent.trim();
+          if (label.startsWith(&quot;L1｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l1&quot;);
+          if (label.startsWith(&quot;L2｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l2&quot;);
+          if (label.startsWith(&quot;L3｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l3&quot;);
+        });
       });
 
       Object.entries(details).forEach(([nodeId, detail]) =&gt; {
@@ -1521,6 +1568,8 @@ flowchart TB
         link.setAttribute(&quot;data-tooltip&quot;, detail.summary);
         link.setAttribute(&quot;data-tooltip-placement&quot;, &quot;top&quot;);
         link.classList.add(&quot;wgl-node-link&quot;);
+        link.classList.add(`wgl-node-${nodeId.slice(0, 2).toLowerCase()}`);
+        if (decisionNodes.has(nodeId)) link.classList.add(&quot;wgl-node-decision&quot;);
         node.parentNode.insertBefore(link, node);
         link.append(node);
         link.addEventListener(&quot;pointerenter&quot;, () =&gt; {
