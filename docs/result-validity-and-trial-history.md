@@ -64,6 +64,13 @@ affected definition lineage.
 - the legacy `--legacy` path writes historical legacy evidence only and never advances
   `latest.json`.
 
+Repository-root `results/` is the only writable and authorization-capable result root.
+Legacy-schema latest results retained under `legacy/results/` are read-only diagnostics: comparison,
+an explicit result-status query, `result status --all`, and documentation checks may fall back to
+the archive when no canonical latest exists. Canonical results always win duplicate identities.
+Freshness, evaluation/ranking, followup, Shadow/Active, qualification, and formal evidence
+verification never use archive fallback.
+
 `latest.json` is therefore a convenience pointer, not a qualification decision. Ranking and
 follow-up selection use only complete, successful, current-definition, current-data results.
 The coordinator generates canonical evidence from the runner's typed raw input and verifies its

@@ -2,7 +2,13 @@ import json
 
 import pytest
 
-from trading.core.results import compare_experiments, save_result
+from trading.core.results import (
+    ResultSource,
+    compare_experiments,
+    inspect_result,
+    latest_result_names,
+    save_result,
+)
 from trading.research_data.result_schema import ResultValidityStatus
 
 
@@ -39,15 +45,93 @@ def test_compare_is_read_only_and_displays_legacy_validity(monkeypatch, tmp_path
     assert {path: path.read_bytes() for path in before} == before
 
 
+def test_archive_fallback_is_explicit_and_reports_its_source(tmp_path) -> None:
+    results_root = tmp_path / "results"
+    archive_root = tmp_path / "legacy" / "results"
+    latest = archive_root / "experiment" / "latest.json"
+    latest.parent.mkdir(parents=True)
+    latest.write_text(json.dumps(_legacy_result(1)), encoding="utf-8")
+
+    assert (
+        inspect_result(
+            "experiment",
+            results_dir=results_root,
+            archive_dir=archive_root,
+        )
+        is None
+    )
+
+    record = inspect_result(
+        "experiment",
+        results_dir=results_root,
+        archive_dir=archive_root,
+        allow_archive=True,
+    )
+
+    assert record is not None
+    assert record.path == latest
+    assert record.source is ResultSource.LEGACY_ARCHIVE
+
+
+def test_diagnostic_archive_fallback_prefers_canonical_and_warns(tmp_path, caplog) -> None:
+    results_root = tmp_path / "results"
+    archive_root = tmp_path / "legacy" / "results"
+    canonical = results_root / "experiment" / "latest.json"
+    archived = archive_root / "experiment" / "latest.json"
+    canonical.parent.mkdir(parents=True)
+    archived.parent.mkdir(parents=True)
+    canonical.write_text(json.dumps(_legacy_result(2)), encoding="utf-8")
+    archived.write_text(json.dumps(_legacy_result(1)), encoding="utf-8")
+
+    record = inspect_result(
+        "experiment",
+        results_dir=results_root,
+        archive_dir=archive_root,
+        allow_archive=True,
+    )
+
+    assert record is not None
+    assert record.path == canonical
+    assert record.source is ResultSource.CANONICAL
+    assert "duplicate latest result" in caplog.text
+
+
+def test_compare_and_status_inventory_can_read_archive(tmp_path, capsys) -> None:
+    results_root = tmp_path / "results"
+    archive_root = tmp_path / "legacy" / "results"
+    for name, signals in (("first", 1), ("second", 2)):
+        latest = archive_root / name / "latest.json"
+        latest.parent.mkdir(parents=True)
+        latest.write_text(json.dumps(_legacy_result(signals)), encoding="utf-8")
+
+    assert latest_result_names(
+        results_dir=results_root,
+        archive_dir=archive_root,
+        include_archive=True,
+    ) == ("first", "second")
+
+    compare_experiments(
+        ["first", "second"],
+        results_dir=results_root,
+        archive_dir=archive_root,
+        definition_resolver=lambda _name: None,
+    )
+
+    assert capsys.readouterr().out.count("Validity: legacy [legacy archive]") == 2
+
+
 def test_legacy_save_does_not_advance_latest(tmp_path, monkeypatch) -> None:
     results_root = tmp_path / "results"
+    archive_root = tmp_path / "legacy" / "results"
     monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.core.results.ARCHIVED_RESULTS_DIR", archive_root)
 
     saved_path = save_result("experiment", _legacy_result(1))
 
     assert saved_path.exists()
     assert saved_path.name != "latest.json"
     assert not (results_root / "experiment" / "latest.json").exists()
+    assert not archive_root.exists()
 
 
 def test_legacy_result_status_cannot_be_qualified() -> None:

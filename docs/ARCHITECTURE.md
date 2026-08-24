@@ -46,7 +46,7 @@ manual trading state are deliberately local-only.
 | `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
 | `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
 | `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
-| `legacy/results/` | Superseded legacy result-directory names retained for historical inspection only; runtime result readers do not scan this archive. |
+| `legacy/results/` | Read-only legacy-schema latest results and superseded result-directory names. Diagnostic comparison, explicit status, and documentation checks may fall back here; selection, authorization, qualification, freshness, formal evidence readers, and all writers remain canonical-only. |
 | `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
 | `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
 
@@ -297,7 +297,7 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 | Pattern | Purpose |
 |---|---|
-| `results/<experiment_name>/latest.json` | Retained latest result consumed by comparison, validity, documentation, and selection workflows. |
+| `results/<experiment_name>/latest.json` | Canonical retained latest result consumed by validity, selection, authorization, and formal workflows; diagnostic readers prefer it over any archived duplicate. |
 | `results/<experiment_name>/prev_1.json`, `prev_2.json` | Retained recent predecessors when present. |
 | `results/<experiment_name>/<snapshot_id>.snapshot.json` | Retained immutable snapshot manifest used for reproducible formal execution. |
 | `results/<experiment_name>/<timestamp>.json` | Historical run output; most such files are ignored unless explicitly retained by repository policy. |
@@ -310,8 +310,11 @@ trading data must never be placed in `tests/` or committed anywhere.
 Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data
 and semantic definition references.
 
-Superseded legacy result-directory aliases that are no longer runtime inputs are retained under
-`legacy/results/`; see `legacy/README.md` for their historical identity map.
+Legacy-schema latest results and superseded aliases are retained under `legacy/results/`. Only
+comparison, explicit result-status, and documentation diagnostics may fall back there. Freshness,
+evaluation/ranking, followup, Shadow/Active, qualification, formal evidence verification, and all
+writers use canonical `results/` exclusively. See `legacy/README.md` for the archive contract and
+historical alias map.
 
 ### `workflows/`
 

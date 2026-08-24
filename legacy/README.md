@@ -14,12 +14,20 @@ released workflow and `src/trading/research_definitions/`.
 
 ## Results
 
-`results/` preserves superseded result-directory names that no longer match a discoverable legacy
-experiment identity. These files are archival records only: the runtime does not scan this directory,
-and current result evidence continues to live under repository-root `results/`.
+`results/` preserves legacy-schema `latest.json` files for the closed experiment inventory plus
+superseded result-directory names that no longer match a discoverable identity. These files are
+read-only archival records. Diagnostic comparison, explicit result-status queries, and documentation
+checks may fall back here when repository-root `results/` has no canonical latest result.
+
+Archive fallback never participates in freshness, experiment evaluation or ranking, followup,
+Shadow/Active authorization, qualification, or formal evidence verification. All result writers
+publish only under repository-root `results/`; they never create or update this archive. When both
+locations contain the same identity, the canonical result wins and diagnostics report the duplicate.
 
 The related identity is recorded for historical navigation, not as a claim that the archived result
 has the same semantics as the final package occupying that numbered identity.
+
+### Superseded result-directory names
 
 | Archived result directory | Related archived identity or disposition |
 |---|---|
