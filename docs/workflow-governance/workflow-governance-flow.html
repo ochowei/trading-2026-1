@@ -956,8 +956,7 @@ html&gt;body{padding:0}&lt;/style&gt;
       display: none;
     }
 
-    #workflow-governance-flow .wg-mobile-sequence,
-    #workflow-governance-flow .wg-mobile-flow {
+    #workflow-governance-flow .wg-mobile-sequence {
       list-style: none;
       margin: 0;
       padding: 0;
@@ -1006,46 +1005,6 @@ html&gt;body{padding:0}&lt;/style&gt;
       color: var(--muted-foreground);
     }
 
-    #workflow-governance-flow .wg-mobile-flow {
-      justify-items: stretch;
-      gap: 6px;
-    }
-
-    #workflow-governance-flow .wg-flow-node {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: color-mix(in srgb, var(--viz-series-1) 10%, transparent);
-      text-align: center;
-    }
-
-    #workflow-governance-flow .wg-flow-decision {
-      background: color-mix(in srgb, var(--viz-series-2) 12%, transparent);
-    }
-
-    #workflow-governance-flow .wg-flow-authority {
-      background: color-mix(in srgb, var(--viz-series-3) 12%, transparent);
-    }
-
-    #workflow-governance-flow .wg-flow-arrow {
-      color: var(--muted-foreground);
-      text-align: center;
-    }
-
-    #workflow-governance-flow .wg-flow-branches {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
-    }
-
-    #workflow-governance-flow .wg-flow-branch {
-      padding: 8px;
-      border-radius: 8px;
-      background: var(--muted);
-      color: var(--muted-foreground);
-      text-align: center;
-    }
-
     @media (max-width: 520px) {
       #workflow-governance-flow {
         gap: 22px;
@@ -1079,7 +1038,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   &lt;/header&gt;
 
   &lt;section class=&quot;wg-panel&quot; aria-labelledby=&quot;wg-sequence-title&quot;&gt;
-    &lt;h2 id=&quot;wg-sequence-title&quot;&gt;B1｜Sequence diagram：權限與交接&lt;/h2&gt;
+    &lt;h2 id=&quot;wg-sequence-title&quot;&gt;B1｜Sequence diagram：高階角色交接&lt;/h2&gt;
     &lt;pre class=&quot;mermaid wg-diagram wg-desktop-only&quot; data-diagram=&quot;sequence&quot;&gt;
 sequenceDiagram
     autonumber
@@ -1113,7 +1072,7 @@ sequenceDiagram
     W--&gt;&gt;V: Frozen plan + exact evidence
     V--&gt;&gt;H: Terminal outcome
     &lt;/pre&gt;
-    &lt;ol class=&quot;wg-mobile-only wg-mobile-sequence&quot; aria-label=&quot;B1：手機版權限交接 sequence diagram&quot;&gt;
+    &lt;ol class=&quot;wg-mobile-only wg-mobile-sequence&quot; aria-label=&quot;B1：手機版高階角色交接 sequence diagram&quot;&gt;
       &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;L1A｜流程設計：首次建立&lt;/strong&gt;&lt;span&gt;Create request → dry-run / confirm / apply → v001 draft。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
       &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;L1B｜流程設計：版本變更&lt;/strong&gt;&lt;span&gt;Change-create request → proposed Cxxx。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
       &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Owner → Workflow Service&lt;/strong&gt;&lt;span&gt;Guarded change decision → accepted。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
@@ -1124,46 +1083,6 @@ sequenceDiagram
       &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Operator → Reviewer&lt;/strong&gt;&lt;span&gt;依 frozen plan 執行並提交 exact evidence。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
       &lt;li&gt;&lt;span class=&quot;wg-step-number&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;wg-message&quot;&gt;&lt;strong&gt;Reviewer → Owner&lt;/strong&gt;&lt;span&gt;獨立判定 terminal outcome。&lt;/span&gt;&lt;/span&gt;&lt;/li&gt;
     &lt;/ol&gt;
-  &lt;/section&gt;
-
-  &lt;section class=&quot;wg-panel&quot; aria-labelledby=&quot;wg-activity-title&quot;&gt;
-    &lt;h2 id=&quot;wg-activity-title&quot;&gt;B2｜Activity diagram：生命週期與治理閘門&lt;/h2&gt;
-    &lt;pre class=&quot;mermaid wg-diagram wg-desktop-only&quot; data-diagram=&quot;activity&quot;&gt;
-flowchart TD
-    ROOT([Workflow governance])
-
-    subgraph L1[L1｜流程設計]
-      A0{Initial 或 replacement?}
-      A0 --&gt;|Initial| A1[Create request] --&gt; A2[Dry-run + confirm] --&gt; A3[v001 draft]
-      A0 --&gt;|Replacement| A4[Change create] --&gt; A5[Human decision → accepted] --&gt; A6[Evolve + dry-run + confirm] --&gt; A7[Replacement draft]
-    end
-
-    subgraph L2[L2｜發布授權]
-      direction LR
-      B1[Human release approval] --&gt; B2[Prepared branch：registry status = active&lt;br/&gt;authority not effective] --&gt; B3[Canonical merge] --&gt; B4[Effective authority]
-    end
-
-    subgraph L3[L3｜研究與獨立審查]
-      direction LR
-      C1[Preregister] --&gt; C2[Execute + evidence] --&gt; C3[Independent outcome]
-    end
-
-    ROOT --&gt; A0
-    A3 --&gt;|draft handoff| B1
-    A7 --&gt;|draft handoff| B1
-    B4 --&gt;|immutable pins| C1
-    &lt;/pre&gt;
-    &lt;div class=&quot;wg-mobile-only wg-mobile-flow&quot; role=&quot;img&quot; aria-label=&quot;B2：手機版 workflow activity diagram&quot;&gt;
-      &lt;div class=&quot;wg-flow-node&quot;&gt;&lt;strong&gt;L1｜流程設計&lt;/strong&gt;&lt;br&gt;建立或修改流程，產生草稿&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-branches&quot; aria-label=&quot;Authoring 路徑&quot;&gt;
-        &lt;div class=&quot;wg-flow-branch&quot;&gt;Initial&lt;br&gt;Create → preview/apply → v001 draft&lt;/div&gt;
-        &lt;div class=&quot;wg-flow-branch&quot;&gt;Replacement&lt;br&gt;Change → accepted → evolve → draft&lt;/div&gt;
-      &lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ draft handoff&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node wg-flow-authority&quot;&gt;&lt;strong&gt;L2｜發布授權&lt;/strong&gt;&lt;br&gt;核准版本；prepared branch 尚未生效，canonical merge 後才有正式權威&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-arrow&quot;&gt;↓ immutable pins&lt;/div&gt;
-      &lt;div class=&quot;wg-flow-node wg-flow-decision&quot;&gt;&lt;strong&gt;L3｜研究與審查&lt;/strong&gt;&lt;br&gt;依核准版本研究，由獨立審查者判定結果&lt;/div&gt;
-    &lt;/div&gt;
   &lt;/section&gt;
 
   &lt;script type=&quot;module&quot;&gt;
