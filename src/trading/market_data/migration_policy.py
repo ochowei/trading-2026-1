@@ -64,13 +64,19 @@ def scan_experiment_market_data_bypasses(repo_root: Path) -> tuple[BypassFinding
     """
 
     root = repo_root.resolve()
-    experiment_root = root / "src" / "trading" / "experiments"
-    if not experiment_root.is_dir():
-        raise MarketDataPolicyError(f"experiment root does not exist: {experiment_root}")
+    experiment_roots = (
+        root / "src" / "trading" / "experiments",
+        root / "legacy" / "experiments",
+    )
+    missing_roots = tuple(path for path in experiment_roots if not path.is_dir())
+    if missing_roots:
+        rendered = ", ".join(str(path) for path in missing_roots)
+        raise MarketDataPolicyError(f"experiment root does not exist: {rendered}")
 
     findings: list[BypassFinding] = []
-    for path in sorted(experiment_root.rglob("*.py")):
-        findings.extend(_scan_file(path, root))
+    for experiment_root in experiment_roots:
+        for path in sorted(experiment_root.rglob("*.py")):
+            findings.extend(_scan_file(path, root))
     return tuple(sorted(findings, key=lambda finding: (finding.kind, finding.path)))
 
 

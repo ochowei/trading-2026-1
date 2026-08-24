@@ -6,10 +6,16 @@ Manages the closed inventory of registered legacy trading experiments.
 
 import importlib
 import pkgutil
+from pathlib import Path
 
 from trading.core.base_strategy import BaseStrategy
 
 _REGISTRY: dict[str, type[BaseStrategy]] = {}
+
+# Keep the historical import identity ``trading.experiments.<name>`` stable while
+# storing the closed legacy packages in a clearly separated archive directory.
+_LEGACY_PACKAGE_PATH = Path(__file__).resolve().parents[3] / "legacy" / "experiments"
+__path__.append(str(_LEGACY_PACKAGE_PATH))
 
 
 def register(name: str):

@@ -25,7 +25,7 @@ def _inventory(path: Path, packages: list[str]) -> None:
 
 
 def test_legacy_inventory_allows_only_monotonic_removal(tmp_path: Path) -> None:
-    root = tmp_path / "experiments"
+    root = tmp_path / "legacy" / "experiments"
     _package(root, "old_one")
     _package(root, "old_two")
     inventory = tmp_path / "inventory.json"
@@ -39,7 +39,7 @@ def test_legacy_inventory_allows_only_monotonic_removal(tmp_path: Path) -> None:
 
 
 def test_legacy_inventory_rejects_addition_and_rename_evasion(tmp_path: Path) -> None:
-    root = tmp_path / "experiments"
+    root = tmp_path / "legacy" / "experiments"
     _package(root, "old_one")
     inventory = tmp_path / "inventory.json"
     _inventory(inventory, ["old_one"])
@@ -57,8 +57,8 @@ def test_legacy_inventory_rejects_addition_and_rename_evasion(tmp_path: Path) ->
 
 
 def test_legacy_inventory_rejects_malformed_baseline(tmp_path: Path) -> None:
-    root = tmp_path / "experiments"
-    root.mkdir()
+    root = tmp_path / "legacy" / "experiments"
+    root.mkdir(parents=True)
     inventory = tmp_path / "inventory.json"
     _inventory(inventory, ["duplicate", "duplicate"])
 
