@@ -39,7 +39,13 @@ from trading.core.qualification_workflow import (
     register_forward_qualification_plan,
     run_registered_historical_screen,
 )
-from trading.core.results import compare_experiments, inspect_result, save_result
+from trading.core.results import (
+    ResultSource,
+    compare_experiments,
+    inspect_result,
+    latest_result_names,
+    save_result,
+)
 from trading.core.study_qualification import (
     STUDY_QUALIFICATION_CAPABILITY,
     compile_study_qualification_plan,
@@ -213,14 +219,10 @@ def cmd_result_status(args: argparse.Namespace) -> None:
     from trading.core import results as result_module
 
     if args.all:
-        names = (
-            sorted(
-                path.name
-                for path in result_module.RESULTS_DIR.iterdir()
-                if path.is_dir() and (path / "latest.json").exists()
-            )
-            if result_module.RESULTS_DIR.exists()
-            else []
+        names = latest_result_names(
+            results_dir=result_module.RESULTS_DIR,
+            archive_dir=result_module.ARCHIVED_RESULTS_DIR,
+            include_archive=True,
         )
     elif args.experiment:
         names = [args.experiment]
@@ -232,13 +234,16 @@ def cmd_result_status(args: argparse.Namespace) -> None:
         record = inspect_result(
             name,
             results_dir=result_module.RESULTS_DIR,
+            archive_dir=result_module.ARCHIVED_RESULTS_DIR,
+            allow_archive=True,
             store=store,
             current_definition_fingerprint=resolve_current_definition_fingerprint(name),
         )
         if record is None:
             print(f"{name}: no latest result")
             continue
-        print(f"{name}: {record.validity.status.value}")
+        source = f" [{record.source.value}]" if record.source is ResultSource.LEGACY_ARCHIVE else ""
+        print(f"{name}: {record.validity.status.value}{source}")
         if record.result.payload:
             payload = record.result.payload
             print(f"  schema version: {payload.get('schema_version', 'legacy')}")

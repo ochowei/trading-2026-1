@@ -67,7 +67,7 @@ def test_selected_followup_auxiliary_detectors_do_not_access_yfinance_directly()
         "tsla_017_qqq_divergence_breakout",
         "xbi_018_xbi_xlv_divergence_mr",
     )
-    experiment_root = Path("src/trading/experiments")
+    experiment_root = Path("legacy/experiments")
 
     for name in roots:
         source = (experiment_root / name / "signal_detector.py").read_text(encoding="utf-8")

@@ -168,6 +168,10 @@ comparator, while still stopping before any epoch or plan registration:
   sessions. SPY-010 now freezes the documented SPY-007 Attempt 2 definition and
   has a valid schema-3 online observation through 2026-08-07 as trial
   `a960a0c24a544e063ca3e97b9c29933f7dde2b58ac50356eb2672905c658eaf3`.
+  Its exact historical result is explicitly retained at
+  `results/spy_010_trend_pullback_baseline/20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json`
+  because the append-only trial registry records that path; this is a repository-policy exception
+  to the default local-only retention of historical results.
 - The SPY experiment overview records all three SPY-007 attempts as failed with
   structurally weak Part A performance and names SPY-009 as the historical best.
   SPY-009's persisted result is also currently `data-stale`, so it cannot be

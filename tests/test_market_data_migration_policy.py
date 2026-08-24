@@ -25,7 +25,20 @@ def write_experiment(root: Path, name: str, source: str) -> Path:
     return path
 
 
+def write_legacy_experiment(root: Path, name: str, source: str) -> Path:
+    path = root / "legacy" / "experiments" / name / "signal_detector.py"
+    path.parent.mkdir(parents=True)
+    path.write_text(source)
+    return path
+
+
+def ensure_experiment_roots(root: Path) -> None:
+    (root / "src" / "trading" / "experiments").mkdir(parents=True, exist_ok=True)
+    (root / "legacy" / "experiments").mkdir(parents=True, exist_ok=True)
+
+
 def test_scanner_detects_yfinance_import_alias_and_api_call(tmp_path: Path) -> None:
+    ensure_experiment_roots(tmp_path)
     write_experiment(
         tmp_path,
         "fixture",
@@ -52,6 +65,7 @@ def test_scanner_detects_yfinance_import_alias_and_api_call(tmp_path: Path) -> N
     ],
 )
 def test_scanner_detects_direct_yfinance_variants(tmp_path: Path, source: str) -> None:
+    ensure_experiment_roots(tmp_path)
     write_experiment(tmp_path, "fixture", source)
 
     findings = scan_experiment_market_data_bypasses(tmp_path)
@@ -61,6 +75,7 @@ def test_scanner_detects_direct_yfinance_variants(tmp_path: Path, source: str) -
 
 
 def test_scanner_detects_datafetcher_bypass_without_yfinance_import(tmp_path: Path) -> None:
+    ensure_experiment_roots(tmp_path)
     write_experiment(
         tmp_path,
         "fixture",
@@ -71,6 +86,17 @@ def test_scanner_detects_datafetcher_bypass_without_yfinance_import(tmp_path: Pa
 
     assert [(finding.kind, finding.path) for finding in findings] == [
         ("indirect-datafetcher", "src/trading/experiments/fixture/signal_detector.py")
+    ]
+
+
+def test_scanner_includes_repository_legacy_archive(tmp_path: Path) -> None:
+    ensure_experiment_roots(tmp_path)
+    write_legacy_experiment(tmp_path, "old_one", "import yfinance as yf\n\nyf.download('SPY')\n")
+
+    findings = scan_experiment_market_data_bypasses(tmp_path)
+
+    assert [(finding.kind, finding.path) for finding in findings] == [
+        ("direct-yfinance", "legacy/experiments/old_one/signal_detector.py")
     ]
 
 

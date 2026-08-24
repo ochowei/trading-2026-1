@@ -96,7 +96,11 @@ class CIBR014Strategy(ExecutionModelStrategy):
             sources={
                 "strategy": Path(__file__),
                 "detector": Path(__file__).with_name("signal_detector.py"),
-                "backtester": Path(__file__).parents[2] / "core" / "execution_backtester.py",
+                "backtester": Path(__file__).parents[3]
+                / "src"
+                / "trading"
+                / "core"
+                / "execution_backtester.py",
             },
             execution_engine_version=CANONICAL_SLEEVE_ENGINE_VERSION,
             dependency_versions={"pandas": pd.__version__},

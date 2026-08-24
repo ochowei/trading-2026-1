@@ -43,6 +43,10 @@ manual trading state are deliberately local-only.
 | `uv.lock` | Locked dependency graph used by `uv` for reproducible environments. |
 | `.python-version` | Project Python-version selection for compatible version managers. |
 | `.gitignore` | Excludes caches, environments, private trading state, credentials, and non-retained results; explicitly allows retained research artifacts. |
+| `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
+| `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
+| `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
+| `legacy/results/` | Read-only legacy-schema latest results and superseded result-directory names. Diagnostic comparison, explicit status, and documentation checks may fall back here; selection, authorization, qualification, freshness, formal evidence readers, and all writers remain canonical-only. |
 | `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
 | `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
 
@@ -245,19 +249,22 @@ experiment tree.
 
 ### `src/trading/experiments/`
 
-This is the closed legacy experiment tree. The registry auto-imports every inventoried package
-whose name does not start with `_`; each package's `__init__.py` registers its strategy. CI rejects
-new or renamed identities. New formal research uses `src/trading/research_definitions/`.
+This is the compatibility registry and documentation area for the closed legacy inventory.
+Archived source packages live under repository-root `legacy/experiments/`, while the registry
+extends its package search path in a repository checkout so their historical import identities remain
+`trading.experiments.<experiment_name>`. It auto-imports every inventoried package whose name does
+not start with `_`; each package's `__init__.py` registers its strategy. CI scans the archive and
+rejects new or renamed identities. New formal research uses `src/trading/research_definitions/`.
 
 | Pattern | Purpose |
 |---|---|
 | `src/trading/experiments/__init__.py` | Registry, registration decorator, lookup/list APIs, and `pkgutil` auto-discovery. |
-| `src/trading/experiments/_template/` | Starting structure for a new experiment. |
+| `src/trading/experiments/_template/` | Historical package template retained for reference; it must not be used to add a legacy identity. |
 | `src/trading/experiments/EXPERIMENTS_<TICKER>.md` | Per-asset experiment overview, result table, parameter comparison, and machine-oriented `AI_CONTEXT`. |
-| `src/trading/experiments/<experiment_name>/config.py` | Experiment identity, ticker, periods, thresholds, exits, and other parameters. |
-| `src/trading/experiments/<experiment_name>/signal_detector.py` | Indicators and entry-signal logic. |
-| `src/trading/experiments/<experiment_name>/strategy.py` | Connects config, detector, data declarations, execution, and formal research hooks. |
-| `src/trading/experiments/<experiment_name>/__init__.py` | Registers the strategy under its CLI experiment name. |
+| `legacy/experiments/<experiment_name>/config.py` | Experiment identity, ticker, periods, thresholds, exits, and other parameters. |
+| `legacy/experiments/<experiment_name>/signal_detector.py` | Indicators and entry-signal logic. |
+| `legacy/experiments/<experiment_name>/strategy.py` | Connects config, detector, data declarations, execution, and formal research hooks. |
+| `legacy/experiments/<experiment_name>/__init__.py` | Registers the strategy under its unchanged CLI and import identity. |
 
 ## Tests and repository checks
 
@@ -290,7 +297,7 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 | Pattern | Purpose |
 |---|---|
-| `results/<experiment_name>/latest.json` | Retained latest result consumed by comparison, validity, documentation, and selection workflows. |
+| `results/<experiment_name>/latest.json` | Canonical retained latest result consumed by validity, selection, authorization, and formal workflows; diagnostic readers prefer it over any archived duplicate. |
 | `results/<experiment_name>/prev_1.json`, `prev_2.json` | Retained recent predecessors when present. |
 | `results/<experiment_name>/<snapshot_id>.snapshot.json` | Retained immutable snapshot manifest used for reproducible formal execution. |
 | `results/<experiment_name>/<timestamp>.json` | Historical run output; most such files are ignored unless explicitly retained by repository policy. |
@@ -302,6 +309,12 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data
 and semantic definition references.
+
+Legacy-schema latest results and superseded aliases are retained under `legacy/results/`. Only
+comparison, explicit result-status, and documentation diagnostics may fall back there. Freshness,
+evaluation/ranking, followup, Shadow/Active, qualification, formal evidence verification, and all
+writers use canonical `results/` exclusively. See `legacy/README.md` for the archive contract and
+historical alias map.
 
 ### `workflows/`
 
@@ -366,7 +379,7 @@ application architecture and is not a source of project rules.
 
 | Change | Primary location | Usually update too |
 |---|---|---|
-| Maintain or reproduce a legacy experiment | Existing `src/trading/experiments/<identity>/` | Preserve semantic identity, per-asset overview, tests, and result evidence; do not add or rename a package. |
+| Maintain or reproduce a legacy experiment | Existing `legacy/experiments/<identity>/` | Preserve semantic identity, per-asset overview, tests, and result evidence; do not add or rename a package. |
 | Add a new research identity | `src/trading/research_definitions/` | Released workflow/study, exact policy versions, immutable definition/data evidence, tests. Never add a legacy experiment package. |
 | Add or revise reusable research constraints | `policies/` and `src/trading/policies/` | Conformance tests, affected workflow version, `docs/policies.md`, and technical docs. |
 | Change shared strategy/backtest behavior | `src/trading/core/` | Focused tests, affected phase docs, and experiment docs if metrics or contracts change. |

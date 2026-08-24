@@ -213,6 +213,8 @@ results/**/*.json
 !results/**/prev_2.json
 !results/**/*.snapshot.json
 !results/trial_registry.json
+# Retained SPY-010 formal observation referenced by the append-only trial registry.
+!results/spy_010_trend_pullback_baseline/20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json
 !results/*--*-gate/*.json
 !results/qualification-evidence/
 !results/qualification-evidence/*.json

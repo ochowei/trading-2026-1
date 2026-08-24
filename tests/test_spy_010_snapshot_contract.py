@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from datetime import date
+from pathlib import Path
 
 import pandas as pd
 
@@ -28,6 +30,12 @@ from trading.research_data import (
     RunMode,
 )
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+RETAINED_ONLINE_RESULT = Path(
+    "results/spy_010_trend_pullback_baseline/"
+    "20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json"
+)
+
 
 def _spy_bars() -> pd.DataFrame:
     sessions = PrimaryUSSessionCalendar().sessions_in_range(
@@ -44,6 +52,19 @@ def _spy_bars() -> pd.DataFrame:
             "Volume": 100.0,
         }
     )
+
+
+def test_spy_010_registry_observation_result_is_retained_and_not_ignored() -> None:
+    historical = REPOSITORY_ROOT / RETAINED_ONLINE_RESULT
+    latest = REPOSITORY_ROOT / "results/spy_010_trend_pullback_baseline/latest.json"
+
+    assert historical.read_bytes() == latest.read_bytes()
+    ignored = subprocess.run(
+        ["git", "check-ignore", "--no-index", "-q", RETAINED_ONLINE_RESULT.as_posix()],
+        cwd=REPOSITORY_ROOT,
+        check=False,
+    )
+    assert ignored.returncode == 1
 
 
 def test_spy_010_freezes_attempt_2_parameters_and_family() -> None:

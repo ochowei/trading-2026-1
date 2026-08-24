@@ -8,6 +8,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 
 from trading.core.definition_resolver import resolve_current_definition_fingerprint
@@ -24,6 +25,14 @@ from trading.research_data.store import ResearchDataStore
 logger = logging.getLogger(__name__)
 
 RESULTS_DIR = Path("results")
+ARCHIVED_RESULTS_DIR = Path("legacy/results")
+
+
+class ResultSource(StrEnum):
+    """Physical source of one persisted latest-result view."""
+
+    CANONICAL = "canonical"
+    LEGACY_ARCHIVE = "legacy archive"
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +42,7 @@ class ResultStatusRecord:
     experiment_name: str
     path: Path
     result: ResearchResult
+    source: ResultSource
 
     @property
     def validity(self) -> ResultValidity:
@@ -62,18 +72,75 @@ def load_latest(experiment_name: str) -> dict | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def latest_result_names(
+    *,
+    results_dir: Path | None = None,
+    archive_dir: Path | None = None,
+    include_archive: bool = False,
+) -> tuple[str, ...]:
+    """List identities with a latest result in the requested read-only roots."""
+
+    roots = [Path(results_dir or RESULTS_DIR)]
+    if include_archive:
+        roots.append(Path(archive_dir or ARCHIVED_RESULTS_DIR))
+    names: set[str] = set()
+    for root in roots:
+        if not root.exists():
+            continue
+        names.update(
+            path.name
+            for path in root.iterdir()
+            if path.is_dir() and (path / "latest.json").exists()
+        )
+    return tuple(sorted(names))
+
+
+def _resolve_latest_result_path(
+    experiment_name: str,
+    *,
+    results_dir: Path | None,
+    archive_dir: Path | None,
+    allow_archive: bool,
+) -> tuple[Path, ResultSource] | None:
+    canonical = Path(results_dir or RESULTS_DIR) / experiment_name / "latest.json"
+    if not allow_archive:
+        return (canonical, ResultSource.CANONICAL) if canonical.exists() else None
+
+    archived = Path(archive_dir or ARCHIVED_RESULTS_DIR) / experiment_name / "latest.json"
+    if canonical.exists():
+        if archived.exists():
+            logger.warning(
+                "duplicate latest result for %s; using canonical %s instead of archive %s",
+                experiment_name,
+                canonical,
+                archived,
+            )
+        return canonical, ResultSource.CANONICAL
+    if archived.exists():
+        return archived, ResultSource.LEGACY_ARCHIVE
+    return None
+
+
 def inspect_result(
     experiment_name: str,
     *,
     results_dir: Path | None = None,
+    archive_dir: Path | None = None,
+    allow_archive: bool = False,
     store: ResearchDataStore | None = None,
     current_definition_fingerprint: str | DefinitionBlobRef | None = None,
     now: datetime | None = None,
 ) -> ResultStatusRecord | None:
-    """Inspect one latest result without refresh, execution, or publication."""
-    path = Path(results_dir or RESULTS_DIR) / experiment_name / "latest.json"
-    if not path.exists():
+    """Inspect one latest result; archive fallback must be explicitly diagnostic-only."""
+    resolved = _resolve_latest_result_path(
+        experiment_name,
+        results_dir=results_dir,
+        archive_dir=archive_dir,
+        allow_archive=allow_archive,
+    )
+    if resolved is None:
         return None
+    path, source = resolved
     try:
         result = load_result(
             path,
@@ -86,13 +153,19 @@ def inspect_result(
             payload={},
             validity=ResultValidity(ResultValidityStatus.UNREPRODUCIBLE, (str(exc),)),
         )
-    return ResultStatusRecord(experiment_name=experiment_name, path=path, result=result)
+    return ResultStatusRecord(
+        experiment_name=experiment_name,
+        path=path,
+        result=result,
+        source=source,
+    )
 
 
 def compare_experiments(
     names: list[str],
     *,
     results_dir: Path | None = None,
+    archive_dir: Path | None = None,
     store: ResearchDataStore | None = None,
     definition_resolver: Callable[[str], str | DefinitionBlobRef | None] | None = None,
     now: datetime | None = None,
@@ -112,6 +185,8 @@ def compare_experiments(
         record = inspect_result(
             name,
             results_dir=results_dir or RESULTS_DIR,
+            archive_dir=archive_dir or ARCHIVED_RESULTS_DIR,
+            allow_archive=True,
             store=store,
             current_definition_fingerprint=current_definition,
             now=now,
@@ -120,7 +195,8 @@ def compare_experiments(
             print(f"  警告: {name} 無結果可載入 (Warning: no results for {name})")
             continue
         loaded[name] = record
-        print(f"  {name}: Validity: {record.validity.status.value}")
+        source = f" [{record.source.value}]" if record.source is ResultSource.LEGACY_ARCHIVE else ""
+        print(f"  {name}: Validity: {record.validity.status.value}{source}")
         for reason in record.validity.reasons:
             print(f"    reason: {reason}")
         try:

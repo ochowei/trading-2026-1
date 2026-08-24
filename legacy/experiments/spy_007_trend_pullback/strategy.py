@@ -1,4 +1,10 @@
-"""SPY-010 qualification baseline for the SPY trend-pullback family."""
+"""
+SPY-007: Trend Pullback to SMA(50)
+(SPY Trend Following Strategy)
+
+使用 SMA 黃金交叉 + 回測 SMA(50) + 反彈作為順勢進場訊號，
+搭配 ExecutionModelBacktester 成交模型。
+"""
 
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
@@ -18,12 +24,12 @@ from trading.core.sleeve_engine import (
     CandidateTrade,
     CanonicalSleeveInput,
 )
-from trading.experiments.spy_010_trend_pullback_baseline.config import (
-    SPY010TrendPullbackBaselineConfig,
+from trading.experiments.spy_007_trend_pullback.config import (
+    SPY007TrendPullbackConfig,
     create_default_config,
 )
-from trading.experiments.spy_010_trend_pullback_baseline.signal_detector import (
-    SPY010TrendPullbackBaselineDetector,
+from trading.experiments.spy_007_trend_pullback.signal_detector import (
+    SPY007TrendPullbackDetector,
 )
 from trading.market_data import MarketDataBundle, MarketDataRequirement, MarketDataSeries
 from trading.research_data import (
@@ -41,11 +47,11 @@ class _BundleExecution:
     trades: tuple[Mapping[str, object], ...]
 
 
-class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
-    """SPY-007 Attempt 2 的獨立 qualification family baseline。"""
+class SPY007TrendPullbackStrategy(ExecutionModelStrategy):
+    """SPY Trend Pullback to SMA(50) (SPY-007)"""
 
     def market_data_requirements(self) -> tuple[MarketDataRequirement, ...]:
-        """宣告完整且僅含 SPY 的 primary market-data dependency。"""
+        """Declare the complete primary-only market-data dependency."""
         config = self.create_config()
         return (
             MarketDataRequirement(
@@ -59,7 +65,7 @@ class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
         self,
         store: ResearchDefinitionStore,
     ) -> ResearchDefinitionSnapshot:
-        """捕捉 baseline 的 exact source、config 與 data requirement identity。"""
+        """Capture source and requirement identity without resolving market data."""
         config = self.create_config()
         return store.capture(
             resolved_config={
@@ -69,7 +75,11 @@ class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
             sources={
                 "strategy": Path(__file__),
                 "detector": Path(__file__).with_name("signal_detector.py"),
-                "backtester": Path(__file__).parents[2] / "core" / "execution_backtester.py",
+                "backtester": Path(__file__).parents[3]
+                / "src"
+                / "trading"
+                / "core"
+                / "execution_backtester.py",
             },
             execution_engine_version=CANONICAL_SLEEVE_ENGINE_VERSION,
             dependency_versions={"pandas": pd.__version__},
@@ -78,17 +88,14 @@ class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
         )
 
     def declare_experiment_trial(self) -> ExperimentTrialDeclaration:
-        """將 comparator 放入 selected trial 的相同 formal family。"""
+        """Declare the stable family and hypothesis for formal trial registration."""
         return ExperimentTrialDeclaration(
             family="SPY:trend-pullback",
-            hypothesis=(
-                "SPY trend-pullback family baseline reproducing SPY-007 Attempt 2 "
-                "without ClosePos confirmation."
-            ),
+            hypothesis="SPY entries after a confirmed uptrend pull back and rebound.",
         )
 
     def run_with_bundle(self, bundle: MarketDataBundle) -> dict[str, object]:
-        """在無 provider capability 下執行 baseline 與 canonical sleeve。"""
+        """Run the SPY-007 detector and execution model without provider capabilities."""
         execution = self._execute_bundle(bundle)
         candidates = [
             candidate
@@ -118,7 +125,7 @@ class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
         }
 
     def run_for_parity(self, bundle: MarketDataBundle) -> DataAccessParityOutputs:
-        """提供 deterministic indicator、signal 與 trade outputs。"""
+        """Expose canonical indicator, signal, and trade outputs for migration parity."""
         execution = self._execute_bundle(bundle)
         return DataAccessParityOutputs(
             indicators=execution.indicators,
@@ -130,7 +137,7 @@ class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
         config = self.create_config()
         declared_series = tuple(item.series for item in self.market_data_requirements())
         if tuple(bundle) != declared_series:
-            raise ValueError("SPY-010 bundle keys do not match its declared requirements")
+            raise ValueError("SPY-007 bundle keys do not match its declared requirements")
         frame = bundle[declared_series[0]]
         detector = self.create_detector()
         backtester = self.create_backtester(config)
@@ -162,21 +169,21 @@ class SPY010TrendPullbackBaselineStrategy(ExecutionModelStrategy):
         return create_default_config()
 
     def create_detector(self) -> BaseSignalDetector:
-        return SPY010TrendPullbackBaselineDetector(create_default_config())
+        return SPY007TrendPullbackDetector(create_default_config())
 
     def _print_strategy_params(self, config: ExperimentConfig) -> None:
-        if isinstance(config, SPY010TrendPullbackBaselineConfig):
+        if isinstance(config, SPY007TrendPullbackConfig):
             print(f"  SMA 短線: {config.sma_short_period}")
             print(f"  SMA 中線: {config.sma_mid_period}")
             print(f"  SMA 長線: {config.sma_long_period}")
-            print("  收盤位置確認: 無 (Family baseline)")
+            print(f"  收盤位置: >= {config.close_position_threshold:.0%} of day range")
             print(f"  冷卻天數: {config.cooldown_days} 天")
             print("  追蹤停損: 無 (Disabled)")
         super()._print_strategy_params(config)
 
 
 def _candidate_from_trade(trade: Mapping[str, object]) -> CandidateTrade | None:
-    """將 filled execution-model trade 轉換為 canonical candidate。"""
+    """Convert one filled execution-model trade into canonical candidate input."""
     required = ("date", "entry_date", "entry", "exit_date", "exit")
     if any(trade.get(field) is None for field in required):
         return None

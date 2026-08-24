@@ -21,7 +21,7 @@ def main() -> None:
     parser.add_argument(
         "--experiments",
         type=Path,
-        default=Path("src/trading/experiments"),
+        default=Path("legacy/experiments"),
     )
     args = parser.parse_args()
     try:

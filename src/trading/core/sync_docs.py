@@ -16,6 +16,7 @@ from trading.research_data.result_schema import ResultValidityStatus
 logger = logging.getLogger(__name__)
 
 RESULTS_DIR = Path("results")
+ARCHIVED_RESULTS_DIR = Path("legacy/results")
 DOCS_DIR = Path("src/trading/experiments")
 
 
@@ -114,39 +115,47 @@ def find_latest_record(
     experiment_id: str,
     *,
     results_dir: Path | None = None,
+    archive_dir: Path | None = None,
     definition_resolver: Callable[[str], str | DefinitionBlobRef | None] | None = None,
 ) -> ResultStatusRecord | None:
     """根據實驗 ID 尋找對應的 latest.json"""
-    root = Path(results_dir or RESULTS_DIR)
-    if not root.exists():
+    canonical_root = Path(results_dir or RESULTS_DIR)
+    archive_root = Path(archive_dir or ARCHIVED_RESULTS_DIR)
+    roots = tuple(root for root in (canonical_root, archive_root) if root.exists())
+    if not roots:
         return None
-    for exp_dir in sorted(root.iterdir()):
-        if not exp_dir.is_dir():
-            continue
+    seen_names: set[str] = set()
+    for root in roots:
+        for exp_dir in sorted(root.iterdir()):
+            if not exp_dir.is_dir():
+                continue
 
-        # 嘗試解析 experiment_id
-        # 我們可能不知道資料夾名稱，所以需要讀取 latest.json 裡面或者找 config
-        latest_path = exp_dir / "latest.json"
-        if not latest_path.exists():
-            continue
-        matches = False
-        try:
-            strategy = get_experiment(exp_dir.name)
-            config = strategy.create_config()
-            matches = config.experiment_id == experiment_id
-        except Exception:  # noqa: BLE001 - discovery is a diagnostic boundary
+            # 嘗試解析 experiment_id
+            # 我們可能不知道資料夾名稱，所以需要讀取 latest.json 裡面或者找 config
+            latest_path = exp_dir / "latest.json"
+            if not latest_path.exists() or exp_dir.name in seen_names:
+                continue
+            seen_names.add(exp_dir.name)
             matches = False
-        if not matches:
-            matches = exp_dir.name.lower().startswith(experiment_id.lower().replace("-", "_"))
-        if matches:
-            current_definition = (
-                definition_resolver(exp_dir.name) if definition_resolver is not None else None
-            )
-            return inspect_result(
-                exp_dir.name,
-                results_dir=root,
-                current_definition_fingerprint=current_definition,
-            )
+            try:
+                strategy = get_experiment(exp_dir.name)
+                config = strategy.create_config()
+                matches = config.experiment_id == experiment_id
+            except Exception:  # noqa: BLE001 - discovery is a diagnostic boundary
+                matches = False
+            if not matches:
+                matches = exp_dir.name.lower().startswith(experiment_id.lower().replace("-", "_"))
+            if matches:
+                current_definition = (
+                    definition_resolver(exp_dir.name) if definition_resolver is not None else None
+                )
+                return inspect_result(
+                    exp_dir.name,
+                    results_dir=canonical_root,
+                    archive_dir=archive_root,
+                    allow_archive=True,
+                    current_definition_fingerprint=current_definition,
+                )
 
     return None
 
@@ -201,7 +210,8 @@ def compare_docs_and_results(
                 if record.validity.status is not ResultValidityStatus.VALID:
                     raise ResultSyncError(
                         f"{exp_id} documentation source is "
-                        f"{record.validity.status.value}; sync-docs requires valid results"
+                        f"{record.validity.status.value} from {record.source.value}; "
+                        "sync-docs requires valid results"
                     )
                 result = record.result.payload
 

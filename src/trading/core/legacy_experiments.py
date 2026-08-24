@@ -11,7 +11,7 @@ class LegacyInventoryError(ValueError):
 
 
 def scan_legacy_experiments(root: Path) -> tuple[str, ...]:
-    """Return importable top-level experiment package identities."""
+    """Return importable experiment identities from the legacy archive."""
     if not root.is_dir():
         raise LegacyInventoryError(f"legacy experiment root does not exist: {root}")
     return tuple(
