@@ -60,7 +60,7 @@ uv run ruff check src/ --fix && uv run ruff format src/
 ```
 
 > CI（GitHub Action `ci.yml`）會在 pull request 與 `main` push 執行上述檢查，並驗證
-> workflow、policy、legacy experiment inventory 與 market-data migration contracts。是否阻擋
+> workflow、policy、legacy experiment inventory 與 market-data boundary contracts。是否阻擋
 > merge 由 GitHub branch protection 設定決定。
 
 ## 成交模型（新實驗必讀）

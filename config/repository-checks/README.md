@@ -32,3 +32,19 @@ uv run pytest -q tests/test_legacy_experiment_inventory.py
 
 Any failure blocks the change until the legacy archive and its inventory satisfy the closed-set
 contract.
+
+## Market-data boundary
+
+`check_experiment_market_data_access.py` enforces permanent zero tolerance for experiment code that
+bypasses the declared market-data boundary. It rejects direct yfinance use, known indirect legacy
+data-access paths, and runtime yfinance imports outside `src/trading/market_data/provider.py`.
+
+The temporary Phase 9 bypass allowlist was retired after reaching zero entries. Do not recreate an
+allowlist to admit a new exception; migrate the caller to the declared market-data boundary instead.
+
+Run the check and its tests with:
+
+```bash
+uv run python config/repository-checks/check_experiment_market_data_access.py
+uv run pytest -q tests/test_market_data_migration_policy.py
+```

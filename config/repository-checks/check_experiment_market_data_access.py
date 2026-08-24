@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Enforce the Phase 9 experiment market-data bypass policy."""
+"""Enforce the repository market-data access boundary."""
 
 from __future__ import annotations
 
@@ -21,13 +21,13 @@ def main() -> int:
     parser.add_argument(
         "--repo-root",
         type=Path,
-        default=Path(__file__).resolve().parents[1],
+        default=Path(__file__).resolve().parents[2],
     )
     parser.add_argument(
         "--allowlist",
         type=Path,
         default=None,
-        help="active Phase 9 allowlist JSON; omit after zero-tolerance cleanup",
+        help="legacy migration allowlist JSON; omit for permanent zero-tolerance mode",
     )
     parser.add_argument(
         "--base-allowlist",
@@ -56,11 +56,11 @@ def main() -> int:
                 base = load_allowlist(args.base_allowlist)
                 enforce_monotonic_shrink(base.entries, document.entries)
     except MarketDataPolicyError as exc:
-        print(f"Phase 9 market-data policy failed: {exc}")
+        print(f"Market-data boundary policy failed: {exc}")
         return 1
 
     print(
-        "Phase 9 market-data policy passed: "
+        "Market-data boundary policy passed: "
         f"{len(findings)} active bypass finding(s), provider boundary is clean"
     )
     return 0

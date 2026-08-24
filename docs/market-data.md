@@ -131,16 +131,14 @@ Phase 1 supplies these common contracts but intentionally does not migrate the e
 fleet. Direct detector downloads are removed family-by-family in Phase 9 with snapshot-based parity
 checks.
 
-## Phase 9 access policy
+## Market-data access policy
 
-During the migration, `tools/check_experiment_market_data_access.py` scans experiment Python ASTs
-for direct yfinance imports/calls, dynamic imports, and known legacy DataFetcher/provider/cache
-paths. The typed identities in `ci/market-data-bypass-allowlist.json` are temporary migration
-inventory only; CI requires an exact match with current findings and rejects any allowlist growth,
-stale entry, duplicate, non-canonical path, or newly renamed bypass. Runtime yfinance imports are
-permitted only in `market_data/provider.py`; the legacy experiment findings are the sole temporary
-exception until their migration batches complete. Once the allowlist is empty, the scanner changes
-to zero-tolerance mode and the compatibility data-access paths are removed.
+`config/repository-checks/check_experiment_market_data_access.py` scans experiment Python ASTs for
+direct yfinance imports/calls, dynamic imports, and known legacy DataFetcher/provider/cache paths.
+The Phase 9 migration allowlist has been retired after reaching zero entries, so CI now runs the
+scanner in permanent zero-tolerance mode: any experiment bypass fails the check. Runtime yfinance
+imports are permitted only in `market_data/provider.py`; imports anywhere else under
+`src/trading/` also fail the check.
 
 ## Operations
 

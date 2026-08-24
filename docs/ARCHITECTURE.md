@@ -78,7 +78,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 
 | Path | Purpose |
 |---|---|
-| `.github/workflows/ci.yml` | Runs Ruff checks plus workflow, policy, legacy-inventory, and market-data migration contract validation for pull requests and `main` pushes. |
+| `.github/workflows/ci.yml` | Runs Ruff checks plus workflow, policy, legacy-inventory, and market-data boundary contract validation for pull requests and `main` pushes. |
 
 ## Documentation
 
@@ -196,7 +196,7 @@ Fail-closed boundary around Yahoo adjusted daily OHLCV and the validated local c
 | `cache.py` | Canonical CSV/sidecar storage, locks, atomic publication, and quarantine. |
 | `service.py` | Fresh reuse plus incremental/full refresh orchestration. |
 | `bundle.py` | Read-only bundles and backward as-of alignment of auxiliary series. |
-| `migration_policy.py` | Scans experiment data access and enforces the shrinking legacy bypass allowlist. |
+| `migration_policy.py` | Scans experiment data access, enforces the zero-tolerance provider boundary, and retains typed allowlist compatibility primitives from the completed migration. |
 | `__init__.py` | Curated public market-data API exports. |
 
 ### `src/trading/research_data/`
@@ -274,10 +274,9 @@ rejects new or renamed identities. New formal research uses `src/trading/researc
 | `tests/test_*.py` | Behavioral and contract tests, generally named after the module or lifecycle being protected. Snapshot-contract tests pin migration behavior for selected experiments. |
 | `tests/policies/test_*.py` | Policy resolution, composition, definition-identity, and version-specific conformance tests. |
 | `config/repository-checks/README.md` | Maintenance contract for active repository-wide checks and their tracked configuration. |
-| `tools/check_experiment_market_data_access.py` | CI scanner that detects experiment access which bypasses the declared market-data boundary. |
+| `config/repository-checks/check_experiment_market_data_access.py` | Zero-tolerance CI scanner that rejects experiment access bypassing the declared market-data boundary and runtime yfinance use outside the provider. |
 | `config/repository-checks/check_legacy_experiment_inventory.py` | CI entry point that rejects additions or rename-based replacements in the legacy experiment tree. |
 | `config/repository-checks/legacy-experiment-inventory.json` | Sorted stage-one baseline of frozen legacy experiment package identities; removals are allowed but additions are not. |
-| `ci/market-data-bypass-allowlist.json` | Typed, shrinking baseline of legacy experiment bypasses permitted during migration. |
 
 Tests may contain explicit synthetic broker fixtures. Real broker exports, credentials, and personal
 trading data must never be placed in `tests/` or committed anywhere.

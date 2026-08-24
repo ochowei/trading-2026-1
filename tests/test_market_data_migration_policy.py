@@ -201,15 +201,6 @@ def test_repository_baseline_has_exact_known_findings() -> None:
     assert sum(finding.kind == "indirect-datafetcher" for finding in findings) == 0
 
 
-def test_repository_allowlist_matches_the_scanned_baseline() -> None:
-    repo_root = Path(__file__).parents[1]
-    document = load_allowlist(repo_root / "ci" / "market-data-bypass-allowlist.json")
-    findings = scan_experiment_market_data_bypasses(repo_root)
-
-    validate_allowlist(document.entries, findings, repo_root=repo_root)
-    assert document.baseline_commit == "41da32ef7f6b2eda5af9fd7bc05b1261a2259294"
-
-
 def test_provider_is_the_only_legal_runtime_yfinance_boundary(tmp_path: Path) -> None:
     provider = tmp_path / "src" / "trading" / "market_data" / "provider.py"
     provider.parent.mkdir(parents=True)

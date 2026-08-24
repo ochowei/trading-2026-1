@@ -246,7 +246,7 @@ uv run trading workflow sync
 uv run trading workflow validate --all
 ```
 
-CI 會驗證 workflow、policy、legacy inventory、market-data migration contracts，以及 Python lint／
+CI 會驗證 workflow、policy、legacy inventory、market-data boundary contracts，以及 Python lint／
 formatting。任何 validation issue 都應停止 release、Study advancement 與 outcome-relevant work，
 直到同一 identity 與 evidence 被確認或恢復。
 
