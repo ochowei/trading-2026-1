@@ -2,7 +2,7 @@
 
 此文件追蹤 [`workflow-governance-flow.html`](workflow-governance-flow.html) 的 sequence／activity
 圖、[`workflow-governance-layers.html`](workflow-governance-layers.html) 的 A1 層級交接與 A2
-各層內部流程圖，
+各 Layer 內部狀態參考，
 以及 Work Package 1–4 治理實作之間的審查問題。它是視覺化文件的待辦紀錄，不是 workflow
 contract、release authority 或 study outcome 的權威來源。
 
@@ -16,10 +16,10 @@ contract、release authority 或 study outcome 的權威來源。
 
 | Status | Count | Items |
 |---|---:|---|
-| `resolved` | 4 | GD-001, GD-002, GD-004, GD-006 |
-| `open-partial` | 2 | GD-003, GD-005 |
+| `resolved` | 5 | GD-001, GD-002, GD-003, GD-004, GD-006 |
+| `open-partial` | 1 | GD-005 |
 
-目前仍需處理的是 **GD-003、GD-005**。
+目前仍需處理的是 **GD-005**。
 
 ## Findings
 
@@ -28,7 +28,7 @@ contract、release authority 或 study outcome 的權威來源。
 - Priority: P1
 - Status: `resolved`
 - Required order: `change create → human decision → accepted → evolve → replacement draft → release`
-- Current evidence: sequence、activity 與 A2 的 L1 內部流程都先完成 change decision，
+- Current evidence: sequence、activity 與 A2 的 L1 內部狀態參考都先完成 change decision，
   再進入 evolve 與 replacement draft。
 - Governing evidence:
   [`tests/test_workflow_authoring.py`](../tests/test_workflow_authoring.py)、
@@ -41,7 +41,7 @@ contract、release authority 或 study outcome 的權威來源。
 - Status: `resolved`
 - Required distinction: prepared branch 中 registry status 已為 `active`，但只有 commit 進入
   canonical branch 後才具 effective authority。
-- Current evidence: sequence、activity 與 A2 的 L2 內部流程均明確拆分 prepared
+- Current evidence: sequence、activity 與 A2 的 L2 內部狀態參考均明確拆分 prepared
   `status = active`、canonical merge 與 effective authority。
 - Governing evidence:
   [`workflow_authoring.py`](../src/trading/core/workflow_authoring.py)、
@@ -52,16 +52,13 @@ contract、release authority 或 study outcome 的權威來源。
 ### GD-003 — Study authority gates
 
 - Priority: P1
-- Status: `open-partial`
-- Already visible: human preregistration、operator/reviewer separation、independent reviewer 與
-  terminal outcome。
-- Still missing: Development、candidate freeze 與 Evaluation 的 authority 必須分開呈現，不能由
-  preregistration 或前一階段推導；reviewer 寫入 terminal outcome 前的 explicit human
-  confirmation 與 stable reviewer identity 也尚未明示。
+- Status: `resolved`
+- Current evidence: A2 的 L3 Authority gates 已分別列出 preregistration、Development、
+  candidate freeze 與 Evaluation approval，明示各 authority 不可從前一階段推導；並要求
+  reviewer 寫入 terminal outcome 前具備 explicit human confirmation 與 stable reviewer identity。
 - Governing evidence:
   [`workflow-study-governance.md`](../.agents/rules/workflow-study-governance.md)
-- Recommended closure: 在 L3 增加獨立 authority gates，保留 lifecycle state 與 authority grant
-  為不同概念。
+- Remaining action: none.
 
 ### GD-004 — Mandatory release guards
 
@@ -80,7 +77,7 @@ contract、release authority 或 study outcome 的權威來源。
 
 - Priority: P2
 - Status: `open-partial`
-- Already visible elsewhere: A2 各層內部流程已涵蓋 change
+- Already visible elsewhere: A2 各 Layer 內部狀態參考已涵蓋 change
   `rejected/deferred/withdrawn`、study pause/cancel/reviewer-return，以及 version
   `abandoned/retired`。
 - Still missing: Activity diagram 本身仍只呈現 happy path，但標題仍為「生命週期與治理閘門」，
@@ -89,7 +86,7 @@ contract、release authority 或 study outcome 的權威來源。
   [`remove.md`](../.agents/skills/trading-author-workflow/references/remove.md)、
   [`workflow-study-governance.md`](../.agents/rules/workflow-study-governance.md)
 - Recommended closure: 保持簡圖並將標題改為 `Activity diagram｜Happy-path handoff`，同時指向
-  A2 各層內部流程作為完整狀態補充；若仍稱 lifecycle，則必須補齊所有分支。
+  A2 各 Layer 內部狀態參考作為完整狀態補充；若仍稱 lifecycle，則必須補齊所有分支。
 
 ### GD-006 — Stale-preview fail-closed gate
 
@@ -98,8 +95,8 @@ contract、release authority 或 study outcome 的權威來源。
 - Required behavior: target drift 或 invalid partial state 必須阻止 apply、保持 zero mutation，
   並要求 fresh preview。
 - Current evidence: A1 已直接畫出 preview 失敗後修正輸入並回到 fresh preview 的路徑；A2 的
-  L1 內部流程也明示 `Target drift / invalid partial state → apply blocked → fresh preview`，並標記
-  不留下 mutation。
+  L1 Fail-closed 防護也明示 target drift / invalid partial state 阻止 apply、保持 zero mutation、
+  重新產生 fresh preview，並在 resolved changes 改變時重新取得人工確認。
 - Governing evidence:
   [`core.md`](../.agents/skills/trading-author-workflow/references/core.md)
 - Remaining action: none. 此 gate 不需重複塞入維持簡化的 happy-path diagram。

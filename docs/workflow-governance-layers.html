@@ -919,12 +919,6 @@ html&gt;body{padding:0}&lt;/style&gt;
       gap: 6px;
     }
 
-    #workflow-governance-layers .wgl-label span,
-    #workflow-governance-layers .wgl-note,
-    #workflow-governance-layers .wgl-arrow {
-      color: var(--muted-foreground);
-    }
-
     #workflow-governance-layers .wgl-diagram {
       display: grid;
       gap: 12px;
@@ -1032,85 +1026,81 @@ html&gt;body{padding:0}&lt;/style&gt;
       overflow-wrap: anywhere;
     }
 
-    #workflow-governance-layers .wgl-stack {
+    #workflow-governance-layers .wgl-a2-reference {
       display: grid;
-      gap: 24px;
+      gap: 1px;
       min-width: 0;
     }
 
-    #workflow-governance-layers .wgl-tier {
-      display: grid;
-      grid-template-columns: 146px minmax(0, 1fr);
-      gap: 14px;
-      align-items: start;
+    #workflow-governance-layers .wgl-a2-layer {
+      --wgl-layer-color: var(--viz-series-1);
       min-width: 0;
+      border-block-start: 1px solid var(--border);
+      background: color-mix(in srgb, var(--wgl-layer-color) 3%, transparent);
     }
 
-    #workflow-governance-layers .wgl-label {
+    #workflow-governance-layers .wgl-a2-layer:last-child {
+      border-block-end: 1px solid var(--border);
+    }
+
+    #workflow-governance-layers .wgl-a2-l2 {
+      --wgl-layer-color: var(--viz-series-3);
+    }
+
+    #workflow-governance-layers .wgl-a2-l3 {
+      --wgl-layer-color: var(--viz-series-2);
+    }
+
+    #workflow-governance-layers .wgl-a2-layer summary {
+      cursor: pointer;
+      padding: 12px 10px;
+      overflow-wrap: anywhere;
+      background: color-mix(in srgb, var(--wgl-layer-color) 6%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-a2-summary-copy {
       display: grid;
       gap: 3px;
-      padding-top: 8px;
+      min-width: 0;
+      margin-inline-start: 4px;
     }
 
-    #workflow-governance-layers .wgl-content {
+    #workflow-governance-layers .wgl-a2-purpose,
+    #workflow-governance-layers .wgl-a2-brief {
+      color: var(--muted-foreground);
+    }
+
+    #workflow-governance-layers .wgl-a2-body {
       display: grid;
-      gap: 10px;
+      gap: 14px;
       min-width: 0;
-    }
-
-    #workflow-governance-layers .wgl-path {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      min-width: 0;
-      max-width: 100%;
-    }
-
-    #workflow-governance-layers .wgl-node {
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: color-mix(in srgb, var(--viz-series-1) 9%, transparent);
-      text-align: center;
-      min-width: 0;
-      max-width: 100%;
+      padding: 2px 10px 16px 30px;
       overflow-wrap: anywhere;
     }
 
-    #workflow-governance-layers .wgl-tier-l2 .wgl-node {
-      background: color-mix(in srgb, var(--viz-series-3) 10%, transparent);
+    #workflow-governance-layers .wgl-a2-body section {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
     }
 
-    #workflow-governance-layers .wgl-tier-l3 .wgl-node {
-      background: color-mix(in srgb, var(--viz-series-2) 10%, transparent);
+    #workflow-governance-layers .wgl-a2-body h3,
+    #workflow-governance-layers .wgl-a2-body p,
+    #workflow-governance-layers .wgl-a2-body ul {
+      margin: 0;
     }
 
-    #workflow-governance-layers .wgl-arrow {
-      text-align: center;
+    #workflow-governance-layers .wgl-a2-body ul {
+      padding-inline-start: 20px;
     }
 
-    #workflow-governance-layers .wgl-note code {
+    #workflow-governance-layers .wgl-a2-body li + li {
+      margin-top: 4px;
+    }
+
+    #workflow-governance-layers .wgl-a2-body code {
       overflow-wrap: anywhere;
       word-break: break-word;
-    }
-
-    #workflow-governance-layers .wgl-branches {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    #workflow-governance-layers .wgl-branch {
-      display: grid;
-      gap: 7px;
-      align-content: start;
-    }
-
-    #workflow-governance-layers .wgl-outcomes {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
     }
 
     @media (max-width: 520px) {
@@ -1118,27 +1108,12 @@ html&gt;body{padding:0}&lt;/style&gt;
         gap: 16px;
       }
 
-      #workflow-governance-layers .wgl-tier {
-        grid-template-columns: 1fr;
-        gap: 6px;
+      #workflow-governance-layers .wgl-a2-layer summary {
+        padding: 10px 4px;
       }
 
-      #workflow-governance-layers .wgl-label {
-        padding-top: 0;
-      }
-
-      #workflow-governance-layers .wgl-path {
-        width: 100%;
-        align-items: stretch;
-      }
-
-      #workflow-governance-layers .wgl-note code {
-        padding-inline: 2px;
-      }
-
-      #workflow-governance-layers .wgl-branches,
-      #workflow-governance-layers .wgl-outcomes {
-        grid-template-columns: 1fr;
+      #workflow-governance-layers .wgl-a2-body {
+        padding: 2px 4px 14px 22px;
       }
     }
 
@@ -1254,69 +1229,137 @@ flowchart TB
   &lt;/section&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-internal-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-internal-title&quot;&gt;A2｜L1／L2／L3 各層內部流程&lt;/h2&gt;
-    &lt;div class=&quot;wgl-stack&quot; role=&quot;img&quot; aria-label=&quot;A2：L1 流程設計、L2 發布授權、L3 研究與審查各自的內部狀態流程&quot;&gt;
-    &lt;div class=&quot;wgl-tier wgl-tier-l1&quot;&gt;
-      &lt;div class=&quot;wgl-label&quot;&gt;&lt;strong&gt;L1｜流程設計&lt;/strong&gt;&lt;span&gt;用途：建立或修改流程&lt;/span&gt;&lt;/div&gt;
-      &lt;div class=&quot;wgl-content&quot;&gt;
-        &lt;div class=&quot;wgl-path&quot;&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;需求／來源&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;預覽&lt;br&gt;&lt;small&gt;不修改檔案&lt;/small&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ 確認 →&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;套用&lt;/span&gt;
+    &lt;h2 id=&quot;wgl-internal-title&quot;&gt;A2｜各 Layer 內部狀態參考&lt;/h2&gt;
+    &lt;div class=&quot;wgl-a2-reference&quot;&gt;
+      &lt;details class=&quot;wgl-a2-layer wgl-a2-l1&quot;&gt;
+        &lt;summary&gt;
+          &lt;span class=&quot;wgl-a2-summary-copy&quot;&gt;
+            &lt;strong&gt;L1｜流程設計&lt;/strong&gt;
+            &lt;span class=&quot;wgl-a2-purpose&quot;&gt;用途：建立、修改或放棄 &lt;code&gt;workflow&lt;/code&gt; 草稿。&lt;/span&gt;
+            &lt;span class=&quot;wgl-a2-brief&quot;&gt;參考 &lt;code&gt;initial&lt;/code&gt;／&lt;code&gt;replacement authoring&lt;/code&gt;、其他 &lt;code&gt;change&lt;/code&gt; 狀態與 &lt;code&gt;fail-closed&lt;/code&gt; 防護。&lt;/span&gt;
+          &lt;/span&gt;
+        &lt;/summary&gt;
+        &lt;div class=&quot;wgl-a2-body&quot;&gt;
+          &lt;section&gt;
+            &lt;h3&gt;正常路徑&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;Initial&lt;/code&gt;：&lt;code&gt;create request&lt;/code&gt; → &lt;code&gt;preview&lt;/code&gt; → &lt;code&gt;human confirm&lt;/code&gt; → version &lt;code&gt;draft&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;Replacement&lt;/code&gt;：change &lt;code&gt;draft&lt;/code&gt; → &lt;code&gt;proposed&lt;/code&gt; → &lt;code&gt;human decision&lt;/code&gt; → &lt;code&gt;accepted&lt;/code&gt; → &lt;code&gt;evolve&lt;/code&gt; → replacement version &lt;code&gt;draft&lt;/code&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;其他狀態&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;proposed → rejected&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;proposed → deferred → proposed&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;proposed&lt;/code&gt; / &lt;code&gt;deferred → withdrawn&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;version &lt;code&gt;draft → abandoned&lt;/code&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;Fail-closed 防護&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;target drift&lt;/code&gt; 或 &lt;code&gt;invalid partial state&lt;/code&gt; 必須阻止 &lt;code&gt;apply&lt;/code&gt;。&lt;/li&gt;
+              &lt;li&gt;保持 &lt;code&gt;zero mutation&lt;/code&gt;。&lt;/li&gt;
+              &lt;li&gt;重新產生 &lt;code&gt;fresh preview&lt;/code&gt;。&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;resolved changes&lt;/code&gt; 改變時必須重新取得人工確認。&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
         &lt;/div&gt;
-        &lt;div class=&quot;wgl-branches&quot;&gt;
-          &lt;div class=&quot;wgl-branch&quot;&gt;
-            &lt;strong&gt;首次建立&lt;/strong&gt;
-            &lt;div class=&quot;wgl-path&quot;&gt;&lt;span class=&quot;wgl-node&quot;&gt;版本 &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→&lt;/span&gt;&lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;abandoned&lt;/code&gt;&lt;/span&gt;&lt;/div&gt;
-          &lt;/div&gt;
-          &lt;div class=&quot;wgl-branch&quot;&gt;
-            &lt;strong&gt;版本替換&lt;/strong&gt;
-            &lt;div class=&quot;wgl-path&quot;&gt;&lt;span class=&quot;wgl-node&quot;&gt;變更 &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→&lt;/span&gt;&lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;proposed&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ 人類決定 →&lt;/span&gt;&lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;accepted&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ evolve →&lt;/span&gt;&lt;span class=&quot;wgl-node&quot;&gt;版本 &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;/div&gt;
-            &lt;div class=&quot;wgl-note text-small&quot;&gt;&lt;code&gt;proposed&lt;/code&gt; → &lt;code&gt;rejected&lt;/code&gt;；&lt;code&gt;proposed&lt;/code&gt; → &lt;code&gt;deferred&lt;/code&gt; → &lt;code&gt;proposed&lt;/code&gt;；&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;proposed&lt;/code&gt; / &lt;code&gt;deferred&lt;/code&gt; → &lt;code&gt;withdrawn&lt;/code&gt;。&lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;wgl-note text-small&quot;&gt;目標漂移或部分狀態無效 → 阻止套用 → 重新預覽；不留下修改。&lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
+      &lt;/details&gt;
 
-    &lt;div class=&quot;wgl-tier wgl-tier-l2&quot;&gt;
-      &lt;div class=&quot;wgl-label&quot;&gt;&lt;strong&gt;L2｜發布授權&lt;/strong&gt;&lt;span&gt;用途：核准版本正式生效&lt;/span&gt;&lt;/div&gt;
-      &lt;div class=&quot;wgl-content&quot;&gt;
-        &lt;div class=&quot;wgl-path&quot;&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;版本 &lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ 發布檢查＋人類核准 →&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;準備分支&lt;br&gt;&lt;code&gt;status = active&lt;/code&gt;&lt;br&gt;&lt;small&gt;尚無正式權威&lt;/small&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ 合併 canonical branch →&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;正式生效&lt;br&gt;&lt;code&gt;active&lt;/code&gt;&lt;/span&gt;
+      &lt;details class=&quot;wgl-a2-layer wgl-a2-l2&quot;&gt;
+        &lt;summary&gt;
+          &lt;span class=&quot;wgl-a2-summary-copy&quot;&gt;
+            &lt;strong&gt;L2｜發布授權&lt;/strong&gt;
+            &lt;span class=&quot;wgl-a2-purpose&quot;&gt;用途：檢查、核准並讓 &lt;code&gt;workflow version&lt;/code&gt; 取得正式 &lt;code&gt;authority&lt;/code&gt;。&lt;/span&gt;
+            &lt;span class=&quot;wgl-a2-brief&quot;&gt;參考 &lt;code&gt;release guards&lt;/code&gt;、&lt;code&gt;prepared branch&lt;/code&gt;、&lt;code&gt;canonical merge&lt;/code&gt; 與受控終點。&lt;/span&gt;
+          &lt;/span&gt;
+        &lt;/summary&gt;
+        &lt;div class=&quot;wgl-a2-body&quot;&gt;
+          &lt;section&gt;
+            &lt;h3&gt;正常路徑&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;version &lt;code&gt;draft&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;release guards&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;explicit human release approval&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;prepared branch&lt;/code&gt;：registry status 可為 &lt;code&gt;active&lt;/code&gt;，但 authority 尚未生效。&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;canonical merge&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;effective authority&lt;/code&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;Mandatory release guards&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;complete self-contained contract&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;accepted changes&lt;/code&gt; 與 &lt;code&gt;combined impact&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;exact active version being replaced&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;safe unfinished-study state&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;exact released policy pins&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;normative dependencies&lt;/code&gt; 與 &lt;code&gt;pinned companions&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;沒有遺漏或未解決的 &lt;code&gt;accepted changes&lt;/code&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;發布副作用與終點&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;previous &lt;code&gt;active&lt;/code&gt; version → &lt;code&gt;superseded&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;accepted changes&lt;/code&gt; → &lt;code&gt;released&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;active&lt;/code&gt; version 經人工核准且 &lt;code&gt;studies&lt;/code&gt; 安全後可進入 &lt;code&gt;retired&lt;/code&gt;。&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p&gt;&lt;code&gt;release approval&lt;/code&gt; 不授權 &lt;code&gt;commit&lt;/code&gt;、&lt;code&gt;push&lt;/code&gt;、&lt;code&gt;merge&lt;/code&gt;、&lt;code&gt;study execution&lt;/code&gt; 或 &lt;code&gt;trading&lt;/code&gt;。&lt;/p&gt;
+          &lt;/section&gt;
         &lt;/div&gt;
-        &lt;div class=&quot;wgl-branches&quot;&gt;
-          &lt;div class=&quot;wgl-note&quot;&gt;發布副作用：上一個 active → &lt;code&gt;superseded&lt;/code&gt;；accepted changes → &lt;code&gt;released&lt;/code&gt;。&lt;/div&gt;
-          &lt;div class=&quot;wgl-note&quot;&gt;受控終點：版本 &lt;code&gt;active&lt;/code&gt; → 人類核准＋研究安全 → &lt;code&gt;retired&lt;/code&gt;。&lt;/div&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
+      &lt;/details&gt;
 
-    &lt;div class=&quot;wgl-tier wgl-tier-l3&quot;&gt;
-      &lt;div class=&quot;wgl-label&quot;&gt;&lt;strong&gt;L3｜研究與審查&lt;/strong&gt;&lt;span&gt;用途：執行研究、獨立判定&lt;/span&gt;&lt;/div&gt;
-      &lt;div class=&quot;wgl-content&quot;&gt;
-        &lt;div class=&quot;wgl-path&quot;&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;draft&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ 人類預註冊核准 →&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;preregistered&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;running&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;awaiting-review&lt;/code&gt;&lt;/span&gt;&lt;span class=&quot;wgl-arrow&quot;&gt;→ 獨立審查 →&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;completed&lt;/code&gt;&lt;/span&gt;
+      &lt;details class=&quot;wgl-a2-layer wgl-a2-l3&quot;&gt;
+        &lt;summary&gt;
+          &lt;span class=&quot;wgl-a2-summary-copy&quot;&gt;
+            &lt;strong&gt;L3｜研究與審查&lt;/strong&gt;
+            &lt;span class=&quot;wgl-a2-purpose&quot;&gt;用途：依 &lt;code&gt;released workflow&lt;/code&gt; 執行 &lt;code&gt;study&lt;/code&gt;，並由獨立 &lt;code&gt;reviewer&lt;/code&gt; 判定結果。&lt;/span&gt;
+            &lt;span class=&quot;wgl-a2-brief&quot;&gt;參考 &lt;code&gt;study lifecycle&lt;/code&gt;、&lt;code&gt;terminal outcomes&lt;/code&gt;、獨立 &lt;code&gt;authority gates&lt;/code&gt; 與角色邊界。&lt;/span&gt;
+          &lt;/span&gt;
+        &lt;/summary&gt;
+        &lt;div class=&quot;wgl-a2-body&quot;&gt;
+          &lt;section&gt;
+            &lt;h3&gt;Study lifecycle&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;draft → preregistered → running → awaiting-review → completed&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;running ↔ paused&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;reviewer return：&lt;code&gt;awaiting-review → running&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;preregistered&lt;/code&gt; / &lt;code&gt;running&lt;/code&gt; / &lt;code&gt;paused → cancelled&lt;/code&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;Terminal outcomes&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;pass&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;fail&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;insufficient-evidence&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;indeterminate&lt;/code&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;Authority gates&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;preregistration approval&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;Development approval&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;candidate freeze approval&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;Evaluation approval&lt;/code&gt;&lt;/li&gt;
+              &lt;li&gt;以上 authority 必須分開取得，不能從前一階段推導。&lt;/li&gt;
+              &lt;li&gt;reviewer 寫入 &lt;code&gt;terminal outcome&lt;/code&gt; 前，需要 &lt;code&gt;explicit human confirmation&lt;/code&gt; 與 &lt;code&gt;stable reviewer identity&lt;/code&gt;。&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
+          &lt;section&gt;
+            &lt;h3&gt;Governance boundary&lt;/h3&gt;
+            &lt;ul&gt;
+              &lt;li&gt;&lt;code&gt;operator&lt;/code&gt; 執行研究並提交 &lt;code&gt;evidence&lt;/code&gt;，但不能決定 &lt;code&gt;outcome&lt;/code&gt;。&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;reviewer&lt;/code&gt; 判定 &lt;code&gt;outcome&lt;/code&gt;，但不能執行研究或修補 &lt;code&gt;evidence&lt;/code&gt;。&lt;/li&gt;
+              &lt;li&gt;&lt;code&gt;study outcome&lt;/code&gt; 只能形成新的 &lt;code&gt;workflow change request&lt;/code&gt;，不能自動修改 &lt;code&gt;released workflow&lt;/code&gt;。&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/section&gt;
         &lt;/div&gt;
-        &lt;div class=&quot;wgl-branches&quot;&gt;
-          &lt;div class=&quot;wgl-note&quot;&gt;&lt;code&gt;running&lt;/code&gt; ↔ &lt;code&gt;paused&lt;/code&gt;；審查者可將 &lt;code&gt;awaiting-review&lt;/code&gt; → &lt;code&gt;running&lt;/code&gt;。&lt;/div&gt;
-          &lt;div class=&quot;wgl-note&quot;&gt;&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;preregistered&lt;/code&gt; / &lt;code&gt;running&lt;/code&gt; / &lt;code&gt;paused&lt;/code&gt; → &lt;code&gt;cancelled&lt;/code&gt;。&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;wgl-outcomes&quot; aria-label=&quot;研究結論&quot;&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;pass&lt;/code&gt;&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;fail&lt;/code&gt;&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;insufficient-evidence&lt;/code&gt;&lt;/span&gt;
-          &lt;span class=&quot;wgl-node&quot;&gt;&lt;code&gt;indeterminate&lt;/code&gt;&lt;/span&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-
+      &lt;/details&gt;
     &lt;/div&gt;
   &lt;/section&gt;
 
