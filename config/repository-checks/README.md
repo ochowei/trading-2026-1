@@ -1,0 +1,50 @@
+# Repository checks
+
+This directory contains tracked configuration and executable checks that enforce repository-wide
+architecture contracts. These checks are active CI inputs, not archived implementation material.
+
+## Legacy experiment inventory
+
+`legacy-experiment-inventory.json` records the closed set of legacy experiment package identities.
+`check_legacy_experiment_inventory.py` compares that baseline with importable packages under
+`legacy/experiments/`.
+
+The inventory may only shrink. Update it when an existing legacy experiment package is permanently
+removed: delete the package and remove its identity from the inventory in the same change. This
+makes retirement irreversible because restoring that identity later will be rejected as a new
+legacy experiment.
+
+Do not update the inventory to:
+
+- add a new experiment identity;
+- permit a renamed replacement for an existing identity; or
+- automatically copy the current directory scan into the baseline.
+
+Keep `packages` as sorted, unique, non-empty strings and leave `schema_version` unchanged unless the
+checker and its tests deliberately introduce a new schema.
+
+After changing the package archive or inventory, run:
+
+```bash
+uv run python config/repository-checks/check_legacy_experiment_inventory.py
+uv run pytest -q tests/test_legacy_experiment_inventory.py
+```
+
+Any failure blocks the change until the legacy archive and its inventory satisfy the closed-set
+contract.
+
+## Market-data boundary
+
+`check_experiment_market_data_access.py` enforces permanent zero tolerance for experiment code that
+bypasses the declared market-data boundary. It rejects direct yfinance use, known indirect legacy
+data-access paths, and runtime yfinance imports outside `src/trading/market_data/provider.py`.
+
+The temporary Phase 9 bypass allowlist was retired after reaching zero entries. Do not recreate an
+allowlist to admit a new exception; migrate the caller to the declared market-data boundary instead.
+
+Run the check and its tests with:
+
+```bash
+uv run python config/repository-checks/check_experiment_market_data_access.py
+uv run pytest -q tests/test_market_data_migration_policy.py
+```

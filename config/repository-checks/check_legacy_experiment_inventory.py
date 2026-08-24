@@ -16,7 +16,7 @@ def main() -> None:
     parser.add_argument(
         "--inventory",
         type=Path,
-        default=Path("ci/legacy-experiment-inventory.json"),
+        default=Path(__file__).with_name("legacy-experiment-inventory.json"),
     )
     parser.add_argument(
         "--experiments",
