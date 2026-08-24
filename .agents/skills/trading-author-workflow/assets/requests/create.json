@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "slug": "REPLACE_ME_WORKFLOW_SLUG",
+  "title": "REPLACE_ME_WORKFLOW_TITLE",
+  "definition_path": "REPLACE_ME_REPOSITORY_RELATIVE_WORKFLOW_MD",
+  "authoring_basis": "REPLACE_ME_CONFIRMED_DECISIONS_AND_SOURCE",
+  "policies": [],
+  "dependencies": [],
+  "capabilities": [],
+  "derived_from": null
+}

@@ -53,8 +53,16 @@ into the repository's canonical branch.
 
 Use `trading-author-workflow` to review, create, or evolve a workflow,
 `trading-operate-workflow` to run a pinned study, and `trading-evaluate-study` for independent
-study conclusions. Use `uv run trading workflow validate --all` for deterministic validation and
-`uv run trading workflow sync` to rebuild generated indexes.
+study conclusions. For authoring, preview a closed request with `trading workflow create --request
+<path> --dry-run`, `trading workflow change create --request <path> --dry-run`, or `trading workflow
+evolve --request <path> --dry-run`; after human confirmation, apply the same request without
+`--dry-run`. These commands retain request and source files. Any exact-path move, pointer
+replacement, or removal requires a separate human confirmation.
+
+Use `uv run trading workflow validate --all` for deterministic validation. Low-level sync and
+lifecycle transitions remain compatibility/diagnostic tools; guarded decisions and release
+preparation remain separate human-authority steps. A prepared release has no authority until its
+commit is merged into the canonical branch.
 
 <!-- GENERATED:WORKFLOW_INDEX_START -->
 | Workflow | Version | Status | Path |

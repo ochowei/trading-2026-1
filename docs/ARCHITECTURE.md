@@ -57,10 +57,11 @@ Repository-owned Agent knowledge and skills.
 | `.agents/context/cross_asset_lessons.md` | Compact cross-asset lessons, prohibited directions, parameter-scaling guidance, and freshness metadata. |
 | `.agents/context/cross_asset_evidence.md` | Detailed evidence supporting the compact cross-asset lessons. |
 | `.agents/rules/execution-model.md` | Mandatory execution-model contract for non-grandfathered experiments. |
+| `.agents/rules/workflow-study-governance.md` | Shared canonical workflow-study identity, lifecycle, authority-separation, evidence, privacy, and version-boundary rules used by operator and reviewer skills. |
 | `.agents/skills/trading-*/SKILL.md` | Workflow instructions for a specific repository research task. |
 | `.agents/skills/trading-*/agents/openai.yaml` | Skill discovery metadata and default Agent presentation. |
 | `.agents/skills/trading-*/assets/` | Templates copied or adapted by a skill, currently used by workflow authoring. |
-| `.agents/skills/trading-*/references/` | Detailed contracts loaded by a skill only when its workflow needs them. |
+| `.agents/skills/trading-*/references/` | Detailed mode-specific contracts loaded through progressive disclosure only when a skill workflow needs them; compatibility pointers may retain old reference paths without duplicating authority. |
 
 ### `.claude/commands/`
 
@@ -103,6 +104,9 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
 | `docs/phase-9-primary-followup-migration.md` | Primary followup migration boundaries, parity evidence, and verification. |
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
+| `docs/workflow-governance/README.md` | Human-facing entry point linking canonical workflow authority, workflow skills, governance diagrams, their scope, and the final review conclusion. |
+| `docs/workflow-governance/workflow-governance-flow.html` | Standalone B1 high-level sequence visualization of workflow authoring, release, study-operation, and review role handoffs. |
+| `docs/workflow-governance/workflow-governance-layers.html` | Standalone A1 inter-layer governance flow with decisions and recovery paths, plus A2 native expandable internal-state references for workflow design, release authority, and study review. |
 | `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |
@@ -169,7 +173,7 @@ creating parallel infrastructure.
 | `qualification_transaction.py` | Durable journal, idempotent recovery, shared journal identity, and serialized publication for one complete-family trial registration plus its exact qualification plan. |
 | `study_qualification.py` | Exact-study qualification compiler, structured preregistration spec, release-capability enforcement, and backward-compatible v004/S004 adapter. |
 | `study_terminal_evidence.py` | Terminal study-time evidence linkage across frozen study artifacts, typed canonical qualification plan/screen replay, current-head Development absence proofs, and independently supported required-challenge observations. |
-| `workflow_authoring.py` | Versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
+| `workflow_authoring.py` | Closed high-level create/change/evolve requests, deterministic mutation previews, versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
 | `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion, including serialization of Development terminal failure against qualification registration. |
 | `policy_authoring.py` | Versioned policy registry validation, synchronization, conformance execution, immutable releases, and lifecycle evidence. |
 | `legacy_experiments.py` | Closed-inventory scan and monotonic-removal guard for legacy experiment identities. |
@@ -313,9 +317,28 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/<slug>--vNNN/STAGES_AND_OUTCOMES.md` | Optional version companion containing full and plain-language stage/outcome guidance; when declared `reference` plus `pinned: true`, release evidence fixes its exact bytes while `WORKFLOW.md` remains the sole behavioral authority. |
 | `workflows/<slug>--vNNN/work/studies/<study>/` | Route/spec, preregistered plan, add-only Development authorization, candidate freeze, metadata, evidence, conclusion, and outcome for a workflow study when present. |
 | `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
+| `workflows/.authoring.lock` | Ignored local advisory lock shared only by workflow authoring writers; it is not lifecycle evidence or repository authority. |
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or
 their repository skills, not hand-edited casually.
+
+`trading workflow create`, `trading workflow change create`, and `trading workflow evolve` are the
+public happy-path authoring façade. Their closed JSON request files are ephemeral operation inputs,
+not tracked lifecycle authority: callers supply confirmed content and exact pins, while the CLI
+allocates `vNNN`/`Cxxx`, writes the existing schema-1 and five-file formats, synchronizes indexes,
+and validates. The façade reads and retains request/source files; moving, replacing with a pointer,
+or removing a source is a separate exact-path operation that requires individual human confirmation.
+Low-level transition and sync commands remain compatibility/diagnostic entry points, while guarded
+decision and release commands remain separate human-authority seams rather than alternate authoring
+happy paths.
+
+High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
+only the workflow tree into a system temporary directory, applies and validates the complete staged
+after-tree against canonical repository dependencies, then rechecks target digests before atomic
+per-file publication. Ordinary in-process publication failures restore the exact before bytes and
+revalidate. A process crash can still leave a partial worktree; the next authoring writer fails
+closed on structural validation and requires manual inspection. This bounded mechanism is not a
+durable journal and does not coordinate study or qualification writers.
 
 Workflow releases pin exact released policy family/version identities and `RELEASE.json` digests.
 Studies inherit those immutable selections from their workflow version and record the composite
@@ -329,6 +352,7 @@ normal.
 | Path | Purpose |
 |---|---|
 | `.venv/` | Local `uv` Python environment. |
+| `workflows/.authoring.lock` | Local workflow-authoring coordination file; safe to recreate and never tracked. |
 | `.cache/market-data/` | Validated active provider CSV data and metadata sidecars. |
 | `.cache/market-data-quarantine/` | Corrupt or rejected cache generations retained for diagnosis. |
 | `.research-data/blobs/` | Protected content-addressed data and research-definition blobs referenced by manifests. |

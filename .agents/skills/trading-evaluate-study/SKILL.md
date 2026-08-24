@@ -5,10 +5,10 @@ description: Independently review evidence for an `awaiting-review` repository w
 
 # Evaluate Trading Studies
 
-Read `CLAUDE.md` and
-`.agents/skills/trading-author-workflow/references/workflow-authoring-contract.md` completely before
-starting. Read the exact study, `PREREGISTRATION.json`, pinned released workflow, and every evidence
-artifact needed for the declared outcome rules.
+Read `CLAUDE.md` and `.agents/rules/workflow-study-governance.md` completely before starting. Read
+the exact study, `PREREGISTRATION.json`, pinned released workflow, and every evidence artifact needed
+for the declared outcome rules. Do not load workflow creation, evolution, removal, or
+release-preparation references unless the user separately asks to author a workflow change.
 
 ## Enforce the review boundary
 

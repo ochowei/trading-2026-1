@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "workflow": "REPLACE_ME_WORKFLOW_SLUG",
+  "title": "REPLACE_ME_WORKFLOW_TITLE",
+  "definition_path": "REPLACE_ME_REPOSITORY_RELATIVE_WORKFLOW_MD",
+  "authoring_basis": "REPLACE_ME_ACCEPTED_CHANGES_AND_COMBINED_IMPACT_REVIEW",
+  "policies": [],
+  "dependencies": [],
+  "capabilities": []
+}
