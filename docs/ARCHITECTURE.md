@@ -74,9 +74,7 @@ the corresponding repository behavior. New cross-Agent workflows should normally
 
 | Path | Purpose |
 |---|---|
-| `.github/workflows/lint.yml` | Runs Ruff lint and formatting checks in CI. |
-| `.github/workflows/tqqq-backtest.yml` | Manually dispatches supported experiment backtests; its experiment choices must stay synchronized with experiment additions required by `CLAUDE.md`. |
-| `.github/workflows/trading-followup-summary.yml` | Produces the scheduled/manual followup summary automation. |
+| `.github/workflows/ci.yml` | Runs Ruff checks plus workflow, policy, legacy-inventory, and market-data migration contract validation for pull requests and `main` pushes. |
 
 ## Documentation
 
