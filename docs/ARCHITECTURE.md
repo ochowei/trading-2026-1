@@ -43,6 +43,7 @@ manual trading state are deliberately local-only.
 | `uv.lock` | Locked dependency graph used by `uv` for reproducible environments. |
 | `.python-version` | Project Python-version selection for compatible version managers. |
 | `.gitignore` | Excludes caches, environments, private trading state, credentials, and non-retained results; explicitly allows retained research artifacts. |
+| `config/` | Tracked repository configuration and executable validation contracts that are not application runtime code. |
 | `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
 | `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
 | `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
@@ -272,10 +273,11 @@ rejects new or renamed identities. New formal research uses `src/trading/researc
 | `tests/conftest.py` | Shared pytest setup and fixtures. |
 | `tests/test_*.py` | Behavioral and contract tests, generally named after the module or lifecycle being protected. Snapshot-contract tests pin migration behavior for selected experiments. |
 | `tests/policies/test_*.py` | Policy resolution, composition, definition-identity, and version-specific conformance tests. |
+| `config/repository-checks/README.md` | Maintenance contract for active repository-wide checks and their tracked configuration. |
 | `tools/check_experiment_market_data_access.py` | CI scanner that detects experiment access which bypasses the declared market-data boundary. |
-| `tools/check_legacy_experiment_inventory.py` | CI entry point that rejects additions or rename-based replacements in the legacy experiment tree. |
+| `config/repository-checks/check_legacy_experiment_inventory.py` | CI entry point that rejects additions or rename-based replacements in the legacy experiment tree. |
+| `config/repository-checks/legacy-experiment-inventory.json` | Sorted stage-one baseline of frozen legacy experiment package identities; removals are allowed but additions are not. |
 | `ci/market-data-bypass-allowlist.json` | Typed, shrinking baseline of legacy experiment bypasses permitted during migration. |
-| `ci/legacy-experiment-inventory.json` | Sorted stage-one baseline of frozen legacy experiment package identities; removals are allowed but additions are not. |
 
 Tests may contain explicit synthetic broker fixtures. Real broker exports, credentials, and personal
 trading data must never be placed in `tests/` or committed anywhere.
