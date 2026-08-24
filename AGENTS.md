@@ -19,14 +19,14 @@ Use the matching repository skill for these workflows:
 
 | Task | Skill |
 |---|---|
-| Explore an asset before outcome-relevant execution | `trading-pre-experiment-research` |
+| Explore an asset before outcome-relevant execution | Archived legacy workflow; use only from `legacy/agent-skills/trading-pre-experiment-research/` |
 | Start or develop any new formal research identity | `trading-operate-workflow` |
 | Inspect or migrate a frozen legacy experiment identity | matching legacy `trading-*` skill |
-| Run an experiment and analyze rolling stability | `trading-run-experiment` |
-| Validate an experiment comprehensively | `trading-validate-experiment` |
-| Synchronize experiment results and documentation | `trading-update-experiment-docs` |
-| Rank one asset's experiments or update followup | `trading-evaluate-best` |
-| Rebuild the complete followup strategy list | `trading-rebuild-followup` |
+| Run an experiment and analyze rolling stability | Archived legacy workflow; use only from `legacy/agent-skills/trading-run-experiment/` |
+| Validate an experiment comprehensively | Archived legacy workflow; use only from `legacy/agent-skills/trading-validate-experiment/` |
+| Synchronize experiment results and documentation | Archived legacy workflow; use only from `legacy/agent-skills/trading-update-experiment-docs/` |
+| Rank one asset's experiments or update followup | Archived legacy workflow; use only from `legacy/agent-skills/trading-evaluate-best/` |
+| Rebuild the complete followup strategy list | Archived legacy workflow; use only from `legacy/agent-skills/trading-rebuild-followup/` |
 | Review, create, version, or release a repository research workflow | `trading-author-workflow` |
 | Start, preregister, run, pause, or submit a workflow study for review | `trading-operate-workflow` |
 | Independently assess evidence and conclude a workflow study | `trading-evaluate-study` |
