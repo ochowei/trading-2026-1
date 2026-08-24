@@ -46,6 +46,7 @@ manual trading state are deliberately local-only.
 | `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
 | `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
 | `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
+| `legacy/results/` | Superseded legacy result-directory names retained for historical inspection only; runtime result readers do not scan this archive. |
 | `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
 | `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
 
@@ -308,6 +309,9 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data
 and semantic definition references.
+
+Superseded legacy result-directory aliases that are no longer runtime inputs are retained under
+`legacy/results/`; see `legacy/README.md` for their historical identity map.
 
 ### `workflows/`
 
