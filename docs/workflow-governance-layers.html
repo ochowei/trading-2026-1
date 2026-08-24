@@ -1516,13 +1516,13 @@ flowchart TB
           .find((candidate) =&gt; candidate.id.startsWith(`flowchart-${nodeId}-`));
         if (!node) return;
         const link = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;a&quot;);
-        const title = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;title&quot;);
-        title.textContent = `查看 ${detail.title} 的詳細說明`;
         link.setAttribute(&quot;href&quot;, &quot;#wgl-a1-detail-panel&quot;);
-        link.setAttribute(&quot;aria-label&quot;, title.textContent);
+        link.setAttribute(&quot;aria-label&quot;, `查看 ${detail.title} 的詳細說明`);
+        link.setAttribute(&quot;data-tooltip&quot;, detail.summary);
+        link.setAttribute(&quot;data-tooltip-placement&quot;, &quot;top&quot;);
         link.classList.add(&quot;wgl-node-link&quot;);
         node.parentNode.insertBefore(link, node);
-        link.append(title, node);
+        link.append(node);
         link.addEventListener(&quot;pointerenter&quot;, () =&gt; {
           if (window.matchMedia(&quot;(hover: hover)&quot;).matches) showDetail(nodeId);
         });
@@ -1535,8 +1535,8 @@ flowchart TB
       });
 
       status.textContent = !isTwoColumnLayout
-        ? &quot;點選 A1 節點，可在下方查看詳細說明。&quot;
-        : &quot;將滑鼠移到、聚焦或點選 A1 節點，可在右欄查看詳細說明。&quot;;
+        ? &quot;滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。&quot;
+        : &quot;滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。&quot;;
     } catch (error) {
       console.error(error);
       status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;

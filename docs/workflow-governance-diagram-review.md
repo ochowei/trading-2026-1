@@ -6,7 +6,7 @@
 以及 Work Package 1–4 治理實作之間的審查問題。它是視覺化文件的待辦紀錄，不是 workflow
 contract、release authority 或 study outcome 的權威來源。
 
-- Last reviewed: 2026-08-23
+- Last reviewed: 2026-08-24
 - Review basis: current repository worktree
 - Status vocabulary:
   - `resolved`: 原始問題已在目前視覺化中可見且語意正確。
