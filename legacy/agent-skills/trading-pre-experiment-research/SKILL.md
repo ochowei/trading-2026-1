@@ -29,7 +29,7 @@ Run `uv run trading freshness` to check if any knowledge is stale. Flag any `dat
 
 ### Step 3: Read the relevant EXPERIMENTS_*.md
 
-Resolve the asset document as `src/trading/experiments/EXPERIMENTS_<TICKER>.md` using the uppercase ticker. Verify that it exists. For a new asset without this file, note that the document must be created.
+Resolve the asset document as `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md` using the uppercase ticker. Verify that it exists. For a new asset without this file, note that the document must be created.
 
 Read ONLY the `<!-- AI_CONTEXT_START ... AI_CONTEXT_END -->` block and the Parameter Comparison table. Do NOT read the full file unless specific experiment details are needed.
 

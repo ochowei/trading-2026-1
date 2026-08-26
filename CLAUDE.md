@@ -5,8 +5,9 @@
 設計新實驗時，按以下順序讀取，夠用就停：
 1. **先讀** [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md) 的跨資產共通教訓（精簡規則版，~290 行）
 1b. **檢查新鮮度**：若任何教訓的 `data_through` 距今超過 6 個月，在實驗提案中標註「基於較舊數據，建議先重新驗證」
-2. **再讀** EXPERIMENTS_*.md 的 `AI Agent 快速索引` 區塊
-3. **再讀** 參數對照表（Parameter Comparison）
+2. **需要歷史脈絡時**，再讀 `legacy/experiment-overviews/EXPERIMENTS_*.md` 的
+   `AI Agent 快速索引` 區塊；它是 legacy evidence，不是新研究 authority
+3. **需要 legacy 參數脈絡時**，再讀參數對照表（Parameter Comparison）
 4. **需要特定規則的詳細證據時**，讀 [.agents/context/cross_asset_evidence.md](.agents/context/cross_asset_evidence.md) 的對應段落（不要整份讀）
 5. **只有需要了解實作細節時**，才讀個別實驗的 config.py / signal_detector.py
 6. **不需要** 讀每個實驗的完整程式碼，mdoc 已包含關鍵參數
@@ -18,14 +19,18 @@
   preregister；純工程維護與不查看 outcome 的探索不需要 study。
 - **Versioned policies**：workflow 必須明確選擇 released market、broker、execution 與
   portfolio policy versions，不可使用隱含 latest 或複製後自行覆寫。
-- **Legacy identity freeze**：`src/trading/experiments/` 是封閉的 legacy inventory。不得新增、
-  改名或就地改變既有 identity 的研究語意；改良必須建立 workflow-native research definition。
+- **Legacy identity freeze**：`legacy/experiments/` 是封閉的 legacy inventory；
+  `src/trading/experiments/` 只是 historical import compatibility facade。不得新增、改名或就地
+  改變既有 identity 的研究語意；改良必須建立 workflow-native research definition。
 
 - **程式碼與文件同步**：任何程式碼變更都必須同步更新相關文件，確保文件準確反映實際行為。
 - **架構文件是唯一權威**：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 是專案檔案、資料夾用途與 ownership boundary 的 canonical map。
 - **自動維護架構文件**：新增、刪除、搬移、重新命名或改變 tracked 檔案／資料夾用途時，必須在同一個 change 更新 `docs/ARCHITECTURE.md`。新增 public entry point、重複性檔案模式、generated artifact 或 local-only data boundary 時亦同。若只是新增符合文件既有 pattern 的 experiment、result、test、ADR 或 workflow study，無須逐一列出，除非 pattern 或責任本身改變。
-- **更新 EXPERIMENTS_*.md 時**：AI Agent 必須同時維護並更新各個 `EXPERIMENTS_*.md` 檔案最頂端的 AI Agent 專用摘要區塊（`<!-- AI_CONTEXT_START ... -->`），確保快速索引（當前最佳、已證明無效、參數空間、未嘗試方向等）保持在最新狀態。
-- **知識新鮮度**：更新 EXPERIMENTS_*.md 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新 `validated` 和 `data_through` 日期。
+- **更新 legacy overview 時**：只有明確的 archive-maintenance 工作才可更新
+  `legacy/experiment-overviews/EXPERIMENTS_*.md`，並須同步維護頂端的 `AI_CONTEXT`；新研究不更新
+  legacy overview，而是在 workflow study 中保存 evidence。
+- **知識新鮮度**：更新 legacy overview 的 AI_CONTEXT 或 cross_asset_lessons.md 時，同步更新
+  `validated` 和 `data_through` 日期。
 - **發現不一致時**：主動修正文件與程式碼之間的不一致。
 - **人類專用文件**：`docs/pm/` 資料夾由人類維護，AI Agent 除非被明確指定為 `HUMAN_PM_HELPER`，否則不可編輯其中的任何文件。
 
@@ -65,7 +70,7 @@ uv run ruff check src/ --fix && uv run ruff format src/
 
 ## 成交模型（新實驗必讀）
 
-TQQQ-001 ~ TQQQ-009 為既往不咎實驗，可維持原始回測邏輯。所有新建實驗必須納入成交模型（進場/出場模式、未成交處理、成交統計、日內路徑假設）。完整規格見 [.agents/rules/execution-model.md](.agents/rules/execution-model.md)。
+TQQQ-001 ~ TQQQ-009 為既往不咎實驗，可維持原始回測邏輯。所有新建實驗必須納入成交模型（進場/出場模式、未成交處理、成交統計、日內路徑假設）。完整規格見 [.agents/rules/execution-model.md](.agents/rules/execution-model.md)。該路徑已被 released workflow 固定，視為 frozen dependency；未來規則變更必須建立 versioned successor，並由新的 workflow version 明確採用，不得就地改寫。
 
 ## 開發指令
 
@@ -74,12 +79,12 @@ TQQQ-001 ~ TQQQ-009 為既往不咎實驗，可維持原始回測邏輯。所有
 uv sync
 
 # 唯讀列出封存的 legacy experiment inventory
-uv run trading list
+uv run trading legacy list
 
 # Legacy experiment execution、analysis、evaluation、snapshot preparation 與 result publication
 # 已正式退役並 fail closed；新研究只使用下方 trading research commands。
 # 唯讀比較封存結果
-uv run trading compare <exp1> <exp2>
+uv run trading legacy compare <exp1> <exp2>
 
 # 產生跟單訊號報告（Firstrade 下單用）
 uv run trading followup
@@ -118,8 +123,10 @@ uv run trading drift status --path state/live-drift/<strategy>.json
 uv run trading drift checkpoint --help
 uv run trading drift recover --help
 
-# 檢查知識新鮮度
+# 聚合檢查 active knowledge 與明確標示的 legacy archive freshness
 uv run trading freshness
+# 只檢查 legacy overview 與 archived result validity
+uv run trading legacy freshness
 
 # 唯讀驗證所有 tracked workflow metadata、索引與 immutable evidence
 uv run trading workflow validate --all
@@ -200,9 +207,13 @@ uv run trading data import backup.snapshot.zip --manifest results/example/import
 uv run trading data gc --grace-days 7
 
 # 唯讀檢查封存的 legacy result；不 refresh、不寫入結果
-uv run trading result status <experiment_name>
-uv run trading result status --all
+uv run trading legacy result status <experiment_name>
+uv run trading legacy result status --all
 ```
+
+舊的頂層 `trading list`、`compare`、`result status`、`run`、`analyze`、`sync-docs` 與
+`followup-backtest` 只保留為至少一個 release cycle 的 deprecated compatibility aliases；新文件與
+自動化一律使用 `trading legacy ...`。
 
 ## 架構速覽
 
@@ -232,7 +243,7 @@ checkpoints, and fail-closed recovery contracts are documented in
 - 建立新實驗教學 → [README.md](README.md)
 - Versioned executable policies → [docs/policies.md](docs/policies.md)
 - 專案檔案與資料夾用途 → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- 資產實驗總覽 → `src/trading/experiments/EXPERIMENTS_<TICKER>.md`（例如 [TQQQ](src/trading/experiments/EXPERIMENTS_TQQQ.md)、[GLD](src/trading/experiments/EXPERIMENTS_GLD.md)）
+- Legacy 資產實驗總覽 → `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md`（例如 [TQQQ](legacy/experiment-overviews/EXPERIMENTS_TQQQ.md)、[GLD](legacy/experiment-overviews/EXPERIMENTS_GLD.md)）；僅供歷史脈絡，不是 workflow outcome authority
 - 成交模型完整規格 → [.agents/rules/execution-model.md](.agents/rules/execution-model.md)
 - 跨資產共通教訓 → [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md)
 - 跨資產詳細證據 → [.agents/context/cross_asset_evidence.md](.agents/context/cross_asset_evidence.md)

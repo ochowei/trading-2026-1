@@ -48,6 +48,8 @@ manual trading state are deliberately local-only.
 | `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
 | `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
 | `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
+| `legacy/experiment-overviews/` | Archived per-asset `EXPERIMENTS_<TICKER>.md` tables and AI context. They are historical evidence, not workflow outcome authority. |
+| `legacy/templates/experiment/` | Former legacy experiment package template retained outside installable and auto-discovery paths for historical inspection only. |
 | `legacy/results/` | Read-only terminal archive for every retired legacy result class: last retained latest results, immutable snapshot manifests, retained formal runs, legacy-schema results, superseded aliases, and unreferenced history. Diagnostics may inspect archived latest files, but no writer, ranking, qualification, promotion, or new-entry authorization may consume this archive. |
 | `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
 | `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
@@ -62,7 +64,7 @@ Repository-owned Agent knowledge and skills.
 |---|---|
 | `.agents/context/cross_asset_lessons.md` | Compact cross-asset lessons, prohibited directions, parameter-scaling guidance, and freshness metadata. |
 | `.agents/context/cross_asset_evidence.md` | Detailed evidence supporting the compact cross-asset lessons. |
-| `.agents/rules/execution-model.md` | Mandatory execution-model contract for non-grandfathered experiments. |
+| `.agents/rules/execution-model.md` | Released-workflow-pinned execution-model dependency. Its current path and bytes are frozen; future changes require a versioned successor selected by a new workflow version. |
 | `.agents/rules/workflow-study-governance.md` | Shared canonical workflow-study identity, lifecycle, authority-separation, evidence, privacy, and version-boundary rules used by operator and reviewer skills. |
 | `.agents/skills/trading-*/SKILL.md` | Active workflow instructions for a specific repository research task. Legacy experiment skills are archived under `legacy/agent-skills/`. |
 | `.agents/skills/trading-*/agents/openai.yaml` | Skill discovery metadata and default Agent presentation. |
@@ -136,7 +138,8 @@ All installable Python code lives under `src/trading/`. `src/trading/__init__.py
 
 | Path | Purpose |
 |---|---|
-| `src/trading/cli.py` | Unified command parser and dispatcher. Workflow-native research remains active; legacy run, analysis, evaluation, registry mutation, snapshot preparation, documentation sync, and followup backtest commands remain parseable only to fail closed with the retirement message. |
+| `src/trading/cli.py` | Stable console entry point and unified dispatcher. Responsibility-specific parsers and handlers live under `src/trading/commands/`. |
+| `src/trading/knowledge_freshness.py` | Aggregate active-knowledge plus explicitly labeled legacy-archive freshness report used by the compatibility `trading freshness` command. |
 | `src/trading/followup.py` | Retired-strategy compatibility used only for fail-closed status reporting and exit handling of pre-existing manual positions; archived results cannot authorize new entries. |
 | `src/trading/followup_backtest.py` | Retained implementation of the retired legacy followup simulation; its public CLI entry fails closed. |
 
@@ -157,12 +160,7 @@ creating parallel infrastructure.
 | `sleeve_engine.py` | Canonical sleeve evaluation, daily equity, base/stress costs, metrics, and parity evidence. |
 | `bundle_strategy.py` | Provider-free strategy seams for primary and auxiliary snapshot bundles. |
 | `data_fetcher.py` | Backward-compatible multi-ticker facade over validated market-data services. |
-| `performance_analyzer.py` | Retained legacy rolling-window implementation; its public CLI entry is retired. |
-| `results.py` | Read-only archived-result diagnostics and comparison plus an explicit fail-closed legacy publication seam. |
-| `freshness.py` | Read-only knowledge freshness and persisted-result validity scans. |
-| `definition_resolver.py` | Read-only resolution of an experiment's current semantic definition. |
-| `evaluation.py` | Retained legacy evaluation implementation; its public CLI entry is retired and cannot publish new observations. |
-| `sync_docs.py` | Retained legacy documentation comparison implementation; its public CLI entry is retired. |
+| `performance_analyzer.py`, `results.py`, `freshness.py`, `definition_resolver.py`, `evaluation.py`, `sync_docs.py` | Module aliases preserving historical `trading.core.*` imports while canonical implementations live under `trading.legacy` or `trading.knowledge_freshness`. |
 | `ledger_csv.py` | Fixed-schema canonical CSV encoding/decoding for manual ledger data. |
 | `ledger_storage.py` | Private atomic writes and bounded filesystem locking. |
 | `broker_reconciliation.py` | Broker-export parsing and comparison against canonical accounting state. |
@@ -174,15 +172,34 @@ creating parallel infrastructure.
 | `live_drift.py` | Frozen drift envelopes, metric evaluation, checkpoints, and recovery rules. |
 | `live_drift_registry.py` | Private append-only drift evidence, hash-chain replay, and storage locking. |
 | `qualification.py` | Historical screens, benchmark/selection adjustment, Shadow evidence, and gates. |
-| `qualification_workflow.py` | Workflow-native or frozen-legacy qualification identity resolution, clean/retrospective plan registration, and deterministic screen orchestration. |
+| `qualification_workflow.py`, `study_qualification.py`, `study_terminal_evidence.py`, `workflow_authoring.py`, `workflow_studies.py` | Module aliases preserving historical imports while canonical implementations live under `trading.workflow`. |
 | `qualification_transaction.py` | Durable journal, idempotent recovery, shared journal identity, and serialized publication for one complete-family trial registration plus its exact qualification plan. |
-| `study_qualification.py` | Exact-study qualification compiler, structured preregistration spec, release-capability enforcement, and backward-compatible v004/S004 adapter. |
-| `study_terminal_evidence.py` | Terminal study-time evidence linkage across frozen study artifacts, typed canonical qualification plan/screen replay, current-head Development absence proofs, and independently supported required-challenge observations. |
-| `workflow_authoring.py` | Closed high-level create/change/evolve requests, deterministic mutation previews, versioned workflow metadata, hashing, indexes, releases, and lifecycle transitions. |
-| `workflow_studies.py` | Study scaffolding, preregistration, stage transitions, evidence, and completion, including serialization of Development terminal failure against qualification registration. |
 | `policy_authoring.py` | Versioned policy registry validation, synchronization, conformance execution, immutable releases, and lifecycle evidence. |
-| `legacy_experiments.py` | Closed-inventory scan and monotonic-removal guard for legacy experiment identities. |
+| `legacy_experiments.py` | Module alias for the canonical legacy inventory guard. |
 | `__init__.py` | Package marker; shared APIs are normally imported from their defining modules. |
+
+### `src/trading/commands/`
+
+CLI parser registration and handlers grouped by public responsibility.
+
+| File | Purpose |
+|---|---|
+| `legacy.py` | Explicit `trading legacy ...` tree, read-only diagnostics, fail-closed retired operations, and deprecated top-level alias dispatch. |
+| `workflow.py` | Workflow authoring, validation, release, and study parser/handler. |
+| `research.py` | Workflow-native definition listing, snapshot, run, and exact orchestration provenance. |
+
+### `src/trading/legacy/`
+
+Canonical read-only compatibility implementation for the retired experiment system. It owns the
+registry implementation, archived-result diagnostics, definition resolution, retired evaluation and
+analysis, archived documentation audit, freshness audit, and inventory guard. No module in this
+package authorizes new research or result publication.
+
+### `src/trading/workflow/`
+
+Canonical workflow lifecycle implementation: authoring, studies, exact-study qualification,
+terminal evidence, and qualification orchestration. Historical `trading.core.*` imports alias these
+same module objects so monkeypatching and process-global state remain compatible.
 
 ### `src/trading/market_data/`
 
@@ -248,12 +265,14 @@ experiment tree.
 | `rate_volatility_pullback_gap_safe.py` | Explicitly suppresses workflow-native signals on over-age auxiliary decisions while preserving lag audit evidence. |
 | `profit_protection_pullback.py` | Reusable primary-only XLF pullback seam with close-armed profit protection, next-open exits, and a fixed occupation lock that preserves paired entry cohorts. |
 | `fxi_mean_reversion.py` | Reusable FXI pullback/WR, ATR-band, and same-session ASHR-divergence definition seam with next-open entry, pessimistic target/stop resolution, cooldown, and fixed expiry semantics. |
+| `README.md` | Active definition-tree boundary, frozen-source compatibility, and new source-placement guidance. |
+| `primitives/` | Destination for new reusable workflow-native definition seams; existing top-level seams remain at evidence-pinned paths. |
 | `_template/` | Starting structure for a workflow-native definition. |
 | `<family>/<trial>/definition.py` | Stable source entry point for one permanent workflow-governed trial identity. |
 
 ### `src/trading/experiments/`
 
-This is the compatibility registry and documentation area for the closed legacy inventory.
+This is the import facade for the closed legacy inventory.
 Archived source packages live under repository-root `legacy/experiments/`, while the registry
 extends its package search path in a repository checkout so their historical import identities remain
 `trading.experiments.<experiment_name>`. It auto-imports every inventoried package whose name does
@@ -264,9 +283,9 @@ publication. New formal research uses `src/trading/research_definitions/`.
 
 | Pattern | Purpose |
 |---|---|
-| `src/trading/experiments/__init__.py` | Registry, registration decorator, lookup/list APIs, and `pkgutil` auto-discovery. |
-| `src/trading/experiments/_template/` | Historical package template retained for reference; it must not be used to add a legacy identity. |
-| `src/trading/experiments/EXPERIMENTS_<TICKER>.md` | Per-asset experiment overview, result table, parameter comparison, and machine-oriented `AI_CONTEXT`. |
+| `src/trading/experiments/__init__.py` | Historical package-search facade that re-exports the canonical `trading.legacy.experiments` registry and discovers the physical archive. |
+| `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md` | Archived per-asset result tables, parameter comparisons, and machine-oriented `AI_CONTEXT`. |
+| `legacy/templates/experiment/` | Former package template retained outside auto-discovery; it is not a supported starting point. |
 | `legacy/experiments/<experiment_name>/config.py` | Experiment identity, ticker, periods, thresholds, exits, and other parameters. |
 | `legacy/experiments/<experiment_name>/signal_detector.py` | Indicators and entry-signal logic. |
 | `legacy/experiments/<experiment_name>/strategy.py` | Frozen historical strategy implementation retained for inspection, reproduction source, and exit compatibility; its former research hooks have no public execution authority. |
@@ -277,7 +296,12 @@ publication. New formal research uses `src/trading/research_definitions/`.
 | Path | Purpose |
 |---|---|
 | `tests/conftest.py` | Shared pytest setup and fixtures. |
-| `tests/test_*.py` | Behavioral and contract tests, generally named after the module or lifecycle being protected. Snapshot-contract tests pin migration behavior for selected experiments. |
+| `tests/test_*.py` | Tests whose historical paths or exact bytes are pinned by released policy or frozen workflow-study evidence; do not relocate them during organizational cleanup. |
+| `tests/legacy/test_*.py` | Legacy import compatibility, frozen snapshot, archived diagnostics, and fail-closed CLI tests. |
+| `tests/workflow/test_*.py` | Workflow authoring, study, qualification, and terminal-evidence tests. |
+| `tests/research/test_*.py` | Workflow-native definition, reproducibility, result-schema, run, and registry tests. |
+| `tests/market_data/test_*.py` | Provider, cache, validation, coverage, bundle, and migration-boundary tests. |
+| `tests/operations/test_*.py` | Ledger, followup, qualification, sleeve, and drift operational tests. |
 | `tests/policies/test_*.py` | Policy resolution, composition, definition-identity, and version-specific conformance tests. |
 | `config/repository-checks/README.md` | Maintenance contract for active repository-wide checks and their tracked configuration. |
 | `config/repository-checks/check_experiment_market_data_access.py` | Zero-tolerance CI scanner that rejects experiment access bypassing the declared market-data boundary and runtime yfinance use outside the provider. |
@@ -314,9 +338,10 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 The legacy experiment result authority is retired. All of its last retained results and manifests
 live under `legacy/results/`; `results/experiment-results/` must not exist or be recreated.
-Comparison and explicit result-status commands may inspect the archive. Freshness,
-evaluation/ranking, followup new entries, Shadow/Active, qualification, formal evidence
-verification, and all writers reject archived results. Historical frozen paths resolve only through
+Comparison, explicit result-status commands, and the labeled legacy archive freshness audit may
+inspect the archive. Active-knowledge freshness, evaluation/ranking, followup new entries,
+Shadow/Active, qualification, formal evidence verification, and all writers reject archived
+results. Historical frozen paths resolve only through
 the bounded, digest-verified `results/registries/path-migrations.json`; released workflow and study
 bytes are not rewritten. See `legacy/README.md` and `docs/legacy-experiment-retirement-v010.md`.
 
@@ -384,14 +409,16 @@ application architecture and is not a source of project rules.
 | Change | Primary location | Usually update too |
 |---|---|---|
 | Inspect or reproduce legacy source without publishing outcomes | Existing `legacy/experiments/<identity>/` | Preserve semantic identity and archived evidence; all public legacy execution and writer entry points remain retired. |
+| Change legacy compatibility or diagnostics | `src/trading/legacy/` | Preserve `trading.experiments` and `trading.core.*` aliases, archived read-only boundaries, and legacy tests. |
 | Add a new research identity | `src/trading/research_definitions/` | Released workflow/study, exact policy versions, immutable definition/data evidence, tests. Never add a legacy experiment package. |
 | Add or revise reusable research constraints | `policies/` and `src/trading/policies/` | Conformance tests, affected workflow version, `docs/policies.md`, and technical docs. |
 | Change shared strategy/backtest behavior | `src/trading/core/` | Focused tests, affected phase docs, and experiment docs if metrics or contracts change. |
 | Change provider/cache behavior | `src/trading/market_data/` | `docs/market-data.md`, tests, ADR when architectural. |
 | Change snapshots/results/formal runs | `src/trading/research_data/` | Reproducibility/result docs, tests, ADR when architectural. |
-| Change CLI behavior | `src/trading/cli.py` | `CLAUDE.md` commands, `README.md`, relevant contract docs, and CLI tests. |
+| Change CLI behavior | Matching `src/trading/commands/` module plus `src/trading/cli.py` dispatch when needed | `CLAUDE.md` commands, `README.md`, relevant contract docs, and CLI tests. |
 | Change followup selection or reporting | `src/trading/followup.py` / `followup_backtest.py` | Followup tests and relevant experiment/result docs. |
 | Change a repository workflow contract | `workflows/` | Use `trading-author-workflow`; generated indexes and release evidence must remain valid. |
+| Change workflow runtime behavior | `src/trading/workflow/` | Preserve old core aliases, focused workflow tests, and pinned source/evidence paths. |
 | Change repository layout or ownership | Affected paths | Update this document in the same change. |
 
 Versioned Phase 6 workflow contracts live at

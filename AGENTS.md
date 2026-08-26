@@ -38,7 +38,9 @@ implementation and tests directly while following [CLAUDE.md](CLAUDE.md).
 
 - `src/trading/cli.py`: command-line interface and command dispatch
 - `src/trading/core/`: shared data, strategy, backtest, analysis, and result infrastructure
-- `src/trading/experiments/`: auto-discovered experiment packages and per-asset overviews
+- `src/trading/experiments/`: checkout-only import facade for the archived legacy inventory
+- `legacy/experiments/`: frozen legacy experiment packages
+- `legacy/experiment-overviews/`: archived per-asset experiment overviews
 - `src/trading/research_definitions/`: workflow-native research definitions
 - `policies/`: versioned executable market, broker, execution, and portfolio policies
 - `workflows/`: versioned procedures and their pinned studies
@@ -56,6 +58,7 @@ implementation and tests directly while following [CLAUDE.md](CLAUDE.md).
 - Do not edit `docs/pm/` unless the user explicitly designates the task as `HUMAN_PM_HELPER`.
 - Use the required execution model for every non-grandfathered experiment.
 - Preserve the freshness metadata when changing experiment context or cross-asset lessons.
-- Do not add or rename a package under `src/trading/experiments/`; that tree is a closed legacy
-  inventory. New outcome-relevant research uses a released workflow, a preregistered study before
-  outcome inspection, exact policy versions, and `src/trading/research_definitions/`.
+- Do not add or rename a package under `legacy/experiments/`; that tree is a closed legacy
+  inventory. `src/trading/experiments/` exists only to preserve historical import identities. New
+  outcome-relevant research uses a released workflow, a preregistered study before outcome
+  inspection, exact policy versions, and `src/trading/research_definitions/`.

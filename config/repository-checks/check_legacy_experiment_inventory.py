@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from trading.core.legacy_experiments import (
+from trading.legacy.legacy_experiments import (
     LegacyInventoryError,
     validate_legacy_inventory,
 )

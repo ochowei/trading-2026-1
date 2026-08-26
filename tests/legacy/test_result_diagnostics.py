@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from trading.core.results import (
+from trading.legacy.results import (
     LegacyExperimentRetiredError,
     ResultSource,
     compare_experiments,
@@ -37,7 +37,7 @@ def test_compare_is_read_only_and_displays_legacy_validity(monkeypatch, tmp_path
             encoding="utf-8",
         )
     before = {path: path.read_bytes() for path in results_root.glob("*/latest.json")}
-    monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.legacy.results.RESULTS_DIR", results_root)
 
     compare_experiments(["first", "second"])
 
@@ -124,8 +124,8 @@ def test_compare_and_status_inventory_can_read_archive(tmp_path, capsys) -> None
 def test_legacy_save_is_rejected_after_retirement(tmp_path, monkeypatch) -> None:
     results_root = tmp_path / "results"
     archive_root = tmp_path / "legacy" / "results"
-    monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
-    monkeypatch.setattr("trading.core.results.ARCHIVED_RESULTS_DIR", archive_root)
+    monkeypatch.setattr("trading.legacy.results.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.legacy.results.ARCHIVED_RESULTS_DIR", archive_root)
 
     with pytest.raises(LegacyExperimentRetiredError, match="publication is retired"):
         save_result("experiment", _legacy_result(1))

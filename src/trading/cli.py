@@ -5,17 +5,19 @@ Supports experiment, followup, and analysis subcommands.
 """
 
 import argparse
-import hashlib
 import json
 import logging
-import subprocess
 import sys
 from collections.abc import Mapping
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+from trading.commands import legacy as legacy_commands
+from trading.commands import research as research_commands
+from trading.commands import workflow as workflow_commands
+from trading.commands.research import cmd_research
+from trading.commands.workflow import cmd_workflow
 from trading.core.data_fetcher import create_default_market_data_service
-from trading.core.definition_resolver import resolve_current_definition_fingerprint
 from trading.core.followup_cutover import (
     FollowupActivationProof,
     FollowupActivationVerifier,
@@ -35,57 +37,31 @@ from trading.core.manual_ledger import (
 )
 from trading.core.policy_authoring import PolicyAuthoringError, PolicyRepository
 from trading.core.proposals import ProposalTerms
-from trading.core.qualification_workflow import (
-    register_forward_qualification_plan,
-    run_registered_historical_screen,
-)
-from trading.core.results import (
-    ResultSource,
-    compare_experiments,
-    inspect_result,
-    latest_result_names,
-)
-from trading.core.study_qualification import (
-    STUDY_QUALIFICATION_CAPABILITY,
-    compile_study_qualification_plan,
-)
-from trading.core.workflow_authoring import (
-    CreateChangeRequest,
-    CreateWorkflowRequest,
-    EvolveWorkflowRequest,
-    WorkflowAuthoringError,
-    WorkflowRepository,
-)
-from trading.core.workflow_studies import WorkflowStudyService
-from trading.experiments import get_experiment, list_experiments
+from trading.legacy.definition_resolver import resolve_current_definition_fingerprint
+from trading.legacy.results import inspect_result
 from trading.market_data import (
     AvailabilityPolicy,
-    MarketDataAvailabilityError,
-    MarketDataBundle,
     MarketDataCoveragePolicy,
     MarketDataRequirement,
     MarketDataSeries,
     SignalDecisionTime,
 )
 from trading.research_data import (
-    ExperimentTrialDeclaration,
     ExperimentTrialRegistry,
     QualificationEvidenceStore,
     QualificationRegistry,
     ResearchDataStore,
-    ResearchDefinitionSnapshot,
     ResearchDefinitionStore,
-    ResearchRunCoordinator,
-    RunMode,
     qualification_evidence_directory,
-    research_trial_directory,
     trial_registry_path,
 )
-from trading.research_definitions import (
-    ResearchDefinitionRegistry,
-    ResearchDefinitionRegistryError,
-    WorkflowNativeExecutionError,
-    resolve_workflow_policy_set,
+from trading.workflow.qualification import (
+    register_forward_qualification_plan,
+    run_registered_historical_screen,
+)
+from trading.workflow.study_qualification import (
+    STUDY_QUALIFICATION_CAPABILITY,
+    compile_study_qualification_plan,
 )
 
 # 設定日誌格式 (Configure logging format)
@@ -96,9 +72,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-LEGACY_EXPERIMENT_RETIREMENT_MESSAGE = (
-    "legacy experiment research is retired; use `trading research` with a released workflow"
-)
+LEGACY_EXPERIMENT_RETIREMENT_MESSAGE = legacy_commands.RETIREMENT_MESSAGE
 
 DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
@@ -115,83 +89,6 @@ def create_default_research_data_store() -> ResearchDataStore:
 def create_default_research_definition_store() -> ResearchDefinitionStore:
     """Build the local protected immutable research-definition store."""
     return ResearchDefinitionStore(Path(".research-data/blobs"))
-
-
-def cmd_list(args: argparse.Namespace) -> None:
-    """List the archived legacy inventory without authorizing execution."""
-    experiments = list_experiments()
-    print(f"\n  Archived legacy experiments: {len(experiments)}")
-    print(f"  {'=' * 40}")
-    for name in experiments:
-        strategy = get_experiment(name)
-        config = strategy.create_config()
-        eid = config.experiment_id or ""
-        print(f"  - {eid:<10} {name:<30} {config.display_name}")
-    print()
-
-
-def cmd_run(args: argparse.Namespace) -> None:
-    """Fail closed after retirement of the legacy experiment runner."""
-    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
-
-
-def cmd_compare(args: argparse.Namespace) -> None:
-    """比較實驗結果 (Compare experiment results)"""
-    compare_experiments(args.experiments)
-
-
-def cmd_result_status(args: argparse.Namespace) -> None:
-    """Show persisted-result validity without refreshing or executing anything."""
-    from trading.core import results as result_module
-
-    if args.all:
-        names = latest_result_names(
-            results_dir=result_module.RESULTS_DIR,
-            archive_dir=result_module.ARCHIVED_RESULTS_DIR,
-            include_archive=True,
-        )
-    elif args.experiment:
-        names = [args.experiment]
-    else:
-        raise SystemExit("result status requires an experiment name or --all")
-
-    store = create_default_research_data_store()
-    for name in names:
-        record = inspect_result(
-            name,
-            results_dir=result_module.RESULTS_DIR,
-            archive_dir=result_module.ARCHIVED_RESULTS_DIR,
-            allow_archive=True,
-            store=store,
-            current_definition_fingerprint=resolve_current_definition_fingerprint(name),
-        )
-        if record is None:
-            print(f"{name}: no latest result")
-            continue
-        source = f" [{record.source.value}]" if record.source is ResultSource.LEGACY_ARCHIVE else ""
-        print(f"{name}: {record.validity.status.value}{source}")
-        if record.result.payload:
-            payload = record.result.payload
-            print(f"  schema version: {payload.get('schema_version', 'legacy')}")
-            print(f"  data cutoff: {payload.get('data_cutoff', '-')}")
-            print(f"  definition fingerprint: {payload.get('definition_fingerprint', '-')}")
-        for reason in record.validity.reasons:
-            print(f"  reason: {reason}")
-
-
-def cmd_result_registry_seed(args: argparse.Namespace) -> None:
-    """Reject mutation of the retired legacy trial inventory."""
-    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
-
-
-def cmd_result(args: argparse.Namespace) -> None:
-    """Dispatch result diagnostics and explicit evaluation workflows."""
-    if args.result_command == "status":
-        cmd_result_status(args)
-    elif args.result_command == "registry" and args.registry_command == "seed":
-        cmd_result_registry_seed(args)
-    elif args.result_command == "evaluate":
-        raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_qualification_status(args: argparse.Namespace) -> None:
@@ -427,119 +324,6 @@ def cmd_qualification(args: argparse.Namespace) -> None:
         raise SystemExit(f"qualification error: {exc}") from exc
 
 
-def cmd_workflow(args: argparse.Namespace) -> None:
-    """Dispatch tracked workflow authoring validation and lifecycle operations."""
-    repository = WorkflowRepository(args.root)
-    try:
-        if args.workflow_command == "create":
-            request = CreateWorkflowRequest.from_path(args.request)
-            plan = repository.plan_create(request)
-            if args.dry_run:
-                print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
-            else:
-                result = repository.apply(plan)
-                print(f"workflow created: {result.workflow}@{result.version}")
-                print(f"  path: {result.target}")
-        elif args.workflow_command == "evolve":
-            request = EvolveWorkflowRequest.from_path(args.request)
-            plan = repository.plan_evolve(request)
-            if args.dry_run:
-                print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
-            else:
-                result = repository.apply(plan)
-                print(f"workflow draft evolved: {result.workflow}@{result.version}")
-                print(f"  path: {result.target}")
-        elif args.workflow_command == "validate":
-            if args.all and args.path is not None:
-                raise WorkflowAuthoringError("validate accepts a path or --all, not both")
-            issues = (
-                repository.validate_all()
-                if args.all or args.path is None
-                else repository.validate_path(args.path)
-            )
-            if issues:
-                for issue in issues:
-                    print(f"FAIL {issue}")
-                raise SystemExit(f"workflow validation failed: {len(issues)} issue(s)")
-            print("workflow validation passed")
-        elif args.workflow_command == "sync":
-            repository.sync()
-            print("workflow indexes synchronized")
-        elif args.workflow_command == "change":
-            if args.workflow_change_command == "create":
-                request = CreateChangeRequest.from_path(args.request)
-                plan = repository.plan_change(request)
-                if args.dry_run:
-                    print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
-                else:
-                    result = repository.apply(plan)
-                    identity = result.target.name.rsplit("--", 1)[-1].upper()
-                    print(f"workflow change created: {identity}")
-                    print(f"  path: {result.target}")
-            elif args.workflow_change_command == "transition":
-                repository.transition_change(
-                    args.path,
-                    args.status,
-                    approved_by=args.approved_by,
-                )
-                print(f"workflow change transitioned to {args.status}: {args.path}")
-        elif args.workflow_command == "version":
-            repository.transition_version(
-                args.path,
-                args.status,
-                approved_by=args.approved_by,
-            )
-            print(f"workflow version transitioned to {args.status}: {args.path}")
-        elif args.workflow_command == "study":
-            studies = WorkflowStudyService(args.root)
-            if args.workflow_study_command == "init":
-                path = studies.initialize(
-                    args.path,
-                    study_slug=args.slug,
-                    title=args.title,
-                    created_by=args.created_by,
-                    revisits=args.revisits,
-                    route=args.route,
-                )
-                print(f"workflow study initialized: {path}")
-            elif args.workflow_study_command == "preregister":
-                registration = studies.preregister(args.path, approved_by=args.approved_by)
-                print(f"workflow study preregistered: {registration['study_id']}")
-            elif args.workflow_study_command == "transition":
-                studies.transition(
-                    args.path,
-                    args.status,
-                    actor=args.actor,
-                    reason=args.reason,
-                    approved_by=args.approved_by,
-                )
-                print(f"workflow study transitioned to {args.status}: {args.path}")
-            elif args.workflow_study_command == "freeze-candidate":
-                freeze = studies.freeze_candidate(
-                    args.path,
-                    selection_path=args.selection,
-                    approved_by=args.approved_by,
-                )
-                print(f"workflow candidate frozen: {freeze['study_id']}")
-            elif args.workflow_study_command == "complete":
-                completion = studies.complete(
-                    args.path,
-                    outcome=args.outcome,
-                    reviewed_by=args.reviewed_by,
-                    disposition=args.disposition,
-                    decision_stage=args.decision_stage,
-                )
-                print(
-                    f"workflow study completed: {completion['study_id']} ({completion['outcome']})"
-                )
-        elif args.workflow_command == "release":
-            release = repository.release(args.path, approved_by=args.approved_by)
-            print(f"workflow release prepared: {release['workflow']}@{release['version']}")
-            print("  becomes effective only after merge to the canonical branch")
-    except WorkflowAuthoringError as exc:
-        raise SystemExit(f"workflow error: {exc}") from exc
-
-
 def cmd_policy(args: argparse.Namespace) -> None:
     """Dispatch tracked policy validation, synchronization, and release preparation."""
     repository = PolicyRepository(args.root)
@@ -569,199 +353,6 @@ def cmd_policy(args: argparse.Namespace) -> None:
             print("  becomes effective only after merge to the canonical branch")
     except PolicyAuthoringError as exc:
         raise SystemExit(f"policy error: {exc}") from exc
-
-
-def _workflow_native_context(identity: str, workflow_path: Path) -> tuple[object, object]:
-    definition = ResearchDefinitionRegistry().load(identity)
-    policy_set = resolve_workflow_policy_set(workflow_path)
-    return definition, policy_set
-
-
-def _workflow_observation_provenance(
-    args: argparse.Namespace,
-    policy_set: object,
-) -> dict[str, object]:
-    """Capture exact workflow-native run coordination and invocation evidence."""
-    workflow_path = Path(args.workflow)
-    release_path = workflow_path / "RELEASE.json"
-    workflow_definition_path = workflow_path / "WORKFLOW.md"
-    try:
-        release_bytes = release_path.read_bytes()
-        workflow_bytes = workflow_definition_path.read_bytes()
-        release = json.loads(release_bytes)
-    except (OSError, json.JSONDecodeError) as exc:
-        raise WorkflowNativeExecutionError(
-            f"cannot capture workflow release provenance: {exc}"
-        ) from exc
-    if not isinstance(release, dict):
-        raise WorkflowNativeExecutionError("workflow release provenance must be an object")
-
-    source_paths = (
-        Path("src/trading/cli.py"),
-        Path("src/trading/research_definitions/execution.py"),
-        Path("src/trading/research_data/runs.py"),
-        Path("src/trading/research_data/result_schema.py"),
-    )
-    sources: dict[str, object] = {}
-    try:
-        for path in source_paths:
-            content = path.read_text(encoding="utf-8")
-            sources[str(path)] = {
-                "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
-                "content": content,
-            }
-        completed = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except (OSError, UnicodeError, subprocess.CalledProcessError) as exc:
-        raise WorkflowNativeExecutionError(
-            f"cannot capture orchestration provenance: {exc}"
-        ) from exc
-
-    canonical_argv = [
-        "trading",
-        "research",
-        "run",
-        args.identity,
-        "--workflow",
-        str(workflow_path),
-        "--manifest",
-        str(args.manifest),
-    ]
-    if args.offline:
-        canonical_argv.append("--offline")
-    policy_set_identity = getattr(policy_set, "identity", None)
-    if not isinstance(policy_set_identity, str):
-        raise WorkflowNativeExecutionError("resolved policy set identity is missing")
-    return {
-        "schema_version": 1,
-        "canonical_argv": canonical_argv,
-        "working_directory": str(Path.cwd()),
-        "workflow": {
-            "path": str(workflow_path),
-            "workflow": release.get("workflow"),
-            "version": release.get("version"),
-            "release_sha256": hashlib.sha256(release_bytes).hexdigest(),
-            "workflow_sha256": hashlib.sha256(workflow_bytes).hexdigest(),
-            "policy_set_identity": policy_set_identity,
-        },
-        "orchestration": {
-            "git_head": completed.stdout.strip(),
-            "sources": sources,
-        },
-    }
-
-
-def cmd_research(args: argparse.Namespace) -> None:
-    """Prepare and execute workflow-native definitions outside the legacy inventory."""
-    try:
-        if args.research_command == "list":
-            for identity in ResearchDefinitionRegistry().list_trials():
-                print(identity)
-            return
-        definition, policy_set = _workflow_native_context(args.identity, args.workflow)
-        capture = getattr(definition, "capture_research_definition", None)
-        requirements_factory = getattr(definition, "market_data_requirements", None)
-        result_name = getattr(definition, "result_name", None)
-        if (
-            not callable(capture)
-            or not callable(requirements_factory)
-            or not isinstance(result_name, str)
-        ):
-            raise WorkflowNativeExecutionError("definition does not implement formal seams")
-        captured = capture(create_default_research_definition_store(), policy_set)
-        if not isinstance(captured, ResearchDefinitionSnapshot):
-            raise WorkflowNativeExecutionError(
-                "capture_research_definition must return ResearchDefinitionSnapshot"
-            )
-        if args.research_command == "snapshot":
-            requirements = MarketDataBundle.validate_requirements(requirements_factory())
-            service_kwargs: dict[str, Path] = {}
-            if args.cache_root is not None:
-                service_kwargs = {
-                    "cache_root": args.cache_root,
-                    "quarantine_root": args.cache_root.parent
-                    / f"{args.cache_root.name}-quarantine",
-                }
-            service = create_default_market_data_service(**service_kwargs)
-            if not args.reuse_full_refresh:
-                for requirement in requirements:
-                    refresh_kwargs = {"mode": "full", "start": None, "end": args.decision}
-                    if requirement.coverage_policy != MarketDataCoveragePolicy.xnys():
-                        refresh_kwargs["coverage_policy"] = requirement.coverage_policy
-                    service.refresh(requirement.series, **refresh_kwargs)
-            store = create_default_research_data_store()
-            manifest = store.create_snapshot(
-                service.cache,
-                requirements,
-                SignalDecisionTime.for_primary_session(args.decision),
-                definition=captured.blob,
-            )
-            destination = args.manifest or (
-                research_trial_directory(Path("results"), args.identity)
-                / f"{manifest.snapshot_id}.snapshot.json"
-            )
-            path = store.write_manifest(manifest, destination)
-            print(f"research snapshot {manifest.snapshot_id} published to {path}")
-            if args.reuse_full_refresh:
-                print("  market data: reused the current eligible full-refresh generation")
-            print(f"  definition fingerprint: {captured.fingerprint}")
-            print(f"  policy set: {captured.policy_set_identity}")
-            return
-        run_with_bundle = getattr(definition, "run_with_bundle", None)
-        declare_trial = getattr(definition, "declare_experiment_trial", None)
-        if not callable(run_with_bundle) or not callable(declare_trial):
-            raise WorkflowNativeExecutionError("definition does not implement formal run seams")
-        trial = declare_trial()
-        if not isinstance(trial, ExperimentTrialDeclaration):
-            raise WorkflowNativeExecutionError(
-                "declare_experiment_trial must return ExperimentTrialDeclaration"
-            )
-        outcome = ResearchRunCoordinator(
-            store=create_default_research_data_store(),
-            results_root=Path("results"),
-            result_directory=research_trial_directory(Path("results"), args.identity),
-            trial_registry=ExperimentTrialRegistry(trial_registry_path()),
-            experiment_family=trial.family,
-            hypothesis=trial.hypothesis,
-        ).execute(
-            result_name,
-            run_with_bundle,
-            manifest_path=args.manifest,
-            current_definition=captured.blob,
-            mode=RunMode.OFFLINE if args.offline else RunMode.ONLINE,
-            observation_provenance=_workflow_observation_provenance(args, policy_set),
-        )
-        print(f"research result published to {outcome.persisted_path}")
-        print(f"  definition fingerprint: {captured.fingerprint}")
-        print(f"  policy set: {captured.policy_set_identity}")
-    except (
-        MarketDataAvailabilityError,
-        ResearchDefinitionRegistryError,
-        WorkflowNativeExecutionError,
-        RuntimeError,
-        TypeError,
-        ValueError,
-    ) as exc:
-        raise SystemExit(f"research error: {exc}") from exc
-
-
-def cmd_analyze(args: argparse.Namespace) -> None:
-    """Reject new analysis under the retired legacy experiment system."""
-    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
-
-
-def cmd_sync_docs(args: argparse.Namespace) -> None:
-    """Reject mutation of frozen legacy experiment documentation."""
-    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
-
-
-def cmd_followup_backtest(args: argparse.Namespace) -> None:
-    """Reject new backtests of the retired legacy followup portfolio."""
-    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_followup_state(args: argparse.Namespace) -> None:
@@ -1627,6 +1218,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = parser.add_subparsers(dest="command")
 
+    legacy_commands.register_namespace(sub, iso_date=iso_date)
+
     # list
     sub.add_parser("list", help="List the archived legacy experiment inventory")
 
@@ -2126,184 +1719,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="IDENTITY=MANIFEST; repeat for every frozen family trial",
     )
 
-    # tracked workflow authoring and release declarations
-    workflow_p = sub.add_parser(
-        "workflow",
-        help="Validate and transition tracked research workflow definitions",
-    )
-    workflow_p.add_argument(
-        "--root",
-        type=Path,
-        default=Path("workflows"),
-        help="Tracked workflow registry root (default: workflows)",
-    )
-    workflow_sub = workflow_p.add_subparsers(dest="workflow_command", required=True)
-    workflow_create_p = workflow_sub.add_parser(
-        "create",
-        help="Preview or create an initial workflow-family draft from a closed request",
-    )
-    workflow_create_p.add_argument("--request", type=Path, required=True)
-    workflow_create_p.add_argument("--dry-run", action="store_true")
-    workflow_evolve_p = workflow_sub.add_parser(
-        "evolve",
-        help="Preview or build the next draft from accepted changes",
-    )
-    workflow_evolve_p.add_argument("--request", type=Path, required=True)
-    workflow_evolve_p.add_argument("--dry-run", action="store_true")
-    workflow_validate_p = workflow_sub.add_parser(
-        "validate",
-        help="Read-only validation of workflow metadata, indexes, and immutable evidence",
-    )
-    workflow_validate_p.add_argument("path", type=Path, nargs="?")
-    workflow_validate_p.add_argument("--all", action="store_true")
-    workflow_sub.add_parser("sync", help="Regenerate root and per-version Markdown indexes")
-    workflow_change_p = workflow_sub.add_parser(
-        "change",
-        help="Transition one workflow change proposal",
-    )
-    workflow_change_sub = workflow_change_p.add_subparsers(
-        dest="workflow_change_command",
-        required=True,
-    )
-    workflow_change_transition_p = workflow_change_sub.add_parser(
-        "transition",
-        help="Apply one legal change lifecycle transition",
-    )
-    workflow_change_transition_p.add_argument("path", type=Path)
-    workflow_change_transition_p.add_argument(
-        "--to",
-        dest="status",
-        required=True,
-        choices=("proposed", "accepted", "rejected", "deferred", "withdrawn"),
-    )
-    workflow_change_transition_p.add_argument("--approved-by")
-    workflow_change_create_p = workflow_change_sub.add_parser(
-        "create",
-        help="Preview or create a change under the active workflow version",
-    )
-    workflow_change_create_p.add_argument("--request", type=Path, required=True)
-    workflow_change_create_p.add_argument("--dry-run", action="store_true")
-    workflow_version_p = workflow_sub.add_parser(
-        "version",
-        help="Abandon a draft or retire an active workflow version",
-    )
-    workflow_version_sub = workflow_version_p.add_subparsers(
-        dest="workflow_version_command",
-        required=True,
-    )
-    workflow_version_transition_p = workflow_version_sub.add_parser(
-        "transition",
-        help="Apply an allowed terminal version transition",
-    )
-    workflow_version_transition_p.add_argument("path", type=Path)
-    workflow_version_transition_p.add_argument(
-        "--to",
-        dest="status",
-        required=True,
-        choices=("abandoned", "retired"),
-    )
-    workflow_version_transition_p.add_argument("--approved-by")
-    workflow_study_p = workflow_sub.add_parser(
-        "study",
-        help="Create, preregister, operate, and conclude workflow studies",
-    )
-    workflow_study_sub = workflow_study_p.add_subparsers(
-        dest="workflow_study_command",
-        required=True,
-    )
-    workflow_study_init_p = workflow_study_sub.add_parser(
-        "init",
-        help="Create the next local study draft under an active workflow version",
-    )
-    workflow_study_init_p.add_argument("path", type=Path, help="Active workflow version path")
-    workflow_study_init_p.add_argument("--slug", required=True, help="Study slug in kebab-case")
-    workflow_study_init_p.add_argument("--title", required=True)
-    workflow_study_init_p.add_argument("--created-by", required=True)
-    workflow_study_init_p.add_argument(
-        "--route",
-        choices=(
-            "clean-historical",
-            "retrospective-confirmatory",
-            "study-time-retrospective",
-        ),
-        help="Preregistration route; the released workflow must authorize it",
-    )
-    workflow_study_init_p.add_argument(
-        "--revisits",
-        help="Repository-relative path of an earlier study being revisited",
-    )
-    workflow_study_preregister_p = workflow_study_sub.add_parser(
-        "preregister",
-        help="Freeze hypothesis and plan with explicit human approval",
-    )
-    workflow_study_preregister_p.add_argument("path", type=Path)
-    workflow_study_preregister_p.add_argument("--approved-by", required=True)
-    workflow_study_transition_p = workflow_study_sub.add_parser(
-        "transition",
-        help="Apply one legal operational study transition",
-    )
-    workflow_study_transition_p.add_argument("path", type=Path)
-    workflow_study_transition_p.add_argument(
-        "--to",
-        dest="status",
-        required=True,
-        choices=("running", "paused", "awaiting-review", "cancelled"),
-    )
-    workflow_study_transition_p.add_argument("--by", dest="actor", required=True)
-    workflow_study_transition_p.add_argument(
-        "--approved-by",
-        help=(
-            "Current human approval for the first preregistered-to-running Development "
-            "transition when required by the released workflow"
-        ),
-    )
-    workflow_study_transition_p.add_argument("--reason")
-    workflow_study_freeze_candidate_p = workflow_study_sub.add_parser(
-        "freeze-candidate",
-        help="Freeze the Development-selected candidate and complete family with human approval",
-    )
-    workflow_study_freeze_candidate_p.add_argument("path", type=Path)
-    workflow_study_freeze_candidate_p.add_argument(
-        "--selection",
-        type=Path,
-        required=True,
-        help="Development selection JSON without approval or frozen study identity fields",
-    )
-    workflow_study_freeze_candidate_p.add_argument("--approved-by", required=True)
-    workflow_study_complete_p = workflow_study_sub.add_parser(
-        "complete",
-        help="Freeze an independently reviewed conclusion and outcome",
-    )
-    workflow_study_complete_p.add_argument("path", type=Path)
-    workflow_study_complete_p.add_argument(
-        "--outcome",
-        required=True,
-        choices=("pass", "fail", "insufficient-evidence", "indeterminate"),
-    )
-    workflow_study_complete_p.add_argument("--reviewed-by", required=True)
-    workflow_study_complete_p.add_argument(
-        "--disposition",
-        choices=(
-            "retrospectively-supported",
-            "development-selection-failed",
-            "retrospective-screen-failed",
-        ),
-    )
-    workflow_study_complete_p.add_argument(
-        "--decision-stage",
-        choices=(
-            "development",
-            "candidate-freeze",
-            "retrospective-evaluation",
-            "independent-review",
-        ),
-    )
-    workflow_release_p = workflow_sub.add_parser(
-        "release",
-        help="Prepare an approved release declaration and intended registry state",
-    )
-    workflow_release_p.add_argument("path", type=Path)
-    workflow_release_p.add_argument("--approved-by", required=True)
+    workflow_commands.register_parser(sub)
 
     # tracked executable policy authoring and release declarations
     policy_p = sub.add_parser(
@@ -2351,48 +1767,7 @@ def build_parser() -> argparse.ArgumentParser:
     policy_release_p.add_argument("path", type=Path)
     policy_release_p.add_argument("--approved-by", required=True)
 
-    research_p = sub.add_parser(
-        "research",
-        help="Prepare and execute workflow-native research definitions",
-    )
-    research_sub = research_p.add_subparsers(dest="research_command", required=True)
-    research_sub.add_parser("list", help="List workflow-native family/trial identities")
-    research_snapshot_p = research_sub.add_parser(
-        "snapshot",
-        help="Capture exact definition and immutable market data",
-    )
-    research_snapshot_p.add_argument("identity", help="Exact family/trial identity")
-    research_snapshot_p.add_argument("--workflow", type=Path, required=True)
-    research_snapshot_p.add_argument("--decision", type=iso_date, required=True)
-    research_snapshot_p.add_argument("--manifest", type=Path)
-    research_snapshot_p.add_argument(
-        "--cache-root",
-        type=Path,
-        help=(
-            "Optional isolated disposable market-data cache root; its quarantine root is "
-            "a sibling with the '-quarantine' suffix"
-        ),
-    )
-    research_snapshot_p.add_argument(
-        "--reuse-full-refresh",
-        action="store_true",
-        help=(
-            "Skip provider refresh and reuse the current snapshot-eligible full-refresh "
-            "cache generation"
-        ),
-    )
-    research_run_p = research_sub.add_parser(
-        "run",
-        help="Execute a workflow-native definition against an immutable snapshot",
-    )
-    research_run_p.add_argument("identity", help="Exact family/trial identity")
-    research_run_p.add_argument("--workflow", type=Path, required=True)
-    research_run_p.add_argument("--manifest", type=Path, required=True)
-    research_run_p.add_argument(
-        "--offline",
-        action="store_true",
-        help="Persist historical evidence without advancing latest.json",
-    )
+    research_commands.register_parser(sub, iso_date=iso_date)
 
     # analyze
     analyze_p = sub.add_parser(
@@ -2554,10 +1929,18 @@ def main(argv: list[str] | None = None) -> None:
 
     args = parser.parse_args(argv)
 
-    if args.command == "list":
-        cmd_list(args)
-    elif args.command == "run":
-        cmd_run(args)
+    if args.command == "legacy":
+        legacy_commands.dispatch(args)
+    elif args.command in {
+        "list",
+        "run",
+        "followup-backtest",
+        "compare",
+        "result",
+        "analyze",
+        "sync-docs",
+    }:
+        legacy_commands.dispatch_alias(args)
     elif args.command == "followup":
         from trading.followup import run_followup
 
@@ -2579,12 +1962,6 @@ def main(argv: list[str] | None = None) -> None:
         cmd_followup_state(args)
     elif args.command == "drift":
         cmd_drift(args)
-    elif args.command == "followup-backtest":
-        cmd_followup_backtest(args)
-    elif args.command == "compare":
-        cmd_compare(args)
-    elif args.command == "result":
-        cmd_result(args)
     elif args.command == "qualification":
         cmd_qualification(args)
     elif args.command == "workflow":
@@ -2593,12 +1970,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_policy(args)
     elif args.command == "research":
         cmd_research(args)
-    elif args.command == "analyze":
-        cmd_analyze(args)
-    elif args.command == "sync-docs":
-        cmd_sync_docs(args)
     elif args.command == "freshness":
-        from trading.core.freshness import check_freshness
+        from trading.knowledge_freshness import check_freshness
 
         check_freshness()
     elif args.command == "ledger":

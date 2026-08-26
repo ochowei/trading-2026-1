@@ -121,100 +121,24 @@ def test_renderer_prints_requested_start_and_actual_period() -> None:
     assert "Actual period:" in text
 
 
-def test_cli_dispatch_passes_days_and_start(monkeypatch) -> None:
-    captured: dict[str, object] = {}
-
-    def fake_run(days: int, start: date | None) -> FollowupBacktestResult:
-        captured.update(days=days, start=start)
-        return _minimal_result(days)
-
-    monkeypatch.setattr("trading.followup_backtest.run_followup_backtest", fake_run)
-    monkeypatch.setattr("trading.followup_backtest.render_followup_backtest", lambda result: None)
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["followup-backtest", "--days", "180", "--start", "2025-01-01"],
+        ["legacy", "followup-backtest", "--days", "180", "--start", "2025-01-01"],
+    ],
+)
+def test_followup_backtest_cli_is_retired_and_fails_closed(argv, capsys) -> None:
     from trading.cli import main
 
-    main(["followup-backtest", "--days", "180", "--start", "2025-01-01"])
-    assert captured == {"days": 180, "start": date(2025, 1, 1)}
+    with pytest.raises(SystemExit, match="legacy experiment research is retired"):
+        main(argv)
 
-
-def test_cli_exits_one_when_all_strategies_fail(monkeypatch) -> None:
-    failed = FollowupBacktestResult(
-        requested_days=126,
-        calendar=(),
-        strategies=[
-            StrategyBacktestResult(
-                experiment_name="bad",
-                label="BAD",
-                ticker="BAD",
-                requested_days=126,
-                sleeve_initial_cash=100000.0,
-                error="Failed to fetch BAD data",
-            )
-        ],
-        portfolio=None,
-    )
-    monkeypatch.setattr(
-        "trading.followup_backtest.run_followup_backtest",
-        lambda days, start=None: failed,
-    )
-    monkeypatch.setattr("trading.followup_backtest.render_followup_backtest", lambda result: None)
-    from trading.cli import main
-
-    with pytest.raises(SystemExit) as exc_info:
-        main(["followup-backtest"])
-    assert exc_info.value.code == 1
-
-
-def test_cli_exits_one_when_all_evaluations_fail_with_cash_portfolio(monkeypatch) -> None:
-    failed = _minimal_result()
-    failed.strategies = [
-        StrategyBacktestResult(
-            experiment_name="bad",
-            label="BAD",
-            ticker="BAD",
-            requested_days=126,
-            sleeve_initial_cash=100000.0,
-            error="evaluation failed",
-        )
-    ]
-    monkeypatch.setattr(
-        "trading.followup_backtest.run_followup_backtest",
-        lambda days, start=None: failed,
-    )
-    monkeypatch.setattr("trading.followup_backtest.render_followup_backtest", lambda result: None)
-    from trading.cli import main
-
-    with pytest.raises(SystemExit) as exc_info:
-        main(["followup-backtest"])
-    assert exc_info.value.code == 1
-
-
-def test_cli_exits_one_when_start_is_after_last_completed_session(monkeypatch) -> None:
-    unavailable = FollowupBacktestResult(
-        requested_days=5,
-        calendar=(),
-        strategies=[
-            StrategyBacktestResult(
-                experiment_name="alpha",
-                label="ALPHA",
-                ticker="AAA",
-                requested_days=5,
-                sleeve_initial_cash=100000.0,
-            )
-        ],
-        portfolio=None,
-        warnings=["Requested start is after the last available completed session"],
-        requested_start=pd.Timestamp("2099-01-01"),
-    )
-    monkeypatch.setattr(
-        "trading.followup_backtest.run_followup_backtest",
-        lambda days, start=None: unavailable,
-    )
-    monkeypatch.setattr("trading.followup_backtest.render_followup_backtest", lambda result: None)
-    from trading.cli import main
-
-    with pytest.raises(SystemExit) as exc_info:
-        main(["followup-backtest", "--start", "2099-01-01", "--days", "5"])
-    assert exc_info.value.code == 1
+    captured = capsys.readouterr()
+    if argv[0] == "followup-backtest":
+        assert "deprecated" in captured.err
+    else:
+        assert captured.err == ""
 
 
 def test_existing_followup_dispatch_and_lookback_remain_unchanged(monkeypatch) -> None:

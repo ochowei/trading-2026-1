@@ -6,7 +6,7 @@ import pytest
 
 from trading.cli import build_parser, main
 from trading.core.policy_authoring import PolicyAuthoringError, PolicyRepository
-from trading.core.workflow_authoring import (
+from trading.workflow.authoring import (
     MarkdownDocument,
     read_markdown_document,
     render_markdown_document,

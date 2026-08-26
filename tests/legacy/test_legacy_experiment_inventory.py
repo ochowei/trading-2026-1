@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from trading.core.legacy_experiments import (
+from trading.legacy.legacy_experiments import (
     LegacyInventoryError,
     scan_legacy_experiments,
     validate_legacy_inventory,

@@ -73,8 +73,9 @@ Legacy experiment system 已正式停止。原 `results/experiment-results/` 內
 - `<snapshot-id>.snapshot.json`：legacy experiment 的 reproducibility manifest。
 - `<timestamp>_<online|offline>_<run-id>.json`：一次歷史執行的完整 payload。
 
-這些檔案只供 `trading list`、`trading compare`、`trading result status` 等唯讀診斷，以及
-既有部位的 fail-closed 退出相容性。`trading run`、`analyze`、`result evaluate`、legacy snapshot
+這些檔案只供 `trading legacy list`、`trading legacy compare`、
+`trading legacy result status` 等唯讀診斷，以及既有部位的 fail-closed 退出相容性。
+`trading legacy run`、`analyze`、`result evaluate`、legacy snapshot
 preparation、registry seed 與 followup promotion 都會拒絕執行。新研究只可使用 released workflow
 與 `trading research`。
 
@@ -151,7 +152,7 @@ jq '{snapshot_id, decision_time, data, definition}' \
 
 ```bash
 jq 'keys' legacy/results/<experiment>/latest.json
-uv run trading result status <experiment>
+uv run trading legacy result status <experiment>
 ```
 
 查某個舊路徑搬到哪裡：

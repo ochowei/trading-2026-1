@@ -1,0 +1,239 @@
+"""Workflow CLI command handler."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+from trading.workflow.authoring import (
+    CreateChangeRequest,
+    CreateWorkflowRequest,
+    EvolveWorkflowRequest,
+    WorkflowAuthoringError,
+    WorkflowRepository,
+)
+from trading.workflow.studies import WorkflowStudyService
+
+
+def register_parser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    """Register the tracked workflow command tree."""
+    workflow = subparsers.add_parser(
+        "workflow", help="Validate and transition tracked research workflow definitions"
+    )
+    workflow.add_argument(
+        "--root", type=Path, default=Path("workflows"), help="Tracked workflow registry root"
+    )
+    commands = workflow.add_subparsers(dest="workflow_command", required=True)
+    create = commands.add_parser("create", help="Create an initial workflow-family draft")
+    create.add_argument("--request", type=Path, required=True)
+    create.add_argument("--dry-run", action="store_true")
+    evolve = commands.add_parser("evolve", help="Build the next draft from accepted changes")
+    evolve.add_argument("--request", type=Path, required=True)
+    evolve.add_argument("--dry-run", action="store_true")
+    validate = commands.add_parser("validate", help="Validate tracked workflow evidence")
+    validate.add_argument("path", type=Path, nargs="?")
+    validate.add_argument("--all", action="store_true")
+    commands.add_parser("sync", help="Regenerate workflow indexes")
+
+    change = commands.add_parser("change", help="Create or transition a workflow change")
+    change_commands = change.add_subparsers(dest="workflow_change_command", required=True)
+    transition_change = change_commands.add_parser("transition")
+    transition_change.add_argument("path", type=Path)
+    transition_change.add_argument(
+        "--to",
+        dest="status",
+        required=True,
+        choices=("proposed", "accepted", "rejected", "deferred", "withdrawn"),
+    )
+    transition_change.add_argument("--approved-by")
+    create_change = change_commands.add_parser("create")
+    create_change.add_argument("--request", type=Path, required=True)
+    create_change.add_argument("--dry-run", action="store_true")
+
+    version = commands.add_parser("version", help="Transition a workflow version")
+    version_commands = version.add_subparsers(dest="workflow_version_command", required=True)
+    transition_version = version_commands.add_parser("transition")
+    transition_version.add_argument("path", type=Path)
+    transition_version.add_argument(
+        "--to", dest="status", required=True, choices=("abandoned", "retired")
+    )
+    transition_version.add_argument("--approved-by")
+
+    study = commands.add_parser("study", help="Operate workflow studies")
+    study_commands = study.add_subparsers(dest="workflow_study_command", required=True)
+    initialize = study_commands.add_parser("init")
+    initialize.add_argument("path", type=Path)
+    initialize.add_argument("--slug", required=True)
+    initialize.add_argument("--title", required=True)
+    initialize.add_argument("--created-by", required=True)
+    initialize.add_argument(
+        "--route",
+        choices=(
+            "clean-historical",
+            "retrospective-confirmatory",
+            "study-time-retrospective",
+        ),
+    )
+    initialize.add_argument("--revisits")
+    preregister = study_commands.add_parser("preregister")
+    preregister.add_argument("path", type=Path)
+    preregister.add_argument("--approved-by", required=True)
+    transition_study = study_commands.add_parser("transition")
+    transition_study.add_argument("path", type=Path)
+    transition_study.add_argument(
+        "--to",
+        dest="status",
+        required=True,
+        choices=("running", "paused", "awaiting-review", "cancelled"),
+    )
+    transition_study.add_argument("--by", dest="actor", required=True)
+    transition_study.add_argument("--approved-by")
+    transition_study.add_argument("--reason")
+    freeze = study_commands.add_parser("freeze-candidate")
+    freeze.add_argument("path", type=Path)
+    freeze.add_argument("--selection", type=Path, required=True)
+    freeze.add_argument("--approved-by", required=True)
+    complete = study_commands.add_parser("complete")
+    complete.add_argument("path", type=Path)
+    complete.add_argument(
+        "--outcome",
+        required=True,
+        choices=("pass", "fail", "insufficient-evidence", "indeterminate"),
+    )
+    complete.add_argument("--reviewed-by", required=True)
+    complete.add_argument(
+        "--disposition",
+        choices=(
+            "retrospectively-supported",
+            "development-selection-failed",
+            "retrospective-screen-failed",
+        ),
+    )
+    complete.add_argument(
+        "--decision-stage",
+        choices=(
+            "development",
+            "candidate-freeze",
+            "retrospective-evaluation",
+            "independent-review",
+        ),
+    )
+    release = commands.add_parser("release", help="Prepare a workflow release declaration")
+    release.add_argument("path", type=Path)
+    release.add_argument("--approved-by", required=True)
+
+
+def cmd_workflow(args: argparse.Namespace) -> None:
+    """Dispatch tracked workflow authoring, validation, and study operations."""
+    repository = WorkflowRepository(args.root)
+    try:
+        if args.workflow_command == "create":
+            request = CreateWorkflowRequest.from_path(args.request)
+            plan = repository.plan_create(request)
+            if args.dry_run:
+                print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
+            else:
+                result = repository.apply(plan)
+                print(f"workflow created: {result.workflow}@{result.version}")
+                print(f"  path: {result.target}")
+        elif args.workflow_command == "evolve":
+            request = EvolveWorkflowRequest.from_path(args.request)
+            plan = repository.plan_evolve(request)
+            if args.dry_run:
+                print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
+            else:
+                result = repository.apply(plan)
+                print(f"workflow draft evolved: {result.workflow}@{result.version}")
+                print(f"  path: {result.target}")
+        elif args.workflow_command == "validate":
+            if args.all and args.path is not None:
+                raise WorkflowAuthoringError("validate accepts a path or --all, not both")
+            issues = (
+                repository.validate_all()
+                if args.all or args.path is None
+                else repository.validate_path(args.path)
+            )
+            if issues:
+                for issue in issues:
+                    print(f"FAIL {issue}")
+                raise SystemExit(f"workflow validation failed: {len(issues)} issue(s)")
+            print("workflow validation passed")
+        elif args.workflow_command == "sync":
+            repository.sync()
+            print("workflow indexes synchronized")
+        elif args.workflow_command == "change":
+            if args.workflow_change_command == "create":
+                request = CreateChangeRequest.from_path(args.request)
+                plan = repository.plan_change(request)
+                if args.dry_run:
+                    print(json.dumps(plan.preview(), ensure_ascii=False, indent=2))
+                else:
+                    result = repository.apply(plan)
+                    identity = result.target.name.rsplit("--", 1)[-1].upper()
+                    print(f"workflow change created: {identity}")
+                    print(f"  path: {result.target}")
+            elif args.workflow_change_command == "transition":
+                repository.transition_change(
+                    args.path,
+                    args.status,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow change transitioned to {args.status}: {args.path}")
+        elif args.workflow_command == "version":
+            repository.transition_version(
+                args.path,
+                args.status,
+                approved_by=args.approved_by,
+            )
+            print(f"workflow version transitioned to {args.status}: {args.path}")
+        elif args.workflow_command == "study":
+            studies = WorkflowStudyService(args.root)
+            if args.workflow_study_command == "init":
+                path = studies.initialize(
+                    args.path,
+                    study_slug=args.slug,
+                    title=args.title,
+                    created_by=args.created_by,
+                    revisits=args.revisits,
+                    route=args.route,
+                )
+                print(f"workflow study initialized: {path}")
+            elif args.workflow_study_command == "preregister":
+                registration = studies.preregister(args.path, approved_by=args.approved_by)
+                print(f"workflow study preregistered: {registration['study_id']}")
+            elif args.workflow_study_command == "transition":
+                studies.transition(
+                    args.path,
+                    args.status,
+                    actor=args.actor,
+                    reason=args.reason,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow study transitioned to {args.status}: {args.path}")
+            elif args.workflow_study_command == "freeze-candidate":
+                freeze = studies.freeze_candidate(
+                    args.path,
+                    selection_path=args.selection,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow candidate frozen: {freeze['study_id']}")
+            elif args.workflow_study_command == "complete":
+                completion = studies.complete(
+                    args.path,
+                    outcome=args.outcome,
+                    reviewed_by=args.reviewed_by,
+                    disposition=args.disposition,
+                    decision_stage=args.decision_stage,
+                )
+                print(
+                    f"workflow study completed: {completion['study_id']} ({completion['outcome']})"
+                )
+        elif args.workflow_command == "release":
+            release = repository.release(args.path, approved_by=args.approved_by)
+            print(f"workflow release prepared: {release['workflow']}@{release['version']}")
+            print("  becomes effective only after merge to the canonical branch")
+    except WorkflowAuthoringError as exc:
+        raise SystemExit(f"workflow error: {exc}") from exc

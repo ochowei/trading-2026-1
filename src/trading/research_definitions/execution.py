@@ -6,8 +6,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from trading.core.workflow_authoring import WorkflowRepository, read_markdown_document
 from trading.policies import PolicyResolver, PolicySet
+from trading.workflow.authoring import WorkflowRepository, read_markdown_document
 
 
 class WorkflowNativeExecutionError(ValueError):

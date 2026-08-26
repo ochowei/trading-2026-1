@@ -24,7 +24,6 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 from trading.core.data_fetcher import DataFetcher
-from trading.core.definition_resolver import resolve_current_definition_fingerprint
 from trading.core.followup_cutover import (
     FollowupAuthorizationContext,
     FollowupLifecycleRegistry,
@@ -53,8 +52,9 @@ from trading.core.manual_ledger import (
     ManualLedgerStore,
 )
 from trading.core.proposals import ProposalConflictError, ProposalTerms
-from trading.core.results import inspect_result
 from trading.experiments import get_experiment
+from trading.legacy.definition_resolver import resolve_current_definition_fingerprint
+from trading.legacy.results import inspect_result
 from trading.market_data import PrimaryUSSessionCalendar
 from trading.research_data.result_schema import ResultValidityStatus
 

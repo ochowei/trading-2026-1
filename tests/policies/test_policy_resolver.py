@@ -6,11 +6,11 @@ from pathlib import Path
 import pytest
 
 from trading.core.policy_authoring import PolicyRepository
-from trading.core.workflow_authoring import (
+from trading.policies import PolicyResolutionError, PolicyResolver, PolicySet
+from trading.workflow.authoring import (
     MarkdownDocument,
     render_markdown_document,
 )
-from trading.policies import PolicyResolutionError, PolicyResolver, PolicySet
 
 FIXED_TIME = datetime(2026, 8, 12, 4, 5, 6, tzinfo=UTC)
 

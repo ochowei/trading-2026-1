@@ -30,9 +30,9 @@ from trading.research_data import (
     RunMode,
 )
 
-REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 RETAINED_ONLINE_RESULT = Path(
-    "results/spy_010_trend_pullback_baseline/"
+    "legacy/results/spy_010_trend_pullback_baseline/"
     "20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json"
 )
 
@@ -56,7 +56,7 @@ def _spy_bars() -> pd.DataFrame:
 
 def test_spy_010_registry_observation_result_is_retained_and_not_ignored() -> None:
     historical = REPOSITORY_ROOT / RETAINED_ONLINE_RESULT
-    latest = REPOSITORY_ROOT / "results/spy_010_trend_pullback_baseline/latest.json"
+    latest = REPOSITORY_ROOT / "legacy/results/spy_010_trend_pullback_baseline/latest.json"
 
     assert historical.read_bytes() == latest.read_bytes()
     ignored = subprocess.run(

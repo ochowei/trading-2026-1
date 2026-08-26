@@ -41,7 +41,7 @@ ls src/trading/experiments/ | grep -i "^<ticker_lower>_"
 ```
 Also check that NO `EXPERIMENTS_<TICKER>.md` file exists:
 ```bash
-ls src/trading/experiments/EXPERIMENTS_<TICKER>.md
+ls legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md
 ```
 
 **If either exists, STOP. This asset already has experiments. Use `$trading-new-experiment` instead.**
@@ -189,7 +189,7 @@ register("<module_name>")(<StrategyClass>)
 
 ## Phase 3: Create the Asset Experiment Document (NEW ASSET — MANDATORY)
 
-Create `src/trading/experiments/EXPERIMENTS_<TICKER>.md` using EXPERIMENTS_FCX.md as the structural template.
+Create `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md` using EXPERIMENTS_FCX.md as the structural template.
 
 The file MUST contain ALL of the following sections:
 
@@ -268,7 +268,7 @@ Include ALL of these subsections (follow FCX-001's structure exactly):
 ### Update 1: `CLAUDE.md` — 按需參考 section
 Add a new link to the "按需參考" section:
 ```markdown
-- <TICKER> 實驗總覽 → [src/trading/experiments/EXPERIMENTS_<TICKER>.md](src/trading/experiments/EXPERIMENTS_<TICKER>.md)
+- <TICKER> 實驗總覽 → [legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md](legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md)
 ```
 Insert in alphabetical order among the existing experiment links.
 
@@ -367,7 +367,7 @@ Present a summary to the user:
 2. src/trading/experiments/<module_name>/config.py
 3. src/trading/experiments/<module_name>/signal_detector.py
 4. src/trading/experiments/<module_name>/strategy.py
-5. src/trading/experiments/EXPERIMENTS_<TICKER>.md
+5. legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md
 
 ### Files Updated
 6. CLAUDE.md (按需參考 + 規則 sections)

@@ -10,8 +10,8 @@ import yaml
 
 from trading.core.accounting import canonical_json_bytes
 from trading.core.policy_authoring import PolicyRepository
-from trading.core.workflow_authoring import read_markdown_document
 from trading.policies.models import PolicyIdentity, PolicyRelease
+from trading.workflow.authoring import read_markdown_document
 
 _CONFIG_FIELDS = frozenset({"schema_version", "family", "version", "kind", "values"})
 
