@@ -14,9 +14,11 @@ from typing import Any
 
 from trading.core.accounting import canonical_json_bytes
 
-PATH_MIGRATION_SCHEMA_VERSION = 1
+PATH_MIGRATION_SCHEMA_VERSION = 2
 PATH_MIGRATION_REGISTRY = Path("results/registries/path-migrations.json")
-PATH_MIGRATION_VERSION = "v009"
+PATH_MIGRATION_VERSION = "v010"
+SUPPORTED_MIGRATION_VERSIONS = frozenset({"v009", PATH_MIGRATION_VERSION})
+MAX_MIGRATION_HOPS = 2
 
 
 class ResultPathMigrationError(ValueError):
@@ -63,7 +65,7 @@ class ResultPathMigration:
             raise ResultPathMigrationError("path migration sha256 is invalid")
         if not self.artifact_class.strip():
             raise ResultPathMigrationError("path migration artifact class is empty")
-        if self.migration_version != PATH_MIGRATION_VERSION:
+        if self.migration_version not in SUPPORTED_MIGRATION_VERSIONS:
             raise ResultPathMigrationError("path migration version is unsupported")
 
     def as_dict(self) -> dict[str, str]:
@@ -77,8 +79,10 @@ class ResultPathMigration:
 
 
 def experiment_result_directory(results_root: Path, experiment_name: str) -> Path:
-    """Return the canonical retained legacy-experiment result directory."""
-    return Path(results_root) / "experiment-results" / _safe_identity(experiment_name)
+    """Reject recreation of the retired legacy-experiment result namespace."""
+    raise ResultPathMigrationError(
+        "legacy experiment result publication is retired; results/experiment-results is forbidden"
+    )
 
 
 def research_trial_directory(results_root: Path, identity: str) -> Path:
@@ -93,8 +97,10 @@ def research_trial_directory(results_root: Path, identity: str) -> Path:
 
 
 def migration_evidence_directory(results_root: Path, experiment_name: str) -> Path:
-    """Return the canonical parity-linked migration evidence directory."""
-    return Path(results_root) / "migration-evidence" / _safe_identity(experiment_name)
+    """Reject new parity publication after retirement of legacy experiment migration."""
+    raise ResultPathMigrationError(
+        "legacy experiment migration publication is retired; retained evidence is read-only"
+    )
 
 
 def trial_registry_path(results_root: Path = Path("results")) -> Path:
@@ -126,7 +132,7 @@ def load_path_migrations(
         raise ResultPathMigrationError(f"cannot read path migration registry: {exc}") from exc
     if not isinstance(payload, dict) or set(payload) != {"schema_version", "migrations"}:
         raise ResultPathMigrationError("path migration registry has an invalid top-level shape")
-    if payload.get("schema_version") != PATH_MIGRATION_SCHEMA_VERSION:
+    if payload.get("schema_version") not in {1, PATH_MIGRATION_SCHEMA_VERSION}:
         raise ResultPathMigrationError("path migration registry schema version is unsupported")
     raw = payload.get("migrations")
     if not isinstance(raw, list) or not all(isinstance(item, dict) for item in raw):
@@ -138,21 +144,23 @@ def load_path_migrations(
         raise ResultPathMigrationError("path migration registry must be sorted by old path")
     _validate_migration_set(entries)
     if require_destinations:
+        by_old_path = {entry.old_path: entry for entry in entries}
         for entry in entries:
-            destination = root / entry.new_path
+            terminal = _terminal_destination(entry, by_old_path)
+            destination = root / terminal
             if not destination.is_file():
                 raise ResultPathMigrationError(
-                    f"migrated result destination is missing: {entry.new_path}"
+                    f"migrated result destination is missing: {terminal}"
                 )
             if _sha256(destination) != entry.sha256:
                 raise ResultPathMigrationError(
-                    f"migrated result destination digest drifted: {entry.new_path}"
+                    f"migrated result destination digest drifted: {terminal}"
                 )
     return entries
 
 
 def resolve_result_path(path: Path, *, repository_root: Path | None = None) -> Path:
-    """Resolve one exact existing or one-hop digest-bound historical result path."""
+    """Resolve one exact existing or bounded digest-bound historical result path."""
     requested = Path(path)
     if requested.is_file():
         return requested.resolve()
@@ -162,10 +170,12 @@ def resolve_result_path(path: Path, *, repository_root: Path | None = None) -> P
         identity = absolute.relative_to(root).as_posix()
     except ValueError as exc:
         raise ResultPathMigrationError(f"result path is outside repository root: {path}") from exc
-    matches = [entry for entry in load_path_migrations(root) if entry.old_path == identity]
+    entries = load_path_migrations(root)
+    matches = [entry for entry in entries if entry.old_path == identity]
     if len(matches) != 1:
         raise ResultPathMigrationError(f"historical result path has no exact migration: {identity}")
-    return (root / matches[0].new_path).resolve()
+    terminal = _terminal_destination(matches[0], {entry.old_path: entry for entry in entries})
+    return (root / terminal).resolve()
 
 
 def apply_result_path_migration(
@@ -173,31 +183,39 @@ def apply_result_path_migration(
     *,
     repository_root: Path = Path("."),
 ) -> Path:
-    """Atomically publish a complete registry and move byte-identical tracked artifacts."""
+    """Append migrations atomically and move byte-identical tracked artifacts."""
     root = Path(repository_root).resolve()
     requested = tuple(sorted(entries, key=lambda entry: entry.old_path))
     _validate_migration_set(requested)
     registry_path = root / PATH_MIGRATION_REGISTRY
+    existing_registry_bytes = registry_path.read_bytes() if registry_path.exists() else None
     existing = load_path_migrations(root) if registry_path.exists() else ()
     if existing:
-        if existing != requested:
-            raise ResultPathMigrationError("path migration registry is append-only and differs")
+        requested_by_old = {entry.old_path: entry for entry in requested}
+        if any(requested_by_old.get(entry.old_path) != entry for entry in existing):
+            raise ResultPathMigrationError("path migration registry changed an existing entry")
+    existing_old_paths = {entry.old_path for entry in existing}
+    new_entries = tuple(entry for entry in requested if entry.old_path not in existing_old_paths)
+
+    if not new_entries:
+        by_old_path = {entry.old_path: entry for entry in requested}
         for entry in requested:
             source = root / entry.old_path
-            destination = root / entry.new_path
             if source.exists() and _sha256(source) != entry.sha256:
                 raise ResultPathMigrationError(f"migration retry source drifted: {entry.old_path}")
+            destination = root / _terminal_destination(entry, by_old_path)
             if not destination.is_file() or _sha256(destination) != entry.sha256:
                 raise ResultPathMigrationError(
-                    f"migration retry destination is invalid: {entry.new_path}"
+                    f"migration retry destination is invalid: {destination.relative_to(root)}"
                 )
         for entry in requested:
             (root / entry.old_path).unlink(missing_ok=True)
         _remove_empty_result_directories(root / "results")
+        load_path_migrations(root)
         return registry_path
 
     sources: list[tuple[ResultPathMigration, Path, Path]] = []
-    for entry in requested:
+    for entry in new_entries:
         entry.validate()
         source = root / entry.old_path
         destination = root / entry.new_path
@@ -230,7 +248,10 @@ def apply_result_path_migration(
         _atomic_write(registry_path, content)
         load_path_migrations(root)
     except Exception:
-        registry_path.unlink(missing_ok=True)
+        if existing_registry_bytes is not None:
+            _atomic_write(registry_path, existing_registry_bytes)
+        else:
+            registry_path.unlink(missing_ok=True)
         for destination in reversed(created):
             destination.unlink(missing_ok=True)
         raise
@@ -238,6 +259,7 @@ def apply_result_path_migration(
     for _entry, source, _destination in sources:
         source.unlink()
     _remove_empty_result_directories(root / "results")
+    load_path_migrations(root)
     return registry_path
 
 
@@ -248,11 +270,32 @@ def _validate_migration_set(entries: tuple[ResultPathMigration, ...]) -> None:
         raise ResultPathMigrationError("path migration registry has duplicate old paths")
     if len(new_paths) != len(set(new_paths)):
         raise ResultPathMigrationError("path migration registry has duplicate new paths")
-    overlap = set(old_paths) & set(new_paths)
-    if overlap:
-        raise ResultPathMigrationError(
-            f"path migration registry contains a chain or cycle: {sorted(overlap)[0]}"
-        )
+    by_old_path = {entry.old_path: entry for entry in entries}
+    for entry in entries:
+        _terminal_destination(entry, by_old_path)
+
+
+def _terminal_destination(
+    entry: ResultPathMigration,
+    by_old_path: Mapping[str, ResultPathMigration],
+) -> str:
+    """Resolve one bounded, byte-identical chain to its terminal destination."""
+    origin = entry
+    current = entry
+    seen = {current.old_path}
+    hops = 1
+    while current.new_path in by_old_path:
+        if hops >= MAX_MIGRATION_HOPS:
+            raise ResultPathMigrationError("path migration chain exceeds the supported hop limit")
+        following = by_old_path[current.new_path]
+        if following.old_path in seen:
+            raise ResultPathMigrationError("path migration registry contains a cycle")
+        if following.sha256 != origin.sha256:
+            raise ResultPathMigrationError("path migration chain changes the artifact digest")
+        seen.add(following.old_path)
+        current = following
+        hops += 1
+    return current.new_path
 
 
 def _safe_repository_path(value: str, *, label: str) -> Path:

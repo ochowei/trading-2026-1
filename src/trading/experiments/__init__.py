@@ -1,7 +1,10 @@
 """
 實驗註冊表 (Experiment Registry)
-管理所有已註冊的 legacy 交易實驗。
-Manages the closed inventory of registered legacy trading experiments.
+管理已退役的 legacy 交易實驗 inventory。
+Provides checkout-only inspection and exit compatibility for retired experiments.
+
+This registry is not an execution or publication authority. Public legacy research commands fail
+closed; new research uses ``trading.research_definitions``.
 """
 
 import importlib

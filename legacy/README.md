@@ -7,24 +7,34 @@ or reproducibility. It is not an extension point for new research.
 
 `experiments/` contains the closed `ticker_NNN_description` experiment inventory. The physical
 packages live outside the installable `src/` tree, but a repository checkout keeps their historical
-`trading.experiments.<experiment_name>` import identities and legacy CLI execution available.
+`trading.experiments.<experiment_name>` import identities for read-only diagnostics, reproducibility,
+and fail-closed exit handling of any pre-existing positions.
+
+Legacy research execution is retired. `trading run`, `analyze`, `followup-backtest`,
+`result evaluate`, `result registry seed`, and `data snapshot --experiment` reject every request.
+The compatibility imports do not authorize new execution, observation, ranking, qualification,
+promotion, or result publication.
 
 Do not add or rename an experiment package here. New outcome-relevant research belongs under a
 released workflow and `src/trading/research_definitions/`.
 
 ## Results
 
-`results/` preserves legacy-schema `latest.json` files for the closed experiment inventory,
-superseded result-directory names that no longer match a discoverable identity, and explicitly
-unreferenced historical runs under `<experiment>/history/`. These files are read-only archival
-records. Diagnostic comparison, explicit result-status queries, and documentation checks may fall
-back to a legacy latest file when the categorized canonical result store has no current result.
+`results/` preserves every retired legacy result class: the last retained `latest.json` files,
+immutable snapshot manifests, retained formal run payloads, older legacy-schema results,
+superseded result-directory names, and explicitly unreferenced historical runs under
+`<experiment>/history/`. These files are read-only archival records.
 
-Archive fallback never participates in freshness, experiment evaluation or ranking, followup,
-Shadow/Active authorization, qualification, or formal evidence verification. All result writers
-publish only under repository-root `results/`; they never create or update this archive. When both
-locations contain the same latest identity, the canonical result wins and diagnostics report the
-duplicate. Files under `history/` are navigation-only and never participate in fallback.
+Diagnostic comparison and explicit result-status queries may read an archived `latest.json`.
+Archived results never participate in freshness, experiment evaluation or ranking, new followup
+entries, Shadow/Active authorization, qualification, or formal evidence verification. No writer may
+create or update a legacy result. Existing followup positions may use frozen strategy compatibility
+only to produce fail-closed exit handling; retirement must never open or promote a new position.
+
+Historical references to the former flat or `results/experiment-results/` paths resolve through
+`results/registries/path-migrations.json`. The v010 retirement adds at most one byte-identical,
+SHA-256-verified hop after a v009 categorized mapping and fails closed on drift, missing terminal
+bytes, cycles, or longer chains.
 
 The related identity is recorded for historical navigation, not as a claim that the archived result
 has the same semantics as the final package occupying that numbered identity.

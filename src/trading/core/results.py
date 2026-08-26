@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
-import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
 
@@ -26,6 +25,10 @@ logger = logging.getLogger(__name__)
 
 RESULTS_DIR = Path("results/experiment-results")
 ARCHIVED_RESULTS_DIR = Path("legacy/results")
+
+
+class LegacyExperimentRetiredError(RuntimeError):
+    """Raised when retired legacy research attempts to publish new state."""
 
 
 class ResultSource(StrEnum):
@@ -50,18 +53,10 @@ class ResultStatusRecord:
 
 
 def save_result(experiment_name: str, result: dict) -> Path:
-    """Persist an explicitly legacy run as historical evidence only.
-
-    The legacy compatibility path deliberately never advances ``latest.json``. Only the
-    Phase 2/3 coordinator can publish a current latest result.
-    """
-    directory = RESULTS_DIR / experiment_name
-    directory.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S_%f")
-    path = directory / f"legacy_{timestamp}_{uuid.uuid4().hex}.json"
-    path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    logger.info("[Results] legacy result saved to %s", path)
-    return path
+    """Reject writes after retirement of the legacy experiment system."""
+    raise LegacyExperimentRetiredError(
+        "legacy experiment result publication is retired; use workflow-native research"
+    )
 
 
 def load_latest(experiment_name: str) -> dict | None:

@@ -1,210 +1,46 @@
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from trading.cli import build_parser, main
+from trading.cli import main
 from trading.market_data import PrimaryUSSessionCalendar, SignalDecisionTime
 from trading.research_data import (
     DefinitionBlobRef,
-    ExperimentTrialDeclaration,
-    ResearchDefinitionSnapshot,
-    RunMode,
     SnapshotManifest,
 )
 
 
-class FakeStrategy:
-    def run(self):
-        return {"metrics": {"return": 0.1}}
-
-
-class FakeSnapshotAwareStrategy:
-    def run_with_bundle(self, bundle):
-        return {"metrics": {"return": 0.1}}
-
-    def capture_research_definition(self, store):
-        blob = DefinitionBlobRef(
-            digest="a" * 64,
-            byte_count=100,
-            fingerprint="b" * 64,
-        )
-        return ResearchDefinitionSnapshot(fingerprint=blob.fingerprint, blob=blob)
-
-    def declare_experiment_trial(self):
-        return ExperimentTrialDeclaration(
-            family="spy-momentum",
-            hypothesis="momentum persists",
-        )
-
-
-def test_run_cli_exposes_offline_and_ephemeral_as_mutually_exclusive_modes(
-    monkeypatch, tmp_path
-) -> None:
-    parser = build_parser()
-    offline = parser.parse_args(["run", "experiment", "--offline", str(tmp_path / "snapshot.json")])
-    ephemeral = parser.parse_args(["run", "experiment", "--ephemeral"])
-
-    assert offline.offline == Path(tmp_path / "snapshot.json")
-    assert offline.ephemeral is False
-    assert ephemeral.ephemeral is True
-    assert ephemeral.offline is None
-
-    saved = []
-    monkeypatch.setattr("trading.cli.get_experiment", lambda name: FakeStrategy())
-    monkeypatch.setattr(
-        "trading.cli.save_result", lambda name, result: saved.append((name, result))
-    )
-
-    main(["run", "experiment", "--ephemeral"])
-
-    assert saved == []
-
-
-def test_run_cli_exposes_migration_parity_as_an_offline_only_mode(tmp_path) -> None:
-    parser = build_parser()
-    parsed = parser.parse_args(
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["run", "experiment"],
+        ["run", "experiment", "--ephemeral"],
+        ["run", "experiment", "--legacy"],
+        ["run", "experiment", "--snapshot", "snapshot.json"],
+        ["analyze", "experiment"],
+        ["sync-docs"],
+        ["followup-backtest"],
+        ["followup-state", "resume", "--reason", "retired"],
+        ["result", "evaluate", "SPY"],
+        ["result", "registry", "seed"],
         [
-            "run",
+            "data",
+            "snapshot",
+            "SPY",
+            "--experiment",
             "experiment",
-            "--offline",
-            str(tmp_path / "snapshot.json"),
-            "--migration-parity",
-            str(tmp_path / "parity.json"),
-        ]
-    )
-
-    assert parsed.offline == tmp_path / "snapshot.json"
-    assert parsed.migration_parity == tmp_path / "parity.json"
-
-
-def test_default_persisted_cli_run_requires_formal_snapshot_or_explicit_legacy(
-    monkeypatch,
-) -> None:
-    saved = []
-    monkeypatch.setattr("trading.cli.get_experiment", lambda name: FakeStrategy())
-    monkeypatch.setattr(
-        "trading.cli.save_result", lambda name, result: saved.append((name, result))
-    )
-
-    with pytest.raises(SystemExit, match="--snapshot.*--legacy"):
-        main(["run", "experiment"])
-
-    assert saved == []
-    main(["run", "experiment", "--legacy"])
-    assert saved == [("experiment", {"metrics": {"return": 0.1}})]
-
-
-def test_snapshot_cli_run_defaults_to_online_and_binds_current_definition(
-    monkeypatch,
-    tmp_path,
-) -> None:
-    calls = []
-    coordinator_args = []
-
-    class FakeCoordinator:
-        def __init__(self, **kwargs):
-            coordinator_args.append(kwargs)
-
-        def execute(self, name, runner, **kwargs):
-            calls.append((name, runner, kwargs))
-
-    strategy = FakeSnapshotAwareStrategy()
-    monkeypatch.setattr("trading.cli.get_experiment", lambda name: strategy)
-    monkeypatch.setattr("trading.cli.ResearchRunCoordinator", FakeCoordinator)
-    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: object())
-    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
-    manifest_path = tmp_path / "run.snapshot.json"
-
-    main(["run", "experiment", "--snapshot", str(manifest_path)])
-
-    name, runner, kwargs = calls[0]
-    assert name == "experiment"
-    assert runner == strategy.run_with_bundle
-    assert kwargs["manifest_path"] == manifest_path
-    assert kwargs["mode"] is RunMode.ONLINE
-    assert kwargs["current_definition"].fingerprint == "b" * 64
-    assert coordinator_args[0]["experiment_family"] == "spy-momentum"
-    assert coordinator_args[0]["hypothesis"] == "momentum persists"
-
-
-def test_snapshot_cli_migration_binds_parity_and_uses_pending_mode(monkeypatch, tmp_path) -> None:
-    calls = []
-
-    class FakeCoordinator:
-        def __init__(self, **_kwargs):
-            pass
-
-        def execute(self, name, runner, **kwargs):
-            calls.append((name, runner, kwargs))
-
-    strategy = FakeSnapshotAwareStrategy()
-    monkeypatch.setattr("trading.cli.get_experiment", lambda name: strategy)
-    monkeypatch.setattr("trading.cli.ResearchRunCoordinator", FakeCoordinator)
-    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: object())
-    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
-    manifest_path = tmp_path / "run.snapshot.json"
-    parity_path = tmp_path / "run.migration-parity.json"
-
-    main(
-        [
-            "run",
-            "experiment",
-            "--offline",
-            str(manifest_path),
-            "--migration-parity",
-            str(parity_path),
-        ]
-    )
-
-    _name, _runner, kwargs = calls[0]
-    assert kwargs["mode"] is RunMode.MIGRATION
-    assert kwargs["migration_parity_path"] == parity_path
-
-
-def test_snapshot_aware_cli_run_uses_prepared_manifest_by_default(monkeypatch) -> None:
-    calls = []
-    discovery_calls = []
-    coordinator_calls = []
-    prepared_path = Path("results/experiment-results/experiment") / f"{'c' * 64}.snapshot.json"
-
-    class FakeStore:
-        def latest_manifest_for_definition(self, manifest_root, definition):
-            discovery_calls.append((manifest_root, definition))
-            return prepared_path
-
-    class FakeCoordinator:
-        def __init__(self, **kwargs):
-            coordinator_calls.append(kwargs)
-
-        def execute(self, name, runner, **kwargs):
-            calls.append((name, kwargs))
-
-    monkeypatch.setattr("trading.cli.get_experiment", lambda name: FakeSnapshotAwareStrategy())
-    monkeypatch.setattr("trading.cli.ResearchRunCoordinator", FakeCoordinator)
-    monkeypatch.setattr("trading.cli.create_default_research_data_store", FakeStore)
-    monkeypatch.setattr("trading.cli.create_default_research_definition_store", lambda: object())
-
-    main(["run", "experiment"])
-
-    _, kwargs = calls[0]
-    assert discovery_calls == [
-        (
-            Path("results/experiment-results/experiment"),
-            DefinitionBlobRef(digest="a" * 64, byte_count=100, fingerprint="b" * 64),
-        )
-    ]
-    assert coordinator_calls[0]["result_directory"] == Path("results/experiment-results/experiment")
-    assert coordinator_calls[0]["migration_directory"] == Path(
-        "results/migration-evidence/experiment"
-    )
-    assert coordinator_calls[0]["trial_registry"].path == Path(
-        "results/registries/trial_registry.json"
-    )
-    assert kwargs["manifest_path"] == prepared_path
-    assert kwargs["mode"] is RunMode.ONLINE
+            "--history-start",
+            "2020-01-01",
+            "--decision",
+            "2026-08-01",
+        ],
+    ],
+)
+def test_legacy_research_mutation_and_execution_commands_fail_closed(argv) -> None:
+    with pytest.raises(SystemExit, match="legacy experiment research is retired"):
+        main(argv)
 
 
 def test_result_status_is_a_read_only_cli_diagnostic(monkeypatch, tmp_path, capsys) -> None:
@@ -308,20 +144,13 @@ def test_result_status_compares_with_the_current_definition(monkeypatch, tmp_pat
     assert "definition-stale" in capsys.readouterr().out
 
 
-def test_result_registry_seed_is_explicit_and_marks_selection_history_incomplete(
-    monkeypatch,
-    tmp_path,
-    capsys,
-) -> None:
+def test_result_registry_seed_cannot_mutate_retired_legacy_inventory(monkeypatch, tmp_path) -> None:
     results_root = tmp_path / "results"
     registry_path = results_root / "registries" / "trial_registry.json"
     monkeypatch.setattr("trading.cli.trial_registry_path", lambda: registry_path)
     monkeypatch.setattr("trading.cli.list_experiments", lambda: ["spy_001", "spy_002"])
 
-    main(["result", "registry", "seed"])
+    with pytest.raises(SystemExit, match="legacy experiment research is retired"):
+        main(["result", "registry", "seed"])
 
-    output = capsys.readouterr().out
-    assert "incomplete" in output
-    registry = json.loads(registry_path.read_text())
-    assert registry["selection_history_incomplete"] is True
-    assert len(registry["trials"]) == 2
+    assert not registry_path.exists()

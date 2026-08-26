@@ -3,6 +3,7 @@ import json
 import pytest
 
 from trading.core.results import (
+    LegacyExperimentRetiredError,
     ResultSource,
     compare_experiments,
     inspect_result,
@@ -120,16 +121,15 @@ def test_compare_and_status_inventory_can_read_archive(tmp_path, capsys) -> None
     assert capsys.readouterr().out.count("Validity: legacy [legacy archive]") == 2
 
 
-def test_legacy_save_does_not_advance_latest(tmp_path, monkeypatch) -> None:
+def test_legacy_save_is_rejected_after_retirement(tmp_path, monkeypatch) -> None:
     results_root = tmp_path / "results"
     archive_root = tmp_path / "legacy" / "results"
     monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
     monkeypatch.setattr("trading.core.results.ARCHIVED_RESULTS_DIR", archive_root)
 
-    saved_path = save_result("experiment", _legacy_result(1))
+    with pytest.raises(LegacyExperimentRetiredError, match="publication is retired"):
+        save_result("experiment", _legacy_result(1))
 
-    assert saved_path.exists()
-    assert saved_path.name != "latest.json"
     assert not (results_root / "experiment" / "latest.json").exists()
     assert not archive_root.exists()
 

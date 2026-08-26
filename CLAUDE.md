@@ -73,21 +73,12 @@ TQQQ-001 ~ TQQQ-009 為既往不咎實驗，可維持原始回測邏輯。所有
 # 安裝依賴
 uv sync
 
-# 列出所有實驗
+# 唯讀列出封存的 legacy experiment inventory
 uv run trading list
 
-# 執行已 prepare 的 snapshot-aware 實驗（預設 formal online）
-uv run trading run <experiment_name>
-
-# 尚未完成 Phase 9 migration 的實驗必須明確選擇 legacy historical run；不會更新 latest.json
-uv run trading run <experiment_name> --legacy
-
-# Phase 9 parity-linked migration evidence；只寫 immutable historical envelope，不更新 latest/qualification/lifecycle
-uv run trading run <experiment_name> --offline \
-  results/experiment-results/<experiment>/<snapshot_id>.snapshot.json \
-  --migration-parity results/migration-evidence/<experiment>/<snapshot_id>.migration-parity.json
-
-# 比較實驗結果
+# Legacy experiment execution、analysis、evaluation、snapshot preparation 與 result publication
+# 已正式退役並 fail closed；新研究只使用下方 trading research commands。
+# 唯讀比較封存結果
 uv run trading compare <exp1> <exp2>
 
 # 產生跟單訊號報告（Firstrade 下單用）
@@ -116,26 +107,16 @@ uv run trading qualification plan register-study --study <study-path> --dry-run
 # 最後一個 frozen fold 完成後，以每個 family trial 的 exact manifest 重算 screen
 uv run trading qualification screen run --help
 
-# Phase 7 controlled cutover（預設 no-new-entry；仍為 dry-run）
-uv run trading followup-state init
+# Phase 7 legacy followup 只保留 no-new-entry、狀態查詢與既有部位退役
 uv run trading followup-state status
 uv run trading followup-state pause --reason "operator rollback"
-# Active promotion additionally requires exact Shadow, activation, result, and parity identities.
-uv run trading followup-state activate --help
+uv run trading followup-state retire --help
+uv run trading followup-state complete-retirement --help
 
 # Phase 8 private drift evidence (dry-run only; no broker access)
 uv run trading drift status --path state/live-drift/<strategy>.json
 uv run trading drift checkpoint --help
 uv run trading drift recover --help
-
-# 回測目前跟單策略組合（預設最近 126 個完整交易日）
-uv run trading followup-backtest
-
-# 自訂完整交易日數
-uv run trading followup-backtest --days 180
-
-# 從指定日期當天或之後第一個完整交易日起，回測 126 個交易日
-uv run trading followup-backtest --start 2025-01-01 --days 126
 
 # 檢查知識新鮮度
 uv run trading freshness
@@ -204,10 +185,6 @@ uv run trading data refresh SPY --start 2020-01-01
 # 完整歷史 refresh；建立 snapshot 前必須執行
 uv run trading data refresh SPY --full
 
-# 完整刷新並捕捉 experiment definition；發布 immutable results/NAME/<snapshot_id>.snapshot.json
-uv run trading data snapshot SPY --experiment <experiment_name> --aux '^VIX' \
-  --history-start 2020-01-01 --decision 2026-08-04
-
 # 不供 formal execution 的 data-only snapshot 必須指定可追蹤 destination
 uv run trading data snapshot SPY --aux '^VIX' --history-start 2020-01-01 \
   --decision 2026-08-04 --manifest results/example/data.snapshot.json
@@ -222,18 +199,9 @@ uv run trading data import backup.snapshot.zip --manifest results/example/import
 # Reference-aware GC 預設掃描完整 results/；額外 roots 為 additive；預設 dry-run
 uv run trading data gc --grace-days 7
 
-# Diagnostic run 不改變 results 或 registry state
-uv run trading run <experiment_name> --ephemeral
-
-# 唯讀檢查 result validity；不 refresh、不寫入結果
+# 唯讀檢查封存的 legacy result；不 refresh、不寫入結果
 uv run trading result status <experiment_name>
 uv run trading result status --all
-
-# 明確評估單一資產；先處理全部 stale candidates，無法完整更新則不排名
-uv run trading result evaluate <asset>
-
-# 一次性建立 legacy experiment inventory；會明確標記 selection history incomplete
-uv run trading result registry seed
 ```
 
 ## 架構速覽

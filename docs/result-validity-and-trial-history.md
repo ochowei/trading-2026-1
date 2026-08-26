@@ -1,5 +1,11 @@
 # Result validity and trial history
 
+> **Retirement notice (2026-08-26):** Legacy experiment execution, refresh, ranking, registry seed,
+> and result publication are retired. All final retained legacy results now live under
+> `legacy/results/` as read-only diagnostics. The schema and historical rules below remain useful
+> for interpreting archived bytes, but they do not authorize new legacy research. See
+> [legacy-experiment-retirement-v010.md](legacy-experiment-retirement-v010.md).
+
 Phase 3 adds a result contract on top of the immutable data and research-definition evidence
 introduced in Phase 2. A result records one execution/observation of a registered trial; it is not evidence merely
 because a JSON file exists.
@@ -49,12 +55,12 @@ Changes to thresholds, signal logic, execution rules,
 dependencies, or other behavior-affecting code produce a new fingerprint and invalidate only the
 affected definition lineage.
 
-## Publication and latest-result rules
+## Retired publication and latest-result rules
 
-`ResearchRunCoordinator` applies these boundaries:
+Before terminal retirement, `ResearchRunCoordinator` applied these boundaries:
 
-- a successful formal `online` run writes a schema-v3 historical result and atomically advances
-  `results/experiment-results/<experiment>/latest.json`;
+- a successful formal `online` run wrote a schema-v3 historical result and atomically advanced
+  the now-archived `<experiment>/latest.json`;
 - a successful formal `offline` run writes only a historical result;
 - a successful formal `migration` run requires passing fixed-snapshot parity and writes only an
   immutable `<snapshot_id>.migration-result.json` envelope marked `migration-pending`;
@@ -64,12 +70,10 @@ affected definition lineage.
 - the legacy `--legacy` path writes historical legacy evidence only and never advances
   `latest.json`.
 
-Repository-root `results/` is the only writable and authorization-capable result root.
-Legacy-schema latest results retained under `legacy/results/` are read-only diagnostics: comparison,
-an explicit result-status query, `result status --all`, and documentation checks may fall back to
-the archive when no canonical latest exists. Canonical results always win duplicate identities.
-Freshness, evaluation/ranking, followup, Shadow/Active, qualification, and formal evidence
-verification never use archive fallback.
+There is no writable or authorization-capable legacy result root. `legacy/results/` is read-only;
+comparison, an explicit result-status query, and `result status --all` may inspect it. Freshness,
+evaluation/ranking, followup new entries, Shadow/Active, qualification, and formal evidence
+verification never use archived results.
 
 `latest.json` is therefore a convenience pointer, not a qualification decision. Ranking and
 follow-up selection use only complete, successful, current-definition, current-data results.
@@ -127,7 +131,7 @@ The qualification lifecycle is documented in
 [historical-qualification-and-shadow.md](historical-qualification-and-shadow.md).
 
 ```bash
-uv run trading result evaluate SPY
+# retired: uv run trading result evaluate SPY
 ```
 
 ## Append-only trial registry
@@ -150,7 +154,7 @@ The registry uses a lock file and atomic replacement. Malformed or conflicting s
 Legacy entries can be explicitly seeded for discoverable pre-Phase-3 experiments:
 
 ```bash
-uv run trading result registry seed
+# retired: uv run trading result registry seed
 ```
 
 Seeded legacy entries are marked with incomplete selection history. They are migration inventory,

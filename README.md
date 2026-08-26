@@ -210,8 +210,11 @@ uv run trading workflow study complete <study-path> \
 src/trading/research_definitions/<family>/<trial>/
 ```
 
-`src/trading/experiments/` 是封閉的 legacy inventory，只供 reproduction 與明確治理的 migration；
-不得新增、改名或就地改變既有 identity 的研究語意。
+Legacy experiment research 已正式退役。`legacy/experiments/` 與 checkout-only
+`trading.experiments` compatibility 只供唯讀診斷、reproduction source inspection，以及既有部位的
+fail-closed exit handling；不得新增、執行、分析、重新排名、qualification、promotion 或發布新結果。
+最後 retained results 位於 `legacy/results/`，不再具有 current authority。完整退役 contract 見
+[docs/legacy-experiment-retirement-v010.md](docs/legacy-experiment-retirement-v010.md)。
 
 正式執行必須綁定 exact workflow release、composite policy-set identity、Research Definition
 Snapshot、data snapshot、runtime/source identity、result identity、complete commit SHA 與 checksums。
