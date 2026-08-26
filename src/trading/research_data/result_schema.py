@@ -26,6 +26,7 @@ from trading.core.sleeve_engine import (
 from trading.market_data import PrimaryUSSessionCalendar, SessionCalendar
 from trading.research_data.definitions import ResearchDefinitionStore
 from trading.research_data.models import DefinitionBlobRef, SnapshotManifest
+from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
 from trading.research_data.store import ResearchDataStore
 
 CURRENT_RESULT_SCHEMA_VERSION = 3
@@ -156,11 +157,14 @@ def load_result(
     calendar: SessionCalendar | None = None,
 ) -> ResearchResult:
     """Read a result and compute status without changing the file or evidence store."""
-    result_path = Path(path)
+    requested_path = Path(path)
     try:
+        result_path = resolve_result_path(requested_path)
         loaded = json.loads(result_path.read_text(encoding="utf-8"))
+    except ResultPathMigrationError as exc:
+        raise ResultSchemaError(f"cannot read result {requested_path}: {exc}") from exc
     except (OSError, json.JSONDecodeError) as exc:
-        raise ResultSchemaError(f"cannot read result {result_path}: {exc}") from exc
+        raise ResultSchemaError(f"cannot read result {requested_path}: {exc}") from exc
     if not isinstance(loaded, dict):
         raise ResultSchemaError("research result must be a JSON object")
     payload = copy.deepcopy(loaded)

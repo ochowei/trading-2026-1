@@ -14,15 +14,17 @@ released workflow and `src/trading/research_definitions/`.
 
 ## Results
 
-`results/` preserves legacy-schema `latest.json` files for the closed experiment inventory plus
-superseded result-directory names that no longer match a discoverable identity. These files are
-read-only archival records. Diagnostic comparison, explicit result-status queries, and documentation
-checks may fall back here when repository-root `results/` has no canonical latest result.
+`results/` preserves legacy-schema `latest.json` files for the closed experiment inventory,
+superseded result-directory names that no longer match a discoverable identity, and explicitly
+unreferenced historical runs under `<experiment>/history/`. These files are read-only archival
+records. Diagnostic comparison, explicit result-status queries, and documentation checks may fall
+back to a legacy latest file when the categorized canonical result store has no current result.
 
 Archive fallback never participates in freshness, experiment evaluation or ranking, followup,
 Shadow/Active authorization, qualification, or formal evidence verification. All result writers
 publish only under repository-root `results/`; they never create or update this archive. When both
-locations contain the same identity, the canonical result wins and diagnostics report the duplicate.
+locations contain the same latest identity, the canonical result wins and diagnostics report the
+duplicate. Files under `history/` are navigation-only and never participate in fallback.
 
 The related identity is recorded for historical navigation, not as a claim that the archived result
 has the same semantics as the final package occupying that numbered identity.

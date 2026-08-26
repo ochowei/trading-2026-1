@@ -14,6 +14,10 @@ from trading.research_data.artifacts import (
     publish_immutable,
     validate_digest,
 )
+from trading.research_data.paths import (
+    qualification_evidence_directory,
+    research_evidence_directory,
+)
 from trading.research_data.qualification_registry import (
     QualificationRegistry,
     QualificationRegistryError,
@@ -23,8 +27,8 @@ from trading.research_data.qualification_registry import (
 class ResearchEvidenceStore:
     """Resolve immutable Markdown evidence retained in canonical Git history."""
 
-    def __init__(self, root: Path = Path("results/research-evidence")) -> None:
-        self.root = Path(root)
+    def __init__(self, root: Path | None = None) -> None:
+        self.root = Path(root) if root is not None else research_evidence_directory()
 
     def path_for(self, digest: str) -> Path:
         """Return the sole canonical path for one SHA-256 evidence identity."""
@@ -73,8 +77,8 @@ class QualificationEvidenceSnapshot:
 class QualificationEvidenceStore:
     """Immutable self-contained qualification-registry snapshots for terminal review."""
 
-    def __init__(self, root: Path = Path("results/qualification-evidence")) -> None:
-        self.root = Path(root)
+    def __init__(self, root: Path | None = None) -> None:
+        self.root = Path(root) if root is not None else qualification_evidence_directory()
 
     def path_for(self, digest: str) -> Path:
         validate_digest(digest)

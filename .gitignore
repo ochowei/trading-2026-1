@@ -212,14 +212,18 @@ results/**/*.json
 !results/**/prev_1.json
 !results/**/prev_2.json
 !results/**/*.snapshot.json
-!results/trial_registry.json
+!results/registries/trial_registry.json
+!results/registries/path-migrations.json
 # Retained SPY-010 formal observation referenced by the append-only trial registry.
-!results/spy_010_trend_pullback_baseline/20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json
-!results/*--*-gate/*.json
-!results/qualification-evidence/
-!results/qualification-evidence/*.json
-!results/study-evidence/
-!results/study-evidence/**/*.json
+!results/experiment-results/spy_010_trend_pullback_baseline/20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json
+# Retained 2026-08-07 SPY formal observations referenced by the migrated trial registry.
+!results/experiment-results/spy_*/20260807_*.json
+!results/migration-evidence/**/*.migration-parity.json
+!results/migration-evidence/**/*.migration-result.json
+!results/evidence/qualification/
+!results/evidence/qualification/*.json
+!results/workflows/
+!results/workflows/**/*.json
 results/**/.trial_registry.json.lock
 
 # Local trading runtime data (never commit provider cache, protected blobs, or state)

@@ -12,6 +12,7 @@ from trading.core.accounting import canonical_json_bytes
 from trading.core.study_qualification import REQUIRED_STUDY_TIME_CHALLENGES
 from trading.research_data import QualificationEvidenceStore
 from trading.research_data.artifacts import ImmutableBlobCorruptionError
+from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
 
 TERMINAL_EVIDENCE_FILENAME = "TERMINAL_EVIDENCE.json"
 
@@ -233,12 +234,28 @@ def _resolve_qualification_snapshot(
     digest = reference.get("sha256")
     if not isinstance(digest, str):
         raise ValueError("qualification evidence digest is missing")
-    root = study.parents[4]
-    store = QualificationEvidenceStore(root / "results" / "qualification-evidence")
-    expected_path = store.path_for(digest)
-    expected_relative = expected_path.relative_to(root).as_posix()
-    if reference.get("path") != expected_relative:
+    root = study.parents[4].resolve()
+    identity = reference.get("path")
+    if not isinstance(identity, str):
+        raise ValueError("qualification evidence path is missing")
+    relative = Path(identity)
+    if relative.is_absolute() or ".." in relative.parts or relative.as_posix() != identity:
+        raise ValueError("qualification evidence path is unsafe")
+    historical_namespace = relative.parts[:2] == ("results", "qualification-evidence")
+    canonical_namespace = relative.parts[:3] == (
+        "results",
+        "evidence",
+        "qualification",
+    )
+    if not (historical_namespace or canonical_namespace):
         raise ValueError("qualification evidence path is not canonical")
+    try:
+        expected_path = resolve_result_path(root / relative, repository_root=root)
+    except ResultPathMigrationError as exc:
+        raise ValueError(str(exc)) from exc
+    if expected_path.name != f"{digest}.json":
+        raise ValueError("qualification evidence path differs from its digest")
+    store = QualificationEvidenceStore(expected_path.parent)
     try:
         return store.resolve(digest)
     except ImmutableBlobCorruptionError as exc:
@@ -354,23 +371,29 @@ def _repo_reference(study: Path, value: object) -> Path:
     if not isinstance(value, str) or not value.strip():
         raise ValueError("terminal evidence path is missing")
     root = study.parents[4]
-    resolved = (root / value).resolve()
+    requested = (root / value).resolve()
     try:
-        resolved.relative_to(root.resolve())
+        requested.relative_to(root.resolve())
     except ValueError as exc:
         raise ValueError("terminal evidence path escapes the repository") from exc
-    if not resolved.is_file():
-        raise ValueError(f"terminal evidence file is missing: {value}")
-    return resolved
+    try:
+        return resolve_result_path(requested, repository_root=root)
+    except ResultPathMigrationError as exc:
+        raise ValueError(str(exc)) from exc
 
 
 def _study_evidence_reference(study: Path, value: object) -> Path:
     """Resolve one tracked canonical Development/challenge evidence artifact."""
+    if not isinstance(value, str):
+        raise ValueError("terminal evidence path is missing")
+    relative = Path(value)
+    allowed = relative.parts[:2] == ("results", "study-evidence") or relative.parts[:2] == (
+        "results",
+        "workflows",
+    )
+    if not allowed:
+        raise ValueError("Development and challenge evidence uses an invalid result namespace")
     resolved = _repo_reference(study, value)
-    root = study.parents[4].resolve()
-    relative = resolved.relative_to(root)
-    if relative.parts[:2] != ("results", "study-evidence"):
-        raise ValueError("Development and challenge evidence must use results/study-evidence/")
     return resolved
 
 

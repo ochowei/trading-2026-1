@@ -14,7 +14,7 @@ from trading.core.results import inspect_result
 
 LESSONS_PATH = Path(".agents/context/cross_asset_lessons.md")
 DOCS_DIR = Path("src/trading/experiments")
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path("results/experiment-results")
 
 # 過期門檻（月數）
 THRESHOLD_GREEN = 3

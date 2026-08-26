@@ -10,6 +10,7 @@ from pathlib import Path
 
 from trading.research_data.artifacts import canonical_json_bytes, publish_immutable
 from trading.research_data.parity import MigrationParityEvidenceError, MigrationParityStore
+from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
 
 MIGRATION_RESULT_SCHEMA_VERSION = 1
 MIGRATION_RESULT_SUFFIX = ".migration-result.json"
@@ -31,12 +32,16 @@ class MigrationResultStore:
         path: Path,
     ) -> Path:
         """Write one parity-linked migration result at a deterministic immutable path."""
-        parity = _load_parity(parity_path)
+        try:
+            resolved_parity_path = resolve_result_path(Path(parity_path))
+        except ResultPathMigrationError as exc:
+            raise MigrationResultError(str(exc)) from exc
+        parity = _load_parity(resolved_parity_path)
         normalized = _build_payload(
             result,
             experiment_name=experiment_name,
             parity=parity,
-            parity_path=Path(parity_path),
+            parity_path=resolved_parity_path,
         )
         destination = Path(path)
         _validate_destination(
@@ -44,7 +49,7 @@ class MigrationResultStore:
             experiment_name=normalized["experiment_name"],
             snapshot_id=normalized["snapshot_id"],
         )
-        if Path(parity_path).parent.resolve() != destination.parent.resolve():
+        if resolved_parity_path.parent.resolve() != destination.parent.resolve():
             raise MigrationResultError(
                 "migration parity evidence must be beside the migration result"
             )
@@ -55,7 +60,11 @@ class MigrationResultStore:
     @staticmethod
     def load(path: Path) -> dict[str, object]:
         """Read, canonicalize, and re-verify one migration result envelope."""
-        source = Path(path)
+        requested = Path(path)
+        try:
+            source = resolve_result_path(requested)
+        except ResultPathMigrationError as exc:
+            raise MigrationResultError(f"invalid migration result artifact: {exc}") from exc
         if not source.name.endswith(MIGRATION_RESULT_SUFFIX):
             raise MigrationResultError("migration result path must end with .migration-result.json")
         try:

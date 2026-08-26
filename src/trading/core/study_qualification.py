@@ -28,6 +28,11 @@ from trading.research_data import (
     QualificationRegistry,
     ResearchDefinitionStore,
 )
+from trading.research_data.paths import (
+    PATH_MIGRATION_REGISTRY,
+    ResultPathMigrationError,
+    resolve_result_path,
+)
 from trading.research_data.trial_registry import formal_trial_id
 from trading.research_definitions import (
     ResearchDefinitionRegistry,
@@ -535,7 +540,20 @@ def compile_study_qualification_plan(
     qualification_registry_identity = getattr(spec, "qualification_registry_identity", None)
     if trial_registry_identity is not None:
         root = spec.study_path.parents[4]
-        expected_trial_registry = (root / trial_registry_identity).resolve()
+        declared_trial_registry = (root / trial_registry_identity).resolve()
+        if (
+            Path(trial_registry_path).resolve() == declared_trial_registry
+            or not (root / PATH_MIGRATION_REGISTRY).is_file()
+        ):
+            expected_trial_registry = declared_trial_registry
+        else:
+            try:
+                expected_trial_registry = resolve_result_path(
+                    declared_trial_registry,
+                    repository_root=root,
+                )
+            except ResultPathMigrationError as exc:
+                raise ValueError(str(exc)) from exc
         expected_qualification_registry = (root / str(qualification_registry_identity)).resolve()
         if Path(trial_registry_path).resolve() != expected_trial_registry:
             raise ValueError("trial registry path differs from frozen qualification spec")

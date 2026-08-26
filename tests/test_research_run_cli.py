@@ -167,7 +167,8 @@ def test_snapshot_cli_migration_binds_parity_and_uses_pending_mode(monkeypatch, 
 def test_snapshot_aware_cli_run_uses_prepared_manifest_by_default(monkeypatch) -> None:
     calls = []
     discovery_calls = []
-    prepared_path = Path("results/experiment") / f"{'c' * 64}.snapshot.json"
+    coordinator_calls = []
+    prepared_path = Path("results/experiment-results/experiment") / f"{'c' * 64}.snapshot.json"
 
     class FakeStore:
         def latest_manifest_for_definition(self, manifest_root, definition):
@@ -176,7 +177,7 @@ def test_snapshot_aware_cli_run_uses_prepared_manifest_by_default(monkeypatch) -
 
     class FakeCoordinator:
         def __init__(self, **kwargs):
-            pass
+            coordinator_calls.append(kwargs)
 
         def execute(self, name, runner, **kwargs):
             calls.append((name, kwargs))
@@ -191,10 +192,17 @@ def test_snapshot_aware_cli_run_uses_prepared_manifest_by_default(monkeypatch) -
     _, kwargs = calls[0]
     assert discovery_calls == [
         (
-            Path("results/experiment"),
+            Path("results/experiment-results/experiment"),
             DefinitionBlobRef(digest="a" * 64, byte_count=100, fingerprint="b" * 64),
         )
     ]
+    assert coordinator_calls[0]["result_directory"] == Path("results/experiment-results/experiment")
+    assert coordinator_calls[0]["migration_directory"] == Path(
+        "results/migration-evidence/experiment"
+    )
+    assert coordinator_calls[0]["trial_registry"].path == Path(
+        "results/registries/trial_registry.json"
+    )
     assert kwargs["manifest_path"] == prepared_path
     assert kwargs["mode"] is RunMode.ONLINE
 
@@ -306,13 +314,14 @@ def test_result_registry_seed_is_explicit_and_marks_selection_history_incomplete
     capsys,
 ) -> None:
     results_root = tmp_path / "results"
-    monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
+    registry_path = results_root / "registries" / "trial_registry.json"
+    monkeypatch.setattr("trading.cli.trial_registry_path", lambda: registry_path)
     monkeypatch.setattr("trading.cli.list_experiments", lambda: ["spy_001", "spy_002"])
 
     main(["result", "registry", "seed"])
 
     output = capsys.readouterr().out
     assert "incomplete" in output
-    registry = json.loads((results_root / "trial_registry.json").read_text())
+    registry = json.loads(registry_path.read_text())
     assert registry["selection_history_incomplete"] is True
     assert len(registry["trials"]) == 2

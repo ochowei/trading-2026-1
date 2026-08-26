@@ -66,6 +66,7 @@ from trading.research_data.models import (
     SnapshotDataRef,
     SnapshotManifest,
 )
+from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
 
 
 class SnapshotEligibilityError(RuntimeError):
@@ -175,7 +176,10 @@ class ResearchDataStore:
     def load_manifest(self, path: Path) -> SnapshotManifest:
         """Parse and verify one immutable snapshot manifest."""
         try:
-            manifest = _manifest_from_bytes(Path(path).read_bytes())
+            resolved = resolve_result_path(Path(path))
+            manifest = _manifest_from_bytes(resolved.read_bytes())
+        except ResultPathMigrationError as exc:
+            raise SnapshotManifestError(f"invalid snapshot manifest: {exc}") from exc
         except (KeyError, TypeError, ValueError, json.JSONDecodeError, OSError) as exc:
             raise SnapshotManifestError(f"invalid snapshot manifest: {exc}") from exc
         expected_id = hashlib.sha256(

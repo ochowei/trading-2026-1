@@ -15,7 +15,7 @@ from trading.research_data.result_schema import ResultValidityStatus
 
 logger = logging.getLogger(__name__)
 
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path("results/experiment-results")
 ARCHIVED_RESULTS_DIR = Path("legacy/results")
 DOCS_DIR = Path("src/trading/experiments")
 

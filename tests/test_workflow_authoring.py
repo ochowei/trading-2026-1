@@ -275,8 +275,8 @@ def test_git_index_check_rejects_worktree_bytes_that_differ_from_staged_blob(tmp
 @pytest.mark.parametrize(
     "relative",
     [
-        "results/qualification-evidence/" + "a" * 64 + ".json",
-        "results/study-evidence/example--s001/challenges/cash.json",
+        "results/evidence/qualification/" + "a" * 64 + ".json",
+        "results/workflows/example-workflow--v001/example--s001/challenges/cash.json",
     ],
 )
 def test_repository_gitignore_tracks_terminal_evidence_namespaces(
@@ -867,6 +867,107 @@ def test_authoring_stage_contains_only_the_workflow_overlay(tmp_path) -> None:
     assert staged_entries
     assert all(entry == "workflows" or entry.startswith("workflows/") for entry in staged_entries)
     assert not any("private.txt" in entry for entry in staged_entries)
+
+
+def test_authoring_stage_validates_existing_preregistered_study(tmp_path) -> None:
+    root, repository = _initialize_root(tmp_path)
+    active = _register_version(root)
+    repository.sync()
+    repository.release(active, approved_by="research-owner")
+    studies = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    study = studies.initialize(
+        active,
+        study_slug="forward-gate",
+        title="Forward gate study",
+        created_by="research-agent",
+    )
+    _complete_study_plan(study)
+    studies.preregister(study, approved_by="research-owner")
+
+    proposal = tmp_path / "docs" / "proposal.md"
+    impact = tmp_path / "docs" / "impact.md"
+    proposal.parent.mkdir()
+    proposal.write_text("# Proposal\n\nClarify the workflow contract.\n", encoding="utf-8")
+    impact.write_text("# Impact\n\nExisting studies continue unchanged.\n", encoding="utf-8")
+    request_path = tmp_path / "change-request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "workflow": "example-workflow",
+                "slug": "clarify-contract",
+                "title": "Clarify contract",
+                "proposal_path": "docs/proposal.md",
+                "impact_path": "docs/impact.md",
+                "validation_path": None,
+                "decision_path": None,
+                "propose": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+    plan = repository.plan_change(CreateChangeRequest.from_path(request_path))
+
+    repository.apply(plan)
+
+    assert (active / "work" / "changes" / "clarify-contract--c001").is_dir()
+    assert repository.validate_all() == ()
+
+
+def test_staged_external_study_validators_use_canonical_workflow_path(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    repository_root = tmp_path / "repository"
+    canonical_root = repository_root / "workflows"
+    staging_root = tmp_path / "stage" / "workflows"
+    relative_study = Path("example-workflow--v001/work/studies/example--s001")
+    canonical_study = canonical_root / relative_study
+    staged_study = staging_root / relative_study
+    canonical_study.mkdir(parents=True)
+    staged_study.mkdir(parents=True)
+    freeze = staged_study / "CANDIDATE_FREEZE.json"
+    freeze.write_text("{}\n", encoding="utf-8")
+    (staged_study / "TERMINAL_EVIDENCE.json").write_text("{}\n", encoding="utf-8")
+    repository = WorkflowRepository(
+        staging_root,
+        _repository_root=repository_root,
+        _canonical_workflow_root=canonical_root,
+    )
+    validated: dict[str, Path] = {}
+
+    def validate_freeze(study_path: Path, _payload: dict[str, object]) -> None:
+        validated["freeze"] = study_path
+
+    def validate_terminal(*, study_path: Path, **_kwargs: object) -> None:
+        validated["terminal"] = study_path
+
+    monkeypatch.setattr(
+        "trading.core.study_qualification.validate_candidate_freeze_for_study",
+        validate_freeze,
+    )
+    monkeypatch.setattr(
+        "trading.core.study_terminal_evidence.validate_study_time_terminal_evidence",
+        validate_terminal,
+    )
+    issues: list[object] = []
+
+    repository._validate_guarded_candidate_freeze(freeze, staged_study, issues)
+    repository._validate_study_time_terminal(
+        {
+            "outcome": "pass",
+            "disposition": "retrospectively-supported",
+            "decision_stage": "retrospective-evaluation",
+        },
+        staged_study / "README.md",
+        issues,
+    )
+
+    assert validated == {
+        "freeze": canonical_study.resolve(),
+        "terminal": canonical_study.resolve(),
+    }
+    assert issues == []
 
 
 def test_apply_rechecks_target_drift_after_staging_before_publish(tmp_path) -> None:
@@ -2110,7 +2211,7 @@ def test_public_cli_dry_run_compiles_real_structured_study_end_to_end(
     )
 
     qualification_registry = tmp_path / "state" / "qualification-registry.json"
-    trial_registry = tmp_path / "results" / "trial_registry.json"
+    trial_registry = tmp_path / "results" / "registries" / "trial_registry.json"
     main(
         [
             "qualification",
