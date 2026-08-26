@@ -3,6 +3,8 @@
 > **用途**：本文件是 [cross_asset_lessons.md](cross_asset_lessons.md)（精簡規則版）的詳細證據檔。
 > 包含完整表格、反例、原因分析。**僅在需要了解特定規則的實作細節時才讀取對應段落**。
 > 段落編號與精簡版一致，方便交叉參考。
+> **身分**：由 frozen legacy evidence 彙整的 active guidance，不是 outcome authority；正式
+> 結論只能由 exact workflow、preregistered study、frozen evidence 與獨立 review 產生。
 
 ---
 
@@ -69,7 +71,7 @@
 |------|-----------------|-----------------|----------|
 | TQQQ-008 → TQQQ-010 | +120.21% | +55.44% (-54%) | +45.44% → +47.59% (微升) |
 
-**規則**：所有新實驗必須納入成交模型（已列入 CLAUDE.md 強制規則）。不要被無成交模型的 In-Sample 數字誤導。
+**規則**：所有新的 workflow-native trial 必須納入成交模型（已列入 CLAUDE.md 強制規則）。不要被無成交模型的 In-Sample 數字誤導。
 
 ---
 
@@ -235,7 +237,7 @@
   confidence: high
 -->
 
-以下做法在多個資產上證明無效，新實驗不應再嘗試：
+以下做法在多個資產上證明無效，新的 workflow-native trial 不應再嘗試：
 
 1. **放寬進場門檻以增加訊號** — 品質下降的速度永遠快過數量增加的速度
 2. **高波動資產上使用 trailing stop** — 日內震盪會觸發悲觀認定出場

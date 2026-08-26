@@ -41,6 +41,7 @@ uv run trading workflow validate --all
 若需完整規則，請直接閱讀各區塊的權威文件：
 
 - Repository 結構與 ownership boundary：[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- 文件狀態與現行入口：[`docs/README.md`](docs/README.md)
 - Agent 規則與開發指令：[`CLAUDE.md`](CLAUDE.md)
 - Policy registry：[`policies/README.md`](policies/README.md)
 - Workflow registry：[`workflows/README.md`](workflows/README.md)

@@ -12,7 +12,9 @@ and fail-closed exit handling of any pre-existing positions.
 
 Legacy research execution is retired. `trading legacy run`, `analyze`, `followup-backtest`,
 `result evaluate`, `result registry seed`, and `data snapshot --experiment` reject every request.
-Former top-level spellings remain deprecated aliases for one compatibility cycle.
+Former top-level `list`, `run`, `followup-backtest`, `compare`, `result`, `analyze`, and `sync-docs`
+spellings have been removed; argparse rejects them. Read-only archive inspection uses the explicit
+`trading legacy ...` namespace.
 The compatibility imports do not authorize new execution, observation, ranking, qualification,
 promotion, or result publication.
 

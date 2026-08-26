@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "coverage_roots": [
+    ".agents",
+    "docs",
+    "results",
+    "src/trading",
+    "tests"
+  ],
+  "rules": [
+    {
+      "pattern": ".agents/context",
+      "status": "shared",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Active guidance that may preserve explicitly labeled legacy-derived evidence."
+    },
+    {
+      "pattern": ".agents/rules",
+      "status": "version-pinned",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Workflow governance and execution dependencies may be pinned by released versions."
+    },
+    {
+      "pattern": ".agents/skills",
+      "status": "active",
+      "canonical_owner": "AGENTS.md",
+      "allows_new_content": true,
+      "reason": "Active repository workflow skills; retired skills live under legacy/agent-skills."
+    },
+    {
+      "pattern": "docs/ARCHITECTURE.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Canonical repository map and ownership authority."
+    },
+    {
+      "pattern": "docs/README.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Human-facing document status and routing index."
+    },
+    {
+      "pattern": "docs/adr",
+      "status": "version-pinned",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Immutable architecture decision records."
+    },
+    {
+      "pattern": "docs/pm",
+      "status": "shared",
+      "canonical_owner": "AGENTS.md",
+      "allows_new_content": true,
+      "reason": "Human-maintained product-management material."
+    },
+    {
+      "pattern": "docs/superpowers",
+      "status": "legacy-archive",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Historical specifications and implementation plans retained as context."
+    },
+    {
+      "pattern": "docs/workflow-governance",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Current human-facing workflow governance explanations."
+    },
+    {
+      "pattern": "docs/*-v[0-9][0-9][0-9].md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": true,
+      "reason": "Version-scoped normative, compatibility, or retirement documents."
+    },
+    {
+      "pattern": "docs/auxiliary-unavailable-decision-reproducibility.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Normative dependency pinned by released workflows."
+    },
+    {
+      "pattern": "docs/canonical-sleeve-execution.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Normative execution dependency pinned by released workflows."
+    },
+    {
+      "pattern": "docs/controlled-followup-cutover.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Normative followup dependency pinned by released workflows."
+    },
+    {
+      "pattern": "docs/historical-qualification-and-shadow.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Older frozen qualification contract; current operations use workflow-native successors."
+    },
+    {
+      "pattern": "docs/live-drift-and-recovery.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Normative drift dependency pinned by released workflows."
+    },
+    {
+      "pattern": "docs/reproducibility.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Older frozen reproducibility contract containing retired legacy command examples."
+    },
+    {
+      "pattern": "docs/result-validity-and-trial-history.md",
+      "status": "version-pinned",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Older frozen result contract retained for released workflow reproduction."
+    },
+    {
+      "pattern": "docs/market-data.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Current market-data reference documentation."
+    },
+    {
+      "pattern": "docs/manual-execution-ledger.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Current manual execution reference documentation."
+    },
+    {
+      "pattern": "docs/phase-9-primary-followup-migration.md",
+      "status": "legacy-compat",
+      "canonical_owner": "docs/README.md",
+      "allows_new_content": false,
+      "reason": "Completed compatibility migration reference retained for audit context."
+    },
+    {
+      "pattern": "docs/policies.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Current policy registry reference documentation."
+    },
+    {
+      "pattern": "docs/research-evidence-preservation.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Current evidence preservation reference documentation."
+    },
+    {
+      "pattern": "docs/research-evidence-stages-and-outcomes.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Current routing pointer for workflow evidence stages and outcomes."
+    },
+    {
+      "pattern": "docs/strategy-forward-replication-research-workflow.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Current human-readable workflow reference."
+    },
+    {
+      "pattern": "results/README.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Human-facing result namespace map."
+    },
+    {
+      "pattern": "results/evidence",
+      "status": "version-pinned",
+      "canonical_owner": "results/README.md",
+      "allows_new_content": true,
+      "reason": "Content-addressed retained workflow evidence."
+    },
+    {
+      "pattern": "results/migration-evidence",
+      "status": "legacy-compat",
+      "canonical_owner": "results/README.md",
+      "allows_new_content": false,
+      "reason": "Frozen legacy migration parity and result envelopes; never current authority."
+    },
+    {
+      "pattern": "results/registries",
+      "status": "shared",
+      "canonical_owner": "results/README.md",
+      "allows_new_content": true,
+      "reason": "Append-only trial and historical path registries shared by current readers."
+    },
+    {
+      "pattern": "results/research-trials",
+      "status": "active",
+      "canonical_owner": "results/README.md",
+      "allows_new_content": true,
+      "reason": "Workflow-native trial snapshots and formal run artifacts."
+    },
+    {
+      "pattern": "results/workflows",
+      "status": "active",
+      "canonical_owner": "results/README.md",
+      "allows_new_content": true,
+      "reason": "Retained workflow-study stage evidence."
+    },
+    {
+      "pattern": "src/trading/__init__.py",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Installable package marker."
+    },
+    {
+      "pattern": "src/trading/cli.py",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Stable public CLI parser and dispatcher."
+    },
+    {
+      "pattern": "src/trading/commands",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Responsibility-scoped current and explicitly labeled legacy CLI handlers."
+    },
+    {
+      "pattern": "src/trading/commands/legacy.py",
+      "status": "legacy-compat",
+      "canonical_owner": "legacy/README.md",
+      "allows_new_content": false,
+      "reason": "Explicit archive diagnostics and fail-closed retired operations."
+    },
+    {
+      "pattern": "src/trading/commands/research.py",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Canonical workflow-native research CLI handlers."
+    },
+    {
+      "pattern": "src/trading/commands/workflow.py",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Canonical workflow lifecycle CLI handlers."
+    },
+    {
+      "pattern": "src/trading/core",
+      "status": "shared",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Mixed shared infrastructure plus historical import aliases; see the local README."
+    },
+    {
+      "pattern": "src/trading/core/execution_backtester.py",
+      "status": "version-pinned",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Shared execution implementation whose exact bytes are pinned by released policies."
+    },
+    {
+      "pattern": "src/trading/core/manual_ledger.py",
+      "status": "version-pinned",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Shared ledger implementation whose exact bytes are pinned by released policies."
+    },
+    {
+      "pattern": "src/trading/core/sleeve_engine.py",
+      "status": "version-pinned",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Shared portfolio implementation whose exact bytes are pinned by released policies."
+    },
+    {
+      "pattern": "src/trading/core/results.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical import alias for the canonical legacy result implementation."
+    },
+    {
+      "pattern": "src/trading/core/definition_resolver.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical import alias for legacy definition resolution."
+    },
+    {
+      "pattern": "src/trading/core/evaluation.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical import alias for retired legacy evaluation."
+    },
+    {
+      "pattern": "src/trading/core/performance_analyzer.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical import alias for retired legacy analysis."
+    },
+    {
+      "pattern": "src/trading/core/sync_docs.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical import alias for retired legacy documentation sync."
+    },
+    {
+      "pattern": "src/trading/core/legacy_experiments.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical import alias for the closed legacy inventory guard."
+    },
+    {
+      "pattern": "src/trading/core/*workflow*.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical imports whose canonical implementations live under trading.workflow."
+    },
+    {
+      "pattern": "src/trading/core/study_*.py",
+      "status": "legacy-compat",
+      "canonical_owner": "src/trading/core/README.md",
+      "allows_new_content": false,
+      "reason": "Historical imports whose canonical implementations live under trading.workflow."
+    },
+    {
+      "pattern": "src/trading/experiments",
+      "status": "legacy-compat",
+      "canonical_owner": "legacy/README.md",
+      "allows_new_content": false,
+      "content_guard": "closed-children",
+      "allowed_children": [
+        "README.md",
+        "__init__.py"
+      ],
+      "reason": "Closed historical import facade; never an extension point for new research."
+    },
+    {
+      "pattern": "src/trading/followup*.py",
+      "status": "legacy-compat",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Retired-strategy status, exit, and backtest compatibility."
+    },
+    {
+      "pattern": "src/trading/knowledge_freshness.py",
+      "status": "shared",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Aggregates active knowledge and explicitly labeled legacy archive freshness."
+    },
+    {
+      "pattern": "src/trading/legacy",
+      "status": "legacy-compat",
+      "canonical_owner": "legacy/README.md",
+      "allows_new_content": true,
+      "reason": "Canonical read-only compatibility implementation for the retired experiment system."
+    },
+    {
+      "pattern": "src/trading/market_data",
+      "status": "shared",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Maintained market-data boundary shared by workflow-native and compatibility readers."
+    },
+    {
+      "pattern": "src/trading/policies",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Current executable policy resolution."
+    },
+    {
+      "pattern": "src/trading/research_data",
+      "status": "shared",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Maintained formal evidence and compatibility-aware result infrastructure."
+    },
+    {
+      "pattern": "src/trading/research_definitions",
+      "status": "active",
+      "canonical_owner": "src/trading/research_definitions/README.md",
+      "allows_new_content": true,
+      "reason": "Only active source namespace for new workflow-native research identities."
+    },
+    {
+      "pattern": "src/trading/workflow",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "reason": "Canonical workflow authoring, study, qualification, and review runtime."
+    },
+    {
+      "pattern": "tests/README.md",
+      "status": "active",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": false,
+      "reason": "Test ownership and frozen-root exception map."
+    },
+    {
+      "pattern": "tests/conftest.py",
+      "status": "shared",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": false,
+      "reason": "Shared pytest setup and fixtures."
+    },
+    {
+      "pattern": "tests/legacy",
+      "status": "legacy-compat",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Legacy import, archive, and fail-closed compatibility tests."
+    },
+    {
+      "pattern": "tests/market_data",
+      "status": "shared",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Maintained market-data boundary tests."
+    },
+    {
+      "pattern": "tests/operations",
+      "status": "shared",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Maintained ledger, followup, qualification, sleeve, and drift tests."
+    },
+    {
+      "pattern": "tests/policies",
+      "status": "version-pinned",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Policy conformance tests, including exact files pinned by releases."
+    },
+    {
+      "pattern": "tests/repository_checks",
+      "status": "active",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Executable repository architecture contract tests."
+    },
+    {
+      "pattern": "tests/research",
+      "status": "active",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Workflow-native research and evidence tests."
+    },
+    {
+      "pattern": "tests/workflow",
+      "status": "active",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": true,
+      "reason": "Destination for new workflow authoring, study, qualification, and review tests."
+    },
+    {
+      "pattern": "tests/test_*.py",
+      "status": "version-pinned",
+      "canonical_owner": "tests/README.md",
+      "allows_new_content": false,
+      "reason": "Historical root paths retained because workflows and studies reference paths or exact bytes."
+    },
+    {
+      "pattern": ".cache",
+      "status": "local-only",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "required": false,
+      "reason": "Ignored provider cache and quarantine state."
+    },
+    {
+      "pattern": ".research-data",
+      "status": "local-only",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "required": false,
+      "reason": "Ignored protected content-addressed data and definition blobs."
+    },
+    {
+      "pattern": "state",
+      "status": "local-only",
+      "canonical_owner": "docs/ARCHITECTURE.md",
+      "allows_new_content": true,
+      "required": false,
+      "reason": "Ignored private lifecycle, ledger, qualification, and drift state."
+    }
+  ]
+}

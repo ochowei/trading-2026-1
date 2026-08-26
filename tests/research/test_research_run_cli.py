@@ -15,16 +15,13 @@ from trading.research_data import (
 @pytest.mark.parametrize(
     "argv",
     [
-        ["run", "experiment"],
-        ["run", "experiment", "--ephemeral"],
-        ["run", "experiment", "--legacy"],
-        ["run", "experiment", "--snapshot", "snapshot.json"],
-        ["analyze", "experiment"],
-        ["sync-docs"],
-        ["followup-backtest"],
+        ["legacy", "run", "experiment"],
+        ["legacy", "analyze", "experiment"],
+        ["legacy", "sync-docs"],
+        ["legacy", "followup-backtest"],
         ["followup-state", "resume", "--reason", "retired"],
-        ["result", "evaluate", "SPY"],
-        ["result", "registry", "seed"],
+        ["legacy", "result", "evaluate", "SPY"],
+        ["legacy", "result", "registry", "seed"],
         [
             "data",
             "snapshot",
@@ -55,7 +52,7 @@ def test_result_status_is_a_read_only_cli_diagnostic(monkeypatch, tmp_path, caps
     before = latest.read_bytes()
     monkeypatch.setattr("trading.legacy.results.RESULTS_DIR", results_root)
 
-    main(["result", "status", "experiment"])
+    main(["legacy", "result", "status", "experiment"])
 
     assert "legacy" in capsys.readouterr().out
     assert latest.read_bytes() == before
@@ -139,7 +136,7 @@ def test_result_status_compares_with_the_current_definition(monkeypatch, tmp_pat
         lambda _name: "f" * 64,
     )
 
-    main(["result", "status", "experiment"])
+    main(["legacy", "result", "status", "experiment"])
 
     assert "definition-stale" in capsys.readouterr().out
 
@@ -149,6 +146,6 @@ def test_result_registry_seed_cannot_mutate_retired_legacy_inventory(tmp_path) -
     registry_path = results_root / "registries" / "trial_registry.json"
 
     with pytest.raises(SystemExit, match="legacy experiment research is retired"):
-        main(["result", "registry", "seed"])
+        main(["legacy", "result", "registry", "seed"])
 
     assert not registry_path.exists()

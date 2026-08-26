@@ -1,7 +1,9 @@
 # Cross-Asset Lessons Learned (Compact Rules)
 
+> **身分**：由 legacy evidence 衍生、持續維護的 active guidance；可協助形成假設，但不是
+> outcome authority，也不能取代 released workflow、preregistered study 或 frozen evidence。
 > **用途**：沉澱跨資產共通發現，避免 Agent 在新資產上重複犯同樣的錯。
-> 設計新實驗時，先讀本文件再動手。
+> 設計新的 workflow-native research definition／trial 時，先讀本文件再動手。
 > **詳細證據**（表格、反例、原因分析）見 [cross_asset_evidence.md](cross_asset_evidence.md)，僅在需要實作細節時才讀。
 
 ---
@@ -47,7 +49,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
 
 從「訊號日收盤進場」改為「隔日開盤市價進場」後，IS 報酬下降 30-70%，但 OOS 更可信。
 
-**規則**：所有新實驗必須納入成交模型。不要被無成交模型的 IS 數字誤導。
+**規則**：所有新的 workflow-native trial 必須納入成交模型。不要被無成交模型的 IS 數字誤導。
 
 ---
 
@@ -251,7 +253,7 @@ Trailing stop 在低波動資產有效，在高波動資產反而摧毀報酬。
   confidence: high
 -->
 
-以下做法在多個資產上證明無效，新實驗不應再嘗試：
+以下做法在多個資產上證明無效，新的 workflow-native trial 不應再嘗試：
 
 ### 通用禁忌
 1. **放寬進場門檻以增加訊號** — 品質下降速度永遠快過數量增加

@@ -81,7 +81,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 
 | Path | Purpose |
 |---|---|
-| `.github/workflows/ci.yml` | Runs Ruff checks plus workflow, policy, legacy-inventory, and market-data boundary contract validation for pull requests and `main` pushes. |
+| `.github/workflows/ci.yml` | Runs Ruff checks plus workflow, policy, path-ownership, legacy-inventory, and market-data boundary contract validation for pull requests and `main` pushes. |
 
 ## Documentation
 
@@ -90,6 +90,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | Path | Purpose |
 |---|---|
 | `docs/ARCHITECTURE.md` | This canonical repository map and file-ownership guide. |
+| `docs/README.md` | Human-facing document status router that distinguishes current, version-pinned, compatibility, historical, and retired guidance without rewriting pinned bytes. |
 | `docs/market-data.md` | CSV market-data provider, cache, validation, freshness, and CLI contract. |
 | `docs/reproducibility.md` | Immutable blobs, manifests, definitions, bundles, run modes, and garbage collection. |
 | `docs/reproducibility-v008.md` | Normative v008 addendum for structured routes, human authority artifacts, deterministic exact-session derivation, tracked terminal evidence, and compatibility. |
@@ -109,7 +110,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/result-validity-and-trial-history-v005.md` | Proposed v005 result-validity extension for retrospective evidence roles while preserving legacy event verification. |
 | `docs/controlled-followup-cutover.md` | Followup lifecycle, authorization, parity, rollback, and allocation epochs. |
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
-| `docs/phase-9-primary-followup-migration.md` | Primary followup migration boundaries, parity evidence, and verification. |
+| `docs/phase-9-primary-followup-migration.md` | Completed compatibility migration closure record with explicit retirement guidance for its historical commands. |
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
 | `docs/workflow-governance/README.md` | Human-facing entry point linking canonical workflow authority, workflow skills, governance diagrams, their scope, and the final review conclusion. |
 | `docs/workflow-governance/workflow-governance-flow.html` | Standalone B1 high-level sequence visualization of workflow authoring, release, study-operation, and review role handoffs. |
@@ -145,11 +146,12 @@ All installable Python code lives under `src/trading/`. `src/trading/__init__.py
 
 ### `src/trading/core/`
 
-Shared domain and orchestration code. Experiment packages should reuse these components instead of
-creating parallel infrastructure.
+Mixed shared domain and compatibility code. Canonical ownership is documented by the local README;
+new workflow-native definitions use maintained components without creating new legacy identities.
 
 | File | Purpose |
 |---|---|
+| `README.md` | Local ownership map separating maintained shared infrastructure, policy-pinned implementations, legacy strategy compatibility, and workflow import aliases. |
 | `accounting.py` | Decimal-safe amounts, canonical JSON, and UTC timestamp primitives. |
 | `base_config.py` | Base `ExperimentConfig` value object. |
 | `base_signal_detector.py` | Abstract signal-detector interface and common signal behavior. |
@@ -184,7 +186,7 @@ CLI parser registration and handlers grouped by public responsibility.
 
 | File | Purpose |
 |---|---|
-| `legacy.py` | Explicit `trading legacy ...` tree, read-only diagnostics, fail-closed retired operations, and deprecated top-level alias dispatch. |
+| `legacy.py` | Explicit `trading legacy ...` tree with read-only diagnostics and fail-closed retired operations. The former top-level aliases no longer exist. |
 | `workflow.py` | Workflow authoring, validation, release, and study parser/handler. |
 | `research.py` | Workflow-native definition listing, snapshot, run, and exact orchestration provenance. |
 
@@ -284,6 +286,7 @@ publication. New formal research uses `src/trading/research_definitions/`.
 | Pattern | Purpose |
 |---|---|
 | `src/trading/experiments/__init__.py` | Historical package-search facade that re-exports the canonical `trading.legacy.experiments` registry and discovers the physical archive. |
+| `src/trading/experiments/README.md` | Local ownership warning: this directory is a closed compatibility facade and not a research extension point. |
 | `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md` | Archived per-asset result tables, parameter comparisons, and machine-oriented `AI_CONTEXT`. |
 | `legacy/templates/experiment/` | Former package template retained outside auto-discovery; it is not a supported starting point. |
 | `legacy/experiments/<experiment_name>/config.py` | Experiment identity, ticker, periods, thresholds, exits, and other parameters. |
@@ -295,6 +298,7 @@ publication. New formal research uses `src/trading/research_definitions/`.
 
 | Path | Purpose |
 |---|---|
+| `tests/README.md` | Placement contract for new tests and explanation of pinned root-level test exceptions. |
 | `tests/conftest.py` | Shared pytest setup and fixtures. |
 | `tests/test_*.py` | Tests whose historical paths or exact bytes are pinned by released policy or frozen workflow-study evidence; do not relocate them during organizational cleanup. |
 | `tests/legacy/test_*.py` | Legacy import compatibility, frozen snapshot, archived diagnostics, and fail-closed CLI tests. |
@@ -303,7 +307,11 @@ publication. New formal research uses `src/trading/research_definitions/`.
 | `tests/market_data/test_*.py` | Provider, cache, validation, coverage, bundle, and migration-boundary tests. |
 | `tests/operations/test_*.py` | Ledger, followup, qualification, sleeve, and drift operational tests. |
 | `tests/policies/test_*.py` | Policy resolution, composition, definition-identity, and version-specific conformance tests. |
+| `tests/repository_checks/test_*.py` | Contract tests for executable repository architecture and ownership checks. |
+| `tests/workflow/README.md` | Declares `tests/workflow/` as the destination for new workflow lifecycle tests while pinned root tests stay in place. |
 | `config/repository-checks/README.md` | Maintenance contract for active repository-wide checks and their tracked configuration. |
+| `config/repository-checks/check_path_ownership.py` | Validates ownership schema, owners, path existence, unique coverage, and closed compatibility directories. |
+| `config/repository-checks/path-ownership.json` | Executable projection of this document's public path statuses and canonical owners. |
 | `config/repository-checks/check_experiment_market_data_access.py` | Zero-tolerance CI scanner that rejects experiment access bypassing the declared market-data boundary and runtime yfinance use outside the provider. |
 | `config/repository-checks/check_legacy_experiment_inventory.py` | CI entry point that rejects additions or rename-based replacements in the legacy experiment tree. |
 | `config/repository-checks/legacy-experiment-inventory.json` | Sorted stage-one baseline of frozen legacy experiment package identities; removals are allowed but additions are not. |

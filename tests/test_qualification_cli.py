@@ -141,37 +141,17 @@ def test_qualification_status_is_read_only_and_reports_lifecycle(
     assert not registry_path.with_name(f".{registry_path.name}.lock").exists()
 
 
-def test_qualification_plan_register_has_no_backdated_clock_input(
-    tmp_path,
-    capsys,
-    monkeypatch,
-) -> None:
-    captured = {}
-    epoch = SimpleNamespace(
-        selected_trial_id="selected-trial",
-        included_trial_ids=("baseline-trial", "selected-trial"),
-        prior_selection_history_incomplete=True,
-    )
-    plan = SimpleNamespace(
-        plan_id="historical-plan-forward",
-        experiment_family="SPY:forward-program",
-        evaluation_sessions=(date(2027, 1, 4), date(2031, 12, 31)),
-        forward_selection_epoch=epoch,
-    )
-
-    def register(**kwargs):
-        captured.update(kwargs)
-        return plan
-
-    monkeypatch.setattr("trading.cli.register_forward_qualification_plan", register)
+def test_legacy_experiment_qualification_fails_before_writing(tmp_path) -> None:
+    qualification_path = tmp_path / "qualification.json"
+    trial_path = tmp_path / "trials.json"
     argv = [
         "qualification",
         "plan",
         "register",
         "--path",
-        str(tmp_path / "qualification.json"),
+        str(qualification_path),
         "--trial-registry-path",
-        str(tmp_path / "trials.json"),
+        str(trial_path),
         "--experiment",
         "spy_forward",
         "--family-baseline-trial-id",
@@ -194,17 +174,13 @@ def test_qualification_plan_register_has_no_backdated_clock_input(
         "17",
     ]
 
-    main(argv)
+    with pytest.raises(SystemExit, match="legacy experiment qualification is retired"):
+        main(argv)
 
-    assert captured["evaluation_years"] == (2027, 2028, 2029, 2030, 2031)
-    assert captured["development_years"] is None
-    assert captured["warmup_start"] is None
-    assert captured["warmup_end"] is None
-    assert captured["random_samples"] == 1000
-    assert "created_at" not in captured
-    assert "qualification plan registered: historical-plan-forward" in capsys.readouterr().out
-    with pytest.raises(SystemExit):
-        build_parser().parse_args([*argv, "--created-at", "2020-01-01T00:00:00Z"])
+    assert not qualification_path.exists()
+    assert not trial_path.exists()
+    assert not qualification_path.with_name(f".{qualification_path.name}.lock").exists()
+    assert not trial_path.with_name(f".{trial_path.name}.lock").exists()
 
 
 def test_retrospective_plan_cli_routes_explicit_role_calendar(

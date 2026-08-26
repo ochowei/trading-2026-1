@@ -31,7 +31,6 @@ from trading.core.sleeve_engine import (
     ExecutionCostPolicy,
     evaluate_canonical_sleeve_input,
 )
-from trading.experiments import get_experiment
 from trading.market_data import PrimaryUSSessionCalendar, SessionCalendar
 from trading.research_data import (
     ExperimentTrialDeclaration,
@@ -46,6 +45,11 @@ from trading.research_data.trial_registry import formal_trial_id
 from trading.research_definitions import (
     ResearchDefinitionRegistry,
     resolve_workflow_policy_set,
+)
+
+LEGACY_QUALIFICATION_RETIREMENT_MESSAGE = (
+    "legacy experiment qualification is retired; use `--research <family/trial> --workflow "
+    "<released-version-path>` or `qualification plan register-study --study <study-path>`"
 )
 
 
@@ -95,6 +99,8 @@ def register_forward_qualification_plan(
     stress_cost_policy: ExecutionCostPolicy = DEFAULT_STRESS_COST_POLICY,
 ) -> HistoricalQualificationPlan:
     """Freeze and register one exact qualification plan without a backdated clock."""
+    if experiment_name:
+        raise ValueError(LEGACY_QUALIFICATION_RETIREMENT_MESSAGE)
     exact_study_required = (
         bool(family_research_identities)
         or evidence_role == "study-time-retrospective"
@@ -561,12 +567,10 @@ def _resolve_qualification_definition(
     research_identity: str | None,
     workflow_path: Path | None,
 ) -> tuple[object, object | None]:
-    if (experiment_name is None) == (research_identity is None):
-        raise ValueError(
-            "qualification requires exactly one legacy experiment or research identity"
-        )
+    if experiment_name:
+        raise ValueError(LEGACY_QUALIFICATION_RETIREMENT_MESSAGE)
     if research_identity is None:
-        return get_experiment(str(experiment_name)), None
+        raise ValueError("qualification requires a workflow-native research identity")
     if workflow_path is None:
         raise ValueError("workflow-native qualification requires an exact released workflow")
     return (

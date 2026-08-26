@@ -1,9 +1,8 @@
-"""Legacy CLI namespace, retired handlers, and compatibility aliases."""
+"""Explicit legacy CLI namespace and fail-closed retired handlers."""
 
 from __future__ import annotations
 
 import argparse
-import sys
 from collections.abc import Callable
 from datetime import date
 from pathlib import Path
@@ -23,23 +22,6 @@ from trading.research_data import ResearchDataStore
 RETIREMENT_MESSAGE = (
     "legacy experiment research is retired; use `trading research` with a released workflow"
 )
-
-_ALIASES = {
-    "list": "legacy list",
-    "run": "legacy run",
-    "followup-backtest": "legacy followup-backtest",
-    "compare": "legacy compare",
-    "result": "legacy result",
-    "analyze": "legacy analyze",
-    "sync-docs": "legacy sync-docs",
-}
-
-
-def _warn_alias(command: str) -> None:
-    print(
-        f"warning: `trading {command}` is deprecated; use `trading {_ALIASES[command]}`",
-        file=sys.stderr,
-    )
 
 
 def cmd_list(_args: argparse.Namespace) -> None:
@@ -130,19 +112,6 @@ def dispatch(args: argparse.Namespace) -> None:
         cmd_retired(args)
 
 
-def dispatch_alias(args: argparse.Namespace) -> None:
-    """Dispatch a deprecated top-level legacy alias with identical behavior."""
-    _warn_alias(args.command)
-    if args.command == "list":
-        cmd_list(args)
-    elif args.command == "compare":
-        cmd_compare(args)
-    elif args.command == "result":
-        cmd_result(args)
-    else:
-        cmd_retired(args)
-
-
 def _add_result_parser(parent: argparse.ArgumentParser) -> None:
     result_sub = parent.add_subparsers(dest="result_command", required=True)
     status = result_sub.add_parser("status", help="Read-only archived-result validity diagnostics")
@@ -160,6 +129,7 @@ def register_namespace(
     subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
     *,
     iso_date: Callable[[str], date],
+    positive_int: Callable[[str], int],
 ) -> None:
     """Register the explicit ``trading legacy`` command tree."""
     legacy = subparsers.add_parser("legacy", help="Inspect the retired legacy experiment system")
@@ -178,6 +148,6 @@ def register_namespace(
     backtest = commands.add_parser(
         "followup-backtest", help="Retired portfolio backtest (always fails closed)"
     )
-    backtest.add_argument("--days", type=int, default=126)
+    backtest.add_argument("--days", type=positive_int, default=126)
     backtest.add_argument("--start", type=iso_date)
     commands.add_parser("freshness", help="Audit archived knowledge and result freshness")

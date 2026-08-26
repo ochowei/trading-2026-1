@@ -41,34 +41,22 @@ def test_legacy_namespace_parses_read_only_and_retired_commands() -> None:
     assert parser.parse_args(["legacy", "freshness"]).legacy_command == "freshness"
 
 
-def test_deprecated_result_alias_preserves_output_and_adds_warning(capsys) -> None:
-    main(["legacy", "result", "status", "missing"])
-    canonical = capsys.readouterr()
+@pytest.mark.parametrize(
+    "command",
+    ["list", "run", "followup-backtest", "compare", "result", "analyze", "sync-docs"],
+)
+def test_top_level_legacy_command_is_rejected_by_parser(command) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        build_parser().parse_args([command])
 
-    main(["result", "status", "missing"])
-    alias = capsys.readouterr()
-
-    assert alias.out == canonical.out
-    assert "deprecated" in alias.err
-    assert canonical.err == ""
+    assert exc_info.value.code == 2
 
 
 @pytest.mark.parametrize("command", ["run", "analyze", "sync-docs", "followup-backtest"])
-def test_retired_alias_and_namespace_have_identical_failure(command, capsys) -> None:
-    canonical = ["legacy", command]
-    alias = [command]
+def test_retired_legacy_namespace_still_fails_closed(command) -> None:
+    argv = ["legacy", command]
     if command in {"run", "analyze"}:
-        canonical.append("example")
-        alias.append("example")
+        argv.append("example")
 
-    with pytest.raises(SystemExit) as canonical_exit:
-        main(canonical)
-    canonical_output = capsys.readouterr()
-    with pytest.raises(SystemExit) as alias_exit:
-        main(alias)
-    alias_output = capsys.readouterr()
-
-    assert alias_exit.value.code == canonical_exit.value.code
-    assert alias_output.out == canonical_output.out
-    assert "deprecated" in alias_output.err
-    assert canonical_output.err == ""
+    with pytest.raises(SystemExit, match="legacy experiment research is retired"):
+        main(argv)

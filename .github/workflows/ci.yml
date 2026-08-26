@@ -43,6 +43,11 @@ jobs:
       - name: Policy contract validation
         run: uv run trading policy validate --all
 
+      - name: Path ownership contract
+        run: |
+          uv run python config/repository-checks/check_path_ownership.py
+          uv run pytest -q tests/repository_checks/test_path_ownership.py
+
       - name: Workflow authoring and study lifecycle tests
         run: uv run pytest -q tests/test_workflow_authoring.py
 

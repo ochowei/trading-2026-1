@@ -2,7 +2,7 @@
 
 ## AI Agent 讀取策略（節省 token）
 
-設計新實驗時，按以下順序讀取，夠用就停：
+設計新的 workflow-native research definition／trial 時，按以下順序讀取，夠用就停：
 1. **先讀** [.agents/context/cross_asset_lessons.md](.agents/context/cross_asset_lessons.md) 的跨資產共通教訓（精簡規則版，~290 行）
 1b. **檢查新鮮度**：若任何教訓的 `data_through` 距今超過 6 個月，在實驗提案中標註「基於較舊數據，建議先重新驗證」
 2. **需要歷史脈絡時**，再讀 `legacy/experiment-overviews/EXPERIMENTS_*.md` 的
@@ -65,7 +65,8 @@ uv run ruff check src/ --fix && uv run ruff format src/
 ```
 
 > CI（GitHub Action `ci.yml`）會在 pull request 與 `main` push 執行上述檢查，並驗證
-> workflow、policy、legacy experiment inventory 與 market-data boundary contracts。是否阻擋
+> workflow、policy、path ownership、legacy experiment inventory 與 market-data boundary
+> contracts。是否阻擋
 > merge 由 GitHub branch protection 設定決定。
 
 ## 成交模型（新實驗必讀）
@@ -104,8 +105,10 @@ uv run trading ledger import backup/manual-execution-ledger.csv --path state/man
 # 唯讀檢查 Phase 6 Historical / Shadow lifecycle（不執行、不授權 live trading）
 uv run trading qualification status
 
-# 註冊 forward-only qualification plan；created_at 固定取當下 UTC，不接受回填
-uv run trading qualification plan register --help
+# 註冊 workflow-native forward-only qualification plan；created_at 固定取當下 UTC，不接受回填
+uv run trading qualification plan register --research <family/trial> \
+  --workflow <released-version-path> --dry-run
+# --experiment 僅保留 parser/API compatibility，永遠在任何 registry、lock 或 evidence 寫入前 fail closed
 # Capability-scoped workflow study 一律由 exact frozen study 編譯；dry-run 不寫 registry
 uv run trading qualification plan register-study --study <study-path> --dry-run
 
@@ -212,8 +215,8 @@ uv run trading legacy result status --all
 ```
 
 舊的頂層 `trading list`、`compare`、`result status`、`run`、`analyze`、`sync-docs` 與
-`followup-backtest` 只保留為至少一個 release cycle 的 deprecated compatibility aliases；新文件與
-自動化一律使用 `trading legacy ...`。
+`followup-backtest` 已移除並由 argparse 拒絕。唯讀 legacy diagnostics 與明確的 retired
+fail-closed entry 只存在於 `trading legacy ...`。
 
 ## 架構速覽
 
@@ -240,7 +243,8 @@ checkpoints, and fail-closed recovery contracts are documented in
 
 ## 按需參考（不需要時不用讀）
 
-- 建立新實驗教學 → [README.md](README.md)
+- 建立 workflow-native research definition／trial 的入口 → [README.md](README.md)
+- 文件狀態與被 pin 住的舊命令說明 → [docs/README.md](docs/README.md)
 - Versioned executable policies → [docs/policies.md](docs/policies.md)
 - 專案檔案與資料夾用途 → [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Legacy 資產實驗總覽 → `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md`（例如 [TQQQ](legacy/experiment-overviews/EXPERIMENTS_TQQQ.md)、[GLD](legacy/experiment-overviews/EXPERIMENTS_GLD.md)）；僅供歷史脈絡，不是 workflow outcome authority

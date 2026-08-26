@@ -56,6 +56,7 @@ from trading.research_data import (
     trial_registry_path,
 )
 from trading.workflow.qualification import (
+    LEGACY_QUALIFICATION_RETIREMENT_MESSAGE,
     register_forward_qualification_plan,
     run_registered_historical_screen,
 )
@@ -163,6 +164,8 @@ def cmd_qualification_status(args: argparse.Namespace) -> None:
 
 def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
     """Freeze and append one forward-dated qualification plan."""
+    if args.experiment:
+        raise SystemExit(LEGACY_QUALIFICATION_RETIREMENT_MESSAGE)
     if args.workflow is not None:
         release_path = Path(args.workflow) / "RELEASE.json"
         try:
@@ -1218,44 +1221,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = parser.add_subparsers(dest="command")
 
-    legacy_commands.register_namespace(sub, iso_date=iso_date)
-
-    # list
-    sub.add_parser("list", help="List the archived legacy experiment inventory")
-
-    # run
-    run_p = sub.add_parser("run", help="Retired legacy experiment runner (always fails closed)")
-    run_p.add_argument("experiment", nargs="?", help="實驗名稱 (Experiment name)")
-    run_p.add_argument("--all", action="store_true", help="執行全部實驗 (Run all experiments)")
-    run_mode = run_p.add_mutually_exclusive_group()
-    run_mode.add_argument(
-        "--snapshot",
-        type=Path,
-        help="Run online against a verified current snapshot and advance latest.json",
-    )
-    run_mode.add_argument(
-        "--offline",
-        type=Path,
-        help="Persist historical output from a verified older snapshot; never update latest.json",
-    )
-    run_mode.add_argument(
-        "--ephemeral",
-        action="store_true",
-        help="Run diagnostics without changing results or registry state",
-    )
-    run_mode.add_argument(
-        "--legacy",
-        action="store_true",
-        help="Explicitly persist an unmigrated historical result; never advance latest.json",
-    )
-    run_p.add_argument(
-        "--migration-parity",
-        type=Path,
-        help=(
-            "Persist parity-linked migration evidence from --offline MANIFEST; "
-            "never update latest.json or qualification state"
-        ),
-    )
+    legacy_commands.register_namespace(sub, iso_date=iso_date, positive_int=positive_int)
 
     # followup
     followup_p = sub.add_parser(
@@ -1441,44 +1407,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--reconciliation-path", type=Path, default=DEFAULT_RECONCILIATION_PATH
     )
 
-    # followup-backtest
-    followup_backtest_p = sub.add_parser(
-        "followup-backtest",
-        help="Retired legacy followup backtest (always fails closed)",
-    )
-    followup_backtest_p.add_argument(
-        "--days",
-        type=positive_int,
-        default=126,
-        help="完整交易日數 (Completed trading sessions, default: 126)",
-    )
-    followup_backtest_p.add_argument(
-        "--start",
-        type=iso_date,
-        help="開始日期 YYYY-MM-DD；非交易日順延 (Optional start date)",
-    )
-
-    # compare
-    cmp_p = sub.add_parser("compare", help="比較實驗結果 (Compare experiment results)")
-    cmp_p.add_argument(
-        "experiments", nargs="+", help="要比較的實驗名稱 (Experiment names to compare)"
-    )
-
-    # result diagnostics and explicit evaluation
-    result_p = sub.add_parser("result", help="Result validity and trial-history operations")
-    result_sub = result_p.add_subparsers(dest="result_command", required=True)
-    status_p = result_sub.add_parser("status", help="Read-only result validity diagnostics")
-    status_p.add_argument("experiment", nargs="?", help="Experiment name")
-    status_p.add_argument("--all", action="store_true", help="Inspect every latest result")
-    evaluate_p = result_sub.add_parser(
-        "evaluate",
-        help="Retired legacy evaluation workflow (always fails closed)",
-    )
-    evaluate_p.add_argument("asset", help="Asset ticker, for example SPY")
-    registry_p = result_sub.add_parser("registry", help="Experiment trial registry operations")
-    registry_sub = registry_p.add_subparsers(dest="registry_command", required=True)
-    registry_sub.add_parser("seed", help="Retired legacy registry mutation (always fails closed)")
-
     qualification_p = sub.add_parser(
         "qualification",
         help="Historical qualification and Shadow lifecycle operations",
@@ -1564,7 +1492,10 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_identity = qualification_plan_register_p.add_mutually_exclusive_group(
         required=True
     )
-    qualification_identity.add_argument("--experiment")
+    qualification_identity.add_argument(
+        "--experiment",
+        help="Retired legacy qualification input; always fails closed",
+    )
     qualification_identity.add_argument(
         "--research",
         help="Workflow-native family/trial research-definition identity",
@@ -1769,27 +1700,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     research_commands.register_parser(sub, iso_date=iso_date)
 
-    # analyze
-    analyze_p = sub.add_parser(
-        "analyze", help="Retired legacy rolling analysis (always fails closed)"
-    )
-    analyze_p.add_argument("experiment", help="實驗名稱 (Experiment name)")
-    analyze_p.add_argument(
-        "--window-years",
-        type=int,
-        default=2,
-        help="窗口大小（年）(Window size in years, default: 2)",
-    )
-    analyze_p.add_argument(
-        "--step-months", type=int, default=6, help="步進（月）(Step size in months, default: 6)"
-    )
-
-    # sync-docs
-    sub.add_parser(
-        "sync-docs",
-        help="Retired legacy documentation sync (always fails closed)",
-    )
-
     # freshness
     sub.add_parser("freshness", help="檢查知識新鮮度 (Check knowledge freshness)")
 
@@ -1931,16 +1841,6 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.command == "legacy":
         legacy_commands.dispatch(args)
-    elif args.command in {
-        "list",
-        "run",
-        "followup-backtest",
-        "compare",
-        "result",
-        "analyze",
-        "sync-docs",
-    }:
-        legacy_commands.dispatch_alias(args)
     elif args.command == "followup":
         from trading.followup import run_followup
 
