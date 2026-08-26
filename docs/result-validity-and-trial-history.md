@@ -54,7 +54,7 @@ affected definition lineage.
 `ResearchRunCoordinator` applies these boundaries:
 
 - a successful formal `online` run writes a schema-v3 historical result and atomically advances
-  `results/<experiment>/latest.json`;
+  `results/experiment-results/<experiment>/latest.json`;
 - a successful formal `offline` run writes only a historical result;
 - a successful formal `migration` run requires passing fixed-snapshot parity and writes only an
   immutable `<snapshot_id>.migration-result.json` envelope marked `migration-pending`;
@@ -132,7 +132,8 @@ uv run trading result evaluate SPY
 
 ## Append-only trial registry
 
-`results/trial_registry.json` is an append-only, atomically updated registry. A formal trial is
+`results/registries/trial_registry.json` is an append-only, atomically updated registry. A formal
+trial is
 identified by the pair `(experiment_family, semantic_definition_fingerprint)`, so repeated runs
 of the same definition add observations while a new semantic fingerprint starts a new trial.
 Snapshot-aware experiments must declare their stable family and optional hypothesis with

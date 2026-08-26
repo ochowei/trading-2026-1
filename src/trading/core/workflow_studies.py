@@ -360,7 +360,7 @@ class WorkflowStudyService:
             "trial_history_complete": False,
             "prior_selection_history_incomplete": True,
             "registries": {
-                "trial_registry_path": "results/trial_registry.json",
+                "trial_registry_path": "results/registries/trial_registry.json",
                 "qualification_registry_path": "state/qualification-registry.json",
             },
             **runtime_contract,

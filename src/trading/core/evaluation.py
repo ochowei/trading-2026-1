@@ -20,6 +20,7 @@ from trading.market_data import (
 )
 from trading.research_data import (
     ExperimentTrialDeclaration,
+    ExperimentTrialRegistry,
     ResearchDataStore,
     ResearchDefinitionSnapshot,
     ResearchRunCoordinator,
@@ -27,6 +28,7 @@ from trading.research_data import (
     ResultValidityStatus,
     RunMode,
 )
+from trading.research_data.paths import experiment_result_directory, trial_registry_path
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,7 +115,10 @@ def refresh_candidate_snapshot(
         SignalDecisionTime.for_primary_session(decision_session),
         definition=current_definition.blob,
     )
-    destination = Path(results_root) / experiment_name / f"{manifest.snapshot_id}.snapshot.json"
+    destination = (
+        experiment_result_directory(Path(results_root), experiment_name)
+        / f"{manifest.snapshot_id}.snapshot.json"
+    )
     return store.write_manifest(manifest, destination)
 
 
@@ -252,6 +257,8 @@ def evaluate_asset_from_cli(asset: str) -> None:
         ResearchRunCoordinator(
             store=store,
             results_root=Path("results"),
+            result_directory=experiment_result_directory(Path("results"), name),
+            trial_registry=ExperimentTrialRegistry(trial_registry_path()),
             experiment_family=trial.family,
             hypothesis=trial.hypothesis,
         ).execute(

@@ -12,7 +12,8 @@ moved, renamed, or given a materially different responsibility. Also update it w
 file pattern, public entry point, generated artifact, or local-only data boundary is introduced.
 
 Routine additions that already fit a documented pattern do not require a new per-file entry. For
-example, adding another `<experiment_name>/` package, `results/<experiment_name>/latest.json`, ADR,
+example, adding another `<experiment_name>/` package,
+`results/experiment-results/<experiment_name>/latest.json`, ADR,
 or `test_*.py` only requires an update here if it changes that pattern or its responsibility.
 
 ## System shape
@@ -47,7 +48,7 @@ manual trading state are deliberately local-only.
 | `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
 | `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
 | `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
-| `legacy/results/` | Read-only legacy-schema latest results and superseded result-directory names. Diagnostic comparison, explicit status, and documentation checks may fall back here; selection, authorization, qualification, freshness, formal evidence readers, and all writers remain canonical-only. |
+| `legacy/results/` | Read-only legacy-schema latest results, superseded result-directory names, and unreferenced historical run files under `<experiment>/history/`. Diagnostic comparison, explicit status, and documentation checks may fall back to legacy latest files; selection, authorization, qualification, freshness, formal evidence readers, and all writers remain canonical-only. |
 | `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
 | `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
 
@@ -101,6 +102,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/historical-qualification-and-shadow-v008.md` | Versioned v008 exact-study readiness, explicit clean-calendar, study-time retrospective terminal-evidence, and unchanged Shadow-authority contract. |
 | `docs/research-evidence-stages-and-outcomes.md` | Stable pointer to the full plus plain-language stage/outcome companion beside v008. |
 | `docs/research-evidence-preservation.md` | Reference explanation of tracked content-addressed candidate-freeze/qualification evidence, recoverable publication, and permanent-retention implementation. |
+| `docs/result-storage-layout-v009.md` | Normative categorized result namespaces, append-only path migration, historical compatibility resolution, canonical writer destinations, and retention boundary. |
 | `docs/result-validity-and-trial-history-v005.md` | Proposed v005 result-validity extension for retrospective evidence roles while preserving legacy event verification. |
 | `docs/controlled-followup-cutover.md` | Followup lifecycle, authorization, parity, rollback, and allocation epochs. |
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
@@ -215,6 +217,7 @@ Immutable reproducibility evidence and formal run coordination.
 | `runs.py` | Online, offline, migration, and ephemeral run/publication boundaries, including exact workflow-native observation provenance supplied by the CLI. |
 | `migration.py` | Immutable parity-linked migration-result publication. |
 | `parity.py` | Fixed-snapshot parity evidence and immutable parity artifacts. |
+| `paths.py` | Canonical categorized result-directory helpers plus append-only, one-hop, SHA-256-bound historical path migration and guarded physical publication. |
 | `trial_registry.py` | Append-only experiment trial identities, observations, and tombstones. |
 | `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence, including canonical single plan/screen identities and empty-registry initialization for authoritative absence proofs. |
 | `__init__.py` | Curated public research-data API exports. |
@@ -297,24 +300,28 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 | Pattern | Purpose |
 |---|---|
-| `results/<experiment_name>/latest.json` | Canonical retained latest result consumed by validity, selection, authorization, and formal workflows; diagnostic readers prefer it over any archived duplicate. |
-| `results/<experiment_name>/prev_1.json`, `prev_2.json` | Retained recent predecessors when present. |
-| `results/<experiment_name>/<snapshot_id>.snapshot.json` | Retained immutable snapshot manifest used for reproducible formal execution. |
-| `results/<experiment_name>/<timestamp>.json` | Historical run output; most such files are ignored unless explicitly retained by repository policy. |
-| `results/<research-family>--<stage>-gate/<study-id>.json` | Tracked workflow-study stage-gate calculation that binds frozen rules to exact formal observation identities and checksums. |
-| `results/research-evidence/<sha256>.md` | Permanently retained, tracked, content-addressed pre-freeze research evidence referenced by immutable candidate-freeze records. |
-| `results/qualification-evidence/<sha256>.json` | Permanently retained, tracked, self-contained source-identified qualification registry/checkpoint snapshot replayed through the authoritative hash-chain reader for terminal study decisions and Development absence proofs. |
-| `results/study-evidence/**` | Permanently retained, tracked Development gates, typed challenge manifests, and distinct challenge evidence artifacts used by terminal study-time review. |
-| `results/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
+| `results/experiment-results/<experiment>/latest.json` | Canonical retained latest legacy-experiment result consumed by validity, selection, authorization, and formal workflows; diagnostic readers prefer it over any archived duplicate. |
+| `results/experiment-results/<experiment>/prev_1.json`, `prev_2.json` | Retained recent legacy-experiment predecessors when present. |
+| `results/experiment-results/<experiment>/<snapshot-id>.snapshot.json` | Retained immutable snapshot manifest for a legacy experiment's reproducible formal execution. |
+| `results/experiment-results/<experiment>/<timestamp>.json` | Historical legacy-experiment run output; most such files are ignored unless explicitly retained by repository policy. |
+| `results/research-trials/<family>/<trial>/<artifact>` | Workflow-native trial snapshot manifests and formal results, grouped by exact family/trial source identity. |
+| `results/migration-evidence/<experiment>/<artifact>` | Retained parity and migration-result envelopes; these never become current result authority. |
+| `results/workflows/<workflow>--vNNN/<study>/<stage>/<artifact>` | Permanently retained tracked workflow-study Development gates, selections, challenge manifests, and distinct challenge evidence. |
+| `results/evidence/research/<sha256>.md` | Permanently retained tracked content-addressed pre-freeze research evidence referenced by immutable candidate-freeze records. |
+| `results/evidence/qualification/<sha256>.json` | Permanently retained tracked self-contained qualification registry/checkpoint snapshot replayed for terminal decisions and Development absence proofs. |
+| `results/registries/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
+| `results/registries/path-migrations.json` | Tracked append-only old-to-new result path registry. Each one-hop mapping pins source/destination identities, artifact class, migration version, and SHA-256; readers fail closed on missing or drifted destinations. |
 
 Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data
 and semantic definition references.
 
-Legacy-schema latest results and superseded aliases are retained under `legacy/results/`. Only
+Legacy-schema latest results, superseded aliases, and explicitly unreferenced historical runs are
+retained under `legacy/results/`. Only
 comparison, explicit result-status, and documentation diagnostics may fall back there. Freshness,
 evaluation/ranking, followup, Shadow/Active, qualification, formal evidence verification, and all
-writers use canonical `results/` exclusively. See `legacy/README.md` for the archive contract and
-historical alias map.
+writers use the categorized canonical `results/` namespaces exclusively. Historical frozen paths
+resolve only through `results/registries/path-migrations.json`; released workflow and study bytes
+are not rewritten. See `legacy/README.md` for the archive contract and historical alias map.
 
 ### `workflows/`
 

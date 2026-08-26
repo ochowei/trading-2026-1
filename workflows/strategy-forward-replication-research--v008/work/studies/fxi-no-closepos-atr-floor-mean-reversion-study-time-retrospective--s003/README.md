@@ -3,13 +3,13 @@ id: S003
 title: FXI No-ClosePos ATR-Floor Mean-Reversion Study-Time Retrospective Evaluation
 workflow: strategy-forward-replication-research
 workflow_version: v008
-status: running
+status: paused
 outcome: null
 created_at: '2026-08-18T03:44:40.848687Z'
 created_by: codex-primary-researcher-fxi-mean-reversion
-status_changed_at: '2026-08-18T04:25:24.143277Z'
+status_changed_at: '2026-08-25T05:10:27.039217Z'
 status_changed_by: codex-primary-researcher-fxi-mean-reversion
-status_reason: null
+status_reason: repository results path migration
 preregistered_at: '2026-08-18T04:01:26.574527Z'
 preregistered_by: ochowei@gmail.com
 completed_at: null

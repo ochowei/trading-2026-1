@@ -77,6 +77,8 @@ class ResearchRunCoordinator:
         now: Callable[[], datetime] | None = None,
         calendar: SessionCalendar | None = None,
         trial_registry: ExperimentTrialRegistry | None = None,
+        result_directory: Path | None = None,
+        migration_directory: Path | None = None,
         experiment_family: str | None = None,
         hypothesis: str = "",
     ) -> None:
@@ -87,6 +89,10 @@ class ResearchRunCoordinator:
         self.trial_registry = trial_registry or ExperimentTrialRegistry(
             self.results_root / "trial_registry.json",
             now=self.now,
+        )
+        self.result_directory = Path(result_directory) if result_directory is not None else None
+        self.migration_directory = (
+            Path(migration_directory) if migration_directory is not None else None
         )
         self.experiment_family = experiment_family
         self.hypothesis = hypothesis
@@ -283,10 +289,14 @@ class ResearchRunCoordinator:
         current_time = current_time or self.now()
         if current_time.tzinfo is None:
             raise ValueError("research run clock must be timezone-aware")
-        directory = self.results_root / experiment_name
+        directory = self.result_directory or self.results_root / experiment_name
         directory.mkdir(parents=True, exist_ok=True)
         if run_mode is RunMode.MIGRATION:
-            migration_path = directory / (f"{snapshot.manifest.snapshot_id}.migration-result.json")
+            migration_directory = self.migration_directory or directory
+            migration_directory.mkdir(parents=True, exist_ok=True)
+            migration_path = migration_directory / (
+                f"{snapshot.manifest.snapshot_id}.migration-result.json"
+            )
             try:
                 published = MigrationResultStore.write(
                     result,

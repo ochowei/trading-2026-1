@@ -83,8 +83,9 @@ uv run trading run <experiment_name>
 uv run trading run <experiment_name> --legacy
 
 # Phase 9 parity-linked migration evidence；只寫 immutable historical envelope，不更新 latest/qualification/lifecycle
-uv run trading run <experiment_name> --offline results/<experiment>/<snapshot_id>.snapshot.json \
-  --migration-parity results/<experiment>/<snapshot_id>.migration-parity.json
+uv run trading run <experiment_name> --offline \
+  results/experiment-results/<experiment>/<snapshot_id>.snapshot.json \
+  --migration-parity results/migration-evidence/<experiment>/<snapshot_id>.migration-parity.json
 
 # 比較實驗結果
 uv run trading compare <exp1> <exp2>

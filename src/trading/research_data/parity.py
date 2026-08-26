@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from trading.research_data.artifacts import canonical_json_bytes, publish_immutable
+from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
 
 
 class MigrationParityEvidenceError(ValueError):
@@ -34,7 +35,11 @@ class MigrationParityStore:
     @staticmethod
     def load(path: Path) -> dict[str, object]:
         """Read and verify one canonical migration parity artifact."""
-        source = Path(path)
+        requested = Path(path)
+        try:
+            source = resolve_result_path(requested)
+        except ResultPathMigrationError as exc:
+            raise MigrationParityEvidenceError(f"invalid migration parity artifact: {exc}") from exc
         if not source.name.endswith(".migration-parity.json"):
             raise MigrationParityEvidenceError(
                 "migration parity artifact path must end with .migration-parity.json"

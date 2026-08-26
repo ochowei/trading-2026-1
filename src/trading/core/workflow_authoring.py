@@ -669,6 +669,8 @@ class WorkflowRepository:
         issues: list[ValidationIssue],
     ) -> None:
         """Verify every tracked candidate-freeze evidence digest from canonical bytes."""
+        from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
+
         freezes = sorted(self.root.glob("*/work/studies/*/CANDIDATE_FREEZE.json"))
         referenced_paths: dict[Path, str] = {}
         for freeze in freezes:
@@ -691,7 +693,16 @@ class WorkflowRepository:
                     )
                 )
                 continue
-            artifact = self.repo_root / "results" / "research-evidence" / f"{digest}.md"
+            canonical = self.repo_root / "results" / "evidence" / "research" / f"{digest}.md"
+            historical = self.repo_root / "results" / "research-evidence" / f"{digest}.md"
+            try:
+                artifact = (
+                    canonical.resolve()
+                    if canonical.is_file()
+                    else resolve_result_path(historical, repository_root=self.repo_root)
+                )
+            except ResultPathMigrationError:
+                artifact = canonical
             prior = referenced_paths.get(artifact)
             if prior is not None and prior != digest:
                 issues.append(ValidationIssue(artifact, "research-evidence digest collision"))
@@ -2484,6 +2495,8 @@ class WorkflowRepository:
         readme: Path,
         issues: list[ValidationIssue],
     ) -> None:
+        from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
+
         outcome = metadata.get("outcome")
         disposition = metadata.get("disposition")
         stage = metadata.get("decision_stage")
@@ -2518,7 +2531,7 @@ class WorkflowRepository:
             )
 
             validate_study_time_terminal_evidence(
-                study_path=readme.parent,
+                study_path=self._canonical_workflow_path(readme.parent),
                 outcome=str(outcome),
                 disposition=disposition if isinstance(disposition, str) else None,
                 decision_stage=str(stage),
@@ -2548,7 +2561,13 @@ class WorkflowRepository:
         if isinstance(challenge_reference, dict) and isinstance(
             challenge_reference.get("path"), str
         ):
-            challenge_path = self.repo_root / challenge_reference["path"]
+            try:
+                challenge_path = resolve_result_path(
+                    self.repo_root / challenge_reference["path"],
+                    repository_root=self.repo_root,
+                )
+            except ResultPathMigrationError:
+                challenge_path = self.repo_root / challenge_reference["path"]
             try:
                 challenge_manifest = json.loads(challenge_path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
@@ -2565,7 +2584,13 @@ class WorkflowRepository:
                     and isinstance(evidence.get("path"), str)
                 )
         for reference in references:
-            artifact = (self.repo_root / reference).resolve()
+            try:
+                artifact = resolve_result_path(
+                    self.repo_root / reference,
+                    repository_root=self.repo_root,
+                )
+            except ResultPathMigrationError:
+                artifact = (self.repo_root / reference).resolve()
             if not self.git_index_checker(artifact):
                 issues.append(
                     ValidationIssue(
@@ -2591,7 +2616,7 @@ class WorkflowRepository:
             return
         if payload.get("schema_version") != 1:
             issues.append(ValidationIssue(path, "preregistration schema_version must be 1"))
-        relative_study = study_path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        relative_study = self._repo_relative(study_path)
         expected = {
             "study_id": metadata.get("id"),
             "workflow": metadata.get("workflow"),
@@ -2646,7 +2671,7 @@ class WorkflowRepository:
         if not isinstance(payload, dict):
             issues.append(ValidationIssue(path, "Development authorization must be an object"))
             return
-        relative_study = study_path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        relative_study = self._repo_relative(study_path)
         expected = {
             "schema_version": 1,
             "study_path": relative_study,
@@ -2677,8 +2702,8 @@ class WorkflowRepository:
                 )
             )
 
-    @staticmethod
     def _validate_guarded_candidate_freeze(
+        self,
         path: Path,
         study_path: Path,
         issues: list[ValidationIssue],
@@ -2689,7 +2714,7 @@ class WorkflowRepository:
                 raise ValueError("candidate freeze must be an object")
             from trading.core.study_qualification import validate_candidate_freeze_for_study
 
-            validate_candidate_freeze_for_study(study_path, payload)
+            validate_candidate_freeze_for_study(self._canonical_workflow_path(study_path), payload)
         except (OSError, json.JSONDecodeError, ValueError) as exc:
             issues.append(ValidationIssue(path, f"invalid guarded candidate freeze: {exc}"))
 
@@ -2710,7 +2735,7 @@ class WorkflowRepository:
             return
         if payload.get("schema_version") != 1:
             issues.append(ValidationIssue(path, "completion schema_version must be 1"))
-        relative_study = study_path.resolve().relative_to(self.repo_root.resolve()).as_posix()
+        relative_study = self._repo_relative(study_path)
         expected = {
             "study_id": metadata.get("id"),
             "workflow": metadata.get("workflow"),
@@ -2887,10 +2912,26 @@ class WorkflowRepository:
         )
 
     def _repo_relative(self, path: Path) -> str:
+        resolved = path.resolve()
+        repository_root = self.repo_root.resolve()
         try:
-            return path.resolve().relative_to(self.repo_root.resolve()).as_posix()
-        except ValueError as exc:
-            raise WorkflowAuthoringError(f"path is outside repository root: {path}") from exc
+            return resolved.relative_to(repository_root).as_posix()
+        except ValueError:
+            pass
+
+        workflow_root = self.root.resolve()
+        if resolved.is_relative_to(workflow_root):
+            canonical = self.canonical_workflow_root.resolve() / resolved.relative_to(workflow_root)
+            if canonical.is_relative_to(repository_root):
+                return canonical.relative_to(repository_root).as_posix()
+        raise WorkflowAuthoringError(f"path is outside repository root: {path}")
+
+    def _canonical_workflow_path(self, path: Path) -> Path:
+        resolved = path.resolve()
+        workflow_root = self.root.resolve()
+        if resolved.is_relative_to(workflow_root):
+            return self.canonical_workflow_root.resolve() / resolved.relative_to(workflow_root)
+        return resolved
 
     def _planned_mutation(
         self,

@@ -24,7 +24,7 @@ from trading.research_data.store import ResearchDataStore
 
 logger = logging.getLogger(__name__)
 
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path("results/experiment-results")
 ARCHIVED_RESULTS_DIR = Path("legacy/results")
 
 

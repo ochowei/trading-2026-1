@@ -78,6 +78,11 @@ from trading.research_data import (
     ResearchDefinitionStore,
     ResearchRunCoordinator,
     RunMode,
+    experiment_result_directory,
+    migration_evidence_directory,
+    qualification_evidence_directory,
+    research_trial_directory,
+    trial_registry_path,
 )
 from trading.research_definitions import (
     ResearchDefinitionRegistry,
@@ -175,12 +180,15 @@ def cmd_run(args: argparse.Namespace) -> None:
             research_store = create_default_research_data_store()
             if default_formal:
                 formal_manifest = research_store.latest_manifest_for_definition(
-                    Path("results") / name,
+                    experiment_result_directory(Path("results"), name),
                     definition.blob,
                 )
             coordinator = ResearchRunCoordinator(
                 store=research_store,
                 results_root=Path("results"),
+                result_directory=experiment_result_directory(Path("results"), name),
+                migration_directory=migration_evidence_directory(Path("results"), name),
+                trial_registry=ExperimentTrialRegistry(trial_registry_path()),
                 experiment_family=trial.family,
                 hypothesis=trial.hypothesis,
             )
@@ -255,9 +263,7 @@ def cmd_result_status(args: argparse.Namespace) -> None:
 
 def cmd_result_registry_seed(args: argparse.Namespace) -> None:
     """Explicitly seed legacy experiment inventory entries in the trial registry."""
-    from trading.core import results as result_module
-
-    registry = ExperimentTrialRegistry(result_module.RESULTS_DIR / "trial_registry.json")
+    registry = ExperimentTrialRegistry(trial_registry_path())
     identities = registry.seed_legacy(list_experiments())
     print(
         f"seeded {len(identities)} legacy trial entries; selection history is explicitly incomplete"
@@ -783,7 +789,8 @@ def cmd_research(args: argparse.Namespace) -> None:
                 definition=captured.blob,
             )
             destination = args.manifest or (
-                Path("results") / result_name / f"{manifest.snapshot_id}.snapshot.json"
+                research_trial_directory(Path("results"), args.identity)
+                / f"{manifest.snapshot_id}.snapshot.json"
             )
             path = store.write_manifest(manifest, destination)
             print(f"research snapshot {manifest.snapshot_id} published to {path}")
@@ -804,6 +811,8 @@ def cmd_research(args: argparse.Namespace) -> None:
         outcome = ResearchRunCoordinator(
             store=create_default_research_data_store(),
             results_root=Path("results"),
+            result_directory=research_trial_directory(Path("results"), args.identity),
+            trial_registry=ExperimentTrialRegistry(trial_registry_path()),
             experiment_family=trial.family,
             hypothesis=trial.hypothesis,
         ).execute(
@@ -962,7 +971,7 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
                 qualification_registry=qualification_registry,
                 lifecycle_registry=registry,
                 current_result_fingerprint_resolver=current_result_fingerprint,
-                trial_registry=ExperimentTrialRegistry(Path("results") / "trial_registry.json"),
+                trial_registry=ExperimentTrialRegistry(trial_registry_path()),
             )
             drift_registry = LiveDriftRegistry(args.drift_path)
 
@@ -1044,7 +1053,7 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
                 qualification_registry=QualificationRegistry(args.qualification_path),
                 lifecycle_registry=registry,
                 current_result_fingerprint_resolver=current_result_fingerprint,
-                trial_registry=ExperimentTrialRegistry(Path("results") / "trial_registry.json"),
+                trial_registry=ExperimentTrialRegistry(trial_registry_path()),
             )
             writer = FollowupLifecycleRegistry(args.path, shadow_verifier=verifier)
             state = writer.register_shadow_strategy(
@@ -1666,7 +1675,10 @@ def cmd_data_snapshot(args: argparse.Namespace) -> None:
         definition=definition,
     )
     if manifest_path is None:
-        manifest_path = Path("results") / args.experiment / f"{manifest.snapshot_id}.snapshot.json"
+        manifest_path = (
+            experiment_result_directory(Path("results"), args.experiment)
+            / f"{manifest.snapshot_id}.snapshot.json"
+        )
     path = store.write_manifest(manifest, manifest_path)
     print(f"snapshot {manifest.snapshot_id} published to {path}")
 
@@ -2058,7 +2070,7 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_evidence_p.add_argument(
         "--output-root",
         type=Path,
-        default=Path("results/qualification-evidence"),
+        default=qualification_evidence_directory(),
     )
     qualification_evidence_p.add_argument(
         "--source-registry-identity",
@@ -2090,7 +2102,7 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_plan_study_p.add_argument(
         "--trial-registry-path",
         type=Path,
-        default=Path("results/trial_registry.json"),
+        default=trial_registry_path(),
     )
     qualification_plan_study_p.add_argument("--dry-run", action="store_true")
     qualification_plan_study_p.add_argument(
@@ -2109,7 +2121,7 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_plan_register_p.add_argument(
         "--trial-registry-path",
         type=Path,
-        default=Path("results/trial_registry.json"),
+        default=trial_registry_path(),
     )
     qualification_identity = qualification_plan_register_p.add_mutually_exclusive_group(
         required=True
@@ -2254,7 +2266,7 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_screen_run_p.add_argument(
         "--trial-registry-path",
         type=Path,
-        default=Path("results/trial_registry.json"),
+        default=trial_registry_path(),
     )
     qualification_screen_run_p.add_argument("--plan-id", required=True)
     qualification_screen_run_p.add_argument(

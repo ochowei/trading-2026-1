@@ -1,7 +1,7 @@
 # Tracked Research-Evidence Preservation
 
 Pre-freeze Markdown evidence referenced by an immutable `CANDIDATE_FREEZE.json` is stored only at
-`results/research-evidence/<sha256>.md`. The filename is the SHA-256 of the exact file bytes; there
+`results/evidence/research/<sha256>.md`. The filename is the SHA-256 of the exact file bytes; there
 is no mutable alias or second maintained copy. `src/trading/research_data/evidence.py` owns
 add-only publication and digest-based resolution. Existing content is never overwritten, and a
 digest mismatch fails closed.
@@ -48,7 +48,7 @@ Each study-time preregistration pins the authoritative trial- and qualification-
 repository-relative identities. Terminal retrospective decisions do not rely on a mutable local
 registry head alone. They publish the exact registry bytes, its pinned source identity, and head
 checkpoint as one tracked,
-`results/qualification-evidence/<sha256>.json` snapshot. Resolution verifies outer and inner
+`results/evidence/qualification/<sha256>.json` snapshot. Resolution verifies outer and inner
 digests, replays the original hash chain and checkpoint through `QualificationRegistry`, and then
 selects the exact frozen plan and sole canonical `historical-screen:<plan-id>` event; duplicate or
 noncanonical plan/screen events fail closed. A Development terminal failure must instead link a
@@ -60,11 +60,16 @@ registration hold the same study-registration lock; the compiler re-reads the fr
 completed study after acquiring that lock, while completion rejects a pending transaction journal.
 Later
 fresh-clone validation replays the tracked terminal snapshot without requiring private runtime
-state. Qualification snapshots must use `results/qualification-evidence/<sha256>.json`;
-Development gates, challenge manifests, and distinct challenge artifacts must use
-`results/study-evidence/**`. All must be present in the Git index and remain replayable after Git GC
+state. Qualification snapshots must use `results/evidence/qualification/<sha256>.json`;
+Development gates, challenge manifests, and distinct challenge artifacts must use the owning
+`results/workflows/<workflow>--vNNN/<study>/<stage>/**` namespace. All must be present in the Git
+index and remain replayable after Git GC
 and a fresh clone. The repository `.gitignore` explicitly unignores these canonical namespaces.
 “Present in the Git index” means the staged blob bytes equal the bytes whose digest is pinned; path
 membership alone is insufficient. Study completion performs this tracked/replayable check before
 writing `COMPLETION.json` or terminal README state, so a rejected completion cannot leave a false
 completed record behind.
+
+Historical v008 and earlier artifacts retain their frozen old path strings. The v009 storage
+boundary resolves those strings only through the tracked, one-hop, digest-bound
+`results/registries/path-migrations.json`; it never rewrites completed or preregistered study bytes.

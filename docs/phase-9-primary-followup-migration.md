@@ -228,7 +228,7 @@ The formalization batch must use one consistent source state and cutoff:
 4. Run each candidate once with `trading run <experiment> --snapshot
    <manifest>`. This is formal `online` mode: it intentionally advances that
    candidate's `latest.json`, writes one immutable historical result, and
-   appends one valid observation to `results/trial_registry.json`.
+   appends one valid observation to `results/registries/trial_registry.json`.
 5. Re-run result status for all nine. If any candidate is not exactly `valid`,
    stop without ranking and without changing followup selection.
 6. Only after the complete set is valid, compare all nine, run gradient
@@ -413,8 +413,8 @@ For each selected snapshot, run the documented offline migration workflow:
 
 ```text
 uv run trading run <experiment_name> --offline \
-  results/<experiment>/<snapshot_id>.snapshot.json \
-  --migration-parity results/<experiment>/<snapshot_id>.migration-parity.json
+  results/experiment-results/<experiment>/<snapshot_id>.snapshot.json \
+  --migration-parity results/migration-evidence/<experiment>/<snapshot_id>.migration-parity.json
 ```
 
 Review the immutable envelope for indicators, ordered signal dates, filled

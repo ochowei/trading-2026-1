@@ -25,6 +25,17 @@ from trading.research_data.models import (
     SnapshotManifest,
 )
 from trading.research_data.parity import MigrationParityEvidenceError, MigrationParityStore
+from trading.research_data.paths import (
+    ResultPathMigration,
+    ResultPathMigrationError,
+    experiment_result_directory,
+    migration_evidence_directory,
+    qualification_evidence_directory,
+    research_evidence_directory,
+    research_trial_directory,
+    resolve_result_path,
+    trial_registry_path,
+)
 from trading.research_data.qualification_registry import (
     QualificationRegistry,
     QualificationRegistryError,
@@ -91,6 +102,8 @@ __all__ = [
     "ResultSchemaError",
     "ResultValidity",
     "ResultValidityStatus",
+    "ResultPathMigration",
+    "ResultPathMigrationError",
     "SnapshotDataRef",
     "SnapshotBundleImport",
     "SnapshotEligibilityError",
@@ -100,6 +113,13 @@ __all__ = [
     "build_result_payload",
     "classify_result",
     "formal_trial_id",
+    "experiment_result_directory",
     "legacy_trial_id",
     "load_result",
+    "migration_evidence_directory",
+    "qualification_evidence_directory",
+    "research_evidence_directory",
+    "research_trial_directory",
+    "resolve_result_path",
+    "trial_registry_path",
 ]
