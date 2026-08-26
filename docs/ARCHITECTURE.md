@@ -12,15 +12,15 @@ moved, renamed, or given a materially different responsibility. Also update it w
 file pattern, public entry point, generated artifact, or local-only data boundary is introduced.
 
 Routine additions that already fit a documented pattern do not require a new per-file entry. For
-example, adding another `<experiment_name>/` package,
-`results/experiment-results/<experiment_name>/latest.json`, ADR,
-or `test_*.py` only requires an update here if it changes that pattern or its responsibility.
+example, adding another workflow-native trial artifact, ADR, or `test_*.py` only requires an update
+here if it changes that pattern or its responsibility. The legacy experiment inventory is retired
+and does not accept additions or new results.
 
 ## System shape
 
 ```text
 CLI and automation
-    -> experiment registry / followup workflows
+    -> workflow-native research / retired-legacy diagnostics / followup exits
     -> market-data validation and immutable snapshots
     -> strategy, signal, execution, and sleeve engines
     -> result validity, qualification, and local lifecycle state
@@ -48,7 +48,7 @@ manual trading state are deliberately local-only.
 | `legacy/` | Repository-level archive for retired source material retained for inspection or reproducibility; it is not an extension point for new research. |
 | `legacy/README.md` | Defines the archive boundary and the checkout-only compatibility contract for legacy experiment source. |
 | `legacy/experiments/` | Physical archive for the closed `ticker_NNN_description` experiment inventory. |
-| `legacy/results/` | Read-only legacy-schema latest results, superseded result-directory names, and unreferenced historical run files under `<experiment>/history/`. Diagnostic comparison, explicit status, and documentation checks may fall back to legacy latest files; selection, authorization, qualification, freshness, formal evidence readers, and all writers remain canonical-only. |
+| `legacy/results/` | Read-only terminal archive for every retired legacy result class: last retained latest results, immutable snapshot manifests, retained formal runs, legacy-schema results, superseded aliases, and unreferenced history. Diagnostics may inspect archived latest files, but no writer, ranking, qualification, promotion, or new-entry authorization may consume this archive. |
 | `policies/` | Versioned executable market, broker, execution, and portfolio policy registry. Released versions are immutable and selected explicitly by workflow releases. |
 | `workflows/` | Versioned research procedures plus version-scoped changes and studies. |
 
@@ -103,6 +103,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/research-evidence-stages-and-outcomes.md` | Stable pointer to the full plus plain-language stage/outcome companion beside v008. |
 | `docs/research-evidence-preservation.md` | Reference explanation of tracked content-addressed candidate-freeze/qualification evidence, recoverable publication, and permanent-retention implementation. |
 | `docs/result-storage-layout-v009.md` | Normative categorized result namespaces, append-only path migration, historical compatibility resolution, canonical writer destinations, and retention boundary. |
+| `docs/legacy-experiment-retirement-v010.md` | Terminal legacy-research retirement boundary, archived result authority, disabled public entry points, bounded v009-to-v010 path resolution, and existing-position exit compatibility. |
 | `docs/result-validity-and-trial-history-v005.md` | Proposed v005 result-validity extension for retrospective evidence roles while preserving legacy event verification. |
 | `docs/controlled-followup-cutover.md` | Followup lifecycle, authorization, parity, rollback, and allocation epochs. |
 | `docs/live-drift-and-recovery.md` | Frozen drift envelopes, health states, hard guards, checkpoints, and recovery. |
@@ -135,9 +136,9 @@ All installable Python code lives under `src/trading/`. `src/trading/__init__.py
 
 | Path | Purpose |
 |---|---|
-| `src/trading/cli.py` | Unified command parser and dispatcher for experiments, workflow-native research definitions, results, data, ledger, qualification, followup lifecycle, drift, versioned policies, and versioned workflows. |
-| `src/trading/followup.py` | Selected-strategy definitions and generation of manual Firstrade followup signals/order instructions. |
-| `src/trading/followup_backtest.py` | Portfolio-level simulation of the followup set, including equal sleeves, daily equity, and structured reporting. |
+| `src/trading/cli.py` | Unified command parser and dispatcher. Workflow-native research remains active; legacy run, analysis, evaluation, registry mutation, snapshot preparation, documentation sync, and followup backtest commands remain parseable only to fail closed with the retirement message. |
+| `src/trading/followup.py` | Retired-strategy compatibility used only for fail-closed status reporting and exit handling of pre-existing manual positions; archived results cannot authorize new entries. |
+| `src/trading/followup_backtest.py` | Retained implementation of the retired legacy followup simulation; its public CLI entry fails closed. |
 
 ### `src/trading/core/`
 
@@ -156,12 +157,12 @@ creating parallel infrastructure.
 | `sleeve_engine.py` | Canonical sleeve evaluation, daily equity, base/stress costs, metrics, and parity evidence. |
 | `bundle_strategy.py` | Provider-free strategy seams for primary and auxiliary snapshot bundles. |
 | `data_fetcher.py` | Backward-compatible multi-ticker facade over validated market-data services. |
-| `performance_analyzer.py` | Rolling-window performance and stability analysis. |
-| `results.py` | Result persistence, reading, validity diagnostics, and experiment comparison. |
+| `performance_analyzer.py` | Retained legacy rolling-window implementation; its public CLI entry is retired. |
+| `results.py` | Read-only archived-result diagnostics and comparison plus an explicit fail-closed legacy publication seam. |
 | `freshness.py` | Read-only knowledge freshness and persisted-result validity scans. |
 | `definition_resolver.py` | Read-only resolution of an experiment's current semantic definition. |
-| `evaluation.py` | Explicit stale-result refresh and fail-closed per-asset ranking boundary. |
-| `sync_docs.py` | Checks synchronization between experiment Markdown metrics and retained results. |
+| `evaluation.py` | Retained legacy evaluation implementation; its public CLI entry is retired and cannot publish new observations. |
+| `sync_docs.py` | Retained legacy documentation comparison implementation; its public CLI entry is retired. |
 | `ledger_csv.py` | Fixed-schema canonical CSV encoding/decoding for manual ledger data. |
 | `ledger_storage.py` | Private atomic writes and bounded filesystem locking. |
 | `broker_reconciliation.py` | Broker-export parsing and comparison against canonical accounting state. |
@@ -217,7 +218,7 @@ Immutable reproducibility evidence and formal run coordination.
 | `runs.py` | Online, offline, migration, and ephemeral run/publication boundaries, including exact workflow-native observation provenance supplied by the CLI. |
 | `migration.py` | Immutable parity-linked migration-result publication. |
 | `parity.py` | Fixed-snapshot parity evidence and immutable parity artifacts. |
-| `paths.py` | Canonical categorized result-directory helpers plus append-only, one-hop, SHA-256-bound historical path migration and guarded physical publication. |
+| `paths.py` | Canonical categorized result-directory helpers plus append-only, SHA-256-bound historical path migration. It preserves v009 one-hop mappings and permits only one additional byte-identical v010 retirement hop. |
 | `trial_registry.py` | Append-only experiment trial identities, observations, and tombstones. |
 | `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence, including canonical single plan/screen identities and empty-registry initialization for authoritative absence proofs. |
 | `__init__.py` | Curated public research-data API exports. |
@@ -257,7 +258,9 @@ Archived source packages live under repository-root `legacy/experiments/`, while
 extends its package search path in a repository checkout so their historical import identities remain
 `trading.experiments.<experiment_name>`. It auto-imports every inventoried package whose name does
 not start with `_`; each package's `__init__.py` registers its strategy. CI scans the archive and
-rejects new or renamed identities. New formal research uses `src/trading/research_definitions/`.
+rejects new or renamed identities. Registration supports read-only diagnostics, source inspection,
+and fail-closed exits for pre-existing positions only; it does not authorize research execution or
+publication. New formal research uses `src/trading/research_definitions/`.
 
 | Pattern | Purpose |
 |---|---|
@@ -266,8 +269,8 @@ rejects new or renamed identities. New formal research uses `src/trading/researc
 | `src/trading/experiments/EXPERIMENTS_<TICKER>.md` | Per-asset experiment overview, result table, parameter comparison, and machine-oriented `AI_CONTEXT`. |
 | `legacy/experiments/<experiment_name>/config.py` | Experiment identity, ticker, periods, thresholds, exits, and other parameters. |
 | `legacy/experiments/<experiment_name>/signal_detector.py` | Indicators and entry-signal logic. |
-| `legacy/experiments/<experiment_name>/strategy.py` | Connects config, detector, data declarations, execution, and formal research hooks. |
-| `legacy/experiments/<experiment_name>/__init__.py` | Registers the strategy under its unchanged CLI and import identity. |
+| `legacy/experiments/<experiment_name>/strategy.py` | Frozen historical strategy implementation retained for inspection, reproduction source, and exit compatibility; its former research hooks have no public execution authority. |
+| `legacy/experiments/<experiment_name>/__init__.py` | Registers the strategy under its unchanged import identity for checkout-only compatibility. |
 
 ## Tests and repository checks
 
@@ -300,28 +303,22 @@ trading data must never be placed in `tests/` or committed anywhere.
 
 | Pattern | Purpose |
 |---|---|
-| `results/experiment-results/<experiment>/latest.json` | Canonical retained latest legacy-experiment result consumed by validity, selection, authorization, and formal workflows; diagnostic readers prefer it over any archived duplicate. |
-| `results/experiment-results/<experiment>/prev_1.json`, `prev_2.json` | Retained recent legacy-experiment predecessors when present. |
-| `results/experiment-results/<experiment>/<snapshot-id>.snapshot.json` | Retained immutable snapshot manifest for a legacy experiment's reproducible formal execution. |
-| `results/experiment-results/<experiment>/<timestamp>.json` | Historical legacy-experiment run output; most such files are ignored unless explicitly retained by repository policy. |
+| `results/README.md` | Human-facing map from common research questions to the correct result namespace, filename semantics, authority boundary, read-only inspection commands, and safe cleanup rules. |
 | `results/research-trials/<family>/<trial>/<artifact>` | Workflow-native trial snapshot manifests and formal results, grouped by exact family/trial source identity. |
 | `results/migration-evidence/<experiment>/<artifact>` | Retained parity and migration-result envelopes; these never become current result authority. |
 | `results/workflows/<workflow>--vNNN/<study>/<stage>/<artifact>` | Permanently retained tracked workflow-study Development gates, selections, challenge manifests, and distinct challenge evidence. |
 | `results/evidence/research/<sha256>.md` | Permanently retained tracked content-addressed pre-freeze research evidence referenced by immutable candidate-freeze records. |
 | `results/evidence/qualification/<sha256>.json` | Permanently retained tracked self-contained qualification registry/checkpoint snapshot replayed for terminal decisions and Development absence proofs. |
 | `results/registries/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
-| `results/registries/path-migrations.json` | Tracked append-only old-to-new result path registry. Each one-hop mapping pins source/destination identities, artifact class, migration version, and SHA-256; readers fail closed on missing or drifted destinations. |
+| `results/registries/path-migrations.json` | Tracked append-only old-to-new result path registry. Entries pin source/destination identities, artifact class, migration version, and SHA-256. A v009 path may have exactly one additional byte-identical v010 retirement hop; readers reject longer chains, cycles, missing terminal bytes, or digest drift. |
 
-Never treat `latest.json` as valid solely because it exists; validity is recomputed against its data
-and semantic definition references.
-
-Legacy-schema latest results, superseded aliases, and explicitly unreferenced historical runs are
-retained under `legacy/results/`. Only
-comparison, explicit result-status, and documentation diagnostics may fall back there. Freshness,
-evaluation/ranking, followup, Shadow/Active, qualification, formal evidence verification, and all
-writers use the categorized canonical `results/` namespaces exclusively. Historical frozen paths
-resolve only through `results/registries/path-migrations.json`; released workflow and study bytes
-are not rewritten. See `legacy/README.md` for the archive contract and historical alias map.
+The legacy experiment result authority is retired. All of its last retained results and manifests
+live under `legacy/results/`; `results/experiment-results/` must not exist or be recreated.
+Comparison and explicit result-status commands may inspect the archive. Freshness,
+evaluation/ranking, followup new entries, Shadow/Active, qualification, formal evidence
+verification, and all writers reject archived results. Historical frozen paths resolve only through
+the bounded, digest-verified `results/registries/path-migrations.json`; released workflow and study
+bytes are not rewritten. See `legacy/README.md` and `docs/legacy-experiment-retirement-v010.md`.
 
 ### `workflows/`
 
@@ -386,7 +383,7 @@ application architecture and is not a source of project rules.
 
 | Change | Primary location | Usually update too |
 |---|---|---|
-| Maintain or reproduce a legacy experiment | Existing `legacy/experiments/<identity>/` | Preserve semantic identity, per-asset overview, tests, and result evidence; do not add or rename a package. |
+| Inspect or reproduce legacy source without publishing outcomes | Existing `legacy/experiments/<identity>/` | Preserve semantic identity and archived evidence; all public legacy execution and writer entry points remain retired. |
 | Add a new research identity | `src/trading/research_definitions/` | Released workflow/study, exact policy versions, immutable definition/data evidence, tests. Never add a legacy experiment package. |
 | Add or revise reusable research constraints | `policies/` and `src/trading/policies/` | Conformance tests, affected workflow version, `docs/policies.md`, and technical docs. |
 | Change shared strategy/backtest behavior | `src/trading/core/` | Focused tests, affected phase docs, and experiment docs if metrics or contracts change. |

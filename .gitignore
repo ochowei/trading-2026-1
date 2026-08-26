@@ -214,10 +214,6 @@ results/**/*.json
 !results/**/*.snapshot.json
 !results/registries/trial_registry.json
 !results/registries/path-migrations.json
-# Retained SPY-010 formal observation referenced by the append-only trial registry.
-!results/experiment-results/spy_010_trend_pullback_baseline/20260810_094817_641071_online_24af2275c923454f8d7b332920a4033a.json
-# Retained 2026-08-07 SPY formal observations referenced by the migrated trial registry.
-!results/experiment-results/spy_*/20260807_*.json
 !results/migration-evidence/**/*.migration-parity.json
 !results/migration-evidence/**/*.migration-result.json
 !results/evidence/qualification/

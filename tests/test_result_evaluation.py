@@ -9,6 +9,7 @@ from trading.core.evaluation import (
     evaluate_asset_candidates,
     refresh_candidate_snapshot,
 )
+from trading.core.results import LegacyExperimentRetiredError
 from trading.market_data import (
     CsvMarketDataCache,
     MarketDataRequirement,
@@ -182,7 +183,7 @@ def test_candidate_ranking_fails_closed_without_canonical_base_net_metrics() -> 
         canonical_ranking_score({"part_b": {"sharpe_ratio": 2.0}})
 
 
-def test_explicit_refresh_publishes_a_new_current_snapshot_from_retained_requirements(
+def test_explicit_refresh_is_rejected_after_legacy_retirement(
     tmp_path,
 ) -> None:
     calendar = EvaluationCalendar()
@@ -211,17 +212,15 @@ def test_explicit_refresh_publishes_a_new_current_snapshot_from_retained_require
         now=lambda: datetime(2026, 8, 6, tzinfo=UTC),
     )
 
-    new_path = refresh_candidate_snapshot(
-        "spy_001",
-        source_manifest_path=old_path,
-        current_definition=definition,
-        store=store,
-        market_data_service=market_data,
-        decision_session=date(2026, 8, 5),
-        results_root=tmp_path / "results",
-    )
+    with pytest.raises(LegacyExperimentRetiredError, match="candidate refresh is retired"):
+        refresh_candidate_snapshot(
+            "spy_001",
+            source_manifest_path=old_path,
+            current_definition=definition,
+            store=store,
+            market_data_service=market_data,
+            decision_session=date(2026, 8, 5),
+            results_root=tmp_path / "results",
+        )
 
-    refreshed = store.load_manifest(new_path)
-    assert refreshed.decision_time.session == date(2026, 8, 5)
-    assert refreshed.definition == definition.blob
-    assert provider.calls == [(None, date(2026, 8, 5))]
+    assert provider.calls == []

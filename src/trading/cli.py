@@ -44,7 +44,6 @@ from trading.core.results import (
     compare_experiments,
     inspect_result,
     latest_result_names,
-    save_result,
 )
 from trading.core.study_qualification import (
     STUDY_QUALIFICATION_CAPABILITY,
@@ -78,8 +77,6 @@ from trading.research_data import (
     ResearchDefinitionStore,
     ResearchRunCoordinator,
     RunMode,
-    experiment_result_directory,
-    migration_evidence_directory,
     qualification_evidence_directory,
     research_trial_directory,
     trial_registry_path,
@@ -99,6 +96,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+LEGACY_EXPERIMENT_RETIREMENT_MESSAGE = (
+    "legacy experiment research is retired; use `trading research` with a released workflow"
+)
+
 DEFAULT_MANUAL_LEDGER_PATH = Path("state/manual-execution-ledger.csv")
 DEFAULT_RECONCILIATION_PATH = Path("state/manual-reconciliation.json")
 DEFAULT_QUALIFICATION_REGISTRY_PATH = Path("state/qualification-registry.json")
@@ -117,9 +118,9 @@ def create_default_research_definition_store() -> ResearchDefinitionStore:
 
 
 def cmd_list(args: argparse.Namespace) -> None:
-    """列出所有已註冊的實驗 (List all registered experiments)"""
+    """List the archived legacy inventory without authorizing execution."""
     experiments = list_experiments()
-    print(f"\n  已註冊的實驗 (Registered experiments): {len(experiments)}")
+    print(f"\n  Archived legacy experiments: {len(experiments)}")
     print(f"  {'=' * 40}")
     for name in experiments:
         strategy = get_experiment(name)
@@ -130,91 +131,8 @@ def cmd_list(args: argparse.Namespace) -> None:
 
 
 def cmd_run(args: argparse.Namespace) -> None:
-    """執行實驗 (Run experiment(s))"""
-    if args.all:
-        names = list_experiments()
-    elif args.experiment:
-        names = [args.experiment]
-    else:
-        # 預設執行全部 (Default: run all)
-        names = list_experiments()
-
-    explicit_formal_manifest = args.offline or args.snapshot
-    if args.migration_parity is not None and args.offline is None:
-        raise SystemExit("--migration-parity requires --offline MANIFEST")
-    default_formal = explicit_formal_manifest is None and not args.ephemeral and not args.legacy
-    if (explicit_formal_manifest is not None or default_formal) and len(names) != 1:
-        raise SystemExit("formal snapshot execution requires exactly one experiment")
-
-    for name in names:
-        logger.info(f"執行實驗: {name} (Running experiment: {name})")
-        strategy = get_experiment(name)
-        formal_manifest = explicit_formal_manifest
-        if formal_manifest is not None or default_formal:
-            run_with_bundle = getattr(strategy, "run_with_bundle", None)
-            capture_definition = getattr(strategy, "capture_research_definition", None)
-            declare_trial = getattr(strategy, "declare_experiment_trial", None)
-            if (
-                not callable(run_with_bundle)
-                or not callable(capture_definition)
-                or not callable(declare_trial)
-            ):
-                if default_formal:
-                    raise SystemExit(
-                        "persisted runs require a snapshot-aware prepared manifest or "
-                        "--snapshot MANIFEST; use --legacy only for unmigrated experiments"
-                    )
-                raise SystemExit(
-                    f"{name} is not snapshot-aware; formal execution requires "
-                    "run_with_bundle, capture_research_definition, and "
-                    "declare_experiment_trial"
-                )
-            definition = capture_definition(create_default_research_definition_store())
-            if not isinstance(definition, ResearchDefinitionSnapshot):
-                raise SystemExit(
-                    "capture_research_definition must return ResearchDefinitionSnapshot"
-                )
-            trial = declare_trial()
-            if not isinstance(trial, ExperimentTrialDeclaration):
-                raise SystemExit("declare_experiment_trial must return ExperimentTrialDeclaration")
-            research_store = create_default_research_data_store()
-            if default_formal:
-                formal_manifest = research_store.latest_manifest_for_definition(
-                    experiment_result_directory(Path("results"), name),
-                    definition.blob,
-                )
-            coordinator = ResearchRunCoordinator(
-                store=research_store,
-                results_root=Path("results"),
-                result_directory=experiment_result_directory(Path("results"), name),
-                migration_directory=migration_evidence_directory(Path("results"), name),
-                trial_registry=ExperimentTrialRegistry(trial_registry_path()),
-                experiment_family=trial.family,
-                hypothesis=trial.hypothesis,
-            )
-            coordinator.execute(
-                name,
-                run_with_bundle,
-                manifest_path=formal_manifest,
-                current_definition=definition.blob,
-                mode=(
-                    RunMode.MIGRATION
-                    if args.migration_parity is not None
-                    else RunMode.OFFLINE
-                    if args.offline is not None
-                    else RunMode.ONLINE
-                ),
-                migration_parity_path=args.migration_parity,
-            )
-        elif args.ephemeral:
-            result = strategy.run()
-        elif args.legacy:
-            result = strategy.run()
-            # 儲存 legacy result (Save legacy result)
-            save_result(name, result)
-
-    if len(names) > 1:
-        print("\n  所有實驗已完成 (All experiments completed)")
+    """Fail closed after retirement of the legacy experiment runner."""
+    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_compare(args: argparse.Namespace) -> None:
@@ -262,12 +180,8 @@ def cmd_result_status(args: argparse.Namespace) -> None:
 
 
 def cmd_result_registry_seed(args: argparse.Namespace) -> None:
-    """Explicitly seed legacy experiment inventory entries in the trial registry."""
-    registry = ExperimentTrialRegistry(trial_registry_path())
-    identities = registry.seed_legacy(list_experiments())
-    print(
-        f"seeded {len(identities)} legacy trial entries; selection history is explicitly incomplete"
-    )
+    """Reject mutation of the retired legacy trial inventory."""
+    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_result(args: argparse.Namespace) -> None:
@@ -277,9 +191,7 @@ def cmd_result(args: argparse.Namespace) -> None:
     elif args.result_command == "registry" and args.registry_command == "seed":
         cmd_result_registry_seed(args)
     elif args.result_command == "evaluate":
-        from trading.core.evaluation import evaluate_asset_from_cli
-
-        evaluate_asset_from_cli(args.asset)
+        raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_qualification_status(args: argparse.Namespace) -> None:
@@ -838,33 +750,18 @@ def cmd_research(args: argparse.Namespace) -> None:
 
 
 def cmd_analyze(args: argparse.Namespace) -> None:
-    """滾動窗口績效分析 (Rolling window performance analysis)"""
-    from trading.core.performance_analyzer import PerformanceAnalyzer
-
-    strategy = get_experiment(args.experiment)
-    analyzer = PerformanceAnalyzer(
-        strategy,
-        window_years=args.window_years,
-        step_months=args.step_months,
-    )
-    analyzer.run()
+    """Reject new analysis under the retired legacy experiment system."""
+    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_sync_docs(args: argparse.Namespace) -> None:
-    """同步與檢查文件 (Sync and check documentation)"""
-    from trading.core.sync_docs import compare_docs_and_results
-
-    compare_docs_and_results()
+    """Reject mutation of frozen legacy experiment documentation."""
+    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_followup_backtest(args: argparse.Namespace) -> None:
-    """Backtest the current followup strategy portfolio."""
-    from trading.followup_backtest import render_followup_backtest, run_followup_backtest
-
-    result = run_followup_backtest(days=args.days, start=args.start)
-    render_followup_backtest(result)
-    if not result.strategies or result.all_failed or result.portfolio is None:
-        raise SystemExit(1)
+    """Reject new backtests of the retired legacy followup portfolio."""
+    raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
 
 
 def cmd_followup_state(args: argparse.Namespace) -> None:
@@ -873,6 +770,8 @@ def cmd_followup_state(args: argparse.Namespace) -> None:
 
     try:
         registry = FollowupLifecycleRegistry(args.path)
+        if args.followup_state_command in {"init", "resume", "activate", "shadow"}:
+            raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
         if args.followup_state_command == "init":
             store = ManualLedgerStore(args.ledger_path)
             replay = store.verify()
@@ -1582,83 +1481,35 @@ def cmd_data_refresh(args: argparse.Namespace) -> None:
 
 def cmd_data_snapshot(args: argparse.Namespace) -> None:
     """Fully refresh declared series and publish one immutable snapshot manifest."""
+    if args.experiment is not None:
+        raise SystemExit(LEGACY_EXPERIMENT_RETIREMENT_MESSAGE)
     manifest_path = args.manifest
-    if manifest_path is None and args.experiment is None:
+    if manifest_path is None:
         raise SystemExit("data-only snapshot requires --manifest PATH")
     service = create_default_market_data_service()
     store = create_default_research_data_store()
-    definition = None
-    declared_requirements = None
-    if args.experiment is not None:
-        experiment = get_experiment(args.experiment)
-        run_with_bundle = getattr(experiment, "run_with_bundle", None)
-        capture_definition = getattr(experiment, "capture_research_definition", None)
-        if not callable(run_with_bundle) or not callable(capture_definition):
-            raise SystemExit(
-                f"{args.experiment} is not snapshot-aware; formal snapshot preparation "
-                "requires run_with_bundle and capture_research_definition"
-            )
-        captured = capture_definition(create_default_research_definition_store())
-        if not isinstance(captured, ResearchDefinitionSnapshot):
-            raise SystemExit("capture_research_definition must return ResearchDefinitionSnapshot")
-        definition = captured.blob
-        declaration_factory = getattr(experiment, "market_data_requirements", None)
-        if callable(declaration_factory):
-            try:
-                declared_requirements = MarketDataBundle.validate_requirements(
-                    declaration_factory()
-                )
-            except (TypeError, ValueError, MarketDataAvailabilityError) as exc:
-                raise SystemExit(f"invalid experiment market-data declaration: {exc}") from exc
-            primary_requirement = next(
-                requirement
-                for requirement in declared_requirements
-                if requirement.role == "primary"
-            )
-            if primary_requirement.series.symbol != args.symbol:
-                raise SystemExit(
-                    f"experiment primary {primary_requirement.series.symbol} does not match "
-                    f"requested {args.symbol}"
-                )
-            if primary_requirement.history_start != args.history_start:
-                raise SystemExit(
-                    f"experiment history start {primary_requirement.history_start} does not "
-                    f"match requested {args.history_start}"
-                )
-            declared_auxiliary = tuple(
-                requirement.series.symbol
-                for requirement in declared_requirements
-                if requirement.role == "auxiliary"
-            )
-            if tuple(args.aux) != declared_auxiliary:
-                raise SystemExit(
-                    "requested auxiliary symbols do not match the experiment declaration"
-                )
     primary = MarketDataSeries.yahoo_adjusted_daily(args.symbol)
-    if declared_requirements is None:
-        auxiliary = [MarketDataSeries.yahoo_adjusted_daily(symbol) for symbol in args.aux]
-        requirements = [
-            MarketDataRequirement(
-                primary,
-                args.history_start,
-                role="primary",
-            )
-        ]
-        requirements.extend(
-            MarketDataRequirement(
-                series,
-                args.history_start,
-                role="auxiliary",
-                availability_policy=AvailabilityPolicy(
-                    publication_lag_sessions=args.aux_publication_lag,
-                    max_observation_lag_sessions=args.aux_max_observation_lag,
-                    publication_time_known=args.aux_publication_time_known,
-                ),
-            )
-            for series in auxiliary
+    auxiliary = [MarketDataSeries.yahoo_adjusted_daily(symbol) for symbol in args.aux]
+    requirements = [
+        MarketDataRequirement(
+            primary,
+            args.history_start,
+            role="primary",
         )
-    else:
-        requirements = list(declared_requirements)
+    ]
+    requirements.extend(
+        MarketDataRequirement(
+            series,
+            args.history_start,
+            role="auxiliary",
+            availability_policy=AvailabilityPolicy(
+                publication_lag_sessions=args.aux_publication_lag,
+                max_observation_lag_sessions=args.aux_max_observation_lag,
+                publication_time_known=args.aux_publication_time_known,
+            ),
+        )
+        for series in auxiliary
+    )
     for requirement in requirements:
         refresh_kwargs = {
             "mode": "full",
@@ -1672,13 +1523,7 @@ def cmd_data_snapshot(args: argparse.Namespace) -> None:
         service.cache,
         requirements,
         SignalDecisionTime.for_primary_session(args.decision),
-        definition=definition,
     )
-    if manifest_path is None:
-        manifest_path = (
-            experiment_result_directory(Path("results"), args.experiment)
-            / f"{manifest.snapshot_id}.snapshot.json"
-        )
     path = store.write_manifest(manifest, manifest_path)
     print(f"snapshot {manifest.snapshot_id} published to {path}")
 
@@ -1783,10 +1628,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command")
 
     # list
-    sub.add_parser("list", help="列出所有實驗 (List all experiments)")
+    sub.add_parser("list", help="List the archived legacy experiment inventory")
 
     # run
-    run_p = sub.add_parser("run", help="執行實驗 (Run experiment(s))")
+    run_p = sub.add_parser("run", help="Retired legacy experiment runner (always fails closed)")
     run_p.add_argument("experiment", nargs="?", help="實驗名稱 (Experiment name)")
     run_p.add_argument("--all", action="store_true", help="執行全部實驗 (Run all experiments)")
     run_mode = run_p.add_mutually_exclusive_group()
@@ -2006,7 +1851,7 @@ def build_parser() -> argparse.ArgumentParser:
     # followup-backtest
     followup_backtest_p = sub.add_parser(
         "followup-backtest",
-        help="回測目前跟單策略組合 (Backtest current followup portfolio)",
+        help="Retired legacy followup backtest (always fails closed)",
     )
     followup_backtest_p.add_argument(
         "--days",
@@ -2034,12 +1879,12 @@ def build_parser() -> argparse.ArgumentParser:
     status_p.add_argument("--all", action="store_true", help="Inspect every latest result")
     evaluate_p = result_sub.add_parser(
         "evaluate",
-        help="Explicitly refresh stale candidates and produce a complete asset ranking",
+        help="Retired legacy evaluation workflow (always fails closed)",
     )
     evaluate_p.add_argument("asset", help="Asset ticker, for example SPY")
     registry_p = result_sub.add_parser("registry", help="Experiment trial registry operations")
     registry_sub = registry_p.add_subparsers(dest="registry_command", required=True)
-    registry_sub.add_parser("seed", help="Seed discoverable legacy experiments")
+    registry_sub.add_parser("seed", help="Retired legacy registry mutation (always fails closed)")
 
     qualification_p = sub.add_parser(
         "qualification",
@@ -2551,7 +2396,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # analyze
     analyze_p = sub.add_parser(
-        "analyze", help="滾動窗口績效分析 (Rolling window performance analysis)"
+        "analyze", help="Retired legacy rolling analysis (always fails closed)"
     )
     analyze_p.add_argument("experiment", help="實驗名稱 (Experiment name)")
     analyze_p.add_argument(
@@ -2567,7 +2412,7 @@ def build_parser() -> argparse.ArgumentParser:
     # sync-docs
     sub.add_parser(
         "sync-docs",
-        help="檢查 Markdown 文件與 latest.json 是否同步 (Check if Markdown docs are in sync with latest.json)",
+        help="Retired legacy documentation sync (always fails closed)",
     )
 
     # freshness
@@ -2645,7 +2490,7 @@ def build_parser() -> argparse.ArgumentParser:
     data_snapshot_p.add_argument("symbol", help="Primary Yahoo Finance ticker symbol")
     data_snapshot_p.add_argument(
         "--experiment",
-        help="Capture snapshot-aware experiment definition for formal execution",
+        help="Retired legacy option (always fails closed)",
     )
     data_snapshot_p.add_argument(
         "--aux",
@@ -2668,10 +2513,7 @@ def build_parser() -> argparse.ArgumentParser:
     data_snapshot_p.add_argument(
         "--manifest",
         type=Path,
-        help=(
-            "Tracked result-linked destination; formal default is "
-            "results/NAME/<snapshot_id>.snapshot.json"
-        ),
+        help="Required tracked destination for a data-only snapshot",
     )
     data_snapshot_p.add_argument("--aux-publication-lag", type=int, default=1)
     data_snapshot_p.add_argument("--aux-max-observation-lag", type=int, default=1)

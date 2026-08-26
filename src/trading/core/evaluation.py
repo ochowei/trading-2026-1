@@ -9,7 +9,7 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 from trading.core.data_fetcher import create_default_market_data_service
-from trading.core.results import inspect_result
+from trading.core.results import LegacyExperimentRetiredError, inspect_result
 from trading.experiments import get_experiment, list_experiments
 from trading.market_data import (
     MarketDataBundle,
@@ -75,7 +75,23 @@ def refresh_candidate_snapshot(
     decision_session: date,
     results_root: Path,
 ) -> Path:
-    """Fully refresh retained declarations and publish a current exact snapshot."""
+    """Reject refresh after retirement of legacy experiment research."""
+    raise LegacyExperimentRetiredError(
+        "legacy candidate refresh is retired; use workflow-native research"
+    )
+
+
+def _retired_refresh_candidate_snapshot(
+    experiment_name: str,
+    *,
+    source_manifest_path: Path,
+    current_definition: ResearchDefinitionSnapshot,
+    store: ResearchDataStore,
+    market_data_service: MarketDataService,
+    decision_session: date,
+    results_root: Path,
+) -> Path:
+    """Historical implementation retained for source-level reproducibility inspection."""
     source = store.load_snapshot(source_manifest_path).manifest
     retained_requirements = tuple(
         MarketDataRequirement(
@@ -190,7 +206,14 @@ def evaluate_asset_candidates(
 
 
 def evaluate_asset_from_cli(asset: str) -> None:
-    """Run the explicit CLI evaluation workflow for one asset."""
+    """Reject evaluation after retirement of legacy experiment research."""
+    raise LegacyExperimentRetiredError(
+        "legacy asset evaluation is retired; use workflow-native research"
+    )
+
+
+def _retired_evaluate_asset_from_cli(asset: str) -> None:
+    """Historical implementation retained for source-level reproducibility inspection."""
     asset_upper = asset.upper()
     names: list[str] = []
     definitions: dict[str, ResearchDefinitionSnapshot] = {}
