@@ -14,23 +14,25 @@ from trading.followup_backtest import (
 
 
 def test_followup_backtest_defaults_to_126_days() -> None:
-    args = build_parser().parse_args(["followup-backtest"])
-    assert args.command == "followup-backtest"
+    args = build_parser().parse_args(["legacy", "followup-backtest"])
+    assert args.legacy_command == "followup-backtest"
     assert args.days == 126
 
 
 def test_followup_backtest_accepts_180_days() -> None:
-    args = build_parser().parse_args(["followup-backtest", "--days", "180"])
+    args = build_parser().parse_args(["legacy", "followup-backtest", "--days", "180"])
     assert args.days == 180
 
 
 def test_followup_backtest_start_defaults_to_none() -> None:
-    args = build_parser().parse_args(["followup-backtest"])
+    args = build_parser().parse_args(["legacy", "followup-backtest"])
     assert args.start is None
 
 
 def test_followup_backtest_accepts_iso_start_date() -> None:
-    args = build_parser().parse_args(["followup-backtest", "--start", "2025-01-01", "--days", "20"])
+    args = build_parser().parse_args(
+        ["legacy", "followup-backtest", "--start", "2025-01-01", "--days", "20"]
+    )
     assert args.start == date(2025, 1, 1)
     assert args.days == 20
 
@@ -38,20 +40,20 @@ def test_followup_backtest_accepts_iso_start_date() -> None:
 @pytest.mark.parametrize("value", ["2025/01/01", "20250101", "2025-02-30", "not-a-date"])
 def test_followup_backtest_rejects_invalid_start_date(value: str) -> None:
     with pytest.raises(SystemExit) as exc_info:
-        build_parser().parse_args(["followup-backtest", "--start", value])
+        build_parser().parse_args(["legacy", "followup-backtest", "--start", value])
     assert exc_info.value.code == 2
 
 
 @pytest.mark.parametrize("value", ["0", "-1", "1.5", "abc"])
 def test_followup_backtest_rejects_non_positive_integer(value: str) -> None:
     with pytest.raises(SystemExit) as exc_info:
-        build_parser().parse_args(["followup-backtest", "--days", value])
+        build_parser().parse_args(["legacy", "followup-backtest", "--days", value])
     assert exc_info.value.code == 2
 
 
 def test_followup_backtest_rejects_missing_days_value() -> None:
     with pytest.raises(SystemExit) as exc_info:
-        build_parser().parse_args(["followup-backtest", "--days"])
+        build_parser().parse_args(["legacy", "followup-backtest", "--days"])
     assert exc_info.value.code == 2
 
 
@@ -121,24 +123,13 @@ def test_renderer_prints_requested_start_and_actual_period() -> None:
     assert "Actual period:" in text
 
 
-@pytest.mark.parametrize(
-    "argv",
-    [
-        ["followup-backtest", "--days", "180", "--start", "2025-01-01"],
-        ["legacy", "followup-backtest", "--days", "180", "--start", "2025-01-01"],
-    ],
-)
-def test_followup_backtest_cli_is_retired_and_fails_closed(argv, capsys) -> None:
+def test_followup_backtest_cli_is_retired_and_fails_closed(capsys) -> None:
     from trading.cli import main
 
     with pytest.raises(SystemExit, match="legacy experiment research is retired"):
-        main(argv)
+        main(["legacy", "followup-backtest", "--days", "180", "--start", "2025-01-01"])
 
-    captured = capsys.readouterr()
-    if argv[0] == "followup-backtest":
-        assert "deprecated" in captured.err
-    else:
-        assert captured.err == ""
+    assert capsys.readouterr().err == ""
 
 
 def test_existing_followup_dispatch_and_lookback_remain_unchanged(monkeypatch) -> None:

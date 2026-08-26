@@ -3,6 +3,26 @@
 This directory contains tracked configuration and executable checks that enforce repository-wide
 architecture contracts. These checks are active CI inputs, not archived implementation material.
 
+## Path ownership
+
+`path-ownership.json` is the executable projection of the ownership and status boundaries defined
+in `docs/ARCHITECTURE.md`. It classifies the public children of `.agents/`, `docs/`, `results/`,
+`src/trading/`, and `tests/` as `active`, `shared`, `legacy-compat`, `legacy-archive`,
+`version-pinned`, or `local-only`.
+
+Each rule records a path pattern, canonical owner, whether new content is allowed, and a reason.
+`check_path_ownership.py` rejects unknown statuses, missing required paths or owners, duplicate or
+overlapping matches, unclassified public paths, and additions to closed compatibility directories.
+Do not weaken the registry to make an ownership violation pass; update the architecture and the
+registry together when a path genuinely changes responsibility.
+
+Run the check and its contract tests with:
+
+```bash
+uv run python config/repository-checks/check_path_ownership.py
+uv run pytest -q tests/repository_checks/test_path_ownership.py
+```
+
 ## Legacy experiment inventory
 
 `legacy-experiment-inventory.json` records the closed set of legacy experiment package identities.

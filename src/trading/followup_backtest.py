@@ -1,4 +1,8 @@
-"""Structured backtest for the current followup strategy portfolio."""
+"""Retired legacy followup backtest implementation retained for compatibility tests.
+
+The public CLI execution entry is fail closed; this module has no current research or outcome
+authority.
+"""
 
 from __future__ import annotations
 

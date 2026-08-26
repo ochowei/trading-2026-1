@@ -1,13 +1,7 @@
-"""
-跟單訊號產生器 (Trading Followup Signal Generator)
-套用各標的最佳策略，執行 60 天回測並產生 Firstrade 下單指令。
-Runs best strategies per ticker with 60-day lookback and generates Firstrade order instructions.
+"""Existing-position exit compatibility for the retired legacy followup portfolio.
 
-使用情境 (Usage):
-- 在 T-1 日美股收盤後執行
-- 使用者於 T 日開盤前根據報告在 Firstrade 下單
-- Run after T-1 US market close
-- User places orders on Firstrade before T-day market open
+This module retains frozen strategy loading, status reporting, and fail-closed exit handling for
+positions that already exist. It must not authorize, rank, promote, or open a new legacy position.
 """
 
 import json

@@ -4,7 +4,13 @@ Updated 2026-08-10. The Phase 9 migration and representative-evidence stage is
 closed at its fail-closed qualification boundary. This note does not claim that
 any strategy is qualified, registered as Shadow, or cut over.
 
-This file is the canonical current Phase 9 status, evidence ledger, and
+> **Compatibility status:** This is the canonical Phase 9 closure record, not a current execution
+> runbook. Its top-level `trading run`／`result` examples and legacy qualification instructions are
+> retired. Current research uses `trading research`; read-only archive diagnostics use
+> `trading legacy ...`; qualification uses `--research` with an exact released workflow or
+> `register-study`.
+
+This file preserves the Phase 9 status, evidence ledger, and historical
 parity/requalification/Shadow runbook. The
 [Phase 9 pre-implementation report](superpowers/plans/2026-08-06-phase-9-pre-implementation-report.md)
 remains a historical design baseline and is not updated retroactively with

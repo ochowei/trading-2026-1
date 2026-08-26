@@ -1,7 +1,7 @@
 import hashlib
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -34,7 +34,6 @@ from trading.research_data import (
     QualificationRegistry,
     ResearchDefinitionSnapshot,
 )
-from trading.research_data.qualification_registry import QualificationRegistryError
 from trading.research_data.trial_registry import formal_trial_id
 
 
@@ -120,12 +119,21 @@ def _register_retrospective_screen_fixture(tmp_path, monkeypatch):
         validity_status="valid",
         observed_at=datetime(2026, 1, 1, 1, tzinfo=UTC),
     )
+    definition_registry = type(
+        "DefinitionRegistry",
+        (),
+        {"load": lambda _self, _identity: _WorkflowStrategy("a" * 64)},
+    )
     monkeypatch.setattr(
-        "trading.core.qualification_workflow.get_experiment",
-        lambda _name: _Strategy("a" * 64),
+        "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+        definition_registry,
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.resolve_workflow_policy_set",
+        lambda _path: "policy-set",
     )
     plan = register_forward_qualification_plan(
-        experiment_name="selected",
+        research_identity="spy-forward/selected",
         workflow_path=Path("workflows/strategy-forward-replication-research--v006"),
         family_baseline_trial_id=baseline_id,
         evaluation_years=(2021, 2022, 2023, 2024, 2025),
@@ -166,72 +174,29 @@ def _register_retrospective_screen_fixture(tmp_path, monkeypatch):
     return plan, registry, trial_path, qualification_path
 
 
-def test_register_forward_plan_bounds_incomplete_legacy_history(
-    tmp_path,
-    monkeypatch,
-) -> None:
-    started_at = datetime(2026, 8, 10, 2, tzinfo=UTC)
+def test_register_forward_plan_rejects_legacy_experiment_without_writes(tmp_path) -> None:
     trial_path = tmp_path / "trial-registry.json"
     qualification_path = tmp_path / "qualification-registry.json"
-    selected_fingerprint = "a" * 64
-    baseline_fingerprint = "b" * 64
-    registry = ExperimentTrialRegistry(trial_path)
-    selected_id = registry.register_trial(
-        "SPY:forward-program",
-        selected_fingerprint,
-        experiment_name="selected",
-        registered_at=datetime(2026, 8, 9, tzinfo=UTC),
-    )
-    baseline_id = registry.register_trial(
-        "SPY:forward-program",
-        baseline_fingerprint,
-        experiment_name="baseline",
-        registered_at=datetime(2026, 8, 9, 1, tzinfo=UTC),
-    )
-    registry.seed_legacy(["unknown-old-trial"], seeded_at=datetime(2026, 8, 9, 2, tzinfo=UTC))
-    monkeypatch.setattr(
-        "trading.core.qualification_workflow.get_experiment",
-        lambda _name: _Strategy(selected_fingerprint),
-    )
+    with pytest.raises(ValueError, match="legacy experiment qualification is retired"):
+        register_forward_qualification_plan(
+            experiment_name="selected",
+            family_baseline_trial_id="baseline-trial",
+            evaluation_years=(2027, 2028, 2029, 2030, 2031),
+            maximum_holding_sessions=1,
+            execution_lag_sessions=1,
+            dependency_sessions=2,
+            embargo_sessions=1,
+            stress_drawdown_limit="0.20",
+            random_seed=17,
+            random_samples=10,
+            bootstrap_repetitions=20,
+            bootstrap_block_sessions=5,
+            qualification_registry_path=qualification_path,
+            trial_registry_path=trial_path,
+        )
 
-    plan = register_forward_qualification_plan(
-        experiment_name="selected",
-        family_baseline_trial_id=baseline_id,
-        evaluation_years=(2027, 2028, 2029, 2030, 2031),
-        maximum_holding_sessions=1,
-        execution_lag_sessions=1,
-        dependency_sessions=2,
-        embargo_sessions=1,
-        stress_drawdown_limit="0.20",
-        random_seed=17,
-        random_samples=10,
-        bootstrap_repetitions=20,
-        bootstrap_block_sessions=5,
-        qualification_registry_path=qualification_path,
-        trial_registry_path=trial_path,
-        now=lambda: started_at,
-    )
-
-    assert plan.forward_selection_epoch == ForwardSelectionEpoch(
-        started_at=started_at,
-        selected_trial_id=selected_id,
-        included_trial_ids=tuple(sorted((selected_id, baseline_id))),
-        prior_selection_history_incomplete=True,
-    )
-    assert plan.evaluation_sessions[0].year == 2027
-    assert QualificationRegistry(qualification_path).historical_plan(plan.plan_id) == plan
-    assert (
-        QualificationRegistry(
-            qualification_path,
-            now=lambda: datetime(2026, 8, 11, tzinfo=UTC),
-        ).register_historical_plan(plan)
-        == plan.plan_id
-    )
-    with pytest.raises(QualificationRegistryError, match="open forward"):
-        QualificationRegistry(
-            qualification_path,
-            now=lambda: started_at,
-        ).register_historical_plan(replace(plan, plan_id="another-forward-plan"))
+    assert not qualification_path.exists()
+    assert not trial_path.exists()
 
 
 def test_cross_registry_plan_transaction_recovers_after_second_write_failure(tmp_path) -> None:
@@ -612,11 +577,6 @@ def test_register_plan_resolves_workflow_native_identity_without_legacy_registry
         "trading.core.qualification_workflow.resolve_workflow_policy_set",
         lambda _path: "policy-set",
     )
-    monkeypatch.setattr(
-        "trading.core.qualification_workflow.get_experiment",
-        lambda _name: pytest.fail("legacy registry must not resolve workflow-native identities"),
-    )
-
     plan = register_forward_qualification_plan(
         research_identity="spy-forward/selected",
         workflow_path=tmp_path / "released-workflow",
@@ -771,13 +731,22 @@ def test_register_retrospective_plan_uses_explicit_role_calendar(tmp_path, monke
         experiment_name="baseline",
         registered_at=datetime(2026, 8, 13, 8, 1, tzinfo=UTC),
     )
+    definition_registry = type(
+        "DefinitionRegistry",
+        (),
+        {"load": lambda _self, _identity: _WorkflowStrategy(selected_fingerprint)},
+    )
     monkeypatch.setattr(
-        "trading.core.qualification_workflow.get_experiment",
-        lambda _name: _Strategy(selected_fingerprint),
+        "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+        definition_registry,
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.resolve_workflow_policy_set",
+        lambda _path: "policy-set",
     )
 
     plan = register_forward_qualification_plan(
-        experiment_name="selected",
+        research_identity="spy-forward/selected",
         workflow_path=Path("workflows/strategy-forward-replication-research--v005"),
         family_baseline_trial_id=baseline_id,
         evaluation_years=(2010, 2011, 2012, 2013, 2014),
@@ -825,14 +794,23 @@ def test_register_plan_rejects_partial_explicit_role_calendar(tmp_path, monkeypa
         experiment_name="baseline",
         registered_at=datetime(2026, 8, 13, 8, 1, tzinfo=UTC),
     )
+    definition_registry = type(
+        "DefinitionRegistry",
+        (),
+        {"load": lambda _self, _identity: _WorkflowStrategy(selected_fingerprint)},
+    )
     monkeypatch.setattr(
-        "trading.core.qualification_workflow.get_experiment",
-        lambda _name: _Strategy(selected_fingerprint),
+        "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+        definition_registry,
+    )
+    monkeypatch.setattr(
+        "trading.core.qualification_workflow.resolve_workflow_policy_set",
+        lambda _path: "policy-set",
     )
 
     with pytest.raises(ValueError, match="requires development years and warmup bounds"):
         register_forward_qualification_plan(
-            experiment_name="selected",
+            research_identity="spy-forward/selected",
             workflow_path=Path("workflows/strategy-forward-replication-research--v005"),
             family_baseline_trial_id=baseline_id,
             evaluation_years=(2010, 2011, 2012, 2013, 2014),
@@ -875,10 +853,6 @@ def test_screen_input_replays_workflow_native_identity_without_legacy_registry(
     monkeypatch.setattr(
         "trading.core.qualification_workflow.resolve_workflow_policy_set",
         lambda _path: "policy-set",
-    )
-    monkeypatch.setattr(
-        "trading.core.qualification_workflow.get_experiment",
-        lambda _name: pytest.fail("legacy registry must not replay workflow-native identities"),
     )
     snapshot = SimpleNamespace(
         manifest=SimpleNamespace(
@@ -1027,12 +1001,21 @@ def test_registered_screen_recomputes_and_records_frozen_selection_boundary(
     sessions = tuple(timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2025-12-31"))
     plan_created_at = evaluated_at if retrospective else epoch_start
     if retrospective:
+        definition_registry = type(
+            "DefinitionRegistry",
+            (),
+            {"load": lambda _self, _identity: _WorkflowStrategy("a" * 64)},
+        )
         monkeypatch.setattr(
-            "trading.core.qualification_workflow.get_experiment",
-            lambda _name: _Strategy("a" * 64),
+            "trading.core.qualification_workflow.ResearchDefinitionRegistry",
+            definition_registry,
+        )
+        monkeypatch.setattr(
+            "trading.core.qualification_workflow.resolve_workflow_policy_set",
+            lambda _path: "policy-set",
         )
         plan = register_forward_qualification_plan(
-            experiment_name="selected",
+            research_identity="spy-forward/selected",
             workflow_path=Path("workflows/strategy-forward-replication-research--v006"),
             family_baseline_trial_id=baseline_id,
             evaluation_years=(2021, 2022, 2023, 2024, 2025),
