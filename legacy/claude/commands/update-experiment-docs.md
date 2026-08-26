@@ -18,10 +18,10 @@ uv run trading run <experiment_name>
 ### Step 2: Identify target EXPERIMENTS_*.md
 
 Based on the experiment prefix:
-- `tqqq_*` → `src/trading/experiments/EXPERIMENTS_TQQQ.md`
-- `gld_*` → `src/trading/experiments/EXPERIMENTS_GLD.md`
-- `sivr_*` → `src/trading/experiments/EXPERIMENTS_SIVR.md`
-- `fcx_*` → `src/trading/experiments/EXPERIMENTS_FCX.md`
+- `tqqq_*` → `legacy/experiment-overviews/EXPERIMENTS_TQQQ.md`
+- `gld_*` → `legacy/experiment-overviews/EXPERIMENTS_GLD.md`
+- `sivr_*` → `legacy/experiment-overviews/EXPERIMENTS_SIVR.md`
+- `fcx_*` → `legacy/experiment-overviews/EXPERIMENTS_FCX.md`
 
 ### Step 3: Update results tables
 

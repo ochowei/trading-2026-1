@@ -23,10 +23,10 @@ Run `uv run trading freshness` to check if any knowledge is stale. Flag any `dat
 ### Step 3: Read the relevant EXPERIMENTS_*.md
 
 Based on the asset ticker:
-- TQQQ → `src/trading/experiments/EXPERIMENTS_TQQQ.md`
-- GLD → `src/trading/experiments/EXPERIMENTS_GLD.md`
-- SIVR → `src/trading/experiments/EXPERIMENTS_SIVR.md`
-- FCX → `src/trading/experiments/EXPERIMENTS_FCX.md`
+- TQQQ → `legacy/experiment-overviews/EXPERIMENTS_TQQQ.md`
+- GLD → `legacy/experiment-overviews/EXPERIMENTS_GLD.md`
+- SIVR → `legacy/experiment-overviews/EXPERIMENTS_SIVR.md`
+- FCX → `legacy/experiment-overviews/EXPERIMENTS_FCX.md`
 - **New asset** → note that a new `EXPERIMENTS_<TICKER>.md` will need to be created
 
 Read ONLY the `<!-- AI_CONTEXT_START ... AI_CONTEXT_END -->` block and the Parameter Comparison table. Do NOT read the full file unless specific experiment details are needed.

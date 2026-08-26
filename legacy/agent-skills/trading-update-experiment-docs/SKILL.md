@@ -43,7 +43,7 @@ uv run trading run <experiment_name>
 
 ### Step 2: Identify target EXPERIMENTS_*.md
 
-Extract the ticker from the experiment's module-name prefix, uppercase it, and resolve `src/trading/experiments/EXPERIMENTS_<TICKER>.md`. Verify that the file exists before editing it.
+Extract the ticker from the experiment's module-name prefix, uppercase it, and resolve `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md`. Verify that the file exists before editing it.
 
 ### Step 3: Update results tables
 

@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 
 from trading.core.accounting import canonical_json_bytes, timestamp_text
-from trading.core.workflow_authoring import (
+from trading.workflow.authoring import (
     MarkdownDocument,
     ValidationIssue,
     _atomic_write,

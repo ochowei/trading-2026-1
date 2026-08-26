@@ -4,12 +4,12 @@ from datetime import UTC, date, datetime
 import pandas as pd
 import pytest
 
-from trading.core.evaluation import (
+from trading.legacy.evaluation import (
     canonical_ranking_score,
     evaluate_asset_candidates,
     refresh_candidate_snapshot,
 )
-from trading.core.results import LegacyExperimentRetiredError
+from trading.legacy.results import LegacyExperimentRetiredError
 from trading.market_data import (
     CsvMarketDataCache,
     MarketDataRequirement,

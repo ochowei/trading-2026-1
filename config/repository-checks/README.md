@@ -27,7 +27,7 @@ After changing the package archive or inventory, run:
 
 ```bash
 uv run python config/repository-checks/check_legacy_experiment_inventory.py
-uv run pytest -q tests/test_legacy_experiment_inventory.py
+uv run pytest -q tests/legacy/test_legacy_experiment_inventory.py
 ```
 
 Any failure blocks the change until the legacy archive and its inventory satisfy the closed-set
@@ -46,5 +46,5 @@ Run the check and its tests with:
 
 ```bash
 uv run python config/repository-checks/check_experiment_market_data_access.py
-uv run pytest -q tests/test_market_data_migration_policy.py
+uv run pytest -q tests/market_data/test_market_data_migration_policy.py
 ```

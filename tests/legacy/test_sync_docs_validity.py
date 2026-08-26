@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from trading.core.sync_docs import ResultSyncError, compare_docs_and_results
+from trading.legacy.sync_docs import ResultSyncError, compare_docs_and_results
 
 
 def test_sync_docs_rejects_legacy_result_source_without_mutating_it(monkeypatch, tmp_path) -> None:
@@ -24,12 +24,12 @@ def test_sync_docs_rejects_legacy_result_source_without_mutating_it(monkeypatch,
         "### Part A\n\n| ID | 訊號數 |\n|---|---|\n| SPY-001 | 1 |\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr("trading.core.sync_docs.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.legacy.sync_docs.RESULTS_DIR", results_root)
     monkeypatch.setattr(
-        "trading.core.sync_docs.ARCHIVED_RESULTS_DIR",
+        "trading.legacy.sync_docs.ARCHIVED_RESULTS_DIR",
         tmp_path / "legacy" / "results",
     )
-    monkeypatch.setattr("trading.core.sync_docs.DOCS_DIR", docs_root)
+    monkeypatch.setattr("trading.legacy.sync_docs.DOCS_DIR", docs_root)
 
     with pytest.raises(ResultSyncError, match="legacy"):
         compare_docs_and_results()
@@ -61,9 +61,9 @@ def test_sync_docs_finds_archived_result_but_rejects_it_as_legacy(monkeypatch, t
         "### Part A\n\n| ID | 訊號數 |\n|---|---|\n| SPY-001 | 1 |\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr("trading.core.sync_docs.RESULTS_DIR", results_root)
-    monkeypatch.setattr("trading.core.sync_docs.ARCHIVED_RESULTS_DIR", archive_root)
-    monkeypatch.setattr("trading.core.sync_docs.DOCS_DIR", docs_root)
+    monkeypatch.setattr("trading.legacy.sync_docs.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.legacy.sync_docs.ARCHIVED_RESULTS_DIR", archive_root)
+    monkeypatch.setattr("trading.legacy.sync_docs.DOCS_DIR", docs_root)
 
     with pytest.raises(ResultSyncError, match="legacy from legacy archive"):
         compare_docs_and_results()

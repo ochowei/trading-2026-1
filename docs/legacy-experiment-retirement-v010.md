@@ -17,16 +17,18 @@ The following commands remain parseable only to return the same fail-closed reti
 
 | Command | Retired capability |
 |---|---|
-| `trading run` in every mode | Legacy online, offline, ephemeral, and migration execution. |
-| `trading analyze` | Rolling outcome analysis of a legacy strategy. |
-| `trading followup-backtest` | New portfolio backtests of the legacy followup set. |
+| `trading legacy run` in every mode | Legacy online, offline, ephemeral, and migration execution. |
+| `trading legacy analyze` | Rolling outcome analysis of a legacy strategy. |
+| `trading legacy followup-backtest` | New portfolio backtests of the legacy followup set. |
 | `trading result evaluate` | Data refresh, rerun, and candidate ranking. |
 | `trading result registry seed` | Mutation of the legacy trial inventory. |
 | `trading data snapshot --experiment` | Definition capture and snapshot preparation for a legacy experiment. |
-| `trading sync-docs` | Mutation of frozen legacy experiment result documentation. |
+| `trading legacy sync-docs` | Mutation of frozen legacy experiment result documentation. |
 | `trading followup-state init`, `resume`, `shadow`, `activate` | Initialization or expansion of legacy new-entry authority. |
 
-`trading list`, `trading compare`, and `trading result status` remain read-only archive diagnostics.
+`trading legacy list`, `trading legacy compare`, and `trading legacy result status` remain read-only
+archive diagnostics. Their former top-level spellings are deprecated compatibility aliases for at
+least one release cycle and add only a stderr warning.
 They do not restore authority or make an archived result qualifiable.
 
 ## Result archive
@@ -96,4 +98,3 @@ Repository verification must cover:
 4. read-only archive status and comparison behavior;
 5. workflow validation without changes to frozen workflow or Study files; and
 6. Ruff, focused result/path/CLI tests, and the full test suite.
-

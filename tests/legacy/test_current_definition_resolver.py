@@ -1,6 +1,6 @@
 import subprocess
 
-from trading.core.definition_resolver import resolve_current_definition
+from trading.legacy.definition_resolver import resolve_current_definition
 
 
 def test_current_definition_resolution_is_read_only(tmp_path) -> None:

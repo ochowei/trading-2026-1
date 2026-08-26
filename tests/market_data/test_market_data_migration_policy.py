@@ -177,7 +177,7 @@ def test_load_allowlist_rejects_noncanonical_payload(tmp_path: Path) -> None:
 
 
 def test_repository_baseline_has_exact_known_findings() -> None:
-    repo_root = Path(__file__).parents[1]
+    repo_root = Path(__file__).parents[2]
 
     findings = scan_experiment_market_data_bypasses(repo_root)
 
@@ -216,7 +216,7 @@ def test_provider_is_the_only_legal_runtime_yfinance_boundary(tmp_path: Path) ->
 
 
 def test_repository_legacy_yfinance_bypasses_are_confined_to_experiments() -> None:
-    repo_root = Path(__file__).parents[1]
+    repo_root = Path(__file__).parents[2]
 
     assert scan_non_experiment_yfinance_bypasses(repo_root) == ()
     assert len(scan_non_provider_yfinance_bypasses(repo_root)) == 0

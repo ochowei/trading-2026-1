@@ -47,15 +47,15 @@ jobs:
         run: uv run pytest -q tests/test_workflow_authoring.py
 
       - name: Policy authoring and composition tests
-        run: uv run pytest -q tests/test_policy_authoring.py tests/policies
+        run: uv run pytest -q tests/policies
 
       - name: Closed legacy experiment inventory
         run: |
           uv run python config/repository-checks/check_legacy_experiment_inventory.py
-          uv run pytest -q tests/test_legacy_experiment_inventory.py
+          uv run pytest -q tests/legacy/test_legacy_experiment_inventory.py
 
       - name: Market-data boundary policy
         run: uv run python config/repository-checks/check_experiment_market_data_access.py
 
       - name: Market-data boundary policy tests
-        run: uv run pytest -q tests/test_market_data_migration_policy.py
+        run: uv run pytest -q tests/market_data/test_market_data_migration_policy.py

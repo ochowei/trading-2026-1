@@ -90,7 +90,7 @@ Insert in the correct position (sorted by asset, then by number).
 
 ### Update 3: New asset only
 If this is the FIRST experiment for a new asset:
-- Create `src/trading/experiments/EXPERIMENTS_<TICKER>.md` with full AI_CONTEXT block (follow EXPERIMENTS_FCX.md as template)
+- Create `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md` with full AI_CONTEXT block (follow EXPERIMENTS_FCX.md as template)
 - Update `CLAUDE.md` "按需參考" section to add link to new EXPERIMENTS file
 - Update `CLAUDE.md` "架構速覽" if directory structure changed
 

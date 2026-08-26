@@ -53,7 +53,7 @@ def test_result_status_is_a_read_only_cli_diagnostic(monkeypatch, tmp_path, caps
         encoding="utf-8",
     )
     before = latest.read_bytes()
-    monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.legacy.results.RESULTS_DIR", results_root)
 
     main(["result", "status", "experiment"])
 
@@ -132,10 +132,10 @@ def test_result_status_compares_with_the_current_definition(monkeypatch, tmp_pat
         def load_snapshot(self, _path):
             return SimpleNamespace(manifest=manifest)
 
-    monkeypatch.setattr("trading.core.results.RESULTS_DIR", results_root)
-    monkeypatch.setattr("trading.cli.create_default_research_data_store", FakeStore)
+    monkeypatch.setattr("trading.legacy.results.RESULTS_DIR", results_root)
+    monkeypatch.setattr("trading.commands.legacy.ResearchDataStore", lambda _path: FakeStore())
     monkeypatch.setattr(
-        "trading.cli.resolve_current_definition_fingerprint",
+        "trading.commands.legacy.resolve_current_definition_fingerprint",
         lambda _name: "f" * 64,
     )
 
@@ -144,11 +144,9 @@ def test_result_status_compares_with_the_current_definition(monkeypatch, tmp_pat
     assert "definition-stale" in capsys.readouterr().out
 
 
-def test_result_registry_seed_cannot_mutate_retired_legacy_inventory(monkeypatch, tmp_path) -> None:
+def test_result_registry_seed_cannot_mutate_retired_legacy_inventory(tmp_path) -> None:
     results_root = tmp_path / "results"
     registry_path = results_root / "registries" / "trial_registry.json"
-    monkeypatch.setattr("trading.cli.trial_registry_path", lambda: registry_path)
-    monkeypatch.setattr("trading.cli.list_experiments", lambda: ["spy_001", "spy_002"])
 
     with pytest.raises(SystemExit, match="legacy experiment research is retired"):
         main(["result", "registry", "seed"])

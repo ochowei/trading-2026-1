@@ -2,7 +2,8 @@ from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
-from trading.cli import _workflow_observation_provenance, build_parser, main
+from trading.cli import build_parser, main
+from trading.commands.research import _workflow_observation_provenance
 from trading.market_data import MarketDataRequirement, MarketDataSeries
 from trading.research_data import DefinitionBlobRef, ResearchDefinitionSnapshot
 from trading.research_definitions import resolve_workflow_policy_set
@@ -104,12 +105,14 @@ def test_research_snapshot_can_use_an_isolated_market_data_cache(
         return Service()
 
     monkeypatch.setattr(
-        "trading.cli._workflow_native_context",
+        "trading.commands.research._workflow_native_context",
         lambda _identity, _workflow: (Definition(), object()),
     )
-    monkeypatch.setattr("trading.cli.create_default_market_data_service", service_factory)
-    monkeypatch.setattr("trading.cli.create_default_research_data_store", Store)
-    monkeypatch.setattr("trading.cli.create_default_research_definition_store", object)
+    monkeypatch.setattr(
+        "trading.commands.research.create_default_market_data_service", service_factory
+    )
+    monkeypatch.setattr("trading.commands.research._research_data_store", Store)
+    monkeypatch.setattr("trading.commands.research._definition_store", object)
     cache_root = tmp_path / "s003-development"
 
     main(
@@ -183,12 +186,12 @@ def test_research_snapshot_can_reuse_eligible_full_refresh_without_provider_acce
 
     store = Store()
     monkeypatch.setattr(
-        "trading.cli._workflow_native_context",
+        "trading.commands.research._workflow_native_context",
         lambda _identity, _workflow: (Definition(), object()),
     )
-    monkeypatch.setattr("trading.cli.create_default_market_data_service", Service)
-    monkeypatch.setattr("trading.cli.create_default_research_data_store", lambda: store)
-    monkeypatch.setattr("trading.cli.create_default_research_definition_store", object)
+    monkeypatch.setattr("trading.commands.research.create_default_market_data_service", Service)
+    monkeypatch.setattr("trading.commands.research._research_data_store", lambda: store)
+    monkeypatch.setattr("trading.commands.research._definition_store", object)
     destination = tmp_path / "reused.snapshot.json"
 
     main(

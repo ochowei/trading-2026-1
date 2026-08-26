@@ -56,7 +56,7 @@ From the backtest output, extract win rates for Part A and Part B.
 
 ### Check 7: Documentation sync
 Verify these files include the experiment:
-1. Resolve `src/trading/experiments/EXPERIMENTS_<TICKER>.md` from the module-name prefix and check for the experiment ID in its experiment-list table
+1. Resolve `legacy/experiment-overviews/EXPERIMENTS_<TICKER>.md` from the module-name prefix and check for the experiment ID in its experiment-list table
 2. `.github/workflows/tqqq-backtest.yml` — check for module name in the `options:` list
 
 **PASS** if found in both. **FAIL** if missing from either (specify which).

@@ -10,13 +10,23 @@ packages live outside the installable `src/` tree, but a repository checkout kee
 `trading.experiments.<experiment_name>` import identities for read-only diagnostics, reproducibility,
 and fail-closed exit handling of any pre-existing positions.
 
-Legacy research execution is retired. `trading run`, `analyze`, `followup-backtest`,
+Legacy research execution is retired. `trading legacy run`, `analyze`, `followup-backtest`,
 `result evaluate`, `result registry seed`, and `data snapshot --experiment` reject every request.
+Former top-level spellings remain deprecated aliases for one compatibility cycle.
 The compatibility imports do not authorize new execution, observation, ranking, qualification,
 promotion, or result publication.
 
 Do not add or rename an experiment package here. New outcome-relevant research belongs under a
 released workflow and `src/trading/research_definitions/`.
+
+`experiment-overviews/` contains the archived `EXPERIMENTS_<TICKER>.md` tables and AI context that
+formerly lived in the installable package tree. They are historical navigation and evidence only;
+new workflow studies record their own plans, evidence, and conclusions instead of extending these
+overviews.
+
+`templates/experiment/` preserves the former legacy package template for historical inspection. It
+is intentionally outside both the installable package tree and the auto-discovery path and must not
+be used to create a new research identity.
 
 ## Results
 
