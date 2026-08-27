@@ -37,6 +37,9 @@ jobs:
       - name: Format check
         run: uv run ruff format --check src/
 
+      - name: Fast regression suite
+        run: uv run pytest -m "not slow" --durations=25
+
       - name: Workflow contract validation
         run: uv run trading workflow validate --all
 
@@ -44,23 +47,10 @@ jobs:
         run: uv run trading policy validate --all
 
       - name: Path ownership contract
-        run: |
-          uv run python config/repository-checks/check_path_ownership.py
-          uv run pytest -q tests/repository_checks/test_path_ownership.py
-
-      - name: Workflow authoring and study lifecycle tests
-        run: uv run pytest -q tests/test_workflow_authoring.py
-
-      - name: Policy authoring and composition tests
-        run: uv run pytest -q tests/policies
+        run: uv run python config/repository-checks/check_path_ownership.py
 
       - name: Closed legacy experiment inventory
-        run: |
-          uv run python config/repository-checks/check_legacy_experiment_inventory.py
-          uv run pytest -q tests/legacy/test_legacy_experiment_inventory.py
+        run: uv run python config/repository-checks/check_legacy_experiment_inventory.py
 
       - name: Market-data boundary policy
         run: uv run python config/repository-checks/check_experiment_market_data_access.py
-
-      - name: Market-data boundary policy tests
-        run: uv run pytest -q tests/market_data/test_market_data_migration_policy.py

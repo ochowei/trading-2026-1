@@ -60,13 +60,20 @@ uv run ruff check src/
 # 檢查格式（必須 0 files would be reformatted）
 uv run ruff format --check src/
 
+# 日常與 PR fast regression；包含固定 legacy smoke matrix
+uv run pytest -m "not slow"
+
+# 只有 legacy/shared runtime 變更、main/release 驗證才執行完整 legacy matrix
+uv run pytest -m legacy_conformance -n auto
+
 # 一鍵修正可自動修復的問題
 uv run ruff check src/ --fix && uv run ruff format src/
 ```
 
 > CI（GitHub Action `ci.yml`）會在 pull request 與 `main` push 執行上述檢查，並驗證
-> workflow、policy、path ownership、legacy experiment inventory 與 market-data boundary
-> contracts。是否阻擋
+> fast regression、workflow、policy、path ownership、legacy experiment inventory 與
+> market-data boundary contracts。高風險路徑、main 與每日排程另執行完整 legacy
+> conformance matrix。是否阻擋
 > merge 由 GitHub branch protection 設定決定。
 
 ## 成交模型（新實驗必讀）

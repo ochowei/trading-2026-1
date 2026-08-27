@@ -22,6 +22,8 @@ from trading.research_data import (
     RunMode,
 )
 
+pytestmark = pytest.mark.legacy_conformance
+
 PRIMARY_FOLLOWUP_EXPERIMENTS = (
     "cibr_001_pullback_wr",
     "cibr_002_vol_adaptive_mr",
@@ -310,6 +312,35 @@ PRIMARY_FOLLOWUP_EXPERIMENTS = (
     "xlu_002_capped_pullback_wr",
 )
 
+PRIMARY_SMOKE_EXPERIMENTS = frozenset(
+    {
+        "cibr_001_pullback_wr",
+        "cibr_003_bb_squeeze_breakout",
+        "copx_006_pairs_fcx",
+        "eem_013_macd_histogram_mr",
+        "ibit_006_gap_reversal_mr",
+        "nvda_010_adx_rsi2_mr",
+        "soxl_009_bb_squeeze_breakout",
+        "tlt_007_regime_vol_gate_mr",
+        "tsla_007_keltner_breakout",
+        "xlu_009_kc_squeeze_breakout",
+    }
+)
+
+
+def _experiment_case(experiment_name: str) -> pytest.ParameterSet:
+    marker = (
+        pytest.mark.legacy_smoke
+        if experiment_name in PRIMARY_SMOKE_EXPERIMENTS
+        else pytest.mark.slow
+    )
+    return pytest.param(experiment_name, marks=marker)
+
+
+PRIMARY_FOLLOWUP_CASES = tuple(
+    _experiment_case(experiment_name) for experiment_name in PRIMARY_FOLLOWUP_EXPERIMENTS
+)
+
 
 @pytest.fixture(scope="module")
 def primary_bars() -> pd.DataFrame:
@@ -326,7 +357,7 @@ def primary_bars() -> pd.DataFrame:
     )
 
 
-@pytest.mark.parametrize("experiment_name", PRIMARY_FOLLOWUP_EXPERIMENTS)
+@pytest.mark.parametrize("experiment_name", PRIMARY_FOLLOWUP_CASES)
 def test_primary_followup_uses_declared_primary_bundle(
     experiment_name: str,
     primary_bars: pd.DataFrame,
@@ -361,6 +392,7 @@ def test_primary_followup_uses_declared_primary_bundle(
     assert result["metadata"]["experiment"] == experiment_name
 
 
+@pytest.mark.legacy_smoke
 def test_primary_followup_definition_capture_includes_shared_bundle_executor(tmp_path) -> None:
     strategy = get_experiment("copx_007_vol_adaptive")
     definition_store = ResearchDefinitionStore(tmp_path / "blobs")
@@ -370,7 +402,7 @@ def test_primary_followup_definition_capture_includes_shared_bundle_executor(tmp
     assert "bundle_executor" in payload["sources"]
 
 
-@pytest.mark.parametrize("experiment_name", PRIMARY_FOLLOWUP_EXPERIMENTS)
+@pytest.mark.parametrize("experiment_name", PRIMARY_FOLLOWUP_CASES)
 def test_primary_followup_completes_formal_offline_execution(
     experiment_name: str,
     primary_bars: pd.DataFrame,

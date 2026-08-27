@@ -34,9 +34,14 @@ Policy
 
 ```bash
 uv sync
+uv run pytest -m "not slow"
 uv run trading policy validate --all
 uv run trading workflow validate --all
 ```
+
+完整的 frozen legacy compatibility matrix 只在相關 shared runtime 變更、main／排程 CI 或
+release 驗證時執行：`uv run pytest -m legacy_conformance -n auto`。詳見
+[`tests/README.md`](tests/README.md)。
 
 若需完整規則，請直接閱讀各區塊的權威文件：
 

@@ -81,7 +81,8 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 
 | Path | Purpose |
 |---|---|
-| `.github/workflows/ci.yml` | Runs Ruff checks plus workflow, policy, path-ownership, legacy-inventory, and market-data boundary contract validation for pull requests and `main` pushes. |
+| `.github/workflows/ci.yml` | Runs Ruff, the non-slow fast regression suite, and workflow, policy, path-ownership, legacy-inventory, and market-data boundary validation for pull requests and `main` pushes. |
+| `.github/workflows/legacy-conformance.yml` | Runs primary and auxiliary frozen-inventory replay in parallel for relevant shared-runtime PRs, every `main` push, daily at 09:00 UTC, and manual dispatch. |
 
 ## Documentation
 
@@ -301,11 +302,13 @@ publication. New formal research uses `src/trading/research_definitions/`.
 | `tests/README.md` | Placement contract for new tests and explanation of pinned root-level test exceptions. |
 | `tests/conftest.py` | Shared pytest setup and fixtures. |
 | `tests/test_*.py` | Tests whose historical paths or exact bytes are pinned by released policy or frozen workflow-study evidence; do not relocate them during organizational cleanup. |
-| `tests/legacy/test_*.py` | Legacy import compatibility, frozen snapshot, archived diagnostics, and fail-closed CLI tests. |
+| `tests/legacy/test_*.py` | Fast legacy import compatibility, archived diagnostics, and fail-closed CLI tests. |
+| `tests/legacy/conformance/README.md` | Marker, execution-frequency, and closed-inventory maintenance contract for exhaustive legacy replay. |
+| `tests/legacy/conformance/test_*_followup_snapshot_contract.py` | Complete primary and auxiliary legacy bundle/formal-offline matrix: 41 fixed smoke cases run in fast regression; remaining cases run only in full conformance. |
 | `tests/workflow/test_*.py` | Workflow authoring, study, qualification, and terminal-evidence tests. |
 | `tests/research/test_*.py` | Workflow-native definition, reproducibility, result-schema, run, and registry tests. |
 | `tests/market_data/test_*.py` | Provider, cache, validation, coverage, bundle, and migration-boundary tests. |
-| `tests/operations/test_*.py` | Ledger, followup, qualification, sleeve, and drift operational tests. |
+| `tests/operations/test_*.py` | Ledger, current followup compatibility, qualification, sleeve, and drift operational tests. |
 | `tests/policies/test_*.py` | Policy resolution, composition, definition-identity, and version-specific conformance tests. |
 | `tests/repository_checks/test_*.py` | Contract tests for executable repository architecture and ownership checks. |
 | `tests/workflow/README.md` | Declares `tests/workflow/` as the destination for new workflow lifecycle tests while pinned root tests stay in place. |

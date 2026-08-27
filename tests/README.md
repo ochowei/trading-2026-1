@@ -7,6 +7,7 @@ New tests must be placed in the responsibility directory that owns the behavior:
 | `workflow/` | New workflow authoring, study, qualification, and terminal-review behavior. |
 | `research/` | Workflow-native definitions, reproducibility, runs, results, and registries. |
 | `legacy/` | Historical imports, archived diagnostics, and fail-closed legacy commands. |
+| `legacy/conformance/` | Exhaustive frozen-inventory replay, split into fast smoke and slow full-matrix cases. |
 | `operations/` | Ledger, followup, qualification lifecycle, sleeve, and drift operations. |
 | `market_data/` | Provider, cache, validation, coverage, and migration boundaries. |
 | `policies/` | Policy resolution and exact conformance tests. |
@@ -16,3 +17,22 @@ Existing root `test_*.py` files are deliberate compatibility exceptions. Release
 refer to many of their paths or exact historical bytes, so organizational cleanup must not move
 them. They retain their current paths while behavior evolves normally. Do not add new root test
 files; use the owning directory above.
+
+## Test tiers
+
+The default development and pull-request suite includes every non-slow test plus 41 fixed legacy
+smoke cases:
+
+```bash
+uv run pytest -m "not slow"
+```
+
+The complete 811-case legacy replay matrix is reserved for relevant shared-runtime changes, main,
+scheduled CI, and release verification:
+
+```bash
+uv run pytest -m legacy_conformance -n auto
+```
+
+Do not replace the full matrix with the smoke set when changing legacy strategies, shared strategy
+or bundle execution, market data, research data, or pinned execution/sleeve implementations.

@@ -1,0 +1,63 @@
+name: Legacy conformance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - "legacy/experiments/**"
+      - "src/trading/experiments/**"
+      - "src/trading/legacy/experiments.py"
+      - "src/trading/core/base_*.py"
+      - "src/trading/core/bundle_strategy.py"
+      - "src/trading/core/data_fetcher.py"
+      - "src/trading/core/execution_*.py"
+      - "src/trading/core/sleeve_engine.py"
+      - "src/trading/market_data/**"
+      - "src/trading/research_data/**"
+      - "tests/conftest.py"
+      - "tests/legacy/conformance/**"
+      - "pyproject.toml"
+      - "uv.lock"
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: legacy-conformance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: ${{ matrix.suite.name }} legacy conformance
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - name: Primary
+            path: tests/legacy/conformance/test_primary_followup_snapshot_contract.py
+          - name: Auxiliary
+            path: tests/legacy/conformance/test_auxiliary_followup_snapshot_contract.py
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.11.8"
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run full matrix
+        run: >-
+          uv run pytest -q -n auto -m legacy_conformance
+          ${{ matrix.suite.path }} --durations=25

@@ -22,6 +22,8 @@ from trading.research_data import (
     RunMode,
 )
 
+pytestmark = pytest.mark.legacy_conformance
+
 AUXILIARY_FOLLOWUP_EXPERIMENTS = (
     "cibr_006_rs_momentum_pullback",
     "cibr_017_vix_bands_mr",
@@ -145,6 +147,35 @@ AUXILIARY_FOLLOWUP_EXPERIMENTS = (
     "xbi_018_xbi_xlv_divergence_mr",
 )
 
+AUXILIARY_SMOKE_EXPERIMENTS = frozenset(
+    {
+        "cibr_006_rs_momentum_pullback",
+        "copx_017_yield_curve_slope_mr",
+        "eem_020_multi_anchor_combo_mr",
+        "ewt_011_vol_gated_rs_momentum",
+        "tlt_013_move_implied_vol_mr",
+        "tqqq_025_vxn_vix_vvix_filter",
+        "tsm_017_earnings_exclusion",
+        "uso_028_ovx_5d_direction_mr",
+        "vgk_009_eurusd_direction_mr",
+        "xbi_018_xbi_xlv_divergence_mr",
+    }
+)
+
+
+def _experiment_case(experiment_name: str) -> pytest.ParameterSet:
+    marker = (
+        pytest.mark.legacy_smoke
+        if experiment_name in AUXILIARY_SMOKE_EXPERIMENTS
+        else pytest.mark.slow
+    )
+    return pytest.param(experiment_name, marks=marker)
+
+
+AUXILIARY_FOLLOWUP_CASES = tuple(
+    _experiment_case(experiment_name) for experiment_name in AUXILIARY_FOLLOWUP_EXPERIMENTS
+)
+
 
 @pytest.fixture(scope="module")
 def historical_bars() -> pd.DataFrame:
@@ -178,7 +209,7 @@ def _bundle(strategy, frame: pd.DataFrame) -> MarketDataBundle:
     )
 
 
-@pytest.mark.parametrize("experiment_name", AUXILIARY_FOLLOWUP_EXPERIMENTS)
+@pytest.mark.parametrize("experiment_name", AUXILIARY_FOLLOWUP_CASES)
 def test_auxiliary_followup_declares_historical_asof_bundle(
     experiment_name: str,
     historical_bars: pd.DataFrame,
@@ -219,7 +250,7 @@ def test_auxiliary_followup_declares_historical_asof_bundle(
         assert aligned["ObservationLagSessions"].min() >= 1
 
 
-@pytest.mark.parametrize("experiment_name", AUXILIARY_FOLLOWUP_EXPERIMENTS)
+@pytest.mark.parametrize("experiment_name", AUXILIARY_FOLLOWUP_CASES)
 def test_auxiliary_followup_completes_formal_offline_execution(
     experiment_name: str,
     historical_bars: pd.DataFrame,

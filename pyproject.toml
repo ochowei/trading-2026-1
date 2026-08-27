@@ -27,6 +27,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=8.3",
+    "pytest-xdist>=3.8",
     "ruff>=0.9",
 ]
 
@@ -49,3 +50,10 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["trading"]
+
+[tool.pytest.ini_options]
+markers = [
+    "legacy_conformance: exhaustive compatibility replay across the frozen legacy inventory",
+    "legacy_smoke: representative legacy compatibility case required in the fast suite",
+    "slow: high-cost case excluded from the default fast regression suite",
+]
