@@ -35,8 +35,9 @@ uv run pytest -m legacy_conformance -n auto
 
 CI runs the complete Primary matrix for relevant shared-runtime pull requests, every `main` push,
 daily at 09:00 UTC, and manual dispatch. Every pull request gets the 20 Auxiliary smoke tests; the
-complete 240-case Auxiliary matrix runs only after a `main` push, weekly on Monday at 09:00 UTC,
-manual dispatch, or when a pull request receives the `full-auxiliary-conformance` label.
+complete 240-case Auxiliary matrix runs only after a high-risk path is pushed to `main`, weekly on
+Monday at 09:00 UTC, on manual dispatch, or when a pull request receives the
+`full-auxiliary-conformance` label.
 
 Do not replace the full matrix with the smoke set when changing legacy strategies, shared strategy
 or bundle execution, market data, research data, or pinned execution/sleeve implementations.

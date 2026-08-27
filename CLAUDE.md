@@ -73,8 +73,8 @@ uv run ruff check src/ --fix && uv run ruff format src/
 > CI（GitHub Action `ci.yml`）會在 pull request 與 `main` push 執行上述檢查，並驗證
 > fast regression、workflow、policy、path ownership、legacy experiment inventory 與
 > market-data boundary contracts。完整 Primary matrix 另在高風險 PR、main、每日排程與手動
-> dispatch 執行；完整 Auxiliary matrix 只在 main、每週一 09:00 UTC、手動 dispatch，或 PR
-> 新增 `full-auxiliary-conformance` label 時執行。是否阻擋
+> dispatch 執行；完整 Auxiliary matrix 只在高風險路徑 push 到 main、每週一 09:00 UTC、
+> 手動 dispatch，或 PR 新增 `full-auxiliary-conformance` label 時執行。是否阻擋
 > merge 由 GitHub branch protection 設定決定。
 
 ## 成交模型（新實驗必讀）

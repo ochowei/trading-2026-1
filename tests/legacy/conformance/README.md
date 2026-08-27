@@ -17,9 +17,9 @@ uv run pytest -m legacy_conformance -n auto
 ```
 
 The fast pull-request suite always includes 10 representative Auxiliary experiments (20 tests).
-Full Auxiliary CI runs after `main` pushes, weekly on Monday at 09:00 UTC, on manual dispatch, or
-when a pull request receives the `full-auxiliary-conformance` label. Primary retains its relevant
-path-triggered pull-request run and daily schedule.
+Full Auxiliary CI runs after high-risk path pushes to `main`, weekly on Monday at 09:00 UTC, on
+manual dispatch, or when a pull request receives the `full-auxiliary-conformance` label. Primary
+retains its relevant path-triggered pull-request run and daily schedule.
 
 Only remove a parametrized identity when the same change validly removes it from the closed legacy
 inventory. Do not add a new identity here.
