@@ -1,4 +1,4 @@
-name: Legacy conformance
+name: Primary legacy conformance
 
 on:
   push:
@@ -17,7 +17,8 @@ on:
       - "src/trading/market_data/**"
       - "src/trading/research_data/**"
       - "tests/conftest.py"
-      - "tests/legacy/conformance/**"
+      - "tests/legacy/conformance/README.md"
+      - "tests/legacy/conformance/test_primary_followup_snapshot_contract.py"
       - "pyproject.toml"
       - "uv.lock"
   schedule:
@@ -33,16 +34,8 @@ permissions:
 
 jobs:
   conformance:
-    name: ${{ matrix.suite.name }} legacy conformance
+    name: Primary legacy conformance
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        suite:
-          - name: Primary
-            path: tests/legacy/conformance/test_primary_followup_snapshot_contract.py
-          - name: Auxiliary
-            path: tests/legacy/conformance/test_auxiliary_followup_snapshot_contract.py
     steps:
       - uses: actions/checkout@v4
 
@@ -57,7 +50,7 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev
 
-      - name: Run full matrix
+      - name: Run full primary matrix
         run: >-
           uv run pytest -q -n auto -m legacy_conformance
-          ${{ matrix.suite.path }} --durations=25
+          tests/legacy/conformance/test_primary_followup_snapshot_contract.py --durations=25

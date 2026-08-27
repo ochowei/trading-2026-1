@@ -27,12 +27,16 @@ smoke cases:
 uv run pytest -m "not slow"
 ```
 
-The complete 811-case legacy replay matrix is reserved for relevant shared-runtime changes, main,
-scheduled CI, and release verification:
+The complete 811-case legacy replay matrix remains available locally:
 
 ```bash
 uv run pytest -m legacy_conformance -n auto
 ```
+
+CI runs the complete Primary matrix for relevant shared-runtime pull requests, every `main` push,
+daily at 09:00 UTC, and manual dispatch. Every pull request gets the 20 Auxiliary smoke tests; the
+complete 240-case Auxiliary matrix runs only after a `main` push, weekly on Monday at 09:00 UTC,
+manual dispatch, or when a pull request receives the `full-auxiliary-conformance` label.
 
 Do not replace the full matrix with the smoke set when changing legacy strategies, shared strategy
 or bundle execution, market data, research data, or pinned execution/sleeve implementations.

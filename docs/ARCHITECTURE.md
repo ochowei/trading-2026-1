@@ -82,7 +82,8 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | Path | Purpose |
 |---|---|
 | `.github/workflows/ci.yml` | Runs Ruff, the non-slow fast regression suite, and workflow, policy, path-ownership, legacy-inventory, and market-data boundary validation for pull requests and `main` pushes. |
-| `.github/workflows/legacy-conformance.yml` | Runs primary and auxiliary frozen-inventory replay in parallel for relevant shared-runtime PRs, every `main` push, daily at 09:00 UTC, and manual dispatch. |
+| `.github/workflows/legacy-conformance.yml` | Runs the full Primary frozen-inventory matrix for relevant shared-runtime PRs, every `main` push, daily at 09:00 UTC, and manual dispatch. |
+| `.github/workflows/auxiliary-legacy-conformance.yml` | Runs the full 240-case Auxiliary matrix after `main` pushes, weekly on Monday at 09:00 UTC, on manual dispatch, or when a PR receives the `full-auxiliary-conformance` label. |
 
 ## Documentation
 
