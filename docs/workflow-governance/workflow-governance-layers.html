@@ -908,6 +908,12 @@ html&gt;body{padding:0}&lt;/style&gt;
 &lt;div id=&quot;workflow-governance-layers&quot;&gt;
   &lt;style&gt;
     #workflow-governance-layers {
+      --wgl-type-input: var(--viz-series-5);
+      --wgl-type-activity: var(--viz-series-1);
+      --wgl-type-decision: var(--viz-series-2);
+      --wgl-type-routing: var(--viz-series-6);
+      --wgl-type-state: var(--viz-series-3);
+      --wgl-type-outcome: var(--viz-series-4);
       color: var(--foreground);
       display: grid;
       gap: 28px;
@@ -948,41 +954,143 @@ html&gt;body{padding:0}&lt;/style&gt;
       text-align: center;
     }
 
+    #workflow-governance-layers .wgl-fsm-notation {
+      margin: 0;
+      color: var(--muted-foreground);
+    }
+
+    #workflow-governance-layers .wgl-node-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      color: var(--muted-foreground);
+      list-style: none;
+    }
+
+    #workflow-governance-layers .wgl-node-legend li {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    #workflow-governance-layers .wgl-node-legend-mark {
+      display: inline-block;
+      width: 20px;
+      height: 14px;
+      flex: none;
+      border: 2px solid currentColor;
+      background: color-mix(in srgb, currentColor 16%, var(--card));
+    }
+
+    #workflow-governance-layers .wgl-node-legend-input {
+      margin-inline: 2px;
+      color: var(--wgl-type-input);
+      transform: skewX(-14deg);
+    }
+
+    #workflow-governance-layers .wgl-node-legend-activity {
+      color: var(--wgl-type-activity);
+      border-radius: 5px;
+    }
+
+    #workflow-governance-layers .wgl-node-legend-decision {
+      width: 12px;
+      height: 12px;
+      margin-inline: 4px;
+      color: var(--wgl-type-decision);
+      transform: rotate(45deg);
+    }
+
+    #workflow-governance-layers .wgl-node-legend-routing {
+      color: var(--wgl-type-routing);
+      clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    }
+
+    #workflow-governance-layers .wgl-node-legend-state {
+      color: var(--wgl-type-state);
+      border-radius: var(--radius-full);
+    }
+
+    #workflow-governance-layers .wgl-node-legend-outcome {
+      width: 16px;
+      height: 16px;
+      margin-inline: 2px;
+      color: var(--wgl-type-outcome);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 2px var(--card), inset 0 0 0 4px currentColor;
+    }
+
     #workflow-governance-layers .wgl-node-link {
       cursor: pointer;
     }
 
-    #workflow-governance-layers .wgl-node-link:focus-visible .node &gt; :first-child {
-      stroke: var(--ring);
-      stroke-width: 3px;
+    #workflow-governance-layers .wgl-node-type-input {
+      --wgl-node-color: var(--wgl-type-input);
+      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-input) 16%, var(--card));
+      --wgl-node-stroke-width: 2px;
+      --wgl-node-stroke-dasharray: 5 3;
     }
 
-    #workflow-governance-layers .wgl-node-link .node &gt; :first-child {
-      stroke: var(--border);
+    #workflow-governance-layers .wgl-node-type-activity {
+      --wgl-node-color: var(--wgl-type-activity);
+      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-activity) 16%, var(--card));
+      --wgl-node-stroke-width: 2px;
+      --wgl-node-stroke-dasharray: none;
     }
 
-    #workflow-governance-layers .wgl-node-l1 .node &gt; :first-child {
-      fill: color-mix(in srgb, var(--viz-series-1) 12%, var(--card));
+    #workflow-governance-layers .wgl-node-type-decision {
+      --wgl-node-color: var(--wgl-type-decision);
+      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-decision) 18%, var(--card));
+      --wgl-node-stroke-width: 2px;
+      --wgl-node-stroke-dasharray: none;
     }
 
-    #workflow-governance-layers .wgl-node-l2 .node &gt; :first-child {
-      fill: color-mix(in srgb, var(--viz-series-3) 12%, var(--card));
+    #workflow-governance-layers .wgl-node-type-routing {
+      --wgl-node-color: var(--wgl-type-routing);
+      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-routing) 16%, var(--card));
+      --wgl-node-stroke-width: 2px;
+      --wgl-node-stroke-dasharray: 7 3;
     }
 
-    #workflow-governance-layers .wgl-node-l3 .node &gt; :first-child {
-      fill: color-mix(in srgb, var(--viz-series-2) 12%, var(--card));
+    #workflow-governance-layers .wgl-node-type-state {
+      --wgl-node-color: var(--wgl-type-state);
+      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-state) 18%, var(--card));
+      --wgl-node-stroke-width: 2px;
+      --wgl-node-stroke-dasharray: none;
     }
 
-    #workflow-governance-layers .wgl-node-l1.wgl-node-decision .node &gt; :first-child {
-      fill: color-mix(in srgb, var(--viz-series-1) 22%, var(--card));
+    #workflow-governance-layers .wgl-node-type-outcome {
+      --wgl-node-color: var(--wgl-type-outcome);
+      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-outcome) 18%, var(--card));
+      --wgl-node-stroke-width: 3px;
+      --wgl-node-stroke-dasharray: none;
     }
 
-    #workflow-governance-layers .wgl-node-l2.wgl-node-decision .node &gt; :first-child {
-      fill: color-mix(in srgb, var(--viz-series-3) 22%, var(--card));
+    #workflow-governance-layers .wgl-node-link .node &gt; .label-container {
+      fill: var(--wgl-node-fill);
+      stroke: var(--wgl-node-color);
+      stroke-width: var(--wgl-node-stroke-width);
+      stroke-dasharray: var(--wgl-node-stroke-dasharray);
     }
 
-    #workflow-governance-layers .wgl-node-l3.wgl-node-decision .node &gt; :first-child {
-      fill: color-mix(in srgb, var(--viz-series-2) 22%, var(--card));
+    #workflow-governance-layers .wgl-node-link .node &gt; g.label-container &gt; path:first-of-type {
+      fill: var(--wgl-node-fill) !important;
+    }
+
+    #workflow-governance-layers .wgl-node-link .node &gt; g.label-container &gt; path:nth-of-type(2) {
+      stroke: var(--wgl-node-color) !important;
+      stroke-width: var(--wgl-node-stroke-width) !important;
+      stroke-dasharray: var(--wgl-node-stroke-dasharray) !important;
+    }
+
+    #workflow-governance-layers .wgl-node-link:focus-visible .node &gt; .label-container,
+    #workflow-governance-layers .wgl-node-link:focus-visible .node &gt; g.label-container &gt; path:nth-of-type(2) {
+      stroke: var(--ring) !important;
+      stroke-width: 3px !important;
     }
 
     #workflow-governance-layers .wgl-cluster-l1 &gt; rect {
@@ -1138,41 +1246,49 @@ html&gt;body{padding:0}&lt;/style&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-switch-title&quot;&gt;
     &lt;h2 id=&quot;wgl-switch-title&quot;&gt;A1｜L1–L3 治理流程與例外路徑&lt;/h2&gt;
+    &lt;ul class=&quot;wgl-node-legend text-small&quot; aria-label=&quot;A1 節點視覺類型&quot;&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-input&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;輸入／觸發&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-activity&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;活動／處理&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-decision&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;決策／Gate&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-routing&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;路由／退回&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-state&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;狀態／條件&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-outcome&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;終局結果&lt;/li&gt;
+    &lt;/ul&gt;
     &lt;div class=&quot;wgl-a1-layout&quot;&gt;
       &lt;div class=&quot;wgl-a1-figure&quot;&gt;
         &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a1&quot; data-diagram=&quot;a1-main&quot;&gt;
 flowchart TB
   subgraph L1[&quot;L1｜流程設計&quot;]
     direction TB
-    L1N1[&quot;L1-N1&lt;br/&gt;可能的輸入&quot;] --&gt; L1N2[&quot;L1-N2&lt;br/&gt;AI 預覽與檢查&quot;]
+    L1N1[/&quot;L1-N1&lt;br/&gt;可能的輸入&quot;/] --&gt; L1N2(&quot;L1-N2&lt;br/&gt;AI 預覽與檢查&quot;)
     L1N2 --&gt; L1N3{&quot;L1-N3&lt;br/&gt;預覽可套用？&quot;}
     L1N3 --&gt;|通過| L1N4{&quot;L1-N4&lt;br/&gt;人工確認？&quot;}
-    L1N3 --&gt;|失敗| L1N6[&quot;L1-N6&lt;br/&gt;修正輸入&quot;]
-    L1N4 --&gt;|確認| L1N5[&quot;L1-N5&lt;br/&gt;建立／修正草稿&quot;]
+    L1N3 --&gt;|失敗| L1N6(&quot;L1-N6&lt;br/&gt;修正輸入&quot;)
+    L1N4 --&gt;|確認| L1N5(&quot;L1-N5&lt;br/&gt;建立／修正草稿&quot;)
     L1N4 --&gt;|修改| L1N6
     L1N6 -. fresh preview .-&gt; L1N2
   end
 
   subgraph L2[&quot;L2｜發布授權&quot;]
     direction TB
-    L2N1[&quot;L2-N1&lt;br/&gt;AI 發布檢查&quot;] --&gt; L2N2{&quot;L2-N2&lt;br/&gt;發布條件通過？&quot;}
+    L2N1(&quot;L2-N1&lt;br/&gt;AI 發布檢查&quot;) --&gt; L2N2{&quot;L2-N2&lt;br/&gt;發布條件通過？&quot;}
     L2N2 --&gt;|通過| L2N3{&quot;L2-N3&lt;br/&gt;人工發布核准？&quot;}
-    L2N3 --&gt;|核准| L2N4[&quot;L2-N4&lt;br/&gt;準備發布&quot;]
+    L2N3 --&gt;|核准| L2N4(&quot;L2-N4&lt;br/&gt;準備發布&quot;)
     L2N4 --&gt; L2N5{&quot;L2-N5&lt;br/&gt;已合併正式分支？&quot;}
-    L2N5 --&gt;|是| L2N6[&quot;L2-N6&lt;br/&gt;正式權威生效&quot;]
-    L2N2 --&gt;|草稿／變更／pins 缺口| L2N7[&quot;L2-N7&lt;br/&gt;退回 L1&quot;]
+    L2N5 --&gt;|是| L2N6([&quot;L2-N6&lt;br/&gt;正式權威生效&quot;])
+    L2N2 --&gt;|草稿／變更／pins 缺口| L2N7{{&quot;L2-N7&lt;br/&gt;退回 L1&quot;}}
     L2N3 --&gt;|未核准| L2N7
-    L2N5 --&gt;|否| L2N8[&quot;L2-N8&lt;br/&gt;阻止新研究&quot;]
+    L2N5 --&gt;|否| L2N8([&quot;L2-N8&lt;br/&gt;阻止新研究&quot;])
     L2N8 -. 等待合併 .-&gt; L2N5
   end
 
   subgraph L3[&quot;L3｜研究與獨立審查&quot;]
     direction TB
-    L3N1[&quot;L3-N1&lt;br/&gt;研究先安全化&quot;]
-    L3N2[&quot;L3-N2&lt;br/&gt;預註冊&quot;] --&gt; L3N3[&quot;L3-N3&lt;br/&gt;執行與證據&quot;]
+    L3N1(&quot;L3-N1&lt;br/&gt;研究先安全化&quot;)
+    L3N2(&quot;L3-N2&lt;br/&gt;預註冊&quot;) --&gt; L3N3(&quot;L3-N3&lt;br/&gt;執行與證據&quot;)
     L3N3 --&gt; L3N4{&quot;L3-N4&lt;br/&gt;獨立審查&quot;}
     L3N4 --&gt;|退回補證| L3N3
-    L3N4 --&gt;|完成| L3N5[&quot;L3-N5&lt;br/&gt;終局結論&quot;]
+    L3N4 --&gt;|完成| L3N5((&quot;L3-N5&lt;br/&gt;終局結論&quot;))
   end
 
   L1N5 --&gt;|draft handoff| L2N1
@@ -1219,6 +1335,7 @@ flowchart TB
         &lt;h3 id=&quot;wgl-a1-detail-title&quot;&gt;L1-N1｜可能的輸入&lt;/h3&gt;
         &lt;p id=&quot;wgl-a1-detail-summary&quot;&gt;彙整首次建立、版本變更、研究回饋與 L2 退回的修正需求。&lt;/p&gt;
         &lt;dl class=&quot;wgl-a1-detail-grid text-small&quot;&gt;
+          &lt;div&gt;&lt;dt&gt;節點類型&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-type&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
           &lt;div&gt;&lt;dt&gt;輸入&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-input&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
           &lt;div&gt;&lt;dt&gt;下一步&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-next&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
           &lt;div&gt;&lt;dt&gt;限制／失敗處理&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-guard&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
@@ -1226,6 +1343,67 @@ flowchart TB
       &lt;/section&gt;
       &lt;/div&gt;
     &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-state-machine-title&quot;&gt;
+    &lt;h2 id=&quot;wgl-state-machine-title&quot;&gt;A1-1｜A1 治理控制有限狀態機&lt;/h2&gt;
+    &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
+      Transition 標示為 &lt;code&gt;事件 [guard] / action&lt;/code&gt;；節點是可持續的 control state，邊框色對應 L1、L2、L3。這裡追蹤單一治理個案；workflow version 與 study 本身的 lifecycle 仍以 A2 為準。
+    &lt;/p&gt;
+    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a11&quot; data-diagram=&quot;a1-state-machine&quot;&gt;
+stateDiagram-v2
+  direction TB
+
+  state &quot;S0 · L1 輸入待整理&quot; as InputPending
+  state &quot;S1 · L1 Preview 已產生&quot; as PreviewReady
+  state &quot;S2 · L1 等待人工確認&quot; as AuthoringConfirmationPending
+  state &quot;S3 · L1 Draft 已就緒&quot; as DraftReady
+  state &quot;S4 · L3 Study 需要安全化&quot; as StudySafetyRequired
+  state &quot;S5 · L2 等待發布核准&quot; as ReleaseApprovalPending
+  state &quot;S6 · L2 Prepared、等待合併&quot; as PreparedAwaitingMerge
+  state &quot;S7 · L2 正式權威生效&quot; as ActiveAuthority
+  state &quot;S8 · L3 Study 已預註冊&quot; as StudyPreregistered
+  state &quot;S9 · L3 Running／蒐集證據&quot; as StudyRunning
+  state &quot;S10 · L3 Awaiting review&quot; as AwaitingReview
+  state &quot;S11 · L3 Completed／Outcome 已凍結&quot; as StudyCompleted
+
+  [*] --&gt; InputPending: 建立／變更需求
+  InputPending --&gt; PreviewReady: closed request / AI 產生 preview
+  PreviewReady --&gt; InputPending: [失敗、衝突或 drift] / 修正輸入
+  PreviewReady --&gt; AuthoringConfirmationPending: [preview 可套用]
+  AuthoringConfirmationPending --&gt; InputPending: 要求修改
+  AuthoringConfirmationPending --&gt; DraftReady: 確認 / 套用 draft
+
+  DraftReady --&gt; InputPending: release guards [contract／change／pins 缺口]
+  DraftReady --&gt; StudySafetyRequired: release guards [unfinished study 不安全]
+  StudySafetyRequired --&gt; DraftReady: [paused／completed／cancelled] / 記錄 impact decision
+  DraftReady --&gt; ReleaseApprovalPending: release guards [全部通過]
+  ReleaseApprovalPending --&gt; InputPending: 未核准
+  ReleaseApprovalPending --&gt; PreparedAwaitingMerge: 核准 / 產生 RELEASE.json
+  PreparedAwaitingMerge --&gt; PreparedAwaitingMerge: 尚未 canonical merge / 阻止新 study
+  PreparedAwaitingMerge --&gt; ActiveAuthority: canonical merge
+
+  ActiveAuthority --&gt; StudyPreregistered: preregistration approval / 凍結 identity 與 plan
+  StudyPreregistered --&gt; StudyRunning: Development approval
+  StudyRunning --&gt; AwaitingReview: 提交 exact evidence
+  AwaitingReview --&gt; StudyRunning: reviewer 退回補證
+  AwaitingReview --&gt; StudyCompleted: reviewer confirmation / 凍結 outcome
+  StudyCompleted --&gt; InputPending: 需要改流程 / 建立 change request
+  StudyCompleted --&gt; [*]: 無流程變更
+
+  note right of ActiveAuthority
+    Workflow authority 在 L3 study 推進期間仍持續有效；
+    狀態轉移只表示本治理個案的控制焦點。
+  end note
+
+  classDef l1 fill:var(--card),stroke:var(--viz-series-1),stroke-width:2px,color:var(--foreground)
+  classDef l2 fill:var(--card),stroke:var(--viz-series-3),stroke-width:2px,color:var(--foreground)
+  classDef l3 fill:var(--card),stroke:var(--viz-series-2),stroke-width:2px,color:var(--foreground)
+  class InputPending,PreviewReady,AuthoringConfirmationPending,DraftReady l1
+  class ReleaseApprovalPending,PreparedAwaitingMerge,ActiveAuthority l2
+  class StudySafetyRequired,StudyPreregistered,StudyRunning,AwaitingReview,StudyCompleted l3
+    &lt;/pre&gt;
+    &lt;div id=&quot;wgl-a11-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-1…&lt;/div&gt;
   &lt;/section&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-internal-title&quot;&gt;
@@ -1365,18 +1543,41 @@ flowchart TB
 
   &lt;script type=&quot;module&quot;&gt;
     const root = document.getElementById(&quot;workflow-governance-layers&quot;);
-    const status = root.querySelector(&quot;#wgl-mermaid-status&quot;);
+    const a1Status = root.querySelector(&quot;#wgl-mermaid-status&quot;);
+    const a11Status = root.querySelector(&quot;#wgl-a11-mermaid-status&quot;);
     const isMobileLayout = window.matchMedia(&quot;(max-width: 520px)&quot;).matches;
     const isTwoColumnLayout = window.matchMedia(&quot;(min-width: 900px)&quot;).matches;
-    const diagrams = [...root.querySelectorAll(&quot;.wgl-mermaid-a1&quot;)];
+    const diagrams = [...root.querySelectorAll(&quot;.wgl-mermaid&quot;)];
     const detailSelect = root.querySelector(&quot;#wgl-a1-detail-select&quot;);
     const detailTitle = root.querySelector(&quot;#wgl-a1-detail-title&quot;);
     const detailSummary = root.querySelector(&quot;#wgl-a1-detail-summary&quot;);
+    const detailType = root.querySelector(&quot;#wgl-a1-detail-type&quot;);
     const detailInput = root.querySelector(&quot;#wgl-a1-detail-input&quot;);
     const detailNext = root.querySelector(&quot;#wgl-a1-detail-next&quot;);
     const detailGuard = root.querySelector(&quot;#wgl-a1-detail-guard&quot;);
     const detailPanel = root.querySelector(&quot;#wgl-a1-detail-panel&quot;);
     const decisionNodes = new Set([&quot;L1N3&quot;, &quot;L1N4&quot;, &quot;L2N2&quot;, &quot;L2N3&quot;, &quot;L2N5&quot;, &quot;L3N4&quot;]);
+    const nodeTypes = {
+      L1N1: { key: &quot;input&quot;, label: &quot;輸入／觸發來源&quot; },
+      L1N2: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L1N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L1N4: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L1N5: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L1N6: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L2N1: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L2N2: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L2N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L2N4: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L2N5: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L2N6: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
+      L2N7: { key: &quot;routing&quot;, label: &quot;路由／退回&quot; },
+      L2N8: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
+      L3N1: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L3N2: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L3N3: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
+      L3N4: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L3N5: { key: &quot;outcome&quot;, label: &quot;終局結果&quot; }
+    };
 
     const details = {
       L1N1: {
@@ -1520,6 +1721,7 @@ flowchart TB
       detailSelect.value = nodeId;
       detailTitle.textContent = detail.title;
       detailSummary.textContent = detail.summary;
+      detailType.textContent = nodeTypes[nodeId].label;
       detailInput.textContent = detail.input;
       detailNext.textContent = detail.next;
       detailGuard.textContent = detail.guard;
@@ -1588,9 +1790,15 @@ flowchart TB
 
       await mermaid.run({ nodes: diagrams });
       const svgs = diagrams.map((item) =&gt; item.querySelector(&quot;svg&quot;));
-      svgs.forEach((svg) =&gt; {
+      svgs.forEach((svg, index) =&gt; {
+        const diagram = diagrams[index].dataset.diagram;
         svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
-        svg.setAttribute(&quot;aria-label&quot;, &quot;A1：L1 流程設計、L2 發布授權與 L3 研究審查的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;);
+        svg.setAttribute(
+          &quot;aria-label&quot;,
+          diagram === &quot;a1-state-machine&quot;
+            ? &quot;A1-1：由輸入待整理、preview、draft、發布、正式權威、study 執行與終局結果構成的治理控制有限狀態機&quot;
+            : &quot;A1：L1 流程設計、L2 發布授權與 L3 研究審查的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;
+        );
         svg.removeAttribute(&quot;height&quot;);
         svg.querySelectorAll(&quot;g.cluster&quot;).forEach((cluster) =&gt; {
           const label = cluster.textContent.trim();
@@ -1601,17 +1809,19 @@ flowchart TB
       });
 
       Object.entries(details).forEach(([nodeId, detail]) =&gt; {
+        const nodeType = nodeTypes[nodeId];
         const node = svgs
           .flatMap((svg) =&gt; [...svg.querySelectorAll(&quot;g.node&quot;)])
           .find((candidate) =&gt; candidate.id.startsWith(`flowchart-${nodeId}-`));
         if (!node) return;
         const link = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;a&quot;);
         link.setAttribute(&quot;href&quot;, &quot;#wgl-a1-detail-panel&quot;);
-        link.setAttribute(&quot;aria-label&quot;, `查看 ${detail.title} 的詳細說明`);
+        link.setAttribute(&quot;aria-label&quot;, `查看 ${detail.title} 的詳細說明；節點類型：${nodeType.label}`);
         link.setAttribute(&quot;data-tooltip&quot;, detail.summary);
         link.setAttribute(&quot;data-tooltip-placement&quot;, &quot;top&quot;);
         link.classList.add(&quot;wgl-node-link&quot;);
         link.classList.add(`wgl-node-${nodeId.slice(0, 2).toLowerCase()}`);
+        link.classList.add(`wgl-node-type-${nodeType.key}`);
         if (decisionNodes.has(nodeId)) link.classList.add(&quot;wgl-node-decision&quot;);
         node.parentNode.insertBefore(link, node);
         link.append(node);
@@ -1626,13 +1836,16 @@ flowchart TB
         });
       });
 
-      status.textContent = !isTwoColumnLayout
+      a1Status.textContent = !isTwoColumnLayout
         ? &quot;滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。&quot;
         : &quot;滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。&quot;;
+      a11Status.textContent = &quot;A1 的活動、判斷與路由已移到 transition；圖中只保留可持續的 control state。&quot;;
     } catch (error) {
       console.error(error);
-      status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
-      status.classList.add(&quot;text-destructive&quot;);
+      a1Status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
+      a11Status.textContent = &quot;A1-1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
+      a1Status.classList.add(&quot;text-destructive&quot;);
+      a11Status.classList.add(&quot;text-destructive&quot;);
     }
   &lt;/script&gt;
 &lt;/div&gt;
