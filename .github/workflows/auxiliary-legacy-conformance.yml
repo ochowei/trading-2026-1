@@ -3,6 +3,22 @@ name: Auxiliary legacy conformance
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/auxiliary-legacy-conformance.yml"
+      - "legacy/experiments/**"
+      - "src/trading/experiments/**"
+      - "src/trading/legacy/experiments.py"
+      - "src/trading/core/base_*.py"
+      - "src/trading/core/bundle_strategy.py"
+      - "src/trading/core/data_fetcher.py"
+      - "src/trading/core/execution_*.py"
+      - "src/trading/core/sleeve_engine.py"
+      - "src/trading/market_data/**"
+      - "src/trading/research_data/**"
+      - "tests/conftest.py"
+      - "tests/legacy/conformance/test_auxiliary_followup_snapshot_contract.py"
+      - "pyproject.toml"
+      - "uv.lock"
   pull_request:
     branches: [main]
     types: [labeled]
