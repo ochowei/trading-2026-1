@@ -434,6 +434,19 @@
       "reason": "Legacy import, archive, and fail-closed compatibility tests."
     },
     {
+      "pattern": "tests/legacy/conformance",
+      "status": "legacy-compat",
+      "canonical_owner": "tests/legacy/conformance/README.md",
+      "allows_new_content": false,
+      "content_guard": "closed-children",
+      "allowed_children": [
+        "README.md",
+        "test_auxiliary_followup_snapshot_contract.py",
+        "test_primary_followup_snapshot_contract.py"
+      ],
+      "reason": "Exhaustive replay matrix for the closed legacy inventory; run selectively or on schedule."
+    },
+    {
       "pattern": "tests/market_data",
       "status": "shared",
       "canonical_owner": "tests/README.md",

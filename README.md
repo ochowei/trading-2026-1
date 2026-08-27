@@ -34,9 +34,16 @@ Policy
 
 ```bash
 uv sync
+uv run pytest -m "not slow"
 uv run trading policy validate --all
 uv run trading workflow validate --all
 ```
+
+每個 PR 都會執行 41 項 frozen legacy smoke cases，其中包含 10 個 auxiliary experiments／20
+項 auxiliary tests。完整 Primary matrix 依高風險 paths、main 與每日排程執行；完整 Auxiliary
+matrix 只在 main、每週排程、手動 dispatch 或 PR 加上 `full-auxiliary-conformance` label 時
+執行。本機完整驗證使用 `uv run pytest -m legacy_conformance -n auto`。詳見
+[`tests/README.md`](tests/README.md)。
 
 若需完整規則，請直接閱讀各區塊的權威文件：
 
