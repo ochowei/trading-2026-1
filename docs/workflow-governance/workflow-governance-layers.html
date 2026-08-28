@@ -1197,7 +1197,7 @@ flowchart TB
     L2N8 -. 等待合併 .-&gt; L2N5
   end
 
-  subgraph L3[&quot;L3｜研究與獨立審查&quot;]
+  subgraph L3[&quot;L3｜各 Study Instance（0..n，可並行）&quot;]
     direction TB
     L3N1(&quot;L3-N1&lt;br/&gt;研究先安全化&quot;)
     L3N2(&quot;L3-N2&lt;br/&gt;預註冊&quot;) --&gt;|首次 Development approval| L3N3(&quot;L3-N3&lt;br/&gt;執行與證據&quot;)
@@ -1210,7 +1210,7 @@ flowchart TB
   L2N2 --&gt;|study 不安全| L3N1
   L3N1 -. 安全後重試 .-&gt; L2N1
   L2N7 -. 修正後重試 .-&gt; L1N2
-  L2N6 --&gt;|immutable pins| L3N2
+  L2N6 --&gt;|建立獨立 Sxxx（可重複；0..n；immutable pins）| L3N2
   L3N5 -. 需要改流程 .-&gt; L1N1
         &lt;/pre&gt;
         &lt;div id=&quot;wgl-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1…&lt;/div&gt;
@@ -1237,7 +1237,7 @@ flowchart TB
             &lt;option value=&quot;L2N7&quot;&gt;L2-N7｜退回 L1&lt;/option&gt;
             &lt;option value=&quot;L2N8&quot;&gt;L2-N8｜阻止新研究&lt;/option&gt;
           &lt;/optgroup&gt;
-          &lt;optgroup label=&quot;L3｜研究與獨立審查&quot;&gt;
+          &lt;optgroup label=&quot;L3｜各 Study Instance（0..n，可並行）&quot;&gt;
             &lt;option value=&quot;L3N1&quot;&gt;L3-N1｜研究先安全化&lt;/option&gt;
             &lt;option value=&quot;L3N2&quot;&gt;L3-N2｜預註冊&lt;/option&gt;
             &lt;option value=&quot;L3N3&quot;&gt;L3-N3｜執行與證據&lt;/option&gt;
@@ -1261,49 +1261,51 @@ flowchart TB
   &lt;/section&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-aligned-state-machine-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-aligned-state-machine-title&quot;&gt;A1-2｜與 A1 嚴格對齊的治理控制有限狀態機&lt;/h2&gt;
+    &lt;h2 id=&quot;wgl-aligned-state-machine-title&quot;&gt;A1-2｜單一 Sxxx（可多重實例化）的治理控制有限狀態機&lt;/h2&gt;
     &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
-      使用精簡的 control states，並將 A1 的修正回路、&lt;code&gt;immutable pins&lt;/code&gt; guard 與首次 &lt;code&gt;Development approval&lt;/code&gt; 明確映射到 transition。所有返回 Preview 的 transition 都會修正 request 並產生 fresh preview。
+      節點使用 &lt;code&gt;A12-Nxx&lt;/code&gt;，transition action 使用 &lt;code&gt;A12-Axx&lt;/code&gt;；起點與終點不另算節點。L1／L2 維持整體治理狀態；L3 則是每個 &lt;code&gt;Sxxx&lt;/code&gt; 各自遵守的 instance lifecycle，同一個 active workflow 下可同時存在 0..n 份。圖中也將 A1 的修正回路、&lt;code&gt;immutable pins&lt;/code&gt; guard 與首次 &lt;code&gt;Development approval&lt;/code&gt; 明確映射到 transition；所有返回 Preview 的 transition 都會修正 request 並產生 fresh preview。
     &lt;/p&gt;
     &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a12&quot; data-diagram=&quot;a1-aligned-state-machine&quot;&gt;
 stateDiagram-v2
   direction TB
 
-  state &quot;L1 · 輸入待整理&quot; as InputPending
-  state &quot;L1 · Preview 待人工確認&quot; as PreviewConfirmationPending
-  state &quot;L1 · Draft 已就緒&quot; as DraftReady
-  state &quot;L3 · Study 需要安全化&quot; as StudySafetyRequired
-  state &quot;L2 · 等待發布核准&quot; as ReleaseApprovalPending
-  state &quot;L2 · Prepared／等待合併（新 study blocked）&quot; as PreparedAwaitingMerge
-  state &quot;L2 · 正式權威生效&quot; as ActiveAuthority
-  state &quot;L3 · Study 已預註冊&quot; as StudyPreregistered
-  state &quot;L3 · Running／蒐集證據&quot; as StudyRunning
-  state &quot;L3 · Awaiting review&quot; as AwaitingReview
-  state &quot;L3 · Completed／Outcome 已凍結&quot; as StudyCompleted
+  state &quot;A12-N01 · L1 · 輸入待整理&quot; as InputPending
+  state &quot;A12-N02 · L1 · Preview 待人工確認&quot; as PreviewConfirmationPending
+  state &quot;A12-N03 · L1 · Draft 已就緒&quot; as DraftReady
+  state &quot;A12-N04 · L3 · Study 需要安全化&quot; as StudySafetyRequired
+  state &quot;A12-N05 · L2 · 等待發布核准&quot; as ReleaseApprovalPending
+  state &quot;A12-N06 · L2 · Prepared／等待合併（新 study blocked）&quot; as PreparedAwaitingMerge
+  state &quot;A12-N07 · L2 · 正式權威生效&quot; as ActiveAuthority
+  state &quot;A12-N08 · L3 · Study 已預註冊&quot; as StudyPreregistered
+  state &quot;A12-N09 · L3 · Running／蒐集證據&quot; as StudyRunning
+  state &quot;A12-N10 · L3 · Awaiting review&quot; as AwaitingReview
+  state &quot;A12-N11 · L3 · Completed／Outcome 已凍結&quot; as StudyCompleted
 
-  [*] --&gt; InputPending: 建立／變更需求
-  InputPending --&gt; PreviewConfirmationPending: closed request / 產生 preview
-  PreviewConfirmationPending --&gt; PreviewConfirmationPending: preview 失敗／要求修改
-  PreviewConfirmationPending --&gt; DraftReady: 確認 [preview 可套用] / 套用 draft
+  [*] --&gt; InputPending: A12-A01｜建立／變更需求
+  InputPending --&gt; PreviewConfirmationPending: A12-A02｜closed request / 產生 preview
+  PreviewConfirmationPending --&gt; PreviewConfirmationPending: A12-A03｜preview 失敗／要求修改
+  PreviewConfirmationPending --&gt; DraftReady: A12-A04｜確認 [preview 可套用] / 套用 draft
 
-  DraftReady --&gt; PreviewConfirmationPending: release guards [缺口]
-  DraftReady --&gt; StudySafetyRequired: release guards [unfinished study 不安全]
-  StudySafetyRequired --&gt; DraftReady: [paused／completed／cancelled] / 記錄 impact decision
-  DraftReady --&gt; ReleaseApprovalPending: release guards [全部通過]
-  ReleaseApprovalPending --&gt; PreviewConfirmationPending: 未核准
-  ReleaseApprovalPending --&gt; PreparedAwaitingMerge: 核准 / 產生 RELEASE.json
-  PreparedAwaitingMerge --&gt; ActiveAuthority: canonical merge
+  DraftReady --&gt; PreviewConfirmationPending: A12-A05｜release guards [缺口]
+  DraftReady --&gt; StudySafetyRequired: A12-A06｜release guards [unfinished study 不安全]
+  StudySafetyRequired --&gt; DraftReady: A12-A07｜[paused／completed／cancelled] / 記錄 impact decision
+  DraftReady --&gt; ReleaseApprovalPending: A12-A08｜release guards [全部通過]
+  ReleaseApprovalPending --&gt; PreviewConfirmationPending: A12-A09｜未核准
+  ReleaseApprovalPending --&gt; PreparedAwaitingMerge: A12-A10｜核准 / 產生 RELEASE.json
+  PreparedAwaitingMerge --&gt; ActiveAuthority: A12-A11｜canonical merge
 
-  ActiveAuthority --&gt; StudyPreregistered: preregistration approval [immutable pins] / 凍結 identity 與 plan
-  StudyPreregistered --&gt; StudyRunning: 首次 Development approval
-  StudyRunning --&gt; AwaitingReview: 提交 exact evidence
-  AwaitingReview --&gt; StudyRunning: reviewer 退回補證
-  AwaitingReview --&gt; StudyCompleted: reviewer confirmation / 凍結 outcome
-  StudyCompleted --&gt; InputPending: 需要改流程 / 建立 change request
-  StudyCompleted --&gt; [*]: 無流程變更
+  ActiveAuthority --&gt; StudyPreregistered: A12-A12｜建立 Sxxx [可重複、0..n；immutable pins] / 獨立預註冊
+  StudyPreregistered --&gt; StudyRunning: A12-A13｜首次 Development approval
+  StudyRunning --&gt; AwaitingReview: A12-A14｜提交 exact evidence
+  AwaitingReview --&gt; StudyRunning: A12-A15｜reviewer 退回補證
+  AwaitingReview --&gt; StudyCompleted: A12-A16｜reviewer confirmation / 凍結 outcome
+  StudyCompleted --&gt; InputPending: A12-A17｜需要改流程 / 建立 change request
+  StudyCompleted --&gt; [*]: A12-A18｜此 Sxxx 結束；其他 study 不受影響
 
   note right of ActiveAuthority
-    Workflow authority 在 study 推進期間持續有效。
+    Workflow authority 持續有效。
+    可重複建立 0..n 個獨立 Sxxx；
+    各 instance 可同時推進。
   end note
 
   classDef l1 fill:var(--card),stroke:var(--viz-series-1),stroke-width:2px,color:var(--foreground)
@@ -1434,10 +1436,10 @@ stateDiagram-v2
       },
       L2N6: {
         title: &quot;L2-N6｜正式權威生效&quot;,
-        summary: &quot;Canonical branch 上的 active version 成為新的 effective authority。&quot;,
+        summary: &quot;Canonical branch 上的 active version 成為可供多個 study 共同釘選的 effective authority。&quot;,
         input: &quot;已合併的 prepared release、immutable release evidence 與 exact pins。&quot;,
-        next: &quot;允許 L3 依 exact version 與 immutable pins 建立 study。&quot;,
-        guard: &quot;Authority 只適用於精確釘選的 released version 與 dependencies。&quot;
+        next: &quot;可重複配發新的 Sxxx；每個 instance 依 exact version 與 immutable pins 獨立預註冊及推進。&quot;,
+        guard: &quot;Authority 只適用於精確釘選的 released version 與 dependencies；各 study 的 identity、plan、授權與 evidence 不得混用。&quot;
       },
       L2N7: {
         title: &quot;L2-N7｜退回 L1&quot;,
@@ -1462,10 +1464,10 @@ stateDiagram-v2
       },
       L3N2: {
         title: &quot;L3-N2｜預註冊&quot;,
-        summary: &quot;在 outcome-relevant execution 或 inspection 前凍結 study identity 與 plan。&quot;,
+        summary: &quot;為每個 Sxxx instance 在 outcome-relevant execution 或 inspection 前凍結 identity 與 plan。&quot;,
         input: &quot;Effective canonical workflow authority、exact policies／dependencies 與人類 preregistration approval。&quot;,
         next: &quot;取得首次 Development approval 後，依 frozen plan 推進各研究階段。&quot;,
-        guard: &quot;Preregistration、Development、candidate freeze 與 Evaluation 的 authority 不可互相推導。&quot;
+        guard: &quot;同一 active workflow 可有 0..n 個獨立 instance；Preregistration、Development、candidate freeze 與 Evaluation 的 authority 不可跨 study 或互相推導。&quot;
       },
       L3N3: {
         title: &quot;L3-N3｜執行與證據&quot;,
@@ -1485,8 +1487,8 @@ stateDiagram-v2
         title: &quot;L3-N5｜終局結論&quot;,
         summary: &quot;凍結 pass、fail、insufficient-evidence 或 indeterminate outcome。&quot;,
         input: &quot;Independent reviewer 的明確確認與完成的 evidence assessment。&quot;,
-        next: &quot;研究結束；若揭示流程改善需求，建立新的 change request 回到 L1-N1。&quot;,
-        guard: &quot;Study outcome 不得自動覆寫 released workflow 或改變 L1／L2 authority。&quot;
+        next: &quot;此 Sxxx instance 結束，不影響其他 study；若揭示流程改善需求，建立新的 change request 回到 L1-N1。&quot;,
+        guard: &quot;Study outcome 不得自動覆寫 released workflow、改變 L1／L2 authority，或阻止正式權威建立其他獨立 Sxxx。&quot;
       }
     };
 
@@ -1571,8 +1573,8 @@ stateDiagram-v2
         svg.setAttribute(
           &quot;aria-label&quot;,
           diagram === &quot;a1-aligned-state-machine&quot;
-            ? &quot;A1-2：將 A1 修正回路、immutable pins 與首次 Development approval 明確映射到 transition 的治理控制有限狀態機&quot;
-            : &quot;A1：L1 流程設計、L2 發布授權與 L3 研究審查的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;
+            ? &quot;A1-2：單一 Sxxx 的治理控制有限狀態機；同一 active workflow 可同時存在多個獨立 instance&quot;
+            : &quot;A1：L1 流程設計、L2 發布授權與 0..n 個可並行 L3 Study Instance 的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;
         );
         svg.removeAttribute(&quot;height&quot;);
         svg.querySelectorAll(&quot;g.cluster&quot;).forEach((cluster) =&gt; {
@@ -1614,7 +1616,7 @@ stateDiagram-v2
       a1Status.textContent = !isTwoColumnLayout
         ? &quot;滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。&quot;
         : &quot;滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。&quot;;
-      a12Status.textContent = &quot;A1-2 已將 A1 的修正回路、immutable pins 與首次 Development approval 明確映射到 transition。&quot;;
+      a12Status.textContent = &quot;A1-2 的 11 個節點與 18 個 action 已編號；同一 active workflow 可同時存在 0..n 個獨立 Sxxx instance。&quot;;
     } catch (error) {
       console.error(error);
       a1Status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
