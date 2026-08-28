@@ -1134,94 +1134,9 @@ html&gt;body{padding:0}&lt;/style&gt;
       overflow-wrap: anywhere;
     }
 
-    #workflow-governance-layers .wgl-a2-reference {
-      display: grid;
-      gap: 1px;
-      min-width: 0;
-    }
-
-    #workflow-governance-layers .wgl-a2-layer {
-      --wgl-layer-color: var(--viz-series-1);
-      min-width: 0;
-      border-block-start: 1px solid var(--border);
-      background: color-mix(in srgb, var(--wgl-layer-color) 3%, transparent);
-    }
-
-    #workflow-governance-layers .wgl-a2-layer:last-child {
-      border-block-end: 1px solid var(--border);
-    }
-
-    #workflow-governance-layers .wgl-a2-l2 {
-      --wgl-layer-color: var(--viz-series-3);
-    }
-
-    #workflow-governance-layers .wgl-a2-l3 {
-      --wgl-layer-color: var(--viz-series-2);
-    }
-
-    #workflow-governance-layers .wgl-a2-layer summary {
-      cursor: pointer;
-      padding: 12px 10px;
-      overflow-wrap: anywhere;
-      background: color-mix(in srgb, var(--wgl-layer-color) 6%, transparent);
-    }
-
-    #workflow-governance-layers .wgl-a2-summary-copy {
-      display: grid;
-      gap: 3px;
-      min-width: 0;
-      margin-inline-start: 4px;
-    }
-
-    #workflow-governance-layers .wgl-a2-purpose,
-    #workflow-governance-layers .wgl-a2-brief {
-      color: var(--muted-foreground);
-    }
-
-    #workflow-governance-layers .wgl-a2-body {
-      display: grid;
-      gap: 14px;
-      min-width: 0;
-      padding: 2px 10px 16px 30px;
-      overflow-wrap: anywhere;
-    }
-
-    #workflow-governance-layers .wgl-a2-body section {
-      display: grid;
-      gap: 6px;
-      min-width: 0;
-    }
-
-    #workflow-governance-layers .wgl-a2-body h3,
-    #workflow-governance-layers .wgl-a2-body p,
-    #workflow-governance-layers .wgl-a2-body ul {
-      margin: 0;
-    }
-
-    #workflow-governance-layers .wgl-a2-body ul {
-      padding-inline-start: 20px;
-    }
-
-    #workflow-governance-layers .wgl-a2-body li + li {
-      margin-top: 4px;
-    }
-
-    #workflow-governance-layers .wgl-a2-body code {
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-
     @media (max-width: 520px) {
       #workflow-governance-layers {
         gap: 16px;
-      }
-
-      #workflow-governance-layers .wgl-a2-layer summary {
-        padding: 10px 4px;
-      }
-
-      #workflow-governance-layers .wgl-a2-body {
-        padding: 2px 4px 14px 22px;
       }
     }
 
@@ -1285,7 +1200,7 @@ flowchart TB
   subgraph L3[&quot;L3｜研究與獨立審查&quot;]
     direction TB
     L3N1(&quot;L3-N1&lt;br/&gt;研究先安全化&quot;)
-    L3N2(&quot;L3-N2&lt;br/&gt;預註冊&quot;) --&gt; L3N3(&quot;L3-N3&lt;br/&gt;執行與證據&quot;)
+    L3N2(&quot;L3-N2&lt;br/&gt;預註冊&quot;) --&gt;|首次 Development approval| L3N3(&quot;L3-N3&lt;br/&gt;執行與證據&quot;)
     L3N3 --&gt; L3N4{&quot;L3-N4&lt;br/&gt;獨立審查&quot;}
     L3N4 --&gt;|退回補證| L3N3
     L3N4 --&gt;|完成| L3N5((&quot;L3-N5&lt;br/&gt;終局結論&quot;))
@@ -1345,46 +1260,42 @@ flowchart TB
     &lt;/div&gt;
   &lt;/section&gt;
 
-  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-state-machine-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-state-machine-title&quot;&gt;A1-1｜A1 治理控制有限狀態機&lt;/h2&gt;
+  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-aligned-state-machine-title&quot;&gt;
+    &lt;h2 id=&quot;wgl-aligned-state-machine-title&quot;&gt;A1-2｜與 A1 嚴格對齊的治理控制有限狀態機&lt;/h2&gt;
     &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
-      Transition 標示為 &lt;code&gt;事件 [guard] / action&lt;/code&gt;；節點是可持續的 control state，邊框色對應 L1、L2、L3。這裡追蹤單一治理個案；workflow version 與 study 本身的 lifecycle 仍以 A2 為準。
+      使用精簡的 control states，並將 A1 的修正回路、&lt;code&gt;immutable pins&lt;/code&gt; guard 與首次 &lt;code&gt;Development approval&lt;/code&gt; 明確映射到 transition。所有返回 Preview 的 transition 都會修正 request 並產生 fresh preview。
     &lt;/p&gt;
-    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a11&quot; data-diagram=&quot;a1-state-machine&quot;&gt;
+    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a12&quot; data-diagram=&quot;a1-aligned-state-machine&quot;&gt;
 stateDiagram-v2
   direction TB
 
-  state &quot;S0 · L1 輸入待整理&quot; as InputPending
-  state &quot;S1 · L1 Preview 已產生&quot; as PreviewReady
-  state &quot;S2 · L1 等待人工確認&quot; as AuthoringConfirmationPending
-  state &quot;S3 · L1 Draft 已就緒&quot; as DraftReady
-  state &quot;S4 · L3 Study 需要安全化&quot; as StudySafetyRequired
-  state &quot;S5 · L2 等待發布核准&quot; as ReleaseApprovalPending
-  state &quot;S6 · L2 Prepared、等待合併&quot; as PreparedAwaitingMerge
-  state &quot;S7 · L2 正式權威生效&quot; as ActiveAuthority
-  state &quot;S8 · L3 Study 已預註冊&quot; as StudyPreregistered
-  state &quot;S9 · L3 Running／蒐集證據&quot; as StudyRunning
-  state &quot;S10 · L3 Awaiting review&quot; as AwaitingReview
-  state &quot;S11 · L3 Completed／Outcome 已凍結&quot; as StudyCompleted
+  state &quot;L1 · 輸入待整理&quot; as InputPending
+  state &quot;L1 · Preview 待人工確認&quot; as PreviewConfirmationPending
+  state &quot;L1 · Draft 已就緒&quot; as DraftReady
+  state &quot;L3 · Study 需要安全化&quot; as StudySafetyRequired
+  state &quot;L2 · 等待發布核准&quot; as ReleaseApprovalPending
+  state &quot;L2 · Prepared／等待合併（新 study blocked）&quot; as PreparedAwaitingMerge
+  state &quot;L2 · 正式權威生效&quot; as ActiveAuthority
+  state &quot;L3 · Study 已預註冊&quot; as StudyPreregistered
+  state &quot;L3 · Running／蒐集證據&quot; as StudyRunning
+  state &quot;L3 · Awaiting review&quot; as AwaitingReview
+  state &quot;L3 · Completed／Outcome 已凍結&quot; as StudyCompleted
 
   [*] --&gt; InputPending: 建立／變更需求
-  InputPending --&gt; PreviewReady: closed request / AI 產生 preview
-  PreviewReady --&gt; InputPending: [失敗、衝突或 drift] / 修正輸入
-  PreviewReady --&gt; AuthoringConfirmationPending: [preview 可套用]
-  AuthoringConfirmationPending --&gt; InputPending: 要求修改
-  AuthoringConfirmationPending --&gt; DraftReady: 確認 / 套用 draft
+  InputPending --&gt; PreviewConfirmationPending: closed request / 產生 preview
+  PreviewConfirmationPending --&gt; PreviewConfirmationPending: preview 失敗／要求修改
+  PreviewConfirmationPending --&gt; DraftReady: 確認 [preview 可套用] / 套用 draft
 
-  DraftReady --&gt; InputPending: release guards [contract／change／pins 缺口]
+  DraftReady --&gt; PreviewConfirmationPending: release guards [缺口]
   DraftReady --&gt; StudySafetyRequired: release guards [unfinished study 不安全]
   StudySafetyRequired --&gt; DraftReady: [paused／completed／cancelled] / 記錄 impact decision
   DraftReady --&gt; ReleaseApprovalPending: release guards [全部通過]
-  ReleaseApprovalPending --&gt; InputPending: 未核准
+  ReleaseApprovalPending --&gt; PreviewConfirmationPending: 未核准
   ReleaseApprovalPending --&gt; PreparedAwaitingMerge: 核准 / 產生 RELEASE.json
-  PreparedAwaitingMerge --&gt; PreparedAwaitingMerge: 尚未 canonical merge / 阻止新 study
   PreparedAwaitingMerge --&gt; ActiveAuthority: canonical merge
 
-  ActiveAuthority --&gt; StudyPreregistered: preregistration approval / 凍結 identity 與 plan
-  StudyPreregistered --&gt; StudyRunning: Development approval
+  ActiveAuthority --&gt; StudyPreregistered: preregistration approval [immutable pins] / 凍結 identity 與 plan
+  StudyPreregistered --&gt; StudyRunning: 首次 Development approval
   StudyRunning --&gt; AwaitingReview: 提交 exact evidence
   AwaitingReview --&gt; StudyRunning: reviewer 退回補證
   AwaitingReview --&gt; StudyCompleted: reviewer confirmation / 凍結 outcome
@@ -1392,159 +1303,23 @@ stateDiagram-v2
   StudyCompleted --&gt; [*]: 無流程變更
 
   note right of ActiveAuthority
-    Workflow authority 在 L3 study 推進期間仍持續有效；
-    狀態轉移只表示本治理個案的控制焦點。
+    Workflow authority 在 study 推進期間持續有效。
   end note
 
   classDef l1 fill:var(--card),stroke:var(--viz-series-1),stroke-width:2px,color:var(--foreground)
   classDef l2 fill:var(--card),stroke:var(--viz-series-3),stroke-width:2px,color:var(--foreground)
   classDef l3 fill:var(--card),stroke:var(--viz-series-2),stroke-width:2px,color:var(--foreground)
-  class InputPending,PreviewReady,AuthoringConfirmationPending,DraftReady l1
+  class InputPending,PreviewConfirmationPending,DraftReady l1
   class ReleaseApprovalPending,PreparedAwaitingMerge,ActiveAuthority l2
   class StudySafetyRequired,StudyPreregistered,StudyRunning,AwaitingReview,StudyCompleted l3
     &lt;/pre&gt;
-    &lt;div id=&quot;wgl-a11-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-1…&lt;/div&gt;
-  &lt;/section&gt;
-
-  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-internal-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-internal-title&quot;&gt;A2｜各 Layer 內部狀態參考&lt;/h2&gt;
-    &lt;div class=&quot;wgl-a2-reference&quot;&gt;
-      &lt;details class=&quot;wgl-a2-layer wgl-a2-l1&quot;&gt;
-        &lt;summary&gt;
-          &lt;span class=&quot;wgl-a2-summary-copy&quot;&gt;
-            &lt;strong&gt;L1｜流程設計&lt;/strong&gt;
-            &lt;span class=&quot;wgl-a2-purpose&quot;&gt;用途：建立、修改或放棄 &lt;code&gt;workflow&lt;/code&gt; 草稿。&lt;/span&gt;
-            &lt;span class=&quot;wgl-a2-brief&quot;&gt;參考 &lt;code&gt;initial&lt;/code&gt;／&lt;code&gt;replacement authoring&lt;/code&gt;、其他 &lt;code&gt;change&lt;/code&gt; 狀態與 &lt;code&gt;fail-closed&lt;/code&gt; 防護。&lt;/span&gt;
-          &lt;/span&gt;
-        &lt;/summary&gt;
-        &lt;div class=&quot;wgl-a2-body&quot;&gt;
-          &lt;section&gt;
-            &lt;h3&gt;正常路徑&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;Initial&lt;/code&gt;：&lt;code&gt;create request&lt;/code&gt; → &lt;code&gt;preview&lt;/code&gt; → &lt;code&gt;human confirm&lt;/code&gt; → version &lt;code&gt;draft&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;Replacement&lt;/code&gt;：change &lt;code&gt;draft&lt;/code&gt; → &lt;code&gt;proposed&lt;/code&gt; → &lt;code&gt;human decision&lt;/code&gt; → &lt;code&gt;accepted&lt;/code&gt; → &lt;code&gt;evolve&lt;/code&gt; → replacement version &lt;code&gt;draft&lt;/code&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;其他狀態&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;proposed → rejected&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;proposed → deferred → proposed&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;proposed&lt;/code&gt; / &lt;code&gt;deferred → withdrawn&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;version &lt;code&gt;draft → abandoned&lt;/code&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;Fail-closed 防護&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;target drift&lt;/code&gt; 或 &lt;code&gt;invalid partial state&lt;/code&gt; 必須阻止 &lt;code&gt;apply&lt;/code&gt;。&lt;/li&gt;
-              &lt;li&gt;保持 &lt;code&gt;zero mutation&lt;/code&gt;。&lt;/li&gt;
-              &lt;li&gt;重新產生 &lt;code&gt;fresh preview&lt;/code&gt;。&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;resolved changes&lt;/code&gt; 改變時必須重新取得人工確認。&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-        &lt;/div&gt;
-      &lt;/details&gt;
-
-      &lt;details class=&quot;wgl-a2-layer wgl-a2-l2&quot;&gt;
-        &lt;summary&gt;
-          &lt;span class=&quot;wgl-a2-summary-copy&quot;&gt;
-            &lt;strong&gt;L2｜發布授權&lt;/strong&gt;
-            &lt;span class=&quot;wgl-a2-purpose&quot;&gt;用途：檢查、核准並讓 &lt;code&gt;workflow version&lt;/code&gt; 取得正式 &lt;code&gt;authority&lt;/code&gt;。&lt;/span&gt;
-            &lt;span class=&quot;wgl-a2-brief&quot;&gt;參考 &lt;code&gt;release guards&lt;/code&gt;、&lt;code&gt;prepared branch&lt;/code&gt;、&lt;code&gt;canonical merge&lt;/code&gt; 與受控終點。&lt;/span&gt;
-          &lt;/span&gt;
-        &lt;/summary&gt;
-        &lt;div class=&quot;wgl-a2-body&quot;&gt;
-          &lt;section&gt;
-            &lt;h3&gt;正常路徑&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;version &lt;code&gt;draft&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;release guards&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;explicit human release approval&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;prepared branch&lt;/code&gt;：registry status 可為 &lt;code&gt;active&lt;/code&gt;，但 authority 尚未生效。&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;canonical merge&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;effective authority&lt;/code&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;Mandatory release guards&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;complete self-contained contract&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;accepted changes&lt;/code&gt; 與 &lt;code&gt;combined impact&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;exact active version being replaced&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;safe unfinished-study state&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;exact released policy pins&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;normative dependencies&lt;/code&gt; 與 &lt;code&gt;pinned companions&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;沒有遺漏或未解決的 &lt;code&gt;accepted changes&lt;/code&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;發布副作用與終點&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;previous &lt;code&gt;active&lt;/code&gt; version → &lt;code&gt;superseded&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;accepted changes&lt;/code&gt; → &lt;code&gt;released&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;active&lt;/code&gt; version 經人工核准且 &lt;code&gt;studies&lt;/code&gt; 安全後可進入 &lt;code&gt;retired&lt;/code&gt;。&lt;/li&gt;
-            &lt;/ul&gt;
-            &lt;p&gt;&lt;code&gt;release approval&lt;/code&gt; 不授權 &lt;code&gt;commit&lt;/code&gt;、&lt;code&gt;push&lt;/code&gt;、&lt;code&gt;merge&lt;/code&gt;、&lt;code&gt;study execution&lt;/code&gt; 或 &lt;code&gt;trading&lt;/code&gt;。&lt;/p&gt;
-          &lt;/section&gt;
-        &lt;/div&gt;
-      &lt;/details&gt;
-
-      &lt;details class=&quot;wgl-a2-layer wgl-a2-l3&quot;&gt;
-        &lt;summary&gt;
-          &lt;span class=&quot;wgl-a2-summary-copy&quot;&gt;
-            &lt;strong&gt;L3｜研究與審查&lt;/strong&gt;
-            &lt;span class=&quot;wgl-a2-purpose&quot;&gt;用途：依 &lt;code&gt;released workflow&lt;/code&gt; 執行 &lt;code&gt;study&lt;/code&gt;，並由獨立 &lt;code&gt;reviewer&lt;/code&gt; 判定結果。&lt;/span&gt;
-            &lt;span class=&quot;wgl-a2-brief&quot;&gt;參考 &lt;code&gt;study lifecycle&lt;/code&gt;、&lt;code&gt;terminal outcomes&lt;/code&gt;、獨立 &lt;code&gt;authority gates&lt;/code&gt; 與角色邊界。&lt;/span&gt;
-          &lt;/span&gt;
-        &lt;/summary&gt;
-        &lt;div class=&quot;wgl-a2-body&quot;&gt;
-          &lt;section&gt;
-            &lt;h3&gt;Study lifecycle&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;draft → preregistered → running → awaiting-review → completed&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;running ↔ paused&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;reviewer return：&lt;code&gt;awaiting-review → running&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;draft&lt;/code&gt; / &lt;code&gt;preregistered&lt;/code&gt; / &lt;code&gt;running&lt;/code&gt; / &lt;code&gt;paused → cancelled&lt;/code&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;Terminal outcomes&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;pass&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;fail&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;insufficient-evidence&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;indeterminate&lt;/code&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;Authority gates&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;preregistration approval&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;Development approval&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;candidate freeze approval&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;Evaluation approval&lt;/code&gt;&lt;/li&gt;
-              &lt;li&gt;以上 authority 必須分開取得，不能從前一階段推導。&lt;/li&gt;
-              &lt;li&gt;reviewer 寫入 &lt;code&gt;terminal outcome&lt;/code&gt; 前，需要 &lt;code&gt;explicit human confirmation&lt;/code&gt; 與 &lt;code&gt;stable reviewer identity&lt;/code&gt;。&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-          &lt;section&gt;
-            &lt;h3&gt;Governance boundary&lt;/h3&gt;
-            &lt;ul&gt;
-              &lt;li&gt;&lt;code&gt;operator&lt;/code&gt; 執行研究並提交 &lt;code&gt;evidence&lt;/code&gt;，但不能決定 &lt;code&gt;outcome&lt;/code&gt;。&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;reviewer&lt;/code&gt; 判定 &lt;code&gt;outcome&lt;/code&gt;，但不能執行研究或修補 &lt;code&gt;evidence&lt;/code&gt;。&lt;/li&gt;
-              &lt;li&gt;&lt;code&gt;study outcome&lt;/code&gt; 只能形成新的 &lt;code&gt;workflow change request&lt;/code&gt;，不能自動修改 &lt;code&gt;released workflow&lt;/code&gt;。&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/section&gt;
-        &lt;/div&gt;
-      &lt;/details&gt;
-    &lt;/div&gt;
+    &lt;div id=&quot;wgl-a12-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2…&lt;/div&gt;
   &lt;/section&gt;
 
   &lt;script type=&quot;module&quot;&gt;
     const root = document.getElementById(&quot;workflow-governance-layers&quot;);
     const a1Status = root.querySelector(&quot;#wgl-mermaid-status&quot;);
-    const a11Status = root.querySelector(&quot;#wgl-a11-mermaid-status&quot;);
+    const a12Status = root.querySelector(&quot;#wgl-a12-mermaid-status&quot;);
     const isMobileLayout = window.matchMedia(&quot;(max-width: 520px)&quot;).matches;
     const isTwoColumnLayout = window.matchMedia(&quot;(min-width: 900px)&quot;).matches;
     const diagrams = [...root.querySelectorAll(&quot;.wgl-mermaid&quot;)];
@@ -1689,7 +1464,7 @@ stateDiagram-v2
         title: &quot;L3-N2｜預註冊&quot;,
         summary: &quot;在 outcome-relevant execution 或 inspection 前凍結 study identity 與 plan。&quot;,
         input: &quot;Effective canonical workflow authority、exact policies／dependencies 與人類 preregistration approval。&quot;,
-        next: &quot;依 frozen plan 推進各研究階段。&quot;,
+        next: &quot;取得首次 Development approval 後，依 frozen plan 推進各研究階段。&quot;,
         guard: &quot;Preregistration、Development、candidate freeze 與 Evaluation 的 authority 不可互相推導。&quot;
       },
       L3N3: {
@@ -1795,8 +1570,8 @@ stateDiagram-v2
         svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
         svg.setAttribute(
           &quot;aria-label&quot;,
-          diagram === &quot;a1-state-machine&quot;
-            ? &quot;A1-1：由輸入待整理、preview、draft、發布、正式權威、study 執行與終局結果構成的治理控制有限狀態機&quot;
+          diagram === &quot;a1-aligned-state-machine&quot;
+            ? &quot;A1-2：將 A1 修正回路、immutable pins 與首次 Development approval 明確映射到 transition 的治理控制有限狀態機&quot;
             : &quot;A1：L1 流程設計、L2 發布授權與 L3 研究審查的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;
         );
         svg.removeAttribute(&quot;height&quot;);
@@ -1839,13 +1614,13 @@ stateDiagram-v2
       a1Status.textContent = !isTwoColumnLayout
         ? &quot;滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。&quot;
         : &quot;滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。&quot;;
-      a11Status.textContent = &quot;A1 的活動、判斷與路由已移到 transition；圖中只保留可持續的 control state。&quot;;
+      a12Status.textContent = &quot;A1-2 已將 A1 的修正回路、immutable pins 與首次 Development approval 明確映射到 transition。&quot;;
     } catch (error) {
       console.error(error);
       a1Status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
-      a11Status.textContent = &quot;A1-1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
+      a12Status.textContent = &quot;A1-2 載入失敗；上方保留可讀的 Mermaid source。&quot;;
       a1Status.classList.add(&quot;text-destructive&quot;);
-      a11Status.classList.add(&quot;text-destructive&quot;);
+      a12Status.classList.add(&quot;text-destructive&quot;);
     }
   &lt;/script&gt;
 &lt;/div&gt;
