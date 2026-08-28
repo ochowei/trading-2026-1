@@ -116,7 +116,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
 | `docs/workflow-governance/README.md` | Human-facing entry point linking canonical workflow authority, workflow skills, governance diagrams, their scope, and the final review conclusion. |
 | `docs/workflow-governance/workflow-governance-flow.html` | Standalone B1 high-level sequence visualization of workflow authoring, release, study-operation, and review role handoffs. |
-| `docs/workflow-governance/workflow-governance-layers.html` | Standalone A1 inter-layer governance flow with decisions and recovery paths, plus the strictly aligned A1-2 governance-control state machine. |
+| `docs/workflow-governance/workflow-governance-layers.html` | Standalone A1 single-Workflow L1–L3 exclusive governance flow, its equivalent A1-2 workflow control state machine, and the separate A1-3 per-study lifecycle within L3. |
 | `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |

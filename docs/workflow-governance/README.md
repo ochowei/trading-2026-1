@@ -24,17 +24,21 @@ The exact released `WORKFLOW.md` pinned by a study remains the procedure authori
 
 ## Diagrams
 
-- [Workflow governance layers](workflow-governance-layers.html): A1 inter-layer governance flow and
-  the strictly aligned A1-2 state machine.
+- [Workflow governance layers](workflow-governance-layers.html): A1 single-Workflow inter-layer
+  governance flow, the equivalent A1-2 workflow control state machine, and the separate A1-3
+  per-study lifecycle inside L3.
 - [Workflow governance flow](workflow-governance-flow.html): B1 high-level role-handoff sequence.
 
 ## Diagram scope and review conclusion
 
-- Last reviewed: 2026-08-24.
-- A1 is the cross-layer governance flow, including decisions, fail-closed guards, recovery, and
-  handoffs between L1, L2, and L3.
-- A1-2 is the compact governance-control state view that maps A1 correction loops, immutable pins,
-  and first-Development approval explicitly to transitions.
+- Last reviewed: 2026-08-28.
+- A1 is the process-and-exception view of one Workflow moving exclusively between L1, L2, and L3;
+  the Workflow occupies only one layer at a time.
+- A1-2 is the equivalent finite-state-machine view of that same single-Workflow governance model.
+  It does not define a second process or mix individual study lifecycle states into Workflow
+  control state.
+- A1-3 is the canonical lifecycle view for one Sxxx inside L3. A Workflow in L3 may coordinate
+  0..n independent A1-3 instances without ceasing to occupy only L3.
 - B1 is a high-level actor handoff summary. It is not a complete authority or lifecycle model; use
   A1 for the detailed gates and control states.
 - A1 replaces the former B2 activity view. B2 was removed because it duplicated the primary
