@@ -24,8 +24,8 @@ The exact released `WORKFLOW.md` pinned by a study remains the procedure authori
 
 ## Diagrams
 
-- [Workflow governance layers](workflow-governance-layers.html): A1 inter-layer governance and A2
-  internal-state reference.
+- [Workflow governance layers](workflow-governance-layers.html): A1 inter-layer governance flow and
+  the strictly aligned A1-2 state machine.
 - [Workflow governance flow](workflow-governance-flow.html): B1 high-level role-handoff sequence.
 
 ## Diagram scope and review conclusion
@@ -33,11 +33,11 @@ The exact released `WORKFLOW.md` pinned by a study remains the procedure authori
 - Last reviewed: 2026-08-24.
 - A1 is the cross-layer governance flow, including decisions, fail-closed guards, recovery, and
   handoffs between L1, L2, and L3.
-- A2 is the internal-state reference for each Layer, including lifecycle alternatives and explicit
-  authority boundaries.
+- A1-2 is the compact governance-control state view that maps A1 correction loops, immutable pins,
+  and first-Development approval explicitly to transitions.
 - B1 is a high-level actor handoff summary. It is not a complete authority or lifecycle model; use
-  A1 and A2 for the detailed gates and states.
-- A1 and A2 replace the former B2 activity view. B2 was removed because it duplicated the primary
+  A1 for the detailed gates and control states.
+- A1 replaces the former B2 activity view. B2 was removed because it duplicated the primary
   flow while showing only a happy path. This scope correction closes the final GD-005 finding; the
   previously tracked GD-001 through GD-006 findings are resolved by diagram content or an explicit
   scope boundary.
