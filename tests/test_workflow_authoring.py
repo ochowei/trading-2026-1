@@ -1620,7 +1620,23 @@ def test_public_authoring_happy_path_is_end_to_end_and_keeps_sources(
         ]
     )
     capsys.readouterr()
-    immutable_v1_bytes = _snapshot_file_bytes(v1 / "WORKFLOW.md", v1 / "RELEASE.json")
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "activate",
+            str(v1),
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    capsys.readouterr()
+    immutable_v1_bytes = _snapshot_file_bytes(
+        v1 / "WORKFLOW.md",
+        v1 / "RELEASE.json",
+        v1 / "ACTIVATION.json",
+    )
 
     main(
         [
@@ -1692,6 +1708,18 @@ def test_public_authoring_happy_path_is_end_to_end_and_keeps_sources(
         ]
     )
     release_output = capsys.readouterr().out
+    main(
+        [
+            "workflow",
+            "--root",
+            str(root),
+            "activate",
+            str(v2),
+            "--approved-by",
+            "research-owner",
+        ]
+    )
+    activation_output = capsys.readouterr().out
 
     versions = read_markdown_document(root / "README.md").metadata["workflows"][
         "acceptance-workflow"
@@ -1702,8 +1730,16 @@ def test_public_authoring_happy_path_is_end_to_end_and_keeps_sources(
     assert change_metadata["status"] == "released"
     assert change_metadata["released_in"] == "v002"
     assert "workflow release prepared: acceptance-workflow@v002" in release_output
-    assert "effective only after merge to the canonical branch" in release_output
-    assert _snapshot_file_bytes(v1 / "WORKFLOW.md", v1 / "RELEASE.json") == (immutable_v1_bytes)
+    assert "use `trading workflow activate`" in release_output
+    assert "workflow release activated: acceptance-workflow@v002" in activation_output
+    assert (
+        _snapshot_file_bytes(
+            v1 / "WORKFLOW.md",
+            v1 / "RELEASE.json",
+            v1 / "ACTIVATION.json",
+        )
+        == immutable_v1_bytes
+    )
     assert _snapshot_file_bytes(docs, create_request, change_request, evolve_request) == (
         source_bytes_before
     )

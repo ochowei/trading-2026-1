@@ -124,6 +124,21 @@ def register_parser(
     release = commands.add_parser("release", help="Prepare a workflow release declaration")
     release.add_argument("path", type=Path)
     release.add_argument("--approved-by", required=True)
+    activate = commands.add_parser("activate", help="Activate one prepared workflow release")
+    activate.add_argument("path", type=Path)
+    activate.add_argument("--approved-by", required=True)
+    activation = commands.add_parser(
+        "activation", help="Manage legacy workflow activation attestations"
+    )
+    activation_commands = activation.add_subparsers(
+        dest="workflow_activation_command", required=True
+    )
+    attest = activation_commands.add_parser(
+        "attest", help="Attest a grandfathered active workflow release"
+    )
+    attest.add_argument("path", type=Path)
+    attest.add_argument("--approved-by", required=True)
+    attest.add_argument("--required-from", required=True)
 
 
 def cmd_workflow(args: argparse.Namespace) -> None:
@@ -234,6 +249,24 @@ def cmd_workflow(args: argparse.Namespace) -> None:
         elif args.workflow_command == "release":
             release = repository.release(args.path, approved_by=args.approved_by)
             print(f"workflow release prepared: {release['workflow']}@{release['version']}")
-            print("  becomes effective only after merge to the canonical branch")
+            _registry, _slug, _version, record = repository._registered_version(args.path)
+            if record.get("status") == "prepared":
+                print("  use `trading workflow activate` to make this release effective")
+            else:
+                print("  becomes effective only after merge to the canonical branch")
+        elif args.workflow_command == "activate":
+            activation = repository.activate(args.path, approved_by=args.approved_by)
+            print(f"workflow release activated: {activation['workflow']}@{activation['version']}")
+        elif args.workflow_command == "activation":
+            if args.workflow_activation_command == "attest":
+                activation = repository.attest_activation(
+                    args.path,
+                    approved_by=args.approved_by,
+                    activation_required_from=args.required_from,
+                )
+                print(
+                    f"workflow activation attested: "
+                    f"{activation['workflow']}@{activation['version']}"
+                )
     except WorkflowAuthoringError as exc:
         raise SystemExit(f"workflow error: {exc}") from exc

@@ -3,11 +3,11 @@ id: C001
 title: Guarded Challenge-Only Execution
 workflow: strategy-forward-replication-research
 source_version: v008
-status: draft
+status: accepted
 created_at: '2026-08-18'
-status_changed_at: null
-decided_at: null
-decided_by: null
+status_changed_at: '2026-08-28T11:26:14.006213Z'
+decided_at: '2026-08-28T11:26:14.006213Z'
+decided_by: ochowei@gmail.com
 released_in: null
 ---
 # Guarded Challenge-Only Execution

@@ -37,7 +37,7 @@ SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 VERSION_PATTERN = re.compile(r"^v\d{3,}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
-VERSION_STATUSES = frozenset({"draft", "active", "superseded", "retired", "abandoned"})
+VERSION_STATUSES = frozenset({"draft", "prepared", "active", "superseded", "retired", "abandoned"})
 CHANGE_STATUSES = frozenset(
     {"draft", "proposed", "accepted", "rejected", "deferred", "withdrawn", "released"}
 )
@@ -604,6 +604,7 @@ class WorkflowRepository:
                         slug=slug,
                         version=version,
                         record=record,
+                        activation_required=self._activation_required(family, version),
                         issues=issues,
                         allow_active_dependency_drift=(
                             _allow_active_dependency_drift_for == (slug, version)
@@ -802,6 +803,7 @@ class WorkflowRepository:
 
         workflows[request.slug] = {
             "title": request.title,
+            "activation_required_from": "v001",
             "versions": {"v001": {"path": target.name, "status": "draft"}},
         }
         metadata = {
@@ -866,6 +868,10 @@ class WorkflowRepository:
                 f"workflow family must have exactly one active version: {request.workflow}"
             )
         version, record = active[0]
+        if self._prepared_successor(family, version) is not None:
+            raise WorkflowAuthoringError(
+                f"workflow family has a prepared successor: {request.workflow}"
+            )
         version_path = self.root / str(record["path"])
         changes_root = version_path / "work" / "changes"
         allocated = (
@@ -1003,6 +1009,10 @@ class WorkflowRepository:
                 f"workflow family must have exactly one active version: {request.workflow}"
             )
         active_version, active_record = active[0]
+        if self._prepared_successor(family, active_version) is not None:
+            raise WorkflowAuthoringError(
+                f"workflow family has a prepared successor: {request.workflow}"
+            )
         active_path = self.root / str(active_record["path"])
         changes_root = active_path / "work" / "changes"
         accepted: list[Path] = []
@@ -1308,9 +1318,11 @@ class WorkflowRepository:
         self._require_structurally_valid()
         version_path = self._containing_version(path)
         registry, slug, version, version_record = self._registered_version(version_path)
-        del registry
         if version_record.get("status") != "active":
             raise WorkflowAuthoringError("changes may transition only under the active version")
+        family = self._family(registry, slug)
+        if self._prepared_successor(family, version) is not None:
+            raise WorkflowAuthoringError("changes cannot transition while a successor is prepared")
         document = read_markdown_document(path / "README.md")
         metadata = copy.deepcopy(document.metadata)
         current = metadata.get("status")
@@ -1396,7 +1408,7 @@ class WorkflowRepository:
         self._require_valid()
 
     def release(self, version_path: Path, *, approved_by: str) -> dict[str, Any]:
-        """Prepare an approved release declaration and intended canonical registry state."""
+        """Prepare an approved release declaration."""
         with self.authoring_lease():
             return self._release_locked(version_path, approved_by=approved_by)
 
@@ -1523,6 +1535,15 @@ class WorkflowRepository:
             release["capabilities"] = capabilities
 
         _atomic_write(release_path, canonical_json_bytes(release), replace=False)
+        if self._activation_required(family, version):
+            record["status"] = "prepared"
+            record["status_changed_at"] = prepared_at
+            record["status_changed_by"] = approved_by.strip()
+            self._write_registry(registry)
+            self.sync()
+            self._require_valid()
+            return release
+
         for change_path, change_document in change_documents:
             change_metadata = copy.deepcopy(change_document.metadata)
             change_metadata["status"] = "released"
@@ -1543,6 +1564,230 @@ class WorkflowRepository:
         self.sync()
         self._require_valid()
         return release
+
+    def activate(self, version_path: Path, *, approved_by: str) -> dict[str, Any]:
+        """Activate one prepared workflow release with immutable current-time evidence."""
+        with self.authoring_lease():
+            approver = approved_by.strip()
+            if not approver:
+                raise WorkflowAuthoringError("workflow activation requires --approved-by")
+            path = self._resolve_input(version_path)
+            self._require_structurally_valid()
+            registry, slug, version, record = self._registered_version(path)
+            if record.get("status") != "prepared":
+                raise WorkflowAuthoringError("only a prepared workflow version may be activated")
+            family = self._family(registry, slug)
+            if not self._activation_required(family, version):
+                raise WorkflowAuthoringError(
+                    "this workflow version uses the legacy canonical-merge boundary"
+                )
+            activation_path = path / "ACTIVATION.json"
+            if activation_path.exists():
+                raise WorkflowAuthoringError("prepared version already has ACTIVATION.json")
+            release_path = path / "RELEASE.json"
+            if not release_path.is_file():
+                raise WorkflowAuthoringError("prepared version is missing RELEASE.json")
+
+            version_document = read_markdown_document(path / "README.md")
+            source_changes = version_document.metadata.get("source_changes")
+            if not isinstance(source_changes, list):
+                raise WorkflowAuthoringError("source_changes must be a list of repository paths")
+            change_documents: list[tuple[Path, MarkdownDocument]] = []
+            for reference in source_changes:
+                if not isinstance(reference, str):
+                    raise WorkflowAuthoringError("source change must be a repository path")
+                change_path = self._resolve_repo_reference(reference)
+                change_document = read_markdown_document(change_path / "README.md")
+                if change_document.metadata.get("status") != "accepted":
+                    raise WorkflowAuthoringError(
+                        f"source change is not accepted at activation: {reference}"
+                    )
+                change_documents.append((change_path, change_document))
+
+            versions = self._versions(family, slug)
+            supersedes = version_document.metadata.get("supersedes")
+            if isinstance(supersedes, str):
+                active_record = versions.get(supersedes)
+                if not isinstance(active_record, dict) or active_record.get("status") != "active":
+                    raise WorkflowAuthoringError(
+                        "prepared replacement must supersede the unique active version"
+                    )
+                active_path = self.root / str(active_record["path"])
+                self._require_no_blocking_changes(
+                    active_path,
+                    included_changes=frozenset(
+                        change_path for change_path, _document in change_documents
+                    ),
+                )
+                self._require_studies_ready_for_version_end(active_path)
+            else:
+                active_record = None
+                if any(
+                    isinstance(item, Mapping) and item.get("status") == "active"
+                    for item in versions.values()
+                ):
+                    raise WorkflowAuthoringError(
+                        "initial prepared version cannot coexist with an active version"
+                    )
+
+            activated_at = timestamp_text(self._current_time())
+            activation = self._activation_payload(
+                slug=slug,
+                version=version,
+                release_path=release_path,
+                activated_at=activated_at,
+                approved_by=approver,
+                basis="explicit-workflow-release-activation",
+            )
+            activation_bytes = canonical_json_bytes(activation)
+            _atomic_write(activation_path, activation_bytes, replace=False)
+            for change_path, change_document in change_documents:
+                change_metadata = copy.deepcopy(change_document.metadata)
+                change_metadata["status"] = "released"
+                change_metadata["released_in"] = version
+                change_metadata["status_changed_at"] = activated_at
+                _atomic_write(
+                    change_path / "README.md",
+                    render_markdown_document(
+                        MarkdownDocument(change_metadata, change_document.body)
+                    ),
+                )
+            if active_record is not None:
+                active_record["status"] = "superseded"
+                active_record["status_changed_at"] = activated_at
+                active_record["status_changed_by"] = approver
+            record["status"] = "active"
+            record["status_changed_at"] = activated_at
+            record["status_changed_by"] = approver
+            record["activation_sha256"] = hashlib.sha256(activation_bytes).hexdigest()
+            self._write_registry(registry)
+            self.sync()
+            self._require_valid()
+            return activation
+
+    def attest_activation(
+        self,
+        version_path: Path,
+        *,
+        approved_by: str,
+        activation_required_from: str | None = None,
+    ) -> dict[str, Any]:
+        """Add a non-backdated migration attestation to one legacy active release."""
+        with self.authoring_lease():
+            approver = approved_by.strip()
+            if not approver:
+                raise WorkflowAuthoringError("activation attestation requires --approved-by")
+            path = self._resolve_input(version_path)
+            self._require_structurally_valid()
+            registry, slug, version, record = self._registered_version(path)
+            if record.get("status") != "active":
+                raise WorkflowAuthoringError(
+                    "activation attestation requires an active workflow version"
+                )
+            family = self._family(registry, slug)
+            if activation_required_from is not None:
+                if VERSION_PATTERN.fullmatch(activation_required_from) is None:
+                    raise WorkflowAuthoringError("activation-required-from must be a version ID")
+                if _version_number(activation_required_from) <= _version_number(version):
+                    raise WorkflowAuthoringError(
+                        "activation-required-from must be newer than the attested version"
+                    )
+                existing_boundary = family.get("activation_required_from")
+                if existing_boundary not in {None, activation_required_from}:
+                    raise WorkflowAuthoringError(
+                        "workflow family already has another activation boundary"
+                    )
+                family["activation_required_from"] = activation_required_from
+            if self._activation_required(family, version):
+                raise WorkflowAuthoringError(
+                    "activation-required versions must use the prepared activation transition"
+                )
+            activation_path = path / "ACTIVATION.json"
+            if activation_path.exists() or record.get("activation_sha256") is not None:
+                raise WorkflowAuthoringError("active version already has ACTIVATION.json")
+            release_path = path / "RELEASE.json"
+            if not release_path.is_file():
+                raise WorkflowAuthoringError("active version is missing RELEASE.json")
+            activation = self._activation_payload(
+                slug=slug,
+                version=version,
+                release_path=release_path,
+                activated_at=timestamp_text(self._current_time()),
+                approved_by=approver,
+                basis="grandfathered-effective-release",
+            )
+            activation_bytes = canonical_json_bytes(activation)
+            _atomic_write(activation_path, activation_bytes, replace=False)
+            record["activation_sha256"] = hashlib.sha256(activation_bytes).hexdigest()
+            self._write_registry(registry)
+            self.sync()
+            self._require_valid()
+            return activation
+
+    def require_effective_version(self, version_path: Path) -> None:
+        """Fail unless a version is active and has no prepared successor."""
+        path = self._resolve_input(version_path)
+        registry, slug, version, record = self._registered_version(path)
+        if record.get("status") != "active":
+            raise WorkflowAuthoringError(
+                f"only an active workflow version is effective: {slug}@{version}"
+            )
+        family = self._family(registry, slug)
+        activation_required = self._activation_required(family, version)
+        if activation_required and not (path / "ACTIVATION.json").is_file():
+            raise WorkflowAuthoringError(
+                f"active workflow version lacks activation evidence: {slug}@{version}"
+            )
+        if self._prepared_successor(family, version) is not None:
+            raise WorkflowAuthoringError(
+                f"active workflow version has a prepared successor: {slug}@{version}"
+            )
+
+    @staticmethod
+    def _activation_payload(
+        *,
+        slug: str,
+        version: str,
+        release_path: Path,
+        activated_at: str,
+        approved_by: str,
+        basis: str,
+    ) -> dict[str, Any]:
+        return {
+            "schema_version": 1,
+            "workflow": slug,
+            "version": version,
+            "activated_at": activated_at,
+            "approved_by": approved_by,
+            "basis": basis,
+            "release_sha256": _sha256(release_path),
+        }
+
+    @staticmethod
+    def _activation_required(family: Mapping[str, Any], version: str) -> bool:
+        boundary = family.get("activation_required_from")
+        return (
+            isinstance(boundary, str)
+            and VERSION_PATTERN.fullmatch(boundary) is not None
+            and (_version_number(version) >= _version_number(boundary))
+        )
+
+    @staticmethod
+    def _prepared_successor(
+        family: Mapping[str, Any], active_version: str
+    ) -> tuple[str, Mapping[str, Any]] | None:
+        versions = family.get("versions")
+        if not isinstance(versions, Mapping):
+            return None
+        for version, record in versions.items():
+            if (
+                isinstance(version, str)
+                and isinstance(record, Mapping)
+                and record.get("status") == "prepared"
+                and _version_number(version) > _version_number(active_version)
+            ):
+                return version, record
+        return None
 
     def _validate_registry_metadata(
         self,
@@ -1571,8 +1816,19 @@ class WorkflowRepository:
                     ValidationIssue(self.registry_path, f"{slug} versions must be non-empty")
                 )
                 continue
+            activation_boundary = family.get("activation_required_from")
+            if activation_boundary is not None and (
+                not isinstance(activation_boundary, str)
+                or VERSION_PATTERN.fullmatch(activation_boundary) is None
+            ):
+                issues.append(
+                    ValidationIssue(
+                        self.registry_path,
+                        f"{slug} activation_required_from must be a version ID",
+                    )
+                )
             active_count = 0
-            draft_count = 0
+            candidate_count = 0
             for version, record in versions.items():
                 if not isinstance(version, str) or not VERSION_PATTERN.fullmatch(version):
                     issues.append(
@@ -1613,8 +1869,8 @@ class WorkflowRepository:
                         )
                     )
                 active_count += int(status == "active")
-                draft_count += int(status == "draft")
-                if status in {"active", "superseded", "retired"}:
+                candidate_count += int(status in {"draft", "prepared"})
+                if status in {"prepared", "active", "superseded", "retired"}:
                     if not _is_canonical_utc_timestamp(record.get("status_changed_at")):
                         issues.append(
                             ValidationIssue(
@@ -1645,9 +1901,12 @@ class WorkflowRepository:
                 issues.append(
                     ValidationIssue(self.registry_path, f"{slug} has more than one active version")
                 )
-            if draft_count > 1:
+            if candidate_count > 1:
                 issues.append(
-                    ValidationIssue(self.registry_path, f"{slug} has more than one draft version")
+                    ValidationIssue(
+                        self.registry_path,
+                        f"{slug} has more than one draft or prepared successor",
+                    )
                 )
         return raw_workflows
 
@@ -1658,6 +1917,7 @@ class WorkflowRepository:
         slug: str,
         version: str,
         record: Mapping[str, Any],
+        activation_required: bool,
         issues: list[ValidationIssue],
         allow_active_dependency_drift: bool,
     ) -> None:
@@ -1726,7 +1986,7 @@ class WorkflowRepository:
         self._validate_derived_from(metadata.get("derived_from"), readme, issues)
         status = record.get("status")
         release_path = path / "RELEASE.json"
-        if status in {"active", "superseded", "retired"}:
+        if status in {"prepared", "active", "superseded", "retired"}:
             if not release_path.is_file():
                 issues.append(ValidationIssue(release_path, f"{status} version needs RELEASE.json"))
             else:
@@ -1743,8 +2003,107 @@ class WorkflowRepository:
             issues.append(
                 ValidationIssue(release_path, f"{status} version must not have RELEASE.json")
             )
+        activation_path = path / "ACTIVATION.json"
+        activation_digest = record.get("activation_sha256")
+        if status == "prepared":
+            if not activation_required:
+                issues.append(
+                    ValidationIssue(
+                        self.registry_path,
+                        f"{slug} {version} cannot be prepared before activation_required_from",
+                    )
+                )
+            if activation_path.exists() or activation_digest is not None:
+                issues.append(
+                    ValidationIssue(
+                        activation_path,
+                        "prepared version must not have activation evidence",
+                    )
+                )
+        elif activation_path.exists() or activation_digest is not None:
+            self._validate_activation(
+                activation_path,
+                slug=slug,
+                version=version,
+                expected_digest=activation_digest,
+                release_path=release_path,
+                expected_basis=(
+                    "explicit-workflow-release-activation"
+                    if activation_required
+                    else "grandfathered-effective-release"
+                ),
+                issues=issues,
+            )
+        elif status == "active" and activation_required:
+            issues.append(
+                ValidationIssue(
+                    activation_path,
+                    "active version needs immutable ACTIVATION.json",
+                )
+            )
         self._validate_changes(path, slug, version, status, issues)
         self._validate_studies(path, slug, version, status, issues)
+
+    def _validate_activation(
+        self,
+        path: Path,
+        *,
+        slug: str,
+        version: str,
+        expected_digest: Any,
+        release_path: Path,
+        expected_basis: str,
+        issues: list[ValidationIssue],
+    ) -> None:
+        if not path.is_file():
+            issues.append(ValidationIssue(path, "activation evidence file is missing"))
+            return
+        if not isinstance(expected_digest, str) or not SHA256_PATTERN.fullmatch(expected_digest):
+            issues.append(
+                ValidationIssue(
+                    self.registry_path, f"{slug} {version} activation_sha256 is invalid"
+                )
+            )
+        elif _sha256(path) != expected_digest:
+            issues.append(ValidationIssue(path, "activation evidence digest has changed"))
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            issues.append(ValidationIssue(path, f"invalid activation JSON: {exc}"))
+            return
+        if not isinstance(payload, dict):
+            issues.append(ValidationIssue(path, "activation payload must be an object"))
+            return
+        if set(payload) != {
+            "schema_version",
+            "workflow",
+            "version",
+            "activated_at",
+            "approved_by",
+            "basis",
+            "release_sha256",
+        }:
+            issues.append(ValidationIssue(path, "activation payload has invalid fields"))
+        if payload.get("schema_version") != 1:
+            issues.append(ValidationIssue(path, "activation schema_version must be 1"))
+        if payload.get("workflow") != slug or payload.get("version") != version:
+            issues.append(ValidationIssue(path, "activation identity does not match version"))
+        if not _is_canonical_utc_timestamp(payload.get("activated_at")):
+            issues.append(
+                ValidationIssue(path, "activation activated_at must be a canonical UTC timestamp")
+            )
+        if (
+            not isinstance(payload.get("approved_by"), str)
+            or not str(payload.get("approved_by")).strip()
+        ):
+            issues.append(ValidationIssue(path, "activation approved_by is required"))
+        if payload.get("basis") != expected_basis:
+            issues.append(ValidationIssue(path, f"activation basis must be {expected_basis}"))
+        release_digest = payload.get("release_sha256")
+        if not isinstance(release_digest, str) or not SHA256_PATTERN.fullmatch(release_digest):
+            issues.append(ValidationIssue(path, "activation release_sha256 is invalid"))
+        elif not release_path.is_file() or _sha256(release_path) != release_digest:
+            issues.append(ValidationIssue(path, "activation release digest has changed"))
 
     def _validate_release(
         self,
@@ -1834,8 +2193,11 @@ class WorkflowRepository:
                 )
                 continue
             pinned_reference = dependency.get("pinned") is True
-            if not pinned_reference and (status != "active" or not check_active_dependency_digest):
-                continue
+            if not pinned_reference:
+                if status not in {"active", "prepared"}:
+                    continue
+                if status == "active" and not check_active_dependency_digest:
+                    continue
             try:
                 resolved = self._resolve_repo_reference(dependency_path)
             except WorkflowAuthoringError as exc:
@@ -1846,10 +2208,16 @@ class WorkflowRepository:
                     label = (
                         "active pinned dependency"
                         if status == "active"
+                        else "prepared pinned dependency"
+                        if status == "prepared"
                         else "released pinned dependency"
                     )
                 else:
-                    label = "active pinned dependency"
+                    label = (
+                        "prepared pinned dependency"
+                        if status == "prepared"
+                        else "active pinned dependency"
+                    )
                 issues.append(ValidationIssue(resolved, f"{label} digest has changed"))
         release_policies = payload.get("policies")
         if (self.repo_root / "policies" / "README.md").is_file():
@@ -2319,8 +2687,10 @@ class WorkflowRepository:
                 issues.append(
                     ValidationIssue(readme, "non-draft study needs transition time and identity")
                 )
-            if version_status in {"draft", "abandoned"}:
-                issues.append(ValidationIssue(readme, "study requires a released workflow version"))
+            if version_status in {"draft", "prepared", "abandoned"}:
+                issues.append(
+                    ValidationIssue(readme, "study requires an effective active workflow version")
+                )
             elif version_status != "active" and status in {
                 "draft",
                 "preregistered",

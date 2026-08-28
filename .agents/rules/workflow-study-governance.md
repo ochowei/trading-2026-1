@@ -6,8 +6,10 @@ operators and independent reviewers.
 ## Identity and pinning
 
 A workflow is a versioned procedure. A study is one execution instance pinned to one exact released
-workflow version. Create and preregister new studies only under the active version; never operate a
-draft, silently move a study to another version, or edit released workflow bytes.
+workflow version. Create and preregister new studies only under the effective active version; never
+operate a draft or prepared version, silently move a study to another version, or edit released
+workflow bytes. When an active version has a prepared successor, do not create, preregister, start,
+resume, or freeze new outcome-relevant work under the predecessor while activation is pending.
 
 Study IDs are local to the exact workflow version. Let the CLI allocate the next never-reused
 `Sxxx`; cross-version continuity uses an exact repository-relative `revisits` path, never a carried
@@ -76,9 +78,10 @@ under `workflows/`.
 
 ## Version boundaries
 
-Before an active workflow version is superseded or retired, every unfinished study must reach a
-safe `paused`, `completed`, or `cancelled` state. Never move or overwrite the old study. Authoring
-impact analysis decides whether paused research continues, restarts, or closes; any later effort is
-a new study under the target version with an exact `revisits` link.
+Before release preparation may create a prepared successor, every unfinished study under the active
+version must reach a safe `paused`, `completed`, or `cancelled` state. Activation rechecks this
+boundary before superseding the predecessor. Never move or overwrite the old study. Authoring impact
+analysis decides whether paused research continues, restarts, or closes; any later effort is a new
+study under the target version with an exact `revisits` link.
 
 Run workflow sync and full validation after every mutation.

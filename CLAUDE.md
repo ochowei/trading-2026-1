@@ -161,8 +161,15 @@ uv run trading workflow change transition <change-path> --to proposed
 uv run trading workflow version transition <version-path> --to retired \
   --approved-by <human-id>
 
-# 獨立 human-authority seam：準備 release；合併 canonical branch 後才生效
+# 獨立 human-authority seam：準備 release；activation-enabled family 只進入 prepared
 uv run trading workflow release <version-path> --approved-by <human-id>
+
+# 第二個獨立 human-authority seam：建立 immutable ACTIVATION.json 並切換 active authority
+uv run trading workflow activate <prepared-version-path> --approved-by <human-id>
+
+# 一次性 legacy migration：只記錄 current-time attestation，不回填歷史 activation 時間
+uv run trading workflow activation attest <active-version-path> \
+  --approved-by <human-id> --required-from <future-version>
 
 # 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC
 uv run trading workflow study init <version-path> --slug <study-slug> \

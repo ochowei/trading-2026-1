@@ -366,6 +366,8 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/README.md` | Version lifecycle authority and generated registry index. |
 | `workflows/<slug>--vNNN/README.md` | Version metadata, state, checksums, release evidence, and generated study/change indexes. |
 | `workflows/<slug>--vNNN/WORKFLOW.md` | Self-contained workflow contract pinned by studies. |
+| `workflows/<slug>--vNNN/RELEASE.json` | Immutable human-approved release-preparation evidence; for activation-enabled families its presence means `prepared`, not `active`. |
+| `workflows/<slug>--vNNN/ACTIVATION.json` | Immutable Workflow Release Activation evidence binding the exact release digest; grandfathered records state migration-time fact without backdating. |
 | `workflows/<slug>--vNNN/STAGES_AND_OUTCOMES.md` | Optional version companion containing full and plain-language stage/outcome guidance; when declared `reference` plus `pinned: true`, release evidence fixes its exact bytes while `WORKFLOW.md` remains the sole behavioral authority. |
 | `workflows/<slug>--vNNN/work/studies/<study>/` | Route/spec, preregistered plan, add-only Development authorization, candidate freeze, metadata, evidence, conclusion, and outcome for a workflow study when present. |
 | `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
@@ -381,8 +383,11 @@ allocates `vNNN`/`Cxxx`, writes the existing schema-1 and five-file formats, syn
 and validates. The façade reads and retains request/source files; moving, replacing with a pointer,
 or removing a source is a separate exact-path operation that requires individual human confirmation.
 Low-level transition and sync commands remain compatibility/diagnostic entry points, while guarded
-decision and release commands remain separate human-authority seams rather than alternate authoring
-happy paths.
+decision, release, and activation commands remain separate human-authority seams rather than
+alternate authoring happy paths. Each family's `activation_required_from` boundary selects the
+first version using `draft -> prepared -> active`; a prepared successor blocks new or resumed
+outcome-relevant work until immutable activation evidence switches authority. Newly created
+families use v001 as that boundary; migrated families retain their explicit future cutoff.
 
 High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
 only the workflow tree into a system temporary directory, applies and validates the complete staged
@@ -437,3 +442,6 @@ Versioned Phase 6 workflow contracts live at
 `docs/historical-qualification-and-shadow-vNNN.md`. Each file is an immutable normative dependency
 for the workflow version that pins it; behavioral changes create a new document version instead of
 rewriting a document pinned by a released workflow.
+The v009 contract layers the guarded challenge-only execution boundary over the unchanged v008
+route, calendar, screen, terminal, Shadow, and compatibility rules; both exact paths are pinned by
+the v009 workflow until a later version consolidates them.
