@@ -1,0 +1,613 @@
+# Explanatory presentation data only. Canonical workflow and study authority remains in workflows/
+# and .agents/rules/workflow-study-governance.md.
+schema_version: 1
+document:
+  title: Workflow 治理層級
+  header_html: |-
+    <header class="wgl-header">
+        <h1>Workflow 治理層級</h1>
+      </header>
+  sections_html:
+    a1: |-
+      <section class="wgl-diagram" aria-labelledby="wgl-switch-title">
+          <h2 id="wgl-switch-title">A1｜Workflow 新舊版本如何接替</h2>
+          <ul class="wgl-fsm-notation text-small" aria-label="A1 閱讀重點">
+            <li><strong>前一版（predecessor）：</strong>目前是 Active（目前生效），之後可能被接替的版本。</li>
+            <li><strong>接替版（successor）：</strong>準備接替前一版的新版本，可以是 Draft（草稿）或 Prepared（已準備、等待啟用）。</li>
+            <li><strong>同一流程系列（workflow family）：</strong>同一套 Workflow 的所有版本，例如 v008 與 v009。A1-2 不會把整個系列合成一個狀態。</li>
+            <li><strong>判定單位：</strong>每一個單一明確版本（exact version）都要分開判斷，而且只能符合一個 A1-2 狀態。</li>
+            <li><strong>切換處理對象（handoff）：</strong>流程可以先去處理接替版，但不會改變前一版的狀態。</li>
+            <li><strong>可以並存：</strong>前一版保持 Active 時，接替版可以同時處於 Draft 或 Prepared。</li>
+            <li><strong>資料有問題時：</strong>資料不足或互相衝突就回報無法判定，不猜答案。</li>
+            <li><strong>不在本圖的狀態：</strong>Superseded（已被接替）、Retired（已退役）與 Abandoned（已放棄）已離開目前的控制流程。</li>
+          </ul>
+          <ul class="wgl-node-legend text-small" aria-label="A1 節點視覺類型">
+            <li><span class="wgl-node-legend-mark wgl-node-legend-input" aria-hidden="true"></span>輸入／觸發</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-activity" aria-hidden="true"></span>活動／處理</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-decision" aria-hidden="true"></span>決策／條件檢查</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-routing" aria-hidden="true"></span>路由／退回</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-state" aria-hidden="true"></span>狀態／條件</li>
+          </ul>
+          <div class="wgl-a1-layout">
+            <div class="wgl-a1-figure">
+              <pre class="mermaid wgl-mermaid wgl-mermaid-a1" data-diagram="a1-main">
+      flowchart TB
+        subgraph L1["L1｜提出接替版需求並建立草稿"]
+          direction TB
+          L1N1[/"L1-N1<br/>接替版需求"/] --> L1N2("L1-N2<br/>AI 預覽與檢查")
+          L1N2 --> L1N3{"L1-N3<br/>預覽可套用？"}
+          L1N3 -->|可套用／人工確認後| L1N4("L1-N4<br/>建立／修正草稿")
+          L1N3 -->|失敗／要求修改| L1N5("L1-N5<br/>修正輸入")
+          L1N5 -. 重新產生預覽 .-> L1N2
+        end
+
+        subgraph L2["L2｜接替版的發布與啟用"]
+          direction TB
+          L2N1("L2-N1<br/>AI 發布檢查") --> L2N2{"L2-N2<br/>發布條件通過？"}
+          L2N2 -->|通過| L2N3{"L2-N3<br/>人工發布核准？"}
+          L2N3 -->|核准| L2N4("L2-N4<br/>準備發布")
+          L2N4 -->|需要另行啟用| L2N5{"L2-N5<br/>人工啟用核准？"}
+          L2N4 -.->|舊版 bootstrap 例外（免另行啟用）| L2N6
+          L2N5 -->|是；產生 ACTIVATION.json| L2N6(["L2-N6<br/>正式權威生效"])
+          L2N2 -->|草稿、影響或固定版本資料有缺口| L2N7{{"L2-N7<br/>修正接替版"}}
+          L2N3 -->|未核准| L2N7
+          L2N5 -->|否| L2N8(["L2-N8<br/>阻止新研究"])
+          L2N8 -. 等待啟用核准 .-> L2N5
+        end
+
+        subgraph L3["L3｜生效中版本的研究治理"]
+          direction TB
+          L3N1(["L3-N1<br/>研究治理就緒"]) --> L3N2("L3-N2<br/>建立／推進零到多個 Sxxx<br/>須通過 G-FAMILY 與各階段人工核准")
+          L3N2 --> L3N3{"L3-N3<br/>需要建立接替版？"}
+          L3N3 -->|否／繼續研究| L3N2
+          L3N4("L3-N4<br/>處理前一版的安全問題") --> L3N5{"L3-N5<br/>安全檢查完成？"}
+          L3N5 -->|否；繼續處理安全問題／補齊影響紀錄| L3N4
+        end
+
+        L1N4 -->|把草稿交給發布檢查| L2N1
+        L2N7 -. 保留同一接替版；修正後重試 .-> L1N2
+        L2N2 -->|前一版的安全或影響處理未完成<br/>暫時改處理前一版| L3N4
+        L2N6 -->|接替版成為 Active；前一版此時才 Superseded| L3N1
+        L3N3 -.->|是／只切換處理對象<br/>前一版保持 N04／N05| L1N1
+        L3N5 -.->|是／回到同一個 N02 接替版<br/>重新檢查發布條件| L2N1
+              </pre>
+              <div id="wgl-mermaid-status" class="wgl-render-status text-small" aria-live="polite">正在整理 A1…</div>
+            </div>
+            <div class="wgl-a1-explorer">
+            <div class="viz-controls">
+              <label class="form-label" for="wgl-a1-detail-select">查看節點說明</label>
+              <select id="wgl-a1-detail-select" class="form-select">
+                <optgroup label="L1｜建立接替版">
+                  <option value="L1N1">L1-N1｜接替版需求</option>
+                  <option value="L1N2">L1-N2｜AI 預覽與檢查</option>
+                  <option value="L1N3">L1-N3｜預覽可套用？</option>
+                  <option value="L1N4">L1-N4｜建立／修正草稿</option>
+                  <option value="L1N5">L1-N5｜修正輸入</option>
+                </optgroup>
+                <optgroup label="L2｜發布與啟用">
+                  <option value="L2N1">L2-N1｜AI 發布檢查</option>
+                  <option value="L2N2">L2-N2｜發布條件通過？</option>
+                  <option value="L2N3">L2-N3｜人工發布核准？</option>
+                  <option value="L2N4">L2-N4｜準備發布</option>
+                  <option value="L2N5">L2-N5｜人工啟用核准？</option>
+                  <option value="L2N6">L2-N6｜正式權威生效</option>
+                  <option value="L2N7">L2-N7｜修正接替版</option>
+                  <option value="L2N8">L2-N8｜阻止新研究</option>
+                </optgroup>
+                <optgroup label="L3｜Active 版本與研究協調">
+                  <option value="L3N1">L3-N1｜研究治理就緒</option>
+                  <option value="L3N2">L3-N2｜建立／推進零到多個 Sxxx</option>
+                  <option value="L3N3">L3-N3｜需要建立接替版？</option>
+                  <option value="L3N4">L3-N4｜處理前一版的安全問題</option>
+                  <option value="L3N5">L3-N5｜安全檢查完成？</option>
+                </optgroup>
+              </select>
+            </div>
+            <section id="wgl-a1-detail-panel" class="card" aria-live="polite" aria-labelledby="wgl-a1-detail-title">
+              <h3 id="wgl-a1-detail-title">L1-N1｜接替版需求</h3>
+              <p id="wgl-a1-detail-summary">先整理為什麼要建立或修改接替版；此時還沒有正式版本路徑。</p>
+              <dl class="wgl-a1-detail-grid text-small">
+                <div><dt>節點類型</dt><dd id="wgl-a1-detail-type"></dd></div>
+                <div><dt>輸入</dt><dd id="wgl-a1-detail-input"></dd></div>
+                <div><dt>下一步</dt><dd id="wgl-a1-detail-next"></dd></div>
+                <div><dt>限制／失敗處理</dt><dd id="wgl-a1-detail-guard"></dd></div>
+              </dl>
+            </section>
+            </div>
+          </div>
+        </section>
+    a1_2: |-
+      <section class="wgl-diagram" aria-labelledby="wgl-aligned-state-machine-title">
+          <h2 id="wgl-aligned-state-machine-title">A1-2｜每一個 Workflow 版本目前在哪個狀態</h2>
+          <ul class="wgl-fsm-notation text-small" aria-label="A1-2 判定原則">
+            <li><strong>判定單位：</strong>一次只判斷一個 <code>workflows/&lt;slug&gt;--vNNN</code> 版本，不把整個同一流程系列合成一個狀態。</li>
+            <li><strong>唯一狀態：</strong>同一版本必須只符合 N02–N06 其中一個。零個或多個都回 invalid（資料矛盾）／indeterminate（資料不足），不可猜測。</li>
+            <li><strong>可以並存：</strong>Active 前一版可與 Draft／Prepared 接替版同時存在；但 Prepared 接替版會阻止新的結果相關研究工作。</li>
+            <li><strong>N01 是入口：</strong>此時接替版尚未取得正式版本路徑，所以 N01 不是已存在版本的持久化狀態。</li>
+            <li><strong>切換處理對象：</strong><code>HANDOFF ONLY</code> 表示開始處理接替版，但前一版仍保持 Active，不會退回 Draft。</li>
+            <li><strong>圖的關係：</strong>Overview、A、B、C 是同一套狀態機的不同視圖，不是四套狀態機。</li>
+            <li><strong>範圍：</strong>已離開控制流程的註冊表（registry）狀態不在本圖；Sxxx 的生命週期只屬於 A1-3。</li>
+          </ul>
+          <ul class="wgl-node-legend text-small" aria-label="A1-2 所在層級">
+            <li><span class="wgl-node-legend-mark wgl-node-legend-layer-l1" aria-hidden="true"></span>L1｜提出需求／編寫草稿</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-layer-l1-l2" aria-hidden="true"></span>L1→L2｜草稿編寫與發布檢查的共同邊界</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-layer-l2" aria-hidden="true"></span>L2｜準備發布／啟用</li>
+            <li><span class="wgl-node-legend-mark wgl-node-legend-layer-l3" aria-hidden="true"></span>L3｜生效版本的研究治理</li>
+          </ul>
+          <ul class="wgl-fsm-notation text-small" aria-label="A1-2 圖例補充">
+            <li><strong>線上的代號：</strong>圖上只顯示 action ID；完整成立條件與結果請看下方的動作對照表。</li>
+            <li><strong>虛線：</strong>表示切換處理對象，或某個 family 明定的舊版例外；不是同一版本的一般狀態轉換。</li>
+          </ul>
+
+          <div class="wgl-a12-segments">
+            <section class="wgl-a12-segment" aria-labelledby="wgl-a12-overview-title">
+              <h3 id="wgl-a12-overview-title">A1-2 Overview｜六個節點與主要流程</h3>
+              <ul class="wgl-fsm-notation text-small" aria-label="A1-2 Overview 說明">
+                <li>這張圖先顯示 N01–N06 與最主要的狀態變化。</li>
+                <li>舊版 bootstrap 例外（既定舊版本可免另行啟用）、切換處理對象與發布安全協調也會顯示；細節請看 A／B／C 與下方動作對照表。</li>
+              </ul>
+              <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2 Overview">
+                <div class="wgl-zoom-controls" role="group" aria-label="A1-2 Overview 圖表縮放控制">
+                  <span class="wgl-zoom-controls-label text-small">圖表縮放</span>
+                  <button class="btn wgl-zoom-out" type="button" aria-controls="wgl-a12-overview-viewport" aria-label="縮小 A1-2 Overview 圖表" title="縮小">−</button>
+                  <button class="btn wgl-zoom-reset" type="button" aria-controls="wgl-a12-overview-viewport" aria-label="重設 A1-2 Overview 圖表縮放" title="重設為 100%">100%</button>
+                  <button class="btn wgl-zoom-in" type="button" aria-controls="wgl-a12-overview-viewport" aria-label="放大 A1-2 Overview 圖表" title="放大">+</button>
+                  <span class="wgl-zoom-announcement sr-only" aria-live="polite">A1-2 Overview 圖表縮放 100%</span>
+                </div>
+                <p id="wgl-a12-overview-help" class="wgl-fsm-notation text-small">放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。</p>
+                <div id="wgl-a12-overview-viewport" class="wgl-zoom-viewport" tabindex="0" aria-label="可縮放與拖曳的 A1-2 Overview" aria-describedby="wgl-a12-overview-help">
+                  <pre class="mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas" data-diagram="a1-2-overview">
+      flowchart TB
+        N01["A12-N01<br/>[L1 入口]<br/>尚未建立接替版"] -->|A12-A03| N02["A12-N02<br/>[L1→L2 共同邊界]<br/>接替版 Draft（草稿）"]
+        N02 -->|A12-A05A| N03["A12-N03<br/>[L2，視版本而定]<br/>Prepared（已準備、等待啟用）"]
+        N03 -->|A12-A07| N04["A12-N04<br/>[L3 共同邊界]<br/>Active（目前生效）／0 個未完成研究"]
+        N02 -.->|A12-A05B · bootstrap 例外| N04
+        N04 -->|A12-A08| N05["A12-N05<br/>[L3]<br/>Active（目前生效）／1..n 個未完成研究"]
+        N05 -->|A12-A10| N04
+        N05 -->|A12-A12| N06["A12-N06<br/>[L3；持久化缺口]<br/>前一版的安全檢查進行中"]
+        N06 -->|A12-A13| N04
+        N06 -->|A12-A13| N05
+        N04 -.->|A12-A11 · HANDOFF ONLY| N01
+        N05 -.->|A12-A11 · HANDOFF ONLY| N01
+        N02 -.->|A12-A12| N06
+        N06 -.->|A12-A13| N02
+                  </pre>
+                </div>
+                <div class="wgl-render-status text-small" data-mermaid-status="a1-2-overview" aria-live="polite">正在整理 A1-2 Overview…</div>
+              </div>
+            </section>
+
+            <section class="wgl-a12-segment" aria-labelledby="wgl-a12a-title">
+              <h3 id="wgl-a12a-title">A1-2A｜L1 建立接替版的正式版本身分</h3>
+              <span class="wgl-shared-boundary text-small">N02 共同邊界：A 與 B 顯示的是同一個接替版 Draft</span>
+              <ul class="wgl-fsm-notation text-small" aria-label="A1-2A 說明">
+                <li>N01 只代表「準備建立接替版」；此時還沒有正式版本路徑。</li>
+                <li>A12-A03 配發路徑並註冊 Draft 後，流程才開始判斷 N02 這個單一明確版本。</li>
+              </ul>
+              <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2A">
+                <div class="wgl-zoom-controls" role="group" aria-label="A1-2A 圖表縮放控制">
+                  <span class="wgl-zoom-controls-label text-small">圖表縮放</span>
+                  <button class="btn wgl-zoom-out" type="button" aria-controls="wgl-a12a-viewport" aria-label="縮小 A1-2A 圖表" title="縮小">−</button>
+                  <button class="btn wgl-zoom-reset" type="button" aria-controls="wgl-a12a-viewport" aria-label="重設 A1-2A 圖表縮放" title="重設為 100%">100%</button>
+                  <button class="btn wgl-zoom-in" type="button" aria-controls="wgl-a12a-viewport" aria-label="放大 A1-2A 圖表" title="放大">+</button>
+                  <span class="wgl-zoom-announcement sr-only" aria-live="polite">A1-2A 圖表縮放 100%</span>
+                </div>
+                <p id="wgl-a12a-help" class="wgl-fsm-notation text-small">放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。</p>
+                <div id="wgl-a12a-viewport" class="wgl-zoom-viewport" tabindex="0" aria-label="可縮放與拖曳的 A1-2A" aria-describedby="wgl-a12a-help">
+                  <pre class="mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas" data-diagram="a1-2a-identity-formation">
+      flowchart LR
+        ENTRY(("入口")) -->|A12-A01| N01["A12-N01<br/>準備建立接替版<br/>尚無正式版本路徑"]
+        N01 -->|A12-A02| N01
+        N01 -->|A12-A03| N02["A12-N02<br/>接替版 Draft（草稿）<br/>共同邊界"]
+                  </pre>
+                </div>
+                <div class="wgl-render-status text-small" data-mermaid-status="a1-2a-identity-formation" aria-live="polite">正在整理 A1-2A…</div>
+              </div>
+            </section>
+
+            <section class="wgl-a12-segment" aria-labelledby="wgl-a12b-title">
+              <h3 id="wgl-a12b-title">A1-2B｜L2 接替版的發布與啟用</h3>
+              <span class="wgl-shared-boundary text-small">N02／N04 共同邊界：A、B、C 重複顯示的是同一個版本</span>
+              <ul class="wgl-fsm-notation text-small" aria-label="A1-2B 說明">
+                <li>只有需要明確啟用的版本才會進入 N03；判定規則是 <code>exact version &gt;= family.activation_required_from</code>。</li>
+                <li>A12-A05A 是一般路徑；A12-A05B 只供同一流程系列設定明確允許的舊版 bootstrap 例外。</li>
+                <li>A12-A07 必須找到與本次發布相符的 <code>ACTIVATION.json</code>，才能讓接替版成為 Active。</li>
+                <li>A12-A12／A13 只會暫時改去處理前一版的安全問題，之後回到原本同一個 N02；接替版仍保持 Draft。</li>
+              </ul>
+              <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2B">
+                <div class="wgl-zoom-controls" role="group" aria-label="A1-2B 圖表縮放控制">
+                  <span class="wgl-zoom-controls-label text-small">圖表縮放</span>
+                  <button class="btn wgl-zoom-out" type="button" aria-controls="wgl-a12b-viewport" aria-label="縮小 A1-2B 圖表" title="縮小">−</button>
+                  <button class="btn wgl-zoom-reset" type="button" aria-controls="wgl-a12b-viewport" aria-label="重設 A1-2B 圖表縮放" title="重設為 100%">100%</button>
+                  <button class="btn wgl-zoom-in" type="button" aria-controls="wgl-a12b-viewport" aria-label="放大 A1-2B 圖表" title="放大">+</button>
+                  <span class="wgl-zoom-announcement sr-only" aria-live="polite">A1-2B 圖表縮放 100%</span>
+                </div>
+                <p id="wgl-a12b-help" class="wgl-fsm-notation text-small">放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。</p>
+                <div id="wgl-a12b-viewport" class="wgl-zoom-viewport" tabindex="0" aria-label="可縮放與拖曳的 A1-2B" aria-describedby="wgl-a12b-help">
+                  <pre class="mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas" data-diagram="a1-2b-release-activation">
+      flowchart LR
+        N02["A12-N02<br/>接替版 Draft（草稿）<br/>共同邊界"] -->|A12-A04| N02
+        N02 -->|A12-A05A| N03["A12-N03<br/>Prepared（已準備、等待啟用）<br/>視版本而定"]
+        N03 -->|A12-A06| N03
+        N03 -->|A12-A07| N04["A12-N04<br/>Active（目前生效）／0 個未完成研究<br/>共同邊界"]
+        N02 -.->|A12-A05B · bootstrap 例外| N04
+        N06PORT["A1-2C／N06<br/>處理前一版的安全問題"]
+        N02 -.->|A12-A12| N06PORT
+        N06PORT -.->|A12-A13| N02
+                  </pre>
+                </div>
+                <div class="wgl-render-status text-small" data-mermaid-status="a1-2b-release-activation" aria-live="polite">正在整理 A1-2B…</div>
+              </div>
+            </section>
+
+            <section class="wgl-a12-segment" aria-labelledby="wgl-a12c-title">
+              <h3 id="wgl-a12c-title">A1-2C｜L3 目前生效版本的研究治理</h3>
+              <span class="wgl-shared-boundary text-small">N04 共同邊界：B 與 C 顯示的是同一個 Active 版本</span>
+              <ul class="wgl-fsm-notation text-small" aria-label="A1-2C 說明">
+                <li>N04–N06 判斷的都是同一個 Active 前一版。</li>
+                <li>A12-A08／A09 要建立或推進研究時，仍須通過 A1-3 的 G-FAMILY 與該階段的人工核准。</li>
+                <li>A12-A11 只會開始處理新的接替版需求；前一版仍留在 N04／N05。</li>
+                <li>A12-A12 會從接替版 N02 暫時切到前一版 N06；A12-A13 完成安全處理後，再回到原本同一個 N02 重試發布檢查。</li>
+                <li>目前儲存庫（repository）尚未持久化安全評估（safety assessment）的開啟／關閉狀態，因此 N04／N05／N06 仍有持久化／CLI 實作缺口。</li>
+              </ul>
+              <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2C">
+                <div class="wgl-zoom-controls" role="group" aria-label="A1-2C 圖表縮放控制">
+                  <span class="wgl-zoom-controls-label text-small">圖表縮放</span>
+                  <button class="btn wgl-zoom-out" type="button" aria-controls="wgl-a12c-viewport" aria-label="縮小 A1-2C 圖表" title="縮小">−</button>
+                  <button class="btn wgl-zoom-reset" type="button" aria-controls="wgl-a12c-viewport" aria-label="重設 A1-2C 圖表縮放" title="重設為 100%">100%</button>
+                  <button class="btn wgl-zoom-in" type="button" aria-controls="wgl-a12c-viewport" aria-label="放大 A1-2C 圖表" title="放大">+</button>
+                  <span class="wgl-zoom-announcement sr-only" aria-live="polite">A1-2C 圖表縮放 100%</span>
+                </div>
+                <p id="wgl-a12c-help" class="wgl-fsm-notation text-small">放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。</p>
+                <div id="wgl-a12c-viewport" class="wgl-zoom-viewport" tabindex="0" aria-label="可縮放與拖曳的 A1-2C" aria-describedby="wgl-a12c-help">
+                  <pre class="mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas" data-diagram="a1-2c-active-governance">
+      flowchart LR
+        N04["A12-N04<br/>Active（目前生效）<br/>0 個未完成研究／共同邊界"] -->|A12-A08| N05["A12-N05<br/>Active（目前生效）<br/>1..n 個未完成研究"]
+        N05 -->|A12-A09| N05
+        N05 -->|A12-A10| N04
+        N04 -->|A12-A11| N04
+        N05 -->|A12-A11| N05
+        N05 -->|A12-A12| N06["A12-N06<br/>Active 前一版<br/>安全檢查進行中"]
+        N06 -->|A12-A13 · 無暫停研究| N04
+        N06 -->|A12-A13 · 仍有暫停研究| N05
+        N01PORT["A1-2A／N01<br/>新的接替版需求"]
+        N02PORT["A1-2B／N02<br/>原本同一個接替版 Draft"]
+        N04 -.->|HANDOFF ONLY| N01PORT
+        N05 -.->|HANDOFF ONLY| N01PORT
+        N02PORT -.->|A12-A12| N06
+        N06 -.->|A12-A13| N02PORT
+                  </pre>
+                </div>
+                <div class="wgl-render-status text-small" data-mermaid-status="a1-2c-active-governance" aria-live="polite">正在整理 A1-2C…</div>
+              </div>
+            </section>
+          </div>
+
+          <section class="wgl-family-profile" aria-labelledby="wgl-family-profile-title">
+            <h3 id="wgl-family-profile-title">版本如何啟用｜由同一流程系列的設定決定</h3>
+            <ul class="wgl-fsm-notation text-small" aria-label="版本啟用設定說明">
+              <li>A12-A05A 與 A12-A05B 要走哪一條，取決於同一流程系列在註冊表中的設定，不是把某個節點綁死給特定版本。</li>
+              <li>這項設定只決定啟用方式，不會新增 A1-2 狀態。</li>
+            </ul>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <caption>一般啟用規則，以及目前同一流程系列採用的設定。</caption>
+                <thead><tr><th>適用範圍</th><th>判定規則／目前設定</th><th>對 A1-2 的影響</th></tr></thead>
+                <tbody>
+                  <tr><td>一般啟用路徑</td><td><code>exact version &gt;= family.activation_required_from</code></td><td>走 A12-A05A：N02 → N03；之後必須由 A12-A07 找到相符的 <code>ACTIVATION.json</code>，才能進入 N04。</td></tr>
+                  <tr><td>舊版 bootstrap 例外（免另行啟用）</td><td>版本早於明確啟用邊界，而且已凍結的 bootstrap 規則明文允許。</td><td>走 A12-A05B：N02 → N04。這是虛線例外，不能套用到需要明確啟用的版本。</td></tr>
+                  <tr><td>目前的同一流程系列</td><td><code>strategy-forward-replication-research</code> 設為 <code>activation_required_from: v010</code>；v009 是最後一個 bootstrap 版本。</td><td>v009 走 A05B 的既定例外；v010 之後都必須走 A05A → N03 → A07。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <caption>A1-2 動作對照表：Overview／A／B／C 的 action ID，都以這裡列出的起點、終點、成立條件與結果為準。</caption>
+              <thead>
+                <tr><th>Action ID</th><th>起點 → 終點</th><th>成立條件與結果</th></tr>
+              </thead>
+              <tbody>
+                <tr><th colspan="3">A1-2A｜L1 建立接替版的正式版本身分</th></tr>
+                <tr><td>A12-A01</td><td>入口 → N01</td><td>收到建立或變更需求；接替版尚未取得正式版本路徑。</td></tr>
+                <tr><td>A12-A02</td><td>N01 → N01</td><td>預覽失敗或需要修改；留在 N01，重新整理輸入。</td></tr>
+                <tr><td>A12-A03</td><td>N01 → N02</td><td>配發正式版本路徑並註冊 Draft；從這一步起才有可判定的單一明確版本。</td></tr>
+                <tr><th colspan="3">A1-2B｜L2 接替版的發布與啟用</th></tr>
+                <tr><td>A12-A04</td><td>N02 → N02</td><td>修正同一個 Draft，包括既有草稿、重新預覽、修復發布條件或未取得發布核准後的修改；不退回 N01，也不更換版本身分。</td></tr>
+                <tr><td>A12-A05A</td><td>N02 → N03</td><td>版本符合 <code>exact version &gt;= family.activation_required_from</code>，發布條件通過且取得人工核准後，產生 <code>RELEASE.json</code>。</td></tr>
+                <tr><td>A12-A05B</td><td>N02 → N04</td><td>只適用同一流程系列設定明確允許的舊版 bootstrap。跨過既定邊界後，接替版成為 Active，前一版成為 Superseded。</td></tr>
+                <tr><td>A12-A06</td><td>N03 → N03</td><td>尚未取得人工啟用核准；維持 Prepared，並阻止新的結果相關研究工作。</td></tr>
+                <tr><td>A12-A07</td><td>N03 → N04</td><td>人工核准並產生 <code>ACTIVATION.json</code>；接替版成為 Active，前一版成為 Superseded。</td></tr>
+                <tr><th colspan="3">A1-2C｜L3 目前生效版本的研究治理</th></tr>
+                <tr><td>A12-A08</td><td>N04 → N05</td><td>G-FAMILY 通過且具有建立權限時，建立第一個 Draft Sxxx，未完成研究數由 0 變成 1。預先登記不屬於這個動作。</td></tr>
+                <tr><td>A12-A09</td><td>N05 → N05</td><td>建立更多 Sxxx，或預先登記、開始、恢復、凍結候選、推進既有研究。每個會影響結果的動作，都要通過 G-FAMILY、凍結計畫檢查與該階段的人工核准。</td></tr>
+                <tr><td>A12-A10</td><td>N05 → N04</td><td>所有 Sxxx 都已 Completed 或 Cancelled，不再有未完成研究。</td></tr>
+                <tr><td>A12-A11</td><td>N04／N05 保持原狀；另切到 N01</td><td>開始整理接替版需求，不要求先暫停未完成研究。前一版保持 N04／N05；<code>HANDOFF ONLY</code> 只切換處理對象，也不授權準備發布。</td></tr>
+                <tr><td>A12-A12</td><td>接替版保持 N02；前一版 N05 → N06</td><td>接替版已在 N02 並嘗試準備發布。若前一版仍有不安全的研究，或暫停研究的影響決定不完整，就暫時改處理前一版並開啟持久化安全評估。</td></tr>
+                <tr><td>A12-A13</td><td>前一版 N06 → N04／N05；再回到原本的接替版 N02</td><td>所有研究都已 Paused、Completed 或 Cancelled，必要的影響決定已記錄，且安全評估可以正式關閉。前一版依未完成研究數回到 N04 或 N05，再對原本 N02 重做發布檢查；不得建立第二個接替版。</td></tr>
+                <tr><th colspan="3">切換處理對象的邊界</th></tr>
+                <tr><td>HANDOFF ONLY</td><td>Active 前一版 → N01 接替版需求</td><td>只把接下來要處理的對象換成尚未建立的接替版；這不是同一版本的狀態轉換，前一版不會回到 Draft。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <caption>A1-2 狀態判定表：每一列只判斷一個單一明確版本；所在層級只說明工作發生在哪裡，不會改變判定對象。</caption>
+              <thead>
+                <tr><th>節點</th><th>所在層級</th><th>正在判斷誰</th><th>儲存庫中的判定依據</th><th>唯一性／無法判定時</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>N01</td><td>L1 入口</td><td>尚未建立的接替版需求</td><td>還沒有正式版本路徑，因此沒有單一明確版本可查。</td><td>N01 只是入口；依版本查詢的 CLI 不得把它猜成版本狀態。</td></tr>
+                <tr><td>N02</td><td>L1→L2 共同邊界</td><td>接替版 Draft</td><td><code>status=draft</code>，而且沒有 <code>RELEASE.json</code>。</td><td>L1 負責建立／修正，L2 負責發布檢查；同一版本不能同時是 N03–N06。</td></tr>
+                <tr><td>N03</td><td>L2</td><td>接替版 Prepared</td><td>版本需要明確啟用，<code>status=prepared</code>，已有有效發布資料，但還沒有相符的啟用資料。</td><td>可與 Active 前一版並存；但同一流程系列的限制會阻止新的結果相關研究工作。</td></tr>
+                <tr><td>N04</td><td>L3</td><td>Active 版本</td><td>註冊表與發布資料有效；需要明確啟用的版本另須相符的 <code>ACTIVATION.json</code>；未完成研究數為 0；另須持久化資料證明沒有進行中的安全評估。</td><td>同一版本不能同時是 N05／N06；接替版是另一個版本。目前仍缺安全評估開啟／關閉的持久化資料。</td></tr>
+                <tr><td>N05</td><td>L3</td><td>Active 版本</td><td>註冊表、發布與適用的啟用資料有效；未完成研究數至少為 1；另須持久化資料證明沒有進行中的安全評估。</td><td>Paused 仍算未完成。缺少安全評估資料時，不能只看研究數就排除 N06。</td></tr>
+                <tr><td>N06</td><td>L3</td><td>Active 前一版</td><td>註冊表、發布與適用的啟用資料有效，而且有持久化資料證明安全評估仍在進行；原因可包含不安全研究、暫停研究的影響決定不完整，或尚未正式關閉。</td><td>進行中的安全評估優先於未完成研究數。目前缺這份持久化資料；需要區分 N04／N05／N06 時應回 invalid（資料矛盾）／indeterminate（資料不足）。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+    a1_3: |-
+      <section class="wgl-diagram" aria-labelledby="wgl-study-state-machine-title">
+          <h2 id="wgl-study-state-machine-title">A1-3｜每一個 Sxxx 研究實例自己的生命週期</h2>
+          <ul class="wgl-fsm-notation text-small" aria-label="A1-3 閱讀重點">
+            <li><strong>判定單位：</strong>一次只判斷一個 Sxxx 研究實例，不判斷整個 Workflow 版本。</li>
+            <li><strong>可以有多個：</strong>同一個 Active Workflow 版本可以有零到多個彼此獨立的 Sxxx。</li>
+            <li><strong>不可混用：</strong>每個 Sxxx 都走自己的生命週期；不得與 A1-2 的版本狀態，或另一個版本的 Sxxx 混在一起。</li>
+          </ul>
+          <div class="wgl-fsm-notation text-small">
+            <strong>動作資格檢查（G-FAMILY）</strong>
+            <ul>
+              <li>G-FAMILY 只判斷「現在能不能執行某個動作」，不是新的 Sxxx 狀態。</li>
+              <li>建立、預先登記、開始、恢復、凍結候選，以及其他會影響結果的動作，都要求研究綁定的版本目前有效且 Active、同一流程系列沒有 Prepared 接替版，而且該版本沒有進行中的安全評估。</li>
+              <li>建立研究另需建立 Draft 的權限；預先登記需完整計畫（plan）並在當次轉換凍結；開始、恢復與凍結候選另需有效的凍結計畫及各階段人工核准。</li>
+              <li>Prepared 限制不阻止暫停、取消、審查者退回或完成審查；但審查者退回後，G-FAMILY 再次成立前不得執行結果相關工作。</li>
+              <li>Paused 仍算未完成；只有 Completed 與 Cancelled 不算未完成。</li>
+              <li>目前實作會對所有進入 Running 的轉換套用有效版本檢查，因此「只做行政退回」的例外仍是後續實作缺口。</li>
+            </ul>
+          </div>
+          <pre class="mermaid wgl-mermaid wgl-mermaid-a13" data-diagram="a1-study-state-machine">
+      stateDiagram-v2
+        direction TB
+
+        state "Draft（草稿）" as StudyDraft
+        state "Preregistered（已預先登記）" as StudyPreregistered
+        state "Running（進行中）" as StudyRunning
+        state "Paused（已暫停）" as StudyPaused
+        state "Awaiting review（等待審查）" as AwaitingReview
+        state "Completed（已完成）" as StudyCompleted
+        state "Cancelled（已取消）" as StudyCancelled
+
+        [*] --> StudyDraft: G-FAMILY + 建立權限 / CLI 配發 Sxxx
+        StudyDraft --> StudyPreregistered: G-FAMILY + 完整計畫 + 人工核准 / 凍結指定版本與檔案
+        StudyDraft --> StudyCancelled: 記錄原因
+        StudyPreregistered --> StudyRunning: G-FAMILY + 凍結計畫有效 + Development 核准
+        StudyPreregistered --> StudyCancelled: 記錄原因
+        StudyRunning --> StudyPaused: 記錄原因
+        StudyPaused --> StudyRunning: G-FAMILY + 凍結計畫有效 + 恢復核准
+        StudyRunning --> AwaitingReview: 提交可核對的完整證據
+        StudyRunning --> StudyCancelled: 記錄原因
+        StudyPaused --> StudyCancelled: 記錄原因
+        AwaitingReview --> StudyRunning: 審查者只做行政退回並記錄原因；後續執行仍受 G-FAMILY 限制
+        AwaitingReview --> StudyCompleted: 審查者確認 / 凍結研究結果
+        StudyCompleted --> [*]
+        StudyCancelled --> [*]
+
+        note right of StudyRunning
+          凍結候選與其他會影響結果的動作：
+          必須通過 G-FAMILY、凍結計畫檢查與該階段人工核准。
+          一個階段的核准不能代替另一個階段。
+        end note
+
+        classDef l3 fill:var(--card),stroke:var(--viz-series-2),stroke-width:2px,color:var(--foreground)
+        class StudyDraft,StudyPreregistered,StudyRunning,StudyPaused,AwaitingReview,StudyCompleted,StudyCancelled l3
+          </pre>
+          <div id="wgl-a13-mermaid-status" class="wgl-render-status text-small" aria-live="polite">正在整理 A1-3…</div>
+        </section>
+presentation:
+  a1_decision_node_ids: [L1N3, L2N2, L2N3, L2N5, L3N3, L3N5]
+  a1_node_types:
+    L1N1: {key: input, label: 輸入／觸發來源}
+    L1N2: {key: activity, label: 活動／處理步驟}
+    L1N3: {key: decision, label: 決策／條件檢查}
+    L1N4: {key: activity, label: 活動／處理步驟}
+    L1N5: {key: activity, label: 活動／處理步驟}
+    L2N1: {key: activity, label: 活動／處理步驟}
+    L2N2: {key: decision, label: 決策／條件檢查}
+    L2N3: {key: decision, label: 決策／條件檢查}
+    L2N4: {key: activity, label: 活動／處理步驟}
+    L2N5: {key: decision, label: 決策／條件檢查}
+    L2N6: {key: state, label: 狀態／治理條件}
+    L2N7: {key: routing, label: 路由／退回}
+    L2N8: {key: state, label: 狀態／治理條件}
+    L3N1: {key: state, label: 狀態／治理條件}
+    L3N2: {key: activity, label: 活動／處理步驟}
+    L3N3: {key: decision, label: 決策／條件檢查}
+    L3N4: {key: activity, label: 活動／處理步驟}
+    L3N5: {key: decision, label: 決策／條件檢查}
+  a1_2_node_layers:
+    N01PORT: l1
+    N02PORT: l2
+    N06PORT: l3
+    N01: l1
+    N02: l2
+    N03: l2
+    N04: l3
+    N05: l3
+    N06: l3
+  a1_2_shared_boundary_node_ids: [N02, N04]
+  a1_2_zoom_controls_enabled: false
+a1_details:
+  L1N1:
+    title: L1-N1｜接替版需求
+    summary: 先整理為什麼要建立或修改接替版；此時還沒有正式版本路徑。
+    input: 第一次建立 Workflow 的需求，或 Active 前一版產生的研究回饋、治理缺口與變更需求。開始整理接替版時，不要求先把研究全部安全化。
+    next: 整理成內容完整的建立／變更需求，並明確說明接下來要建立接替版。
+    guard: 接替版尚未取得正式路徑；前一版保持 Active，不會回到 Draft。依版本查詢的 CLI 也不能把 N01 當成已存在的版本狀態。
+  L1N2:
+    title: L1-N2｜AI 預覽與檢查
+    summary: AI 讀取儲存庫與需求，產生不寫入檔案的預覽。
+    input: 完整需求、同一流程系列的註冊表、Active 前一版、可能已存在的接替版 Draft、來源文件與治理規則。
+    next: 確認預覽是否完整、可以套用，而且目標檔案從預覽後沒有改變。
+    guard: 若目標已改變，或儲存庫處於不完整狀態，就停止且不寫入任何內容，重新產生預覽。
+  L1N3:
+    title: L1-N3｜預覽可套用？
+    summary: 確認預覽內容完整，而且仍對應儲存庫的目前狀態。
+    input: 預計修改的內容、明確路徑、目標檔案摘要、來源文件處置方式與驗證計畫。
+    next: 人類確認可套用後，建立或維持同一個接替版 Draft；若不能套用，就保留目前狀態並重新預覽。
+    guard: 不得略過目標變更、不完整狀態或預覽確認檢查，也不得只套用一部分修改。
+  L1N4:
+    title: L1-N4｜建立／修正草稿
+    summary: 依已確認且仍有效的預覽，建立或更新一個完整註冊的接替版 Draft。
+    input: 第一次建立的需求，或把前一版已接受的修改整合成接替版 Draft 的演進需求。
+    next: 把同一個接替版 Draft 交給 L2 做發布檢查。
+    guard: 接替版 Draft 尚未生效，也不能用來建立新的 L3 研究；同一流程系列的前一版仍保持 Active。
+  L1N5:
+    title: L1-N5｜修正輸入
+    summary: 修正預覽失敗、資料缺漏或人類要求調整的內容。
+    input: 缺漏、衝突、目標檔案已改變、儲存庫狀態不完整或修改意見；問題可能發生在 N01，也可能發生在已存在的接替版 Draft。
+    next: 重新整理需求，再回到 L1-N2 產生新預覽；已存在的接替版仍保留原本的版本身分。
+    guard: 若預計修改的內容不同，舊預覽就不能再用，必須重新產生並確認；已存在的 Draft 也不能假裝回到尚無版本身分的 N01。
+  L2N1:
+    title: L2-N1｜AI 發布檢查
+    summary: CLI 與 Agent 檢查同一個 N02 接替版是否具備準備發布的條件。
+    input: 完整 Workflow 規格、已接受的修改、整體影響、N02 接替版、Active 前一版的研究，以及固定的政策／相依版本。
+    next: 把檢查結果交給 L2-N2；若前一版的安全或影響處理不完整，就暫時改處理 N06，完成後再回原本 N02 重試。
+    guard: 任何缺口都要停止發布。AI 檢查不能取代人工發布核准，也不能在重試時建立第二個接替版。
+  L2N2:
+    title: L2-N2｜發布條件通過？
+    summary: 把結果分成三類：可以準備發布、要修正同一個 Draft，或要先處理前一版的安全問題。
+    input: L2-N1 完整的發布就緒檢查結果。
+    next: 通過就請求人類核准；接替版內容或固定版本有缺口就走 A12-A04；前一版的安全或暫停研究影響有缺口就走 A12-A12 到 N06。
+    guard: 研究安全只會阻止準備發布或啟用，不會阻止建立 N01 需求或 N02 Draft；處理安全問題期間，接替版仍保持 N02。
+  L2N3:
+    title: L2-N3｜人工發布核准？
+    summary: 由具穩定識別碼的人類明確核准這一次準備發布。
+    input: 完整發布範圍、就緒檢查結果與整體影響。
+    next: 核准後，為同一個接替版建立不可變的發布證據；未核准就修正或保留 Draft。
+    guard: 這項核准只允許準備發布，不授權 commit、push、merge、研究或交易。
+  L2N4:
+    title: L2-N4｜準備發布
+    summary: 依同一流程系列的啟用設定，選擇一般明確啟用路徑，或明文允許的舊版 bootstrap 例外。
+    input: 通過所有檢查的 Draft，以及當下明確的人工發布核准。
+    next: 需要明確啟用的版本會成為 Prepared，等待另一個人工啟用核准；只有早於邊界且設定明文允許的版本，才能走已凍結的 bootstrap 例外。
+    guard: 需要明確啟用時，RELEASE.json 只證明已準備發布。前一版仍是註冊表中的 Active，但 Prepared 限制已阻止新的結果相關研究工作。
+  L2N5:
+    title: L2-N5｜人工啟用核准？
+    summary: 由具穩定識別碼的人類，另外核准版本啟用（Workflow Release Activation）。
+    input: Prepared 版本、不可變的 RELEASE.json、該次發布的摘要值與啟用影響。
+    next: 核准後產生不可變的 ACTIVATION.json，讓接替版成為 Active；同一次轉換才把前一版改為 Superseded。未核准時繼續阻止新的結果相關研究工作。
+    guard: 不得因為 Agent 判斷、RELEASE.json 已存在，或版本位於正式分支（canonical branch），就推定已啟用。
+  L2N6:
+    title: L2-N6｜正式權威生效
+    summary: 接替版依同一流程系列要求的啟用證據，或明文允許的舊版 bootstrap 邊界，成為 Active。
+    input: 適用且不可變的發布／啟用證據、相符的註冊表資料、固定版本，以及前一版的影響處理結果。
+    next: 接替版以自己的版本身分進入 L3；只有此時，前一版才成為 Superseded。
+    guard: 啟用不會把前一版與接替版合成同一個版本；某個同一流程系列的 bootstrap 例外也不能套用到需要明確啟用的版本。
+  L2N7:
+    title: L2-N7｜修正接替版
+    summary: 修正接替版的規格、已接受修改、影響分析、固定版本或發布核准缺口。
+    input: L2 停止發布時列出的缺口，或尚未取得人工核准的結果。
+    next: 回到草稿編寫流程修正需求並重新預覽；已存在的 Draft 仍是 A12-N02，不會退回 N01。
+    guard: 不得重建或偷換接替版的版本身分，不得直接修改 Prepared 的發布證據，也不得略過重新確認。
+  L2N8:
+    title: L2-N8｜阻止新研究
+    summary: Prepared 接替版尚未取得 Workflow Release Activation，因此維持停止新研究。
+    input: 註冊表顯示 Prepared，而且還沒有相符的 ACTIVATION.json。
+    next: 等待獨立人工啟用核准，再重新檢查 L2-N5。
+    guard: Prepared 接替版還沒有 L3 權限；前一版也不得建立、預先登記、開始、恢復或凍結新的結果相關研究工作。
+  L3N1:
+    title: L3-N1｜研究治理就緒
+    summary: 一個版本已依適用的發布邊界成為 Active，並以自己的版本身分進入研究治理。
+    input: 依同一流程系列設定完成版本啟用的版本，或符合明文且已凍結 bootstrap 規則的邊界前版本，以及不可變證據與固定版本。
+    next: 可以建立或推進 0..n 個彼此獨立的 Sxxx；每個 Sxxx 的生命週期請看 A1-3。
+    guard: 此版本只能符合一個 L3 狀態；Draft 接替版可以並存。Prepared 接替版或進行中的安全評估都會阻止新的結果相關研究工作。
+  L3N2:
+    title: L3-N2｜建立／推進零到多個 Sxxx
+    summary: 在同一個 Active 版本下，分別管理多個獨立的 Sxxx 研究實例。
+    input: L3 的有效權限，以及每個 Sxxx 自己的版本身分、計畫（plan）、人工核准與證據（evidence）。
+    next: 每個 Sxxx 依 A1-3 獨立推進；即使開始整理接替版需求，Active 版本仍保持自己的 L3 狀態。
+    guard: 不同 Sxxx 的固定版本、權限、計畫、證據與研究結果（outcome）不得混用；建立、預先登記、開始、恢復與凍結另受 G-FAMILY 及各階段人工核准約束。
+  L3N3:
+    title: L3-N3｜需要建立接替版？
+    summary: 判斷研究回饋或治理缺口是否需要形成新的接替版需求。
+    input: 研究結論、流程缺陷、治理需求，或人類提出的 Workflow 變更意圖。
+    next: 不需要修改時，前一版繼續留在 L3；需要接替版時，立即以 HANDOFF ONLY 開始處理 N01，前一版保持原本的 N04／N05。
+    guard: Study 的研究結果只能形成接替版需求，不能直接覆寫已發布的前一版、讓它回到 Draft，或把 A12-A11 當成準備發布的授權。
+  L3N4:
+    title: L3-N4｜處理前一版的安全問題
+    summary: 接替版已在 N02 並嘗試準備發布，因此流程暫時改去處理 Active 前一版的 N06。
+    input: 進行中的持久化安全評估、不安全的 Sxxx，或尚未完成的暫停研究影響決定／關閉程序。
+    next: 由研究操作人員（operator）／獨立審查者（reviewer）合法地讓研究進入 Paused、Completed 或 Cancelled，補齊影響決定，再檢查安全評估能否關閉。
+    guard: Workflow 作者（Author）不能代替研究操作人員或獨立審查者。目前缺少正式持久化的安全評估資料，未來 CLI 不得只靠說明文字或研究數量推定 N06。
+  L3N5:
+    title: L3-N5｜安全檢查完成？
+    summary: 確認前一版的發布安全處理是否完整，以及持久化安全評估能否正式關閉。
+    input: 前一版下所有 Sxxx 的正式生命週期狀態，以及每個暫停研究的影響決定。
+    next: 所有研究都安全、必要影響決定完整，而且安全評估已關閉後，N06 依未完成研究數回到 N04／N05；再回原本同一個 N02 接替版重做發布檢查。
+    guard: 安全評估關閉前維持 N06；不得建立 N01 或第二個接替版，也不得讓前一版回到 Draft。
+diagram_aria_labels:
+  a1-main: A1：前一版保持 Active；流程可以先整理接替版需求。只有接替版準備發布時，才暫時改去處理前一版的安全問題，完成後回到原本的接替版。每個節點都可開啟詳細說明
+  a1-2-overview: A1-2 Overview：同一套版本狀態機的 N01 到 N06、主要流程、舊版 bootstrap 例外、切換處理對象與發布安全協調
+  a1-2a-identity-formation: A1-2A：接替版需求經過預覽、配發正式路徑並註冊後，成為可判定的 Draft 版本
+  a1-2b-release-activation: A1-2B：接替版 Draft 依同一流程系列設定進入 Prepared 或 Active；若前一版有安全缺口，處理完成後回到原本同一個 Draft
+  a1-2c-active-governance: A1-2C：同一個 Active 前一版只能符合 N04、N05、N06 其中一個；A12-A11 只開始處理新的接替版需求，A12-A12 與 A12-A13 則回到原本同一個 N02 接替版重試發布檢查
+  a1-study-state-machine: A1-3：單一 Sxxx 研究實例的七個狀態；建立、預先登記、開始、恢復與凍結等動作受 G-FAMILY 與各階段人工核准約束，Workflow 版本條件不會變成新的研究狀態
+render_status:
+  a1_mobile: 滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。
+  a1_desktop: 滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。
+  a1_2:
+    a1-2-overview: Overview 已顯示同一套狀態機的 N01–N06、主要流程、舊版例外、A12-A11 切換處理對象，以及 A12-A12／A13 的發布安全協調；完整條件請看下方動作對照表。
+    a1-2a-identity-formation: A1-2A 已顯示 N01 入口、A12-A01–A03 與 N02 共同邊界；只有 A12-A03 完成後，才有可依版本路徑判定的接替版。
+    a1-2b-release-activation: A1-2B 已顯示 N02–N04、A12-A04–A07，以及 A12-A12／A13 暫時改處理前一版後，再回到同一個 N02；A12-A07 只接受相符的 ACTIVATION.json。
+    a1-2c-active-governance: A1-2C 已顯示 N04–N06 與 A12-A08–A13；A12-A11 只開始處理新的 N01 需求，A12-A12／A13 則回到原本同一個 N02 接替版。
+  interaction_enabled: 可在 75%–200% 間縮放，並以拖曳、觸控或方向鍵移動。
+  interaction_disabled: 縮放控制目前關閉；圖表維持 100%。
+  a1_3: A1-3 仍是每一個 Sxxx 各自使用的七狀態生命週期。G-FAMILY、Prepared 接替版與進行中的安全評估只會限制可執行的動作，不是新的 Sxxx 狀態。
+  load_errors:
+    a1: A1 載入失敗；上方仍可閱讀 Mermaid 原始文字。
+    a1_2: 此 A1-2 分段圖載入失敗；上方仍可閱讀 Mermaid 原始文字。
+    a1_3: A1-3 載入失敗；上方仍可閱讀 Mermaid 原始文字。
+validation:
+  diagram_ids:
+  - a1-main
+  - a1-2-overview
+  - a1-2a-identity-formation
+  - a1-2b-release-activation
+  - a1-2c-active-governance
+  - a1-study-state-machine
+  a1_detail_node_ids:
+  - L1N1
+  - L1N2
+  - L1N3
+  - L1N4
+  - L1N5
+  - L2N1
+  - L2N2
+  - L2N3
+  - L2N4
+  - L2N5
+  - L2N6
+  - L2N7
+  - L2N8
+  - L3N1
+  - L3N2
+  - L3N3
+  - L3N4
+  - L3N5
+  a1_2_action_ids:
+  - A12-A01
+  - A12-A02
+  - A12-A03
+  - A12-A04
+  - A12-A05A
+  - A12-A05B
+  - A12-A06
+  - A12-A07
+  - A12-A08
+  - A12-A09
+  - A12-A10
+  - A12-A11
+  - A12-A12
+  - A12-A13

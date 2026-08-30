@@ -116,7 +116,10 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
 | `docs/workflow-governance/README.md` | Human-facing entry point linking canonical workflow authority, workflow skills, governance diagrams, their scope, and the final review conclusion. |
 | `docs/workflow-governance/workflow-governance-flow.html` | Standalone B1 high-level sequence visualization of workflow authoring, release, study-operation, and review role handoffs. |
-| `docs/workflow-governance/workflow-governance-layers.html` | Standalone A1 single-Workflow L1–L3 exclusive governance flow, its equivalent A1-2 workflow control state machine, and the separate A1-3 per-study lifecycle within L3. |
+| `docs/workflow-governance/workflow-governance-layers.html` | Local-HTTP page shell for the data-backed A1/A1-2/A1-3 governance visualization; direct `file://` loading is unsupported. |
+| `docs/workflow-governance/workflow-governance-layers.yaml` | Explanatory, machine-validated presentation data for the A1/A1-2/A1-3 visualization: human text, Mermaid source, detail panels, status messages, and expected IDs. It does not replace workflow or study lifecycle authority. |
+| `docs/workflow-governance/workflow-governance-layers.css` | Visual layout and interaction styling for the data-backed layers diagram. |
+| `docs/workflow-governance/workflow-governance-layers.js` | Same-origin YAML loader, runtime consistency checks, DOM/Mermaid rendering, and zoom/pan/detail interactions for the layers diagram. |
 | `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |

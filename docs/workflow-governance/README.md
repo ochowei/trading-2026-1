@@ -28,8 +28,35 @@ The exact released `WORKFLOW.md` pinned by a study remains the procedure authori
 - [Workflow governance layers](workflow-governance-layers.html): A1 exact-version governance and
   predecessor-to-successor identity handoff; A1-2 Overview plus A1-2A identity formation, A1-2B
   release/activation authority, A1-2C active-version governance, and a separate family activation
-  profile; and the independent A1-3 per-study lifecycle inside L3.
+  profile; and the independent A1-3 per-study lifecycle inside L3. Its tracked YAML data is loaded
+  by browser JavaScript at runtime and remains explanatory rather than lifecycle authority.
 - [Workflow governance flow](workflow-governance-flow.html): B1 high-level role-handoff sequence.
+
+## View the data-backed layers diagram locally
+
+The layers diagram must be opened through a local HTTP server so the browser can load its adjacent
+YAML file. From the repository root, run:
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1 --directory docs/workflow-governance
+```
+
+Then open
+`http://127.0.0.1:8000/workflow-governance-layers.html`. Direct `file://` loading is intentionally
+unsupported: browsers do not reliably allow an ES module to fetch an adjacent YAML file from a
+local-file origin. Bind the documentation server to `127.0.0.1`, not `0.0.0.0`, unless access from
+other machines is explicitly required.
+
+The layers diagram is split by responsibility:
+
+- `workflow-governance-layers.yaml`: human-facing governance content, Mermaid source, detail-panel
+  data, presentation mappings, status text, and runtime validation expectations.
+- `workflow-governance-layers.html`: page shell and local asset loading.
+- `workflow-governance-layers.css`: visual presentation.
+- `workflow-governance-layers.js`: YAML loading, validation, rendering, Mermaid setup, and existing
+  zoom/pan and detail-panel interaction.
+
+Edit governance content in the YAML file rather than copying it back into HTML or JavaScript.
 
 ## Diagram scope and review conclusion
 
