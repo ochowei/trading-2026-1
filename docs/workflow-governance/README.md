@@ -26,21 +26,29 @@ The exact released `WORKFLOW.md` pinned by a study remains the procedure authori
 ## Diagrams
 
 - [Workflow governance layers](workflow-governance-layers.html): A1 exact-version governance and
-  predecessor-to-successor identity handoff, the equivalent A1-2 per-exact-version control-state
-  view, and the separate A1-3 per-study lifecycle inside L3.
+  predecessor-to-successor identity handoff; A1-2 Overview plus A1-2A identity formation, A1-2B
+  release/activation authority, A1-2C active-version governance, and a separate family activation
+  profile; and the independent A1-3 per-study lifecycle inside L3.
 - [Workflow governance flow](workflow-governance-flow.html): B1 high-level role-handoff sequence.
 
 ## Diagram scope and review conclusion
 
-- Last reviewed: 2026-08-28.
+- Last reviewed: 2026-08-29.
 - A1 is the process-and-exception view of one exact Workflow version and the cross-identity handoff
   that creates a prospective successor. An active predecessor never returns to Draft; it remains
   immutable and active until successor activation changes it to `superseded`.
-- A1-2 is the equivalent per-exact-version control-state view. Mutual exclusion is scoped to one
+- A1-2 is one per-exact-version control-state model presented as an Overview and three segmented
+  views: A (L1 successor identity formation), B (L2 release/activation authority), and C (L3
+  active-version governance). Repeated N02 and N04 nodes are shared boundaries for the same
+  canonical identities, not duplicate states or separate FSMs. Mutual exclusion is scoped to one
   immutable `workflows/<slug>--vNNN` identity, not the family: a family may contain one active
   predecessor and one draft or prepared successor at the same time. N01 is a prospective-successor
   entry boundary before an exact version identity exists; it is not a persisted registered-version
   state. Individual Sxxx lifecycle states remain outside this model.
+- A1-2 keeps family activation policy outside the FSM. The generic required-path predicate is
+  `exact version >= family.activation_required_from`; pre-boundary bootstrap is an explicit legacy
+  exception. For `strategy-forward-replication-research`, v009 remains the final bootstrap version
+  and v010+ requires explicit activation.
 - `RELEASE.json` identifies a prepared release; for activation-enabled versions, only a valid
   version-root `ACTIVATION.json` bound to that release can establish the active control state.
 - A1-3 is the canonical lifecycle view for one Sxxx inside one exact active version's L3. That
@@ -49,9 +57,14 @@ The exact released `WORKFLOW.md` pinned by a study remains the procedure authori
 - A prepared successor can coexist with its active predecessor, but the family-level prepared
   guard blocks creating, preregistering, starting, resuming, or freezing new outcome-relevant work
   while activation is pending.
+- Study safety gates release preparation and activation, not the authoring handoff that creates a
+  prospective input or exact draft successor. A release-safety failure switches control to the
+  active predecessor while the same successor remains draft, then returns to that same draft for a
+  fresh release check after safety closure.
 - Repository facts do not yet persist a prospective successor identity for N01 or a canonical
-  safety-required intent for N06. A future exact-version CLI must report `invalid` or
-  `indeterminate` when those required facts are absent rather than infer them from prose.
+  open/closed safety-assessment fact for N06 versus N04/N05. A future exact-version CLI must report
+  `invalid` or `indeterminate` when those required facts are absent rather than infer them from
+  prose or study counts.
 - B1 is a high-level actor handoff summary. It is not a complete authority or lifecycle model; use
   A1 for the detailed gates and control states.
 - A1 replaces the former B2 activity view. B2 was removed because it duplicated the primary

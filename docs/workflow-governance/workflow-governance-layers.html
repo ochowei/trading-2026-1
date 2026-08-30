@@ -957,6 +957,10 @@ html&gt;body{padding:0}&lt;/style&gt;
       justify-content: flex-end;
     }
 
+    #workflow-governance-layers .wgl-zoom-controls[hidden] {
+      display: none;
+    }
+
     #workflow-governance-layers .wgl-zoom-controls-label {
       margin-inline-end: 2px;
       color: var(--muted-foreground);
@@ -981,7 +985,8 @@ html&gt;body{padding:0}&lt;/style&gt;
       border-radius: var(--radius-lg);
       background: color-mix(in srgb, var(--muted) 24%, transparent);
       scrollbar-gutter: stable;
-      overscroll-behavior: contain;
+      overscroll-behavior-inline: contain;
+      overscroll-behavior-block: auto;
     }
 
     #workflow-governance-layers .wgl-zoom-viewport.is-zoomed {
@@ -997,21 +1002,118 @@ html&gt;body{padding:0}&lt;/style&gt;
       user-select: none;
     }
 
-    #workflow-governance-layers .wgl-zoom-viewport .wgl-mermaid-a12 {
+    #workflow-governance-layers .wgl-zoom-viewport .wgl-zoom-canvas {
       max-width: none;
     }
 
-    #workflow-governance-layers .wgl-mermaid-a12 .edgeLabel {
+    #workflow-governance-layers .wgl-a12-diagram .edgeLabel {
       font-weight: 700;
     }
 
-    #workflow-governance-layers .wgl-mermaid-a12 .edgeLabel rect,
-    #workflow-governance-layers .wgl-mermaid-a12 .edgeLabel .labelBkg {
+    #workflow-governance-layers .wgl-a12-diagram .edgeLabel rect,
+    #workflow-governance-layers .wgl-a12-diagram .edgeLabel .labelBkg {
       fill: var(--card) !important;
       stroke: var(--border) !important;
       stroke-width: 1px !important;
       rx: 4px;
       ry: 4px;
+    }
+
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l1 &gt; rect,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l1 &gt; circle,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l1 &gt; ellipse,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l1 &gt; polygon,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l1 &gt; path {
+      fill: var(--card) !important;
+      stroke: var(--viz-series-1) !important;
+      stroke-width: 2px !important;
+    }
+
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l2 &gt; rect,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l2 &gt; circle,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l2 &gt; ellipse,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l2 &gt; polygon,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l2 &gt; path {
+      fill: var(--card) !important;
+      stroke: var(--viz-series-3) !important;
+      stroke-width: 2px !important;
+    }
+
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l3 &gt; rect,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l3 &gt; circle,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l3 &gt; ellipse,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l3 &gt; polygon,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-layer-l3 &gt; path {
+      fill: var(--card) !important;
+      stroke: var(--viz-series-2) !important;
+      stroke-width: 2px !important;
+    }
+
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-shared-boundary &gt; rect,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-shared-boundary &gt; circle,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-shared-boundary &gt; ellipse,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-shared-boundary &gt; polygon,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-shared-boundary &gt; path {
+      stroke-width: 4px !important;
+      stroke-dasharray: 6 3 !important;
+    }
+
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-conditional &gt; rect,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-conditional &gt; circle,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-conditional &gt; ellipse,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-conditional &gt; polygon,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-conditional &gt; path {
+      stroke-dasharray: 5 3 !important;
+    }
+
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-boundary-port &gt; rect,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-boundary-port &gt; circle,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-boundary-port &gt; ellipse,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-boundary-port &gt; polygon,
+    #workflow-governance-layers .wgl-a12-diagram .wgl-a12-boundary-port &gt; path {
+      stroke-dasharray: 5 3 !important;
+    }
+
+    #workflow-governance-layers .wgl-a12-segments {
+      display: grid;
+      gap: 18px;
+    }
+
+    #workflow-governance-layers .wgl-a12-segment {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-a12-segment h3 {
+      margin: 0;
+    }
+
+    #workflow-governance-layers .wgl-shared-boundary {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border: 1px dashed var(--muted-foreground);
+      border-radius: 999px;
+      color: var(--muted-foreground);
+    }
+
+    #workflow-governance-layers .wgl-family-profile {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-inline-start: 4px solid var(--viz-series-3);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--muted) 42%, transparent);
+    }
+
+    #workflow-governance-layers .wgl-family-profile h3 {
+      margin: 0;
     }
 
     #workflow-governance-layers .wgl-render-status {
@@ -1253,14 +1355,21 @@ html&gt;body{padding:0}&lt;/style&gt;
   &lt;/header&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-switch-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-switch-title&quot;&gt;A1｜Exact Workflow version 的治理與 successor identity handoff｜流程與例外路徑視圖&lt;/h2&gt;
-    &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
-      A1 呈現 exact Workflow version 的治理與 predecessor-to-successor identity handoff。每個已建立 version 最多符合一個 A1-2 state；family 可同時含 active predecessor 與 draft／prepared successor。A12-N01 是尚未配發 successor identity 的 authoring entry boundary。
-    &lt;/p&gt;
+    &lt;h2 id=&quot;wgl-switch-title&quot;&gt;A1｜Workflow 新舊版本如何接替&lt;/h2&gt;
+    &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1 閱讀重點&quot;&gt;
+      &lt;li&gt;&lt;strong&gt;前一版（predecessor）：&lt;/strong&gt;目前是 Active（目前生效），之後可能被接替的版本。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;接替版（successor）：&lt;/strong&gt;準備接替前一版的新版本，可以是 Draft（草稿）或 Prepared（已準備、等待啟用）。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;同一流程系列（workflow family）：&lt;/strong&gt;同一套 Workflow 的所有版本，例如 v008 與 v009。A1-2 不會把整個系列合成一個狀態。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;判定單位：&lt;/strong&gt;每一個單一明確版本（exact version）都要分開判斷，而且只能符合一個 A1-2 狀態。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;切換處理對象（handoff）：&lt;/strong&gt;流程可以先去處理接替版，但不會改變前一版的狀態。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;可以並存：&lt;/strong&gt;前一版保持 Active 時，接替版可以同時處於 Draft 或 Prepared。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;資料有問題時：&lt;/strong&gt;資料不足或互相衝突就回報無法判定，不猜答案。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;不在本圖的狀態：&lt;/strong&gt;Superseded（已被接替）、Retired（已退役）與 Abandoned（已放棄）已離開目前的控制流程。&lt;/li&gt;
+    &lt;/ul&gt;
     &lt;ul class=&quot;wgl-node-legend text-small&quot; aria-label=&quot;A1 節點視覺類型&quot;&gt;
       &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-input&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;輸入／觸發&lt;/li&gt;
       &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-activity&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;活動／處理&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-decision&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;決策／Gate&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-decision&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;決策／條件檢查&lt;/li&gt;
       &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-routing&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;路由／退回&lt;/li&gt;
       &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-state&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;狀態／條件&lt;/li&gt;
     &lt;/ul&gt;
@@ -1268,43 +1377,44 @@ html&gt;body{padding:0}&lt;/style&gt;
       &lt;div class=&quot;wgl-a1-figure&quot;&gt;
         &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a1&quot; data-diagram=&quot;a1-main&quot;&gt;
 flowchart TB
-  subgraph L1[&quot;L1｜Prospective successor／Draft authoring&quot;]
+  subgraph L1[&quot;L1｜提出接替版需求並建立草稿&quot;]
     direction TB
-    L1N1[/&quot;L1-N1&lt;br/&gt;Prospective successor 輸入&quot;/] --&gt; L1N2(&quot;L1-N2&lt;br/&gt;AI 預覽與檢查&quot;)
+    L1N1[/&quot;L1-N1&lt;br/&gt;接替版需求&quot;/] --&gt; L1N2(&quot;L1-N2&lt;br/&gt;AI 預覽與檢查&quot;)
     L1N2 --&gt; L1N3{&quot;L1-N3&lt;br/&gt;預覽可套用？&quot;}
     L1N3 --&gt;|可套用／人工確認後| L1N4(&quot;L1-N4&lt;br/&gt;建立／修正草稿&quot;)
     L1N3 --&gt;|失敗／要求修改| L1N5(&quot;L1-N5&lt;br/&gt;修正輸入&quot;)
-    L1N5 -. fresh preview .-&gt; L1N2
+    L1N5 -. 重新產生預覽 .-&gt; L1N2
   end
 
-  subgraph L2[&quot;L2｜Exact successor 發布授權&quot;]
+  subgraph L2[&quot;L2｜接替版的發布與啟用&quot;]
     direction TB
     L2N1(&quot;L2-N1&lt;br/&gt;AI 發布檢查&quot;) --&gt; L2N2{&quot;L2-N2&lt;br/&gt;發布條件通過？&quot;}
     L2N2 --&gt;|通過| L2N3{&quot;L2-N3&lt;br/&gt;人工發布核准？&quot;}
     L2N3 --&gt;|核准| L2N4(&quot;L2-N4&lt;br/&gt;準備發布&quot;)
-    L2N4 --&gt;|v010+| L2N5{&quot;L2-N5&lt;br/&gt;人工啟用核准？&quot;}
-    L2N4 --&gt;|v009 bootstrap only&lt;br/&gt;canonical-merge boundary| L2N6
+    L2N4 --&gt;|需要另行啟用| L2N5{&quot;L2-N5&lt;br/&gt;人工啟用核准？&quot;}
+    L2N4 -.-&gt;|舊版 bootstrap 例外（免另行啟用）| L2N6
     L2N5 --&gt;|是；產生 ACTIVATION.json| L2N6([&quot;L2-N6&lt;br/&gt;正式權威生效&quot;])
-    L2N2 --&gt;|草稿／變更／impact／pins 缺口| L2N7{{&quot;L2-N7&lt;br/&gt;修正 successor&quot;}}
+    L2N2 --&gt;|草稿、影響或固定版本資料有缺口| L2N7{{&quot;L2-N7&lt;br/&gt;修正接替版&quot;}}
     L2N3 --&gt;|未核准| L2N7
     L2N5 --&gt;|否| L2N8([&quot;L2-N8&lt;br/&gt;阻止新研究&quot;])
     L2N8 -. 等待啟用核准 .-&gt; L2N5
   end
 
-  subgraph L3[&quot;L3｜Exact active predecessor 研究治理&quot;]
+  subgraph L3[&quot;L3｜生效中版本的研究治理&quot;]
     direction TB
-    L3N1([&quot;L3-N1&lt;br/&gt;研究治理就緒&quot;]) --&gt; L3N2(&quot;L3-N2&lt;br/&gt;建立／推進 0..n 個 Sxxx&quot;)
-    L3N2 --&gt; L3N3{&quot;L3-N3&lt;br/&gt;需要 prospective successor？&quot;}
+    L3N1([&quot;L3-N1&lt;br/&gt;研究治理就緒&quot;]) --&gt; L3N2(&quot;L3-N2&lt;br/&gt;建立／推進零到多個 Sxxx&lt;br/&gt;須通過 G-FAMILY 與各階段人工核准&quot;)
+    L3N2 --&gt; L3N3{&quot;L3-N3&lt;br/&gt;需要建立接替版？&quot;}
     L3N3 --&gt;|否／繼續研究| L3N2
-    L3N3 --&gt;|是；predecessor identity 不變| L3N5{&quot;L3-N5&lt;br/&gt;Predecessor studies 已安全？&quot;}
-    L3N5 --&gt;|否| L3N4(&quot;L3-N4&lt;br/&gt;Predecessor studies 先安全化&quot;)
-    L3N4 -. paused／completed／cancelled .-&gt; L3N5
+    L3N4(&quot;L3-N4&lt;br/&gt;處理前一版的安全問題&quot;) --&gt; L3N5{&quot;L3-N5&lt;br/&gt;安全檢查完成？&quot;}
+    L3N5 --&gt;|否；繼續處理安全問題／補齊影響紀錄| L3N4
   end
 
-  L1N4 --&gt;|draft handoff| L2N1
-  L2N7 -. 同一 successor draft identity；修正後重試 .-&gt; L1N2
-  L2N6 --&gt;|successor 成為 active；此時 predecessor 才 superseded| L3N1
-  L3N5 -.-&gt;|是／跨 identity handoff&lt;br/&gt;predecessor 保持 active| L1N1
+  L1N4 --&gt;|把草稿交給發布檢查| L2N1
+  L2N7 -. 保留同一接替版；修正後重試 .-&gt; L1N2
+  L2N2 --&gt;|前一版的安全或影響處理未完成&lt;br/&gt;暫時改處理前一版| L3N4
+  L2N6 --&gt;|接替版成為 Active；前一版此時才 Superseded| L3N1
+  L3N3 -.-&gt;|是／只切換處理對象&lt;br/&gt;前一版保持 N04／N05| L1N1
+  L3N5 -.-&gt;|是／回到同一個 N02 接替版&lt;br/&gt;重新檢查發布條件| L2N1
         &lt;/pre&gt;
         &lt;div id=&quot;wgl-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1…&lt;/div&gt;
       &lt;/div&gt;
@@ -1312,35 +1422,35 @@ flowchart TB
       &lt;div class=&quot;viz-controls&quot;&gt;
         &lt;label class=&quot;form-label&quot; for=&quot;wgl-a1-detail-select&quot;&gt;查看節點說明&lt;/label&gt;
         &lt;select id=&quot;wgl-a1-detail-select&quot; class=&quot;form-select&quot;&gt;
-          &lt;optgroup label=&quot;L1｜流程設計&quot;&gt;
-            &lt;option value=&quot;L1N1&quot;&gt;L1-N1｜Prospective successor 輸入&lt;/option&gt;
+          &lt;optgroup label=&quot;L1｜建立接替版&quot;&gt;
+            &lt;option value=&quot;L1N1&quot;&gt;L1-N1｜接替版需求&lt;/option&gt;
             &lt;option value=&quot;L1N2&quot;&gt;L1-N2｜AI 預覽與檢查&lt;/option&gt;
             &lt;option value=&quot;L1N3&quot;&gt;L1-N3｜預覽可套用？&lt;/option&gt;
             &lt;option value=&quot;L1N4&quot;&gt;L1-N4｜建立／修正草稿&lt;/option&gt;
             &lt;option value=&quot;L1N5&quot;&gt;L1-N5｜修正輸入&lt;/option&gt;
           &lt;/optgroup&gt;
-          &lt;optgroup label=&quot;L2｜發布授權&quot;&gt;
+          &lt;optgroup label=&quot;L2｜發布與啟用&quot;&gt;
             &lt;option value=&quot;L2N1&quot;&gt;L2-N1｜AI 發布檢查&lt;/option&gt;
             &lt;option value=&quot;L2N2&quot;&gt;L2-N2｜發布條件通過？&lt;/option&gt;
             &lt;option value=&quot;L2N3&quot;&gt;L2-N3｜人工發布核准？&lt;/option&gt;
             &lt;option value=&quot;L2N4&quot;&gt;L2-N4｜準備發布&lt;/option&gt;
             &lt;option value=&quot;L2N5&quot;&gt;L2-N5｜人工啟用核准？&lt;/option&gt;
             &lt;option value=&quot;L2N6&quot;&gt;L2-N6｜正式權威生效&lt;/option&gt;
-            &lt;option value=&quot;L2N7&quot;&gt;L2-N7｜修正 successor authoring&lt;/option&gt;
+            &lt;option value=&quot;L2N7&quot;&gt;L2-N7｜修正接替版&lt;/option&gt;
             &lt;option value=&quot;L2N8&quot;&gt;L2-N8｜阻止新研究&lt;/option&gt;
           &lt;/optgroup&gt;
-          &lt;optgroup label=&quot;L3｜研究治理與 Study 協調&quot;&gt;
+          &lt;optgroup label=&quot;L3｜Active 版本與研究協調&quot;&gt;
             &lt;option value=&quot;L3N1&quot;&gt;L3-N1｜研究治理就緒&lt;/option&gt;
-            &lt;option value=&quot;L3N2&quot;&gt;L3-N2｜建立／推進 0..n 個 Sxxx&lt;/option&gt;
-            &lt;option value=&quot;L3N3&quot;&gt;L3-N3｜需要 prospective successor？&lt;/option&gt;
-            &lt;option value=&quot;L3N4&quot;&gt;L3-N4｜Predecessor studies 先安全化&lt;/option&gt;
-            &lt;option value=&quot;L3N5&quot;&gt;L3-N5｜Predecessor studies 已安全？&lt;/option&gt;
+            &lt;option value=&quot;L3N2&quot;&gt;L3-N2｜建立／推進零到多個 Sxxx&lt;/option&gt;
+            &lt;option value=&quot;L3N3&quot;&gt;L3-N3｜需要建立接替版？&lt;/option&gt;
+            &lt;option value=&quot;L3N4&quot;&gt;L3-N4｜處理前一版的安全問題&lt;/option&gt;
+            &lt;option value=&quot;L3N5&quot;&gt;L3-N5｜安全檢查完成？&lt;/option&gt;
           &lt;/optgroup&gt;
         &lt;/select&gt;
       &lt;/div&gt;
       &lt;section id=&quot;wgl-a1-detail-panel&quot; class=&quot;card&quot; aria-live=&quot;polite&quot; aria-labelledby=&quot;wgl-a1-detail-title&quot;&gt;
-        &lt;h3 id=&quot;wgl-a1-detail-title&quot;&gt;L1-N1｜Prospective successor 輸入&lt;/h3&gt;
-        &lt;p id=&quot;wgl-a1-detail-summary&quot;&gt;彙整尚未配發 exact version identity 的首次建立或 successor authoring input。&lt;/p&gt;
+        &lt;h3 id=&quot;wgl-a1-detail-title&quot;&gt;L1-N1｜接替版需求&lt;/h3&gt;
+        &lt;p id=&quot;wgl-a1-detail-summary&quot;&gt;先整理為什麼要建立或修改接替版；此時還沒有正式版本路徑。&lt;/p&gt;
         &lt;dl class=&quot;wgl-a1-detail-grid text-small&quot;&gt;
           &lt;div&gt;&lt;dt&gt;節點類型&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-type&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
           &lt;div&gt;&lt;dt&gt;輸入&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-input&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
@@ -1353,169 +1463,286 @@ flowchart TB
   &lt;/section&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-aligned-state-machine-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-aligned-state-machine-title&quot;&gt;A1-2｜Per exact Workflow version 的互斥 control state｜含 prospective successor 入口 boundary&lt;/h2&gt;
-    &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
-      A1-2 是 A1 的 per-exact-version control view。互斥範圍是同一個 immutable &lt;code&gt;workflows/&amp;lt;slug&amp;gt;--vNNN&lt;/code&gt; identity，不是 family；active predecessor 可與另一個 draft／prepared successor 共存。節點中的 L1／L2／L3 是與 A1 activity layer 的 alignment，不是 identity ownership 或巢狀 state；N02 跨越 authoring 與 release gate，因此標成 L1→L2 boundary。N01 是尚未取得 exact path 的 prospective entry boundary。&lt;code&gt;HANDOFF ONLY&lt;/code&gt; 會切換 subject，不是 predecessor 回到 Draft。Sxxx lifecycle 只屬 A1-3。本圖保留 v009 bootstrap；v010 起要求 explicit activation。
-    &lt;/p&gt;
-    &lt;ul class=&quot;wgl-node-legend text-small&quot; aria-label=&quot;A1-2 layer alignment&quot;&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l1&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L1｜entry／authoring&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l1-l2&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L1→L2｜authoring／release boundary&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l2&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L2｜release／activation&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l3&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L3｜active research governance&lt;/li&gt;
+    &lt;h2 id=&quot;wgl-aligned-state-machine-title&quot;&gt;A1-2｜每一個 Workflow 版本目前在哪個狀態&lt;/h2&gt;
+    &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-2 判定原則&quot;&gt;
+      &lt;li&gt;&lt;strong&gt;判定單位：&lt;/strong&gt;一次只判斷一個 &lt;code&gt;workflows/&amp;lt;slug&amp;gt;--vNNN&lt;/code&gt; 版本，不把整個同一流程系列合成一個狀態。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;唯一狀態：&lt;/strong&gt;同一版本必須只符合 N02–N06 其中一個。零個或多個都回 invalid（資料矛盾）／indeterminate（資料不足），不可猜測。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;可以並存：&lt;/strong&gt;Active 前一版可與 Draft／Prepared 接替版同時存在；但 Prepared 接替版會阻止新的結果相關研究工作。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;N01 是入口：&lt;/strong&gt;此時接替版尚未取得正式版本路徑，所以 N01 不是已存在版本的持久化狀態。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;切換處理對象：&lt;/strong&gt;&lt;code&gt;HANDOFF ONLY&lt;/code&gt; 表示開始處理接替版，但前一版仍保持 Active，不會退回 Draft。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;圖的關係：&lt;/strong&gt;Overview、A、B、C 是同一套狀態機的不同視圖，不是四套狀態機。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;範圍：&lt;/strong&gt;已離開控制流程的註冊表（registry）狀態不在本圖；Sxxx 的生命週期只屬於 A1-3。&lt;/li&gt;
     &lt;/ul&gt;
-    &lt;div class=&quot;wgl-zoom-controls&quot; role=&quot;group&quot; aria-label=&quot;A1-2 圖表縮放控制&quot;&gt;
-      &lt;span class=&quot;wgl-zoom-controls-label text-small&quot;&gt;圖表縮放&lt;/span&gt;
-      &lt;button id=&quot;wgl-a12-zoom-out&quot; class=&quot;btn&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12-zoom-viewport&quot; aria-label=&quot;縮小 A1-2 圖表&quot; title=&quot;縮小&quot;&gt;−&lt;/button&gt;
-      &lt;button id=&quot;wgl-a12-zoom-reset&quot; class=&quot;btn wgl-zoom-reset&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12-zoom-viewport&quot; aria-label=&quot;重設 A1-2 圖表縮放&quot; title=&quot;重設為 100%&quot;&gt;100%&lt;/button&gt;
-      &lt;button id=&quot;wgl-a12-zoom-in&quot; class=&quot;btn&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12-zoom-viewport&quot; aria-label=&quot;放大 A1-2 圖表&quot; title=&quot;放大&quot;&gt;+&lt;/button&gt;
-      &lt;span id=&quot;wgl-a12-zoom-announcement&quot; class=&quot;sr-only&quot; aria-live=&quot;polite&quot;&gt;A1-2 圖表縮放 100%&lt;/span&gt;
+    &lt;ul class=&quot;wgl-node-legend text-small&quot; aria-label=&quot;A1-2 所在層級&quot;&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l1&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L1｜提出需求／編寫草稿&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l1-l2&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L1→L2｜草稿編寫與發布檢查的共同邊界&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l2&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L2｜準備發布／啟用&lt;/li&gt;
+      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-layer-l3&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;L3｜生效版本的研究治理&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-2 圖例補充&quot;&gt;
+      &lt;li&gt;&lt;strong&gt;線上的代號：&lt;/strong&gt;圖上只顯示 action ID；完整成立條件與結果請看下方的動作對照表。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;虛線：&lt;/strong&gt;表示切換處理對象，或某個 family 明定的舊版例外；不是同一版本的一般狀態轉換。&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;div class=&quot;wgl-a12-segments&quot;&gt;
+      &lt;section class=&quot;wgl-a12-segment&quot; aria-labelledby=&quot;wgl-a12-overview-title&quot;&gt;
+        &lt;h3 id=&quot;wgl-a12-overview-title&quot;&gt;A1-2 Overview｜六個節點與主要流程&lt;/h3&gt;
+        &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-2 Overview 說明&quot;&gt;
+          &lt;li&gt;這張圖先顯示 N01–N06 與最主要的狀態變化。&lt;/li&gt;
+          &lt;li&gt;舊版 bootstrap 例外（既定舊版本可免另行啟用）、切換處理對象與發布安全協調也會顯示；細節請看 A／B／C 與下方動作對照表。&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;div class=&quot;wgl-zoom-panel&quot; data-zoom-pan data-zoom-label=&quot;A1-2 Overview&quot;&gt;
+          &lt;div class=&quot;wgl-zoom-controls&quot; role=&quot;group&quot; aria-label=&quot;A1-2 Overview 圖表縮放控制&quot;&gt;
+            &lt;span class=&quot;wgl-zoom-controls-label text-small&quot;&gt;圖表縮放&lt;/span&gt;
+            &lt;button class=&quot;btn wgl-zoom-out&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12-overview-viewport&quot; aria-label=&quot;縮小 A1-2 Overview 圖表&quot; title=&quot;縮小&quot;&gt;−&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-reset&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12-overview-viewport&quot; aria-label=&quot;重設 A1-2 Overview 圖表縮放&quot; title=&quot;重設為 100%&quot;&gt;100%&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-in&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12-overview-viewport&quot; aria-label=&quot;放大 A1-2 Overview 圖表&quot; title=&quot;放大&quot;&gt;+&lt;/button&gt;
+            &lt;span class=&quot;wgl-zoom-announcement sr-only&quot; aria-live=&quot;polite&quot;&gt;A1-2 Overview 圖表縮放 100%&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p id=&quot;wgl-a12-overview-help&quot; class=&quot;wgl-fsm-notation text-small&quot;&gt;放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。&lt;/p&gt;
+          &lt;div id=&quot;wgl-a12-overview-viewport&quot; class=&quot;wgl-zoom-viewport&quot; tabindex=&quot;0&quot; aria-label=&quot;可縮放與拖曳的 A1-2 Overview&quot; aria-describedby=&quot;wgl-a12-overview-help&quot;&gt;
+            &lt;pre class=&quot;mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas&quot; data-diagram=&quot;a1-2-overview&quot;&gt;
+flowchart TB
+  N01[&quot;A12-N01&lt;br/&gt;[L1 入口]&lt;br/&gt;尚未建立接替版&quot;] --&gt;|A12-A03| N02[&quot;A12-N02&lt;br/&gt;[L1→L2 共同邊界]&lt;br/&gt;接替版 Draft（草稿）&quot;]
+  N02 --&gt;|A12-A05A| N03[&quot;A12-N03&lt;br/&gt;[L2，視版本而定]&lt;br/&gt;Prepared（已準備、等待啟用）&quot;]
+  N03 --&gt;|A12-A07| N04[&quot;A12-N04&lt;br/&gt;[L3 共同邊界]&lt;br/&gt;Active（目前生效）／0 個未完成研究&quot;]
+  N02 -.-&gt;|A12-A05B · bootstrap 例外| N04
+  N04 --&gt;|A12-A08| N05[&quot;A12-N05&lt;br/&gt;[L3]&lt;br/&gt;Active（目前生效）／1..n 個未完成研究&quot;]
+  N05 --&gt;|A12-A10| N04
+  N05 --&gt;|A12-A12| N06[&quot;A12-N06&lt;br/&gt;[L3；持久化缺口]&lt;br/&gt;前一版的安全檢查進行中&quot;]
+  N06 --&gt;|A12-A13| N04
+  N06 --&gt;|A12-A13| N05
+  N04 -.-&gt;|A12-A11 · HANDOFF ONLY| N01
+  N05 -.-&gt;|A12-A11 · HANDOFF ONLY| N01
+  N02 -.-&gt;|A12-A12| N06
+  N06 -.-&gt;|A12-A13| N02
+            &lt;/pre&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wgl-render-status text-small&quot; data-mermaid-status=&quot;a1-2-overview&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2 Overview…&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+
+      &lt;section class=&quot;wgl-a12-segment&quot; aria-labelledby=&quot;wgl-a12a-title&quot;&gt;
+        &lt;h3 id=&quot;wgl-a12a-title&quot;&gt;A1-2A｜L1 建立接替版的正式版本身分&lt;/h3&gt;
+        &lt;span class=&quot;wgl-shared-boundary text-small&quot;&gt;N02 共同邊界：A 與 B 顯示的是同一個接替版 Draft&lt;/span&gt;
+        &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-2A 說明&quot;&gt;
+          &lt;li&gt;N01 只代表「準備建立接替版」；此時還沒有正式版本路徑。&lt;/li&gt;
+          &lt;li&gt;A12-A03 配發路徑並註冊 Draft 後，流程才開始判斷 N02 這個單一明確版本。&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;div class=&quot;wgl-zoom-panel&quot; data-zoom-pan data-zoom-label=&quot;A1-2A&quot;&gt;
+          &lt;div class=&quot;wgl-zoom-controls&quot; role=&quot;group&quot; aria-label=&quot;A1-2A 圖表縮放控制&quot;&gt;
+            &lt;span class=&quot;wgl-zoom-controls-label text-small&quot;&gt;圖表縮放&lt;/span&gt;
+            &lt;button class=&quot;btn wgl-zoom-out&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12a-viewport&quot; aria-label=&quot;縮小 A1-2A 圖表&quot; title=&quot;縮小&quot;&gt;−&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-reset&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12a-viewport&quot; aria-label=&quot;重設 A1-2A 圖表縮放&quot; title=&quot;重設為 100%&quot;&gt;100%&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-in&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12a-viewport&quot; aria-label=&quot;放大 A1-2A 圖表&quot; title=&quot;放大&quot;&gt;+&lt;/button&gt;
+            &lt;span class=&quot;wgl-zoom-announcement sr-only&quot; aria-live=&quot;polite&quot;&gt;A1-2A 圖表縮放 100%&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p id=&quot;wgl-a12a-help&quot; class=&quot;wgl-fsm-notation text-small&quot;&gt;放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。&lt;/p&gt;
+          &lt;div id=&quot;wgl-a12a-viewport&quot; class=&quot;wgl-zoom-viewport&quot; tabindex=&quot;0&quot; aria-label=&quot;可縮放與拖曳的 A1-2A&quot; aria-describedby=&quot;wgl-a12a-help&quot;&gt;
+            &lt;pre class=&quot;mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas&quot; data-diagram=&quot;a1-2a-identity-formation&quot;&gt;
+flowchart LR
+  ENTRY((&quot;入口&quot;)) --&gt;|A12-A01| N01[&quot;A12-N01&lt;br/&gt;準備建立接替版&lt;br/&gt;尚無正式版本路徑&quot;]
+  N01 --&gt;|A12-A02| N01
+  N01 --&gt;|A12-A03| N02[&quot;A12-N02&lt;br/&gt;接替版 Draft（草稿）&lt;br/&gt;共同邊界&quot;]
+            &lt;/pre&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wgl-render-status text-small&quot; data-mermaid-status=&quot;a1-2a-identity-formation&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2A…&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+
+      &lt;section class=&quot;wgl-a12-segment&quot; aria-labelledby=&quot;wgl-a12b-title&quot;&gt;
+        &lt;h3 id=&quot;wgl-a12b-title&quot;&gt;A1-2B｜L2 接替版的發布與啟用&lt;/h3&gt;
+        &lt;span class=&quot;wgl-shared-boundary text-small&quot;&gt;N02／N04 共同邊界：A、B、C 重複顯示的是同一個版本&lt;/span&gt;
+        &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-2B 說明&quot;&gt;
+          &lt;li&gt;只有需要明確啟用的版本才會進入 N03；判定規則是 &lt;code&gt;exact version &amp;gt;= family.activation_required_from&lt;/code&gt;。&lt;/li&gt;
+          &lt;li&gt;A12-A05A 是一般路徑；A12-A05B 只供同一流程系列設定明確允許的舊版 bootstrap 例外。&lt;/li&gt;
+          &lt;li&gt;A12-A07 必須找到與本次發布相符的 &lt;code&gt;ACTIVATION.json&lt;/code&gt;，才能讓接替版成為 Active。&lt;/li&gt;
+          &lt;li&gt;A12-A12／A13 只會暫時改去處理前一版的安全問題，之後回到原本同一個 N02；接替版仍保持 Draft。&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;div class=&quot;wgl-zoom-panel&quot; data-zoom-pan data-zoom-label=&quot;A1-2B&quot;&gt;
+          &lt;div class=&quot;wgl-zoom-controls&quot; role=&quot;group&quot; aria-label=&quot;A1-2B 圖表縮放控制&quot;&gt;
+            &lt;span class=&quot;wgl-zoom-controls-label text-small&quot;&gt;圖表縮放&lt;/span&gt;
+            &lt;button class=&quot;btn wgl-zoom-out&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12b-viewport&quot; aria-label=&quot;縮小 A1-2B 圖表&quot; title=&quot;縮小&quot;&gt;−&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-reset&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12b-viewport&quot; aria-label=&quot;重設 A1-2B 圖表縮放&quot; title=&quot;重設為 100%&quot;&gt;100%&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-in&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12b-viewport&quot; aria-label=&quot;放大 A1-2B 圖表&quot; title=&quot;放大&quot;&gt;+&lt;/button&gt;
+            &lt;span class=&quot;wgl-zoom-announcement sr-only&quot; aria-live=&quot;polite&quot;&gt;A1-2B 圖表縮放 100%&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p id=&quot;wgl-a12b-help&quot; class=&quot;wgl-fsm-notation text-small&quot;&gt;放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。&lt;/p&gt;
+          &lt;div id=&quot;wgl-a12b-viewport&quot; class=&quot;wgl-zoom-viewport&quot; tabindex=&quot;0&quot; aria-label=&quot;可縮放與拖曳的 A1-2B&quot; aria-describedby=&quot;wgl-a12b-help&quot;&gt;
+            &lt;pre class=&quot;mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas&quot; data-diagram=&quot;a1-2b-release-activation&quot;&gt;
+flowchart LR
+  N02[&quot;A12-N02&lt;br/&gt;接替版 Draft（草稿）&lt;br/&gt;共同邊界&quot;] --&gt;|A12-A04| N02
+  N02 --&gt;|A12-A05A| N03[&quot;A12-N03&lt;br/&gt;Prepared（已準備、等待啟用）&lt;br/&gt;視版本而定&quot;]
+  N03 --&gt;|A12-A06| N03
+  N03 --&gt;|A12-A07| N04[&quot;A12-N04&lt;br/&gt;Active（目前生效）／0 個未完成研究&lt;br/&gt;共同邊界&quot;]
+  N02 -.-&gt;|A12-A05B · bootstrap 例外| N04
+  N06PORT[&quot;A1-2C／N06&lt;br/&gt;處理前一版的安全問題&quot;]
+  N02 -.-&gt;|A12-A12| N06PORT
+  N06PORT -.-&gt;|A12-A13| N02
+            &lt;/pre&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wgl-render-status text-small&quot; data-mermaid-status=&quot;a1-2b-release-activation&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2B…&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+
+      &lt;section class=&quot;wgl-a12-segment&quot; aria-labelledby=&quot;wgl-a12c-title&quot;&gt;
+        &lt;h3 id=&quot;wgl-a12c-title&quot;&gt;A1-2C｜L3 目前生效版本的研究治理&lt;/h3&gt;
+        &lt;span class=&quot;wgl-shared-boundary text-small&quot;&gt;N04 共同邊界：B 與 C 顯示的是同一個 Active 版本&lt;/span&gt;
+        &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-2C 說明&quot;&gt;
+          &lt;li&gt;N04–N06 判斷的都是同一個 Active 前一版。&lt;/li&gt;
+          &lt;li&gt;A12-A08／A09 要建立或推進研究時，仍須通過 A1-3 的 G-FAMILY 與該階段的人工核准。&lt;/li&gt;
+          &lt;li&gt;A12-A11 只會開始處理新的接替版需求；前一版仍留在 N04／N05。&lt;/li&gt;
+          &lt;li&gt;A12-A12 會從接替版 N02 暫時切到前一版 N06；A12-A13 完成安全處理後，再回到原本同一個 N02 重試發布檢查。&lt;/li&gt;
+          &lt;li&gt;目前儲存庫（repository）尚未持久化安全評估（safety assessment）的開啟／關閉狀態，因此 N04／N05／N06 仍有持久化／CLI 實作缺口。&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;div class=&quot;wgl-zoom-panel&quot; data-zoom-pan data-zoom-label=&quot;A1-2C&quot;&gt;
+          &lt;div class=&quot;wgl-zoom-controls&quot; role=&quot;group&quot; aria-label=&quot;A1-2C 圖表縮放控制&quot;&gt;
+            &lt;span class=&quot;wgl-zoom-controls-label text-small&quot;&gt;圖表縮放&lt;/span&gt;
+            &lt;button class=&quot;btn wgl-zoom-out&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12c-viewport&quot; aria-label=&quot;縮小 A1-2C 圖表&quot; title=&quot;縮小&quot;&gt;−&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-reset&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12c-viewport&quot; aria-label=&quot;重設 A1-2C 圖表縮放&quot; title=&quot;重設為 100%&quot;&gt;100%&lt;/button&gt;
+            &lt;button class=&quot;btn wgl-zoom-in&quot; type=&quot;button&quot; aria-controls=&quot;wgl-a12c-viewport&quot; aria-label=&quot;放大 A1-2C 圖表&quot; title=&quot;放大&quot;&gt;+&lt;/button&gt;
+            &lt;span class=&quot;wgl-zoom-announcement sr-only&quot; aria-live=&quot;polite&quot;&gt;A1-2C 圖表縮放 100%&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;p id=&quot;wgl-a12c-help&quot; class=&quot;wgl-fsm-notation text-small&quot;&gt;放大後可按住滑鼠拖曳；觸控可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。&lt;/p&gt;
+          &lt;div id=&quot;wgl-a12c-viewport&quot; class=&quot;wgl-zoom-viewport&quot; tabindex=&quot;0&quot; aria-label=&quot;可縮放與拖曳的 A1-2C&quot; aria-describedby=&quot;wgl-a12c-help&quot;&gt;
+            &lt;pre class=&quot;mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas&quot; data-diagram=&quot;a1-2c-active-governance&quot;&gt;
+flowchart LR
+  N04[&quot;A12-N04&lt;br/&gt;Active（目前生效）&lt;br/&gt;0 個未完成研究／共同邊界&quot;] --&gt;|A12-A08| N05[&quot;A12-N05&lt;br/&gt;Active（目前生效）&lt;br/&gt;1..n 個未完成研究&quot;]
+  N05 --&gt;|A12-A09| N05
+  N05 --&gt;|A12-A10| N04
+  N04 --&gt;|A12-A11| N04
+  N05 --&gt;|A12-A11| N05
+  N05 --&gt;|A12-A12| N06[&quot;A12-N06&lt;br/&gt;Active 前一版&lt;br/&gt;安全檢查進行中&quot;]
+  N06 --&gt;|A12-A13 · 無暫停研究| N04
+  N06 --&gt;|A12-A13 · 仍有暫停研究| N05
+  N01PORT[&quot;A1-2A／N01&lt;br/&gt;新的接替版需求&quot;]
+  N02PORT[&quot;A1-2B／N02&lt;br/&gt;原本同一個接替版 Draft&quot;]
+  N04 -.-&gt;|HANDOFF ONLY| N01PORT
+  N05 -.-&gt;|HANDOFF ONLY| N01PORT
+  N02PORT -.-&gt;|A12-A12| N06
+  N06 -.-&gt;|A12-A13| N02PORT
+            &lt;/pre&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;wgl-render-status text-small&quot; data-mermaid-status=&quot;a1-2c-active-governance&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2C…&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
     &lt;/div&gt;
-    &lt;p id=&quot;wgl-a12-pan-help&quot; class=&quot;wgl-fsm-notation text-small&quot;&gt;放大後可按住滑鼠拖曳圖面；觸控裝置可直接滑動，鍵盤聚焦圖表區後可使用方向鍵。&lt;/p&gt;
-    &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;為避免交叉線附近的文字混淆，線上只保留 action ID；完整 guard、effect 與 identity handoff 請見圖下方 transition 對照表。&lt;/p&gt;
-    &lt;div id=&quot;wgl-a12-zoom-viewport&quot; class=&quot;wgl-zoom-viewport&quot; tabindex=&quot;0&quot; aria-label=&quot;可縮放與拖曳的 A1-2 狀態圖&quot; aria-describedby=&quot;wgl-a12-pan-help&quot;&gt;
-      &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a12&quot; data-diagram=&quot;a1-aligned-state-machine&quot;&gt;
-stateDiagram-v2
-  direction TB
 
-  state &quot;A12-N01 · [L1 entry boundary] · prospective successor 輸入&quot; as InputPending
-  state &quot;A12-N02 · [L1→L2 boundary] · Exact successor Draft&quot; as DraftPendingRelease
-  state &quot;A12-N03 · [L2] · Exact successor Prepared／等待啟用&quot; as PreparedAwaitingActivation
-  state &quot;A12-N04 · [L3] · Exact active version／0 個 unfinished study&quot; as GovernanceReady
-  state &quot;A12-N05 · [L3] · Exact active version／1..n 個 unfinished study&quot; as StudiesOperating
-  state &quot;A12-N06 · [L3] · Exact active predecessor／Study 需要安全化&quot; as StudySafetyRequired
-  state SafetyComplete &lt;&lt;choice&gt;&gt;
+    &lt;section class=&quot;wgl-family-profile&quot; aria-labelledby=&quot;wgl-family-profile-title&quot;&gt;
+      &lt;h3 id=&quot;wgl-family-profile-title&quot;&gt;版本如何啟用｜由同一流程系列的設定決定&lt;/h3&gt;
+      &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;版本啟用設定說明&quot;&gt;
+        &lt;li&gt;A12-A05A 與 A12-A05B 要走哪一條，取決於同一流程系列在註冊表中的設定，不是把某個節點綁死給特定版本。&lt;/li&gt;
+        &lt;li&gt;這項設定只決定啟用方式，不會新增 A1-2 狀態。&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;div class=&quot;table-responsive&quot;&gt;
+        &lt;table class=&quot;table table-sm&quot;&gt;
+          &lt;caption&gt;一般啟用規則，以及目前同一流程系列採用的設定。&lt;/caption&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th&gt;適用範圍&lt;/th&gt;&lt;th&gt;判定規則／目前設定&lt;/th&gt;&lt;th&gt;對 A1-2 的影響&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;
+            &lt;tr&gt;&lt;td&gt;一般啟用路徑&lt;/td&gt;&lt;td&gt;&lt;code&gt;exact version &amp;gt;= family.activation_required_from&lt;/code&gt;&lt;/td&gt;&lt;td&gt;走 A12-A05A：N02 → N03；之後必須由 A12-A07 找到相符的 &lt;code&gt;ACTIVATION.json&lt;/code&gt;，才能進入 N04。&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;舊版 bootstrap 例外（免另行啟用）&lt;/td&gt;&lt;td&gt;版本早於明確啟用邊界，而且已凍結的 bootstrap 規則明文允許。&lt;/td&gt;&lt;td&gt;走 A12-A05B：N02 → N04。這是虛線例外，不能套用到需要明確啟用的版本。&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;目前的同一流程系列&lt;/td&gt;&lt;td&gt;&lt;code&gt;strategy-forward-replication-research&lt;/code&gt; 設為 &lt;code&gt;activation_required_from: v010&lt;/code&gt;；v009 是最後一個 bootstrap 版本。&lt;/td&gt;&lt;td&gt;v009 走 A05B 的既定例外；v010 之後都必須走 A05A → N03 → A07。&lt;/td&gt;&lt;/tr&gt;
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
 
-  [*] --&gt; InputPending: A12-A01
-  InputPending --&gt; InputPending: A12-A02
-  InputPending --&gt; DraftPendingRelease: A12-A03
-
-  DraftPendingRelease --&gt; DraftPendingRelease: A12-A04
-  DraftPendingRelease --&gt; PreparedAwaitingActivation: A12-A05A
-  DraftPendingRelease --&gt; GovernanceReady: A12-A05B · v009 only
-  PreparedAwaitingActivation --&gt; PreparedAwaitingActivation: A12-A06
-  PreparedAwaitingActivation --&gt; GovernanceReady: A12-A07
-
-  GovernanceReady --&gt; StudiesOperating: A12-A08
-  StudiesOperating --&gt; StudiesOperating: A12-A09
-  StudiesOperating --&gt; GovernanceReady: A12-A10
-  GovernanceReady --&gt; GovernanceReady: A12-A11 · successor intent
-  GovernanceReady --&gt; InputPending: HANDOFF ONLY
-  StudiesOperating --&gt; StudiesOperating: A12-A11 · paused only
-  StudiesOperating --&gt; InputPending: HANDOFF ONLY
-  StudiesOperating --&gt; StudySafetyRequired: A12-A12
-  StudySafetyRequired --&gt; SafetyComplete: A12-A13
-  SafetyComplete --&gt; GovernanceReady: 0 unfinished
-  SafetyComplete --&gt; StudiesOperating: paused remain
-  SafetyComplete --&gt; InputPending: HANDOFF ONLY
-
-  note right of GovernanceReady
-    此 exact version 的 RELEASE.json、適用的 activation
-    evidence 與 registry facts 已建立 active authority。
-    同 family 的 successor N01／N02／N03 可同時存在；
-    那是另一個 control subject。
-  end note
-
-  note left of InputPending
-    N01 尚無正式 exact successor version identity。
-    現有 repository 沒有 canonical persisted prospective ID；
-    active predecessor 經 change／safety assessment 後只把
-    target HANDOFF 到此 context；未來 CLI 不得猜 version state。
-  end note
-
-  note right of StudySafetyRequired
-    Study statuses 可持久化；但「已進入 safety-required mode」
-    尚無 canonical persisted intent。未來 CLI 在缺少該事實時
-    必須回傳 invalid／indeterminate，而不是由 change prose 猜測。
-  end note
-
-  classDef l1 fill:var(--card),stroke:var(--viz-series-1),stroke-width:2px,color:var(--foreground)
-  classDef l2 fill:var(--card),stroke:var(--viz-series-3),stroke-width:2px,color:var(--foreground)
-  classDef l3 fill:var(--card),stroke:var(--viz-series-2),stroke-width:2px,color:var(--foreground)
-  class InputPending l1
-  class DraftPendingRelease,PreparedAwaitingActivation l2
-  class GovernanceReady,StudiesOperating,StudySafetyRequired l3
-      &lt;/pre&gt;
-    &lt;/div&gt;
     &lt;div class=&quot;table-responsive&quot;&gt;
       &lt;table class=&quot;table table-sm&quot;&gt;
-        &lt;caption&gt;A1-2 transition 對照表；圖上的 action ID 對應下列明確 source、target 與條件。&lt;/caption&gt;
+        &lt;caption&gt;A1-2 動作對照表：Overview／A／B／C 的 action ID，都以這裡列出的起點、終點、成立條件與結果為準。&lt;/caption&gt;
         &lt;thead&gt;
-          &lt;tr&gt;&lt;th&gt;Action&lt;/th&gt;&lt;th&gt;Source → target&lt;/th&gt;&lt;th&gt;Guard／effect&lt;/th&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;th&gt;Action ID&lt;/th&gt;&lt;th&gt;起點 → 終點&lt;/th&gt;&lt;th&gt;成立條件與結果&lt;/th&gt;&lt;/tr&gt;
         &lt;/thead&gt;
         &lt;tbody&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A01&lt;/td&gt;&lt;td&gt;入口 → N01&lt;/td&gt;&lt;td&gt;建立／變更需求；尚無 exact successor identity。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A02&lt;/td&gt;&lt;td&gt;N01 → N01&lt;/td&gt;&lt;td&gt;Preview 失敗或要求修改；維持 prospective context。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A03&lt;/td&gt;&lt;td&gt;N01 → N02&lt;/td&gt;&lt;td&gt;配發 exact version path，套用 registered draft。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A04&lt;/td&gt;&lt;td&gt;N02 → N02&lt;/td&gt;&lt;td&gt;Release guard 有缺口；修正同一 exact draft，不退回 N01。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A05A&lt;/td&gt;&lt;td&gt;N02 → N03&lt;/td&gt;&lt;td&gt;v010+ guards 通過並取得人工發布核准；產生 &lt;code&gt;RELEASE.json&lt;/code&gt;。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A05B&lt;/td&gt;&lt;td&gt;N02 → N04&lt;/td&gt;&lt;td&gt;僅 v009 bootstrap：canonical-merge boundary 使 successor active，predecessor superseded。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A06&lt;/td&gt;&lt;td&gt;N03 → N03&lt;/td&gt;&lt;td&gt;尚未取得 activation approval；維持 prepared 並阻止新研究。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A07&lt;/td&gt;&lt;td&gt;N03 → N04&lt;/td&gt;&lt;td&gt;人工核准並產生 &lt;code&gt;ACTIVATION.json&lt;/code&gt;；successor active，predecessor superseded。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A08&lt;/td&gt;&lt;td&gt;N04 → N05&lt;/td&gt;&lt;td&gt;建立／預註冊首個 unfinished Sxxx。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A09&lt;/td&gt;&lt;td&gt;N05 → N05&lt;/td&gt;&lt;td&gt;建立更多 Sxxx，或依 A1-3 推進既有 studies。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A10&lt;/td&gt;&lt;td&gt;N05 → N04&lt;/td&gt;&lt;td&gt;所有 Sxxx 均 completed／cancelled，沒有 unfinished study。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A11&lt;/td&gt;&lt;td&gt;N04／N05 → 原 state＋N01 handoff&lt;/td&gt;&lt;td&gt;形成 successor intent；predecessor 保持 active，authoring target 跨 identity 切到 prospective successor。N05 僅在 unfinished studies 全為 paused 時可 handoff。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A12&lt;/td&gt;&lt;td&gt;N05 → N06&lt;/td&gt;&lt;td&gt;需已形成 persisted successor safety intent，且存在 draft／preregistered／running／awaiting-review Sxxx。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;A12-A13&lt;/td&gt;&lt;td&gt;N06 → N04／N05＋N01 handoff&lt;/td&gt;&lt;td&gt;全部 unsafe Sxxx 已 paused／completed／cancelled 並記錄 impact；依是否仍有 paused studies 回 N04 或 N05，再跨 identity handoff。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;HANDOFF ONLY&lt;/td&gt;&lt;td&gt;Active predecessor → N01 context&lt;/td&gt;&lt;td&gt;只切換 authoring target；不是同一 exact version 的 lifecycle transition，predecessor 不回 Draft。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;th colspan=&quot;3&quot;&gt;A1-2A｜L1 建立接替版的正式版本身分&lt;/th&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A01&lt;/td&gt;&lt;td&gt;入口 → N01&lt;/td&gt;&lt;td&gt;收到建立或變更需求；接替版尚未取得正式版本路徑。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A02&lt;/td&gt;&lt;td&gt;N01 → N01&lt;/td&gt;&lt;td&gt;預覽失敗或需要修改；留在 N01，重新整理輸入。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A03&lt;/td&gt;&lt;td&gt;N01 → N02&lt;/td&gt;&lt;td&gt;配發正式版本路徑並註冊 Draft；從這一步起才有可判定的單一明確版本。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;th colspan=&quot;3&quot;&gt;A1-2B｜L2 接替版的發布與啟用&lt;/th&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A04&lt;/td&gt;&lt;td&gt;N02 → N02&lt;/td&gt;&lt;td&gt;修正同一個 Draft，包括既有草稿、重新預覽、修復發布條件或未取得發布核准後的修改；不退回 N01，也不更換版本身分。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A05A&lt;/td&gt;&lt;td&gt;N02 → N03&lt;/td&gt;&lt;td&gt;版本符合 &lt;code&gt;exact version &amp;gt;= family.activation_required_from&lt;/code&gt;，發布條件通過且取得人工核准後，產生 &lt;code&gt;RELEASE.json&lt;/code&gt;。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A05B&lt;/td&gt;&lt;td&gt;N02 → N04&lt;/td&gt;&lt;td&gt;只適用同一流程系列設定明確允許的舊版 bootstrap。跨過既定邊界後，接替版成為 Active，前一版成為 Superseded。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A06&lt;/td&gt;&lt;td&gt;N03 → N03&lt;/td&gt;&lt;td&gt;尚未取得人工啟用核准；維持 Prepared，並阻止新的結果相關研究工作。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A07&lt;/td&gt;&lt;td&gt;N03 → N04&lt;/td&gt;&lt;td&gt;人工核准並產生 &lt;code&gt;ACTIVATION.json&lt;/code&gt;；接替版成為 Active，前一版成為 Superseded。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;th colspan=&quot;3&quot;&gt;A1-2C｜L3 目前生效版本的研究治理&lt;/th&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A08&lt;/td&gt;&lt;td&gt;N04 → N05&lt;/td&gt;&lt;td&gt;G-FAMILY 通過且具有建立權限時，建立第一個 Draft Sxxx，未完成研究數由 0 變成 1。預先登記不屬於這個動作。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A09&lt;/td&gt;&lt;td&gt;N05 → N05&lt;/td&gt;&lt;td&gt;建立更多 Sxxx，或預先登記、開始、恢復、凍結候選、推進既有研究。每個會影響結果的動作，都要通過 G-FAMILY、凍結計畫檢查與該階段的人工核准。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A10&lt;/td&gt;&lt;td&gt;N05 → N04&lt;/td&gt;&lt;td&gt;所有 Sxxx 都已 Completed 或 Cancelled，不再有未完成研究。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A11&lt;/td&gt;&lt;td&gt;N04／N05 保持原狀；另切到 N01&lt;/td&gt;&lt;td&gt;開始整理接替版需求，不要求先暫停未完成研究。前一版保持 N04／N05；&lt;code&gt;HANDOFF ONLY&lt;/code&gt; 只切換處理對象，也不授權準備發布。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A12&lt;/td&gt;&lt;td&gt;接替版保持 N02；前一版 N05 → N06&lt;/td&gt;&lt;td&gt;接替版已在 N02 並嘗試準備發布。若前一版仍有不安全的研究，或暫停研究的影響決定不完整，就暫時改處理前一版並開啟持久化安全評估。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;A12-A13&lt;/td&gt;&lt;td&gt;前一版 N06 → N04／N05；再回到原本的接替版 N02&lt;/td&gt;&lt;td&gt;所有研究都已 Paused、Completed 或 Cancelled，必要的影響決定已記錄，且安全評估可以正式關閉。前一版依未完成研究數回到 N04 或 N05，再對原本 N02 重做發布檢查；不得建立第二個接替版。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;th colspan=&quot;3&quot;&gt;切換處理對象的邊界&lt;/th&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;HANDOFF ONLY&lt;/td&gt;&lt;td&gt;Active 前一版 → N01 接替版需求&lt;/td&gt;&lt;td&gt;只把接下來要處理的對象換成尚未建立的接替版；這不是同一版本的狀態轉換，前一版不會回到 Draft。&lt;/td&gt;&lt;/tr&gt;
         &lt;/tbody&gt;
       &lt;/table&gt;
     &lt;/div&gt;
     &lt;div class=&quot;table-responsive&quot;&gt;
       &lt;table class=&quot;table table-sm&quot;&gt;
-        &lt;caption&gt;A1-2：per-exact-version 判定邊界；Layer alignment 描述 activity 對應，不改變 control subject。&lt;/caption&gt;
+        &lt;caption&gt;A1-2 狀態判定表：每一列只判斷一個單一明確版本；所在層級只說明工作發生在哪裡，不會改變判定對象。&lt;/caption&gt;
         &lt;thead&gt;
-          &lt;tr&gt;&lt;th&gt;節點&lt;/th&gt;&lt;th&gt;Layer alignment&lt;/th&gt;&lt;th&gt;Control subject&lt;/th&gt;&lt;th&gt;Repository 判定條件&lt;/th&gt;&lt;th&gt;唯一性／失敗處理&lt;/th&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;th&gt;節點&lt;/th&gt;&lt;th&gt;所在層級&lt;/th&gt;&lt;th&gt;正在判斷誰&lt;/th&gt;&lt;th&gt;儲存庫中的判定依據&lt;/th&gt;&lt;th&gt;唯一性／無法判定時&lt;/th&gt;&lt;/tr&gt;
         &lt;/thead&gt;
         &lt;tbody&gt;
-          &lt;tr&gt;&lt;td&gt;N01&lt;/td&gt;&lt;td&gt;L1 entry boundary&lt;/td&gt;&lt;td&gt;Prospective successor context&lt;/td&gt;&lt;td&gt;缺 canonical prospective identity。&lt;/td&gt;&lt;td&gt;Entry boundary；per-version CLI 不得猜。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;N02&lt;/td&gt;&lt;td&gt;L1→L2 boundary&lt;/td&gt;&lt;td&gt;Exact draft&lt;/td&gt;&lt;td&gt;&lt;code&gt;status=draft&lt;/code&gt;；無 &lt;code&gt;RELEASE.json&lt;/code&gt;。&lt;/td&gt;&lt;td&gt;L1 建立／修正，L2 檢查發布；與同 identity N03–N06 互斥。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;N03&lt;/td&gt;&lt;td&gt;L2&lt;/td&gt;&lt;td&gt;Exact prepared&lt;/td&gt;&lt;td&gt;&lt;code&gt;status=prepared&lt;/code&gt;＋release；無 activation。&lt;/td&gt;&lt;td&gt;僅 v010+；可與 active predecessor 並存並阻止新 work。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;N04&lt;/td&gt;&lt;td&gt;L3&lt;/td&gt;&lt;td&gt;Exact active version&lt;/td&gt;&lt;td&gt;有效 active facts；0 unfinished Sxxx。&lt;/td&gt;&lt;td&gt;與同 identity N05/N06 互斥；successor 是另一 identity。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;N05&lt;/td&gt;&lt;td&gt;L3&lt;/td&gt;&lt;td&gt;Exact active version&lt;/td&gt;&lt;td&gt;有效 active facts；1..n unfinished Sxxx。&lt;/td&gt;&lt;td&gt;Paused 仍 unfinished；缺 safety intent 時無法排除 N06。&lt;/td&gt;&lt;/tr&gt;
-          &lt;tr&gt;&lt;td&gt;N06&lt;/td&gt;&lt;td&gt;L3&lt;/td&gt;&lt;td&gt;Exact active predecessor&lt;/td&gt;&lt;td&gt;需 persisted safety intent＋unsafe Sxxx；目前缺前者。&lt;/td&gt;&lt;td&gt;未補 persistence 前回 invalid／indeterminate。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;N01&lt;/td&gt;&lt;td&gt;L1 入口&lt;/td&gt;&lt;td&gt;尚未建立的接替版需求&lt;/td&gt;&lt;td&gt;還沒有正式版本路徑，因此沒有單一明確版本可查。&lt;/td&gt;&lt;td&gt;N01 只是入口；依版本查詢的 CLI 不得把它猜成版本狀態。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;N02&lt;/td&gt;&lt;td&gt;L1→L2 共同邊界&lt;/td&gt;&lt;td&gt;接替版 Draft&lt;/td&gt;&lt;td&gt;&lt;code&gt;status=draft&lt;/code&gt;，而且沒有 &lt;code&gt;RELEASE.json&lt;/code&gt;。&lt;/td&gt;&lt;td&gt;L1 負責建立／修正，L2 負責發布檢查；同一版本不能同時是 N03–N06。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;N03&lt;/td&gt;&lt;td&gt;L2&lt;/td&gt;&lt;td&gt;接替版 Prepared&lt;/td&gt;&lt;td&gt;版本需要明確啟用，&lt;code&gt;status=prepared&lt;/code&gt;，已有有效發布資料，但還沒有相符的啟用資料。&lt;/td&gt;&lt;td&gt;可與 Active 前一版並存；但同一流程系列的限制會阻止新的結果相關研究工作。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;N04&lt;/td&gt;&lt;td&gt;L3&lt;/td&gt;&lt;td&gt;Active 版本&lt;/td&gt;&lt;td&gt;註冊表與發布資料有效；需要明確啟用的版本另須相符的 &lt;code&gt;ACTIVATION.json&lt;/code&gt;；未完成研究數為 0；另須持久化資料證明沒有進行中的安全評估。&lt;/td&gt;&lt;td&gt;同一版本不能同時是 N05／N06；接替版是另一個版本。目前仍缺安全評估開啟／關閉的持久化資料。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;N05&lt;/td&gt;&lt;td&gt;L3&lt;/td&gt;&lt;td&gt;Active 版本&lt;/td&gt;&lt;td&gt;註冊表、發布與適用的啟用資料有效；未完成研究數至少為 1；另須持久化資料證明沒有進行中的安全評估。&lt;/td&gt;&lt;td&gt;Paused 仍算未完成。缺少安全評估資料時，不能只看研究數就排除 N06。&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;N06&lt;/td&gt;&lt;td&gt;L3&lt;/td&gt;&lt;td&gt;Active 前一版&lt;/td&gt;&lt;td&gt;註冊表、發布與適用的啟用資料有效，而且有持久化資料證明安全評估仍在進行；原因可包含不安全研究、暫停研究的影響決定不完整，或尚未正式關閉。&lt;/td&gt;&lt;td&gt;進行中的安全評估優先於未完成研究數。目前缺這份持久化資料；需要區分 N04／N05／N06 時應回 invalid（資料矛盾）／indeterminate（資料不足）。&lt;/td&gt;&lt;/tr&gt;
         &lt;/tbody&gt;
       &lt;/table&gt;
     &lt;/div&gt;
-    &lt;div id=&quot;wgl-a12-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2…&lt;/div&gt;
   &lt;/section&gt;
 
   &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-study-state-machine-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-study-state-machine-title&quot;&gt;A1-3｜L3 內單一 Sxxx 的生命週期｜可多重實例化&lt;/h2&gt;
-    &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
-      A1-3 只描述一個 exact active Workflow version 的 L3 內，單一 Study Instance 的 canonical lifecycle。該 exact version 可有 0..n 個彼此獨立的 Sxxx；每個 instance 各自遵守下列狀態與 authority guards，不得與 workflow-version control state 或另一 version 的 Sxxx 混用。
-    &lt;/p&gt;
+    &lt;h2 id=&quot;wgl-study-state-machine-title&quot;&gt;A1-3｜每一個 Sxxx 研究實例自己的生命週期&lt;/h2&gt;
+    &lt;ul class=&quot;wgl-fsm-notation text-small&quot; aria-label=&quot;A1-3 閱讀重點&quot;&gt;
+      &lt;li&gt;&lt;strong&gt;判定單位：&lt;/strong&gt;一次只判斷一個 Sxxx 研究實例，不判斷整個 Workflow 版本。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;可以有多個：&lt;/strong&gt;同一個 Active Workflow 版本可以有零到多個彼此獨立的 Sxxx。&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;不可混用：&lt;/strong&gt;每個 Sxxx 都走自己的生命週期；不得與 A1-2 的版本狀態，或另一個版本的 Sxxx 混在一起。&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;div class=&quot;wgl-fsm-notation text-small&quot;&gt;
+      &lt;strong&gt;動作資格檢查（G-FAMILY）&lt;/strong&gt;
+      &lt;ul&gt;
+        &lt;li&gt;G-FAMILY 只判斷「現在能不能執行某個動作」，不是新的 Sxxx 狀態。&lt;/li&gt;
+        &lt;li&gt;建立、預先登記、開始、恢復、凍結候選，以及其他會影響結果的動作，都要求研究綁定的版本目前有效且 Active、同一流程系列沒有 Prepared 接替版，而且該版本沒有進行中的安全評估。&lt;/li&gt;
+        &lt;li&gt;建立研究另需建立 Draft 的權限；預先登記需完整計畫（plan）並在當次轉換凍結；開始、恢復與凍結候選另需有效的凍結計畫及各階段人工核准。&lt;/li&gt;
+        &lt;li&gt;Prepared 限制不阻止暫停、取消、審查者退回或完成審查；但審查者退回後，G-FAMILY 再次成立前不得執行結果相關工作。&lt;/li&gt;
+        &lt;li&gt;Paused 仍算未完成；只有 Completed 與 Cancelled 不算未完成。&lt;/li&gt;
+        &lt;li&gt;目前實作會對所有進入 Running 的轉換套用有效版本檢查，因此「只做行政退回」的例外仍是後續實作缺口。&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
     &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a13&quot; data-diagram=&quot;a1-study-state-machine&quot;&gt;
 stateDiagram-v2
   direction TB
 
-  state &quot;Draft&quot; as StudyDraft
-  state &quot;Preregistered&quot; as StudyPreregistered
-  state &quot;Running&quot; as StudyRunning
-  state &quot;Paused&quot; as StudyPaused
-  state &quot;Awaiting review&quot; as AwaitingReview
-  state &quot;Completed&quot; as StudyCompleted
-  state &quot;Cancelled&quot; as StudyCancelled
+  state &quot;Draft（草稿）&quot; as StudyDraft
+  state &quot;Preregistered（已預先登記）&quot; as StudyPreregistered
+  state &quot;Running（進行中）&quot; as StudyRunning
+  state &quot;Paused（已暫停）&quot; as StudyPaused
+  state &quot;Awaiting review（等待審查）&quot; as AwaitingReview
+  state &quot;Completed（已完成）&quot; as StudyCompleted
+  state &quot;Cancelled（已取消）&quot; as StudyCancelled
 
-  [*] --&gt; StudyDraft: CLI 配發 Sxxx
-  StudyDraft --&gt; StudyPreregistered: 人工核准 / 凍結 hypothesis、plan 與 exact pins
-  StudyDraft --&gt; StudyCancelled: reason
-  StudyPreregistered --&gt; StudyRunning: 首次 Development approval
-  StudyPreregistered --&gt; StudyCancelled: reason
-  StudyRunning --&gt; StudyPaused: reason
-  StudyPaused --&gt; StudyRunning: active workflow 且 frozen plan 仍有效
-  StudyRunning --&gt; AwaitingReview: 提交 exact evidence
-  StudyRunning --&gt; StudyCancelled: reason
-  StudyPaused --&gt; StudyCancelled: reason
-  AwaitingReview --&gt; StudyRunning: reviewer 退回補證 [不得改 frozen design]
-  AwaitingReview --&gt; StudyCompleted: reviewer confirmation / 凍結 outcome
+  [*] --&gt; StudyDraft: G-FAMILY + 建立權限 / CLI 配發 Sxxx
+  StudyDraft --&gt; StudyPreregistered: G-FAMILY + 完整計畫 + 人工核准 / 凍結指定版本與檔案
+  StudyDraft --&gt; StudyCancelled: 記錄原因
+  StudyPreregistered --&gt; StudyRunning: G-FAMILY + 凍結計畫有效 + Development 核准
+  StudyPreregistered --&gt; StudyCancelled: 記錄原因
+  StudyRunning --&gt; StudyPaused: 記錄原因
+  StudyPaused --&gt; StudyRunning: G-FAMILY + 凍結計畫有效 + 恢復核准
+  StudyRunning --&gt; AwaitingReview: 提交可核對的完整證據
+  StudyRunning --&gt; StudyCancelled: 記錄原因
+  StudyPaused --&gt; StudyCancelled: 記錄原因
+  AwaitingReview --&gt; StudyRunning: 審查者只做行政退回並記錄原因；後續執行仍受 G-FAMILY 限制
+  AwaitingReview --&gt; StudyCompleted: 審查者確認 / 凍結研究結果
   StudyCompleted --&gt; [*]
   StudyCancelled --&gt; [*]
 
   note right of StudyRunning
-    Preregistration、Development、candidate freeze、
-    Evaluation 與 review authority 彼此獨立，
-    不可從前一階段自動推導。
+    凍結候選與其他會影響結果的動作：
+    必須通過 G-FAMILY、凍結計畫檢查與該階段人工核准。
+    一個階段的核准不能代替另一個階段。
   end note
 
   classDef l3 fill:var(--card),stroke:var(--viz-series-2),stroke-width:2px,color:var(--foreground)
@@ -1527,16 +1754,17 @@ stateDiagram-v2
   &lt;script type=&quot;module&quot;&gt;
     const root = document.getElementById(&quot;workflow-governance-layers&quot;);
     const a1Status = root.querySelector(&quot;#wgl-mermaid-status&quot;);
-    const a12Status = root.querySelector(&quot;#wgl-a12-mermaid-status&quot;);
     const a13Status = root.querySelector(&quot;#wgl-a13-mermaid-status&quot;);
-    const a12Diagram = root.querySelector(&quot;.wgl-mermaid-a12&quot;);
-    const a12ZoomViewport = root.querySelector(&quot;#wgl-a12-zoom-viewport&quot;);
-    const a12ZoomOut = root.querySelector(&quot;#wgl-a12-zoom-out&quot;);
-    const a12ZoomReset = root.querySelector(&quot;#wgl-a12-zoom-reset&quot;);
-    const a12ZoomIn = root.querySelector(&quot;#wgl-a12-zoom-in&quot;);
-    const a12ZoomAnnouncement = root.querySelector(&quot;#wgl-a12-zoom-announcement&quot;);
+    const a12Statuses = new Map(
+      [...root.querySelectorAll(&quot;[data-mermaid-status]&quot;)].map((status) =&gt; [
+        status.dataset.mermaidStatus,
+        status
+      ])
+    );
     const isMobileLayout = window.matchMedia(&quot;(max-width: 520px)&quot;).matches;
     const isTwoColumnLayout = window.matchMedia(&quot;(min-width: 900px)&quot;).matches;
+    // Temporary feature flag: set to true to restore all A1-2 zoom controls.
+    const a12ZoomControlsEnabled = false;
     const diagrams = [...root.querySelectorAll(&quot;.wgl-mermaid&quot;)];
     const detailSelect = root.querySelector(&quot;#wgl-a1-detail-select&quot;);
     const detailTitle = root.querySelector(&quot;#wgl-a1-detail-title&quot;);
@@ -1546,247 +1774,263 @@ stateDiagram-v2
     const detailNext = root.querySelector(&quot;#wgl-a1-detail-next&quot;);
     const detailGuard = root.querySelector(&quot;#wgl-a1-detail-guard&quot;);
     const detailPanel = root.querySelector(&quot;#wgl-a1-detail-panel&quot;);
-    const a12ZoomMin = 75;
-    const a12ZoomMax = 200;
-    const a12ZoomStep = 25;
-    let a12Zoom = 100;
-    let a12PanPointerId = null;
-    let a12PanStartX = 0;
-    let a12PanStartY = 0;
-    let a12PanStartScrollLeft = 0;
-    let a12PanStartScrollTop = 0;
     const decisionNodes = new Set([&quot;L1N3&quot;, &quot;L2N2&quot;, &quot;L2N3&quot;, &quot;L2N5&quot;, &quot;L3N3&quot;, &quot;L3N5&quot;]);
     const nodeTypes = {
       L1N1: { key: &quot;input&quot;, label: &quot;輸入／觸發來源&quot; },
       L1N2: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L1N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L1N3: { key: &quot;decision&quot;, label: &quot;決策／條件檢查&quot; },
       L1N4: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
       L1N5: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
       L2N1: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L2N2: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L2N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L2N2: { key: &quot;decision&quot;, label: &quot;決策／條件檢查&quot; },
+      L2N3: { key: &quot;decision&quot;, label: &quot;決策／條件檢查&quot; },
       L2N4: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L2N5: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L2N5: { key: &quot;decision&quot;, label: &quot;決策／條件檢查&quot; },
       L2N6: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
       L2N7: { key: &quot;routing&quot;, label: &quot;路由／退回&quot; },
       L2N8: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
       L3N1: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
       L3N2: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L3N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
+      L3N3: { key: &quot;decision&quot;, label: &quot;決策／條件檢查&quot; },
       L3N4: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L3N5: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; }
+      L3N5: { key: &quot;decision&quot;, label: &quot;決策／條件檢查&quot; }
     };
 
     const details = {
       L1N1: {
-        title: &quot;L1-N1｜Prospective successor 輸入&quot;,
-        summary: &quot;彙整尚未配發 exact version identity 的首次建立或 successor authoring input。&quot;,
-        input: &quot;首次建立需求，或 exact active predecessor 的研究回饋、治理缺口與已完成的 study-safety／impact assessment。&quot;,
-        next: &quot;形成 closed create／change request，並把 authoring target 明確設為 prospective successor。&quot;,
-        guard: &quot;尚無 registered successor path；predecessor 不回 Draft。Per-version CLI 不能把 N01 猜成 version state。&quot;
+        title: &quot;L1-N1｜接替版需求&quot;,
+        summary: &quot;先整理為什麼要建立或修改接替版；此時還沒有正式版本路徑。&quot;,
+        input: &quot;第一次建立 Workflow 的需求，或 Active 前一版產生的研究回饋、治理缺口與變更需求。開始整理接替版時，不要求先把研究全部安全化。&quot;,
+        next: &quot;整理成內容完整的建立／變更需求，並明確說明接下來要建立接替版。&quot;,
+        guard: &quot;接替版尚未取得正式路徑；前一版保持 Active，不會回到 Draft。依版本查詢的 CLI 也不能把 N01 當成已存在的版本狀態。&quot;
       },
       L1N2: {
         title: &quot;L1-N2｜AI 預覽與檢查&quot;,
-        summary: &quot;AI 解析 repository facts 與要求，產生不寫檔的 preview。&quot;,
-        input: &quot;Closed request、family registry、exact active predecessor、可能已存在的 exact successor draft、來源文件與治理規則。&quot;,
-        next: &quot;檢查 preview 是否完整、可套用且目標狀態沒有漂移。&quot;,
-        guard: &quot;Target drift 或 invalid partial state 必須 fail closed、零 mutation，並重新產生 fresh preview。&quot;
+        summary: &quot;AI 讀取儲存庫與需求，產生不寫入檔案的預覽。&quot;,
+        input: &quot;完整需求、同一流程系列的註冊表、Active 前一版、可能已存在的接替版 Draft、來源文件與治理規則。&quot;,
+        next: &quot;確認預覽是否完整、可以套用，而且目標檔案從預覽後沒有改變。&quot;,
+        guard: &quot;若目標已改變，或儲存庫處於不完整狀態，就停止且不寫入任何內容，重新產生預覽。&quot;
       },
       L1N3: {
         title: &quot;L1-N3｜預覽可套用？&quot;,
-        summary: &quot;判斷 preview 是否完整且仍對應目前 repository 狀態。&quot;,
-        input: &quot;Resolved changes、exact paths、target digests、source disposition 與 validation plan。&quot;,
-        next: &quot;可套用且經人類確認後，配發／維持 exact successor identity 並建立或修正其 draft；失敗則維持原 control subject 並重新 preview。&quot;,
-        guard: &quot;不得繞過 drift、partial-state 或 exact-preview confirmation guard，也不得留下部分修改。&quot;
+        summary: &quot;確認預覽內容完整，而且仍對應儲存庫的目前狀態。&quot;,
+        input: &quot;預計修改的內容、明確路徑、目標檔案摘要、來源文件處置方式與驗證計畫。&quot;,
+        next: &quot;人類確認可套用後，建立或維持同一個接替版 Draft；若不能套用，就保留目前狀態並重新預覽。&quot;,
+        guard: &quot;不得略過目標變更、不完整狀態或預覽確認檢查，也不得只套用一部分修改。&quot;
       },
       L1N4: {
         title: &quot;L1-N4｜建立／修正草稿&quot;,
-        summary: &quot;依可套用且已確認的 fresh preview 配發或更新一個完整 registered exact successor draft。&quot;,
-        input: &quot;首次建立 request，或 active predecessor 的 accepted changes 經 evolve 形成的 replacement draft。&quot;,
-        next: &quot;以同一 exact successor identity handoff 給 L2 發布檢查。&quot;,
-        guard: &quot;Successor draft 沒有 effective authority，也不能供新的 L3 study 使用；同 family 的 predecessor 仍可保持 active。&quot;
+        summary: &quot;依已確認且仍有效的預覽，建立或更新一個完整註冊的接替版 Draft。&quot;,
+        input: &quot;第一次建立的需求，或把前一版已接受的修改整合成接替版 Draft 的演進需求。&quot;,
+        next: &quot;把同一個接替版 Draft 交給 L2 做發布檢查。&quot;,
+        guard: &quot;接替版 Draft 尚未生效，也不能用來建立新的 L3 研究；同一流程系列的前一版仍保持 Active。&quot;
       },
       L1N5: {
         title: &quot;L1-N5｜修正輸入&quot;,
-        summary: &quot;處理 preview 失敗或要求調整的內容。&quot;,
-        input: &quot;缺漏、衝突、target drift、invalid partial state 或修改意見；可能發生在 N01 boundary 或已存在的 successor draft。&quot;,
-        next: &quot;重新整理 request，回到 L1-N2 產生 fresh preview；已存在的 successor 仍保留原 exact identity。&quot;,
-        guard: &quot;若 resolved changes 不同，原 preview 不得套用，必須重新產生並確認；不得把已存在 draft 降格假裝成尚無 identity 的 N01。&quot;
+        summary: &quot;修正預覽失敗、資料缺漏或人類要求調整的內容。&quot;,
+        input: &quot;缺漏、衝突、目標檔案已改變、儲存庫狀態不完整或修改意見；問題可能發生在 N01，也可能發生在已存在的接替版 Draft。&quot;,
+        next: &quot;重新整理需求，再回到 L1-N2 產生新預覽；已存在的接替版仍保留原本的版本身分。&quot;,
+        guard: &quot;若預計修改的內容不同，舊預覽就不能再用，必須重新產生並確認；已存在的 Draft 也不能假裝回到尚無版本身分的 N01。&quot;
       },
       L2N1: {
         title: &quot;L2-N1｜AI 發布檢查&quot;,
-        summary: &quot;CLI 與 Agent 檢查所有 release guards。&quot;,
-        input: &quot;完整 contract、accepted changes 與 combined impact、exact active version，以及 policy／dependency pins。&quot;,
-        next: &quot;將結果交給發布條件判斷。&quot;,
-        guard: &quot;任何缺口都必須 fail closed；AI 檢查不能取代人類發布核准。&quot;
+        summary: &quot;CLI 與 Agent 檢查同一個 N02 接替版是否具備準備發布的條件。&quot;,
+        input: &quot;完整 Workflow 規格、已接受的修改、整體影響、N02 接替版、Active 前一版的研究，以及固定的政策／相依版本。&quot;,
+        next: &quot;把檢查結果交給 L2-N2；若前一版的安全或影響處理不完整，就暫時改處理 N06，完成後再回原本 N02 重試。&quot;,
+        guard: &quot;任何缺口都要停止發布。AI 檢查不能取代人工發布核准，也不能在重試時建立第二個接替版。&quot;
       },
       L2N2: {
         title: &quot;L2-N2｜發布條件通過？&quot;,
-        summary: &quot;區分可發布與需要回 L1 修正的情況。&quot;,
-        input: &quot;L2-N1 的完整 release-readiness 結果。&quot;,
-        next: &quot;通過則請求人類核准；contract、change、impact 或 pins 有缺口時，修正同一 prospective context 或 exact successor draft。&quot;,
-        guard: &quot;Release preparation 要求 predecessor studies 安全；draft 可並存，prepared successor 會阻止新的 outcome-relevant work。&quot;
+        summary: &quot;把結果分成三類：可以準備發布、要修正同一個 Draft，或要先處理前一版的安全問題。&quot;,
+        input: &quot;L2-N1 完整的發布就緒檢查結果。&quot;,
+        next: &quot;通過就請求人類核准；接替版內容或固定版本有缺口就走 A12-A04；前一版的安全或暫停研究影響有缺口就走 A12-A12 到 N06。&quot;,
+        guard: &quot;研究安全只會阻止準備發布或啟用，不會阻止建立 N01 需求或 N02 Draft；處理安全問題期間，接替版仍保持 N02。&quot;
       },
       L2N3: {
         title: &quot;L2-N3｜人工發布核准？&quot;,
-        summary: &quot;人類以 stable identity 明確批准目前這一次 release preparation。&quot;,
-        input: &quot;完整 release scope、readiness 結果與 combined impact。&quot;,
-        next: &quot;核准後為同一 exact successor 準備 immutable release evidence；未核准則修正或保留該 draft。&quot;,
-        guard: &quot;核准只允許準備發布，不授權 commit、push、merge、研究或交易。&quot;
+        summary: &quot;由具穩定識別碼的人類明確核准這一次準備發布。&quot;,
+        input: &quot;完整發布範圍、就緒檢查結果與整體影響。&quot;,
+        next: &quot;核准後，為同一個接替版建立不可變的發布證據；未核准就修正或保留 Draft。&quot;,
+        guard: &quot;這項核准只允許準備發布，不授權 commit、push、merge、研究或交易。&quot;
       },
       L2N4: {
         title: &quot;L2-N4｜準備發布&quot;,
-        summary: &quot;Guarded release 產生 RELEASE.json 並將 activation-enabled version 轉為 prepared。&quot;,
-        input: &quot;通過所有 guards 的 draft 與當下明確的人類發布核准。&quot;,
-        next: &quot;v010+ 將同一 successor 置為 prepared 並等待獨立啟用核准；v009 bootstrap 依其 frozen canonical-merge boundary 生效。&quot;,
-        guard: &quot;v010+ 的 RELEASE.json 只證明 preparation；predecessor 仍是 registry active，但新 work 已被阻止。&quot;
+        summary: &quot;依同一流程系列的啟用設定，選擇一般明確啟用路徑，或明文允許的舊版 bootstrap 例外。&quot;,
+        input: &quot;通過所有檢查的 Draft，以及當下明確的人工發布核准。&quot;,
+        next: &quot;需要明確啟用的版本會成為 Prepared，等待另一個人工啟用核准；只有早於邊界且設定明文允許的版本，才能走已凍結的 bootstrap 例外。&quot;,
+        guard: &quot;需要明確啟用時，RELEASE.json 只證明已準備發布。前一版仍是註冊表中的 Active，但 Prepared 限制已阻止新的結果相關研究工作。&quot;
       },
       L2N5: {
         title: &quot;L2-N5｜人工啟用核准？&quot;,
-        summary: &quot;由 stable human identity 另外核准 Workflow Release Activation。&quot;,
-        input: &quot;Prepared version、immutable RELEASE.json、exact release digest 與 activation impact。&quot;,
-        next: &quot;核准後產生不可變 ACTIVATION.json，使 successor 轉 active，並在同一 transition 才把 predecessor 轉 superseded；未核准則持續阻止新的 outcome-relevant work。&quot;,
-        guard: &quot;不得由 Agent、RELEASE.json 存在或 canonical branch membership 推定啟用。&quot;
+        summary: &quot;由具穩定識別碼的人類，另外核准版本啟用（Workflow Release Activation）。&quot;,
+        input: &quot;Prepared 版本、不可變的 RELEASE.json、該次發布的摘要值與啟用影響。&quot;,
+        next: &quot;核准後產生不可變的 ACTIVATION.json，讓接替版成為 Active；同一次轉換才把前一版改為 Superseded。未核准時繼續阻止新的結果相關研究工作。&quot;,
+        guard: &quot;不得因為 Agent 判斷、RELEASE.json 已存在，或版本位於正式分支（canonical branch），就推定已啟用。&quot;
       },
       L2N6: {
         title: &quot;L2-N6｜正式權威生效&quot;,
-        summary: &quot;Exact successor 依 v010+ activation evidence 或 v009 bootstrap boundary 成為 active version。&quot;,
-        input: &quot;適用的 immutable release／activation evidence、matching registry facts、exact pins 與 predecessor impact boundary。&quot;,
-        next: &quot;Successor 以自己的 identity 進入 L3；只有此時 predecessor 才轉為 superseded。&quot;,
-        guard: &quot;權威切換不會把 successor 與 predecessor 合併成同一 identity；v009 bootstrap 不得被泛化到 v010+。&quot;
+        summary: &quot;接替版依同一流程系列要求的啟用證據，或明文允許的舊版 bootstrap 邊界，成為 Active。&quot;,
+        input: &quot;適用且不可變的發布／啟用證據、相符的註冊表資料、固定版本，以及前一版的影響處理結果。&quot;,
+        next: &quot;接替版以自己的版本身分進入 L3；只有此時，前一版才成為 Superseded。&quot;,
+        guard: &quot;啟用不會把前一版與接替版合成同一個版本；某個同一流程系列的 bootstrap 例外也不能套用到需要明確啟用的版本。&quot;
       },
       L2N7: {
-        title: &quot;L2-N7｜修正 successor authoring&quot;,
-        summary: &quot;處理 exact successor 的 contract、accepted change、impact、pins 或發布核准不足。&quot;,
-        input: &quot;L2 的 fail-closed 缺口報告或未取得核准的結果。&quot;,
-        next: &quot;回到 authoring activity 修正 request 並 fresh preview；已存在的 exact draft 仍是 A12-N02，不退回 prospective N01。&quot;,
-        guard: &quot;不得重建或偷換 successor identity，不得直接修改 prepared release evidence，也不得繞過重新確認。&quot;
+        title: &quot;L2-N7｜修正接替版&quot;,
+        summary: &quot;修正接替版的規格、已接受修改、影響分析、固定版本或發布核准缺口。&quot;,
+        input: &quot;L2 停止發布時列出的缺口，或尚未取得人工核准的結果。&quot;,
+        next: &quot;回到草稿編寫流程修正需求並重新預覽；已存在的 Draft 仍是 A12-N02，不會退回 N01。&quot;,
+        guard: &quot;不得重建或偷換接替版的版本身分，不得直接修改 Prepared 的發布證據，也不得略過重新確認。&quot;
       },
       L2N8: {
         title: &quot;L2-N8｜阻止新研究&quot;,
-        summary: &quot;Prepared release 尚未取得 Workflow Release Activation 時維持 fail closed。&quot;,
-        input: &quot;Registry 顯示 prepared，且尚無 matching ACTIVATION.json。&quot;,
+        summary: &quot;Prepared 接替版尚未取得 Workflow Release Activation，因此維持停止新研究。&quot;,
+        input: &quot;註冊表顯示 Prepared，而且還沒有相符的 ACTIVATION.json。&quot;,
         next: &quot;等待獨立人工啟用核准，再重新檢查 L2-N5。&quot;,
-        guard: &quot;Prepared successor 無 L3 authority；predecessor 也不得建立、預註冊、開始、恢復或 freeze 新 work。&quot;
+        guard: &quot;Prepared 接替版還沒有 L3 權限；前一版也不得建立、預先登記、開始、恢復或凍結新的結果相關研究工作。&quot;
       },
       L3N1: {
         title: &quot;L3-N1｜研究治理就緒&quot;,
-        summary: &quot;一個 exact version 已依適用 release boundary 成為 active，並以自己的 identity 進入研究治理。&quot;,
-        input: &quot;v010+ 經 Workflow Release Activation 生效的 version，或符合 frozen bootstrap contract 的 v009，以及 immutable evidence 與 exact pins。&quot;,
-        next: &quot;可建立或推進 0..n 個彼此獨立的 Sxxx；個別 lifecycle 依 A1-3。&quot;,
-        guard: &quot;此 version 只符合一個 L3 state；另一 successor 可並存，prepared guard 仍限制 predecessor。&quot;
+        summary: &quot;一個版本已依適用的發布邊界成為 Active，並以自己的版本身分進入研究治理。&quot;,
+        input: &quot;依同一流程系列設定完成版本啟用的版本，或符合明文且已凍結 bootstrap 規則的邊界前版本，以及不可變證據與固定版本。&quot;,
+        next: &quot;可以建立或推進 0..n 個彼此獨立的 Sxxx；每個 Sxxx 的生命週期請看 A1-3。&quot;,
+        guard: &quot;此版本只能符合一個 L3 狀態；Draft 接替版可以並存。Prepared 接替版或進行中的安全評估都會阻止新的結果相關研究工作。&quot;
       },
       L3N2: {
-        title: &quot;L3-N2｜建立／推進 0..n 個 Sxxx&quot;,
-        summary: &quot;在同一個 L3 governance context 中協調多個獨立 Study Instance。&quot;,
-        input: &quot;L3 effective authority，以及每個 Sxxx 自己的 identity、plan、approval 與 evidence。&quot;,
-        next: &quot;各 Sxxx 依 A1-3 獨立推進；active exact version 保持 L3 identity，即使另行形成 prospective successor input。&quot;,
-        guard: &quot;不同 Sxxx 的 pins、authority、plan、evidence 與 outcome 不得混用。&quot;
+        title: &quot;L3-N2｜建立／推進零到多個 Sxxx&quot;,
+        summary: &quot;在同一個 Active 版本下，分別管理多個獨立的 Sxxx 研究實例。&quot;,
+        input: &quot;L3 的有效權限，以及每個 Sxxx 自己的版本身分、計畫（plan）、人工核准與證據（evidence）。&quot;,
+        next: &quot;每個 Sxxx 依 A1-3 獨立推進；即使開始整理接替版需求，Active 版本仍保持自己的 L3 狀態。&quot;,
+        guard: &quot;不同 Sxxx 的固定版本、權限、計畫、證據與研究結果（outcome）不得混用；建立、預先登記、開始、恢復與凍結另受 G-FAMILY 及各階段人工核准約束。&quot;
       },
       L3N3: {
-        title: &quot;L3-N3｜需要 prospective successor？&quot;,
-        summary: &quot;判斷研究回饋或治理缺口是否應形成另一個 exact successor 的 authoring input。&quot;,
-        input: &quot;Study 結論、流程缺陷、治理需求或人工提出的 workflow change intent。&quot;,
-        next: &quot;不需修改則 predecessor 繼續留在 L3；需要 successor 則先檢查該 predecessor 的 studies 是否達到版本邊界安全條件。&quot;,
-        guard: &quot;Study outcome 只能形成跨 identity 的 successor input；不能直接覆寫 released predecessor，也不能使它回到 Draft。&quot;
+        title: &quot;L3-N3｜需要建立接替版？&quot;,
+        summary: &quot;判斷研究回饋或治理缺口是否需要形成新的接替版需求。&quot;,
+        input: &quot;研究結論、流程缺陷、治理需求，或人類提出的 Workflow 變更意圖。&quot;,
+        next: &quot;不需要修改時，前一版繼續留在 L3；需要接替版時，立即以 HANDOFF ONLY 開始處理 N01，前一版保持原本的 N04／N05。&quot;,
+        guard: &quot;Study 的研究結果只能形成接替版需求，不能直接覆寫已發布的前一版、讓它回到 Draft，或把 A12-A11 當成準備發布的授權。&quot;
       },
       L3N4: {
-        title: &quot;L3-N4｜Predecessor studies 先安全化&quot;,
-        summary: &quot;在 successor release boundary 前，逐一讓 active predecessor 的 unsafe studies 到達合法安全狀態。&quot;,
-        input: &quot;Draft、preregistered、running 或 awaiting-review 的 Sxxx。&quot;,
-        next: &quot;由 operator／reviewer 合法進入 paused、completed 或 cancelled，再重新檢查全部 study。&quot;,
-        guard: &quot;Author 不能代替 operator／reviewer；缺 canonical safety intent 時，CLI 不得由 prose 推定 N06。&quot;
+        title: &quot;L3-N4｜處理前一版的安全問題&quot;,
+        summary: &quot;接替版已在 N02 並嘗試準備發布，因此流程暫時改去處理 Active 前一版的 N06。&quot;,
+        input: &quot;進行中的持久化安全評估、不安全的 Sxxx，或尚未完成的暫停研究影響決定／關閉程序。&quot;,
+        next: &quot;由研究操作人員（operator）／獨立審查者（reviewer）合法地讓研究進入 Paused、Completed 或 Cancelled，補齊影響決定，再檢查安全評估能否關閉。&quot;,
+        guard: &quot;Workflow 作者（Author）不能代替研究操作人員或獨立審查者。目前缺少正式持久化的安全評估資料，未來 CLI 不得只靠說明文字或研究數量推定 N06。&quot;
       },
       L3N5: {
-        title: &quot;L3-N5｜Predecessor studies 已安全？&quot;,
-        summary: &quot;確認 active predecessor 是否已具備把 authoring target handoff 給 prospective successor 的版本邊界條件。&quot;,
-        input: &quot;該 exact predecessor 下所有 Sxxx 的 canonical lifecycle state 與 paused-study impact decisions。&quot;,
-        next: &quot;全部為 paused、completed 或 cancelled 時記錄 impact decision，跨 identity 建立 prospective successor input；predecessor 仍留在自己的 active L3 state。&quot;,
-        guard: &quot;任何 unsafe study 都阻止 version boundary，但不改寫 predecessor identity。&quot;
+        title: &quot;L3-N5｜安全檢查完成？&quot;,
+        summary: &quot;確認前一版的發布安全處理是否完整，以及持久化安全評估能否正式關閉。&quot;,
+        input: &quot;前一版下所有 Sxxx 的正式生命週期狀態，以及每個暫停研究的影響決定。&quot;,
+        next: &quot;所有研究都安全、必要影響決定完整，而且安全評估已關閉後，N06 依未完成研究數回到 N04／N05；再回原本同一個 N02 接替版重做發布檢查。&quot;,
+        guard: &quot;安全評估關閉前維持 N06；不得建立 N01 或第二個接替版，也不得讓前一版回到 Draft。&quot;
       }
     };
 
-    const updateA12Pannable = () =&gt; {
-      const isPannable =
-        a12ZoomViewport.scrollWidth &gt; a12ZoomViewport.clientWidth + 1 ||
-        a12ZoomViewport.scrollHeight &gt; a12ZoomViewport.clientHeight + 1;
-      a12ZoomViewport.classList.toggle(&quot;is-pannable&quot;, isPannable);
-    };
+    const createZoomPanController = (panel) =&gt; {
+      const diagram = panel.querySelector(&quot;.wgl-zoom-canvas&quot;);
+      const viewport = panel.querySelector(&quot;.wgl-zoom-viewport&quot;);
+      const controls = panel.querySelector(&quot;.wgl-zoom-controls&quot;);
+      const help = panel.querySelector(&quot;.wgl-fsm-notation&quot;);
+      const zoomOut = panel.querySelector(&quot;.wgl-zoom-out&quot;);
+      const zoomReset = panel.querySelector(&quot;.wgl-zoom-reset&quot;);
+      const zoomIn = panel.querySelector(&quot;.wgl-zoom-in&quot;);
+      const announcement = panel.querySelector(&quot;.wgl-zoom-announcement&quot;);
+      const label = panel.dataset.zoomLabel || &quot;圖表&quot;;
+      const zoomMin = 75;
+      const zoomMax = 200;
+      const zoomStep = 25;
+      let zoom = 100;
+      let panPointerId = null;
+      let panStartX = 0;
+      let panStartY = 0;
+      let panStartScrollLeft = 0;
+      let panStartScrollTop = 0;
 
-    const applyA12Zoom = (nextZoom) =&gt; {
-      const previousScrollableWidth = a12ZoomViewport.scrollWidth;
-      const previousScrollableHeight = a12ZoomViewport.scrollHeight;
-      const previousCenter = a12ZoomViewport.scrollLeft + a12ZoomViewport.clientWidth / 2;
-      const previousMiddle = a12ZoomViewport.scrollTop + a12ZoomViewport.clientHeight / 2;
-      const previousCenterRatio = previousScrollableWidth
-        ? previousCenter / previousScrollableWidth
-        : 0.5;
-      const previousMiddleRatio = previousScrollableHeight
-        ? previousMiddle / previousScrollableHeight
-        : 0.5;
-      a12Zoom = Math.min(a12ZoomMax, Math.max(a12ZoomMin, nextZoom));
-      a12Diagram.style.width = `${a12Zoom}%`;
-      a12ZoomViewport.classList.toggle(&quot;is-zoomed&quot;, a12Zoom &gt; 100);
-      a12ZoomReset.textContent = `${a12Zoom}%`;
-      a12ZoomReset.title = a12Zoom === 100 ? &quot;目前為 100%&quot; : &quot;重設為 100%&quot;;
-      a12ZoomOut.disabled = a12Zoom === a12ZoomMin;
-      a12ZoomIn.disabled = a12Zoom === a12ZoomMax;
-      a12ZoomAnnouncement.textContent = `A1-2 圖表縮放 ${a12Zoom}%`;
-      requestAnimationFrame(() =&gt; {
-        const nextCenter = previousCenterRatio * a12ZoomViewport.scrollWidth;
-        const nextMiddle = previousMiddleRatio * a12ZoomViewport.scrollHeight;
-        a12ZoomViewport.scrollLeft = Math.max(
-          0,
-          nextCenter - a12ZoomViewport.clientWidth / 2
-        );
-        a12ZoomViewport.scrollTop = Math.max(
-          0,
-          nextMiddle - a12ZoomViewport.clientHeight / 2
-        );
-        updateA12Pannable();
+      controls.hidden = !a12ZoomControlsEnabled;
+      if (!a12ZoomControlsEnabled) {
+        help.textContent = &quot;圖表維持 100%；縮放控制目前隱藏。&quot;;
+      }
+
+      const refresh = () =&gt; {
+        const isPannable =
+          viewport.scrollWidth &gt; viewport.clientWidth + 1 ||
+          viewport.scrollHeight &gt; viewport.clientHeight + 1;
+        viewport.classList.toggle(&quot;is-pannable&quot;, isPannable);
+      };
+
+      const applyZoom = (nextZoom) =&gt; {
+        const previousScrollableWidth = viewport.scrollWidth;
+        const previousScrollableHeight = viewport.scrollHeight;
+        const previousCenter = viewport.scrollLeft + viewport.clientWidth / 2;
+        const previousMiddle = viewport.scrollTop + viewport.clientHeight / 2;
+        const previousCenterRatio = previousScrollableWidth
+          ? previousCenter / previousScrollableWidth
+          : 0.5;
+        const previousMiddleRatio = previousScrollableHeight
+          ? previousMiddle / previousScrollableHeight
+          : 0.5;
+        zoom = Math.min(zoomMax, Math.max(zoomMin, nextZoom));
+        diagram.style.width = `${zoom}%`;
+        viewport.classList.toggle(&quot;is-zoomed&quot;, zoom &gt; 100);
+        zoomReset.textContent = `${zoom}%`;
+        zoomReset.title = zoom === 100 ? &quot;目前為 100%&quot; : &quot;重設為 100%&quot;;
+        zoomOut.disabled = zoom === zoomMin;
+        zoomIn.disabled = zoom === zoomMax;
+        announcement.textContent = `${label} 圖表縮放 ${zoom}%`;
+        requestAnimationFrame(() =&gt; {
+          const nextCenter = previousCenterRatio * viewport.scrollWidth;
+          const nextMiddle = previousMiddleRatio * viewport.scrollHeight;
+          viewport.scrollLeft = Math.max(0, nextCenter - viewport.clientWidth / 2);
+          viewport.scrollTop = Math.max(0, nextMiddle - viewport.clientHeight / 2);
+          refresh();
+        });
+      };
+
+      const stopPan = () =&gt; {
+        if (panPointerId === null) return;
+        if (viewport.hasPointerCapture(panPointerId)) {
+          viewport.releasePointerCapture(panPointerId);
+        }
+        panPointerId = null;
+        viewport.classList.remove(&quot;is-panning&quot;);
+      };
+
+      viewport.addEventListener(&quot;pointerdown&quot;, (event) =&gt; {
+        if (event.pointerType === &quot;touch&quot; || event.button !== 0) return;
+        if (!viewport.classList.contains(&quot;is-pannable&quot;)) return;
+        panPointerId = event.pointerId;
+        panStartX = event.clientX;
+        panStartY = event.clientY;
+        panStartScrollLeft = viewport.scrollLeft;
+        panStartScrollTop = viewport.scrollTop;
+        viewport.setPointerCapture(event.pointerId);
+        viewport.classList.add(&quot;is-panning&quot;);
       });
+
+      viewport.addEventListener(&quot;pointermove&quot;, (event) =&gt; {
+        if (event.pointerId !== panPointerId) return;
+        event.preventDefault();
+        viewport.scrollLeft = panStartScrollLeft - (event.clientX - panStartX);
+        viewport.scrollTop = panStartScrollTop - (event.clientY - panStartY);
+      });
+      viewport.addEventListener(&quot;pointerup&quot;, stopPan);
+      viewport.addEventListener(&quot;pointercancel&quot;, stopPan);
+      viewport.addEventListener(&quot;lostpointercapture&quot;, () =&gt; {
+        panPointerId = null;
+        viewport.classList.remove(&quot;is-panning&quot;);
+      });
+      zoomOut.addEventListener(&quot;click&quot;, () =&gt; applyZoom(zoom - zoomStep));
+      zoomReset.addEventListener(&quot;click&quot;, () =&gt; applyZoom(100));
+      zoomIn.addEventListener(&quot;click&quot;, () =&gt; applyZoom(zoom + zoomStep));
+      applyZoom(100);
+      return { refresh };
     };
 
-    const stopA12Pan = () =&gt; {
-      if (a12PanPointerId === null) return;
-      if (a12ZoomViewport.hasPointerCapture(a12PanPointerId)) {
-        a12ZoomViewport.releasePointerCapture(a12PanPointerId);
-      }
-      a12PanPointerId = null;
-      a12ZoomViewport.classList.remove(&quot;is-panning&quot;);
-    };
-
-    a12ZoomViewport.addEventListener(&quot;pointerdown&quot;, (event) =&gt; {
-      if (event.pointerType === &quot;touch&quot; || event.button !== 0) return;
-      if (!a12ZoomViewport.classList.contains(&quot;is-pannable&quot;)) return;
-      a12PanPointerId = event.pointerId;
-      a12PanStartX = event.clientX;
-      a12PanStartY = event.clientY;
-      a12PanStartScrollLeft = a12ZoomViewport.scrollLeft;
-      a12PanStartScrollTop = a12ZoomViewport.scrollTop;
-      a12ZoomViewport.setPointerCapture(event.pointerId);
-      a12ZoomViewport.classList.add(&quot;is-panning&quot;);
+    const zoomPanControllers = [...root.querySelectorAll(&quot;[data-zoom-pan]&quot;)].map(
+      createZoomPanController
+    );
+    window.addEventListener(&quot;resize&quot;, () =&gt; {
+      zoomPanControllers.forEach(({ refresh }) =&gt; requestAnimationFrame(refresh));
     });
-
-    a12ZoomViewport.addEventListener(&quot;pointermove&quot;, (event) =&gt; {
-      if (event.pointerId !== a12PanPointerId) return;
-      event.preventDefault();
-      a12ZoomViewport.scrollLeft = a12PanStartScrollLeft - (event.clientX - a12PanStartX);
-      a12ZoomViewport.scrollTop = a12PanStartScrollTop - (event.clientY - a12PanStartY);
-    });
-
-    a12ZoomViewport.addEventListener(&quot;pointerup&quot;, stopA12Pan);
-    a12ZoomViewport.addEventListener(&quot;pointercancel&quot;, stopA12Pan);
-    a12ZoomViewport.addEventListener(&quot;lostpointercapture&quot;, () =&gt; {
-      a12PanPointerId = null;
-      a12ZoomViewport.classList.remove(&quot;is-panning&quot;);
-    });
-
-    a12ZoomOut.addEventListener(&quot;click&quot;, () =&gt; applyA12Zoom(a12Zoom - a12ZoomStep));
-    a12ZoomReset.addEventListener(&quot;click&quot;, () =&gt; applyA12Zoom(100));
-    a12ZoomIn.addEventListener(&quot;click&quot;, () =&gt; applyA12Zoom(a12Zoom + a12ZoomStep));
-    window.addEventListener(&quot;resize&quot;, () =&gt; requestAnimationFrame(updateA12Pannable));
-    applyA12Zoom(100);
 
     const showDetail = (nodeId) =&gt; {
       const detail = details[nodeId];
@@ -1826,6 +2070,27 @@ stateDiagram-v2
       return resolved;
     };
 
+    const diagramAriaLabels = {
+      &quot;a1-main&quot;: &quot;A1：前一版保持 Active；流程可以先整理接替版需求。只有接替版準備發布時，才暫時改去處理前一版的安全問題，完成後回到原本的接替版。每個節點都可開啟詳細說明&quot;,
+      &quot;a1-2-overview&quot;: &quot;A1-2 Overview：同一套版本狀態機的 N01 到 N06、主要流程、舊版 bootstrap 例外、切換處理對象與發布安全協調&quot;,
+      &quot;a1-2a-identity-formation&quot;: &quot;A1-2A：接替版需求經過預覽、配發正式路徑並註冊後，成為可判定的 Draft 版本&quot;,
+      &quot;a1-2b-release-activation&quot;: &quot;A1-2B：接替版 Draft 依同一流程系列設定進入 Prepared 或 Active；若前一版有安全缺口，處理完成後回到原本同一個 Draft&quot;,
+      &quot;a1-2c-active-governance&quot;: &quot;A1-2C：同一個 Active 前一版只能符合 N04、N05、N06 其中一個；A12-A11 只開始處理新的接替版需求，A12-A12 與 A12-A13 則回到原本同一個 N02 接替版重試發布檢查&quot;,
+      &quot;a1-study-state-machine&quot;: &quot;A1-3：單一 Sxxx 研究實例的七個狀態；建立、預先登記、開始、恢復與凍結等動作受 G-FAMILY 與各階段人工核准約束，Workflow 版本條件不會變成新的研究狀態&quot;
+    };
+    const a12NodeLayers = {
+      N01PORT: &quot;l1&quot;,
+      N02PORT: &quot;l2&quot;,
+      N06PORT: &quot;l3&quot;,
+      N01: &quot;l1&quot;,
+      N02: &quot;l2&quot;,
+      N03: &quot;l2&quot;,
+      N04: &quot;l3&quot;,
+      N05: &quot;l3&quot;,
+      N06: &quot;l3&quot;
+    };
+    const a12SharedBoundaryNodes = new Set([&quot;N02&quot;, &quot;N04&quot;]);
+
     try {
       const module = await import(&quot;https://cdn.jsdelivr.net/npm/mermaid@11.12.0/+esm&quot;);
       const mermaid = module.default;
@@ -1863,18 +2128,11 @@ stateDiagram-v2
 
       await mermaid.run({ nodes: diagrams });
       const svgs = diagrams.map((item) =&gt; item.querySelector(&quot;svg&quot;));
-      requestAnimationFrame(updateA12Pannable);
+      zoomPanControllers.forEach(({ refresh }) =&gt; requestAnimationFrame(refresh));
       svgs.forEach((svg, index) =&gt; {
         const diagram = diagrams[index].dataset.diagram;
         svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
-        svg.setAttribute(
-          &quot;aria-label&quot;,
-          diagram === &quot;a1-aligned-state-machine&quot;
-            ? &quot;A1-2：每個 exact Workflow version 各自只有一個 control state；跨 identity handoff 可讓 active predecessor 與 draft 或 prepared successor 共存&quot;
-            : diagram === &quot;a1-study-state-machine&quot;
-              ? &quot;A1-3：一個 exact active Workflow version 的 L3 內，單一 Sxxx 的 canonical per-study lifecycle；可多重實例化&quot;
-              : &quot;A1：exact active predecessor 維持 immutable identity，並經 change 與 study-safety assessment 把 authoring target handoff 給 prospective successor；每個節點可開啟詳細說明&quot;
-        );
+        svg.setAttribute(&quot;aria-label&quot;, diagramAriaLabels[diagram] || &quot;Workflow 治理圖&quot;);
         svg.removeAttribute(&quot;height&quot;);
         svg.querySelectorAll(&quot;g.cluster&quot;).forEach((cluster) =&gt; {
           const label = cluster.textContent.trim();
@@ -1882,6 +2140,20 @@ stateDiagram-v2
           if (label.startsWith(&quot;L2｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l2&quot;);
           if (label.startsWith(&quot;L3｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l3&quot;);
         });
+        if (diagram.startsWith(&quot;a1-2&quot;)) {
+          svg.querySelectorAll(&quot;g.node&quot;).forEach((node) =&gt; {
+            const nodeId = Object.keys(a12NodeLayers).find((candidate) =&gt;
+              node.id.startsWith(`flowchart-${candidate}-`)
+            );
+            if (!nodeId) return;
+            node.classList.add(`wgl-a12-layer-${a12NodeLayers[nodeId]}`);
+            if (a12SharedBoundaryNodes.has(nodeId)) {
+              node.classList.add(&quot;wgl-a12-shared-boundary&quot;);
+            }
+            if (nodeId === &quot;N03&quot;) node.classList.add(&quot;wgl-a12-conditional&quot;);
+            if (nodeId.endsWith(&quot;PORT&quot;)) node.classList.add(&quot;wgl-a12-boundary-port&quot;);
+          });
+        }
       });
 
       Object.entries(details).forEach(([nodeId, detail]) =&gt; {
@@ -1915,15 +2187,28 @@ stateDiagram-v2
       a1Status.textContent = !isTwoColumnLayout
         ? &quot;滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。&quot;
         : &quot;滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。&quot;;
-      a12Status.textContent = &quot;A1-2 以 6 個節點與 13 個 action family 重述 A1；可用上方按鈕在 75%–200% 間縮放，放大後可拖曳、觸控滑動或用方向鍵移動圖面。節點 badge 標示 activity-layer alignment，而非 identity ownership。N01 是 L1 entry boundary，N02 跨 L1→L2，N03 對應 L2，N04–N06 對應 L3。A05 含 v009 bootstrap 與 v010+ activation 兩個分支。&quot;;
-      a13Status.textContent = &quot;A1-3 維持 per-study-instance：一個 exact active Workflow version 的 L3 內，可獨立重複實例化 0..n 份七狀態 Sxxx lifecycle。&quot;;
+      const a12RenderedMessages = {
+        &quot;a1-2-overview&quot;: &quot;Overview 已顯示同一套狀態機的 N01–N06、主要流程、舊版例外、A12-A11 切換處理對象，以及 A12-A12／A13 的發布安全協調；完整條件請看下方動作對照表。&quot;,
+        &quot;a1-2a-identity-formation&quot;: &quot;A1-2A 已顯示 N01 入口、A12-A01–A03 與 N02 共同邊界；只有 A12-A03 完成後，才有可依版本路徑判定的接替版。&quot;,
+        &quot;a1-2b-release-activation&quot;: &quot;A1-2B 已顯示 N02–N04、A12-A04–A07，以及 A12-A12／A13 暫時改處理前一版後，再回到同一個 N02；A12-A07 只接受相符的 ACTIVATION.json。&quot;,
+        &quot;a1-2c-active-governance&quot;: &quot;A1-2C 已顯示 N04–N06 與 A12-A08–A13；A12-A11 只開始處理新的 N01 需求，A12-A12／A13 則回到原本同一個 N02 接替版。&quot;
+      };
+      a12Statuses.forEach((status, diagram) =&gt; {
+        const interactionStatus = a12ZoomControlsEnabled
+          ? &quot;可在 75%–200% 間縮放，並以拖曳、觸控或方向鍵移動。&quot;
+          : &quot;縮放控制目前關閉；圖表維持 100%。&quot;;
+        status.textContent = `${a12RenderedMessages[diagram]} ${interactionStatus}`;
+      });
+      a13Status.textContent = &quot;A1-3 仍是每一個 Sxxx 各自使用的七狀態生命週期。G-FAMILY、Prepared 接替版與進行中的安全評估只會限制可執行的動作，不是新的 Sxxx 狀態。&quot;;
     } catch (error) {
       console.error(error);
-      a1Status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
-      a12Status.textContent = &quot;A1-2 載入失敗；上方保留可讀的 Mermaid source。&quot;;
-      a13Status.textContent = &quot;A1-3 載入失敗；上方保留可讀的 Mermaid source。&quot;;
+      a1Status.textContent = &quot;A1 載入失敗；上方仍可閱讀 Mermaid 原始文字。&quot;;
+      a13Status.textContent = &quot;A1-3 載入失敗；上方仍可閱讀 Mermaid 原始文字。&quot;;
       a1Status.classList.add(&quot;text-destructive&quot;);
-      a12Status.classList.add(&quot;text-destructive&quot;);
+      a12Statuses.forEach((status) =&gt; {
+        status.textContent = &quot;此 A1-2 分段圖載入失敗；上方仍可閱讀 Mermaid 原始文字。&quot;;
+        status.classList.add(&quot;text-destructive&quot;);
+      });
       a13Status.classList.add(&quot;text-destructive&quot;);
     }
   &lt;/script&gt;
