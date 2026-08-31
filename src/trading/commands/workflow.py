@@ -15,6 +15,10 @@ from trading.workflow.authoring import (
     WorkflowAuthoringError,
     WorkflowRepository,
 )
+from trading.workflow.control_state import (
+    WorkflowControlStateResult,
+    evaluate_workflow_control_state,
+)
 from trading.workflow.studies import WorkflowStudyService
 
 
@@ -63,6 +67,11 @@ def register_parser(
         "--to", dest="status", required=True, choices=("abandoned", "retired")
     )
     transition_version.add_argument("--approved-by")
+    version_state = version_commands.add_parser(
+        "state", help="Report the A1-2 control state for one exact workflow version"
+    )
+    version_state.add_argument("path", type=Path)
+    version_state.add_argument("--json", dest="json_output", action="store_true")
 
     study = commands.add_parser("study", help="Operate workflow studies")
     study_commands = study.add_subparsers(dest="workflow_study_command", required=True)
@@ -217,12 +226,18 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                 )
                 print(f"workflow change transitioned to {args.status}: {args.path}")
         elif args.workflow_command == "version":
-            repository.transition_version(
-                args.path,
-                args.status,
-                approved_by=args.approved_by,
-            )
-            print(f"workflow version transitioned to {args.status}: {args.path}")
+            if args.workflow_version_command == "transition":
+                repository.transition_version(
+                    args.path,
+                    args.status,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow version transitioned to {args.status}: {args.path}")
+            elif args.workflow_version_command == "state":
+                result = evaluate_workflow_control_state(repository, args.path)
+                _print_control_state(result, json_output=args.json_output)
+                if result.result in {"invalid", "indeterminate"}:
+                    raise SystemExit(2)
         elif args.workflow_command == "study":
             studies = WorkflowStudyService(args.root)
             if args.workflow_study_command == "init":
@@ -306,3 +321,24 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                 print(f"workflow safety assessment cleared: {clearance['assessment_id']}")
     except WorkflowAuthoringError as exc:
         raise SystemExit(f"workflow error: {exc}") from exc
+
+
+def _print_control_state(
+    result: WorkflowControlStateResult,
+    *,
+    json_output: bool,
+) -> None:
+    if json_output:
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        return
+    label = result.control_state or result.result
+    print(f"workflow control state: {label}")
+    print(f"  path: {result.path}")
+    if result.workflow is not None and result.version is not None:
+        print(f"  identity: {result.workflow}@{result.version}")
+    if result.registry_status is not None:
+        print(f"  registry status: {result.registry_status}")
+    for reason in result.reasons:
+        print(f"  reason: {reason}")
+    for issue in result.issues:
+        print(f"  issue: {issue}")

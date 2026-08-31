@@ -88,10 +88,11 @@ Edit governance content in the YAML file rather than copying it back into HTML o
   prospective input or exact draft successor. A release-safety failure switches control to the
   active predecessor while the same successor remains draft, then returns to that same draft for a
   fresh release check after safety closure.
-- Repository facts do not yet persist a prospective successor identity for `ENTRY-01` or a canonical
-  open/closed safety-assessment fact for N06 versus N04/N05. A future exact-version CLI must report
-  `invalid` or `indeterminate` when those required facts are absent rather than infer them from
-  prose or study counts.
+- Repository facts do not persist a prospective successor identity for `ENTRY-01`. Canonical
+  open/closed safety-assessment facts begin only when the active release authorizes
+  `workflow-release-safety-v1`; they cannot be backfilled for v008. The exact-version state CLI
+  therefore reports `indeterminate` for that historical gap and `invalid` for contradictory
+  evidence rather than inferring a state from prose or study counts.
 - B1 is a high-level actor handoff summary. It is not a complete authority or lifecycle model; use
   A1 for the detailed gates and control states.
 - A1 replaces the former B2 activity view. B2 was removed because it duplicated the primary

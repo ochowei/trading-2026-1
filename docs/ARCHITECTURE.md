@@ -192,7 +192,7 @@ CLI parser registration and handlers grouped by public responsibility.
 | File | Purpose |
 |---|---|
 | `legacy.py` | Explicit `trading legacy ...` tree with read-only diagnostics and fail-closed retired operations. The former top-level aliases no longer exist. |
-| `workflow.py` | Workflow authoring, validation, release, activation, guarded release-safety persistence, and study parser/handler. |
+| `workflow.py` | Workflow authoring, validation, release, activation, guarded release-safety persistence, read-only exact-version state query, and study parser/handler. |
 | `research.py` | Workflow-native definition listing, snapshot, run, and exact orchestration provenance. |
 
 ### `src/trading/legacy/`
@@ -205,8 +205,12 @@ package authorizes new research or result publication.
 ### `src/trading/workflow/`
 
 Canonical workflow lifecycle implementation: authoring, guarded release-safety persistence and
-validation, studies, exact-study qualification, terminal evidence, and qualification orchestration. Historical `trading.core.*` imports alias these
-same module objects so monkeypatching and process-global state remain compatible.
+validation, read-only exact-version control-state evaluation, studies, exact-study qualification,
+terminal evidence, and qualification orchestration. `control_state.py` evaluates A1-2 N02–N06
+from the canonical registry, release/activation evidence, release-safety artifacts, and persisted
+study lifecycles; it returns fail-closed `invalid` or `indeterminate` results rather than granting
+authority. Historical `trading.core.*` imports alias these same module objects so monkeypatching and
+process-global state remain compatible.
 
 ### `src/trading/market_data/`
 
@@ -402,6 +406,13 @@ evidence digests, and creates `CLEARANCE.json` without changing study or version
 rejects multiple open assessments for one version pair, malformed or drifted identities, unsafe or
 incomplete resolutions, and evidence drift. An open assessment blocks new outcome-relevant study
 work and successor release preparation.
+
+`trading workflow version state <version-path> [--json]` is the separate read-only A1-2 query. It
+uses one exact registered version as its subject, never returns the pre-version `ENTRY-01` context,
+and reports N02–N06 only after tracked workflow validation succeeds. Historical active releases
+without `workflow-release-safety-v1` return `indeterminate`; contradictory evidence returns
+`invalid`. Neither result nor a determined state grants release, activation, study, or trading
+authority.
 
 High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
 only the workflow tree into a system temporary directory, applies and validates the complete staged

@@ -176,7 +176,12 @@ uv run trading workflow safety assess <draft-successor-path> \
   --request safety-assessment-request.json --by <identity>
 uv run trading workflow safety clear <saNNN-path> \
   --request safety-clearance-request.json --approved-by <human-id>
-# 這兩個命令只保存／關閉 release-safety evidence；不查詢 A1-2 state，也不授權 release/activation
+# 這兩個命令只保存／關閉 release-safety evidence；不授權 release/activation
+
+# 唯讀查詢單一 exact workflow version 的 A1-2 control state；ENTRY-01 不會成為查詢結果
+uv run trading workflow version state <version-path>
+uv run trading workflow version state <version-path> --json
+# determined／outside-a1-2 結束碼為 0；invalid／indeterminate 仍輸出結果，但結束碼為 2
 
 # 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC
 uv run trading workflow study init <version-path> --slug <study-slug> \

@@ -250,7 +250,7 @@ document:
                 <li>A12-A11 只會開始處理新的接替版需求；前一版仍留在 N04／N05。</li>
                 <li>A12-A12 會從接替版 N02 暫時切到前一版 N06；後續須由 <code>ASSESSMENT.json</code> 持久化開啟事實。</li>
                 <li>A12-A13 完成安全處理後，後續須由 <code>CLEARANCE.json</code> 持久化關閉事實，再回到原本同一個 N02 重試發布檢查。</li>
-                <li>上述 artifacts、guarded writer 與 validator 已納入 v009 Draft；v009 Active 後可成為 persistence authority。目前剩下 state-query CLI blocker，而且不可回填 v008 歷史。</li>
+                <li>上述 artifacts、guarded writer 與 validator 已納入 v009 Draft；v009 Active 後可成為 persistence authority。Exact-version state CLI 已實作，但不可回填 v008 歷史，因此查詢 v008 的 N04／N05／N06 會回 <code>indeterminate</code>。</li>
               </ul>
               <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2C">
                 <div class="wgl-zoom-controls" role="group" aria-label="A1-2C 圖表縮放控制">
@@ -335,7 +335,7 @@ document:
           </div>
           <div class="table-responsive">
             <table class="table table-sm">
-              <caption>A1-2 的發布安全證據：schema、guarded writer 與 validator 已納入 v009 Draft；v009 成為 Active 後才是有效 contract。目前沒有 A1-2 state-query CLI。</caption>
+              <caption>A1-2 的發布安全證據：schema、guarded writer 與 validator 已納入 v009 Draft；v009 成為 Active 後才是有效 contract。Exact-version state CLI 已提供唯讀查詢。</caption>
               <thead>
                 <tr><th>項目</th><th>v009 contract／實作規則</th></tr>
               </thead>
@@ -344,7 +344,8 @@ document:
                 <tr><td><code>ASSESSMENT.json</code></td><td>不可變的開啟證據；至少綁定 workflow family、前一版與接替版的 exact path／version、接替版 <code>WORKFLOW.md</code> digest、阻擋中的 Sxxx、缺少的 impact decision、原因、時間與操作者。</td></tr>
                 <tr><td><code>CLEARANCE.json</code></td><td>不可變的關閉證據；必須綁定對應 <code>ASSESSMENT.json</code> digest、每個阻擋項目的處理結果、時間與核准者。</td></tr>
                 <tr><td>唯一性</td><td>同一對前一版／接替版最多只能有一份有效且尚未關閉的 assessment。多份未關閉紀錄、identity 衝突或 digest 不符都回 <code>invalid</code>。</td></tr>
-                <tr><td>目前限制</td><td>Artifact schema、guarded writer 與 validator 已實作，但 capability 仍只在 v009 Draft。v009 尚未 Active 前，不能回填 v008 歷史，也不能把 v008 的「檔案不存在」解讀成「確定沒有進行中的安全評估」。第 5 項 state-query CLI 仍未實作。</td></tr>
+                <tr><td>唯讀查詢</td><td>使用 <code>trading workflow version state &lt;version-path&gt; [--json]</code>。輸入必須是已註冊的單一明確版本；CLI 只回 N02–N06、<code>outside-a1-2</code>、<code>invalid</code> 或 <code>indeterminate</code>，不會回 ENTRY-01。</td></tr>
+                <tr><td>目前限制</td><td>Artifact schema、guarded writer、validator 與 exact-version state CLI 已實作，但 capability 仍只在 v009 Draft。v009 尚未 Active 前，不能回填 v008 歷史，也不能把 v008 的「檔案不存在」解讀成「確定沒有進行中的安全評估」；CLI 會回 <code>indeterminate</code>。</td></tr>
               </tbody>
             </table>
           </div>
@@ -573,7 +574,7 @@ a1_details:
     summary: 接替版已在 N02 並嘗試準備發布，因此流程暫時改去處理 Active 前一版的 N06。
     input: 由 <code>ASSESSMENT.json</code> 綁定的前一版／接替版 identity、不安全的 Sxxx，或尚未完成的暫停研究影響決定。
     next: 由研究操作人員（operator）／獨立審查者（reviewer）合法地讓研究進入 Paused、Completed 或 Cancelled，補齊影響決定，再檢查是否可建立 <code>CLEARANCE.json</code>。
-    guard: Workflow 作者（Author）不能代替研究操作人員或獨立審查者。Artifacts、guarded writer 與 validator 已納入 v009 Draft；state-query CLI 仍不得只靠說明文字或研究數量推定 N06。
+    guard: Workflow 作者（Author）不能代替研究操作人員或獨立審查者。Artifacts、guarded writer 與 validator 已納入 v009 Draft；state-query CLI 只接受通過驗證的持久化證據，不會只靠說明文字或研究數量推定 N06。
   L3N5:
     title: L3-N5｜安全檢查完成？
     summary: 確認前一版的發布安全處理是否完整，以及是否可建立不可變的關閉證據。
@@ -597,7 +598,7 @@ render_status:
     a1-2c-active-governance: A1-2C 已顯示 N04–N06 與 A12-A08–A13；A12-A11 只開始處理新的 ENTRY-01 需求，A12-A12／A13 則回到原本同一個 N02 接替版。
   interaction_enabled: 可在 75%–200% 間縮放，並以拖曳、觸控或方向鍵移動。
   interaction_disabled: 縮放控制目前關閉；圖表維持 100%。
-  a1_3: A1-3 仍是每一個 Sxxx 各自使用的七狀態生命週期。G-FAMILY、Prepared 接替版與進行中的安全評估只會限制可執行的動作，不是新的 Sxxx 狀態；safety writer／validator 已納入 v009 Draft，state-query CLI 仍待後續實作。
+  a1_3: A1-3 仍是每一個 Sxxx 各自使用的七狀態生命週期。G-FAMILY、Prepared 接替版與進行中的安全評估只會限制可執行的動作，不是新的 Sxxx 狀態；safety writer／validator 已納入 v009 Draft，exact-version state CLI 已實作且不會把 Sxxx 狀態當成版本狀態。
   load_errors:
     a1: A1 載入失敗；上方仍可閱讀 Mermaid 原始文字。
     a1_2: 此 A1-2 分段圖載入失敗；上方仍可閱讀 Mermaid 原始文字。
