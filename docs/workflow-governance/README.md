@@ -69,9 +69,9 @@ Edit governance content in the YAML file rather than copying it back into HTML o
   active-version governance). Repeated N02 and N04 nodes are shared boundaries for the same
   canonical identities, not duplicate states or separate FSMs. Mutual exclusion is scoped to one
   immutable `workflows/<slug>--vNNN` identity, not the family: a family may contain one active
-  predecessor and one draft or prepared successor at the same time. N01 is a prospective-successor
-  entry boundary before an exact version identity exists; it is not a persisted registered-version
-  state. Individual Sxxx lifecycle states remain outside this model.
+  predecessor and one draft or prepared successor at the same time. `ENTRY-01` is a
+  prospective-successor entry context before an exact version identity exists; it is not a
+  persisted registered-version state. Individual Sxxx lifecycle states remain outside this model.
 - A1-2 keeps family activation policy outside the FSM. The generic required-path predicate is
   `exact version >= family.activation_required_from`; pre-boundary bootstrap is an explicit legacy
   exception. For `strategy-forward-replication-research`, v009 remains the final bootstrap version
@@ -88,7 +88,7 @@ Edit governance content in the YAML file rather than copying it back into HTML o
   prospective input or exact draft successor. A release-safety failure switches control to the
   active predecessor while the same successor remains draft, then returns to that same draft for a
   fresh release check after safety closure.
-- Repository facts do not yet persist a prospective successor identity for N01 or a canonical
+- Repository facts do not yet persist a prospective successor identity for `ENTRY-01` or a canonical
   open/closed safety-assessment fact for N06 versus N04/N05. A future exact-version CLI must report
   `invalid` or `indeterminate` when those required facts are absent rather than infer them from
   prose or study counts.
