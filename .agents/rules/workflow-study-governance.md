@@ -30,7 +30,20 @@ draft/preregistered/running/paused -> cancelled
 
 Require concrete reasons for pause, cancellation, or reviewer return. `completed` and `cancelled`
 are terminal. A reviewer may return `awaiting-review -> running` only without changing the frozen
-design.
+design. That status transition is an administrative review action and is not blocked by a prepared
+successor or open release-safety assessment. It does not authorize execution: before any subsequent
+outcome-relevant work, the operator must re-establish the family-level action gate.
+
+## Exact-version action gate
+
+Use `trading workflow version state <version-path> --json` to inspect one registered version. For a
+safety-capable active release, `N04` and `N05` are the only states eligible for new,
+preregistration, start, resume, freeze, or other outcome-relevant actions; `N06` blocks them. `N02`
+and `N03` are not active execution states. Stop on `invalid`. Treat a legacy `indeterminate` result
+as unavailable evidence rather than permission: inspect canonical registry and release/activation
+evidence and rely on guarded operations to fail closed. Pause, cancellation, administrative
+reviewer return, and review completion remain available because they reduce risk or finish frozen
+work rather than begin new outcome-relevant work.
 
 ## Frozen design and authority
 

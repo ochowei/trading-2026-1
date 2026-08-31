@@ -10,6 +10,7 @@ Read the mode-specific canonical references instead:
 - [`evolve.md`](evolve.md): active-version changes and replacement drafts.
 - [`remove.md`](remove.md): abandon, retire, and removal classification.
 - [`release.md`](release.md): approved release preparation and immutable evidence.
+- [`safety.md`](safety.md): guarded release-safety assessment and clearance evidence.
 - [`impact.md`](impact.md): active-version, dependency, and unfinished-study impact.
 
 Study operation and evaluation use

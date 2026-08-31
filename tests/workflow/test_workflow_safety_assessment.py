@@ -244,6 +244,51 @@ def test_guarded_safety_assessment_blocks_new_work_and_release(tmp_path: Path) -
         repository.release(successor, approved_by="owner@example.com")
 
 
+def test_reviewer_return_is_administrative_but_followup_work_remains_blocked(
+    tmp_path: Path,
+) -> None:
+    root, repository, _predecessor, successor, study = _initialize_pair(tmp_path)
+    (study / "HYPOTHESIS.md").write_text(
+        "# Hypothesis\n\nA falsifiable result is fixed before execution.\n",
+        encoding="utf-8",
+    )
+    (study / "PLAN.md").write_text(
+        "# Plan\n\nRun the frozen stages and preserve exact evidence.\n",
+        encoding="utf-8",
+    )
+    service = WorkflowStudyService(root, now=lambda: FIXED_TIME)
+    service.preregister(study, approved_by="owner@example.com")
+    service.transition(study, "running", actor="operator@example.com")
+    (study / "EVIDENCE.md").write_text(
+        "# Evidence\n\nThe submitted package is complete enough for independent review.\n",
+        encoding="utf-8",
+    )
+    service.transition(study, "awaiting-review", actor="operator@example.com")
+    repository.open_safety_assessment(
+        successor,
+        _open_request(tmp_path, study),
+        opened_by="author@example.com",
+    )
+
+    service.transition(
+        study,
+        "running",
+        actor="reviewer@example.com",
+        reason="required evidence identity is not replayable",
+    )
+
+    metadata = read_markdown_document(study / "README.md").metadata
+    assert metadata["status"] == "running"
+    assert metadata["status_changed_by"] == "reviewer@example.com"
+    assert metadata["status_reason"] == "required evidence identity is not replayable"
+    with pytest.raises(WorkflowAuthoringError, match="open safety assessment"):
+        service.freeze_candidate(
+            study,
+            selection_path=tmp_path / "unused-selection.json",
+            approved_by="owner@example.com",
+        )
+
+
 def test_clearance_requires_safe_study_then_restores_family_eligibility(tmp_path: Path) -> None:
     root, repository, predecessor, successor, study = _initialize_pair(tmp_path)
     request = _open_request(tmp_path, study)

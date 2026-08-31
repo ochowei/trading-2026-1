@@ -59,6 +59,7 @@ def test_authoring_skill_routes_modes_to_progressive_disclosure_references() -> 
         "evolve.md",
         "remove.md",
         "release.md",
+        "safety.md",
         "impact.md",
     }
 
@@ -72,6 +73,7 @@ def test_authoring_skill_routes_modes_to_progressive_disclosure_references() -> 
     assert "Read `references/evolve.md`" in skill_text
     assert "Read `references/remove.md`" in skill_text
     assert "Read `references/release.md`" in skill_text
+    assert "Read `references/safety.md`" in skill_text
     assert "Read `references/impact.md`" in skill_text
     assert "Read\n[`references/workflow-authoring-contract.md`]" not in skill_text
 

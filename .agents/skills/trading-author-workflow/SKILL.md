@@ -1,6 +1,6 @@
 ---
 name: trading-author-workflow
-description: Review, create, import, evolve, abandon, retire, and prepare approved releases for versioned repository research workflows under `workflows/`. Use for workflow authoring and version-impact decisions. Do not execute studies or decide study outcomes.
+description: Review, create, import, evolve, abandon, retire, assess release safety, clear resolved safety assessments, and prepare approved releases for versioned repository research workflows under `workflows/`. Use for workflow authoring and version-impact decisions. Do not execute studies or decide study outcomes.
 ---
 
 # Author Trading Workflows
@@ -22,6 +22,11 @@ background.
 - **Abandon, retire, or remove:** Read `references/remove.md`; also read
   `references/impact.md` for an active version.
 - **Release preparation:** Read `references/release.md` and `references/impact.md`.
+- **Release-safety assessment:** Read `references/safety.md` and `references/impact.md` when a draft
+  successor cannot pass release safety because its active predecessor has unsafe unfinished studies
+  or missing paused-study impact decisions.
+- **Release-safety clearance:** Read `references/safety.md` and `references/impact.md` when every
+  blocking study has reached a safe state and each required impact decision has exact evidence.
 
 Do not load unrelated mode references. Do not trigger this skill merely because the user wants to
 execute or evaluate an existing study.
@@ -32,6 +37,17 @@ Read `workflows/README.md`, the supplied source, and the exact active workflow w
 Search relevant code, shared documents, ADRs, references, and inbound links. Resolve repository
 facts yourself and label extracted material as `explicit`, `repository-fact`, `proposed`, `missing`,
 or `conflict`; never silently promote proposed material into a decision.
+
+For every registered version involved in the requested operation, inspect its exact control state:
+
+```bash
+uv run trading workflow version state <version-path> --json
+```
+
+Use `N02` through `N06` only for the exact version reported. Stop on `invalid`. Treat
+`indeterminate` as a legacy/capability limitation, never as proof that no safety assessment or
+family guard exists; inspect the canonical registry and release evidence and let the guarded
+writer fail closed. `outside-a1-2` is not an authoring state that can be reopened.
 
 Ask only unresolved decisions, one at a time and in dependency order. Include the recommended
 answer and main tradeoff. Low-risk editorial decisions may be confirmed together; deletion,
@@ -53,6 +69,7 @@ outcomes to `trading-evaluate-study`.
 
 ## Finish
 
-Report the selected mode and references loaded, files changed, validation results, source
-disposition, remaining open decisions, and whether the result is a local draft, prepared release,
-or explicitly activated effective release (or a documented legacy bootstrap release).
+Report the selected mode and references loaded, exact control-state results, files changed,
+validation results, source disposition, remaining open decisions, and whether the result is a
+local draft, open or cleared safety assessment, prepared release, or explicitly activated
+effective release (or a documented legacy bootstrap release).

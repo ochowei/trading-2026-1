@@ -13,11 +13,19 @@ user separately asks to author a workflow change.
 ## Orient first
 
 Resolve whether the user wants to start, preregister, run, pause, resume, cancel, or submit a study
-for review. Inspect the current lifecycle state and run:
+for review. Inspect the current lifecycle state and exact workflow-version control state, then run:
 
 ```bash
+uv run trading workflow version state <exact-version-path> --json
 uv run trading workflow validate <study-or-version-path>
 ```
+
+For new, preregister, start, resume, freeze, or other outcome-relevant work, a capability-aware
+active version must report `N04` or `N05`; `N02`, `N03`, and `N06` block those actions. Stop on
+`invalid`. An `indeterminate` legacy result is not a green light: verify the canonical registry,
+release/activation evidence, absence of a prepared successor, and absence of any supported open
+assessment, then rely on the guarded command to fail closed. A read-only query does not replace
+stage-specific human authority.
 
 Do not operate a draft workflow version. Do not silently move a study to another workflow version.
 Treat the workflow as the procedure definition and the study as one execution instance pinned to
@@ -150,9 +158,14 @@ uv run trading workflow study transition <study-path> \
   --to awaiting-review --by <identity>
 ```
 
-Stop there. Use `trading-evaluate-study` for judgment and completion. If a reviewer returns the
-study, record the reason while transitioning back to `running`; add only evidence allowed by the
-frozen plan.
+Stop there. Use `trading-evaluate-study` for judgment, completion, or a reviewer-authorized
+administrative return. The operator must not impersonate the reviewer. After the reviewer records
+their stable identity and concrete reason while transitioning the study back to `running`, verify
+those facts before accepting the handoff. The return may be recorded while a prepared successor or
+open safety assessment blocks family work; it is not permission to resume execution. Before adding
+evidence or performing any outcome-relevant work, query the exact version again and require
+G-FAMILY eligibility under the orientation rules above. Add only evidence allowed by the frozen
+plan.
 
 For `study-time-retrospective`, record and submit the exact terminal evidence package required by
 the pinned workflow, but do not infer its terminal outcome. The operator never turns missing or
@@ -161,6 +174,6 @@ applies the released fixed mapping.
 
 ## Finish
 
-Run sync and full validation after every mutation. Report the pinned workflow version, study ID,
-current state, commands and worker skills used, exact new evidence, deviations, and the next legal
-action. Never claim an awaiting-review study has passed or failed.
+Run sync and full validation after every mutation. Report the pinned workflow version, exact
+control-state result, study ID, current state, commands and worker skills used, exact new evidence,
+deviations, and the next legal action. Never claim an awaiting-review study has passed or failed.
