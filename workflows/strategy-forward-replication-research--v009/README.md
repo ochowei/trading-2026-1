@@ -9,8 +9,10 @@ source_changes:
 - workflows/strategy-forward-replication-research--v008/work/changes/categorized-results-layout-migration--c002
 - workflows/strategy-forward-replication-research--v008/work/changes/guarded-challenge-only-execution--c001
 - workflows/strategy-forward-replication-research--v008/work/changes/workflow-release-activation--c003
+- workflows/strategy-forward-replication-research--v008/work/changes/workflow-release-safety-persistence--c004
 capabilities:
 - study-time-retrospective-v1
+- workflow-release-safety-v1
 policies:
 - family: us-equity-market
   version: v002
@@ -70,7 +72,7 @@ only in the root `workflows/README.md` registry.
 
 ## Authoring basis
 
-Combine accepted v008/C001 guarded challenge-only execution, v008/C002 categorized result-layout migration, and v008/C003 immutable Workflow Release Activation, while preserving C001 implementation as an explicit release-readiness requirement and the confirmed v008/v009 bootstrap and v010 enforcement boundary.
+Combine accepted v008/C001 guarded challenge-only execution, v008/C002 categorized result-layout migration, v008/C003 immutable Workflow Release Activation, and v008/C004 guarded workflow release-safety persistence. Preserve the v009 bootstrap and v010 explicit activation boundary; workflow-release-safety-v1 becomes effective only when v009 is active.
 
 ## Errata
 

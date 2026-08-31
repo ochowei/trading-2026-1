@@ -7,9 +7,11 @@ import json
 from pathlib import Path
 
 from trading.workflow.authoring import (
+    ClearSafetyAssessmentRequest,
     CreateChangeRequest,
     CreateWorkflowRequest,
     EvolveWorkflowRequest,
+    OpenSafetyAssessmentRequest,
     WorkflowAuthoringError,
     WorkflowRepository,
 )
@@ -140,6 +142,23 @@ def register_parser(
     attest.add_argument("--approved-by", required=True)
     attest.add_argument("--required-from", required=True)
 
+    safety = commands.add_parser(
+        "safety", help="Persist guarded workflow release-safety assessments"
+    )
+    safety_commands = safety.add_subparsers(dest="workflow_safety_command", required=True)
+    assess = safety_commands.add_parser(
+        "assess", help="Open one immutable assessment for an active/draft version pair"
+    )
+    assess.add_argument("path", type=Path, help="Draft successor workflow version")
+    assess.add_argument("--request", type=Path, required=True)
+    assess.add_argument("--by", dest="actor", required=True)
+    clear = safety_commands.add_parser(
+        "clear", help="Close one assessment with immutable resolution evidence"
+    )
+    clear.add_argument("path", type=Path, help="Exact saNNN assessment directory")
+    clear.add_argument("--request", type=Path, required=True)
+    clear.add_argument("--approved-by", required=True)
+
 
 def cmd_workflow(args: argparse.Namespace) -> None:
     """Dispatch tracked workflow authoring, validation, and study operations."""
@@ -268,5 +287,22 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                     f"workflow activation attested: "
                     f"{activation['workflow']}@{activation['version']}"
                 )
+        elif args.workflow_command == "safety":
+            if args.workflow_safety_command == "assess":
+                request = OpenSafetyAssessmentRequest.from_path(args.request)
+                assessment = repository.open_safety_assessment(
+                    args.path,
+                    request,
+                    opened_by=args.actor,
+                )
+                print(f"workflow safety assessment opened: {assessment['assessment_id']}")
+            elif args.workflow_safety_command == "clear":
+                request = ClearSafetyAssessmentRequest.from_path(args.request)
+                clearance = repository.clear_safety_assessment(
+                    args.path,
+                    request,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow safety assessment cleared: {clearance['assessment_id']}")
     except WorkflowAuthoringError as exc:
         raise SystemExit(f"workflow error: {exc}") from exc

@@ -15,7 +15,7 @@ document:
             <li><strong>前一版（predecessor）：</strong>目前是 Active（目前生效），之後可能被接替的版本。</li>
             <li><strong>接替版（successor）：</strong>準備接替前一版的新版本，可以是 Draft（草稿）或 Prepared（已準備、等待啟用）。</li>
             <li><strong>同一流程系列（workflow family）：</strong>同一套 Workflow 的所有版本，例如 v008 與 v009。A1-2 不會把整個系列合成一個狀態。</li>
-            <li><strong>判定單位：</strong>每一個單一明確版本（exact version）都要分開判斷，而且只能符合一個 A1-2 狀態。</li>
+            <li><strong>判定單位：</strong>每一個已建立的單一明確版本（exact version）都要分開判斷，而且只能符合 N02–N06 一個狀態；N01 只是版本建立前的入口。</li>
             <li><strong>切換處理對象（handoff）：</strong>流程可以先去處理接替版，但不會改變前一版的狀態。</li>
             <li><strong>可以並存：</strong>前一版保持 Active 時，接替版可以同時處於 Draft 或 Prepared。</li>
             <li><strong>資料有問題時：</strong>資料不足或互相衝突就回報無法判定，不猜答案。</li>
@@ -60,7 +60,7 @@ document:
           L3N1(["L3-N1<br/>研究治理就緒"]) --> L3N2("L3-N2<br/>建立／推進零到多個 Sxxx<br/>須通過 G-FAMILY 與各階段人工核准")
           L3N2 --> L3N3{"L3-N3<br/>需要建立接替版？"}
           L3N3 -->|否／繼續研究| L3N2
-          L3N4("L3-N4<br/>處理前一版的安全問題") --> L3N5{"L3-N5<br/>安全檢查完成？"}
+          L3N4("L3-N4<br/>處理前一版的安全問題<br/>建立 ASSESSMENT.json") --> L3N5{"L3-N5<br/>可建立 CLEARANCE.json？"}
           L3N5 -->|否；繼續處理安全問題／補齊影響紀錄| L3N4
         end
 
@@ -69,7 +69,7 @@ document:
         L2N2 -->|前一版的安全或影響處理未完成<br/>暫時改處理前一版| L3N4
         L2N6 -->|接替版成為 Active；前一版此時才 Superseded| L3N1
         L3N3 -.->|是／只切換處理對象<br/>前一版保持 N04／N05| L1N1
-        L3N5 -.->|是／回到同一個 N02 接替版<br/>重新檢查發布條件| L2N1
+        L3N5 -.->|是／關閉證據成立後<br/>回到同一個 N02 接替版| L2N1
               </pre>
               <div id="wgl-mermaid-status" class="wgl-render-status text-small" aria-live="polite">正在整理 A1…</div>
             </div>
@@ -118,12 +118,12 @@ document:
         </section>
     a1_2: |-
       <section class="wgl-diagram" aria-labelledby="wgl-aligned-state-machine-title">
-          <h2 id="wgl-aligned-state-machine-title">A1-2｜每一個 Workflow 版本目前在哪個狀態</h2>
+          <h2 id="wgl-aligned-state-machine-title">A1-2｜五個版本狀態與一個建立入口</h2>
           <ul class="wgl-fsm-notation text-small" aria-label="A1-2 判定原則">
             <li><strong>判定單位：</strong>一次只判斷一個 <code>workflows/&lt;slug&gt;--vNNN</code> 版本，不把整個同一流程系列合成一個狀態。</li>
             <li><strong>唯一狀態：</strong>同一版本必須只符合 N02–N06 其中一個。零個或多個都回 invalid（資料矛盾）／indeterminate（資料不足），不可猜測。</li>
             <li><strong>可以並存：</strong>Active 前一版可與 Draft／Prepared 接替版同時存在；但 Prepared 接替版會阻止新的結果相關研究工作。</li>
-            <li><strong>N01 是入口：</strong>此時接替版尚未取得正式版本路徑，所以 N01 不是已存在版本的持久化狀態。</li>
+            <li><strong>N01 是入口情境：</strong>此時接替版尚未取得正式版本路徑，所以 N01 不屬於 exact-version FSM，也不是已存在版本的持久化狀態。</li>
             <li><strong>切換處理對象：</strong><code>HANDOFF ONLY</code> 表示開始處理接替版，但前一版仍保持 Active，不會退回 Draft。</li>
             <li><strong>圖的關係：</strong>Overview、A、B、C 是同一套狀態機的不同視圖，不是四套狀態機。</li>
             <li><strong>範圍：</strong>已離開控制流程的註冊表（registry）狀態不在本圖；Sxxx 的生命週期只屬於 A1-3。</li>
@@ -141,9 +141,10 @@ document:
 
           <div class="wgl-a12-segments">
             <section class="wgl-a12-segment" aria-labelledby="wgl-a12-overview-title">
-              <h3 id="wgl-a12-overview-title">A1-2 Overview｜六個節點與主要流程</h3>
+              <h3 id="wgl-a12-overview-title">A1-2 Overview｜一個入口、五個版本狀態</h3>
               <ul class="wgl-fsm-notation text-small" aria-label="A1-2 Overview 說明">
-                <li>這張圖先顯示 N01–N06 與最主要的狀態變化。</li>
+                <li>N01 是接替版尚未建立前的入口情境；N02–N06 才是單一明確版本的 control states。</li>
+                <li>依 exact version path 查詢時，只能回 N02–N06、invalid、indeterminate，或已離開本圖範圍；不能回 N01。</li>
                 <li>舊版 bootstrap 例外（既定舊版本可免另行啟用）、切換處理對象與發布安全協調也會顯示；細節請看 A／B／C 與下方動作對照表。</li>
               </ul>
               <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2 Overview">
@@ -158,13 +159,13 @@ document:
                 <div id="wgl-a12-overview-viewport" class="wgl-zoom-viewport" tabindex="0" aria-label="可縮放與拖曳的 A1-2 Overview" aria-describedby="wgl-a12-overview-help">
                   <pre class="mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas" data-diagram="a1-2-overview">
       flowchart TB
-        N01["A12-N01<br/>[L1 入口]<br/>尚未建立接替版"] -->|A12-A03| N02["A12-N02<br/>[L1→L2 共同邊界]<br/>接替版 Draft（草稿）"]
+        N01["A12-N01<br/>[L1 入口情境；非版本狀態]<br/>尚未建立接替版"] -->|A12-A03| N02["A12-N02<br/>[L1→L2 共同邊界]<br/>接替版 Draft（草稿）"]
         N02 -->|A12-A05A| N03["A12-N03<br/>[L2，視版本而定]<br/>Prepared（已準備、等待啟用）"]
         N03 -->|A12-A07| N04["A12-N04<br/>[L3 共同邊界]<br/>Active（目前生效）／0 個未完成研究"]
         N02 -.->|A12-A05B · bootstrap 例外| N04
         N04 -->|A12-A08| N05["A12-N05<br/>[L3]<br/>Active（目前生效）／1..n 個未完成研究"]
         N05 -->|A12-A10| N04
-        N05 -->|A12-A12| N06["A12-N06<br/>[L3；持久化缺口]<br/>前一版的安全檢查進行中"]
+        N05 -->|A12-A12| N06["A12-N06<br/>[L3；v009 capability]<br/>前一版的安全檢查進行中"]
         N06 -->|A12-A13| N04
         N06 -->|A12-A13| N05
         N04 -.->|A12-A11 · HANDOFF ONLY| N01
@@ -178,10 +179,10 @@ document:
             </section>
 
             <section class="wgl-a12-segment" aria-labelledby="wgl-a12a-title">
-              <h3 id="wgl-a12a-title">A1-2A｜L1 建立接替版的正式版本身分</h3>
+              <h3 id="wgl-a12a-title">A1-2A｜L1 從入口建立正式版本身分</h3>
               <span class="wgl-shared-boundary text-small">N02 共同邊界：A 與 B 顯示的是同一個接替版 Draft</span>
               <ul class="wgl-fsm-notation text-small" aria-label="A1-2A 說明">
-                <li>N01 只代表「準備建立接替版」；此時還沒有正式版本路徑。</li>
+                <li>N01 只代表「準備建立接替版」的入口情境；此時還沒有正式版本路徑，也還沒有可查詢的版本狀態。</li>
                 <li>A12-A03 配發路徑並註冊 Draft 後，流程才開始判斷 N02 這個單一明確版本。</li>
               </ul>
               <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2A">
@@ -196,7 +197,7 @@ document:
                 <div id="wgl-a12a-viewport" class="wgl-zoom-viewport" tabindex="0" aria-label="可縮放與拖曳的 A1-2A" aria-describedby="wgl-a12a-help">
                   <pre class="mermaid wgl-mermaid wgl-a12-diagram wgl-zoom-canvas" data-diagram="a1-2a-identity-formation">
       flowchart LR
-        ENTRY(("入口")) -->|A12-A01| N01["A12-N01<br/>準備建立接替版<br/>尚無正式版本路徑"]
+        ENTRY(("入口")) -->|A12-A01| N01["A12-N01<br/>入口情境；非版本狀態<br/>尚無正式版本路徑"]
         N01 -->|A12-A02| N01
         N01 -->|A12-A03| N02["A12-N02<br/>接替版 Draft（草稿）<br/>共同邊界"]
                   </pre>
@@ -231,7 +232,7 @@ document:
         N03 -->|A12-A06| N03
         N03 -->|A12-A07| N04["A12-N04<br/>Active（目前生效）／0 個未完成研究<br/>共同邊界"]
         N02 -.->|A12-A05B · bootstrap 例外| N04
-        N06PORT["A1-2C／N06<br/>處理前一版的安全問題"]
+        N06PORT["A1-2C／N06<br/>未關閉的安全評估<br/>v009 capability"]
         N02 -.->|A12-A12| N06PORT
         N06PORT -.->|A12-A13| N02
                   </pre>
@@ -247,8 +248,9 @@ document:
                 <li>N04–N06 判斷的都是同一個 Active 前一版。</li>
                 <li>A12-A08／A09 要建立或推進研究時，仍須通過 A1-3 的 G-FAMILY 與該階段的人工核准。</li>
                 <li>A12-A11 只會開始處理新的接替版需求；前一版仍留在 N04／N05。</li>
-                <li>A12-A12 會從接替版 N02 暫時切到前一版 N06；A12-A13 完成安全處理後，再回到原本同一個 N02 重試發布檢查。</li>
-                <li>目前儲存庫（repository）尚未持久化安全評估（safety assessment）的開啟／關閉狀態，因此 N04／N05／N06 仍有持久化／CLI 實作缺口。</li>
+                <li>A12-A12 會從接替版 N02 暫時切到前一版 N06；後續須由 <code>ASSESSMENT.json</code> 持久化開啟事實。</li>
+                <li>A12-A13 完成安全處理後，後續須由 <code>CLEARANCE.json</code> 持久化關閉事實，再回到原本同一個 N02 重試發布檢查。</li>
+                <li>上述 artifacts、guarded writer 與 validator 已納入 v009 Draft；v009 Active 後可成為 persistence authority。目前剩下 state-query CLI blocker，而且不可回填 v008 歷史。</li>
               </ul>
               <div class="wgl-zoom-panel" data-zoom-pan data-zoom-label="A1-2C">
                 <div class="wgl-zoom-controls" role="group" aria-label="A1-2C 圖表縮放控制">
@@ -267,10 +269,10 @@ document:
         N05 -->|A12-A10| N04
         N04 -->|A12-A11| N04
         N05 -->|A12-A11| N05
-        N05 -->|A12-A12| N06["A12-N06<br/>Active 前一版<br/>安全檢查進行中"]
+        N05 -->|A12-A12| N06["A12-N06<br/>Active 前一版<br/>未關閉的安全評估"]
         N06 -->|A12-A13 · 無暫停研究| N04
         N06 -->|A12-A13 · 仍有暫停研究| N05
-        N01PORT["A1-2A／N01<br/>新的接替版需求"]
+        N01PORT["A1-2A／N01<br/>新的接替版入口情境"]
         N02PORT["A1-2B／N02<br/>原本同一個接替版 Draft"]
         N04 -.->|HANDOFF ONLY| N01PORT
         N05 -.->|HANDOFF ONLY| N01PORT
@@ -309,9 +311,9 @@ document:
                 <tr><th>Action ID</th><th>起點 → 終點</th><th>成立條件與結果</th></tr>
               </thead>
               <tbody>
-                <tr><th colspan="3">A1-2A｜L1 建立接替版的正式版本身分</th></tr>
-                <tr><td>A12-A01</td><td>入口 → N01</td><td>收到建立或變更需求；接替版尚未取得正式版本路徑。</td></tr>
-                <tr><td>A12-A02</td><td>N01 → N01</td><td>預覽失敗或需要修改；留在 N01，重新整理輸入。</td></tr>
+                <tr><th colspan="3">A1-2A｜L1 從入口建立接替版的正式版本身分</th></tr>
+                <tr><td>A12-A01</td><td>入口 → N01</td><td>收到建立或變更需求；接替版尚未取得正式版本路徑，N01 仍是入口情境而不是版本狀態。</td></tr>
+                <tr><td>A12-A02</td><td>N01 → N01</td><td>預覽失敗或需要修改；留在入口情境，重新整理輸入。</td></tr>
                 <tr><td>A12-A03</td><td>N01 → N02</td><td>配發正式版本路徑並註冊 Draft；從這一步起才有可判定的單一明確版本。</td></tr>
                 <tr><th colspan="3">A1-2B｜L2 接替版的發布與啟用</th></tr>
                 <tr><td>A12-A04</td><td>N02 → N02</td><td>修正同一個 Draft，包括既有草稿、重新預覽、修復發布條件或未取得發布核准後的修改；不退回 N01，也不更換版本身分。</td></tr>
@@ -324,8 +326,8 @@ document:
                 <tr><td>A12-A09</td><td>N05 → N05</td><td>建立更多 Sxxx，或預先登記、開始、恢復、凍結候選、推進既有研究。每個會影響結果的動作，都要通過 G-FAMILY、凍結計畫檢查與該階段的人工核准。</td></tr>
                 <tr><td>A12-A10</td><td>N05 → N04</td><td>所有 Sxxx 都已 Completed 或 Cancelled，不再有未完成研究。</td></tr>
                 <tr><td>A12-A11</td><td>N04／N05 保持原狀；另切到 N01</td><td>開始整理接替版需求，不要求先暫停未完成研究。前一版保持 N04／N05；<code>HANDOFF ONLY</code> 只切換處理對象，也不授權準備發布。</td></tr>
-                <tr><td>A12-A12</td><td>接替版保持 N02；前一版 N05 → N06</td><td>接替版已在 N02 並嘗試準備發布。若前一版仍有不安全的研究，或暫停研究的影響決定不完整，就暫時改處理前一版並開啟持久化安全評估。</td></tr>
-                <tr><td>A12-A13</td><td>前一版 N06 → N04／N05；再回到原本的接替版 N02</td><td>所有研究都已 Paused、Completed 或 Cancelled，必要的影響決定已記錄，且安全評估可以正式關閉。前一版依未完成研究數回到 N04 或 N05，再對原本 N02 重做發布檢查；不得建立第二個接替版。</td></tr>
+                <tr><td>A12-A12</td><td>接替版保持 N02；前一版 N05 → N06</td><td>接替版已在 N02 並嘗試準備發布。若前一版仍有不安全的研究，或暫停研究的影響決定不完整，就暫時改處理前一版。v009 contract 已加入 guarded writer，由 <code>workflow safety assess</code> 建立不可變的 <code>ASSESSMENT.json</code>；這項 authority 要等 v009 成為 Active 才生效。</td></tr>
+                <tr><td>A12-A13</td><td>前一版 N06 → N04／N05；再回到原本的接替版 N02</td><td>所有研究都已 Paused、Completed 或 Cancelled，必要的影響決定已記錄後，由 <code>workflow safety clear</code> 建立綁定 assessment digest 的不可變 <code>CLEARANCE.json</code>；完成後依未完成研究數回到 N04 或 N05，再對原本 N02 重做發布檢查。</td></tr>
                 <tr><th colspan="3">切換處理對象的邊界</th></tr>
                 <tr><td>HANDOFF ONLY</td><td>Active 前一版 → N01 接替版需求</td><td>只把接下來要處理的對象換成尚未建立的接替版；這不是同一版本的狀態轉換，前一版不會回到 Draft。</td></tr>
               </tbody>
@@ -333,17 +335,47 @@ document:
           </div>
           <div class="table-responsive">
             <table class="table table-sm">
-              <caption>A1-2 狀態判定表：每一列只判斷一個單一明確版本；所在層級只說明工作發生在哪裡，不會改變判定對象。</caption>
+              <caption>A1-2 的發布安全證據：schema、guarded writer 與 validator 已納入 v009 Draft；v009 成為 Active 後才是有效 contract。目前沒有 A1-2 state-query CLI。</caption>
+              <thead>
+                <tr><th>項目</th><th>v009 contract／實作規則</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>保存位置</td><td>放在接替版的 <code>work/release-safety/saNNN/</code>；安全評估同時綁定 Active 前一版與 N02 接替版，不改變兩者的 registry status。</td></tr>
+                <tr><td><code>ASSESSMENT.json</code></td><td>不可變的開啟證據；至少綁定 workflow family、前一版與接替版的 exact path／version、接替版 <code>WORKFLOW.md</code> digest、阻擋中的 Sxxx、缺少的 impact decision、原因、時間與操作者。</td></tr>
+                <tr><td><code>CLEARANCE.json</code></td><td>不可變的關閉證據；必須綁定對應 <code>ASSESSMENT.json</code> digest、每個阻擋項目的處理結果、時間與核准者。</td></tr>
+                <tr><td>唯一性</td><td>同一對前一版／接替版最多只能有一份有效且尚未關閉的 assessment。多份未關閉紀錄、identity 衝突或 digest 不符都回 <code>invalid</code>。</td></tr>
+                <tr><td>目前限制</td><td>Artifact schema、guarded writer 與 validator 已實作，但 capability 仍只在 v009 Draft。v009 尚未 Active 前，不能回填 v008 歷史，也不能把 v008 的「檔案不存在」解讀成「確定沒有進行中的安全評估」。第 5 項 state-query CLI 仍未實作。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <caption>A1-2 判定優先序：只適用 N02–N06；N01 是入口情境，不參與 exact-version state matching。</caption>
+              <thead>
+                <tr><th>順序</th><th>判定方式</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>先驗證 exact version identity、registry、<code>RELEASE.json</code> 與適用的 <code>ACTIVATION.json</code>。資料衝突、digest 錯誤或同時符合多個 lifecycle 條件時回 <code>invalid</code>。</td></tr>
+                <tr><td>2</td><td><code>draft</code> 判為 N02；需要明確啟用且有效的 <code>prepared</code> 判為 N03。</td></tr>
+                <tr><td>3</td><td>對 Active 版本先查是否有唯一、有效且未被 <code>CLEARANCE.json</code> 關閉的 assessment。若有，優先判為 N06，不看未完成研究數。</td></tr>
+                <tr><td>4</td><td>沒有未關閉 assessment 時，未完成研究數為 0 判 N04；至少 1 個判 N05。Paused 仍算未完成，只有 Completed 與 Cancelled 不算。</td></tr>
+                <tr><td>5</td><td>必要資料沒有矛盾但仍不足時回 <code>indeterminate</code>。對目前仍由 v008 治理的歷史邊界，N04／N05／N06 的嚴格判定仍停在這裡；v009 Active 後才可依 capability 與已驗證 artifacts 判定。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <caption>A1-2 狀態判定表：N01 是入口情境；N02–N06 才各自判斷一個單一明確版本。所在層級只說明工作發生在哪裡，不會改變判定對象。</caption>
               <thead>
                 <tr><th>節點</th><th>所在層級</th><th>正在判斷誰</th><th>儲存庫中的判定依據</th><th>唯一性／無法判定時</th></tr>
               </thead>
               <tbody>
-                <tr><td>N01</td><td>L1 入口</td><td>尚未建立的接替版需求</td><td>還沒有正式版本路徑，因此沒有單一明確版本可查。</td><td>N01 只是入口；依版本查詢的 CLI 不得把它猜成版本狀態。</td></tr>
+                <tr><td>N01</td><td>L1 入口</td><td>尚未建立的接替版需求</td><td>還沒有正式版本路徑，因此沒有單一明確版本可查。</td><td>N01 是 exact-version FSM 外的入口情境；依版本查詢的 CLI 不得回傳 N01。</td></tr>
                 <tr><td>N02</td><td>L1→L2 共同邊界</td><td>接替版 Draft</td><td><code>status=draft</code>，而且沒有 <code>RELEASE.json</code>。</td><td>L1 負責建立／修正，L2 負責發布檢查；同一版本不能同時是 N03–N06。</td></tr>
                 <tr><td>N03</td><td>L2</td><td>接替版 Prepared</td><td>版本需要明確啟用，<code>status=prepared</code>，已有有效發布資料，但還沒有相符的啟用資料。</td><td>可與 Active 前一版並存；但同一流程系列的限制會阻止新的結果相關研究工作。</td></tr>
-                <tr><td>N04</td><td>L3</td><td>Active 版本</td><td>註冊表與發布資料有效；需要明確啟用的版本另須相符的 <code>ACTIVATION.json</code>；未完成研究數為 0；另須持久化資料證明沒有進行中的安全評估。</td><td>同一版本不能同時是 N05／N06；接替版是另一個版本。目前仍缺安全評估開啟／關閉的持久化資料。</td></tr>
-                <tr><td>N05</td><td>L3</td><td>Active 版本</td><td>註冊表、發布與適用的啟用資料有效；未完成研究數至少為 1；另須持久化資料證明沒有進行中的安全評估。</td><td>Paused 仍算未完成。缺少安全評估資料時，不能只看研究數就排除 N06。</td></tr>
-                <tr><td>N06</td><td>L3</td><td>Active 前一版</td><td>註冊表、發布與適用的啟用資料有效，而且有持久化資料證明安全評估仍在進行；原因可包含不安全研究、暫停研究的影響決定不完整，或尚未正式關閉。</td><td>進行中的安全評估優先於未完成研究數。目前缺這份持久化資料；需要區分 N04／N05／N06 時應回 invalid（資料矛盾）／indeterminate（資料不足）。</td></tr>
+                <tr><td>N04</td><td>L3</td><td>Active 版本</td><td>註冊表與發布資料有效；需要明確啟用的版本另須相符的 <code>ACTIVATION.json</code>；適用的 safety capability 下沒有有效且未關閉的 assessment；未完成研究數為 0。</td><td>先排除 N06，再依研究數判定。v009 Active 後可由 artifacts 嚴格判斷；目前 v008 不可回填，仍須回 <code>indeterminate</code>。</td></tr>
+                <tr><td>N05</td><td>L3</td><td>Active 版本</td><td>註冊表、發布與適用的啟用資料有效；適用的 safety capability 下沒有有效且未關閉的 assessment；未完成研究數至少為 1。</td><td>Paused 仍算未完成。v009 Active 後可先排除 N06，再依研究數判定；目前 v008 仍須回 <code>indeterminate</code>。</td></tr>
+                <tr><td>N06</td><td>L3</td><td>Active 前一版</td><td>註冊表、發布與適用的啟用資料有效，而且接替版下有唯一、有效、明確綁定此前一版且尚無相符 <code>CLEARANCE.json</code> 的 <code>ASSESSMENT.json</code>。</td><td>N06 優先於未完成研究數。Writer 與 validator 已實作；多份未關閉紀錄或 identity／digest 衝突回 <code>invalid</code>，但 capability 尚未生效或必要資料不足時回 <code>indeterminate</code>。</td></tr>
               </tbody>
             </table>
           </div>
@@ -361,6 +393,7 @@ document:
             <ul>
               <li>G-FAMILY 只判斷「現在能不能執行某個動作」，不是新的 Sxxx 狀態。</li>
               <li>建立、預先登記、開始、恢復、凍結候選，以及其他會影響結果的動作，都要求研究綁定的版本目前有效且 Active、同一流程系列沒有 Prepared 接替版，而且該版本沒有進行中的安全評估。</li>
+              <li>安全評估證據是接替版下成對的 <code>ASSESSMENT.json</code>／<code>CLEARANCE.json</code>。Guarded writer 與 validator 已實作並由 v009 capability 授權；v009 尚未 Active 前，不可把它回溯套用到 v008。</li>
               <li>建立研究另需建立 Draft 的權限；預先登記需完整計畫（plan）並在當次轉換凍結；開始、恢復與凍結候選另需有效的凍結計畫及各階段人工核准。</li>
               <li>Prepared 限制不阻止暫停、取消、審查者退回或完成審查；但審查者退回後，G-FAMILY 再次成立前不得執行結果相關工作。</li>
               <li>Paused 仍算未完成；只有 Completed 與 Cancelled 不算未完成。</li>
@@ -441,10 +474,10 @@ presentation:
 a1_details:
   L1N1:
     title: L1-N1｜接替版需求
-    summary: 先整理為什麼要建立或修改接替版；此時還沒有正式版本路徑。
+    summary: 先整理為什麼要建立或修改接替版；此時只是 N01 入口情境，還沒有正式版本路徑或版本狀態。
     input: 第一次建立 Workflow 的需求，或 Active 前一版產生的研究回饋、治理缺口與變更需求。開始整理接替版時，不要求先把研究全部安全化。
     next: 整理成內容完整的建立／變更需求，並明確說明接下來要建立接替版。
-    guard: 接替版尚未取得正式路徑；前一版保持 Active，不會回到 Draft。依版本查詢的 CLI 也不能把 N01 當成已存在的版本狀態。
+    guard: 接替版尚未取得正式路徑；前一版保持 Active，不會回到 Draft。依版本查詢的 CLI 不能回傳 N01。
   L1N2:
     title: L1-N2｜AI 預覽與檢查
     summary: AI 讀取儲存庫與需求，產生不寫入檔案的預覽。
@@ -473,13 +506,13 @@ a1_details:
     title: L2-N1｜AI 發布檢查
     summary: CLI 與 Agent 檢查同一個 N02 接替版是否具備準備發布的條件。
     input: 完整 Workflow 規格、已接受的修改、整體影響、N02 接替版、Active 前一版的研究，以及固定的政策／相依版本。
-    next: 把檢查結果交給 L2-N2；若前一版的安全或影響處理不完整，就暫時改處理 N06，完成後再回原本 N02 重試。
-    guard: 任何缺口都要停止發布。AI 檢查不能取代人工發布核准，也不能在重試時建立第二個接替版。
+    next: 把檢查結果交給 L2-N2；若前一版的安全或影響處理不完整，就暫時改處理 N06，後續以成對 safety artifacts 記錄開啟／關閉，再回原本 N02 重試。
+    guard: 任何缺口都要停止發布。AI 檢查不能取代人工發布核准，也不能在重試時建立第二個接替版；v009 safety writer 只保存證據，不授予發布權限。
   L2N2:
     title: L2-N2｜發布條件通過？
     summary: 把結果分成三類：可以準備發布、要修正同一個 Draft，或要先處理前一版的安全問題。
     input: L2-N1 完整的發布就緒檢查結果。
-    next: 通過就請求人類核准；接替版內容或固定版本有缺口就走 A12-A04；前一版的安全或暫停研究影響有缺口就走 A12-A12 到 N06。
+    next: 通過就請求人類核准；接替版內容或固定版本有缺口就走 A12-A04；前一版的安全或暫停研究影響有缺口就走 A12-A12 到 N06，後續須建立 <code>ASSESSMENT.json</code>。
     guard: 研究安全只會阻止準備發布或啟用，不會阻止建立 N01 需求或 N02 Draft；處理安全問題期間，接替版仍保持 N02。
   L2N3:
     title: L2-N3｜人工發布核准？
@@ -522,7 +555,7 @@ a1_details:
     summary: 一個版本已依適用的發布邊界成為 Active，並以自己的版本身分進入研究治理。
     input: 依同一流程系列設定完成版本啟用的版本，或符合明文且已凍結 bootstrap 規則的邊界前版本，以及不可變證據與固定版本。
     next: 可以建立或推進 0..n 個彼此獨立的 Sxxx；每個 Sxxx 的生命週期請看 A1-3。
-    guard: 此版本只能符合一個 L3 狀態；Draft 接替版可以並存。Prepared 接替版或進行中的安全評估都會阻止新的結果相關研究工作。
+    guard: 此版本只能符合一個 L3 狀態；Draft 接替版可以並存。Prepared 接替版或未關閉的安全評估都會阻止新的結果相關研究工作。Safety writer／validator 已實作，但 v009 capability 要等 v009 Active 才生效。
   L3N2:
     title: L3-N2｜建立／推進零到多個 Sxxx
     summary: 在同一個 Active 版本下，分別管理多個獨立的 Sxxx 研究實例。
@@ -538,33 +571,33 @@ a1_details:
   L3N4:
     title: L3-N4｜處理前一版的安全問題
     summary: 接替版已在 N02 並嘗試準備發布，因此流程暫時改去處理 Active 前一版的 N06。
-    input: 進行中的持久化安全評估、不安全的 Sxxx，或尚未完成的暫停研究影響決定／關閉程序。
-    next: 由研究操作人員（operator）／獨立審查者（reviewer）合法地讓研究進入 Paused、Completed 或 Cancelled，補齊影響決定，再檢查安全評估能否關閉。
-    guard: Workflow 作者（Author）不能代替研究操作人員或獨立審查者。目前缺少正式持久化的安全評估資料，未來 CLI 不得只靠說明文字或研究數量推定 N06。
+    input: 由 <code>ASSESSMENT.json</code> 綁定的前一版／接替版 identity、不安全的 Sxxx，或尚未完成的暫停研究影響決定。
+    next: 由研究操作人員（operator）／獨立審查者（reviewer）合法地讓研究進入 Paused、Completed 或 Cancelled，補齊影響決定，再檢查是否可建立 <code>CLEARANCE.json</code>。
+    guard: Workflow 作者（Author）不能代替研究操作人員或獨立審查者。Artifacts、guarded writer 與 validator 已納入 v009 Draft；state-query CLI 仍不得只靠說明文字或研究數量推定 N06。
   L3N5:
     title: L3-N5｜安全檢查完成？
-    summary: 確認前一版的發布安全處理是否完整，以及持久化安全評估能否正式關閉。
-    input: 前一版下所有 Sxxx 的正式生命週期狀態，以及每個暫停研究的影響決定。
-    next: 所有研究都安全、必要影響決定完整，而且安全評估已關閉後，N06 依未完成研究數回到 N04／N05；再回原本同一個 N02 接替版重做發布檢查。
-    guard: 安全評估關閉前維持 N06；不得建立 N01 或第二個接替版，也不得讓前一版回到 Draft。
+    summary: 確認前一版的發布安全處理是否完整，以及是否可建立不可變的關閉證據。
+    input: 前一版下所有 Sxxx 的正式生命週期狀態、每個暫停研究的影響決定，以及已保存的 <code>ASSESSMENT.json</code> identity／digest。
+    next: 所有研究都安全、必要影響決定完整，且後續建立相符的 <code>CLEARANCE.json</code> 後，N06 才依未完成研究數回到 N04／N05；再回原本同一個 N02 接替版重做發布檢查。
+    guard: 相符的關閉證據建立前維持 N06；不得建立 N01 或第二個接替版，也不得讓前一版回到 Draft。Writer 只建立 add-only evidence，不會自動發布或啟用版本。
 diagram_aria_labels:
-  a1-main: A1：前一版保持 Active；流程可以先整理接替版需求。只有接替版準備發布時，才暫時改去處理前一版的安全問題，完成後回到原本的接替版。每個節點都可開啟詳細說明
-  a1-2-overview: A1-2 Overview：同一套版本狀態機的 N01 到 N06、主要流程、舊版 bootstrap 例外、切換處理對象與發布安全協調
-  a1-2a-identity-formation: A1-2A：接替版需求經過預覽、配發正式路徑並註冊後，成為可判定的 Draft 版本
-  a1-2b-release-activation: A1-2B：接替版 Draft 依同一流程系列設定進入 Prepared 或 Active；若前一版有安全缺口，處理完成後回到原本同一個 Draft
-  a1-2c-active-governance: A1-2C：同一個 Active 前一版只能符合 N04、N05、N06 其中一個；A12-A11 只開始處理新的接替版需求，A12-A12 與 A12-A13 則回到原本同一個 N02 接替版重試發布檢查
+  a1-main: A1：前一版保持 Active；流程可以先整理接替版需求。只有接替版準備發布時，才暫時改去處理前一版的安全問題；v009 contract 以 ASSESSMENT.json 與 CLEARANCE.json 記錄開啟及關閉。每個節點都可開啟詳細說明
+  a1-2-overview: A1-2 Overview：N01 是版本建立前的入口情境，N02 到 N06 是五個版本 control states；圖中另顯示舊版 bootstrap 例外、切換處理對象與發布安全協調
+  a1-2a-identity-formation: A1-2A：N01 入口情境經過預覽、配發正式路徑並註冊後，才成為可判定的 N02 Draft 版本
+  a1-2b-release-activation: A1-2B：接替版 Draft 依同一流程系列設定進入 Prepared 或 Active；若前一版有安全缺口，v009 capability 由成對 safety artifacts 記錄處理後回到原本同一個 Draft
+  a1-2c-active-governance: A1-2C：同一個 Active 前一版只能符合 N04、N05、N06 其中一個；v009 Active 後，未關閉 assessment 優先判 N06，否則依未完成研究數判 N04 或 N05
   a1-study-state-machine: A1-3：單一 Sxxx 研究實例的七個狀態；建立、預先登記、開始、恢復與凍結等動作受 G-FAMILY 與各階段人工核准約束，Workflow 版本條件不會變成新的研究狀態
 render_status:
   a1_mobile: 滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。
   a1_desktop: 滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。
   a1_2:
-    a1-2-overview: Overview 已顯示同一套狀態機的 N01–N06、主要流程、舊版例外、A12-A11 切換處理對象，以及 A12-A12／A13 的發布安全協調；完整條件請看下方動作對照表。
-    a1-2a-identity-formation: A1-2A 已顯示 N01 入口、A12-A01–A03 與 N02 共同邊界；只有 A12-A03 完成後，才有可依版本路徑判定的接替版。
+    a1-2-overview: Overview 已顯示 N01 入口情境、N02–N06 五個版本狀態、舊版例外、A12-A11 切換處理對象，以及 A12-A12／A13 的發布安全協調；完整條件請看下方表格。
+    a1-2a-identity-formation: A1-2A 已顯示 N01 入口情境、A12-A01–A03 與 N02 共同邊界；只有 A12-A03 完成後，才有可依版本路徑判定的接替版。
     a1-2b-release-activation: A1-2B 已顯示 N02–N04、A12-A04–A07，以及 A12-A12／A13 暫時改處理前一版後，再回到同一個 N02；A12-A07 只接受相符的 ACTIVATION.json。
     a1-2c-active-governance: A1-2C 已顯示 N04–N06 與 A12-A08–A13；A12-A11 只開始處理新的 N01 需求，A12-A12／A13 則回到原本同一個 N02 接替版。
   interaction_enabled: 可在 75%–200% 間縮放，並以拖曳、觸控或方向鍵移動。
   interaction_disabled: 縮放控制目前關閉；圖表維持 100%。
-  a1_3: A1-3 仍是每一個 Sxxx 各自使用的七狀態生命週期。G-FAMILY、Prepared 接替版與進行中的安全評估只會限制可執行的動作，不是新的 Sxxx 狀態。
+  a1_3: A1-3 仍是每一個 Sxxx 各自使用的七狀態生命週期。G-FAMILY、Prepared 接替版與進行中的安全評估只會限制可執行的動作，不是新的 Sxxx 狀態；safety writer／validator 已納入 v009 Draft，state-query CLI 仍待後續實作。
   load_errors:
     a1: A1 載入失敗；上方仍可閱讀 Mermaid 原始文字。
     a1_2: 此 A1-2 分段圖載入失敗；上方仍可閱讀 Mermaid 原始文字。

@@ -192,7 +192,7 @@ CLI parser registration and handlers grouped by public responsibility.
 | File | Purpose |
 |---|---|
 | `legacy.py` | Explicit `trading legacy ...` tree with read-only diagnostics and fail-closed retired operations. The former top-level aliases no longer exist. |
-| `workflow.py` | Workflow authoring, validation, release, and study parser/handler. |
+| `workflow.py` | Workflow authoring, validation, release, activation, guarded release-safety persistence, and study parser/handler. |
 | `research.py` | Workflow-native definition listing, snapshot, run, and exact orchestration provenance. |
 
 ### `src/trading/legacy/`
@@ -204,8 +204,8 @@ package authorizes new research or result publication.
 
 ### `src/trading/workflow/`
 
-Canonical workflow lifecycle implementation: authoring, studies, exact-study qualification,
-terminal evidence, and qualification orchestration. Historical `trading.core.*` imports alias these
+Canonical workflow lifecycle implementation: authoring, guarded release-safety persistence and
+validation, studies, exact-study qualification, terminal evidence, and qualification orchestration. Historical `trading.core.*` imports alias these
 same module objects so monkeypatching and process-global state remain compatible.
 
 ### `src/trading/market_data/`
@@ -374,6 +374,8 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/<slug>--vNNN/STAGES_AND_OUTCOMES.md` | Optional version companion containing full and plain-language stage/outcome guidance; when declared `reference` plus `pinned: true`, release evidence fixes its exact bytes while `WORKFLOW.md` remains the sole behavioral authority. |
 | `workflows/<slug>--vNNN/work/studies/<study>/` | Route/spec, preregistered plan, add-only Development authorization, candidate freeze, metadata, evidence, conclusion, and outcome for a workflow study when present. |
 | `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
+| `workflows/<slug>--vNNN/work/release-safety/saNNN/ASSESSMENT.json` | Immutable capability-gated opening evidence under a Draft successor, binding its exact Active predecessor, workflow digest, blocking studies, missing impact decisions, current time, and actor. |
+| `workflows/<slug>--vNNN/work/release-safety/saNNN/CLEARANCE.json` | Optional immutable closing evidence binding the exact assessment digest and one safe, evidence-digested resolution for every blocking study. |
 | `workflows/.authoring.lock` | Ignored local advisory lock shared only by workflow authoring writers; it is not lifecycle evidence or repository authority. |
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or
@@ -391,6 +393,15 @@ alternate authoring happy paths. Each family's `activation_required_from` bounda
 first version using `draft -> prepared -> active`; a prepared successor blocks new or resumed
 outcome-relevant work until immutable activation evidence switches authority. Newly created
 families use v001 as that boundary; migrated families retain their explicit future cutoff.
+
+`trading workflow safety assess/clear` are capability-gated add-only writers, not state-query or
+release-authority commands. `assess` allocates the next `SAxxx` under a Draft successor and derives
+all workflow/study identities, digests, actor, and current UTC under the shared authoring lock.
+`clear` requires every blocking study to be safely paused or terminal, binds exact resolution
+evidence digests, and creates `CLEARANCE.json` without changing study or version state. Validation
+rejects multiple open assessments for one version pair, malformed or drifted identities, unsafe or
+incomplete resolutions, and evidence drift. An open assessment blocks new outcome-relevant study
+work and successor release preparation.
 
 High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
 only the workflow tree into a system temporary directory, applies and validates the complete staged

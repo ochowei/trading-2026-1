@@ -33,6 +33,7 @@ WORKFLOW_DIRECTORY_PATTERN = re.compile(
 )
 CHANGE_DIRECTORY_PATTERN = re.compile(r"^(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)--c(?P<number>\d{3,})$")
 STUDY_DIRECTORY_PATTERN = re.compile(r"^(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)--s(?P<number>\d{3,})$")
+SAFETY_ASSESSMENT_DIRECTORY_PATTERN = re.compile(r"^sa(?P<number>\d{3,})$")
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 VERSION_PATTERN = re.compile(r"^v\d{3,}$")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
@@ -56,6 +57,8 @@ STUDY_OUTCOMES = frozenset({"pass", "fail", "insufficient-evidence", "indetermin
 STUDY_ROUTES = frozenset(
     {"clean-historical", "retrospective-confirmatory", "study-time-retrospective"}
 )
+SAFETY_RESOLVED_STUDY_STATUSES = frozenset({"paused", "completed", "cancelled"})
+WORKFLOW_SAFETY_CAPABILITY = "workflow-release-safety-v1"
 
 _CHANGE_TRANSITIONS: dict[str, frozenset[str]] = {
     "draft": frozenset({"proposed", "withdrawn"}),
@@ -277,6 +280,95 @@ class EvolveWorkflowRequest:
 
 
 @dataclass(frozen=True)
+class OpenSafetyAssessmentRequest:
+    """Caller-supplied facts for opening one guarded release-safety assessment."""
+
+    reason: str
+    blocking_studies: tuple[str, ...]
+    missing_impact_decisions: tuple[str, ...]
+
+    @classmethod
+    def from_path(cls, path: Path) -> OpenSafetyAssessmentRequest:
+        fields = {
+            "schema_version",
+            "reason",
+            "blocking_studies",
+            "missing_impact_decisions",
+        }
+        payload = _read_closed_request(path, allowed=fields, required=fields)
+        if payload["schema_version"] != 1:
+            raise WorkflowAuthoringError("safety assessment request schema_version must be 1")
+        reason = payload["reason"]
+        if not isinstance(reason, str) or not reason.strip():
+            raise WorkflowAuthoringError("safety assessment reason must be non-empty text")
+        blocking = _request_unique_paths(payload["blocking_studies"], "blocking_studies")
+        missing = _request_unique_paths(
+            payload["missing_impact_decisions"], "missing_impact_decisions"
+        )
+        if not blocking:
+            raise WorkflowAuthoringError("safety assessment requires at least one blocking study")
+        if not set(missing).issubset(blocking):
+            raise WorkflowAuthoringError("missing impact decisions must identify blocking studies")
+        return cls(
+            reason=reason.strip(),
+            blocking_studies=tuple(blocking),
+            missing_impact_decisions=tuple(missing),
+        )
+
+
+@dataclass(frozen=True)
+class ClearSafetyAssessmentRequest:
+    """Caller-supplied resolutions for closing one guarded safety assessment."""
+
+    resolutions: tuple[dict[str, Any], ...]
+
+    @classmethod
+    def from_path(cls, path: Path) -> ClearSafetyAssessmentRequest:
+        payload = _read_closed_request(
+            path,
+            allowed={"schema_version", "resolutions"},
+            required={"schema_version", "resolutions"},
+        )
+        if payload["schema_version"] != 1:
+            raise WorkflowAuthoringError("safety clearance request schema_version must be 1")
+        raw = payload["resolutions"]
+        if not isinstance(raw, list) or not raw:
+            raise WorkflowAuthoringError("safety clearance resolutions must be a non-empty list")
+        resolutions: list[dict[str, Any]] = []
+        studies: set[str] = set()
+        for item in raw:
+            if not isinstance(item, dict) or set(item) != {
+                "study_path",
+                "disposition",
+                "evidence",
+            }:
+                raise WorkflowAuthoringError(
+                    "each safety clearance resolution must contain only study_path, "
+                    "disposition, and evidence"
+                )
+            study_path = item["study_path"]
+            disposition = item["disposition"]
+            if not isinstance(study_path, str) or not study_path:
+                raise WorkflowAuthoringError("safety clearance study_path is required")
+            if study_path in studies:
+                raise WorkflowAuthoringError(f"duplicate safety clearance study_path: {study_path}")
+            studies.add(study_path)
+            if not isinstance(disposition, str) or not disposition:
+                raise WorkflowAuthoringError("safety clearance disposition is required")
+            evidence = _request_unique_paths(item["evidence"], "resolution evidence")
+            if not evidence:
+                raise WorkflowAuthoringError("safety clearance evidence must not be empty")
+            resolutions.append(
+                {
+                    "study_path": study_path,
+                    "disposition": disposition,
+                    "evidence": evidence,
+                }
+            )
+        return cls(resolutions=tuple(resolutions))
+
+
+@dataclass(frozen=True)
 class WorkflowFileMutation:
     """One deterministic file change in a workflow-authoring plan."""
 
@@ -374,6 +466,14 @@ def _request_mapping_list(value: Any, *, field: str) -> list[dict[str, Any]]:
     if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
         raise WorkflowAuthoringError(f"authoring request {field} must be a list of mappings")
     return copy.deepcopy(value)
+
+
+def _request_unique_paths(value: Any, field: str) -> list[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        raise WorkflowAuthoringError(f"safety request {field} must be a list of paths")
+    if len(value) != len(set(value)):
+        raise WorkflowAuthoringError(f"safety request {field} paths must be unique")
+    return list(value)
 
 
 def _request_dependencies(value: Any) -> list[dict[str, Any]]:
@@ -1501,6 +1601,11 @@ class WorkflowRepository:
 
         if active_record is not None:
             active_path = self.root / str(active_record["path"])
+            open_assessment = self._open_safety_assessment_for(active_path)
+            if open_assessment is not None:
+                raise WorkflowAuthoringError(
+                    f"clear the open safety assessment before release: {open_assessment}"
+                )
             self._require_no_blocking_changes(
                 active_path,
                 included_changes=frozenset(path for path, _document in change_documents),
@@ -1724,8 +1829,282 @@ class WorkflowRepository:
             self._require_valid()
             return activation
 
+    def open_safety_assessment(
+        self,
+        successor_path: Path,
+        request: OpenSafetyAssessmentRequest,
+        *,
+        opened_by: str,
+    ) -> dict[str, Any]:
+        """Add one immutable release-safety assessment for an active/draft version pair."""
+        with self.authoring_lease():
+            actor = opened_by.strip()
+            if not actor:
+                raise WorkflowAuthoringError("opening a safety assessment requires --by")
+            self._require_structurally_valid()
+            successor = self._resolve_input(successor_path)
+            registry, slug, successor_version, successor_record = self._registered_version(
+                successor
+            )
+            if successor_record.get("status") != "draft":
+                raise WorkflowAuthoringError(
+                    "a safety assessment may open only under a draft successor"
+                )
+            successor_document = read_markdown_document(successor / "README.md")
+            predecessor_version = successor_document.metadata.get("supersedes")
+            if not isinstance(predecessor_version, str):
+                raise WorkflowAuthoringError(
+                    "a safety assessment requires an exact predecessor version"
+                )
+            family = self._family(registry, slug)
+            predecessor_record = self._versions(family, slug).get(predecessor_version)
+            if (
+                not isinstance(predecessor_record, dict)
+                or predecessor_record.get("status") != "active"
+            ):
+                raise WorkflowAuthoringError(
+                    "a safety assessment requires the successor's active predecessor"
+                )
+            predecessor = self.root / str(predecessor_record.get("path"))
+            release_path = predecessor / "RELEASE.json"
+            if not release_path.is_file():
+                raise WorkflowAuthoringError("active predecessor is missing RELEASE.json")
+            release = self._read_json_object(release_path, label="workflow release")
+            if WORKFLOW_SAFETY_CAPABILITY not in release.get("capabilities", []):
+                raise WorkflowAuthoringError(
+                    "active predecessor does not authorize release-safety persistence"
+                )
+            if self._open_safety_assessment_for(predecessor) is not None:
+                raise WorkflowAuthoringError(
+                    "workflow version pair already has an open safety assessment"
+                )
+
+            blocking_studies: list[dict[str, str]] = []
+            for reference in request.blocking_studies:
+                study = self._resolve_repo_reference(reference)
+                self._require_study_under_version(study, predecessor)
+                document = read_markdown_document(study / "README.md")
+                status = document.metadata.get("status")
+                study_id = document.metadata.get("id")
+                if status not in STUDY_STATUSES or not isinstance(study_id, str):
+                    raise WorkflowAuthoringError(
+                        f"blocking study has invalid lifecycle metadata: {reference}"
+                    )
+                blocking_studies.append(
+                    {
+                        "study_path": self._repo_relative(study),
+                        "study_id": study_id,
+                        "status_at_open": str(status),
+                    }
+                )
+            missing_decisions = [
+                self._repo_relative(self._resolve_repo_reference(reference))
+                for reference in request.missing_impact_decisions
+            ]
+
+            safety_root = successor / "work" / "release-safety"
+            safety_root.mkdir(parents=True, exist_ok=True)
+            allocated = (
+                max(
+                    (
+                        int(match.group("number"))
+                        for path in safety_root.iterdir()
+                        if path.is_dir()
+                        and (match := SAFETY_ASSESSMENT_DIRECTORY_PATTERN.fullmatch(path.name))
+                        is not None
+                    ),
+                    default=0,
+                )
+                + 1
+                if safety_root.exists()
+                else 1
+            )
+            assessment_id = f"SA{allocated:03d}"
+            target = safety_root / assessment_id.lower()
+            assessment = {
+                "schema_version": 1,
+                "assessment_id": assessment_id,
+                "workflow": slug,
+                "predecessor_version": predecessor_version,
+                "predecessor_path": self._repo_relative(predecessor),
+                "predecessor_release_sha256": _sha256(release_path),
+                "successor_version": successor_version,
+                "successor_path": self._repo_relative(successor),
+                "successor_workflow_sha256": _sha256(successor / "WORKFLOW.md"),
+                "blocking_studies": blocking_studies,
+                "missing_impact_decisions": missing_decisions,
+                "reason": request.reason,
+                "opened_at": timestamp_text(self._current_time()),
+                "opened_by": actor,
+            }
+            temporary = Path(tempfile.mkdtemp(prefix=".safety-", dir=safety_root))
+            try:
+                _atomic_write(
+                    temporary / "ASSESSMENT.json",
+                    canonical_json_bytes(assessment),
+                    replace=False,
+                )
+                try:
+                    os.rename(temporary, target)
+                except FileExistsError as exc:
+                    raise WorkflowAuthoringError(
+                        f"safety assessment path already exists: {target}"
+                    ) from exc
+                try:
+                    self._require_valid()
+                except WorkflowAuthoringError:
+                    shutil.rmtree(target)
+                    raise
+            finally:
+                if temporary.exists():
+                    shutil.rmtree(temporary)
+            return assessment
+
+    def clear_safety_assessment(
+        self,
+        assessment_path: Path,
+        request: ClearSafetyAssessmentRequest,
+        *,
+        approved_by: str,
+    ) -> dict[str, Any]:
+        """Add immutable clearance evidence after every blocking study is safe."""
+        with self.authoring_lease():
+            approver = approved_by.strip()
+            if not approver:
+                raise WorkflowAuthoringError("clearing a safety assessment requires --approved-by")
+            self._require_structurally_valid()
+            assessment_dir = self._resolve_input(assessment_path)
+            if (
+                not assessment_dir.is_dir()
+                or SAFETY_ASSESSMENT_DIRECTORY_PATTERN.fullmatch(assessment_dir.name) is None
+                or assessment_dir.parent.name != "release-safety"
+                or assessment_dir.parent.parent.name != "work"
+            ):
+                raise WorkflowAuthoringError(
+                    f"invalid safety assessment directory: {assessment_path}"
+                )
+            successor = assessment_dir.parents[2]
+            _registry, slug, successor_version, successor_record = self._registered_version(
+                successor
+            )
+            if successor_record.get("status") != "draft":
+                raise WorkflowAuthoringError(
+                    "a safety assessment must be cleared before release preparation"
+                )
+            assessment_file = assessment_dir / "ASSESSMENT.json"
+            assessment = self._read_json_object(assessment_file, label="safety assessment")
+            clearance_path = assessment_dir / "CLEARANCE.json"
+            if clearance_path.exists():
+                raise WorkflowAuthoringError("safety assessment already has CLEARANCE.json")
+            if (
+                assessment.get("workflow") != slug
+                or assessment.get("successor_version") != successor_version
+                or assessment.get("successor_path") != self._repo_relative(successor)
+            ):
+                raise WorkflowAuthoringError("safety assessment successor identity is inconsistent")
+            raw_blocking = assessment.get("blocking_studies")
+            if not isinstance(raw_blocking, list):
+                raise WorkflowAuthoringError("safety assessment blocking studies are malformed")
+            blocking_paths = {
+                item.get("study_path")
+                for item in raw_blocking
+                if isinstance(item, dict) and isinstance(item.get("study_path"), str)
+            }
+            supplied = {item["study_path"] for item in request.resolutions}
+            if supplied != blocking_paths:
+                raise WorkflowAuthoringError(
+                    "safety clearance must resolve every blocking study exactly once"
+                )
+
+            predecessor_version = assessment.get("predecessor_version")
+            if not isinstance(predecessor_version, str):
+                raise WorkflowAuthoringError("safety assessment predecessor identity is missing")
+            missing_decisions = set(assessment.get("missing_impact_decisions", []))
+            valid_impact_evidence = self._successor_impact_paths(successor)
+            resolutions: list[dict[str, Any]] = []
+            for requested in sorted(request.resolutions, key=lambda item: str(item["study_path"])):
+                study = self._resolve_repo_reference(str(requested["study_path"]))
+                document = read_markdown_document(study / "README.md")
+                status = document.metadata.get("status")
+                if status not in SAFETY_RESOLVED_STUDY_STATUSES:
+                    raise WorkflowAuthoringError(
+                        f"blocking study is not safely paused or terminal: {requested['study_path']}"
+                    )
+                allowed_dispositions = (
+                    {"resolved-terminal"}
+                    if status in {"completed", "cancelled"}
+                    else {
+                        f"continue-on-{predecessor_version}",
+                        f"restart-on-{successor_version}",
+                        "close-invalidated",
+                    }
+                )
+                disposition = str(requested["disposition"])
+                if disposition not in allowed_dispositions:
+                    raise WorkflowAuthoringError(
+                        f"invalid {status} study disposition: {disposition}"
+                    )
+                evidence: list[dict[str, str]] = []
+                evidence_references: set[str] = set()
+                for reference in requested["evidence"]:
+                    evidence_path = self._resolve_repo_reference(reference)
+                    if not evidence_path.is_file():
+                        raise WorkflowAuthoringError(
+                            f"safety clearance evidence does not exist: {reference}"
+                        )
+                    canonical_reference = self._repo_relative(evidence_path)
+                    evidence_references.add(canonical_reference)
+                    evidence.append(
+                        {
+                            "path": canonical_reference,
+                            "sha256": _sha256(evidence_path),
+                        }
+                    )
+                canonical_study = self._repo_relative(study)
+                if (
+                    canonical_study in missing_decisions
+                    and status == "paused"
+                    and evidence_references.isdisjoint(valid_impact_evidence)
+                ):
+                    raise WorkflowAuthoringError(
+                        "paused study with a missing impact decision requires an included "
+                        "source change IMPACT.md as clearance evidence"
+                    )
+                resolutions.append(
+                    {
+                        "study_path": canonical_study,
+                        "status_at_clear": str(status),
+                        "disposition": disposition,
+                        "evidence": evidence,
+                    }
+                )
+            clearance = {
+                "schema_version": 1,
+                "assessment_id": assessment.get("assessment_id"),
+                "assessment_sha256": _sha256(assessment_file),
+                "workflow": slug,
+                "predecessor_version": predecessor_version,
+                "predecessor_path": assessment.get("predecessor_path"),
+                "successor_version": successor_version,
+                "successor_path": self._repo_relative(successor),
+                "resolutions": resolutions,
+                "cleared_at": timestamp_text(self._current_time()),
+                "approved_by": approver,
+            }
+            _atomic_write(
+                clearance_path,
+                canonical_json_bytes(clearance),
+                replace=False,
+            )
+            try:
+                self._require_valid()
+            except WorkflowAuthoringError:
+                clearance_path.unlink(missing_ok=True)
+                raise
+            return clearance
+
     def require_effective_version(self, version_path: Path) -> None:
-        """Fail unless a version is active and has no prepared successor."""
+        """Fail unless a version is active and has no family-level work guard."""
         path = self._resolve_input(version_path)
         registry, slug, version, record = self._registered_version(path)
         if record.get("status") != "active":
@@ -1742,6 +2121,76 @@ class WorkflowRepository:
             raise WorkflowAuthoringError(
                 f"active workflow version has a prepared successor: {slug}@{version}"
             )
+        open_assessment = self._open_safety_assessment_for(path)
+        if open_assessment is not None:
+            raise WorkflowAuthoringError(
+                f"active workflow version has an open safety assessment: {open_assessment}"
+            )
+
+    def _open_safety_assessment_for(self, predecessor: Path) -> Path | None:
+        predecessor_reference = self._repo_relative(predecessor)
+        registry, slug, predecessor_version, _record = self._registered_version(predecessor)
+        family = self._family(registry, slug)
+        for version, record in self._versions(family, slug).items():
+            if (
+                not isinstance(version, str)
+                or _version_number(version) <= _version_number(predecessor_version)
+                or not isinstance(record, Mapping)
+            ):
+                continue
+            safety_root = self.root / str(record.get("path")) / "work" / "release-safety"
+            if not safety_root.is_dir():
+                continue
+            for assessment_dir in sorted(path for path in safety_root.iterdir() if path.is_dir()):
+                assessment_path = assessment_dir / "ASSESSMENT.json"
+                clearance_path = assessment_dir / "CLEARANCE.json"
+                if not assessment_path.is_file() or clearance_path.exists():
+                    continue
+                try:
+                    payload = self._read_json_object(assessment_path, label="safety assessment")
+                except WorkflowAuthoringError:
+                    continue
+                if payload.get("predecessor_path") == predecessor_reference:
+                    return assessment_dir
+        return None
+
+    def _require_study_under_version(self, study: Path, version: Path) -> None:
+        if (
+            not study.is_dir()
+            or STUDY_DIRECTORY_PATTERN.fullmatch(study.name) is None
+            or study.parent != version / "work" / "studies"
+        ):
+            raise WorkflowAuthoringError(
+                f"study is not under the exact predecessor version: {study}"
+            )
+
+    def _successor_impact_paths(self, successor: Path) -> set[str]:
+        document = read_markdown_document(successor / "README.md")
+        source_changes = document.metadata.get("source_changes")
+        if not isinstance(source_changes, list):
+            raise WorkflowAuthoringError("successor source_changes must be a list")
+        impacts: set[str] = set()
+        for reference in source_changes:
+            if not isinstance(reference, str):
+                raise WorkflowAuthoringError("successor source change path is invalid")
+            change = self._resolve_repo_reference(reference)
+            impact = change / "IMPACT.md"
+            if not impact.is_file():
+                raise WorkflowAuthoringError(
+                    f"successor source change is missing IMPACT.md: {reference}"
+                )
+            impacts.add(self._repo_relative(impact))
+        return impacts
+
+    @staticmethod
+    def _read_json_object(path: Path, *, label: str) -> dict[str, Any]:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise WorkflowAuthoringError(f"cannot read {label} {path}: {exc}") from exc
+        if not isinstance(payload, dict):
+            raise WorkflowAuthoringError(f"{label} must be a JSON object: {path}")
+        return payload
 
     @staticmethod
     def _activation_payload(
@@ -2043,6 +2492,7 @@ class WorkflowRepository:
             )
         self._validate_changes(path, slug, version, status, issues)
         self._validate_studies(path, slug, version, status, issues)
+        self._validate_release_safety(path, slug, version, status, issues)
 
     def _validate_activation(
         self,
@@ -2858,6 +3308,405 @@ class WorkflowRepository:
                 issues.append(
                     ValidationIssue(completion, "unfinished study must not have COMPLETION.json")
                 )
+
+    def _validate_release_safety(
+        self,
+        successor: Path,
+        slug: str,
+        successor_version: str,
+        successor_status: Any,
+        issues: list[ValidationIssue],
+    ) -> None:
+        safety_root = successor / "work" / "release-safety"
+        if not safety_root.exists():
+            return
+        if not safety_root.is_dir():
+            issues.append(ValidationIssue(safety_root, "release-safety must be a directory"))
+            return
+        open_assessments: list[Path] = []
+        for child in sorted(safety_root.iterdir()):
+            if not child.is_dir():
+                issues.append(
+                    ValidationIssue(child, "release-safety may contain only saNNN directories")
+                )
+                continue
+            match = SAFETY_ASSESSMENT_DIRECTORY_PATTERN.fullmatch(child.name)
+            if match is None:
+                issues.append(ValidationIssue(child, "invalid safety assessment directory name"))
+                continue
+            expected_id = f"SA{match.group('number')}"
+            allowed_files = {"ASSESSMENT.json", "CLEARANCE.json"}
+            for artifact in sorted(child.iterdir()):
+                if not artifact.is_file() or artifact.name not in allowed_files:
+                    issues.append(
+                        ValidationIssue(
+                            artifact,
+                            "safety assessment directory contains an unsupported artifact",
+                        )
+                    )
+            assessment_path = child / "ASSESSMENT.json"
+            try:
+                assessment = self._read_json_object(assessment_path, label="safety assessment")
+            except WorkflowAuthoringError as exc:
+                issues.append(ValidationIssue(assessment_path, str(exc)))
+                continue
+            assessment_fields = {
+                "schema_version",
+                "assessment_id",
+                "workflow",
+                "predecessor_version",
+                "predecessor_path",
+                "predecessor_release_sha256",
+                "successor_version",
+                "successor_path",
+                "successor_workflow_sha256",
+                "blocking_studies",
+                "missing_impact_decisions",
+                "reason",
+                "opened_at",
+                "opened_by",
+            }
+            if set(assessment) != assessment_fields:
+                issues.append(
+                    ValidationIssue(
+                        assessment_path,
+                        "safety assessment fields do not match schema 1",
+                    )
+                )
+            if assessment.get("schema_version") != 1:
+                issues.append(ValidationIssue(assessment_path, "schema_version must be 1"))
+            if assessment.get("assessment_id") != expected_id:
+                issues.append(
+                    ValidationIssue(assessment_path, f"assessment_id must be {expected_id}")
+                )
+            if (
+                assessment.get("workflow") != slug
+                or assessment.get("successor_version") != successor_version
+                or assessment.get("successor_path") != self._repo_relative(successor)
+            ):
+                issues.append(
+                    ValidationIssue(assessment_path, "successor identity is inconsistent")
+                )
+            successor_digest = assessment.get("successor_workflow_sha256")
+            if (
+                not isinstance(successor_digest, str)
+                or SHA256_PATTERN.fullmatch(successor_digest) is None
+            ):
+                issues.append(
+                    ValidationIssue(assessment_path, "successor workflow digest is invalid")
+                )
+            if (
+                not _is_canonical_utc_timestamp(assessment.get("opened_at"))
+                or not str(assessment.get("opened_by") or "").strip()
+            ):
+                issues.append(
+                    ValidationIssue(assessment_path, "assessment needs current time and actor")
+                )
+            if not str(assessment.get("reason") or "").strip():
+                issues.append(ValidationIssue(assessment_path, "assessment reason is required"))
+
+            predecessor_path_text = assessment.get("predecessor_path")
+            predecessor_version = assessment.get("predecessor_version")
+            predecessor: Path | None = None
+            if not isinstance(predecessor_path_text, str) or not isinstance(
+                predecessor_version, str
+            ):
+                issues.append(
+                    ValidationIssue(assessment_path, "predecessor identity is incomplete")
+                )
+            else:
+                try:
+                    predecessor = self._resolve_repo_reference(predecessor_path_text)
+                    _registry, predecessor_slug, registered_version, _record = (
+                        self._registered_version(predecessor)
+                    )
+                except WorkflowAuthoringError as exc:
+                    issues.append(ValidationIssue(assessment_path, str(exc)))
+                    predecessor = None
+                else:
+                    if predecessor_slug != slug or registered_version != predecessor_version:
+                        issues.append(
+                            ValidationIssue(assessment_path, "predecessor identity is inconsistent")
+                        )
+                    try:
+                        successor_metadata = read_markdown_document(
+                            successor / "README.md"
+                        ).metadata
+                    except WorkflowAuthoringError as exc:
+                        issues.append(ValidationIssue(assessment_path, str(exc)))
+                    else:
+                        if successor_metadata.get("supersedes") != predecessor_version:
+                            issues.append(
+                                ValidationIssue(
+                                    assessment_path,
+                                    "successor does not supersede the assessed predecessor",
+                                )
+                            )
+                    release_path = predecessor / "RELEASE.json"
+                    expected_release_digest = assessment.get("predecessor_release_sha256")
+                    if (
+                        not isinstance(expected_release_digest, str)
+                        or SHA256_PATTERN.fullmatch(expected_release_digest) is None
+                        or not release_path.is_file()
+                        or _sha256(release_path) != expected_release_digest
+                    ):
+                        issues.append(
+                            ValidationIssue(
+                                assessment_path, "predecessor release digest is invalid"
+                            )
+                        )
+                    else:
+                        try:
+                            release = self._read_json_object(release_path, label="workflow release")
+                        except WorkflowAuthoringError as exc:
+                            issues.append(ValidationIssue(assessment_path, str(exc)))
+                        else:
+                            if WORKFLOW_SAFETY_CAPABILITY not in release.get("capabilities", []):
+                                issues.append(
+                                    ValidationIssue(
+                                        assessment_path,
+                                        "predecessor release does not authorize safety artifacts",
+                                    )
+                                )
+
+            raw_blocking = assessment.get("blocking_studies")
+            blocking_paths: list[str] = []
+            if not isinstance(raw_blocking, list) or not raw_blocking:
+                issues.append(
+                    ValidationIssue(assessment_path, "assessment requires blocking studies")
+                )
+            else:
+                for item in raw_blocking:
+                    if not isinstance(item, dict) or set(item) != {
+                        "study_path",
+                        "study_id",
+                        "status_at_open",
+                    }:
+                        issues.append(
+                            ValidationIssue(assessment_path, "blocking study entry is malformed")
+                        )
+                        continue
+                    study_path_text = item.get("study_path")
+                    if not isinstance(study_path_text, str):
+                        issues.append(
+                            ValidationIssue(assessment_path, "blocking study path is invalid")
+                        )
+                        continue
+                    blocking_paths.append(study_path_text)
+                    try:
+                        study = self._resolve_repo_reference(study_path_text)
+                        if predecessor is None:
+                            raise WorkflowAuthoringError("predecessor is unavailable")
+                        self._require_study_under_version(study, predecessor)
+                        metadata = read_markdown_document(study / "README.md").metadata
+                    except WorkflowAuthoringError as exc:
+                        issues.append(ValidationIssue(assessment_path, str(exc)))
+                        continue
+                    if (
+                        item.get("study_id") != metadata.get("id")
+                        or item.get("status_at_open") not in STUDY_STATUSES
+                    ):
+                        issues.append(
+                            ValidationIssue(
+                                assessment_path, "blocking study identity is inconsistent"
+                            )
+                        )
+            if len(blocking_paths) != len(set(blocking_paths)):
+                issues.append(
+                    ValidationIssue(assessment_path, "blocking study paths must be unique")
+                )
+            raw_missing = assessment.get("missing_impact_decisions")
+            if (
+                not isinstance(raw_missing, list)
+                or not all(isinstance(item, str) for item in raw_missing)
+                or len(raw_missing) != len(set(raw_missing))
+                or not set(raw_missing).issubset(blocking_paths)
+            ):
+                issues.append(
+                    ValidationIssue(assessment_path, "missing impact decisions are inconsistent")
+                )
+
+            clearance_path = child / "CLEARANCE.json"
+            if not clearance_path.exists():
+                open_assessments.append(child)
+                if successor_status != "draft":
+                    issues.append(
+                        ValidationIssue(
+                            assessment_path,
+                            "an open safety assessment requires a draft successor",
+                        )
+                    )
+                if (
+                    not (successor / "WORKFLOW.md").is_file()
+                    or _sha256(successor / "WORKFLOW.md") != successor_digest
+                ):
+                    issues.append(
+                        ValidationIssue(
+                            assessment_path,
+                            "open assessment successor workflow digest has changed",
+                        )
+                    )
+                continue
+            self._validate_safety_clearance(
+                clearance_path,
+                assessment_path=assessment_path,
+                assessment=assessment,
+                blocking_paths=blocking_paths,
+                issues=issues,
+            )
+        if len(open_assessments) > 1:
+            issues.append(
+                ValidationIssue(
+                    safety_root,
+                    "workflow version pair has more than one open safety assessment",
+                )
+            )
+
+    def _validate_safety_clearance(
+        self,
+        path: Path,
+        *,
+        assessment_path: Path,
+        assessment: Mapping[str, Any],
+        blocking_paths: list[str],
+        issues: list[ValidationIssue],
+    ) -> None:
+        try:
+            clearance = self._read_json_object(path, label="safety clearance")
+        except WorkflowAuthoringError as exc:
+            issues.append(ValidationIssue(path, str(exc)))
+            return
+        fields = {
+            "schema_version",
+            "assessment_id",
+            "assessment_sha256",
+            "workflow",
+            "predecessor_version",
+            "predecessor_path",
+            "successor_version",
+            "successor_path",
+            "resolutions",
+            "cleared_at",
+            "approved_by",
+        }
+        if set(clearance) != fields:
+            issues.append(ValidationIssue(path, "safety clearance fields do not match schema 1"))
+        for field in (
+            "assessment_id",
+            "workflow",
+            "predecessor_version",
+            "predecessor_path",
+            "successor_version",
+            "successor_path",
+        ):
+            if clearance.get(field) != assessment.get(field):
+                issues.append(
+                    ValidationIssue(path, f"safety clearance {field} does not match assessment")
+                )
+        if clearance.get("schema_version") != 1:
+            issues.append(ValidationIssue(path, "schema_version must be 1"))
+        if clearance.get("assessment_sha256") != _sha256(assessment_path):
+            issues.append(ValidationIssue(path, "assessment digest does not match"))
+        if (
+            not _is_canonical_utc_timestamp(clearance.get("cleared_at"))
+            or not str(clearance.get("approved_by") or "").strip()
+        ):
+            issues.append(ValidationIssue(path, "clearance needs current time and approver"))
+        raw_resolutions = clearance.get("resolutions")
+        if not isinstance(raw_resolutions, list):
+            issues.append(ValidationIssue(path, "clearance resolutions must be a list"))
+            return
+        resolved_paths: list[str] = []
+        predecessor_version = assessment.get("predecessor_version")
+        successor_version = assessment.get("successor_version")
+        missing_decisions = set(assessment.get("missing_impact_decisions", []))
+        try:
+            successor = self._resolve_repo_reference(str(assessment.get("successor_path")))
+            valid_impact_evidence = self._successor_impact_paths(successor)
+        except WorkflowAuthoringError as exc:
+            issues.append(ValidationIssue(path, str(exc)))
+            valid_impact_evidence = set()
+        for resolution in raw_resolutions:
+            if not isinstance(resolution, dict) or set(resolution) != {
+                "study_path",
+                "status_at_clear",
+                "disposition",
+                "evidence",
+            }:
+                issues.append(ValidationIssue(path, "clearance resolution is malformed"))
+                continue
+            study_path_text = resolution.get("study_path")
+            status = resolution.get("status_at_clear")
+            disposition = resolution.get("disposition")
+            if not isinstance(study_path_text, str):
+                issues.append(ValidationIssue(path, "clearance study path is invalid"))
+                continue
+            resolved_paths.append(study_path_text)
+            try:
+                study = self._resolve_repo_reference(study_path_text)
+                current_status = read_markdown_document(study / "README.md").metadata.get("status")
+            except WorkflowAuthoringError as exc:
+                issues.append(ValidationIssue(path, str(exc)))
+                current_status = None
+            if current_status != status:
+                issues.append(
+                    ValidationIssue(path, "clearance study status no longer matches repository")
+                )
+            expected_dispositions = (
+                {"resolved-terminal"}
+                if status in {"completed", "cancelled"}
+                else {
+                    f"continue-on-{predecessor_version}",
+                    f"restart-on-{successor_version}",
+                    "close-invalidated",
+                }
+                if status == "paused"
+                else set()
+            )
+            if disposition not in expected_dispositions:
+                issues.append(ValidationIssue(path, "clearance status and disposition conflict"))
+            evidence = resolution.get("evidence")
+            if not isinstance(evidence, list) or not evidence:
+                issues.append(ValidationIssue(path, "clearance evidence must not be empty"))
+                continue
+            evidence_paths: set[str] = set()
+            for item in evidence:
+                if not isinstance(item, dict) or set(item) != {"path", "sha256"}:
+                    issues.append(ValidationIssue(path, "clearance evidence entry is malformed"))
+                    continue
+                reference = item.get("path")
+                digest = item.get("sha256")
+                if not isinstance(reference, str) or reference in evidence_paths:
+                    issues.append(ValidationIssue(path, "clearance evidence paths must be unique"))
+                    continue
+                evidence_paths.add(reference)
+                try:
+                    artifact = self._resolve_repo_reference(reference)
+                except WorkflowAuthoringError as exc:
+                    issues.append(ValidationIssue(path, str(exc)))
+                    continue
+                if (
+                    not artifact.is_file()
+                    or not isinstance(digest, str)
+                    or SHA256_PATTERN.fullmatch(digest) is None
+                    or _sha256(artifact) != digest
+                ):
+                    issues.append(ValidationIssue(path, "clearance evidence digest is invalid"))
+            if (
+                study_path_text in missing_decisions
+                and status == "paused"
+                and evidence_paths.isdisjoint(valid_impact_evidence)
+            ):
+                issues.append(
+                    ValidationIssue(
+                        path,
+                        "paused missing impact decision lacks source change IMPACT.md evidence",
+                    )
+                )
+        if sorted(resolved_paths) != sorted(blocking_paths):
+            issues.append(
+                ValidationIssue(path, "clearance must resolve every blocking study exactly once")
+            )
 
     def _validate_study_time_terminal(
         self,

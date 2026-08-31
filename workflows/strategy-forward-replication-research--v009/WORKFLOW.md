@@ -474,6 +474,12 @@ expiry 規則管理，不得因 pause 失去退出責任。
 22. v009 在 registered challenge schemas/implementations、provider-free coordinator、atomic
     publisher/recovery 與 synthetic release tests 完成前不得 release；accepted C001 本身不構成
     implementation、execution 或 release evidence。
+23. `workflow-release-safety-v1` 只授權受控 writer 在 Draft 接替版下建立 add-only
+    `work/release-safety/saNNN/ASSESSMENT.json` 與 `CLEARANCE.json`。Caller 不得指定 assessment
+    ID、版本 identity、digest 或時間；不得手寫、覆寫、刪除或用 study count／說明文字代替。
+    同一對 Active 前一版與 Draft 接替版最多只能有一份未關閉 assessment。未關閉 assessment
+    會阻止建立、預先登記、開始、恢復或凍結新的結果相關研究工作，也會阻止接替版準備發布；
+    Paused／Cancelled／review／completion 等收斂安全狀態的合法操作仍保留原本權限邊界。
 
 ## Required artifacts and evidence
 
@@ -490,6 +496,7 @@ expiry 規則管理，不得因 pause 失去退出責任。
 | Shadow | Historical source events、Shadow registration、immutable definition identity、prospective paper proposals、simulated fills、monotonic checkpoints、base/stress metrics、critical-drift assessment 與 activation evaluation。 |
 | Controlled activation | Exact Shadow/evaluation/result/parity identities、frozen predictive envelope、lifecycle proof、verified ledger accounting hash、broker reconciliation、allocation epoch、data cutoff/bundle identity 與 operator reason。 |
 | Monitoring and decisions | Drift observations/checkpoints、hard guards、Healthy/Watch/Paused state、pause/recovery evidence，以及每次 pass、fail、insufficient-evidence、indeterminate、activation、retirement 與 termination 的 human/system identities和 timestamps。 |
+| Workflow release safety | Draft 接替版下的 immutable `ASSESSMENT.json` 綁定 exact Active 前一版、exact Draft 接替版、接替版 `WORKFLOW.md` digest、blocking Sxxx、缺少的 impact decisions、原因、current UTC 與 actor；相符的 `CLEARANCE.json` 必須綁定 assessment digest，並為每個 blocking Sxxx 記錄安全狀態、`continue-on-vNNN`／`restart-on-vNNN`／`close-invalidated` 或 terminal disposition，以及 evidence path/digest。 |
 
 Formal evidence 必須留在 authoritative repository 或 private runtime location；workflow/study
 records只保存精確 repository-relative paths、immutable manifest IDs、complete commit SHAs 與
@@ -541,6 +548,10 @@ drift modules。Qualification plan 與 screen 必須原生解析 `src/trading/re
 identity、exact policy set 與 definition snapshot，不得依賴 closed legacy experiment registry 或
 caller assertion。正式 evidence 必須保存 exact policy releases、composite policy-set identity、
 definition snapshot、data snapshot、result identity、complete commit SHA 與 checksum。
+
+Workflow release-safety evidence 由 `trading workflow safety assess/clear` 經
+`src/trading/workflow/authoring.py` 的共用 authoring lock 產生並驗證；它不改寫 Sxxx lifecycle，
+也不提供 A1-2 state-query CLI。
 
 ## Outcomes
 
@@ -614,6 +625,24 @@ qualification 不得以修改狀態復活。
 個別 strategy parameters、signals、data dependencies 或 execution definition 的變更通常只
 建立新 experiment trial 或 research round；只要 workflow rules 不變，不需要新的 workflow
 version。反之，不得用「只是文件修改」掩飾會改變流程解讀的規則變更。
+
+當本 v009 成為 Active 後，`workflow-release-safety-v1` 治理其接替版的發布安全邊界。若對
+Active v009 與 Draft 接替版開啟 assessment，writer 必須配置下一個永不重用的 `SAxxx`，從
+repository 取得兩個 exact version paths、v009 `RELEASE.json` digest、接替版 `WORKFLOW.md`
+digest 與 blocking studies 的當下狀態，再以 current UTC 與 stable actor add-only 寫入
+`ASSESSMENT.json`。同一版本對已有未關閉 assessment 時不得另開一份。
+
+關閉 assessment 前，每個 blocking study 必須已是 `paused`、`completed` 或 `cancelled`。
+Paused study 必須明確選擇 `continue-on-v009`、`restart-on-<接替版>` 或
+`close-invalidated`；terminal study 使用 `resolved-terminal`。Guarded clearance writer 必須把
+每項 resolution 與 evidence SHA-256 綁入 `CLEARANCE.json`，並引用 exact
+`ASSESSMENT.json` digest。任何 identity、digest、status、resolution、唯一性或 evidence 衝突都
+使 validator fail closed。只有相符 clearance 建立後，family action guard 與 successor release
+check 才可重新評估；它不會自動推進 study、發布或啟用版本。
+
+這套 persistence 由 v009 capability 開始生效，不能回頭假裝 v008 歷史上已保存 assessment。
+因此 v009 尚未成為有效 release 前，既有 v008 的 N04／N05／N06 歷史判定缺口仍不得由新程式
+回填或猜測。
 
 Released `WORKFLOW.md` 永不可直接編輯。無害勘誤記在 version README 的 Errata，並在後續
 版本整合；可能改變解讀的文字修正也必須走 expedited change 與新版本。Reference source 的

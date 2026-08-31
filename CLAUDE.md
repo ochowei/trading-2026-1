@@ -171,6 +171,13 @@ uv run trading workflow activate <prepared-version-path> --approved-by <human-id
 uv run trading workflow activation attest <active-version-path> \
   --approved-by <human-id> --required-from <future-version>
 
+# v009+ capability：以 request 提供 blocking studies／resolutions；writer 配置 SAxxx 並補 identity、digest 與 current UTC
+uv run trading workflow safety assess <draft-successor-path> \
+  --request safety-assessment-request.json --by <identity>
+uv run trading workflow safety clear <saNNN-path> \
+  --request safety-clearance-request.json --approved-by <human-id>
+# 這兩個命令只保存／關閉 release-safety evidence；不查詢 A1-2 state，也不授權 release/activation
+
 # 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC
 uv run trading workflow study init <version-path> --slug <study-slug> \
   --title <title> --created-by <identity> \
