@@ -31,8 +31,10 @@ Use English ASCII for paths, filenames, metadata keys, IDs, and lifecycle values
 Chinese may be used for explanatory prose. Do not maintain two authoritative translations.
 
 `workflows/README.md` schema-1 frontmatter is the lifecycle authority. Derive the current version
-from the unique `active` entry; allow at most one `active` and one `draft` per family. Preserve
-`superseded`, `retired`, and `abandoned` entries permanently.
+from the unique `active` entry; allow at most one `active` and one candidate in either `draft` or
+`prepared` per family. `prepared` means release evidence exists but authority has not switched.
+New families declare `activation_required_from: v001`; migrated families declare their confirmed
+future boundary. Preserve `superseded`, `retired`, and `abandoned` entries permanently.
 
 ## Complete contracts and exact dependencies
 
@@ -70,8 +72,8 @@ Use three layers:
 
 1. CLI validates structure, paths, metadata, lifecycle, indexes, hashes, and exact references.
 2. Agent validates semantic fidelity, change coverage, and impact reasoning.
-3. Humans approve change decisions, retirement, and releases; an independent reviewer confirms
-   study outcomes.
+3. Humans approve change decisions, retirement, release preparation, and Workflow Release
+   Activation; an independent reviewer confirms study outcomes.
 
 Run after every write:
 
@@ -85,5 +87,5 @@ invalid partial worktree, do not bypass the guard: inspect the repository, regen
 preview, and obtain confirmation again when its resolved changes differ. The authoring lock does
 not grant authority and does not coordinate study or qualification operations.
 
-CI must fail closed on validation issues. Release preparation does not authorize commit, push,
-merge, study execution, promotion, or trading.
+CI must fail closed on validation issues. Release preparation does not authorize activation,
+commit, push, merge, study execution, promotion, or trading.

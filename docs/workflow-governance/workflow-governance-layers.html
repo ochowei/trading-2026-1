@@ -1,1642 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src 'self' 'unsafe-inline' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src 'self' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src 'self' blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src 'self' blob: data:; worker-src 'self' blob:; connect-src 'self' blob: data:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Workflow 治理層級</title>
-<style>:root{color-scheme:light dark;background:light-dark(rgb(255 255 255), rgb(24 24 24))}html,body{margin:0}body{box-sizing:border-box;padding:1rem;background:inherit}iframe{display:block;width:100%;height:calc(100vh - 2rem);margin:0 auto;border:0}</style>
+<link rel="stylesheet" href="./workflow-governance-layers.css">
 </head>
 <body>
-<iframe sandbox="allow-scripts" referrerpolicy="no-referrer" title="Workflow 治理層級" srcdoc="&lt;!doctype html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-&lt;meta charset=&quot;utf-8&quot;&gt;
-&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-&lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot;&gt;
-&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src &#x27;none&#x27;; script-src &#x27;unsafe-inline&#x27; &#x27;unsafe-eval&#x27; &#x27;wasm-unsafe-eval&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; style-src &#x27;unsafe-inline&#x27; blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; img-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; font-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; media-src blob: data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://esm.sh https://fonts.bunny.net https://fonts.googleapis.com https://fonts.gstatic.com https://unpkg.com; worker-src blob:; connect-src blob: data:; frame-src &#x27;none&#x27;; object-src &#x27;none&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;&quot;&gt;
-&lt;title&gt;Workflow 治理層級&lt;/title&gt;
-&lt;style&gt;:root {
-  color-scheme: light dark;
-  background-color: var(
-    --background,
-    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
-  ) !important;
-
-  /* Agent-facing contract; keep in sync with SKILL.md. */
-  --background: var(
-    --color-background-primary,
-    light-dark(rgb(255 255 255), rgb(24 24 24))
-  );
-  --foreground: var(
-    --color-text-primary,
-    light-dark(rgb(26 28 31), rgb(255 255 255))
-  );
-  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
-  --card-foreground: var(
-    --color-text-primary,
-    light-dark(rgb(26 28 31), rgb(255 255 255))
-  );
-  --popover: var(
-    --color-background-secondary,
-    light-dark(rgb(255 255 255), rgb(45 45 45))
-  );
-  --popover-foreground: var(
-    --color-text-primary,
-    light-dark(rgb(26 28 31), rgb(255 255 255))
-  );
-  --primary: var(
-    --color-text-info,
-    light-dark(rgb(51 156 255), rgb(131 195 255))
-  );
-  --primary-foreground: var(
-    --color-text-inverse,
-    light-dark(rgb(255 255 255), rgb(13 13 13))
-  );
-  --secondary: var(
-    --color-background-secondary,
-    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
-  );
-  --secondary-foreground: var(
-    --color-text-primary,
-    light-dark(rgb(26 28 31), rgb(255 255 255))
-  );
-  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
-  --muted-foreground: var(
-    --color-text-secondary,
-    light-dark(rgb(26 28 31 / 49.4%), rgb(255 255 255 / 49.8%))
-  );
-  --accent: var(
-    --color-background-info,
-    light-dark(rgb(229 242 255), rgb(13 39 63))
-  );
-  --accent-foreground: var(
-    --color-text-info,
-    light-dark(rgb(51 156 255), rgb(131 195 255))
-  );
-  --destructive: var(
-    --color-text-warning,
-    light-dark(rgb(226 85 7), rgb(255 133 73))
-  );
-  --border: var(
-    --color-border-secondary,
-    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
-  );
-  --input: var(
-    --color-border-primary,
-    light-dark(
-      rgb(26 28 31 / 11.8%),
-      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
-    )
-  );
-  --ring: var(
-    --color-ring-primary,
-    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
-  );
-  --font-size-base: var(--font-text-md-size, 14px);
-  --blue: light-dark(rgb(51 156 255), rgb(51 156 255));
-  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
-  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
-  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
-  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
-  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
-  --viz-series-1: var(--primary);
-  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
-  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
-  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
-  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
-  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
-
-  /* Internal implementation variables; not part of the agent contract. */
-  --font-sans: -apple-system, system-ui, &quot;Segoe UI&quot;, sans-serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, &quot;SF Mono&quot;, Menlo, Consolas, &quot;Liberation Mono&quot;,
-    monospace;
-  --font-size-normal: max(11px, var(--font-size-base));
-  --font-size-tooltip: calc(var(--font-size-base) - 1px);
-  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
-  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
-  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
-  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
-  --font-weight-normal: 430;
-  --font-weight-medium: 500;
-  --line-height-normal: calc(var(--font-size-normal) * 1.5);
-  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
-  --line-height-small: calc(var(--font-size-small) + 4px);
-  --radius: var(--border-radius-lg, 12.5px);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-2xl: calc(var(--radius) * 1.6);
-  --radius-full: 9999px;
-  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
-  --checkmark-image: url(&quot;data:image/svg+xml,%3Csvg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; viewBox=&#x27;0 0 17 17&#x27;%3E%3Cpath d=&#x27;M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z&#x27;/%3E%3C/svg%3E&quot;);
-
-  /* Legacy aliases; not part of the current agent contract. */
-  --viz-bg: transparent;
-  --viz-panel: var(--card);
-  --viz-border: var(--border);
-  --viz-text: var(--foreground);
-  --viz-muted: var(--muted-foreground);
-  --viz-accent: var(--primary);
-  --viz-accent-text: var(--primary-foreground);
-  --viz-accent-bg: var(--accent);
-  --viz-font-size: var(--font-size-base);
-  --viz-warning: var(--destructive);
-}
-
-:root[data-theme=&quot;light&quot;] {
-  color-scheme: light;
-}
-
-:root[data-theme=&quot;dark&quot;] {
-  color-scheme: dark;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html &gt; body {
-  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
-  --color-background-primary: var(
-    --background,
-    light-dark(rgb(255 255 255), rgb(24 24 24))
-  );
-  --color-text-primary: var(
-    --foreground,
-    light-dark(rgb(26 28 31), rgb(255 255 255))
-  );
-  --color-border-secondary: var(
-    --border,
-    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
-  );
-
-  margin: 0;
-  padding: 5px;
-  color: var(--foreground);
-  background: transparent !important;
-  font-family: var(--font-sans) !important;
-  font-size: var(--font-size-normal);
-  font-weight: var(--font-weight-normal);
-  line-height: var(--line-height-normal);
-}
-
-a {
-  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
-  cursor: pointer;
-  font-weight: var(--font-weight-medium, 500);
-  text-decoration: none;
-  text-underline-offset: 2px;
-}
-
-a:is(:hover, :focus-visible) {
-  text-decoration-line: underline;
-  text-decoration-style: dashed;
-  text-decoration-thickness: 0.5px;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  margin-block: 0;
-}
-
-h1 {
-  font-size: var(--font-size-h1);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.25;
-}
-
-h2 {
-  font-size: var(--font-size-h2);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.25;
-}
-
-h3,
-h4,
-h5,
-h6 {
-  font-size: var(--font-size-h3);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.3;
-}
-
-b,
-strong,
-th {
-  font-weight: var(--font-weight-medium);
-}
-
-code:not(pre code) {
-  display: inline;
-  padding: 1px 6px;
-  border-radius: var(--radius-sm);
-  corner-shape: superellipse(1.5);
-  background: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 0.92em;
-  overflow-wrap: anywhere;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  word-break: break-word;
-}
-
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  color: var(--foreground);
-  font: inherit;
-  text-align: start;
-}
-
-.table :is(th, td) {
-  padding-block: 10px;
-  padding-inline: 0 24px;
-  overflow-wrap: anywhere;
-  border-bottom: 1px solid var(--border);
-  text-align: start;
-  vertical-align: top;
-}
-
-.table-responsive &gt; .table :is(th, td) {
-  overflow-wrap: break-word;
-}
-
-.table :is(th, td):last-child {
-  padding-inline-end: 0;
-}
-
-.table :is(caption, thead th) {
-  font-weight: 600;
-}
-
-.table thead th {
-  padding-block: 8px;
-  border-bottom-color: color-mix(in srgb, var(--foreground) 16%, transparent);
-}
-
-.table tbody tr:last-child :is(th, td) {
-  border-bottom: 0;
-}
-
-.table.table-sm :is(th, td) {
-  padding-block: 6px;
-}
-
-.table.table-sm :is(th, td):not(:last-child) {
-  padding-inline-end: 16px;
-}
-
-.table :is(.text-end, [align=&quot;right&quot;]) {
-  text-align: end;
-  font-variant-numeric: tabular-nums;
-}
-
-.table :is(.text-center, [align=&quot;center&quot;]) {
-  text-align: center;
-}
-
-.table .text-nowrap {
-  white-space: nowrap;
-}
-
-#widget {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  padding: 0;
-  background: transparent !important;
-}
-
-.card {
-  min-width: 0;
-  padding: 12px;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  border-radius: var(--radius-2xl);
-  corner-shape: superellipse(1.5);
-  color: var(--card-foreground);
-  background: var(--card);
-}
-
-#widget &gt; :not(.card, .progress) {
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.tooltip {
-  position: fixed;
-  z-index: 50;
-  top: 0;
-  left: 0;
-  width: max-content;
-  max-width: min(
-    20rem,
-    var(--tooltip-available-width, calc(100vw - 10px)),
-    calc(100vw - 10px)
-  );
-  max-height: min(
-    var(--tooltip-available-height, calc(100vh - 10px)),
-    calc(100vh - 10px)
-  );
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  corner-shape: superellipse(1.5);
-  color: var(--popover-foreground);
-  background: var(--popover);
-  box-shadow: none;
-  font-size: var(--font-size-tooltip);
-  line-height: var(--line-height-tooltip);
-  overflow-wrap: break-word;
-  white-space: normal;
-  pointer-events: none;
-  user-select: none;
-}
-
-.viz-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
-  gap: 10px;
-}
-
-.viz-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.viz-stat-value {
-  font-size: var(--font-size-h2);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.25;
-}
-
-.viz-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.progress {
-  display: flex;
-  height: 6px;
-  margin-block: calc((var(--line-height-normal, 1.5em) - 6px) / 2);
-  overflow: hidden;
-  border: 0;
-  border-radius: var(--radius-full);
-  background: var(--muted);
-}
-
-.progress-bar {
-  height: 100%;
-  flex-shrink: 0;
-  border: 0;
-  background: var(--viz-series-1);
-}
-
-.viz-badge {
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  color: var(--accent-foreground);
-  background: var(--accent);
-  font-weight: var(--font-weight-medium);
-}
-
-small,
-.text-small,
-.viz-badge {
-  font-size: var(--font-size-small);
-  line-height: var(--line-height-small);
-}
-
-.text-muted {
-  color: var(--muted-foreground);
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.viz-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-.viz-controls &gt; .form-label {
-  display: grid;
-  min-width: min(100%, 260px);
-  flex: 1 1 280px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 2px 12px;
-  margin-bottom: 0;
-}
-
-.viz-controls &gt; .form-label &gt; :is(.form-control, .form-range, .form-select) {
-  grid-column: 1 / -1;
-}
-
-.btn,
-.form-check-input,
-.form-control,
-.form-range,
-.form-select {
-  font: inherit;
-}
-
-.btn {
-  appearance: button;
-  display: inline-flex;
-  inline-size: fit-content;
-  max-inline-size: 100%;
-  min-height: 28px;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  margin: 0;
-  padding: 0 8px;
-  -webkit-app-region: no-drag;
-  border: 1px solid var(--input);
-  border-radius: var(--radius-lg);
-  corner-shape: superellipse(1.5);
-  color: var(--secondary-foreground);
-  background: var(--secondary);
-  cursor: var(--cursor-interaction, pointer);
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-  user-select: none;
-  -webkit-font-smoothing: antialiased;
-}
-
-.btn:is(.btn-block, .viz-tile) {
-  inline-size: 100%;
-}
-
-.btn.viz-tile {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-a.btn {
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.btn:not(:disabled):hover {
-  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
-}
-
-.btn-primary {
-  border-color: transparent;
-  color: var(--primary-foreground);
-  background: var(--foreground);
-  background-clip: padding-box;
-}
-
-.btn-primary .text-muted {
-  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
-}
-
-.btn-primary:not(:disabled):hover {
-  background: color-mix(in srgb, var(--foreground) 80%, transparent);
-  background-clip: padding-box;
-}
-
-.btn-ghost {
-  border-color: transparent;
-  color: var(--muted-foreground);
-  background: transparent;
-}
-
-.btn-ghost:not(:disabled):hover {
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
-}
-
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-[data-lucide] {
-  stroke-width: 1.6;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--foreground);
-}
-
-.form-control {
-  display: block;
-  width: 100%;
-  min-height: 28px;
-  padding: 0 8px;
-  outline: none;
-  border: 1px solid var(--input);
-  border-radius: var(--radius-lg);
-  corner-shape: superellipse(1.5);
-  color: var(--foreground);
-  background: var(--secondary);
-}
-
-.form-control::placeholder {
-  color: var(--muted-foreground);
-}
-
-.form-control[type=&quot;file&quot;] {
-  padding: 0;
-  overflow: hidden;
-  cursor: var(--cursor-interaction, pointer);
-}
-
-.form-control[type=&quot;file&quot;]::file-selector-button {
-  min-height: 26px;
-  margin-right: 8px;
-  padding: 0 8px;
-  border: 0;
-  border-right: 1px solid var(--input);
-  color: var(--secondary-foreground);
-  background: var(--secondary);
-  cursor: inherit;
-  font: inherit;
-}
-
-.form-control[type=&quot;file&quot;]:not(:disabled):hover::file-selector-button {
-  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
-}
-
-.form-control-color[type=&quot;color&quot;] {
-  width: 40px;
-  height: 28px;
-  padding: 3px;
-  cursor: var(--cursor-interaction, pointer);
-}
-
-.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-.form-control-color[type=&quot;color&quot;]::-webkit-color-swatch {
-  border: 0;
-  border-radius: calc(var(--radius-lg) - 4px);
-  corner-shape: superellipse(1.5);
-}
-
-textarea.form-control {
-  height: auto;
-  min-height: 72px;
-  padding: 8px 10px;
-  resize: vertical;
-}
-
-.form-control:focus-visible {
-  border-color: var(--ring);
-  box-shadow: inset 0 0 0 1px var(--ring);
-}
-
-.form-control:disabled,
-.form-select:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-.form-select {
-  appearance: none;
-  display: block;
-  width: 100%;
-  min-height: 28px;
-  margin: 0;
-  padding: 0 32px 0 8px;
-  outline: none;
-  border: 1px solid var(--input);
-  border-radius: var(--radius-lg);
-  corner-shape: superellipse(1.5);
-  color: var(--foreground);
-  background-color: var(--secondary);
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
-    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
-  background-position:
-    calc(100% - 14px) 50%,
-    calc(100% - 10px) 50%;
-  background-repeat: no-repeat;
-  background-size: 4px 4px;
-  cursor: var(--cursor-interaction, default);
-}
-
-.form-select:not(:disabled):hover {
-  background-color: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
-}
-
-.form-select:focus-visible {
-  border-color: var(--ring);
-  box-shadow: inset 0 0 0 1px var(--ring);
-}
-
-.form-check {
-  display: flex;
-  min-height: 20px;
-  align-items: center;
-  gap: 6px;
-}
-
-.form-check-input {
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  margin: 0;
-  border: 1px solid var(--input);
-  color: var(--primary-foreground);
-  background-color: transparent;
-  cursor: var(--cursor-interaction, default);
-  transition:
-    background-color 150ms,
-    border-color 150ms,
-    box-shadow 150ms;
-}
-
-.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;] {
-  border-color: var(--input);
-  border-radius: var(--radius-sm);
-  corner-shape: superellipse(1.5);
-  background-color: var(--secondary);
-  box-shadow: var(--shadow-sm);
-}
-
-.form-check:not(.form-switch)
-  .form-check-input:not(:disabled):not(:checked):hover {
-  background-color: var(--card);
-}
-
-.form-check:not(.form-switch) .form-check-input[type=&quot;checkbox&quot;]:checked {
-  border-color: var(--primary);
-  background-color: var(--primary);
-}
-
-.form-check:not(.form-switch)
-  .form-check-input[type=&quot;checkbox&quot;]:checked::before {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: var(--primary-foreground);
-  content: &quot;&quot;;
-  mask: var(--checkmark-image) center / 12px 12px no-repeat;
-}
-
-.form-check-input[type=&quot;radio&quot;] {
-  width: 14px;
-  height: 14px;
-  border-radius: var(--radius-full);
-}
-
-.form-check-input[type=&quot;radio&quot;]:checked {
-  border: 2px solid var(--primary);
-  background:
-    radial-gradient(circle, var(--primary-foreground) 0 2.5px, transparent 3px),
-    var(--primary);
-}
-
-.form-check:not(.form-switch) .form-check-input:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-.form-check:not(.form-switch) .form-check-input:disabled {
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
-  cursor: not-allowed;
-}
-
-.form-switch .form-check-input:disabled,
-.form-switch .form-check-input:disabled + .form-check-label {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.form-check-label {
-  color: var(--foreground);
-  cursor: var(--cursor-interaction, default);
-}
-
-.form-switch .form-check-input {
-  position: relative;
-  width: 32px;
-  height: 20px;
-  border: 0;
-  border-radius: var(--radius-full);
-  background: var(--muted);
-  box-shadow: none;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.form-switch .form-check-input::before {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 16px;
-  height: 16px;
-  box-sizing: border-box;
-  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
-  border-radius: var(--radius-full);
-  background: light-dark(var(--primary-foreground), var(--foreground));
-  box-shadow: var(--shadow-sm);
-  content: &quot;&quot;;
-  transform: translate(2px, -50%);
-  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.form-switch .form-check-input:checked {
-  background: var(--primary);
-}
-
-.form-switch .form-check-input:checked::before {
-  transform: translate(14px, -50%);
-}
-
-.form-switch .form-check-input:focus-visible {
-  box-shadow: 0 0 0 2px var(--ring);
-}
-
-.form-range {
-  appearance: none;
-  display: block;
-  width: 100%;
-  height: 28px;
-  flex: 1;
-  margin: 0;
-  padding: 0;
-  outline: none;
-  border: 0;
-  accent-color: var(--primary);
-  background: linear-gradient(
-      color-mix(in srgb, var(--foreground) 7%, transparent),
-      color-mix(in srgb, var(--foreground) 7%, transparent)
-    )
-    center / 100% 2px no-repeat;
-}
-
-.form-range::-webkit-slider-runnable-track {
-  height: 28px;
-  background: transparent;
-}
-
-.form-range::-webkit-slider-thumb {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  margin-top: 4px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  background: light-dark(var(--primary-foreground), var(--foreground));
-}
-
-.form-range:focus-visible::-webkit-slider-thumb {
-  border-color: var(--ring);
-  box-shadow: inset 0 0 0 1px var(--ring);
-}
-
-.form-range::-moz-range-track {
-  height: 28px;
-  background: transparent;
-}
-
-.form-range::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  background: light-dark(var(--primary-foreground), var(--foreground));
-}
-
-.form-range:focus-visible::-moz-range-thumb {
-  border-color: var(--ring);
-  box-shadow: inset 0 0 0 1px var(--ring);
-}
-
-.form-range:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-.btn:not(.btn-primary, .viz-tile):is(
-  [aria-pressed=&quot;true&quot;],
-  [aria-selected=&quot;true&quot;],
-  .is-selected
-) {
-  border-color: var(--primary);
-  color: var(--primary-foreground);
-  background: var(--primary);
-}
-
-.btn.viz-tile:is([aria-pressed=&quot;true&quot;], [aria-selected=&quot;true&quot;], .is-selected) {
-  border-color: var(--primary);
-  box-shadow: inset 0 0 0 1px var(--primary);
-}
-
-.btn:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-svg {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-#widget &gt; svg {
-  width: 100%;
-}
-
-/* Model-authored chart rules can otherwise stretch icons after these styles load. */
-svg.lucide {
-  display: block;
-  width: 16px !important;
-  height: 16px !important;
-  flex: none;
-  margin: 0 !important;
-  stroke-width: 1.6;
-}
-
-.text-warning,
-.text-destructive {
-  color: var(--destructive);
-}
-
-html&gt;body{padding:0}&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;div id=&quot;workflow-governance-layers&quot;&gt;
-  &lt;style&gt;
-    #workflow-governance-layers {
-      --wgl-type-input: var(--viz-series-5);
-      --wgl-type-activity: var(--viz-series-1);
-      --wgl-type-decision: var(--viz-series-2);
-      --wgl-type-routing: var(--viz-series-6);
-      --wgl-type-state: var(--viz-series-3);
-      --wgl-type-outcome: var(--viz-series-4);
-      color: var(--foreground);
-      display: grid;
-      gap: 28px;
-      width: 100%;
-    }
-
-    #workflow-governance-layers .wgl-header {
-      display: grid;
-      gap: 6px;
-    }
-
-    #workflow-governance-layers .wgl-diagram {
-      display: grid;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    #workflow-governance-layers .wgl-mermaid {
-      width: 100%;
-      min-width: 0;
-      margin: 0;
-      overflow: visible;
-      color: var(--foreground);
-      text-align: center;
-      white-space: pre-wrap;
-    }
-
-    #workflow-governance-layers .wgl-mermaid svg {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      margin: 0 auto;
-    }
-
-    #workflow-governance-layers .wgl-render-status {
-      color: var(--muted-foreground);
-      text-align: center;
-    }
-
-    #workflow-governance-layers .wgl-fsm-notation {
-      margin: 0;
-      color: var(--muted-foreground);
-    }
-
-    #workflow-governance-layers .wgl-node-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 16px;
-      align-items: center;
-      margin: 0;
-      padding: 0;
-      color: var(--muted-foreground);
-      list-style: none;
-    }
-
-    #workflow-governance-layers .wgl-node-legend li {
-      display: inline-flex;
-      gap: 7px;
-      align-items: center;
-      white-space: nowrap;
-    }
-
-    #workflow-governance-layers .wgl-node-legend-mark {
-      display: inline-block;
-      width: 20px;
-      height: 14px;
-      flex: none;
-      border: 2px solid currentColor;
-      background: color-mix(in srgb, currentColor 16%, var(--card));
-    }
-
-    #workflow-governance-layers .wgl-node-legend-input {
-      margin-inline: 2px;
-      color: var(--wgl-type-input);
-      transform: skewX(-14deg);
-    }
-
-    #workflow-governance-layers .wgl-node-legend-activity {
-      color: var(--wgl-type-activity);
-      border-radius: 5px;
-    }
-
-    #workflow-governance-layers .wgl-node-legend-decision {
-      width: 12px;
-      height: 12px;
-      margin-inline: 4px;
-      color: var(--wgl-type-decision);
-      transform: rotate(45deg);
-    }
-
-    #workflow-governance-layers .wgl-node-legend-routing {
-      color: var(--wgl-type-routing);
-      clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
-    }
-
-    #workflow-governance-layers .wgl-node-legend-state {
-      color: var(--wgl-type-state);
-      border-radius: var(--radius-full);
-    }
-
-    #workflow-governance-layers .wgl-node-legend-outcome {
-      width: 16px;
-      height: 16px;
-      margin-inline: 2px;
-      color: var(--wgl-type-outcome);
-      border-radius: 50%;
-      box-shadow: inset 0 0 0 2px var(--card), inset 0 0 0 4px currentColor;
-    }
-
-    #workflow-governance-layers .wgl-node-link {
-      cursor: pointer;
-    }
-
-    #workflow-governance-layers .wgl-node-type-input {
-      --wgl-node-color: var(--wgl-type-input);
-      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-input) 16%, var(--card));
-      --wgl-node-stroke-width: 2px;
-      --wgl-node-stroke-dasharray: 5 3;
-    }
-
-    #workflow-governance-layers .wgl-node-type-activity {
-      --wgl-node-color: var(--wgl-type-activity);
-      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-activity) 16%, var(--card));
-      --wgl-node-stroke-width: 2px;
-      --wgl-node-stroke-dasharray: none;
-    }
-
-    #workflow-governance-layers .wgl-node-type-decision {
-      --wgl-node-color: var(--wgl-type-decision);
-      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-decision) 18%, var(--card));
-      --wgl-node-stroke-width: 2px;
-      --wgl-node-stroke-dasharray: none;
-    }
-
-    #workflow-governance-layers .wgl-node-type-routing {
-      --wgl-node-color: var(--wgl-type-routing);
-      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-routing) 16%, var(--card));
-      --wgl-node-stroke-width: 2px;
-      --wgl-node-stroke-dasharray: 7 3;
-    }
-
-    #workflow-governance-layers .wgl-node-type-state {
-      --wgl-node-color: var(--wgl-type-state);
-      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-state) 18%, var(--card));
-      --wgl-node-stroke-width: 2px;
-      --wgl-node-stroke-dasharray: none;
-    }
-
-    #workflow-governance-layers .wgl-node-type-outcome {
-      --wgl-node-color: var(--wgl-type-outcome);
-      --wgl-node-fill: color-mix(in srgb, var(--wgl-type-outcome) 18%, var(--card));
-      --wgl-node-stroke-width: 3px;
-      --wgl-node-stroke-dasharray: none;
-    }
-
-    #workflow-governance-layers .wgl-node-link .node &gt; .label-container {
-      fill: var(--wgl-node-fill);
-      stroke: var(--wgl-node-color);
-      stroke-width: var(--wgl-node-stroke-width);
-      stroke-dasharray: var(--wgl-node-stroke-dasharray);
-    }
-
-    #workflow-governance-layers .wgl-node-link .node &gt; g.label-container &gt; path:first-of-type {
-      fill: var(--wgl-node-fill) !important;
-    }
-
-    #workflow-governance-layers .wgl-node-link .node &gt; g.label-container &gt; path:nth-of-type(2) {
-      stroke: var(--wgl-node-color) !important;
-      stroke-width: var(--wgl-node-stroke-width) !important;
-      stroke-dasharray: var(--wgl-node-stroke-dasharray) !important;
-    }
-
-    #workflow-governance-layers .wgl-node-link:focus-visible .node &gt; .label-container,
-    #workflow-governance-layers .wgl-node-link:focus-visible .node &gt; g.label-container &gt; path:nth-of-type(2) {
-      stroke: var(--ring) !important;
-      stroke-width: 3px !important;
-    }
-
-    #workflow-governance-layers .wgl-cluster-l1 &gt; rect {
-      fill: color-mix(in srgb, var(--viz-series-1) 5%, transparent);
-    }
-
-    #workflow-governance-layers .wgl-cluster-l2 &gt; rect {
-      fill: color-mix(in srgb, var(--viz-series-3) 5%, transparent);
-    }
-
-    #workflow-governance-layers .wgl-cluster-l3 &gt; rect {
-      fill: color-mix(in srgb, var(--viz-series-2) 5%, transparent);
-    }
-
-    #workflow-governance-layers .wgl-a1-layout,
-    #workflow-governance-layers .wgl-a1-figure,
-    #workflow-governance-layers .wgl-a1-explorer,
-    #workflow-governance-layers .wgl-a1-detail-grid {
-      display: grid;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    #workflow-governance-layers .wgl-a1-detail-grid {
-      grid-template-columns: 1fr;
-      margin: 0;
-    }
-
-    #workflow-governance-layers .wgl-a1-detail-grid div {
-      display: grid;
-      gap: 3px;
-      min-width: 0;
-    }
-
-    #workflow-governance-layers .wgl-a1-detail-grid dt {
-      color: var(--muted-foreground);
-    }
-
-    #workflow-governance-layers .wgl-a1-detail-grid dd {
-      margin: 0;
-      overflow-wrap: anywhere;
-    }
-
-    @media (max-width: 520px) {
-      #workflow-governance-layers {
-        gap: 16px;
-      }
-    }
-
-    @media (min-width: 900px) {
-      #workflow-governance-layers .wgl-a1-layout {
-        grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.8fr);
-        gap: 18px;
-        align-items: start;
-      }
-
-      #workflow-governance-layers .wgl-a1-explorer {
-        align-content: start;
-        position: sticky;
-        top: 10px;
-      }
-    }
-  &lt;/style&gt;
-
-  &lt;header class=&quot;wgl-header&quot;&gt;
-    &lt;h1&gt;Workflow 治理層級&lt;/h1&gt;
-  &lt;/header&gt;
-
-  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-switch-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-switch-title&quot;&gt;A1｜L1–L3 治理流程與例外路徑&lt;/h2&gt;
-    &lt;ul class=&quot;wgl-node-legend text-small&quot; aria-label=&quot;A1 節點視覺類型&quot;&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-input&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;輸入／觸發&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-activity&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;活動／處理&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-decision&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;決策／Gate&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-routing&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;路由／退回&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-state&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;狀態／條件&lt;/li&gt;
-      &lt;li&gt;&lt;span class=&quot;wgl-node-legend-mark wgl-node-legend-outcome&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;終局結果&lt;/li&gt;
-    &lt;/ul&gt;
-    &lt;div class=&quot;wgl-a1-layout&quot;&gt;
-      &lt;div class=&quot;wgl-a1-figure&quot;&gt;
-        &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a1&quot; data-diagram=&quot;a1-main&quot;&gt;
-flowchart TB
-  subgraph L1[&quot;L1｜流程設計&quot;]
-    direction TB
-    L1N1[/&quot;L1-N1&lt;br/&gt;可能的輸入&quot;/] --&gt; L1N2(&quot;L1-N2&lt;br/&gt;AI 預覽與檢查&quot;)
-    L1N2 --&gt; L1N3{&quot;L1-N3&lt;br/&gt;預覽可套用？&quot;}
-    L1N3 --&gt;|通過| L1N4{&quot;L1-N4&lt;br/&gt;人工確認？&quot;}
-    L1N3 --&gt;|失敗| L1N6(&quot;L1-N6&lt;br/&gt;修正輸入&quot;)
-    L1N4 --&gt;|確認| L1N5(&quot;L1-N5&lt;br/&gt;建立／修正草稿&quot;)
-    L1N4 --&gt;|修改| L1N6
-    L1N6 -. fresh preview .-&gt; L1N2
-  end
-
-  subgraph L2[&quot;L2｜發布授權&quot;]
-    direction TB
-    L2N1(&quot;L2-N1&lt;br/&gt;AI 發布檢查&quot;) --&gt; L2N2{&quot;L2-N2&lt;br/&gt;發布條件通過？&quot;}
-    L2N2 --&gt;|通過| L2N3{&quot;L2-N3&lt;br/&gt;人工發布核准？&quot;}
-    L2N3 --&gt;|核准| L2N4(&quot;L2-N4&lt;br/&gt;準備發布&quot;)
-    L2N4 --&gt; L2N5{&quot;L2-N5&lt;br/&gt;已合併正式分支？&quot;}
-    L2N5 --&gt;|是| L2N6([&quot;L2-N6&lt;br/&gt;正式權威生效&quot;])
-    L2N2 --&gt;|草稿／變更／pins 缺口| L2N7{{&quot;L2-N7&lt;br/&gt;退回 L1&quot;}}
-    L2N3 --&gt;|未核准| L2N7
-    L2N5 --&gt;|否| L2N8([&quot;L2-N8&lt;br/&gt;阻止新研究&quot;])
-    L2N8 -. 等待合併 .-&gt; L2N5
-  end
-
-  subgraph L3[&quot;L3｜各 Study Instance（0..n，可並行）&quot;]
-    direction TB
-    L3N1(&quot;L3-N1&lt;br/&gt;研究先安全化&quot;)
-    L3N2(&quot;L3-N2&lt;br/&gt;預註冊&quot;) --&gt;|首次 Development approval| L3N3(&quot;L3-N3&lt;br/&gt;執行與證據&quot;)
-    L3N3 --&gt; L3N4{&quot;L3-N4&lt;br/&gt;獨立審查&quot;}
-    L3N4 --&gt;|退回補證| L3N3
-    L3N4 --&gt;|完成| L3N5((&quot;L3-N5&lt;br/&gt;終局結論&quot;))
-  end
-
-  L1N5 --&gt;|draft handoff| L2N1
-  L2N2 --&gt;|study 不安全| L3N1
-  L3N1 -. 安全後重試 .-&gt; L2N1
-  L2N7 -. 修正後重試 .-&gt; L1N2
-  L2N6 --&gt;|建立獨立 Sxxx（可重複；0..n；immutable pins）| L3N2
-  L3N5 -. 需要改流程 .-&gt; L1N1
-        &lt;/pre&gt;
-        &lt;div id=&quot;wgl-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1…&lt;/div&gt;
-      &lt;/div&gt;
-      &lt;div class=&quot;wgl-a1-explorer&quot;&gt;
-      &lt;div class=&quot;viz-controls&quot;&gt;
-        &lt;label class=&quot;form-label&quot; for=&quot;wgl-a1-detail-select&quot;&gt;查看節點說明&lt;/label&gt;
-        &lt;select id=&quot;wgl-a1-detail-select&quot; class=&quot;form-select&quot;&gt;
-          &lt;optgroup label=&quot;L1｜流程設計&quot;&gt;
-            &lt;option value=&quot;L1N1&quot;&gt;L1-N1｜可能的輸入&lt;/option&gt;
-            &lt;option value=&quot;L1N2&quot;&gt;L1-N2｜AI 預覽與檢查&lt;/option&gt;
-            &lt;option value=&quot;L1N3&quot;&gt;L1-N3｜預覽可套用？&lt;/option&gt;
-            &lt;option value=&quot;L1N4&quot;&gt;L1-N4｜人工確認？&lt;/option&gt;
-            &lt;option value=&quot;L1N5&quot;&gt;L1-N5｜建立／修正草稿&lt;/option&gt;
-            &lt;option value=&quot;L1N6&quot;&gt;L1-N6｜修正輸入&lt;/option&gt;
-          &lt;/optgroup&gt;
-          &lt;optgroup label=&quot;L2｜發布授權&quot;&gt;
-            &lt;option value=&quot;L2N1&quot;&gt;L2-N1｜AI 發布檢查&lt;/option&gt;
-            &lt;option value=&quot;L2N2&quot;&gt;L2-N2｜發布條件通過？&lt;/option&gt;
-            &lt;option value=&quot;L2N3&quot;&gt;L2-N3｜人工發布核准？&lt;/option&gt;
-            &lt;option value=&quot;L2N4&quot;&gt;L2-N4｜準備發布&lt;/option&gt;
-            &lt;option value=&quot;L2N5&quot;&gt;L2-N5｜已合併正式分支？&lt;/option&gt;
-            &lt;option value=&quot;L2N6&quot;&gt;L2-N6｜正式權威生效&lt;/option&gt;
-            &lt;option value=&quot;L2N7&quot;&gt;L2-N7｜退回 L1&lt;/option&gt;
-            &lt;option value=&quot;L2N8&quot;&gt;L2-N8｜阻止新研究&lt;/option&gt;
-          &lt;/optgroup&gt;
-          &lt;optgroup label=&quot;L3｜各 Study Instance（0..n，可並行）&quot;&gt;
-            &lt;option value=&quot;L3N1&quot;&gt;L3-N1｜研究先安全化&lt;/option&gt;
-            &lt;option value=&quot;L3N2&quot;&gt;L3-N2｜預註冊&lt;/option&gt;
-            &lt;option value=&quot;L3N3&quot;&gt;L3-N3｜執行與證據&lt;/option&gt;
-            &lt;option value=&quot;L3N4&quot;&gt;L3-N4｜獨立審查&lt;/option&gt;
-            &lt;option value=&quot;L3N5&quot;&gt;L3-N5｜終局結論&lt;/option&gt;
-          &lt;/optgroup&gt;
-        &lt;/select&gt;
-      &lt;/div&gt;
-      &lt;section id=&quot;wgl-a1-detail-panel&quot; class=&quot;card&quot; aria-live=&quot;polite&quot; aria-labelledby=&quot;wgl-a1-detail-title&quot;&gt;
-        &lt;h3 id=&quot;wgl-a1-detail-title&quot;&gt;L1-N1｜可能的輸入&lt;/h3&gt;
-        &lt;p id=&quot;wgl-a1-detail-summary&quot;&gt;彙整首次建立、版本變更、研究回饋與 L2 退回的修正需求。&lt;/p&gt;
-        &lt;dl class=&quot;wgl-a1-detail-grid text-small&quot;&gt;
-          &lt;div&gt;&lt;dt&gt;節點類型&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-type&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
-          &lt;div&gt;&lt;dt&gt;輸入&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-input&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
-          &lt;div&gt;&lt;dt&gt;下一步&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-next&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
-          &lt;div&gt;&lt;dt&gt;限制／失敗處理&lt;/dt&gt;&lt;dd id=&quot;wgl-a1-detail-guard&quot;&gt;&lt;/dd&gt;&lt;/div&gt;
-        &lt;/dl&gt;
-      &lt;/section&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/section&gt;
-
-  &lt;section class=&quot;wgl-diagram&quot; aria-labelledby=&quot;wgl-aligned-state-machine-title&quot;&gt;
-    &lt;h2 id=&quot;wgl-aligned-state-machine-title&quot;&gt;A1-2｜單一 Sxxx（可多重實例化）的治理控制有限狀態機&lt;/h2&gt;
-    &lt;p class=&quot;wgl-fsm-notation text-small&quot;&gt;
-      節點使用 &lt;code&gt;A12-Nxx&lt;/code&gt;，transition action 使用 &lt;code&gt;A12-Axx&lt;/code&gt;；起點與終點不另算節點。L1／L2 維持整體治理狀態；L3 則是每個 &lt;code&gt;Sxxx&lt;/code&gt; 各自遵守的 instance lifecycle，同一個 active workflow 下可同時存在 0..n 份。圖中也將 A1 的修正回路、&lt;code&gt;immutable pins&lt;/code&gt; guard 與首次 &lt;code&gt;Development approval&lt;/code&gt; 明確映射到 transition；所有返回 Preview 的 transition 都會修正 request 並產生 fresh preview。
-    &lt;/p&gt;
-    &lt;pre class=&quot;mermaid wgl-mermaid wgl-mermaid-a12&quot; data-diagram=&quot;a1-aligned-state-machine&quot;&gt;
-stateDiagram-v2
-  direction TB
-
-  state &quot;A12-N01 · L1 · 輸入待整理&quot; as InputPending
-  state &quot;A12-N02 · L1 · Preview 待人工確認&quot; as PreviewConfirmationPending
-  state &quot;A12-N03 · L1 · Draft 已就緒&quot; as DraftReady
-  state &quot;A12-N04 · L3 · Study 需要安全化&quot; as StudySafetyRequired
-  state &quot;A12-N05 · L2 · 等待發布核准&quot; as ReleaseApprovalPending
-  state &quot;A12-N06 · L2 · Prepared／等待合併（新 study blocked）&quot; as PreparedAwaitingMerge
-  state &quot;A12-N07 · L2 · 正式權威生效&quot; as ActiveAuthority
-  state &quot;A12-N08 · L3 · Study 已預註冊&quot; as StudyPreregistered
-  state &quot;A12-N09 · L3 · Running／蒐集證據&quot; as StudyRunning
-  state &quot;A12-N10 · L3 · Awaiting review&quot; as AwaitingReview
-  state &quot;A12-N11 · L3 · Completed／Outcome 已凍結&quot; as StudyCompleted
-
-  [*] --&gt; InputPending: A12-A01｜建立／變更需求
-  InputPending --&gt; PreviewConfirmationPending: A12-A02｜closed request / 產生 preview
-  PreviewConfirmationPending --&gt; PreviewConfirmationPending: A12-A03｜preview 失敗／要求修改
-  PreviewConfirmationPending --&gt; DraftReady: A12-A04｜確認 [preview 可套用] / 套用 draft
-
-  DraftReady --&gt; PreviewConfirmationPending: A12-A05｜release guards [缺口]
-  DraftReady --&gt; StudySafetyRequired: A12-A06｜release guards [unfinished study 不安全]
-  StudySafetyRequired --&gt; DraftReady: A12-A07｜[paused／completed／cancelled] / 記錄 impact decision
-  DraftReady --&gt; ReleaseApprovalPending: A12-A08｜release guards [全部通過]
-  ReleaseApprovalPending --&gt; PreviewConfirmationPending: A12-A09｜未核准
-  ReleaseApprovalPending --&gt; PreparedAwaitingMerge: A12-A10｜核准 / 產生 RELEASE.json
-  PreparedAwaitingMerge --&gt; ActiveAuthority: A12-A11｜canonical merge
-
-  ActiveAuthority --&gt; StudyPreregistered: A12-A12｜建立 Sxxx [可重複、0..n；immutable pins] / 獨立預註冊
-  StudyPreregistered --&gt; StudyRunning: A12-A13｜首次 Development approval
-  StudyRunning --&gt; AwaitingReview: A12-A14｜提交 exact evidence
-  AwaitingReview --&gt; StudyRunning: A12-A15｜reviewer 退回補證
-  AwaitingReview --&gt; StudyCompleted: A12-A16｜reviewer confirmation / 凍結 outcome
-  StudyCompleted --&gt; InputPending: A12-A17｜需要改流程 / 建立 change request
-  StudyCompleted --&gt; [*]: A12-A18｜此 Sxxx 結束；其他 study 不受影響
-
-  note right of ActiveAuthority
-    Workflow authority 持續有效。
-    可重複建立 0..n 個獨立 Sxxx；
-    各 instance 可同時推進。
-  end note
-
-  classDef l1 fill:var(--card),stroke:var(--viz-series-1),stroke-width:2px,color:var(--foreground)
-  classDef l2 fill:var(--card),stroke:var(--viz-series-3),stroke-width:2px,color:var(--foreground)
-  classDef l3 fill:var(--card),stroke:var(--viz-series-2),stroke-width:2px,color:var(--foreground)
-  class InputPending,PreviewConfirmationPending,DraftReady l1
-  class ReleaseApprovalPending,PreparedAwaitingMerge,ActiveAuthority l2
-  class StudySafetyRequired,StudyPreregistered,StudyRunning,AwaitingReview,StudyCompleted l3
-    &lt;/pre&gt;
-    &lt;div id=&quot;wgl-a12-mermaid-status&quot; class=&quot;wgl-render-status text-small&quot; aria-live=&quot;polite&quot;&gt;正在整理 A1-2…&lt;/div&gt;
-  &lt;/section&gt;
-
-  &lt;script type=&quot;module&quot;&gt;
-    const root = document.getElementById(&quot;workflow-governance-layers&quot;);
-    const a1Status = root.querySelector(&quot;#wgl-mermaid-status&quot;);
-    const a12Status = root.querySelector(&quot;#wgl-a12-mermaid-status&quot;);
-    const isMobileLayout = window.matchMedia(&quot;(max-width: 520px)&quot;).matches;
-    const isTwoColumnLayout = window.matchMedia(&quot;(min-width: 900px)&quot;).matches;
-    const diagrams = [...root.querySelectorAll(&quot;.wgl-mermaid&quot;)];
-    const detailSelect = root.querySelector(&quot;#wgl-a1-detail-select&quot;);
-    const detailTitle = root.querySelector(&quot;#wgl-a1-detail-title&quot;);
-    const detailSummary = root.querySelector(&quot;#wgl-a1-detail-summary&quot;);
-    const detailType = root.querySelector(&quot;#wgl-a1-detail-type&quot;);
-    const detailInput = root.querySelector(&quot;#wgl-a1-detail-input&quot;);
-    const detailNext = root.querySelector(&quot;#wgl-a1-detail-next&quot;);
-    const detailGuard = root.querySelector(&quot;#wgl-a1-detail-guard&quot;);
-    const detailPanel = root.querySelector(&quot;#wgl-a1-detail-panel&quot;);
-    const decisionNodes = new Set([&quot;L1N3&quot;, &quot;L1N4&quot;, &quot;L2N2&quot;, &quot;L2N3&quot;, &quot;L2N5&quot;, &quot;L3N4&quot;]);
-    const nodeTypes = {
-      L1N1: { key: &quot;input&quot;, label: &quot;輸入／觸發來源&quot; },
-      L1N2: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L1N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L1N4: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L1N5: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L1N6: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L2N1: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L2N2: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L2N3: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L2N4: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L2N5: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L2N6: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
-      L2N7: { key: &quot;routing&quot;, label: &quot;路由／退回&quot; },
-      L2N8: { key: &quot;state&quot;, label: &quot;狀態／治理條件&quot; },
-      L3N1: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L3N2: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L3N3: { key: &quot;activity&quot;, label: &quot;活動／處理步驟&quot; },
-      L3N4: { key: &quot;decision&quot;, label: &quot;決策／Gate&quot; },
-      L3N5: { key: &quot;outcome&quot;, label: &quot;終局結果&quot; }
-    };
-
-    const details = {
-      L1N1: {
-        title: &quot;L1-N1｜可能的輸入&quot;,
-        summary: &quot;彙整所有可能觸發 workflow 建立或修改的來源。&quot;,
-        input: &quot;首次建立需求、active workflow 的變更需求、L2 退回缺口，以及 L3 結論形成的新 change request。&quot;,
-        next: &quot;形成 closed create／change request，交給 AI 預覽與檢查。&quot;,
-        guard: &quot;L2 退回與 L3 結論只能成為輸入，不能自動改動 workflow。&quot;
-      },
-      L1N2: {
-        title: &quot;L1-N2｜AI 預覽與檢查&quot;,
-        summary: &quot;AI 解析 repository facts 與要求，產生不寫檔的 preview。&quot;,
-        input: &quot;Closed request、registry、active version、來源文件與治理規則。&quot;,
-        next: &quot;檢查 preview 是否完整、可套用且目標狀態沒有漂移。&quot;,
-        guard: &quot;Target drift 或 invalid partial state 必須 fail closed、零 mutation，並重新產生 fresh preview。&quot;
-      },
-      L1N3: {
-        title: &quot;L1-N3｜預覽可套用？&quot;,
-        summary: &quot;判斷 preview 是否完整且仍對應目前 repository 狀態。&quot;,
-        input: &quot;Resolved changes、exact paths、target digests、source disposition 與 validation plan。&quot;,
-        next: &quot;通過則交給人類確認；失敗則修正輸入並回到 fresh preview。&quot;,
-        guard: &quot;不得繞過 drift 或 partial-state guard，也不得留下部分修改。&quot;
-      },
-      L1N4: {
-        title: &quot;L1-N4｜人工確認？&quot;,
-        summary: &quot;人類確認 AI 已解析出的實際修改內容與範圍。&quot;,
-        input: &quot;完整 preview、resolved changes、目標路徑、來源處置與驗證計畫。&quot;,
-        next: &quot;確認後僅授權依該 preview 套用；要求修改則返回 preview。&quot;,
-        guard: &quot;Resolved changes 一旦改變，原確認失效；此確認也不是 release approval。&quot;
-      },
-      L1N5: {
-        title: &quot;L1-N5｜建立／修正草稿&quot;,
-        summary: &quot;依已確認的 preview 形成完整 registered draft。&quot;,
-        input: &quot;首次建立 request，或 change accepted 後經 evolve 形成的 replacement draft。&quot;,
-        next: &quot;以 draft handoff 交給 L2 發布檢查。&quot;,
-        guard: &quot;Draft 沒有 effective authority，也不能供新的 L3 study 使用。&quot;
-      },
-      L1N6: {
-        title: &quot;L1-N6｜修正輸入&quot;,
-        summary: &quot;處理 preview 失敗或人類要求調整的內容。&quot;,
-        input: &quot;缺漏、衝突、target drift、invalid partial state 或人工修改意見。&quot;,
-        next: &quot;重新整理 request，回到 L1-N2 產生 fresh preview。&quot;,
-        guard: &quot;若 resolved changes 不同，必須重新取得人工確認。&quot;
-      },
-      L2N1: {
-        title: &quot;L2-N1｜AI 發布檢查&quot;,
-        summary: &quot;CLI 與 Agent 檢查所有 release guards。&quot;,
-        input: &quot;完整 contract、accepted changes 與 combined impact、exact active version、study 狀態、policy／dependency pins。&quot;,
-        next: &quot;將結果交給發布條件判斷。&quot;,
-        guard: &quot;任何缺口都必須 fail closed；AI 檢查不能取代人類發布核准。&quot;
-      },
-      L2N2: {
-        title: &quot;L2-N2｜發布條件通過？&quot;,
-        summary: &quot;區分可發布、需要回 L1 修正，以及需要先安全化研究的情況。&quot;,
-        input: &quot;L2-N1 的完整 release-readiness 結果。&quot;,
-        next: &quot;通過則請求人類核准；草稿／變更／pins 缺口退回 L1；不安全 study 轉至 L3-N1。&quot;,
-        guard: &quot;Running、preregistered、draft 或 awaiting-review study 會阻擋版本邊界。&quot;
-      },
-      L2N3: {
-        title: &quot;L2-N3｜人工發布核准？&quot;,
-        summary: &quot;人類以 stable identity 明確批准目前這一次 release preparation。&quot;,
-        input: &quot;完整 release scope、readiness 結果與 combined impact。&quot;,
-        next: &quot;核准後準備 immutable release evidence；未核准則退回 L1。&quot;,
-        guard: &quot;核准只允許準備發布，不授權 commit、push、merge、研究或交易。&quot;
-      },
-      L2N4: {
-        title: &quot;L2-N4｜準備發布&quot;,
-        summary: &quot;Guarded release 產生 RELEASE.json 並準備 registry transition。&quot;,
-        input: &quot;通過所有 guards 的 draft 與當下明確的人類發布核准。&quot;,
-        next: &quot;Prepared branch 的 registry status 成為 active，等待 canonical merge。&quot;,
-        guard: &quot;此時 effective authority 尚未生效。&quot;
-      },
-      L2N5: {
-        title: &quot;L2-N5｜已合併正式分支？&quot;,
-        summary: &quot;確認 prepared release commit 是否已進入 canonical branch。&quot;,
-        input: &quot;Prepared release commit 與 repository canonical branch 狀態。&quot;,
-        next: &quot;已合併則權威生效；尚未合併則阻止新的 L3 study。&quot;,
-        guard: &quot;Prepared branch 上的 active registry 狀態不能取代 canonical merge。&quot;
-      },
-      L2N6: {
-        title: &quot;L2-N6｜正式權威生效&quot;,
-        summary: &quot;Canonical branch 上的 active version 成為可供多個 study 共同釘選的 effective authority。&quot;,
-        input: &quot;已合併的 prepared release、immutable release evidence 與 exact pins。&quot;,
-        next: &quot;可重複配發新的 Sxxx；每個 instance 依 exact version 與 immutable pins 獨立預註冊及推進。&quot;,
-        guard: &quot;Authority 只適用於精確釘選的 released version 與 dependencies；各 study 的 identity、plan、授權與 evidence 不得混用。&quot;
-      },
-      L2N7: {
-        title: &quot;L2-N7｜退回 L1&quot;,
-        summary: &quot;處理 contract、accepted change、impact、pins 或發布核准不足。&quot;,
-        input: &quot;L2 的 fail-closed 缺口報告或未取得核准的結果。&quot;,
-        next: &quot;回到 L1-N2；修正 request 後重新 preview、確認及發布檢查。&quot;,
-        guard: &quot;不得直接修改 prepared release evidence 或繞過重新確認。&quot;
-      },
-      L2N8: {
-        title: &quot;L2-N8｜阻止新研究&quot;,
-        summary: &quot;Prepared release 尚未 canonical merge 時維持 fail closed。&quot;,
-        input: &quot;Registry 已顯示 active，但 release commit 尚未進入 canonical branch。&quot;,
-        next: &quot;等待正常 repository merge 流程，再重新檢查 L2-N5。&quot;,
-        guard: &quot;不得把 prepared registry active 誤認為 effective authority。&quot;
-      },
-      L3N1: {
-        title: &quot;L3-N1｜研究先安全化&quot;,
-        summary: &quot;版本邊界前先讓 unfinished studies 到達合法安全狀態。&quot;,
-        input: &quot;阻擋 release 的 running、preregistered、draft 或 awaiting-review study。&quot;,
-        next: &quot;由 operator／reviewer 合法進入 paused、completed 或 cancelled，記錄 impact decision 後重試 L2。&quot;,
-        guard: &quot;Workflow author 不能代替 operator／reviewer 操作、完成或重解釋 study。&quot;
-      },
-      L3N2: {
-        title: &quot;L3-N2｜預註冊&quot;,
-        summary: &quot;為每個 Sxxx instance 在 outcome-relevant execution 或 inspection 前凍結 identity 與 plan。&quot;,
-        input: &quot;Effective canonical workflow authority、exact policies／dependencies 與人類 preregistration approval。&quot;,
-        next: &quot;取得首次 Development approval 後，依 frozen plan 推進各研究階段。&quot;,
-        guard: &quot;同一 active workflow 可有 0..n 個獨立 instance；Preregistration、Development、candidate freeze 與 Evaluation 的 authority 不可跨 study 或互相推導。&quot;
-      },
-      L3N3: {
-        title: &quot;L3-N3｜執行與證據&quot;,
-        summary: &quot;Operator 依 frozen plan 執行研究並提交 exact evidence。&quot;,
-        input: &quot;Preregistered study、各階段必要的人類批准、immutable pins 與 frozen outcome rules。&quot;,
-        next: &quot;完成後提交 awaiting-review；被 reviewer 退回時補充合法 evidence。&quot;,
-        guard: &quot;不得修改 preregistered hypothesis、plan 或 outcome rules。&quot;
-      },
-      L3N4: {
-        title: &quot;L3-N4｜獨立審查&quot;,
-        summary: &quot;獨立 reviewer 對 frozen plan 與 exact evidence 作出判定。&quot;,
-        input: &quot;Awaiting-review study、frozen evidence、workflow version 與 outcome rules。&quot;,
-        next: &quot;證據不足或需補充時退回 running；完成時形成 terminal outcome。&quot;,
-        guard: &quot;Reviewer 完成 outcome 前需要明確確認，且不能執行研究或修補 evidence。&quot;
-      },
-      L3N5: {
-        title: &quot;L3-N5｜終局結論&quot;,
-        summary: &quot;凍結 pass、fail、insufficient-evidence 或 indeterminate outcome。&quot;,
-        input: &quot;Independent reviewer 的明確確認與完成的 evidence assessment。&quot;,
-        next: &quot;此 Sxxx instance 結束，不影響其他 study；若揭示流程改善需求，建立新的 change request 回到 L1-N1。&quot;,
-        guard: &quot;Study outcome 不得自動覆寫 released workflow、改變 L1／L2 authority，或阻止正式權威建立其他獨立 Sxxx。&quot;
-      }
-    };
-
-    const showDetail = (nodeId) =&gt; {
-      const detail = details[nodeId];
-      if (!detail) return;
-      detailSelect.value = nodeId;
-      detailTitle.textContent = detail.title;
-      detailSummary.textContent = detail.summary;
-      detailType.textContent = nodeTypes[nodeId].label;
-      detailInput.textContent = detail.input;
-      detailNext.textContent = detail.next;
-      detailGuard.textContent = detail.guard;
-    };
-
-    detailSelect.addEventListener(&quot;change&quot;, (event) =&gt; showDetail(event.target.value));
-    showDetail(detailSelect.value);
-
-    const colorCanvas = document.createElement(&quot;canvas&quot;);
-    colorCanvas.width = 1;
-    colorCanvas.height = 1;
-    const colorContext = colorCanvas.getContext(&quot;2d&quot;, { willReadFrequently: true });
-
-    const normalizeColor = (value) =&gt; {
-      colorContext.clearRect(0, 0, 1, 1);
-      colorContext.fillStyle = value;
-      colorContext.fillRect(0, 0, 1, 1);
-      const [red, green, blue, alpha] = colorContext.getImageData(0, 0, 1, 1).data;
-      return `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`;
-    };
-
-    const readColor = (name) =&gt; {
-      const resolver = document.createElement(&quot;span&quot;);
-      resolver.style.color = `var(${name})`;
-      resolver.hidden = true;
-      root.appendChild(resolver);
-      const resolved = normalizeColor(getComputedStyle(resolver).color);
-      resolver.remove();
-      return resolved;
-    };
-
-    try {
-      const module = await import(&quot;https://cdn.jsdelivr.net/npm/mermaid@11.12.0/+esm&quot;);
-      const mermaid = module.default;
-      mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: &quot;strict&quot;,
-        theme: &quot;base&quot;,
-        themeVariables: {
-          background: &quot;transparent&quot;,
-          primaryColor: readColor(&quot;--card&quot;),
-          primaryTextColor: readColor(&quot;--card-foreground&quot;),
-          primaryBorderColor: readColor(&quot;--border&quot;),
-          secondaryColor: readColor(&quot;--muted&quot;),
-          secondaryTextColor: readColor(&quot;--foreground&quot;),
-          secondaryBorderColor: readColor(&quot;--border&quot;),
-          tertiaryColor: readColor(&quot;--background&quot;),
-          tertiaryTextColor: readColor(&quot;--foreground&quot;),
-          tertiaryBorderColor: readColor(&quot;--border&quot;),
-          lineColor: readColor(&quot;--muted-foreground&quot;),
-          textColor: readColor(&quot;--foreground&quot;),
-          clusterBkg: readColor(&quot;--background&quot;),
-          clusterBorder: readColor(&quot;--border&quot;),
-          edgeLabelBackground: readColor(&quot;--background&quot;),
-          fontSize: &quot;14px&quot;
-        },
-        flowchart: {
-          curve: &quot;basis&quot;,
-          htmlLabels: true,
-          nodeSpacing: isMobileLayout ? 18 : 26,
-          rankSpacing: isMobileLayout ? 28 : 34,
-          padding: 10,
-          useMaxWidth: true
-        }
-      });
-
-      await mermaid.run({ nodes: diagrams });
-      const svgs = diagrams.map((item) =&gt; item.querySelector(&quot;svg&quot;));
-      svgs.forEach((svg, index) =&gt; {
-        const diagram = diagrams[index].dataset.diagram;
-        svg.setAttribute(&quot;role&quot;, &quot;img&quot;);
-        svg.setAttribute(
-          &quot;aria-label&quot;,
-          diagram === &quot;a1-aligned-state-machine&quot;
-            ? &quot;A1-2：單一 Sxxx 的治理控制有限狀態機；同一 active workflow 可同時存在多個獨立 instance&quot;
-            : &quot;A1：L1 流程設計、L2 發布授權與 0..n 個可並行 L3 Study Instance 的治理流程、判斷與例外回復路徑；每個節點可開啟詳細說明&quot;
-        );
-        svg.removeAttribute(&quot;height&quot;);
-        svg.querySelectorAll(&quot;g.cluster&quot;).forEach((cluster) =&gt; {
-          const label = cluster.textContent.trim();
-          if (label.startsWith(&quot;L1｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l1&quot;);
-          if (label.startsWith(&quot;L2｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l2&quot;);
-          if (label.startsWith(&quot;L3｜&quot;)) cluster.classList.add(&quot;wgl-cluster-l3&quot;);
-        });
-      });
-
-      Object.entries(details).forEach(([nodeId, detail]) =&gt; {
-        const nodeType = nodeTypes[nodeId];
-        const node = svgs
-          .flatMap((svg) =&gt; [...svg.querySelectorAll(&quot;g.node&quot;)])
-          .find((candidate) =&gt; candidate.id.startsWith(`flowchart-${nodeId}-`));
-        if (!node) return;
-        const link = document.createElementNS(&quot;http://www.w3.org/2000/svg&quot;, &quot;a&quot;);
-        link.setAttribute(&quot;href&quot;, &quot;#wgl-a1-detail-panel&quot;);
-        link.setAttribute(&quot;aria-label&quot;, `查看 ${detail.title} 的詳細說明；節點類型：${nodeType.label}`);
-        link.setAttribute(&quot;data-tooltip&quot;, detail.summary);
-        link.setAttribute(&quot;data-tooltip-placement&quot;, &quot;top&quot;);
-        link.classList.add(&quot;wgl-node-link&quot;);
-        link.classList.add(`wgl-node-${nodeId.slice(0, 2).toLowerCase()}`);
-        link.classList.add(`wgl-node-type-${nodeType.key}`);
-        if (decisionNodes.has(nodeId)) link.classList.add(&quot;wgl-node-decision&quot;);
-        node.parentNode.insertBefore(link, node);
-        link.append(node);
-        link.addEventListener(&quot;pointerenter&quot;, () =&gt; {
-          if (window.matchMedia(&quot;(hover: hover)&quot;).matches) showDetail(nodeId);
-        });
-        link.addEventListener(&quot;focus&quot;, () =&gt; showDetail(nodeId));
-        link.addEventListener(&quot;click&quot;, (event) =&gt; {
-          event.preventDefault();
-          showDetail(nodeId);
-          if (!isTwoColumnLayout) detailPanel.scrollIntoView({ block: &quot;start&quot; });
-        });
-      });
-
-      a1Status.textContent = !isTwoColumnLayout
-        ? &quot;滑鼠停留顯示摘要；點選 A1 節點可在下方查看完整說明。&quot;
-        : &quot;滑鼠停留顯示摘要；聚焦或點選 A1 節點可在右欄查看完整說明。&quot;;
-      a12Status.textContent = &quot;A1-2 的 11 個節點與 18 個 action 已編號；同一 active workflow 可同時存在 0..n 個獨立 Sxxx instance。&quot;;
-    } catch (error) {
-      console.error(error);
-      a1Status.textContent = &quot;A1 載入失敗；上方保留可讀的 Mermaid source。&quot;;
-      a12Status.textContent = &quot;A1-2 載入失敗；上方保留可讀的 Mermaid source。&quot;;
-      a1Status.classList.add(&quot;text-destructive&quot;);
-      a12Status.classList.add(&quot;text-destructive&quot;);
-    }
-  &lt;/script&gt;
-&lt;/div&gt;
-
-&lt;script src=&quot;https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js&quot;&gt;&lt;/script&gt;
-&lt;script&gt;
-(() =&gt; {
+<div id="workflow-governance-layers">
+  <p id="wgl-data-load-status" class="wgl-render-status text-small" role="status" aria-live="polite">正在從 workflow-governance-layers.yaml 載入治理資料…</p>
+  <noscript>此頁面需要 JavaScript 才能載入 Workflow 治理資料。</noscript>
+</div>
+<script type="module" src="./workflow-governance-layers.js"></script>
+
+<script src="https://unpkg.com/@floating-ui/core@1.7.3/dist/floating-ui.core.umd.min.js"></script>
+<script src="https://unpkg.com/@floating-ui/dom@1.7.4/dist/floating-ui.dom.umd.min.js"></script>
+<script>
+(() => {
   if (window.FloatingUIDOM == null) {
     return;
   }
   const { autoUpdate, computePosition, flip, offset, shift, size } =
     window.FloatingUIDOM;
-  const tooltipPlacements = new Set([&quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, &quot;left&quot;]);
+  const tooltipPlacements = new Set(["top", "right", "bottom", "left"]);
   const tooltipId = `codex-visualization-tooltip-${
     window.crypto?.randomUUID?.() ?? Date.now().toString(36)
   }`;
@@ -1651,30 +39,30 @@ stateDiagram-v2
   let positionRequest = 0;
   let skipDelayUntil = 0;
 
-  const getTrigger = (target) =&gt;
+  const getTrigger = (target) =>
     target?.nodeType === Node.ELEMENT_NODE
-      ? target.closest(&quot;[data-tooltip]&quot;)
+      ? target.closest("[data-tooltip]")
       : null;
-  const containsTarget = (trigger, target) =&gt;
-    target?.nodeType != null &amp;&amp; trigger.contains(target);
-  const getContent = (trigger) =&gt;
-    trigger.getAttribute(&quot;data-tooltip&quot;)?.trim() ?? &quot;&quot;;
-  const getPlacement = (trigger) =&gt; {
-    const placement = trigger.getAttribute(&quot;data-tooltip-placement&quot;);
-    return tooltipPlacements.has(placement) ? placement : &quot;top&quot;;
+  const containsTarget = (trigger, target) =>
+    target?.nodeType != null && trigger.contains(target);
+  const getContent = (trigger) =>
+    trigger.getAttribute("data-tooltip")?.trim() ?? "";
+  const getPlacement = (trigger) => {
+    const placement = trigger.getAttribute("data-tooltip-placement");
+    return tooltipPlacements.has(placement) ? placement : "top";
   };
-  const getTooltip = () =&gt; {
+  const getTooltip = () => {
     if (tooltip == null) {
-      tooltip = document.createElement(&quot;div&quot;);
+      tooltip = document.createElement("div");
       tooltip.id = tooltipId;
-      tooltip.className = &quot;tooltip&quot;;
-      tooltip.setAttribute(&quot;role&quot;, &quot;tooltip&quot;);
+      tooltip.className = "tooltip";
+      tooltip.setAttribute("role", "tooltip");
     }
     return tooltip;
   };
-  const setDescribedBy = (trigger, described) =&gt; {
+  const setDescribedBy = (trigger, described) => {
     const ids = new Set(
-      (trigger.getAttribute(&quot;aria-describedby&quot;) ?? &quot;&quot;)
+      (trigger.getAttribute("aria-describedby") ?? "")
         .split(/\s+/)
         .filter(Boolean),
     );
@@ -1684,19 +72,19 @@ stateDiagram-v2
       ids.delete(tooltipId);
     }
     if (ids.size === 0) {
-      trigger.removeAttribute(&quot;aria-describedby&quot;);
+      trigger.removeAttribute("aria-describedby");
     } else {
-      trigger.setAttribute(&quot;aria-describedby&quot;, [...ids].join(&quot; &quot;));
+      trigger.setAttribute("aria-describedby", [...ids].join(" "));
     }
   };
-  const clearOpenTimeout = () =&gt; {
+  const clearOpenTimeout = () => {
     if (openTimeout != null) {
       window.clearTimeout(openTimeout);
       openTimeout = null;
     }
     pendingTrigger = null;
   };
-  const closeTooltip = (activateSkipDelay = true) =&gt; {
+  const closeTooltip = (activateSkipDelay = true) => {
     clearOpenTimeout();
     positionRequest += 1;
     autoUpdateCleanup?.();
@@ -1711,7 +99,7 @@ stateDiagram-v2
       skipDelayUntil = Date.now() + skipDelay;
     }
   };
-  const updatePosition = (trigger, floating) =&gt; {
+  const updatePosition = (trigger, floating) => {
     const request = ++positionRequest;
     void computePosition(trigger, floating, {
       middleware: [
@@ -1722,34 +110,34 @@ stateDiagram-v2
           padding: tooltipGap,
           apply({ availableHeight, availableWidth, elements }) {
             elements.floating.style.setProperty(
-              &quot;--tooltip-available-width&quot;,
+              "--tooltip-available-width",
               `${Math.max(0, availableWidth)}px`,
             );
             elements.floating.style.setProperty(
-              &quot;--tooltip-available-height&quot;,
+              "--tooltip-available-height",
               `${Math.max(0, availableHeight)}px`,
             );
           },
         }),
       ],
       placement: getPlacement(trigger),
-      strategy: &quot;fixed&quot;,
+      strategy: "fixed",
     })
-      .then(({ x, y }) =&gt; {
+      .then(({ x, y }) => {
         if (activeTrigger !== trigger || request !== positionRequest) {
           return;
         }
         const scale = window.devicePixelRatio || 1;
         floating.style.transform = `translate(${Math.round(x * scale) / scale}px, ${Math.round(y * scale) / scale}px)`;
-        floating.style.visibility = &quot;visible&quot;;
+        floating.style.visibility = "visible";
       })
-      .catch(() =&gt; {
-        if (activeTrigger === trigger &amp;&amp; request === positionRequest) {
+      .catch(() => {
+        if (activeTrigger === trigger && request === positionRequest) {
           closeTooltip(false);
         }
       });
   };
-  const openTooltip = (trigger) =&gt; {
+  const openTooltip = (trigger) => {
     const content = getContent(trigger);
     if (!trigger.isConnected || content.length === 0) {
       return;
@@ -1761,16 +149,16 @@ stateDiagram-v2
     closeTooltip();
     const floating = getTooltip();
     floating.textContent = content;
-    floating.style.visibility = &quot;hidden&quot;;
-    floating.style.transform = &quot;translate(0, 0)&quot;;
+    floating.style.visibility = "hidden";
+    floating.style.transform = "translate(0, 0)";
     document.body.appendChild(floating);
     activeTrigger = trigger;
     setDescribedBy(trigger, true);
-    autoUpdateCleanup = autoUpdate(trigger, floating, () =&gt; {
+    autoUpdateCleanup = autoUpdate(trigger, floating, () => {
       updatePosition(trigger, floating);
     });
   };
-  const requestOpen = (trigger, immediate = false) =&gt; {
+  const requestOpen = (trigger, immediate = false) => {
     if (
       getContent(trigger).length === 0 ||
       activeTrigger === trigger ||
@@ -1781,21 +169,21 @@ stateDiagram-v2
     clearOpenTimeout();
     pendingTrigger = trigger;
     const delay =
-      immediate || activeTrigger != null || Date.now() &lt; skipDelayUntil
+      immediate || activeTrigger != null || Date.now() < skipDelayUntil
         ? 0
         : hoverDelay;
     if (delay === 0) {
       openTooltip(trigger);
       return;
     }
-    openTimeout = window.setTimeout(() =&gt; {
+    openTimeout = window.setTimeout(() => {
       openTimeout = null;
       pendingTrigger = null;
       openTooltip(trigger);
     }, delay);
   };
-  const handlePointerOpen = (event) =&gt; {
-    if (event.pointerType === &quot;touch&quot;) {
+  const handlePointerOpen = (event) => {
+    if (event.pointerType === "touch") {
       return;
     }
     const trigger = getTrigger(event.target);
@@ -1804,7 +192,7 @@ stateDiagram-v2
     }
     requestOpen(trigger);
   };
-  const handleLeave = (event) =&gt; {
+  const handleLeave = (event) => {
     const trigger = getTrigger(event.target);
     if (trigger == null || containsTarget(trigger, event.relatedTarget)) {
       return;
@@ -1813,47 +201,47 @@ stateDiagram-v2
       closeTooltip();
     }
   };
-  const handleFocusIn = (event) =&gt; {
+  const handleFocusIn = (event) => {
     const trigger = getTrigger(event.target);
-    if (trigger?.matches(&quot;:focus-visible&quot;)) {
+    if (trigger?.matches(":focus-visible")) {
       requestOpen(trigger, true);
     }
   };
-  const handleKeyDown = (event) =&gt; {
-    if (event.key === &quot;Escape&quot;) {
+  const handleKeyDown = (event) => {
+    if (event.key === "Escape") {
       closeTooltip();
     }
   };
-  const handleContextMenu = (event) =&gt; {
+  const handleContextMenu = (event) => {
     const trigger = getTrigger(event.target);
     if (activeTrigger === trigger || pendingTrigger === trigger) {
       closeTooltip();
     }
   };
-  const destroy = () =&gt; {
+  const destroy = () => {
     closeTooltip(false);
-    document.removeEventListener(&quot;pointerover&quot;, handlePointerOpen);
-    document.removeEventListener(&quot;pointerout&quot;, handleLeave);
-    document.removeEventListener(&quot;focusin&quot;, handleFocusIn);
-    document.removeEventListener(&quot;focusout&quot;, handleLeave);
-    document.removeEventListener(&quot;keydown&quot;, handleKeyDown);
-    document.removeEventListener(&quot;contextmenu&quot;, handleContextMenu);
+    document.removeEventListener("pointerover", handlePointerOpen);
+    document.removeEventListener("pointerout", handleLeave);
+    document.removeEventListener("focusin", handleFocusIn);
+    document.removeEventListener("focusout", handleLeave);
+    document.removeEventListener("keydown", handleKeyDown);
+    document.removeEventListener("contextmenu", handleContextMenu);
     tooltip = null;
   };
 
-  document.addEventListener(&quot;pointerover&quot;, handlePointerOpen);
-  document.addEventListener(&quot;pointerout&quot;, handleLeave);
-  document.addEventListener(&quot;focusin&quot;, handleFocusIn);
-  document.addEventListener(&quot;focusout&quot;, handleLeave);
-  document.addEventListener(&quot;keydown&quot;, handleKeyDown);
-  document.addEventListener(&quot;contextmenu&quot;, handleContextMenu);
-  window.addEventListener(&quot;pagehide&quot;, destroy, { once: true });
+  document.addEventListener("pointerover", handlePointerOpen);
+  document.addEventListener("pointerout", handleLeave);
+  document.addEventListener("focusin", handleFocusIn);
+  document.addEventListener("focusout", handleLeave);
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("contextmenu", handleContextMenu);
+  window.addEventListener("pagehide", destroy, { once: true });
 })();
-&lt;/script&gt;
-&lt;script id=&quot;codex-visualization-lucide&quot; async src=&quot;https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js&quot;&gt;&lt;/script&gt;
-&lt;script&gt;
-(() =&gt; {
-  const initialize = () =&gt; {
+</script>
+<script id="codex-visualization-lucide" async src="https://unpkg.com/lucide@1.17.0/dist/umd/lucide.js"></script>
+<script>
+(() => {
+  const initialize = () => {
     globalThis.lucide?.createIcons({ attrs: { width: 16, height: 16 } });
   };
   if (globalThis.lucide != null) {
@@ -1861,13 +249,10 @@ stateDiagram-v2
     return;
   }
   document
-    .getElementById(&quot;codex-visualization-lucide&quot;)
-    ?.addEventListener(&quot;load&quot;, initialize, { once: true });
+    .getElementById("codex-visualization-lucide")
+    ?.addEventListener("load", initialize, { once: true });
 })();
-&lt;/script&gt;
+</script>
 
-&lt;/body&gt;
-&lt;/html&gt;
-"></iframe>
 </body>
 </html>

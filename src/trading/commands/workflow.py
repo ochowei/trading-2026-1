@@ -7,11 +7,17 @@ import json
 from pathlib import Path
 
 from trading.workflow.authoring import (
+    ClearSafetyAssessmentRequest,
     CreateChangeRequest,
     CreateWorkflowRequest,
     EvolveWorkflowRequest,
+    OpenSafetyAssessmentRequest,
     WorkflowAuthoringError,
     WorkflowRepository,
+)
+from trading.workflow.control_state import (
+    WorkflowControlStateResult,
+    evaluate_workflow_control_state,
 )
 from trading.workflow.studies import WorkflowStudyService
 
@@ -61,6 +67,11 @@ def register_parser(
         "--to", dest="status", required=True, choices=("abandoned", "retired")
     )
     transition_version.add_argument("--approved-by")
+    version_state = version_commands.add_parser(
+        "state", help="Report the A1-2 control state for one exact workflow version"
+    )
+    version_state.add_argument("path", type=Path)
+    version_state.add_argument("--json", dest="json_output", action="store_true")
 
     study = commands.add_parser("study", help="Operate workflow studies")
     study_commands = study.add_subparsers(dest="workflow_study_command", required=True)
@@ -124,6 +135,38 @@ def register_parser(
     release = commands.add_parser("release", help="Prepare a workflow release declaration")
     release.add_argument("path", type=Path)
     release.add_argument("--approved-by", required=True)
+    activate = commands.add_parser("activate", help="Activate one prepared workflow release")
+    activate.add_argument("path", type=Path)
+    activate.add_argument("--approved-by", required=True)
+    activation = commands.add_parser(
+        "activation", help="Manage legacy workflow activation attestations"
+    )
+    activation_commands = activation.add_subparsers(
+        dest="workflow_activation_command", required=True
+    )
+    attest = activation_commands.add_parser(
+        "attest", help="Attest a grandfathered active workflow release"
+    )
+    attest.add_argument("path", type=Path)
+    attest.add_argument("--approved-by", required=True)
+    attest.add_argument("--required-from", required=True)
+
+    safety = commands.add_parser(
+        "safety", help="Persist guarded workflow release-safety assessments"
+    )
+    safety_commands = safety.add_subparsers(dest="workflow_safety_command", required=True)
+    assess = safety_commands.add_parser(
+        "assess", help="Open one immutable assessment for an active/draft version pair"
+    )
+    assess.add_argument("path", type=Path, help="Draft successor workflow version")
+    assess.add_argument("--request", type=Path, required=True)
+    assess.add_argument("--by", dest="actor", required=True)
+    clear = safety_commands.add_parser(
+        "clear", help="Close one assessment with immutable resolution evidence"
+    )
+    clear.add_argument("path", type=Path, help="Exact saNNN assessment directory")
+    clear.add_argument("--request", type=Path, required=True)
+    clear.add_argument("--approved-by", required=True)
 
 
 def cmd_workflow(args: argparse.Namespace) -> None:
@@ -183,12 +226,18 @@ def cmd_workflow(args: argparse.Namespace) -> None:
                 )
                 print(f"workflow change transitioned to {args.status}: {args.path}")
         elif args.workflow_command == "version":
-            repository.transition_version(
-                args.path,
-                args.status,
-                approved_by=args.approved_by,
-            )
-            print(f"workflow version transitioned to {args.status}: {args.path}")
+            if args.workflow_version_command == "transition":
+                repository.transition_version(
+                    args.path,
+                    args.status,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow version transitioned to {args.status}: {args.path}")
+            elif args.workflow_version_command == "state":
+                result = evaluate_workflow_control_state(repository, args.path)
+                _print_control_state(result, json_output=args.json_output)
+                if result.result in {"invalid", "indeterminate"}:
+                    raise SystemExit(2)
         elif args.workflow_command == "study":
             studies = WorkflowStudyService(args.root)
             if args.workflow_study_command == "init":
@@ -234,6 +283,62 @@ def cmd_workflow(args: argparse.Namespace) -> None:
         elif args.workflow_command == "release":
             release = repository.release(args.path, approved_by=args.approved_by)
             print(f"workflow release prepared: {release['workflow']}@{release['version']}")
-            print("  becomes effective only after merge to the canonical branch")
+            _registry, _slug, _version, record = repository._registered_version(args.path)
+            if record.get("status") == "prepared":
+                print("  use `trading workflow activate` to make this release effective")
+            else:
+                print("  becomes effective only after merge to the canonical branch")
+        elif args.workflow_command == "activate":
+            activation = repository.activate(args.path, approved_by=args.approved_by)
+            print(f"workflow release activated: {activation['workflow']}@{activation['version']}")
+        elif args.workflow_command == "activation":
+            if args.workflow_activation_command == "attest":
+                activation = repository.attest_activation(
+                    args.path,
+                    approved_by=args.approved_by,
+                    activation_required_from=args.required_from,
+                )
+                print(
+                    f"workflow activation attested: "
+                    f"{activation['workflow']}@{activation['version']}"
+                )
+        elif args.workflow_command == "safety":
+            if args.workflow_safety_command == "assess":
+                request = OpenSafetyAssessmentRequest.from_path(args.request)
+                assessment = repository.open_safety_assessment(
+                    args.path,
+                    request,
+                    opened_by=args.actor,
+                )
+                print(f"workflow safety assessment opened: {assessment['assessment_id']}")
+            elif args.workflow_safety_command == "clear":
+                request = ClearSafetyAssessmentRequest.from_path(args.request)
+                clearance = repository.clear_safety_assessment(
+                    args.path,
+                    request,
+                    approved_by=args.approved_by,
+                )
+                print(f"workflow safety assessment cleared: {clearance['assessment_id']}")
     except WorkflowAuthoringError as exc:
         raise SystemExit(f"workflow error: {exc}") from exc
+
+
+def _print_control_state(
+    result: WorkflowControlStateResult,
+    *,
+    json_output: bool,
+) -> None:
+    if json_output:
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        return
+    label = result.control_state or result.result
+    print(f"workflow control state: {label}")
+    print(f"  path: {result.path}")
+    if result.workflow is not None and result.version is not None:
+        print(f"  identity: {result.workflow}@{result.version}")
+    if result.registry_status is not None:
+        print(f"  registry status: {result.registry_status}")
+    for reason in result.reasons:
+        print(f"  reason: {reason}")
+    for issue in result.issues:
+        print(f"  issue: {issue}")

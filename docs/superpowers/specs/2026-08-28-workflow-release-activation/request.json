@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "workflow": "strategy-forward-replication-research",
+  "slug": "workflow-release-activation",
+  "title": "Adopt immutable workflow release activation evidence",
+  "proposal_path": "docs/superpowers/specs/2026-08-28-workflow-release-activation/proposal.md",
+  "impact_path": "docs/superpowers/specs/2026-08-28-workflow-release-activation/impact.md",
+  "validation_path": "docs/superpowers/specs/2026-08-28-workflow-release-activation/validation.md",
+  "decision_path": "docs/superpowers/specs/2026-08-28-workflow-release-activation/decision.md",
+  "propose": true
+}

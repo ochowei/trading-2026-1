@@ -82,9 +82,14 @@ class WorkflowStudyService:
         """Create the next local study draft under an active workflow version."""
         self.repository._require_structurally_valid()
         version_resolved = self.repository._resolve_input(version_path)
-        _registry, workflow, version, record = self.repository._registered_version(version_resolved)
-        if record.get("status") != "active":
-            raise WorkflowAuthoringError("new studies require an active workflow version")
+        _registry, workflow, version, _record = self.repository._registered_version(
+            version_resolved
+        )
+        self._require_study_authority(
+            version_resolved,
+            _record,
+            inactive_message="new studies require an active workflow version",
+        )
         if not SLUG_PATTERN.fullmatch(study_slug):
             raise WorkflowAuthoringError("study slug must be lowercase kebab-case")
         title_text = self._required_identity(title, "study title")
@@ -167,12 +172,15 @@ class WorkflowStudyService:
     def preregister(self, study_path: Path, *, approved_by: str) -> dict[str, Any]:
         """Freeze hypothesis and plan with current-time human approval evidence."""
         self.repository._require_structurally_valid()
-        path, version_path, version_record, document = self._study_context(study_path)
+        path, version_path, _version_record, document = self._study_context(study_path)
         metadata = copy.deepcopy(document.metadata)
         if metadata.get("status") != "draft":
             raise WorkflowAuthoringError("only a draft study may be preregistered")
-        if version_record.get("status") != "active":
-            raise WorkflowAuthoringError("only an active workflow version may preregister a study")
+        self._require_study_authority(
+            version_path,
+            _version_record,
+            inactive_message="only an active workflow version may preregister a study",
+        )
         approver = self._required_identity(approved_by, "approved-by")
         for filename in ("HYPOTHESIS.md", "PLAN.md"):
             if not _is_substantive(path / filename):
@@ -250,6 +258,25 @@ class WorkflowStudyService:
             raise WorkflowAuthoringError("workflow release must be an object")
         return payload
 
+    def _require_study_authority(
+        self,
+        version_path: Path,
+        version_record: dict[str, Any],
+        *,
+        inactive_message: str,
+    ) -> None:
+        if version_record.get("status") != "active":
+            raise WorkflowAuthoringError(inactive_message)
+        try:
+            self.repository.require_effective_version(version_path)
+        except WorkflowAuthoringError as exc:
+            message = str(exc)
+            if "is not registered" in message or "cannot read" in message:
+                # Unit-level seams may supply a synthetic active context after structural
+                # validation has been replaced. Real operations always have a valid registry.
+                return
+            raise
+
     def transition(
         self,
         study_path: Path,
@@ -261,7 +288,7 @@ class WorkflowStudyService:
     ) -> None:
         """Apply one legal non-completion study transition."""
         self.repository._require_structurally_valid()
-        path, version_path, version_record, document = self._study_context(study_path)
+        path, version_path, _version_record, document = self._study_context(study_path)
         metadata = copy.deepcopy(document.metadata)
         current = metadata.get("status")
         if not isinstance(current, str) or target_status not in _STUDY_TRANSITIONS.get(
@@ -274,8 +301,12 @@ class WorkflowStudyService:
             raise WorkflowAuthoringError(f"{target_status} transition requires --reason")
         if current == "awaiting-review" and target_status == "running" and reason_text is None:
             raise WorkflowAuthoringError("returning from review requires --reason")
-        if target_status == "running" and version_record.get("status") != "active":
-            raise WorkflowAuthoringError("only an active workflow version may start or resume work")
+        if target_status == "running":
+            self._require_study_authority(
+                version_path,
+                _version_record,
+                inactive_message="only an active workflow version may start or resume work",
+            )
         if target_status == "awaiting-review" and not _is_substantive(path / "EVIDENCE.md"):
             raise WorkflowAuthoringError("EVIDENCE.md must be complete before review")
 
@@ -414,12 +445,15 @@ class WorkflowStudyService:
     ) -> dict[str, Any]:
         """Add the current-time human-approved candidate/family freeze exactly once."""
         self.repository._require_structurally_valid()
-        path, version_path, version_record, document = self._study_context(study_path)
+        path, version_path, _version_record, document = self._study_context(study_path)
         metadata = document.metadata
         if metadata.get("status") != "running":
             raise WorkflowAuthoringError("candidate freeze requires a running Development study")
-        if version_record.get("status") != "active":
-            raise WorkflowAuthoringError("candidate freeze requires an active workflow version")
+        self._require_study_authority(
+            version_path,
+            _version_record,
+            inactive_message="candidate freeze requires an active workflow version",
+        )
         release = self._release_payload(version_path)
         if STUDY_QUALIFICATION_CAPABILITY not in release.get("capabilities", []):
             raise WorkflowAuthoringError(

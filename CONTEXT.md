@@ -142,6 +142,10 @@ _Avoid_: Individual study, engineering task, strategy implementation
 An immutable released contract for one research workflow; every study is pinned to exactly one version.
 _Avoid_: Current workflow file, mutable procedure, study version
 
+**Workflow Release Activation**:
+The separate human-approved governance event that makes one prepared Workflow Version the unique active authority.
+_Avoid_: Canonical branch inference, release preparation, Controlled Activation, Activation Checkpoint
+
 **Workflow Study**:
 One execution instance of a released workflow version, containing its preregistered question, plan, evidence references, and independently reviewed conclusion.
 _Avoid_: Workflow, experiment directory, ad-hoc backtest

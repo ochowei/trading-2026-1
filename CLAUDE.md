@@ -161,8 +161,27 @@ uv run trading workflow change transition <change-path> --to proposed
 uv run trading workflow version transition <version-path> --to retired \
   --approved-by <human-id>
 
-# 獨立 human-authority seam：準備 release；合併 canonical branch 後才生效
+# 獨立 human-authority seam：準備 release；activation-enabled family 只進入 prepared
 uv run trading workflow release <version-path> --approved-by <human-id>
+
+# 第二個獨立 human-authority seam：建立 immutable ACTIVATION.json 並切換 active authority
+uv run trading workflow activate <prepared-version-path> --approved-by <human-id>
+
+# 一次性 legacy migration：只記錄 current-time attestation，不回填歷史 activation 時間
+uv run trading workflow activation attest <active-version-path> \
+  --approved-by <human-id> --required-from <future-version>
+
+# v009+ capability：以 request 提供 blocking studies／resolutions；writer 配置 SAxxx 並補 identity、digest 與 current UTC
+uv run trading workflow safety assess <draft-successor-path> \
+  --request safety-assessment-request.json --by <identity>
+uv run trading workflow safety clear <saNNN-path> \
+  --request safety-clearance-request.json --approved-by <human-id>
+# 這兩個命令只保存／關閉 release-safety evidence；不授權 release/activation
+
+# 唯讀查詢單一 exact workflow version 的 A1-2 control state；ENTRY-01 不會成為查詢結果
+uv run trading workflow version state <version-path>
+uv run trading workflow version state <version-path> --json
+# determined／outside-a1-2 結束碼為 0；invalid／indeterminate 仍輸出結果，但結束碼為 2
 
 # 在 active workflow version 下建立並預註冊 study；時間固定取當下 UTC
 uv run trading workflow study init <version-path> --slug <study-slug> \

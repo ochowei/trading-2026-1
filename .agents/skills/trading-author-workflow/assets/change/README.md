@@ -13,4 +13,5 @@ released_in: null
 # REPLACE_ME_CHANGE_TITLE
 
 This change modifies `REPLACE_ME_WORKFLOW_SLUG@REPLACE_ME_SOURCE_VERSION`. The source version
-remains authoritative until an approved replacement release reaches the canonical branch.
+remains authoritative until an approved replacement completes the family-applicable authority
+boundary: the legacy canonical-merge bootstrap or explicit Workflow Release Activation.

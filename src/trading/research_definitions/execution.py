@@ -23,6 +23,9 @@ def resolve_workflow_policy_set(version_path: Path) -> PolicySet:
     issues = repository.validate_path(path)
     if issues:
         raise WorkflowNativeExecutionError(str(issues[0]))
+    _registry, workflow, version, record = repository._registered_version(path)
+    if record.get("status") == "prepared":
+        raise WorkflowNativeExecutionError(f"workflow version is not active: {workflow}@{version}")
     return resolve_workflow_policy_set_from_release(path)
 
 

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "resolutions": [
+    {
+      "study_path": "workflows/REPLACE_ME_PREDECESSOR/work/studies/REPLACE_ME_STUDY",
+      "disposition": "REPLACE_ME_resolved-terminal_OR_continue-on-vNNN_OR_restart-on-vNNN_OR_close-invalidated",
+      "evidence": [
+        "workflows/REPLACE_ME_PREDECESSOR/work/studies/REPLACE_ME_STUDY/README.md"
+      ]
+    }
+  ]
+}

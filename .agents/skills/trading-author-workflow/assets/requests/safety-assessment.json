@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "reason": "REPLACE_ME_WHY_RELEASE_SAFETY_REQUIRES_EXPLICIT_REVIEW",
+  "blocking_studies": [
+    "workflows/REPLACE_ME_PREDECESSOR/work/studies/REPLACE_ME_STUDY"
+  ],
+  "missing_impact_decisions": [
+    "workflows/REPLACE_ME_PREDECESSOR/work/studies/REPLACE_ME_STUDY"
+  ]
+}

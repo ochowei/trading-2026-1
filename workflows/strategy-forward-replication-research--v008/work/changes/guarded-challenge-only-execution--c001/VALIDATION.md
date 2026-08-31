@@ -13,7 +13,7 @@ define missed-entry selection and ledger handling; an adverse-fill identity plus
 gate does not uniquely define the fill transform. Those gaps must be resolved prospectively before
 implementation or study execution. No S003 outcome metric was needed to identify them.
 
-Validation required before this change can be accepted:
+Validation required before a replacement version containing this accepted change can be released:
 
 1. Specify a strict versioned executable challenge-method schema covering every required semantic
    field and prove preregistration rejects omissions or unknown implementations.
@@ -29,22 +29,28 @@ Validation required before this change can be accepted:
 6. Run relevant qualification, registry, result-schema, research-data, workflow-authoring,
    terminal-evidence, and CLI regression tests plus Ruff and complete workflow validation.
 
-No implementation or validation completion is claimed by this draft.
+Acceptance records the required behavioral boundary, not implementation or release readiness. No
+challenge execution, study transition, or outcome authority is created by this decision.
 
 ## Interaction with other accepted changes
 
-There are no accepted changes under v008. A future replacement version may aggregate this change
-with other independently accepted v008 changes only after combined impact analysis confirms that
-their route, evidence, authority, and compatibility rules do not conflict.
+This change is intended for v009 together with accepted v008/C002 categorized result-layout
+migration and v008/C003 Workflow Release Activation. C002 changes the canonical destination of the
+new challenge artifacts but not their identities or semantics. C003 changes workflow release
+authority but grants no challenge execution authority. The combined v009 draft must preserve all
+three boundaries and their independent release conditions.
 
 ## Remaining uncertainty
 
-The exact executable schemas and algorithms for all challenge methods still require human review.
-In particular, candidate ordering and rounding for missed-entry evidence and the exact canonical
-adverse-fill transform must be decided before this change can move beyond draft. The final shared
-technical document path, command spelling, transaction format, and replacement version number are
-also undecided implementation details.
+The exact executable schemas and registered implementations for all challenge methods remain a
+release-readiness requirement. Study-specific method parameters may vary, but v009 must require
+them to be complete, versioned, digest-bound, human-approved before outcome inspection, and
+deterministically executable without defaults. In particular, candidate ordering, rounding, and
+no-replacement behavior for missed-entry evidence and the exact canonical adverse-fill transform
+must be frozen by the study. The selected version is v009 and its Phase 6 contract is
+`docs/historical-qualification-and-shadow-v009.md`; command spelling and transaction encoding may
+remain implementation details only if they preserve the accepted behavioral boundary.
 
-Until the change is accepted, implemented in a complete replacement draft, explicitly approved for
-release, and merged into the canonical branch, v008 remains authoritative and no study gains new
-challenge-only authority.
+Until the change is implemented, validated in the complete v009 draft, explicitly approved for
+release, and made active under the applicable bootstrap rule, v008 remains authoritative and no
+study gains new challenge-only authority.

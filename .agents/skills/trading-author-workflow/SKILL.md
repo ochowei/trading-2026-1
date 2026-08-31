@@ -55,4 +55,4 @@ outcomes to `trading-evaluate-study`.
 
 Report the selected mode and references loaded, files changed, validation results, source
 disposition, remaining open decisions, and whether the result is a local draft, prepared release,
-or effective canonical release.
+or explicitly activated effective release (or a documented legacy bootstrap release).

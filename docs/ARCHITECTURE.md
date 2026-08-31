@@ -116,7 +116,10 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/strategy-forward-replication-research-workflow.md` | Human-readable design of the strategy replication and promotion research workflow. |
 | `docs/workflow-governance/README.md` | Human-facing entry point linking canonical workflow authority, workflow skills, governance diagrams, their scope, and the final review conclusion. |
 | `docs/workflow-governance/workflow-governance-flow.html` | Standalone B1 high-level sequence visualization of workflow authoring, release, study-operation, and review role handoffs. |
-| `docs/workflow-governance/workflow-governance-layers.html` | Standalone A1 inter-layer governance flow with decisions and recovery paths, plus the strictly aligned A1-2 governance-control state machine. |
+| `docs/workflow-governance/workflow-governance-layers.html` | Local-HTTP page shell for the data-backed A1/A1-2/A1-3 governance visualization; direct `file://` loading is unsupported. |
+| `docs/workflow-governance/workflow-governance-layers.yaml` | Explanatory, machine-validated presentation data for the A1/A1-2/A1-3 visualization: human text, Mermaid source, detail panels, status messages, and expected IDs. It does not replace workflow or study lifecycle authority. |
+| `docs/workflow-governance/workflow-governance-layers.css` | Visual layout and interaction styling for the data-backed layers diagram. |
+| `docs/workflow-governance/workflow-governance-layers.js` | Same-origin YAML loader, runtime consistency checks, DOM/Mermaid rendering, and zoom/pan/detail interactions for the layers diagram. |
 | `docs/policies.md` | Policy registry, release, resolution, composition, and privacy contract. |
 | `docs/adr/NNNN-*.md` | Immutable Architecture Decision Records explaining important design choices and their consequences. |
 | `docs/superpowers/specs/YYYY-MM-DD-*.md` | Historical feature/design specifications retained as implementation context. |
@@ -189,7 +192,7 @@ CLI parser registration and handlers grouped by public responsibility.
 | File | Purpose |
 |---|---|
 | `legacy.py` | Explicit `trading legacy ...` tree with read-only diagnostics and fail-closed retired operations. The former top-level aliases no longer exist. |
-| `workflow.py` | Workflow authoring, validation, release, and study parser/handler. |
+| `workflow.py` | Workflow authoring, validation, release, activation, guarded release-safety persistence, read-only exact-version state query, and study parser/handler. |
 | `research.py` | Workflow-native definition listing, snapshot, run, and exact orchestration provenance. |
 
 ### `src/trading/legacy/`
@@ -201,9 +204,13 @@ package authorizes new research or result publication.
 
 ### `src/trading/workflow/`
 
-Canonical workflow lifecycle implementation: authoring, studies, exact-study qualification,
-terminal evidence, and qualification orchestration. Historical `trading.core.*` imports alias these
-same module objects so monkeypatching and process-global state remain compatible.
+Canonical workflow lifecycle implementation: authoring, guarded release-safety persistence and
+validation, read-only exact-version control-state evaluation, studies, exact-study qualification,
+terminal evidence, and qualification orchestration. `control_state.py` evaluates A1-2 N02–N06
+from the canonical registry, release/activation evidence, release-safety artifacts, and persisted
+study lifecycles; it returns fail-closed `invalid` or `indeterminate` results rather than granting
+authority. Historical `trading.core.*` imports alias these same module objects so monkeypatching and
+process-global state remain compatible.
 
 ### `src/trading/market_data/`
 
@@ -366,9 +373,13 @@ Versioned, tracked research-workflow registry shared by humans and Agents.
 | `workflows/README.md` | Version lifecycle authority and generated registry index. |
 | `workflows/<slug>--vNNN/README.md` | Version metadata, state, checksums, release evidence, and generated study/change indexes. |
 | `workflows/<slug>--vNNN/WORKFLOW.md` | Self-contained workflow contract pinned by studies. |
+| `workflows/<slug>--vNNN/RELEASE.json` | Immutable human-approved release-preparation evidence; for activation-enabled families its presence means `prepared`, not `active`. |
+| `workflows/<slug>--vNNN/ACTIVATION.json` | Immutable Workflow Release Activation evidence binding the exact release digest; grandfathered records state migration-time fact without backdating. |
 | `workflows/<slug>--vNNN/STAGES_AND_OUTCOMES.md` | Optional version companion containing full and plain-language stage/outcome guidance; when declared `reference` plus `pinned: true`, release evidence fixes its exact bytes while `WORKFLOW.md` remains the sole behavioral authority. |
 | `workflows/<slug>--vNNN/work/studies/<study>/` | Route/spec, preregistered plan, add-only Development authorization, candidate freeze, metadata, evidence, conclusion, and outcome for a workflow study when present. |
 | `workflows/<slug>--vNNN/work/changes/<change>/` | Proposed workflow change, impact, decision, and validation evidence when present. |
+| `workflows/<slug>--vNNN/work/release-safety/saNNN/ASSESSMENT.json` | Immutable capability-gated opening evidence under a Draft successor, binding its exact Active predecessor, workflow digest, blocking studies, missing impact decisions, current time, and actor. |
+| `workflows/<slug>--vNNN/work/release-safety/saNNN/CLEARANCE.json` | Optional immutable closing evidence binding the exact assessment digest and one safe, evidence-digested resolution for every blocking study. |
 | `workflows/.authoring.lock` | Ignored local advisory lock shared only by workflow authoring writers; it is not lifecycle evidence or repository authority. |
 
 Workflow metadata and generated indexes must be changed through the authoring/study services or
@@ -381,8 +392,27 @@ allocates `vNNN`/`Cxxx`, writes the existing schema-1 and five-file formats, syn
 and validates. The façade reads and retains request/source files; moving, replacing with a pointer,
 or removing a source is a separate exact-path operation that requires individual human confirmation.
 Low-level transition and sync commands remain compatibility/diagnostic entry points, while guarded
-decision and release commands remain separate human-authority seams rather than alternate authoring
-happy paths.
+decision, release, and activation commands remain separate human-authority seams rather than
+alternate authoring happy paths. Each family's `activation_required_from` boundary selects the
+first version using `draft -> prepared -> active`; a prepared successor blocks new or resumed
+outcome-relevant work until immutable activation evidence switches authority. Newly created
+families use v001 as that boundary; migrated families retain their explicit future cutoff.
+
+`trading workflow safety assess/clear` are capability-gated add-only writers, not state-query or
+release-authority commands. `assess` allocates the next `SAxxx` under a Draft successor and derives
+all workflow/study identities, digests, actor, and current UTC under the shared authoring lock.
+`clear` requires every blocking study to be safely paused or terminal, binds exact resolution
+evidence digests, and creates `CLEARANCE.json` without changing study or version state. Validation
+rejects multiple open assessments for one version pair, malformed or drifted identities, unsafe or
+incomplete resolutions, and evidence drift. An open assessment blocks new outcome-relevant study
+work and successor release preparation.
+
+`trading workflow version state <version-path> [--json]` is the separate read-only A1-2 query. It
+uses one exact registered version as its subject, never returns the pre-version `ENTRY-01` context,
+and reports N02–N06 only after tracked workflow validation succeeds. Historical active releases
+without `workflow-release-safety-v1` return `indeterminate`; contradictory evidence returns
+`invalid`. Neither result nor a determined state grants release, activation, study, or trading
+authority.
 
 High-level apply holds the re-entrant authoring lease, verifies the previewed target digests, copies
 only the workflow tree into a system temporary directory, applies and validates the complete staged
@@ -437,3 +467,6 @@ Versioned Phase 6 workflow contracts live at
 `docs/historical-qualification-and-shadow-vNNN.md`. Each file is an immutable normative dependency
 for the workflow version that pins it; behavioral changes create a new document version instead of
 rewriting a document pinned by a released workflow.
+The v009 contract layers the guarded challenge-only execution boundary over the unchanged v008
+route, calendar, screen, terminal, Shadow, and compatibility rules; both exact paths are pinned by
+the v009 workflow until a later version consolidates them.
