@@ -301,7 +301,8 @@ class WorkflowStudyService:
             raise WorkflowAuthoringError(f"{target_status} transition requires --reason")
         if current == "awaiting-review" and target_status == "running" and reason_text is None:
             raise WorkflowAuthoringError("returning from review requires --reason")
-        if target_status == "running":
+        administrative_review_return = current == "awaiting-review" and target_status == "running"
+        if target_status == "running" and not administrative_review_return:
             self._require_study_authority(
                 version_path,
                 _version_record,

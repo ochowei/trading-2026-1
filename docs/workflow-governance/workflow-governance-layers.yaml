@@ -398,7 +398,7 @@ document:
               <li>建立研究另需建立 Draft 的權限；預先登記需完整計畫（plan）並在當次轉換凍結；開始、恢復與凍結候選另需有效的凍結計畫及各階段人工核准。</li>
               <li>Prepared 限制不阻止暫停、取消、審查者退回或完成審查；但審查者退回後，G-FAMILY 再次成立前不得執行結果相關工作。</li>
               <li>Paused 仍算未完成；只有 Completed 與 Cancelled 不算未完成。</li>
-              <li>目前實作會對所有進入 Running 的轉換套用有效版本檢查，因此「只做行政退回」的例外仍是後續實作缺口。</li>
+              <li>目前實作已將審查者的行政退回與結果相關執行分開：退回本身可記錄，但後續 guarded 動作與 operator skill 仍須重新通過 G-FAMILY。</li>
             </ul>
           </div>
           <pre class="mermaid wgl-mermaid wgl-mermaid-a13" data-diagram="a1-study-state-machine">

@@ -34,6 +34,10 @@ in `revisits`.
 Study IDs are local to each exact workflow version. Do not carry an `Sxxx` across versions or infer
 family-wide numbering. A replacement version with no studies starts at its own `S001`.
 
+When release preparation discovers an unsafe study or a missing paused-study impact decision under
+a safety-capable active predecessor, route to `safety.md`. Opening or clearing that assessment
+persists coordination evidence only; it never supplies release or activation approval.
+
 ## Shared dependencies
 
 Changing a normative dependency or selected policy in a way that affects the active workflow

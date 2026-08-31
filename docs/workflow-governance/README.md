@@ -60,7 +60,7 @@ Edit governance content in the YAML file rather than copying it back into HTML o
 
 ## Diagram scope and review conclusion
 
-- Last reviewed: 2026-08-29.
+- Last reviewed: 2026-08-31.
 - A1 is the process-and-exception view of one exact Workflow version and the cross-identity handoff
   that creates a prospective successor. An active predecessor never returns to Draft; it remains
   immutable and active until successor activation changes it to `superseded`.
@@ -84,6 +84,9 @@ Edit governance content in the YAML file rather than copying it back into HTML o
 - A prepared successor can coexist with its active predecessor, but the family-level prepared
   guard blocks creating, preregistering, starting, resuming, or freezing new outcome-relevant work
   while activation is pending.
+- A reviewer may administratively return `awaiting-review -> running` while a family guard is
+  active, but that status change grants no execution authority; subsequent outcome-relevant work
+  must pass the family action gate again.
 - Study safety gates release preparation and activation, not the authoring handoff that creates a
   prospective input or exact draft successor. A release-safety failure switches control to the
   active predecessor while the same successor remains draft, then returns to that same draft for a

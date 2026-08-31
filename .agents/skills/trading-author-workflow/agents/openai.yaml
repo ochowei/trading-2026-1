@@ -1,4 +1,4 @@
 interface:
   display_name: "Author Trading Workflows"
   short_description: "Review and govern versioned research workflows"
-  default_prompt: "Use $trading-author-workflow to review, create, evolve, abandon, retire, or prepare a release for a repository workflow."
+  default_prompt: "Use $trading-author-workflow to review, create, evolve, govern release safety, abandon, retire, or prepare a release for a repository workflow."

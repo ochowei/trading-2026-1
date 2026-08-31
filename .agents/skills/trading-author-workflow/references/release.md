@@ -11,6 +11,11 @@ Confirm:
 - normative dependencies and pinned reference companions; and
 - absence of unresolved or omitted accepted changes.
 
+Run `uv run trading workflow version state <version-path> --json` before requesting release
+approval. Ordinary release preparation starts from exact state `N02`. If predecessor study safety
+or paused-study impact evidence is incomplete, stop and route to the release-safety assessment
+mode in `safety.md`; do not treat the failed release attempt as authority to create safety evidence.
+
 Then run:
 
 ```bash

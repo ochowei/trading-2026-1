@@ -15,13 +15,23 @@ release-preparation references unless the user separately asks to author a workf
 Require study status `awaiting-review` and begin with:
 
 ```bash
+uv run trading workflow version state <exact-version-path> --json
 uv run trading workflow validate <study-path>
 ```
 
+Use the exact-version query for repository awareness, not as a new outcome rule. Stop on `invalid`.
+Report `indeterminate` without inferring absent safety evidence. A prepared successor or open safety
+assessment does not block read-only review, administrative reviewer return, or completion under the
+already frozen plan, but it does block later outcome-relevant operator work after a return.
+
 Remain read-only while assessing evidence. Do not invoke experiment-running skills or commands,
 fill evidence gaps, modify `HYPOTHESIS.md`, `PLAN.md`, or `EVIDENCE.md`, or substitute mutable
-`latest` references for frozen identities. If execution is incomplete, report the exact gap and
-hand the study back to `trading-operate-workflow` without choosing a favorable outcome.
+`latest` references for frozen identities. If execution is incomplete, report the exact gap and use
+the guarded `awaiting-review -> running` transition only after explicit user confirmation, with the
+stable reviewer identity and a concrete reason. Without that authority, remain read-only and
+propose the return. This is only an administrative return; hand the study back to
+`trading-operate-workflow` and do not execute or repair evidence. The operator must re-establish
+G-FAMILY before doing outcome-relevant work. Do not choose a favorable outcome.
 
 ## Evaluate against frozen rules
 
@@ -83,6 +93,7 @@ workflow or create a change from this skill.
 
 ## Finish
 
-Report the study ID, pinned workflow version, validated evidence identities, confirmed outcome,
-limitations, completion validation, and any separately recommended workflow change. Distinguish a
-completed study result from downstream promotion or trading authorization.
+Report the study ID, pinned workflow version, exact control-state result, validated evidence
+identities, confirmed outcome, limitations, completion validation, and any separately recommended
+workflow change. Distinguish a completed study result from downstream promotion or trading
+authorization.
