@@ -32,6 +32,9 @@ from trading.research_data.paths import (
     ResultPathMigrationError,
     resolve_result_path,
 )
+from trading.research_data.shared_qualification_state import (
+    resolve_study_qualification_registry_path,
+)
 from trading.research_data.trial_registry import formal_trial_id
 from trading.research_definitions import (
     ResearchDefinitionRegistry,
@@ -665,7 +668,10 @@ def compile_study_qualification_plan(
                 )
             except ResultPathMigrationError as exc:
                 raise ValueError(str(exc)) from exc
-        expected_qualification_registry = (root / str(qualification_registry_identity)).resolve()
+        expected_qualification_registry = resolve_study_qualification_registry_path(
+            spec.study_path,
+            logical_identity=str(qualification_registry_identity),
+        )
         if Path(trial_registry_path).resolve() != expected_trial_registry:
             raise ValueError("trial registry path differs from frozen qualification spec")
         if Path(qualification_registry_path).resolve() != expected_qualification_registry:
@@ -740,7 +746,7 @@ def frozen_study_qualification_registry_path(study_path: Path) -> Path:
     identity = registries.get("qualification_registry_path")
     if not isinstance(identity, str) or not _is_safe_repo_relative(identity):
         raise ValueError("QUALIFICATION_SPEC.json qualification_registry_path is invalid")
-    return (study.parents[4] / identity).resolve()
+    return resolve_study_qualification_registry_path(study, logical_identity=identity)
 
 
 def qualification_study_registration_lock_path(registry_path: Path) -> Path:
