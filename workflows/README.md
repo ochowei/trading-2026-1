@@ -52,13 +52,16 @@ workflows:
         status_changed_by: ochowei@gmail.com
       v010:
         path: strategy-forward-replication-research--v010
-        status: active
-        status_changed_at: '2026-09-01T11:50:25.856993Z'
+        status: superseded
+        status_changed_at: '2026-09-01T14:54:00.740839Z'
         status_changed_by: ochowei@gmail.com
         activation_sha256: 343bdd64f665f43859707418fb0af9c15b985e6178068972d5ee0a7e2aaf5207
       v011:
         path: strategy-forward-replication-research--v011
-        status: draft
+        status: active
+        status_changed_at: '2026-09-01T14:54:00.740839Z'
+        status_changed_by: ochowei@gmail.com
+        activation_sha256: 4ec24b46bb46a30a4b00c933844e81a1a3a7cbfc912e038effc39e0a37fd4654
     activation_required_from: v010
 ---
 # Research Workflows
@@ -100,6 +103,6 @@ historical activation.
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v007` | `superseded` | [strategy-forward-replication-research--v007](strategy-forward-replication-research--v007/) |
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v008` | `superseded` | [strategy-forward-replication-research--v008](strategy-forward-replication-research--v008/) |
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v009` | `superseded` | [strategy-forward-replication-research--v009](strategy-forward-replication-research--v009/) |
-| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v010` | `active` | [strategy-forward-replication-research--v010](strategy-forward-replication-research--v010/) |
-| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v011` | `draft` | [strategy-forward-replication-research--v011](strategy-forward-replication-research--v011/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v010` | `superseded` | [strategy-forward-replication-research--v010](strategy-forward-replication-research--v010/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v011` | `active` | [strategy-forward-replication-research--v011](strategy-forward-replication-research--v011/) |
 <!-- GENERATED:WORKFLOW_INDEX_END -->
