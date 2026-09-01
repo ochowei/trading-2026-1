@@ -103,8 +103,9 @@ None.
 
 | ID | Title | Status | Released in | Path |
 | --- | --- | --- | --- | --- |
-| `C002` | Categorized Results Layout Migration | `accepted` | `-` | [categorized-results-layout-migration--c002](work/changes/categorized-results-layout-migration--c002/) |
-| `C001` | Guarded Challenge-Only Execution | `accepted` | `-` | [guarded-challenge-only-execution--c001](work/changes/guarded-challenge-only-execution--c001/) |
-| `C003` | Adopt immutable workflow release activation evidence | `accepted` | `-` | [workflow-release-activation--c003](work/changes/workflow-release-activation--c003/) |
-| `C004` | Persist guarded workflow release-safety assessments | `accepted` | `-` | [workflow-release-safety-persistence--c004](work/changes/workflow-release-safety-persistence--c004/) |
+| `C002` | Categorized Results Layout Migration | `released` | `v009` | [categorized-results-layout-migration--c002](work/changes/categorized-results-layout-migration--c002/) |
+| `C005` | Adopt a fixed-calendar retrospective protocol | `released` | `v009` | [fixed-calendar-retrospective-protocol--c005](work/changes/fixed-calendar-retrospective-protocol--c005/) |
+| `C001` | Guarded Challenge-Only Execution | `released` | `v009` | [guarded-challenge-only-execution--c001](work/changes/guarded-challenge-only-execution--c001/) |
+| `C003` | Adopt immutable workflow release activation evidence | `released` | `v009` | [workflow-release-activation--c003](work/changes/workflow-release-activation--c003/) |
+| `C004` | Persist guarded workflow release-safety assessments | `released` | `v009` | [workflow-release-safety-persistence--c004](work/changes/workflow-release-safety-persistence--c004/) |
 <!-- GENERATED:WORK_INDEX_END -->

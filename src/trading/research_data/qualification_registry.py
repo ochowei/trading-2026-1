@@ -275,7 +275,14 @@ class QualificationRegistry:
         _validate_plan_selection_boundaries(plan)
         if plan.evidence_role in RETROSPECTIVE_EVIDENCE_ROLES and plan.evidence_audit is None:
             raise QualificationRegistryError("retrospective plan requires clean-evidence audit")
-        if plan.evidence_role == "study-time-retrospective" and plan.study_identity is None:
+        if (
+            plan.evidence_role
+            in {
+                "study-time-retrospective",
+                "fixed-calendar-retrospective",
+            }
+            and plan.study_identity is None
+        ):
             raise QualificationRegistryError("study-time plan requires exact frozen study linkage")
         if (
             plan.evidence_role == "historical"
@@ -1066,9 +1073,10 @@ def _validate_plan_role_calendar(plan: HistoricalQualificationPlan) -> None:
         raise QualificationRegistryError(
             "qualification role calendar Development context was not complete at plan freeze"
         )
-    if plan.evidence_role == "study-time-retrospective" and (
-        calendar.development_sessions[-1] >= calendar.evaluation_sessions[0]
-    ):
+    if plan.evidence_role in {
+        "study-time-retrospective",
+        "fixed-calendar-retrospective",
+    } and (calendar.development_sessions[-1] >= calendar.evaluation_sessions[0]):
         raise QualificationRegistryError(
             "study-time retrospective Development must precede evaluation"
         )

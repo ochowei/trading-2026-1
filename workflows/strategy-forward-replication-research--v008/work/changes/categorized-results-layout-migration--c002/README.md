@@ -3,12 +3,12 @@ id: C002
 title: Categorized Results Layout Migration
 workflow: strategy-forward-replication-research
 source_version: v008
-status: accepted
+status: released
 created_at: '2026-08-25'
-status_changed_at: '2026-08-25T06:32:33.119801Z'
+status_changed_at: '2026-09-01T05:46:22.658301Z'
 decided_at: '2026-08-25T06:32:33.119801Z'
 decided_by: ochowei@gmail.com
-released_in: null
+released_in: v009
 ---
 # Categorized Results Layout Migration
 

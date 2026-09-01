@@ -103,7 +103,7 @@ def register_forward_qualification_plan(
         raise ValueError(LEGACY_QUALIFICATION_RETIREMENT_MESSAGE)
     exact_study_required = (
         bool(family_research_identities)
-        or evidence_role == "study-time-retrospective"
+        or evidence_role in {"study-time-retrospective", "fixed-calendar-retrospective"}
         or (
             evidence_role == "historical"
             and any(
@@ -591,11 +591,10 @@ def _require_retrospective_workflow(
         text = contract.read_text(encoding="utf-8")
     except OSError as exc:
         raise ValueError(f"cannot read retrospective workflow contract: {exc}") from exc
-    required_marker = (
-        "study-time-retrospective"
-        if evidence_role == "study-time-retrospective"
-        else "Optional retrospective-confirmatory checkpoint"
-    )
+    required_marker = {
+        "study-time-retrospective": "study-time-retrospective",
+        "fixed-calendar-retrospective": "fixed-calendar-retrospective",
+    }.get(evidence_role, "Optional retrospective-confirmatory checkpoint")
     if required_marker not in text:
         raise ValueError("released workflow does not authorize retrospective qualification")
 

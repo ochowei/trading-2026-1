@@ -72,8 +72,15 @@ EVIDENCE_ROLES = (
     "historical",
     "retrospective-confirmatory",
     "study-time-retrospective",
+    "fixed-calendar-retrospective",
 )
-RETROSPECTIVE_EVIDENCE_ROLES = frozenset({"retrospective-confirmatory", "study-time-retrospective"})
+RETROSPECTIVE_EVIDENCE_ROLES = frozenset(
+    {
+        "retrospective-confirmatory",
+        "study-time-retrospective",
+        "fixed-calendar-retrospective",
+    }
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -573,7 +580,7 @@ def build_historical_qualification_plan(
             or quarantined_set & evaluation_set
         ):
             raise ValueError("qualification role calendar sessions must not overlap")
-        if evidence_role == "study-time-retrospective" and (
+        if evidence_role in {"study-time-retrospective", "fixed-calendar-retrospective"} and (
             ordered_development_sessions[-1] >= evaluation_sessions[0]
         ):
             raise ValueError("study-time retrospective Development must precede evaluation")
@@ -1310,7 +1317,14 @@ def _validate_evidence_audit(
         audit.classification != "verified-clean" or not audit.trial_history_complete
     ):
         raise ValueError("Historical Evaluation requires verified-clean complete provenance")
-    if evidence_role == "study-time-retrospective" and audit.classification == "verified-clean":
+    if (
+        evidence_role
+        in {
+            "study-time-retrospective",
+            "fixed-calendar-retrospective",
+        }
+        and audit.classification == "verified-clean"
+    ):
         raise ValueError(
             "study-time retrospective evaluation cannot claim verified-clean provenance"
         )

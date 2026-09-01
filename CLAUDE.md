@@ -123,6 +123,12 @@ uv run trading qualification plan register-study --study <study-path> --dry-run
 # 最後一個 frozen fold 完成後，以每個 family trial 的 exact manifest 重算 screen
 uv run trading qualification screen run --help
 
+# v009 fixed-calendar：獨立重算九個 Evaluation challenges，不具 screen/registry 權限
+uv run trading qualification challenge run-study --help
+
+# v009 fixed-calendar：重算固定 2025 歷史 execution replay，不具 Shadow/live/order 權限
+uv run trading qualification replay run-study --help
+
 # Phase 7 legacy followup 只保留 no-new-entry、狀態查詢與既有部位退役
 uv run trading followup-state status
 uv run trading followup-state pause --reason "operator rollback"
@@ -255,9 +261,10 @@ Phase 5 manual-execution details and the broker-export CSV contract are document
 [docs/manual-execution-ledger.md](docs/manual-execution-ledger.md). Runtime ledger, reconciliation,
 broker-import, and credential files are local-only and must remain outside Git.
 
-Phase 6 historical qualification, benchmark, selection-adjustment, Shadow, and local registry
-contracts are documented in
-[docs/historical-qualification-and-shadow.md](docs/historical-qualification-and-shadow.md).
+Phase 6 historical qualification, benchmark, selection-adjustment, Shadow, local registry, and the
+v009 fixed-calendar challenge/replay boundary are documented in
+[docs/historical-qualification-and-shadow.md](docs/historical-qualification-and-shadow.md) and
+[docs/historical-qualification-and-shadow-v009.md](docs/historical-qualification-and-shadow-v009.md).
 
 Phase 7 controlled-cutover lifecycle, no-new-entry rollback, Active authorization, migration parity,
 and allocation-epoch contracts are documented in

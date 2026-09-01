@@ -1,6 +1,6 @@
 import hashlib
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,9 +10,13 @@ import trading.core.study_qualification as study_qualification_module
 from trading.core.accounting import canonical_json_bytes
 from trading.core.study_qualification import (
     CANDIDATE_FREEZE_AUTHORIZATION_SCOPE,
+    FIXED_CALENDAR,
+    FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY,
+    FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
     REQUIRED_STUDY_TIME_CHALLENGES,
     _compile_spec,
     compile_study_qualification_plan,
+    fixed_challenge_method_contract,
     load_frozen_study_qualification_spec,
     validate_study_qualification_spec_for_preregistration,
 )
@@ -186,7 +190,13 @@ def _write_structured_artifacts(study: Path, payload: dict, *, tmp_path: Path) -
             {
                 "schema_version": 1,
                 "workflow_sha256": workflow_sha,
-                "capabilities": ["study-time-retrospective-v1"],
+                "capabilities": [
+                    (
+                        FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY
+                        if payload["route"] == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+                        else "study-time-retrospective-v1"
+                    )
+                ],
             },
             sort_keys=True,
         )
@@ -427,6 +437,50 @@ def test_preregistration_spec_requires_complete_family_calendar_and_challenges(t
     payload = _spec(study, tmp_path=tmp_path)
     _write_spec(study, payload)
     assert len(validate_study_qualification_spec_for_preregistration(study)) == 64
+
+
+def test_fixed_calendar_route_accepts_only_the_released_civil_dates(tmp_path) -> None:
+    study = _study(tmp_path)
+    payload = _spec(study, tmp_path=tmp_path)
+    payload.update(
+        route=FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+        evidence_classification="provenance-unknown",
+        trial_history_complete=False,
+    )
+    payload["calendar"] = dict(FIXED_CALENDAR)
+    for challenge in payload["required_challenges"]:
+        challenge["method"] = fixed_challenge_method_contract(challenge["id"])
+    _write_spec(study, payload)
+
+    assert len(validate_study_qualification_spec_for_preregistration(study)) == 64
+
+    payload["calendar"]["replay_start"] = "2025-01-02"
+    _write_spec(study, payload)
+    with pytest.raises(ValueError, match="must match the released 2013-2025 contract"):
+        validate_study_qualification_spec_for_preregistration(study)
+
+
+def test_fixed_calendar_loader_exposes_replay_bounds(tmp_path) -> None:
+    study = _study(tmp_path)
+    payload = _spec(study, tmp_path=tmp_path)
+    payload.update(
+        route=FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+        evidence_classification="provenance-unknown",
+        trial_history_complete=False,
+    )
+    payload["calendar"] = dict(FIXED_CALENDAR)
+    for challenge in payload["required_challenges"]:
+        challenge["method"] = fixed_challenge_method_contract(challenge["id"])
+    _write_structured_artifacts(study, payload, tmp_path=tmp_path)
+
+    frozen = load_frozen_study_qualification_spec(study)
+
+    assert frozen.route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+    assert frozen.evidence_role == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+    assert frozen.development_years == tuple(range(2014, 2019))
+    assert frozen.evaluation_years == tuple(range(2020, 2025))
+    assert frozen.replay_start == date(2025, 1, 1)
+    assert frozen.replay_end == date(2025, 12, 31)
 
     payload["family"]["members"] = payload["family"]["members"][:1]
     _write_spec(study, payload)
