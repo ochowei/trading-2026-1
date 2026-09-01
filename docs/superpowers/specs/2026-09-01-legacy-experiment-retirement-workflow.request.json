@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "workflow": "strategy-forward-replication-research",
+  "slug": "legacy-experiment-retirement-contract-alignment",
+  "title": "Legacy Experiment Retirement Contract Alignment",
+  "proposal_path": "docs/superpowers/specs/2026-09-01-legacy-experiment-retirement-workflow-proposal.md",
+  "impact_path": "docs/superpowers/specs/2026-09-01-legacy-experiment-retirement-workflow-impact.md",
+  "validation_path": null,
+  "decision_path": null,
+  "propose": true
+}

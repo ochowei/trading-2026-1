@@ -18,13 +18,14 @@ def _entry(
     new_path: str,
     content: bytes,
     *,
+    artifact_class: str = "test-artifact",
     migration_version: str = "v010",
 ) -> ResultPathMigration:
     return ResultPathMigration(
         old_path=old_path,
         new_path=new_path,
         sha256=hashlib.sha256(content).hexdigest(),
-        artifact_class="test-artifact",
+        artifact_class=artifact_class,
         migration_version=migration_version,
     )
 
@@ -118,6 +119,74 @@ def test_migration_appends_one_digest_identical_retirement_hop(tmp_path) -> None
     )
 
 
+def test_migration_allows_digest_bound_trial_registry_history_transition(tmp_path) -> None:
+    content = b'{"schema_version":1,"trials":[]}\n'
+    source = tmp_path / "results" / "trial_registry.json"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(content)
+    categorized = "results/registries/trial_registry.json"
+    initial = _entry(
+        "results/trial_registry.json",
+        categorized,
+        content,
+        artifact_class="trial-registry",
+        migration_version="v009",
+    )
+    apply_result_path_migration((initial,), repository_root=tmp_path)
+    terminal = (
+        f"results/registries/history/trial_registry--{hashlib.sha256(content).hexdigest()}.json"
+    )
+    retirement = _entry(
+        categorized,
+        terminal,
+        content,
+        artifact_class="trial-registry-history",
+    )
+
+    apply_result_path_migration((initial, retirement), repository_root=tmp_path)
+
+    assert resolve_result_path(source, repository_root=tmp_path) == (tmp_path / terminal).resolve()
+
+
+@pytest.mark.parametrize(
+    ("initial_version", "retirement_version", "initial_class", "retirement_class", "message"),
+    [
+        ("v010", "v009", "legacy-result", "legacy-result", "version order"),
+        ("v009", "v010", "legacy-result", "workflow-native-trial", "artifact class"),
+    ],
+)
+def test_migration_rejects_invalid_two_hop_chain_metadata(
+    tmp_path,
+    initial_version: str,
+    retirement_version: str,
+    initial_class: str,
+    retirement_class: str,
+    message: str,
+) -> None:
+    content = b"immutable result\n"
+    source = tmp_path / "results" / "flat" / "result.json"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(content)
+    categorized = "results/experiment-results/flat/result.json"
+    initial = _entry(
+        "results/flat/result.json",
+        categorized,
+        content,
+        artifact_class=initial_class,
+        migration_version=initial_version,
+    )
+    retirement = _entry(
+        categorized,
+        "legacy/results/flat/result.json",
+        content,
+        artifact_class=retirement_class,
+        migration_version=retirement_version,
+    )
+
+    with pytest.raises(ResultPathMigrationError, match=message):
+        apply_result_path_migration((initial, retirement), repository_root=tmp_path)
+
+
 @pytest.mark.parametrize(
     ("raw_entries", "message"),
     [
@@ -140,7 +209,15 @@ def test_migration_appends_one_digest_identical_retirement_hop(tmp_path) -> None
 )
 def test_migration_rejects_unsafe_registry(tmp_path, raw_entries, message: str) -> None:
     content = b"x"
-    entries = (_entry(old_path, new_path, content) for old_path, new_path in raw_entries)
+    entries = (
+        _entry(
+            old_path,
+            new_path,
+            content,
+            migration_version="v009" if index == 0 else "v010",
+        )
+        for index, (old_path, new_path) in enumerate(raw_entries)
+    )
 
     with pytest.raises(ResultPathMigrationError, match=message):
         apply_result_path_migration(tuple(entries), repository_root=tmp_path)

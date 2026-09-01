@@ -3,7 +3,7 @@
   "workflow": "strategy-forward-replication-research",
   "title": "策略前瞻驗證流程",
   "definition_path": "docs/superpowers/specs/2026-09-01-strategy-forward-replication-research-v010.md",
-  "authoring_basis": "Accepted v009/C001 append-only qualification-plan abandonment with combined impact review: preserve v009 S001 completed and S002 cancelled; keep S002's open plan unchanged until v010 is active and a separate current abandonment approval is supplied; keep v009 S003 paused with restart-on-v010 and require any successor effort to use a new CLI-allocated study with exact revisits and known-contaminated disclosure. Preserve the v009 fixed-calendar retrospective contract, exact released policies, non-promotional outcome boundary, workflow release-safety capability, and explicit Workflow Release Activation from v010.",
+  "authoring_basis": "Accepted v009/C001 append-only qualification-plan abandonment and accepted v009/C002 legacy experiment retirement contract alignment with combined impact review: preserve v009 S001 completed and S002 cancelled; keep S002's open plan unchanged until v010 is active and a separate current abandonment approval is supplied; keep v009 S003 paused with restart-on-v010 and require any successor effort to use a new CLI-allocated study with exact revisits and known-contaminated disclosure. Preserve the v009 fixed-calendar retrospective contract, exact released policies, non-promotional outcome boundary, workflow release-safety capability, and explicit Workflow Release Activation from v010. Align v010 with the terminal read-only legacy/results archive and the schema-2, digest-identical, maximum-two-hop compatibility resolver without rewriting released v009 dependencies or frozen study bytes.",
   "policies": [
     {
       "family": "us-equity-market",
@@ -41,6 +41,7 @@
     {"path": "docs/historical-qualification-and-shadow-v009.md", "role": "normative"},
     {"path": "docs/historical-qualification-and-shadow-v010.md", "role": "normative"},
     {"path": "docs/result-storage-layout-v009.md", "role": "normative"},
+    {"path": "docs/legacy-experiment-retirement-v010.md", "role": "normative"},
     {"path": "docs/controlled-followup-cutover.md", "role": "reference"},
     {"path": "docs/live-drift-and-recovery.md", "role": "reference"},
     {"path": "docs/market-data.md", "role": "reference"},
