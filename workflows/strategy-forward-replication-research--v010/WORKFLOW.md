@@ -17,6 +17,11 @@ bound study 已經 terminal `cancelled`、但 qualification registry 仍留有 u
 治理分歧。Abandonment 只關閉 single-open-plan administrative lock；它不是 Evaluation、screen、
 study outcome、replay、Shadow 或任何 trading authority。
 
+本版本同時對齊 repository 已完成的 legacy experiment retirement：legacy source 與最後 retained
+results 只保留作唯讀 archive、歷史重播與既有部位的 fail-closed exit compatibility。Archived
+legacy result 不具 current result、selection、qualification、terminal、promotion 或 live authority；
+歷史路徑只可經 append-only、digest-identical、最多兩跳的 v009-to-v010 compatibility chain 解析。
+
 ## Scope and non-goals
 
 本流程涵蓋一個 experiment family 的單輪固定歷史研究，從預註冊、Development 選擇與
@@ -28,12 +33,18 @@ frozen-plan readiness、決策權限、必要證據及失敗後 successor study 
 administrative abandonment。該操作不屬於任何 study execution stage，不會移動、恢復、完成、
 評估或重新解讀 owning study。
 
+Legacy experiment retirement 只界定 archive、compatibility resolution 與禁止消費邊界，不建立
+study stage。`results/experiment-results/` 已移除且不得重建；retained legacy bytes 的 canonical
+terminal location 是唯讀 `legacy/results/<experiment>/`。
+
 本流程不負責：
 
 - 設計或實作策略程式碼、執行個別 study，或替 study 解讀研究結論；
 - 定義資料 provider、檔案 schema、CLI 參數或 broker 操作細節；
 - 呼叫 broker、提交自動訂單，或把 Historical Evaluation／execution replay 宣稱為實盤授權；
 - 以 study cancellation 自動推論 plan 已關閉，或以 plan abandonment 推論 study outcome；
+- 恢復 legacy experiment execution、result publication、ranking、qualification、promotion 或
+  followup new-entry authority；
 - 將策略通過解讀為獲利保證；
 - 在 `workflows/` 保存正式結果、原始私有資料、broker export、credentials、個人持倉或
   private ledger。這些內容必須留在各自的 authoritative location，workflow 只記錄精確
@@ -42,7 +53,9 @@ administrative abandonment。該操作不屬於任何 study execution stage，�
 新 research definition 的 source 必須位於 `src/trading/research_definitions/`。既有
 `src/trading/experiments/` identity 只可作為凍結的 legacy provenance 或 migration input，
 不得就地改變研究語意。Source 不複製進 study；正式執行以 immutable Research Definition
-Snapshot 保存 exact source、runtime 與 policy-set identity。
+Snapshot 保存 exact source、runtime 與 policy-set identity。`legacy/results/` 中的 archive 只能
+供明確唯讀診斷、byte-identical historical resolution 或 already-owned position exit compatibility；
+不得成為 formal observation、current result validity 或任何新部位的依據。
 
 ## Entry conditions and required inputs
 
@@ -432,8 +445,15 @@ identity、approval、artifact、calendar、provenance 或 replay 不足為 stag
 19. `STAGES_AND_OUTCOMES.md` 是 pinned explanatory companion；它不能新增、放寬或覆寫本
     `WORKFLOW.md` 的行為與 authority。
 20. Canonical result writers 必須使用分類後 namespace。Historical explicit paths 只可經
-    `results/registries/path-migrations.json` 的單跳、append-only、SHA-256-bound mapping 解析；
-    chained、cyclic、duplicate、missing、untracked 或 digest drift 一律 fail closed。
+    `results/registries/path-migrations.json` 的 append-only、SHA-256-bound mapping 解析；v009
+    categorized path 最多再接一個 v010 retirement hop，整條 chain 最多兩跳且每一跳必須保持
+    original digest。超過兩跳、cyclic、duplicate、missing、untracked、unsafe、artifact-class
+    conflict 或 digest drift 一律 fail closed。
+    Legacy-result chain 的 artifact class 必須完全相同。Schema-2 registry 唯一允許的
+    non-identical class transition 是 v009 `trial-registry` 的 exact categorized path
+    `results/registries/trial_registry.json`，轉為 v010 `trial-registry-history` 的 exact
+    digest-bound `results/registries/history/trial_registry--<sha256>.json`；其他 cross-class
+    transition 一律視為 conflict。這個 historical registry replay 不恢復任何 current authority。
 21. Challenge-only authority 必須獨立於 screen、terminal、study transition、provider、research
     execution 與 registry mutation；任何 implicit invocation 或 authority widening 都 fail closed。
 22. Registered challenge schemas/implementations、provider-free coordinator、atomic
@@ -463,6 +483,9 @@ identity、approval、artifact、calendar、provenance 或 replay 不足為 stag
 29. Original plan、event hashes、study bytes 與 failed attempts 必須保留。不得刪除 registry、
     fabricate screen、改 family identity、重寫 status、重用 event ID 或放寬 single-open-plan
     invariant 來取代 canonical abandonment。
+30. `legacy/results/` 是 terminal read-only archive，`results/experiment-results/` 不得存在或重建。
+    Archived result 不得被 freshness、evaluation、ranking、qualification、terminal evidence、
+    Shadow/Active、followup new entry 或任何 live path 消費；compatibility read 不恢復 authority。
 ## Required artifacts and evidence
 
 | Stage | Required artifacts and evidence |
@@ -483,14 +506,14 @@ records只保存精確 repository-relative paths、immutable manifest IDs、comp
 checksums。Mutable `latest` reference 只能作便利 pointer，不能單獨支持決策。
 
 Canonical tracked result namespaces are purpose-owned: workflow-native trial artifacts use
-`results/research-trials/<family>/<trial>/`; retained legacy experiment outputs use
-`results/experiment-results/<experiment>/`; parity-linked migration artifacts use
+`results/research-trials/<family>/<trial>/`; terminally retired legacy experiment outputs use the
+read-only archive `legacy/results/<experiment>/`; parity-linked migration artifacts use
 `results/migration-evidence/<experiment>/`; workflow study evidence uses
 `results/workflows/<workflow>--vNNN/<study>/<stage>/`; content-addressed evidence uses
-`results/evidence/{research,qualification}/`; and registries use `results/registries/`. Pure
-unreferenced legacy history belongs under `legacy/results/<experiment>/history/`. Released workflow
-and frozen study bytes keep their original path strings and resolve them only through the exact
-digest-bound compatibility registry.
+`results/evidence/{research,qualification}/`; and registries use `results/registries/`.
+`results/experiment-results/` 已移除且不得重建；pure unreferenced legacy history 位於
+`legacy/results/<experiment>/history/`。Released workflow 與 frozen study bytes 保持原始 path
+strings，並只透過 exact、最多兩跳、same-digest compatibility registry 解析到 terminal bytes。
 
 每個 formal observation 的 immutable Research Definition Snapshot 必須保存所有
 outcome-relevant strategy、detector、backtester 與 resolved configuration bytes。若 workflow
@@ -544,6 +567,12 @@ Qualification-plan abandonment authority 由
 boundary 下驗證與寫入 canonical event；`src/trading/workflow/studies.py` 只提供 canonical
 study-lifecycle identity。CLI 或 registry caller 都不得以自報的 active capability、study path 或
 cancelled status 取代這些 verified boundaries。
+
+Legacy result compatibility 由 `src/trading/research_data/paths.py` 解析 tracked schema-2
+`results/registries/path-migrations.json`。Resolver 只接受 v009/v010、最多兩跳且 original digest
+一致的 chain；`legacy/results/` writer 與所有 legacy outcome-relevant public operation維持退役並
+fail closed。這個 compatibility seam 只保存 frozen reference replay，不產生 current observation、
+qualification、promotion 或 trading authority。
 
 ## Outcomes
 
@@ -606,6 +635,8 @@ integrity 任一不足，operation 必須零 mutation fail closed。
   tracked/local-only evidence boundary；
 - categorized result namespace、canonical writer destination、path-migration registry 或 frozen
   historical path-resolution contract；
+- legacy archive location、retired-result consumption boundary、migration schema/hop limit 或
+  byte-identical retirement rule；
 - auxiliary excess-lag mode、unavailable-decision semantics、required audit inventory 或
   signal-suppression proof；
 - pinned reference companion 的 meaning、identity 或 release-stability contract。
@@ -616,7 +647,9 @@ integrity 任一不足，operation 必須零 mutation fail closed。
 建立新 experiment trial 或 research round；只要 workflow rules 不變，不需要新的 workflow
 version。反之，不得用「只是文件修改」掩飾會改變流程解讀的規則變更。
 
-本 v010 draft 不會改變 active v009 或其 studies。v009/S001 與 v009/S002 保持 terminal；
+本 v010 draft 聚合 accepted v009/C001 qualification-plan abandonment 與 accepted v009/C002
+legacy experiment retirement contract alignment。兩者 authority 各自獨立，且不會改變 active
+v009 或其 studies。v009/S001 與 v009/S002 保持 terminal；
 v009/S003 保持 paused，version-boundary decision 為 `restart-on-v010`，不得移動、恢復或改寫。
 任何後續 effort 必須在 v010 effective 後建立 next CLI-allocated local study，並以 exact
 `revisits` 指向 v009/S003、如實保留 `known-contaminated` disclosure。
@@ -675,7 +708,8 @@ Release Activation，canonical branch membership 或 `RELEASE.json` 存在都不
 | `docs/historical-qualification-and-shadow-v010.md` | normative | Exact active-release capability、cancelled-study binding、canonical abandonment event、single-open-plan closure 與 unchanged outcome/Shadow/live-authority boundary。 |
 | `docs/controlled-followup-cutover.md` | reference | 只供 historical ledger/parity mechanics 參考；Active promotion、position ownership 與 order authority 不適用於 v010 study。 |
 | `docs/live-drift-and-recovery.md` | reference | 只供 2025 historical drift replay mechanics 參考；不建立 prospective monitoring 或 recovery authority。 |
-| `docs/result-storage-layout-v009.md` | normative | Categorized result namespaces、append-only path migration、historical compatibility resolution、writer cutover 與 retention boundary。 |
+| `docs/result-storage-layout-v009.md` | normative | v009 categorized result namespaces、第一跳 migration 與未被 v010 retirement successor 取代的 storage/evidence rules。 |
+| `docs/legacy-experiment-retirement-v010.md` | normative | Terminal read-only legacy archive、已移除 categorized legacy-result path、同 digest 最多兩跳 resolution，以及 archived result 的 non-authority boundary；在這些主題上取代 v009 storage 文件。 |
 | `docs/market-data.md` | reference | Provider/cache、session validation、declared dependencies 與 as-of availability implementation。 |
 | `docs/manual-execution-ledger.md` | reference | Private manual position authority、accounting integrity 與 broker reconciliation implementation。 |
 | `docs/research-evidence-preservation.md` | reference | Content-addressed pre-freeze/qualification evidence、logical transaction 與 fresh-clone implementation boundary。 |

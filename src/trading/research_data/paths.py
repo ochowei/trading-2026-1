@@ -290,12 +290,32 @@ def _terminal_destination(
         following = by_old_path[current.new_path]
         if following.old_path in seen:
             raise ResultPathMigrationError("path migration registry contains a cycle")
+        if (current.migration_version, following.migration_version) != ("v009", "v010"):
+            raise ResultPathMigrationError("path migration chain has an invalid version order")
+        if not _artifact_classes_are_compatible(origin, following):
+            raise ResultPathMigrationError("path migration chain changes the artifact class")
         if following.sha256 != origin.sha256:
             raise ResultPathMigrationError("path migration chain changes the artifact digest")
         seen.add(following.old_path)
         current = following
         hops += 1
     return current.new_path
+
+
+def _artifact_classes_are_compatible(
+    origin: ResultPathMigration,
+    following: ResultPathMigration,
+) -> bool:
+    if following.artifact_class == origin.artifact_class:
+        return True
+    expected_registry_history = f"results/registries/history/trial_registry--{origin.sha256}.json"
+    return (
+        origin.artifact_class == "trial-registry"
+        and following.artifact_class == "trial-registry-history"
+        and origin.new_path == "results/registries/trial_registry.json"
+        and following.old_path == origin.new_path
+        and following.new_path == expected_registry_history
+    )
 
 
 def _safe_repository_path(value: str, *, label: str) -> Path:
