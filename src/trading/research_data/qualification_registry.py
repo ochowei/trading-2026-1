@@ -324,23 +324,74 @@ class QualificationRegistry:
                 raise QualificationRegistryError(
                     "selection plan must be registered when its trial universe freezes"
                 )
+        projection_events = self._global_plan_projection_events(state)
         open_plan_ids = {
             event_payload.get("plan_id")
-            for event in _events(state)
+            for event in projection_events
             if event.get("event_type") == "historical_plan"
             and isinstance((event_payload := event.get("payload")), Mapping)
             and event_payload.get("experiment_family") == plan.experiment_family
             and not any(
-                terminal.get("event_type") in {"historical_screen", "historical_plan_abandoned"}
+                terminal.get("event_type")
+                in {
+                    "historical_screen",
+                    "historical_plan_abandoned",
+                    "historical_plan_closed_invalidated",
+                }
                 and isinstance(terminal.get("payload"), Mapping)
                 and terminal["payload"].get("plan_id") == event_payload.get("plan_id")
-                for terminal in _events(state)
+                for terminal in projection_events
             )
         }
         if open_plan_ids - {plan.plan_id}:
             raise QualificationRegistryError(
                 "experiment family already has an open forward or retrospective qualification plan"
             )
+
+    def _global_plan_projection_events(
+        self,
+        state: dict[str, object],
+    ) -> list[dict[str, object]]:
+        """Include immutable shared shards when this registry is the active chain."""
+        catalog_path = self.path.parent.parent / "catalog.json"
+        if self.path.parent.name != "active" or not catalog_path.is_file():
+            return _events(state)
+        try:
+            catalog = json.loads(catalog_path.read_bytes())
+        except (OSError, json.JSONDecodeError) as exc:
+            raise QualificationRegistryError(
+                f"cannot read shared authority catalog: {exc}"
+            ) from exc
+        shards = catalog.get("shards") if isinstance(catalog, Mapping) else None
+        if not isinstance(shards, list):
+            raise QualificationRegistryError("shared authority catalog shards are malformed")
+        projected: list[dict[str, object]] = []
+        seen_plan_ids: set[str] = set()
+        for raw_shard in shards:
+            if not isinstance(raw_shard, Mapping):
+                raise QualificationRegistryError("shared authority catalog shard is malformed")
+            digest = _required_sha256(raw_shard.get("registry_sha256"), "shared shard digest")
+            shard_path = self.path.parent.parent / "shards" / digest / "qualification-registry.json"
+            shard_events = _events(QualificationRegistry(shard_path).read())
+            for event in shard_events:
+                if event.get("event_type") == "historical_plan":
+                    plan_id = _payload(event).get("plan_id")
+                    if not isinstance(plan_id, str) or plan_id in seen_plan_ids:
+                        raise QualificationRegistryError(
+                            "shared qualification shards contain duplicate plan identities"
+                        )
+                    seen_plan_ids.add(plan_id)
+            projected.extend(shard_events)
+        for event in _events(state):
+            if event.get("event_type") == "historical_plan":
+                plan_id = _payload(event).get("plan_id")
+                if not isinstance(plan_id, str) or plan_id in seen_plan_ids:
+                    raise QualificationRegistryError(
+                        "shared active chain repeats an imported plan identity"
+                    )
+                seen_plan_ids.add(plan_id)
+            projected.append(event)
+        return projected
 
     def abandon_historical_plan(
         self,
@@ -443,6 +494,29 @@ class QualificationRegistry:
                 event_type="historical_plan_abandoned",
                 payload=payload,
             )
+        return event_id
+
+    def append_cross_chain_terminal(
+        self,
+        *,
+        event_type: str,
+        payload: dict[str, object],
+    ) -> str:
+        """Append a globally verified imported-plan terminal to the active chain.
+
+        The shared-state writer verifies the referenced immutable shard and canonical study.
+        This registry boundary validates the durable event shape, hash chain, and checkpoint.
+        """
+        plan_id = _required_text(payload.get("plan_id"), "cross-chain plan identity")
+        event_prefixes = {
+            "historical_plan_abandoned": "historical-plan-abandoned",
+            "historical_plan_closed_invalidated": "historical-plan-closed-invalidated",
+        }
+        prefix = event_prefixes.get(event_type)
+        if prefix is None:
+            raise QualificationRegistryError("unsupported cross-chain terminal event type")
+        event_id = f"{prefix}:{plan_id}"
+        self._append(event_id=event_id, event_type=event_type, payload=payload)
         return event_id
 
     def record_historical_screen(
@@ -1098,6 +1172,80 @@ def _validated_abandonment_authority(authority: Mapping[str, object]) -> dict[st
     return payload
 
 
+def _validate_cross_chain_terminal(
+    event: Mapping[str, object],
+    *,
+    expected_status: str,
+) -> None:
+    payload = _payload(dict(event))
+    plan_id = _required_text(payload.get("plan_id"), "cross-chain plan identity")
+    _required_text(payload.get("experiment_family"), "cross-chain experiment family")
+    binding = payload.get("source_binding")
+    study_identity = payload.get("study_identity")
+    lifecycle = payload.get("study_lifecycle")
+    authority = payload.get("authorization")
+    impact = payload.get("accepted_impact")
+    prior_shared = payload.get("prior_shared")
+    if not all(
+        isinstance(item, Mapping)
+        for item in (binding, study_identity, lifecycle, authority, impact, prior_shared)
+    ):
+        raise QualificationRegistryError("cross-chain terminal authority is malformed")
+    if binding.get("plan_id") != plan_id:
+        raise QualificationRegistryError("cross-chain source binding uses a different plan")
+    for field in ("registry_sha256", "head_hash", "plan_event_hash"):
+        _required_sha256(binding.get(field), f"cross-chain source {field}")
+    frozen_study = _validated_frozen_study_identity(study_identity)
+    if (
+        lifecycle.get("study_path") != frozen_study["study_path"]
+        or lifecycle.get("status") != expected_status
+        or not isinstance(lifecycle.get("workflow"), str)
+        or not isinstance(lifecycle.get("workflow_version"), str)
+    ):
+        raise QualificationRegistryError("cross-chain terminal study lifecycle is inconsistent")
+    capabilities = authority.get("capabilities")
+    if not isinstance(capabilities, list) or not all(
+        isinstance(capability, str) and capability for capability in capabilities
+    ):
+        raise QualificationRegistryError("cross-chain authorization capabilities are malformed")
+    required_capabilities = {
+        "shared-qualification-state-v1",
+        "cross-chain-plan-administration-v1",
+    }
+    if expected_status == "cancelled":
+        required_capabilities.add("qualification-plan-abandonment-v1")
+    if not required_capabilities.issubset(capabilities):
+        raise QualificationRegistryError("cross-chain authorization lacks required capabilities")
+    _required_text(authority.get("workflow"), "cross-chain authorizing workflow")
+    _required_text(authority.get("workflow_version"), "cross-chain authorizing version")
+    _required_repository_path(authority.get("workflow_path"), "cross-chain workflow path")
+    _required_sha256(
+        authority.get("workflow_release_sha256"),
+        "cross-chain workflow release identity",
+    )
+    _required_repository_path(impact.get("path"), "accepted impact path")
+    _required_sha256(impact.get("impact_sha256"), "accepted impact identity")
+    _required_sha256(impact.get("decision_sha256"), "accepted decision identity")
+    expected_disposition = "cancelled" if expected_status == "cancelled" else "close-invalidated"
+    if impact.get("disposition") != expected_disposition:
+        raise QualificationRegistryError("accepted impact disposition is invalid")
+    _required_sha256(prior_shared.get("catalog_sha256"), "prior shared catalog identity")
+    if (
+        not isinstance(prior_shared.get("active_event_count"), int)
+        or prior_shared.get("active_event_count") != event.get("sequence", 0) - 1
+        or prior_shared.get("active_head_hash") != event.get("previous_hash")
+    ):
+        raise QualificationRegistryError("prior shared active-chain identity is malformed")
+    recorded_at = _required_text(payload.get("recorded_at"), "cross-chain terminal time")
+    try:
+        if timestamp_text(parse_timestamp(recorded_at)) != recorded_at:
+            raise ValueError("non-canonical timestamp")
+    except ValueError as exc:
+        raise QualificationRegistryError("cross-chain terminal time is malformed") from exc
+    _required_text(payload.get("approved_by"), "cross-chain terminal approver")
+    _required_text(payload.get("reason"), "cross-chain terminal reason")
+
+
 def _validate_lifecycle(events: list[dict[str, object]]) -> None:
     plans: dict[str, Mapping[str, object]] = {}
     screens: set[str] = set()
@@ -1133,7 +1281,8 @@ def _validate_lifecycle(events: list[dict[str, object]]) -> None:
             screens.add(plan_id)
         elif event_type == "historical_plan_abandoned":
             plan_id = payload.get("plan_id")
-            if not isinstance(plan_id, str) or plan_id not in plans:
+            imported = isinstance(payload.get("source_binding"), Mapping)
+            if not isinstance(plan_id, str) or (plan_id not in plans and not imported):
                 raise QualificationRegistryError(
                     "historical plan abandonment precedes its frozen plan"
                 )
@@ -1147,6 +1296,10 @@ def _validate_lifecycle(events: list[dict[str, object]]) -> None:
                 raise QualificationRegistryError(
                     "qualification registry repeats a historical plan abandonment"
                 )
+            if imported:
+                _validate_cross_chain_terminal(event, expected_status="cancelled")
+                abandoned.add(plan_id)
+                continue
             plan_payload = plans[plan_id]
             if payload.get("experiment_family") != plan_payload.get("experiment_family"):
                 raise QualificationRegistryError(
@@ -1203,6 +1356,22 @@ def _validate_lifecycle(events: list[dict[str, object]]) -> None:
                 raise QualificationRegistryError(
                     "historical plan abandonment prior registry identity is malformed"
                 )
+            abandoned.add(plan_id)
+        elif event_type == "historical_plan_closed_invalidated":
+            plan_id = payload.get("plan_id")
+            if not isinstance(plan_id, str) or not isinstance(
+                payload.get("source_binding"), Mapping
+            ):
+                raise QualificationRegistryError(
+                    "invalidated plan closure requires an imported source binding"
+                )
+            if event.get("event_id") != f"historical-plan-closed-invalidated:{plan_id}":
+                raise QualificationRegistryError(
+                    "invalidated plan closure event identity is not canonical"
+                )
+            if plan_id in screens or plan_id in abandoned:
+                raise QualificationRegistryError("historical plan already has a terminal event")
+            _validate_cross_chain_terminal(event, expected_status="paused")
             abandoned.add(plan_id)
         elif event_type == "shadow_registration":
             shadow_id = payload.get("shadow_id")

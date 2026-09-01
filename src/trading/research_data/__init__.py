@@ -5,7 +5,11 @@ from trading.research_data.definitions import (
     ResearchDefinitionError,
     ResearchDefinitionStore,
 )
-from trading.research_data.evidence import QualificationEvidenceStore, ResearchEvidenceStore
+from trading.research_data.evidence import (
+    QualificationEvidenceStore,
+    ResearchEvidenceStore,
+    SharedQualificationEvidenceSnapshot,
+)
 from trading.research_data.manifest_codec import SnapshotManifestError
 from trading.research_data.migration import (
     MIGRATION_RESULT_SCHEMA_VERSION,
@@ -55,6 +59,21 @@ from trading.research_data.runs import (
     RunExecutionError,
     RunMode,
 )
+from trading.research_data.shared_qualification_state import (
+    CROSS_CHAIN_PLAN_ADMINISTRATION_CAPABILITY,
+    DEFAULT_LOGICAL_REGISTRY_IDENTITY,
+    SHARED_QUALIFICATION_STATE_CAPABILITY,
+    MigrationPreview,
+    MigrationSource,
+    SharedMigrationRequest,
+    SharedQualificationPaths,
+    SharedQualificationState,
+    SharedQualificationStateError,
+    resolve_git_repository_identity,
+    resolve_study_qualification_registry_path,
+    resolve_workflow_qualification_registry_path,
+    shared_qualification_paths,
+)
 from trading.research_data.store import (
     ResearchDataStore,
     SnapshotEligibilityError,
@@ -85,11 +104,21 @@ __all__ = [
     "ResearchDataStore",
     "ResearchEvidenceStore",
     "QualificationEvidenceStore",
+    "SharedQualificationEvidenceSnapshot",
     "ResearchDefinitionError",
     "ResearchDefinitionSnapshot",
     "ResearchDefinitionStore",
     "QualificationRegistry",
     "QualificationRegistryError",
+    "CROSS_CHAIN_PLAN_ADMINISTRATION_CAPABILITY",
+    "DEFAULT_LOGICAL_REGISTRY_IDENTITY",
+    "SHARED_QUALIFICATION_STATE_CAPABILITY",
+    "MigrationPreview",
+    "MigrationSource",
+    "SharedMigrationRequest",
+    "SharedQualificationPaths",
+    "SharedQualificationState",
+    "SharedQualificationStateError",
     "ResearchResult",
     "ResearchSnapshot",
     "ResearchRunCoordinator",
@@ -117,5 +146,9 @@ __all__ = [
     "research_evidence_directory",
     "research_trial_directory",
     "resolve_result_path",
+    "resolve_git_repository_identity",
+    "resolve_study_qualification_registry_path",
+    "resolve_workflow_qualification_registry_path",
+    "shared_qualification_paths",
     "trial_registry_path",
 ]

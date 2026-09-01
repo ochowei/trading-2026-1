@@ -1,16 +1,17 @@
 ---
 workflow: strategy-forward-replication-research
 title: 策略前瞻驗證流程
-version: v010
+version: v011
 definition: WORKFLOW.md
-supersedes: v009
+supersedes: v010
 derived_from: null
 source_changes:
-- workflows/strategy-forward-replication-research--v009/work/changes/legacy-experiment-retirement-contract-alignment--c002
-- workflows/strategy-forward-replication-research--v009/work/changes/qualification-plan-abandonment--c001
+- workflows/strategy-forward-replication-research--v010/work/changes/shared-qualification-state-authority--c001
 capabilities:
 - fixed-calendar-retrospective-v1
 - qualification-plan-abandonment-v1
+- shared-qualification-state-v1
+- cross-chain-plan-administration-v1
 - workflow-release-safety-v1
 policies:
 - family: us-equity-market
@@ -48,6 +49,8 @@ dependencies:
   role: normative
 - path: docs/historical-qualification-and-shadow-v010.md
   role: normative
+- path: docs/shared-qualification-state-v011.md
+  role: normative
 - path: docs/result-storage-layout-v009.md
   role: normative
 - path: docs/legacy-experiment-retirement-v010.md
@@ -75,7 +78,7 @@ only in the root `workflows/README.md` registry.
 
 ## Authoring basis
 
-Accepted v009/C001 append-only qualification-plan abandonment and accepted v009/C002 legacy experiment retirement contract alignment with combined impact review: preserve v009 S001 completed and S002 cancelled; keep S002's open plan unchanged until v010 is active and a separate current abandonment approval is supplied; keep v009 S003 paused with restart-on-v010 and require any successor effort to use a new CLI-allocated study with exact revisits and known-contaminated disclosure. Preserve the v009 fixed-calendar retrospective contract, exact released policies, non-promotional outcome boundary, workflow release-safety capability, and explicit Workflow Release Activation from v010. Align v010 with the terminal read-only legacy/results archive and the schema-2, digest-identical, maximum-two-hop compatibility resolver without rewriting released v009 dependencies or frozen study bytes.
+Accepted v010/C001 worktree-independent shared qualification state authority with combined impact review: preserve every existing registry and checkpoint byte-for-byte; expose the split same-family open-plan conflict; keep completed studies terminal; keep v009/S002 cancelled pending separately approved cross-chain closure; close-invalidated v008/S003 only after successor authority and separate approval; keep v009/S003 paused and restart-on-v011 if no v010 successor study exists before activation. Preserve the v010 fixed-calendar retrospective, non-promotional outcome, policy, release-safety, explicit activation, plan-abandonment, and terminal legacy-archive boundaries.
 
 ## Errata
 
@@ -90,7 +93,5 @@ _No studies._
 
 ### Changes
 
-| ID | Title | Status | Released in | Path |
-| --- | --- | --- | --- | --- |
-| `C001` | Worktree-Independent Shared Qualification State Authority | `accepted` | `-` | [shared-qualification-state-authority--c001](work/changes/shared-qualification-state-authority--c001/) |
+_No changes._
 <!-- GENERATED:WORK_INDEX_END -->

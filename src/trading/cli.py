@@ -52,7 +52,11 @@ from trading.research_data import (
     QualificationRegistry,
     ResearchDataStore,
     ResearchDefinitionStore,
+    SharedMigrationRequest,
+    SharedQualificationState,
     qualification_evidence_directory,
+    resolve_study_qualification_registry_path,
+    resolve_workflow_qualification_registry_path,
     trial_registry_path,
 )
 from trading.workflow.challenge_execution import run_fixed_study_challenges
@@ -186,6 +190,44 @@ def cmd_qualification_status(args: argparse.Namespace) -> None:
         )
 
 
+def cmd_qualification_shared_state(args: argparse.Namespace) -> None:
+    """Inspect or migrate the Git-common qualification authority."""
+    shared = SharedQualificationState(args.repository_root)
+    if args.shared_state_command == "status":
+        projection = shared.global_projection()
+        print(json.dumps(projection, indent=2, sort_keys=True))
+        return
+    if args.shared_state_command == "evidence-snapshot":
+        path, digest = QualificationEvidenceStore(args.output_root).publish_shared(shared)
+        print(f"shared qualification evidence published: {digest}")
+        print(f"  path: {path}")
+        return
+    if args.shared_state_command == "close-plan":
+        event_id = shared.close_imported_plan(
+            args.plan_id,
+            disposition=args.disposition,
+            workflow_path=args.workflow,
+            impact_change_path=args.impact_change,
+            approved_by=args.approved_by,
+            reason=args.reason,
+        )
+        print(f"shared qualification plan closed: {event_id}")
+        return
+    request = SharedMigrationRequest.from_path(args.request)
+    if args.shared_state_command == "migration-preview":
+        preview = shared.preview_migration(request, workflow_path=args.workflow)
+        print(json.dumps(preview.as_payload(), indent=2, sort_keys=True))
+        return
+    if args.shared_state_command == "migration-apply":
+        preview = shared.apply_migration(
+            request,
+            workflow_path=args.workflow,
+            approved_decision_sha256=args.approved_decision_sha256,
+        )
+        print(f"shared qualification migration published: {preview.decision_sha256}")
+        print(f"  shared root: {preview.shared_paths.root}")
+
+
 def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
     """Freeze and append one forward-dated qualification plan."""
     if args.experiment:
@@ -221,6 +263,12 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
         if identity in family_source_sha256:
             raise ValueError(f"duplicate family source digest: {identity}")
         family_source_sha256[identity] = digest.strip()
+    qualification_path = args.path
+    if args.workflow is not None and args.path == DEFAULT_QUALIFICATION_REGISTRY_PATH:
+        qualification_path = resolve_workflow_qualification_registry_path(
+            Path("."),
+            args.workflow,
+        )
     plan = register_forward_qualification_plan(
         experiment_name=args.experiment,
         research_identity=args.research,
@@ -236,7 +284,7 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
         random_samples=args.random_samples,
         bootstrap_repetitions=args.bootstrap_repetitions,
         bootstrap_block_sessions=args.bootstrap_block_sessions,
-        qualification_registry_path=args.path,
+        qualification_registry_path=qualification_path,
         trial_registry_path=args.trial_registry_path,
         evidence_role=args.evidence_role,
         evidence_classification=args.evidence_classification,
@@ -281,9 +329,12 @@ def cmd_qualification_plan_register(args: argparse.Namespace) -> None:
 
 def cmd_qualification_plan_register_study(args: argparse.Namespace) -> None:
     """Compile or register one exact frozen study without caller-supplied study inputs."""
+    qualification_path = args.path
+    if args.path == DEFAULT_QUALIFICATION_REGISTRY_PATH:
+        qualification_path = resolve_study_qualification_registry_path(args.study)
     plan = compile_study_qualification_plan(
         study_path=args.study,
-        qualification_registry_path=args.path,
+        qualification_registry_path=qualification_path,
         trial_registry_path=args.trial_registry_path,
         dry_run=args.dry_run,
         approved_by=args.approved_by,
@@ -302,7 +353,13 @@ def cmd_qualification_plan_abandon(args: argparse.Namespace) -> None:
     """Append one authorized terminal event for a cancelled study's open plan."""
     authority = resolve_qualification_plan_abandonment_authority(args.workflow)
     studies = WorkflowStudyService()
-    event_id = QualificationRegistry(args.path).abandon_historical_plan(
+    qualification_path = args.path
+    if args.path == DEFAULT_QUALIFICATION_REGISTRY_PATH:
+        qualification_path = resolve_workflow_qualification_registry_path(
+            Path("."),
+            args.workflow,
+        )
+    event_id = QualificationRegistry(qualification_path).abandon_historical_plan(
         args.plan_id,
         approved_by=args.approved_by,
         reason=args.reason,
@@ -336,10 +393,16 @@ def cmd_qualification_screen_run(args: argparse.Namespace) -> None:
         if experiment in trial_manifests:
             raise ValueError(f"duplicate screen experiment: {experiment}")
         trial_manifests[experiment] = Path(manifest.strip())
+    qualification_path = args.path
+    if args.workflow is not None and args.path == DEFAULT_QUALIFICATION_REGISTRY_PATH:
+        qualification_path = resolve_workflow_qualification_registry_path(
+            Path("."),
+            args.workflow,
+        )
     execution = run_registered_historical_screen(
         plan_id=args.plan_id,
         trial_manifests=trial_manifests,
-        qualification_registry_path=args.path,
+        qualification_registry_path=qualification_path,
         trial_registry_path=args.trial_registry_path,
         research_data_store=create_default_research_data_store(),
         definition_store=create_default_research_definition_store(),
@@ -352,12 +415,15 @@ def cmd_qualification_screen_run(args: argparse.Namespace) -> None:
 
 def cmd_qualification_replay_run_study(args: argparse.Namespace) -> None:
     """Run the fixed 2025 provider-free replay without granting operational authority."""
+    qualification_path = args.path
+    if args.path == DEFAULT_QUALIFICATION_REGISTRY_PATH:
+        qualification_path = resolve_study_qualification_registry_path(args.study)
     publication = run_fixed_calendar_retrospective_replay(
         study_path=args.study,
         plan_id=args.plan_id,
         selected_manifest_path=args.manifest,
         challenge_manifest_path=args.challenge_manifest,
-        qualification_registry_path=args.path,
+        qualification_registry_path=qualification_path,
         trial_registry_path=args.trial_registry_path,
         research_data_store=create_default_research_data_store(),
         definition_store=create_default_research_definition_store(),
@@ -382,11 +448,14 @@ def cmd_qualification_challenge_run_study(args: argparse.Namespace) -> None:
         if identity in family_manifests:
             raise ValueError(f"duplicate challenge trial identity: {identity}")
         family_manifests[identity] = Path(manifest.strip())
+    qualification_path = args.path
+    if args.path == DEFAULT_QUALIFICATION_REGISTRY_PATH:
+        qualification_path = resolve_study_qualification_registry_path(args.study)
     manifest_path = run_fixed_study_challenges(
         study_path=args.study,
         plan_id=args.plan_id,
         family_manifests=family_manifests,
-        qualification_registry_path=args.path,
+        qualification_registry_path=qualification_path,
         trial_registry_path=args.trial_registry_path,
         research_data_store=create_default_research_data_store(),
         output_root=args.output_root,
@@ -409,6 +478,8 @@ def cmd_qualification(args: argparse.Namespace) -> None:
             cmd_qualification_plan_register_study(args)
         elif args.qualification_command == "plan" and args.plan_command == "abandon":
             cmd_qualification_plan_abandon(args)
+        elif args.qualification_command == "shared-state":
+            cmd_qualification_shared_state(args)
         elif args.qualification_command == "evidence-snapshot":
             cmd_qualification_evidence_snapshot(args)
         elif args.qualification_command == "screen" and args.screen_command == "run":
@@ -1536,6 +1607,82 @@ def build_parser() -> argparse.ArgumentParser:
         "--source-registry-identity",
         default=DEFAULT_QUALIFICATION_REGISTRY_PATH.as_posix(),
         help="Preregistered repository-relative identity of the captured registry",
+    )
+    qualification_shared_p = qualification_sub.add_parser(
+        "shared-state",
+        help="Inspect or migrate the Git-common shared qualification authority",
+    )
+    qualification_shared_sub = qualification_shared_p.add_subparsers(
+        dest="shared_state_command",
+        required=True,
+    )
+    qualification_shared_status_p = qualification_shared_sub.add_parser(
+        "status",
+        help="Replay the complete shared catalog without changing it",
+    )
+    qualification_shared_status_p.add_argument(
+        "--repository-root",
+        type=Path,
+        default=Path("."),
+    )
+    qualification_shared_evidence_p = qualification_shared_sub.add_parser(
+        "evidence-snapshot",
+        help="Publish a provider-free snapshot of the catalog, every shard, and active chain",
+    )
+    qualification_shared_evidence_p.add_argument(
+        "--repository-root",
+        type=Path,
+        default=Path("."),
+    )
+    qualification_shared_evidence_p.add_argument(
+        "--output-root",
+        type=Path,
+        default=qualification_evidence_directory(),
+    )
+    qualification_shared_preview_p = qualification_shared_sub.add_parser(
+        "migration-preview",
+        help="Derive the exact complete-inventory migration decision without writing",
+    )
+    qualification_shared_apply_p = qualification_shared_sub.add_parser(
+        "migration-apply",
+        help="Publish an exact separately approved migration under an effective workflow",
+    )
+    qualification_shared_close_p = qualification_shared_sub.add_parser(
+        "close-plan",
+        help="Append one separately approved imported-plan administrative terminal",
+    )
+    for migration_parser in (qualification_shared_preview_p, qualification_shared_apply_p):
+        migration_parser.add_argument("--request", type=Path, required=True)
+        migration_parser.add_argument("--workflow", type=Path, required=True)
+        migration_parser.add_argument(
+            "--repository-root",
+            type=Path,
+            default=Path("."),
+        )
+    qualification_shared_apply_p.add_argument(
+        "--approved-decision-sha256",
+        required=True,
+        help="Exact digest emitted by migration-preview and separately approved by the human",
+    )
+    qualification_shared_close_p.add_argument("--plan-id", required=True)
+    qualification_shared_close_p.add_argument(
+        "--disposition",
+        choices=("cancelled", "close-invalidated"),
+        required=True,
+    )
+    qualification_shared_close_p.add_argument("--workflow", type=Path, required=True)
+    qualification_shared_close_p.add_argument(
+        "--impact-change",
+        type=Path,
+        required=True,
+        help="Accepted change directory containing exact IMPACT.md and DECISION.md",
+    )
+    qualification_shared_close_p.add_argument("--approved-by", required=True)
+    qualification_shared_close_p.add_argument("--reason", required=True)
+    qualification_shared_close_p.add_argument(
+        "--repository-root",
+        type=Path,
+        default=Path("."),
     )
     qualification_plan_p = qualification_sub.add_parser(
         "plan",

@@ -246,6 +246,112 @@ def test_qualification_plan_abandon_routes_verified_authority_and_derived_study(
     assert "outcome authority: none" in output
 
 
+def test_shared_state_migration_preview_is_read_only_and_prints_exact_decision(
+    tmp_path,
+    capsys,
+    monkeypatch,
+) -> None:
+    calls: dict[str, object] = {}
+
+    class FakeRequest:
+        @classmethod
+        def from_path(cls, path: Path):
+            calls["request_path"] = path
+            return "request"
+
+    class FakePreview:
+        def as_payload(self):
+            return {"decision_sha256": "a" * 64, "open_plans_by_family": {}}
+
+    class FakeShared:
+        def __init__(self, root: Path) -> None:
+            calls["repository_root"] = root
+
+        def preview_migration(self, request, *, workflow_path: Path):
+            calls["request"] = request
+            calls["workflow"] = workflow_path
+            return FakePreview()
+
+    monkeypatch.setattr("trading.cli.SharedMigrationRequest", FakeRequest)
+    monkeypatch.setattr("trading.cli.SharedQualificationState", FakeShared)
+    request_path = tmp_path / "migration.json"
+
+    main(
+        [
+            "qualification",
+            "shared-state",
+            "migration-preview",
+            "--request",
+            str(request_path),
+            "--workflow",
+            "workflows/example--v011",
+            "--repository-root",
+            str(tmp_path),
+        ]
+    )
+
+    assert calls == {
+        "repository_root": tmp_path,
+        "request_path": request_path,
+        "request": "request",
+        "workflow": Path("workflows/example--v011"),
+    }
+    assert '"decision_sha256": "' + "a" * 64 + '"' in capsys.readouterr().out
+
+
+def test_shared_state_close_plan_routes_separate_human_approval(
+    tmp_path,
+    capsys,
+    monkeypatch,
+) -> None:
+    calls: dict[str, object] = {}
+
+    class FakeShared:
+        def __init__(self, root: Path) -> None:
+            calls["repository_root"] = root
+
+        def close_imported_plan(self, plan_id: str, **kwargs) -> str:
+            calls["plan_id"] = plan_id
+            calls.update(kwargs)
+            return f"historical-plan-closed-invalidated:{plan_id}"
+
+    monkeypatch.setattr("trading.cli.SharedQualificationState", FakeShared)
+    impact = tmp_path / "accepted-change"
+
+    main(
+        [
+            "qualification",
+            "shared-state",
+            "close-plan",
+            "--plan-id",
+            "plan-1",
+            "--disposition",
+            "close-invalidated",
+            "--workflow",
+            "workflows/example--v011",
+            "--impact-change",
+            str(impact),
+            "--approved-by",
+            "ochowei@gmail.com",
+            "--reason",
+            "The owning workflow is superseded.",
+            "--repository-root",
+            str(tmp_path),
+        ]
+    )
+
+    assert calls == {
+        "repository_root": tmp_path,
+        "plan_id": "plan-1",
+        "disposition": "close-invalidated",
+        "workflow_path": Path("workflows/example--v011"),
+        "impact_change_path": impact,
+        "approved_by": "ochowei@gmail.com",
+        "reason": "The owning workflow is superseded.",
+    }
+    assert "shared qualification plan closed" in capsys.readouterr().out
+
+
 def test_legacy_experiment_qualification_fails_before_writing(tmp_path) -> None:
     qualification_path = tmp_path / "qualification.json"
     trial_path = tmp_path / "trials.json"

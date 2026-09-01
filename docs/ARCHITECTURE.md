@@ -107,6 +107,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/historical-qualification-and-shadow-v008.md` | Versioned v008 exact-study readiness, explicit clean-calendar, study-time retrospective terminal-evidence, and unchanged Shadow-authority contract. |
 | `docs/historical-qualification-and-shadow-v009.md` | Versioned v009 fixed 2013-2025 calendar, executable challenge-only contracts, atomic evidence publication, and non-actionable retrospective replay boundary. |
 | `docs/historical-qualification-and-shadow-v010.md` | Proposed v010 capability-gated append-only qualification-plan abandonment and unchanged outcome/Shadow/live-authority boundaries. |
+| `docs/shared-qualification-state-v011.md` | Proposed v011 worktree-independent private qualification authority, immutable legacy-chain federation, global open-plan projection, guarded migration, and cross-chain administrative closure. |
 | `docs/research-evidence-stages-and-outcomes.md` | Stable pointer to the full plus plain-language stage/outcome companion beside v008. |
 | `docs/research-evidence-preservation.md` | Reference explanation of tracked content-addressed candidate-freeze/qualification evidence, recoverable publication, and permanent-retention implementation. |
 | `docs/result-storage-layout-v009.md` | Normative categorized result namespaces, append-only path migration, historical compatibility resolution, canonical writer destinations, and retention boundary. |
@@ -250,7 +251,7 @@ Immutable reproducibility evidence and formal run coordination.
 | File | Purpose |
 |---|---|
 | `artifacts.py` | Shared immutable publication, checksums, and semantic verification. |
-| `evidence.py` | Add-only publication and digest resolution for tracked candidate-freeze evidence and replayable source-identified qualification registry/checkpoint snapshots. |
+| `evidence.py` | Add-only publication and digest resolution for tracked candidate-freeze evidence, replayable source-identified registry/checkpoint snapshots, and provider-free shared qualification catalog/all-shard/active-chain bundles. |
 | `models.py` | Typed blob, manifest, definition, run, and garbage-collection values. |
 | `manifest_codec.py` | Strict canonical manifest encoding and snapshot identity. |
 | `store.py` | Snapshot publication, verification, portable bundles, references, and garbage collection. |
@@ -261,7 +262,8 @@ Immutable reproducibility evidence and formal run coordination.
 | `parity.py` | Fixed-snapshot parity evidence and immutable parity artifacts. |
 | `paths.py` | Canonical categorized result-directory helpers plus append-only, SHA-256-bound historical path migration. It preserves v009 one-hop mappings and permits only one additional byte-identical v010 retirement hop. |
 | `trial_registry.py` | Append-only experiment trial identities, observations, and tombstones. |
-| `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence, including canonical plan, screen, and cancelled-study abandonment identities plus empty-registry initialization for authoritative absence proofs. |
+| `qualification_registry.py` | Append-only Historical and Shadow lifecycle evidence, including canonical plan, screen, local cancellation, imported-plan administrative terminal identities, shared-shard family projection, and empty-registry initialization for authoritative absence proofs. |
+| `shared_qualification_state.py` | v011 Git-common repository identity, private shared paths, complete-inventory migration preview/apply, immutable shard catalog replay, active-chain routing, global open-plan projection, and cross-chain terminal administration. Draft capability may preview; publication and terminal mutation require the exact effective release. |
 | `__init__.py` | Curated public research-data API exports. |
 
 ### `src/trading/policies/`
@@ -452,7 +454,7 @@ normal.
 | `.cache/market-data/` | Validated active provider CSV data and metadata sidecars. |
 | `.cache/market-data-quarantine/` | Corrupt or rejected cache generations retained for diagnosis. |
 | `.research-data/blobs/` | Protected content-addressed data and research-definition blobs referenced by manifests. |
-| `state/` | Manual ledger, reconciliation, qualification, followup lifecycle, live-drift evidence, heads, and locks. |
+| `state/` | Worktree-local manual ledger, reconciliation, followup lifecycle, live-drift evidence, and compatibility qualification inputs. From v011, mutable qualification authority resolves to the private Git-common shared state root while this repository-relative path remains the frozen logical identity. |
 | `broker-imports/`, `.broker-imports/` | Local real broker exports used for reconciliation. |
 | `credentials/`, `.credentials/`, `secrets/` | Local secrets and provider/broker credentials. |
 | `.pytest_cache/`, `.ruff_cache/`, `__pycache__/` | Regenerable test, lint, and Python caches. |

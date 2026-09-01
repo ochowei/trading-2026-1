@@ -25,6 +25,9 @@ from trading.research_data import (
 )
 from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
 from trading.research_data.result_schema import _canonical_sleeve_evidence_error
+from trading.research_data.shared_qualification_state import (
+    resolve_study_qualification_registry_path,
+)
 from trading.workflow.study_qualification import (
     FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
     REQUIRED_STUDY_TIME_CHALLENGES,
@@ -52,7 +55,10 @@ def run_fixed_study_challenges(
     spec = load_frozen_study_qualification_spec(study)
     if spec.route != FIXED_CALENDAR_RETROSPECTIVE_ROUTE:
         raise ValueError("challenge-only operation requires fixed-calendar-retrospective route")
-    expected_qualification = (root / str(spec.qualification_registry_identity)).resolve()
+    expected_qualification = resolve_study_qualification_registry_path(
+        study,
+        logical_identity=str(spec.qualification_registry_identity),
+    )
     expected_trials = (root / str(spec.trial_registry_identity)).resolve()
     if Path(qualification_registry_path).resolve() != expected_qualification:
         raise ValueError("qualification registry path differs from frozen qualification spec")

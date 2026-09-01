@@ -29,6 +29,9 @@ from trading.research_data import (
     ResearchDataStore,
     ResearchDefinitionStore,
 )
+from trading.research_data.shared_qualification_state import (
+    resolve_study_qualification_registry_path,
+)
 from trading.workflow.qualification import (
     _load_trial_input,
     _verify_formal_snapshot_observation,
@@ -81,7 +84,10 @@ def run_fixed_calendar_retrospective_replay(
         raise ValueError("retrospective replay requires a qualification plan id")
 
     root = study.parents[4].resolve()
-    expected_qualification_registry = (root / str(spec.qualification_registry_identity)).resolve()
+    expected_qualification_registry = resolve_study_qualification_registry_path(
+        study,
+        logical_identity=str(spec.qualification_registry_identity),
+    )
     expected_trial_registry = (root / str(spec.trial_registry_identity)).resolve()
     if Path(qualification_registry_path).resolve() != expected_qualification_registry:
         raise ValueError("qualification registry path differs from frozen qualification spec")
@@ -337,7 +343,7 @@ def _replay_payload(
         },
         "challenge_manifest": challenge_reference,
         "qualification_registry": {
-            "path": qualification_registry_path.relative_to(root).as_posix(),
+            "path": str(spec.qualification_registry_identity),
             "sha256": _sha256(qualification_registry_path),
         },
         "trial_registry": {
