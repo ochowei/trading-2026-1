@@ -98,6 +98,6 @@ None.
 
 | ID | Title | Status | Released in | Path |
 | --- | --- | --- | --- | --- |
-| `C002` | Legacy Experiment Retirement Contract Alignment | `accepted` | `-` | [legacy-experiment-retirement-contract-alignment--c002](work/changes/legacy-experiment-retirement-contract-alignment--c002/) |
-| `C001` | Append-Only Qualification Plan Abandonment | `accepted` | `-` | [qualification-plan-abandonment--c001](work/changes/qualification-plan-abandonment--c001/) |
+| `C002` | Legacy Experiment Retirement Contract Alignment | `released` | `v010` | [legacy-experiment-retirement-contract-alignment--c002](work/changes/legacy-experiment-retirement-contract-alignment--c002/) |
+| `C001` | Append-Only Qualification Plan Abandonment | `released` | `v010` | [qualification-plan-abandonment--c001](work/changes/qualification-plan-abandonment--c001/) |
 <!-- GENERATED:WORK_INDEX_END -->
