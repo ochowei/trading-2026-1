@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "kind": "v011-evaluation-offline-execution-inputs",
+  "prepared_at": "2026-09-01T17:29:43Z",
+  "prepared_by": "codex-primary-researcher-fxi-mean-reversion",
+  "preparation_approved_by": "ochowei@gmail.com",
+  "authorization_scope": "Verify fixed 2020-2024 snapshots and prepare six exact v011-bound offline execution inputs only; do not execute definitions, publish challenges, or run the screen.",
+  "study_path": "workflows/strategy-forward-replication-research--v011/work/studies/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002",
+  "qualification_plan_id": "retrospective-plan-97a56af83c3c034ee4e012385c0e03a48df625be69d7589dabecca391f567c44",
+  "evidence_classification": "known-contaminated",
+  "workflow": {
+    "workflow": "strategy-forward-replication-research",
+    "version": "v011",
+    "path": "workflows/strategy-forward-replication-research--v011",
+    "release_sha256": "78e1458573b060e86975bb22845e9d4a8f780c82e3a600832416404a1f86bb49",
+    "workflow_sha256": "beba95e97972a283ab7db7b59da101a1e2efca900154cfbc371786ebae8ff89f",
+    "policy_set_identity": "cac4973cf0055c772487b069c96f1cd2b488a2457636f8cfe2c812c89ad0f63e"
+  },
+  "execution_git_head": "fd08db32d0b5f48664d79b9031387edec4d7e71a",
+  "orchestration_sources": [
+    {
+      "path": "src/trading/cli.py",
+      "sha256": "1e9c33dc78fd556c07f7d5faf0c2c7d303dcb11b69f8cdbfb379c32077b1eb8c"
+    },
+    {
+      "path": "src/trading/commands/research.py",
+      "sha256": "d11a64ce9583a4bea1be1459ba004bfc32c2b39282404512080bd575d295fa99"
+    },
+    {
+      "path": "src/trading/research_definitions/execution.py",
+      "sha256": "4586292cf7d615d2c64900c1e0911ec55878abcbf6d045dff6886359eea65c24"
+    },
+    {
+      "path": "src/trading/research_data/runs.py",
+      "sha256": "52277d1a567c8e7ef4f56f1332cbf06a5a77dcee27e820ebfadd01430ace59ea"
+    },
+    {
+      "path": "src/trading/research_data/result_schema.py",
+      "sha256": "ff3f871e40c390fe4237ea45059ccb683dc20a83c9abdd668f79b6e6379620b6"
+    }
+  ],
+  "shared_sources": [
+    {
+      "path": "src/trading/research_definitions/fxi_mean_reversion.py",
+      "sha256": "e091fce410709eeceb9b45f5bb753154866eff07f0a1bc0484611133367266d5"
+    }
+  ],
+  "evaluation_contract": {
+    "run_mode": "offline",
+    "data_cutoff": "2024-12-31",
+    "decision_session": "2024-12-31",
+    "decision_time": "2024-12-31T21:30:00Z",
+    "history_start": "2013-11-06",
+    "common_data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+    "evaluation_years": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "formal_observation_requirement": "Each execution must create one new successful/valid S002-bound formal observation whose metadata.observation_provenance exactly matches this v011 workflow, policy set, Git HEAD, canonical argv, and maintained orchestration-source bytes.",
+    "prohibitions": [
+      "provider-access",
+      "data-refresh",
+      "definition-or-parameter-change",
+      "v009-result-reuse-as-s002-observation",
+      "synthetic-v011-provenance",
+      "challenge-publication",
+      "qualification-screen",
+      "replay",
+      "broker-or-order-access"
+    ]
+  },
+  "inputs": [
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+      "role": "selection-candidate",
+      "source_sha256": "0e685eb68323bf38c5de9082cd204791f45e503473706857ef6a191d7f6d8de3",
+      "definition_fingerprint": "af7b50d6949168d9ac2e4fe63743ed5d1f0539bd086b78cd4ac943bf72fdf577",
+      "definition_snapshot_id": "04d932ea50ee83f0fb5cdd673cb73273c088720edce0b5bbff379d2bede055a6",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/1b4f89fc896c136dca9677a75cec5401d4342dc861af738d3ebc2382860d998b.snapshot.json",
+      "manifest_sha256": "ea05a5f182e44fbf2545492d1ae0aeda2e601073bceeed35fefde8b08c52c774",
+      "snapshot_id": "1b4f89fc896c136dca9677a75cec5401d4342dc861af738d3ebc2382860d998b",
+      "data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+      "canonical_argv": [
+        "trading",
+        "research",
+        "run",
+        "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+        "--workflow",
+        "workflows/strategy-forward-replication-research--v011",
+        "--manifest",
+        "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/1b4f89fc896c136dca9677a75cec5401d4342dc861af738d3ebc2382860d998b.snapshot.json",
+        "--offline"
+      ]
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+      "role": "family-baseline",
+      "source_sha256": "f2a80bcb33700832a20b80af7b71c247db58da2c258a5fb82b562035e8dd6bb9",
+      "definition_fingerprint": "d60e82c6076bd89b910afd56434364a8717947aba23c743bd03d9a7158060131",
+      "definition_snapshot_id": "fa81df9a1fe51386604363244d3b6e96cc2954a29e0389012d281ed9dc6b8745",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/b61abc07c82759799c65c4b3b233524cdaa41439a450fa473cf375ad2604cf38.snapshot.json",
+      "manifest_sha256": "25b7a36a2a3d7f17752c6b9178a2129de2fada8fe67c95fc8cbbe9ce26c4bb64",
+      "snapshot_id": "b61abc07c82759799c65c4b3b233524cdaa41439a450fa473cf375ad2604cf38",
+      "data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+      "canonical_argv": [
+        "trading",
+        "research",
+        "run",
+        "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+        "--workflow",
+        "workflows/strategy-forward-replication-research--v011",
+        "--manifest",
+        "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/b61abc07c82759799c65c4b3b233524cdaa41439a450fa473cf375ad2604cf38.snapshot.json",
+        "--offline"
+      ]
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+      "role": "robustness",
+      "source_sha256": "9e4d355b27517f389d1daf34c76b0bfbfa28cfd10f206d18de64f2f3a1810f6b",
+      "definition_fingerprint": "84306c97f43a475c75d9bf348b19b1976b4a1b5d3e2e46dcb7813331a429dc34",
+      "definition_snapshot_id": "4351e30eb0b4ad12eaadd70cd1591b4ab923922408a7d4a6dfa7a47323424f62",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/50ed8598ddb68244a39ffe7e8a6a86b529db1c677c76b709fc16e615c37b80ec.snapshot.json",
+      "manifest_sha256": "6b8ee09f1923e28678344c77fb94151f3af4ce0674485a9a3535e1e82b2a35b7",
+      "snapshot_id": "50ed8598ddb68244a39ffe7e8a6a86b529db1c677c76b709fc16e615c37b80ec",
+      "data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+      "canonical_argv": [
+        "trading",
+        "research",
+        "run",
+        "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+        "--workflow",
+        "workflows/strategy-forward-replication-research--v011",
+        "--manifest",
+        "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/50ed8598ddb68244a39ffe7e8a6a86b529db1c677c76b709fc16e615c37b80ec.snapshot.json",
+        "--offline"
+      ]
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+      "role": "robustness",
+      "source_sha256": "149714e85b1e922ba310e5db944b07691401c51751cefdf4a8ac40db9fd3a18c",
+      "definition_fingerprint": "5f902af3dede1558af3d25a151f8fb56992f2a662d18ace69590f87202ac0f8a",
+      "definition_snapshot_id": "41c36e390bf08136d163ce86165c07794655d89101afb1bb0607cda11512106b",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/375305110646174306fba2704a9160223cdde37f8383bc10720f9553935098dd.snapshot.json",
+      "manifest_sha256": "aa2dd758685ce36de8d1b00d13a6f2aa448f1fed50edc6a5cda5987ab5653b9b",
+      "snapshot_id": "375305110646174306fba2704a9160223cdde37f8383bc10720f9553935098dd",
+      "data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+      "canonical_argv": [
+        "trading",
+        "research",
+        "run",
+        "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+        "--workflow",
+        "workflows/strategy-forward-replication-research--v011",
+        "--manifest",
+        "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/375305110646174306fba2704a9160223cdde37f8383bc10720f9553935098dd.snapshot.json",
+        "--offline"
+      ]
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+      "role": "robustness",
+      "source_sha256": "d9a5a0d95e4537c5b1c8045ce9b8e9ce4b71aa29640b266a27654bc52851e7d9",
+      "definition_fingerprint": "4824bdc6040b61362f7ee474dbb433ac54fd6d4a01961cad6b3974f3b8a3f0c3",
+      "definition_snapshot_id": "1d97575d282357035c8f9a87a0bd3b0a0b92f6e4447f0c8de75b93acbbadee7b",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/76e4935dbe4a520db93329020f7e2caf9bbefbf7623c9d57f176377853eb5781.snapshot.json",
+      "manifest_sha256": "5ca99c40a83df235e363cdb483e2c828f661c9041be7f7c3068c4da924238dcb",
+      "snapshot_id": "76e4935dbe4a520db93329020f7e2caf9bbefbf7623c9d57f176377853eb5781",
+      "data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+      "canonical_argv": [
+        "trading",
+        "research",
+        "run",
+        "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+        "--workflow",
+        "workflows/strategy-forward-replication-research--v011",
+        "--manifest",
+        "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/76e4935dbe4a520db93329020f7e2caf9bbefbf7623c9d57f176377853eb5781.snapshot.json",
+        "--offline"
+      ]
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+      "role": "robustness",
+      "source_sha256": "a9e5895399b23894a878dc0823ca9590f79c36772242c954f24f8731a4269fcb",
+      "definition_fingerprint": "c0e4a6b7bccff12c63e62b2bf06e96d3222ae693536f32df547a092ede0e8516",
+      "definition_snapshot_id": "fc7aa5cd9eae4f656ed1b135c6b1eb3469a1bf388b9e6afbeb615434b0104778",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/3c038a1357b12b2bae931b6bef4f0e21e0952e5ddf5ca525310952d8cab8628d.snapshot.json",
+      "manifest_sha256": "93df31c55ef9c7a3d103dc0e7dfe3c4a2fe03903388a4f420fa1405e9efc6397",
+      "snapshot_id": "3c038a1357b12b2bae931b6bef4f0e21e0952e5ddf5ca525310952d8cab8628d",
+      "data_blob_sha256": "3a28c034baad3cad095a4baff6295500e1448ba6e1177a118f0cca2d0419fa8e",
+      "canonical_argv": [
+        "trading",
+        "research",
+        "run",
+        "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+        "--workflow",
+        "workflows/strategy-forward-replication-research--v011",
+        "--manifest",
+        "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/3c038a1357b12b2bae931b6bef4f0e21e0952e5ddf5ca525310952d8cab8628d.snapshot.json",
+        "--offline"
+      ]
+    }
+  ]
+}

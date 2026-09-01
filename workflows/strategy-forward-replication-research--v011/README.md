@@ -89,7 +89,10 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-_No studies._
+| ID | Title | Status | Outcome | Path |
+| --- | --- | --- | --- | --- |
+| `S001` | FXI No-ClosePos Cooldown-7 ATR-Floor Dependency-Corrected Fixed-Calendar Retrospective Study | `cancelled` | `-` | [fxi-no-closepos-cooldown-7-atr-floor-dependency-corrected-fixed-calendar-retrospective--s001](work/studies/fxi-no-closepos-cooldown-7-atr-floor-dependency-corrected-fixed-calendar-retrospective--s001/) |
+| `S002` | FXI No-ClosePos Cooldown-7 ATR-Floor v011-Bound Evaluation Reexecution Fixed-Calendar Retrospective Study | `paused` | `-` | [fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002](work/studies/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/) |
 
 ### Changes
 

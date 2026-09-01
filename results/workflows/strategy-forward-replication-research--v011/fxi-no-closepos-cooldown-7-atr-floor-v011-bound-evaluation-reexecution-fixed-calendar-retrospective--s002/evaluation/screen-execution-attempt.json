@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "v011-qualification-screen-execution-attempt",
+  "study_path": "workflows/strategy-forward-replication-research--v011/work/studies/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002",
+  "qualification_plan_id": "retrospective-plan-97a56af83c3c034ee4e012385c0e03a48df625be69d7589dabecca391f567c44",
+  "approved_by": "ochowei@gmail.com",
+  "authorization_scope": "Execute the qualification screen using only the exact registered plan, published challenge set c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978, and the original six exact manifests; allow one canonical historical_screen write; do not execute replay if the screen does not pass.",
+  "recorded_at": "2026-09-01T18:25:51Z",
+  "workflow": {
+    "path": "workflows/strategy-forward-replication-research--v011",
+    "release_sha256": "78e1458573b060e86975bb22845e9d4a8f780c82e3a600832416404a1f86bb49",
+    "workflow_sha256": "beba95e97972a283ab7db7b59da101a1e2efca900154cfbc371786ebae8ff89f",
+    "control_state_before": "N05"
+  },
+  "challenge_manifest": {
+    "challenge_set_id": "c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978",
+    "path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/fixed-historical-evaluation-challenges/challenges-c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978/MANIFEST.json",
+    "sha256": "286b05b89e8aab849ed7e476cd63752be533efbecea08f347a2952b89a592c25"
+  },
+  "trial_registry_sha256": "88bbc59db7bec1138b5ef53eaed45ca53d69d331610720821efa5808d1ce8d68",
+  "inputs": [
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/f794dc7257726f3ec2c505b52858fbf78b120a6fabdadbe7d4aa0f1de69bce8b.snapshot.json",
+      "manifest_sha256": "9ce4cefe363dae233a64e90dbd81fc4f758abca1426eb6ab1f49f067b99d2dbd"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/85fd1408d50c4d3d647ac70f4aa8eb1d77b76da6a4aa9245a498d7bfa838f51c.snapshot.json",
+      "manifest_sha256": "ca9892a8ea264e115b56d89b27646f721a5b0c9d8ef21bf718d232e3ed428007"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/0c2647c20841a2fa886b897a9a0003d062321849478c5d75500ea81196b0de63.snapshot.json",
+      "manifest_sha256": "c8a8218ae891c148ead4c9780f15b2a26b960db0cb0f379a7dfb6155f20ff0f9"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/17c15b08736c66319a5c193dce5f70d155531a59a01f432e556b63f644a1dddd.snapshot.json",
+      "manifest_sha256": "bbb4831e624bfa1ace16be836bbe7639e698e195d4c64834bd48b4d6de1f2ce6"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/7287ad60881a8a72b2ee94b4f1938ff80d60a71ce86f4fca0a6f64789a6edd64.snapshot.json",
+      "manifest_sha256": "60776a994bd24bedc2a6b052e22330fa28c0db912e2fe85fc6bcda2683e92c48"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/a16c65426ae8a1d0f2e2664356f4402e91fb3d73cb4fe17e697bd196728031bd.snapshot.json",
+      "manifest_sha256": "8f230ca7910385830ee4eee6263518cb7d958b7727ffd54ee8d85780ea0a2122"
+    }
+  ],
+  "result": "blocked-before-screen-recording",
+  "error": "random-entry benchmark could not preserve completed trade count",
+  "diagnosis": {
+    "selected_evaluation_raw_candidate_count": 39,
+    "selected_evaluation_completed_trade_count": 37,
+    "selected_evaluation_skipped_trade_count": 2,
+    "skipped_signal_dates": [
+      "2022-01-05",
+      "2023-02-15"
+    ],
+    "implementation_path": "src/trading/core/qualification.py",
+    "implementation_behavior": "The screen random-entry benchmark randomizes all 39 raw candidates independently, then requires every randomized canonical sleeve sample to complete exactly the original 37 trades without constraining randomized overlap. The deterministic sample failed that invariant before a screen could be recorded."
+  },
+  "mutation_verification": {
+    "shared_catalog_sha256_before": "9a919ec7506c72068d21096c106f752162bd600420afa0cf3e515bc1d47898cb",
+    "shared_catalog_sha256_after": "9a919ec7506c72068d21096c106f752162bd600420afa0cf3e515bc1d47898cb",
+    "shared_plan_count_before": 5,
+    "shared_plan_count_after": 5,
+    "shared_terminal_count_before": 3,
+    "shared_terminal_count_after": 3,
+    "plan_remains_open": true,
+    "historical_screen_recorded": false,
+    "replay_executed": false
+  },
+  "disposition": null
+}
