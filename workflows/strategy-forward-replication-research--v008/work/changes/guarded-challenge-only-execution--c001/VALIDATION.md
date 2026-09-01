@@ -54,3 +54,30 @@ remain implementation details only if they preserve the accepted behavioral boun
 Until the change is implemented, validated in the complete v009 draft, explicitly approved for
 release, and made active under the applicable bootstrap rule, v008 remains authoritative and no
 study gains new challenge-only authority.
+
+## Post-acceptance implementation evidence (2026-09-01)
+
+This evidence was produced after the acceptance/evolution decision and does not retroactively turn
+that decision into implementation evidence. The v009 draft now contains the independent guarded
+operation in `src/trading/workflow/challenge_execution.py` and the public
+`trading qualification challenge run-study` command. The fixed-route compiler requires exact
+`fixed-challenge-v1` method contracts for all nine methods; the operation verifies exact family
+manifests, formal offline observations, definition fingerprints, policy set, workflow provenance,
+common data generation, and complete Evaluation role projection before publishing nine distinct
+content-addressed artifacts plus one manifest.
+
+Provider-free synthetic coverage demonstrates dry-run zero publication, deterministic atomic
+publication, exact retry idempotence, injected rename failure without a visible partial set,
+terminal manifest recomputation, collision rejection, and workflow-provenance drift rejection.
+Repository validation completed with:
+
+- `uv run pytest -q tests/test_challenge_execution.py`: 4 passed;
+- the affected qualification/workflow/terminal/result/path suites: 187 passed;
+- `uv run pytest -m "not slow" -q`: 764 passed, 770 deselected;
+- `uv run pytest -m legacy_conformance -n auto -q`: 811 passed;
+- `uv run ruff check ...` and `uv run ruff format --check ...`: passed;
+- `uv run trading workflow validate --all`: passed; and
+- `uv run trading policy validate --all`: passed.
+
+No provider was contacted, no study outcome was inspected, no registry or study state was mutated,
+and this validation does not release or activate v009.

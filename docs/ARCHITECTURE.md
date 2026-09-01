@@ -105,6 +105,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/historical-qualification-and-shadow-v006.md` | Proposed v006 explicit retrospective role-calendar contract with backward-compatible Historical and Shadow boundaries. |
 | `docs/historical-qualification-and-shadow-v007.md` | Released v007 frozen selection-boundary contract for clean and retrospective qualification. |
 | `docs/historical-qualification-and-shadow-v008.md` | Versioned v008 exact-study readiness, explicit clean-calendar, study-time retrospective terminal-evidence, and unchanged Shadow-authority contract. |
+| `docs/historical-qualification-and-shadow-v009.md` | Versioned v009 fixed 2013-2025 calendar, executable challenge-only contracts, atomic evidence publication, and non-actionable retrospective replay boundary. |
 | `docs/research-evidence-stages-and-outcomes.md` | Stable pointer to the full plus plain-language stage/outcome companion beside v008. |
 | `docs/research-evidence-preservation.md` | Reference explanation of tracked content-addressed candidate-freeze/qualification evidence, recoverable publication, and permanent-retention implementation. |
 | `docs/result-storage-layout-v009.md` | Normative categorized result namespaces, append-only path migration, historical compatibility resolution, canonical writer destinations, and retention boundary. |
@@ -211,6 +212,16 @@ from the canonical registry, release/activation evidence, release-safety artifac
 study lifecycles; it returns fail-closed `invalid` or `indeterminate` results rather than granting
 authority. Historical `trading.core.*` imports alias these same module objects so monkeypatching and
 process-global state remain compatible.
+
+| File | Purpose |
+|---|---|
+| `authoring.py`, `studies.py` | Workflow/change/study governance, released capability routing, fixed-calendar study templates, and terminal lifecycle guards. |
+| `study_qualification.py` | Exact-study compiler, immutable 2013-2025 fixed calendar, capability checks, complete-family binding, and registered executable challenge-method schemas. |
+| `qualification.py` | Historical plan and screen orchestration over exact formal snapshot observations. |
+| `challenge_execution.py` | Independent provider-free challenge-only operation with exact Evaluation role projections and atomic nine-artifact publication. |
+| `retrospective_replay.py` | Fixed 2025 non-actionable simulated execution replay, provider-free evidence verification, and atomic publication. |
+| `terminal_evidence.py` | Exact registry/challenge/replay linkage and fail-closed terminal disposition validation. |
+| `control_state.py` | Read-only exact workflow-version authority and safety-state evaluation. |
 
 ### `src/trading/market_data/`
 

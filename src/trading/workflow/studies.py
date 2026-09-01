@@ -32,8 +32,12 @@ from trading.workflow.authoring import (
 )
 from trading.workflow.study_qualification import (
     CANDIDATE_FREEZE_AUTHORIZATION_SCOPE,
+    FIXED_CALENDAR,
+    FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY,
+    FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
     REQUIRED_STUDY_TIME_CHALLENGES,
     STUDY_QUALIFICATION_CAPABILITY,
+    fixed_challenge_method_contract,
     frozen_study_qualification_registry_path,
     qualification_study_registration_lock_path,
     structured_qualification_runtime_contract,
@@ -96,7 +100,11 @@ class WorkflowStudyService:
         creator = self._required_identity(created_by, "created-by")
         revisits_path = self._normalize_revisits(revisits)
         release = self._release_payload(version_resolved)
-        structured_routes = STUDY_QUALIFICATION_CAPABILITY in release.get("capabilities", [])
+        capabilities = release.get("capabilities", [])
+        structured_routes = bool(
+            {STUDY_QUALIFICATION_CAPABILITY, FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY}
+            & set(capabilities)
+        )
         if structured_routes and route is None:
             raise WorkflowAuthoringError("released workflow requires an explicit study route")
         if route is not None and route not in STUDY_ROUTES:
@@ -105,6 +113,11 @@ class WorkflowStudyService:
             if STUDY_QUALIFICATION_CAPABILITY not in release.get("capabilities", []):
                 raise WorkflowAuthoringError(
                     "released workflow does not authorize the study-time-retrospective route"
+                )
+        if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE:
+            if FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY not in capabilities:
+                raise WorkflowAuthoringError(
+                    "released workflow does not authorize the fixed-calendar-retrospective route"
                 )
 
         studies_root = version_resolved / "work" / "studies"
@@ -199,7 +212,11 @@ class WorkflowStudyService:
             raise WorkflowAuthoringError("workflow release digest is missing")
 
         qualification_spec_sha256 = None
-        structured_routes = STUDY_QUALIFICATION_CAPABILITY in release.get("capabilities", [])
+        capabilities = release.get("capabilities", [])
+        structured_routes = bool(
+            {STUDY_QUALIFICATION_CAPABILITY, FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY}
+            & set(capabilities)
+        )
         if structured_routes and metadata.get("route") is None:
             raise WorkflowAuthoringError("released workflow requires an explicit study route")
         if structured_routes:
@@ -210,6 +227,12 @@ class WorkflowStudyService:
             ):
                 raise WorkflowAuthoringError(
                     "released workflow lacks study-time-retrospective capability"
+                )
+            if metadata.get("route") == FIXED_CALENDAR_RETROSPECTIVE_ROUTE and (
+                FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY not in capabilities
+            ):
+                raise WorkflowAuthoringError(
+                    "released workflow lacks fixed-calendar-retrospective capability"
                 )
             try:
                 qualification_spec_sha256 = validate_study_qualification_spec_for_preregistration(
@@ -396,13 +419,17 @@ class WorkflowStudyService:
                 "qualification_registry_path": "state/qualification-registry.json",
             },
             **runtime_contract,
-            "calendar": {
-                "warmup_start": None,
-                "warmup_end": None,
-                "development_years": [],
-                "quarantine_years": [],
-                "evaluation_years": [],
-            },
+            "calendar": (
+                dict(FIXED_CALENDAR)
+                if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+                else {
+                    "warmup_start": None,
+                    "warmup_end": None,
+                    "development_years": [],
+                    "quarantine_years": [],
+                    "evaluation_years": [],
+                }
+            ),
             "family": {
                 "maximum_trials": 0,
                 "baseline_identity": None,
@@ -432,6 +459,11 @@ class WorkflowStudyService:
                         ],
                     },
                     "gate": {},
+                    **(
+                        {"method": fixed_challenge_method_contract(challenge)}
+                        if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+                        else {}
+                    ),
                 }
                 for challenge in sorted(REQUIRED_STUDY_TIME_CHALLENGES)
             ],
@@ -456,7 +488,12 @@ class WorkflowStudyService:
             inactive_message="candidate freeze requires an active workflow version",
         )
         release = self._release_payload(version_path)
-        if STUDY_QUALIFICATION_CAPABILITY not in release.get("capabilities", []):
+        route_capability = (
+            FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY
+            if metadata.get("route") == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+            else STUDY_QUALIFICATION_CAPABILITY
+        )
+        if route_capability not in release.get("capabilities", []):
             raise WorkflowAuthoringError(
                 "released workflow does not authorize guarded candidate freezes"
             )
@@ -580,7 +617,10 @@ class WorkflowStudyService:
             disposition=disposition,
             decision_stage=decision_stage,
         )
-        if metadata.get("route") == "study-time-retrospective":
+        if metadata.get("route") in {
+            "study-time-retrospective",
+            FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+        }:
             try:
                 registry_path = frozen_study_qualification_registry_path(path)
             except ValueError as exc:
@@ -627,7 +667,10 @@ class WorkflowStudyService:
     ) -> dict[str, Any]:
         """Complete after any stage-specific serialization lock has been acquired."""
         terminal_evidence_sha256 = None
-        if metadata.get("route") == "study-time-retrospective":
+        if metadata.get("route") in {
+            "study-time-retrospective",
+            FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+        }:
             if decision_stage is None:
                 raise WorkflowAuthoringError("study-time terminal decision needs a stage")
             try:
@@ -643,6 +686,7 @@ class WorkflowStudyService:
             replay_issues: list[Any] = []
             self.repository._validate_study_time_terminal(
                 {
+                    "route": metadata.get("route"),
                     "outcome": outcome,
                     "disposition": disposition,
                     "decision_stage": decision_stage,
@@ -709,28 +753,37 @@ class WorkflowStudyService:
         disposition: str | None,
         decision_stage: str | None,
     ) -> None:
-        if route != "study-time-retrospective":
+        if route not in {"study-time-retrospective", FIXED_CALENDAR_RETROSPECTIVE_ROUTE}:
             if disposition is not None or decision_stage is not None:
                 raise WorkflowAuthoringError(
-                    "terminal disposition fields require a study-time-retrospective route"
+                    "terminal disposition fields require a retrospective study route"
                 )
             return
+        fixed = route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
         valid = False
         if outcome == "pass":
-            valid = (
-                disposition == "retrospectively-supported"
-                and decision_stage == "retrospective-evaluation"
+            valid = disposition == "retrospectively-supported" and decision_stage == (
+                "retrospective-execution-replay" if fixed else "retrospective-evaluation"
             )
         elif outcome == "fail":
-            valid = (disposition, decision_stage) in {
+            allowed_failures = {
                 ("development-selection-failed", "development"),
                 ("retrospective-screen-failed", "retrospective-evaluation"),
             }
+            if fixed:
+                allowed_failures = {
+                    ("development-selection-failed", "development"),
+                    ("fixed-evaluation-failed", "fixed-historical-evaluation"),
+                    ("retrospective-replay-failed", "retrospective-execution-replay"),
+                }
+            valid = (disposition, decision_stage) in allowed_failures
         elif outcome == "indeterminate":
             valid = disposition is None and decision_stage in {
                 "development",
                 "candidate-freeze",
                 "retrospective-evaluation",
+                "fixed-historical-evaluation",
+                "retrospective-execution-replay",
                 "independent-review",
             }
         if not valid:

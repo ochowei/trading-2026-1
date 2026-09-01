@@ -12,7 +12,10 @@ from trading.core.accounting import canonical_json_bytes
 from trading.research_data import QualificationEvidenceStore
 from trading.research_data.artifacts import ImmutableBlobCorruptionError
 from trading.research_data.paths import ResultPathMigrationError, resolve_result_path
-from trading.workflow.study_qualification import REQUIRED_STUDY_TIME_CHALLENGES
+from trading.workflow.study_qualification import (
+    FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+    REQUIRED_STUDY_TIME_CHALLENGES,
+)
 
 TERMINAL_EVIDENCE_FILENAME = "TERMINAL_EVIDENCE.json"
 
@@ -32,9 +35,13 @@ def validate_study_time_terminal_evidence(
     if terminal.get("schema_version") != 1:
         raise ValueError("TERMINAL_EVIDENCE.json schema_version must be 1")
     relative_study = study.relative_to(study.parents[4]).as_posix()
+    spec = _json_object(study / "QUALIFICATION_SPEC.json")
+    route = spec.get("route", terminal.get("route"))
+    if route not in {"study-time-retrospective", FIXED_CALENDAR_RETROSPECTIVE_ROUTE}:
+        raise ValueError("terminal evidence requires a supported retrospective study route")
     expected = {
         "study_path": relative_study,
-        "route": "study-time-retrospective",
+        "route": route,
         "decision_stage": decision_stage,
         "preregistration_sha256": _sha256(study / "PREREGISTRATION.json"),
         "qualification_spec_sha256": _sha256(study / "QUALIFICATION_SPEC.json"),
@@ -62,22 +69,65 @@ def validate_study_time_terminal_evidence(
         )
         return _sha256(terminal_path)
 
-    if decision_stage != "retrospective-evaluation":
-        raise ValueError("retrospective pass/fail needs retrospective-evaluation evidence")
+    allowed_stages = (
+        {"fixed-historical-evaluation", "retrospective-execution-replay"}
+        if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+        else {"retrospective-evaluation"}
+    )
+    if decision_stage not in allowed_stages:
+        raise ValueError("retrospective pass/fail uses an invalid decision stage")
     candidate_freeze = study / "CANDIDATE_FREEZE.json"
     if terminal.get("candidate_freeze_sha256") != _sha256(candidate_freeze):
         raise ValueError("terminal evidence differs from the candidate freeze")
     screen_passed = _validate_registry_link(study, terminal)
     challenges_passed = _validate_challenge_manifest(study, terminal)
+    replay_passed: bool | None = None
+    if (
+        route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+        and decision_stage == "retrospective-execution-replay"
+    ):
+        replay_passed = _validate_fixed_replay(study, terminal)
     if outcome == "pass":
-        if disposition != "retrospectively-supported" or not (screen_passed and challenges_passed):
+        if (
+            disposition != "retrospectively-supported"
+            or not (screen_passed and challenges_passed)
+            or (route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE and replay_passed is not True)
+        ):
             raise ValueError("pass requires a linked passing screen and every challenge gate")
     elif outcome == "fail":
-        if disposition != "retrospective-screen-failed" or (screen_passed and challenges_passed):
+        if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE:
+            valid_failure = (
+                decision_stage == "fixed-historical-evaluation"
+                and disposition == "fixed-evaluation-failed"
+                and not (screen_passed and challenges_passed)
+            ) or (
+                decision_stage == "retrospective-execution-replay"
+                and disposition == "retrospective-replay-failed"
+                and screen_passed
+                and challenges_passed
+                and replay_passed is False
+            )
+            if not valid_failure:
+                raise ValueError("fixed-calendar fail requires a failed gate at its exact stage")
+        elif disposition != "retrospective-screen-failed" or (screen_passed and challenges_passed):
             raise ValueError("retrospective fail requires at least one linked failed gate")
     else:
         raise ValueError("fixed study-time evidence cannot support insufficient-evidence")
     return _sha256(terminal_path)
+
+
+def _validate_fixed_replay(study: Path, terminal: dict[str, Any]) -> bool:
+    from trading.workflow.retrospective_replay import validate_retrospective_replay_artifact
+
+    reference = _mapping(terminal.get("retrospective_replay"), "retrospective replay")
+    path = _study_evidence_reference(study, reference.get("path"))
+    if reference.get("sha256") != _sha256(path):
+        raise ValueError("retrospective replay digest differs from terminal evidence")
+    payload = _json_object(path)
+    qualification = _mapping(terminal.get("qualification_evidence"), "qualification evidence")
+    if payload.get("qualification_plan_id") != qualification.get("plan_id"):
+        raise ValueError("retrospective replay uses a different qualification plan")
+    return validate_retrospective_replay_artifact(study, path)
 
 
 def _validate_development_failure(
@@ -201,7 +251,8 @@ def _validate_registry_link(study: Path, terminal: dict[str, Any]) -> bool:
     ):
         raise ValueError("qualification plan lacks durable study-time human authorization")
     if (
-        plan_payload.get("evidence_role") != "study-time-retrospective"
+        plan_payload.get("evidence_role")
+        not in {"study-time-retrospective", FIXED_CALENDAR_RETROSPECTIVE_ROUTE}
         or screen_payload.get("plan_id") != plan_id
         or type(screen_payload.get("passed")) is not bool
     ):

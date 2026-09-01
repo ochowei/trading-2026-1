@@ -86,6 +86,7 @@ def register_parser(
             "clean-historical",
             "retrospective-confirmatory",
             "study-time-retrospective",
+            "fixed-calendar-retrospective",
         ),
     )
     initialize.add_argument("--revisits")

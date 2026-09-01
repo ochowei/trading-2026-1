@@ -1,10 +1,17 @@
-# Guarded challenge-only Phase 6 contract (v009)
+# Fixed-calendar retrospective qualification contract (v009)
 
-This normative Phase 6 extension is selected only by
-`strategy-forward-replication-research@v009`. The unchanged route, calendar, screen, terminal,
-Shadow, and compatibility rules remain pinned to
-`docs/historical-qualification-and-shadow-v008.md`; the complete behavioral authority remains the
-v009 `WORKFLOW.md`. This document defines the new executable challenge and publication boundary.
+This normative contract is selected only by `strategy-forward-replication-research@v009` through
+the `fixed-calendar-retrospective-v1` capability and `fixed-calendar-retrospective` route. It pins
+the civil calendar to 2013 warmup, 2014-2018 Development, 2019 quarantine, 2020-2024 fixed
+Historical Evaluation, and 2025 retrospective execution replay. The calendar is workflow-owned:
+callers and studies cannot override, roll, or reinterpret any date, year, fold, route, or role.
+
+v009 has no prospective Shadow, Controlled Activation, Active monitoring, broker, order, or live
+authority. Its only positive terminal disposition is `retrospectively-supported`; changing the
+calendar or restoring prospective authority requires a new workflow version. Fewer than 12
+completed 2025 replay fills is a failed replay gate, not insufficient evidence. The complete
+behavioral authority remains the v009 `WORKFLOW.md`; this document defines the executable
+challenge and replay publication boundaries.
 
 ## Preregistration-ready challenge contract
 
@@ -26,6 +33,12 @@ Unknown implementations, omitted fields, implicit defaults, mutable aliases, cal
 observed values, or a contract whose digest cannot be reproduced fail before preregistration.
 Study-specific parameters may differ only when the registered schema permits them and the exact
 values are frozen before outcome inspection.
+
+The maintained `fixed-challenge-v1` registry defines the exact calculation contract for all nine
+methods: cash, family baseline, stationary-block random entry, parameter perturbation, delayed
+entry, higher costs, worse fills, missed entries, and calendar-quarter market regimes. A fixed
+route study must serialize the registry's exact method object byte-for-byte; a renamed method,
+omitted field, changed default, or unregistered parameter fails preregistration.
 
 For `missed-entries`, the contract additionally freezes the eligible-entry universe, canonical
 ordering key and direction, selection algorithm, percentage-to-count rounding, seed, tie handling,
@@ -91,6 +104,32 @@ verifies final content-addressed identities, and commits the complete set atomic
 leaves no newly visible partial set. An exact retry is idempotent. Partial, conflicting, duplicate,
 differently bound, or previously executed challenges fail closed. Recovery may complete only an
 already committed exact publication decision and rejects changed inputs.
+
+## Fixed 2025 retrospective execution replay
+
+After the Historical Evaluation screen and all nine challenges pass, the public replay operation
+is equivalent to:
+
+```text
+trading qualification replay run-study --study <path> --plan-id <id> \
+  --manifest <selected-2025.snapshot.json> --challenge-manifest <MANIFEST.json> [--dry-run]
+```
+
+The operation resolves the exact selected candidate, registered plan, passing challenge manifest,
+offline formal 2025 observation, frozen policies, result and snapshot identities, and complete
+2025 XNYS session inventory. Any local definition execution must match the snapshot's exact frozen
+fingerprint and policy set. The operation must not obtain provider data, mutate a registry, create
+actual positions, or emit actionable orders; published-artifact validation must not require either
+provider or definition access.
+
+Publication contains exactly `REPLAY.json` and `MANIFEST.json` under
+`results/workflows/<workflow>--vNNN/<study>/retrospective-execution-replay/<replay-id>/`. The replay
+artifact contains non-actionable paper proposals, simulated fills, ledger-style events, base and
+stress metrics, monthly checkpoints, critical-drift observations, gate results, and sufficient
+raw input for provider-free recomputation. It is plan-bound, content-addressed, atomically
+published, idempotent on exact retry, and explicitly labeled
+`non-actionable-historical-replay-only`; collision, partial state, identity drift, missing sessions,
+or changed inputs fail closed.
 
 ## Release readiness
 

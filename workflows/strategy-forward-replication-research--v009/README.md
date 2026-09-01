@@ -7,11 +7,12 @@ supersedes: v008
 derived_from: null
 source_changes:
 - workflows/strategy-forward-replication-research--v008/work/changes/categorized-results-layout-migration--c002
+- workflows/strategy-forward-replication-research--v008/work/changes/fixed-calendar-retrospective-protocol--c005
 - workflows/strategy-forward-replication-research--v008/work/changes/guarded-challenge-only-execution--c001
 - workflows/strategy-forward-replication-research--v008/work/changes/workflow-release-activation--c003
 - workflows/strategy-forward-replication-research--v008/work/changes/workflow-release-safety-persistence--c004
 capabilities:
-- study-time-retrospective-v1
+- fixed-calendar-retrospective-v1
 - workflow-release-safety-v1
 policies:
 - family: us-equity-market
@@ -47,12 +48,12 @@ dependencies:
   role: normative
 - path: docs/historical-qualification-and-shadow-v009.md
   role: normative
-- path: docs/controlled-followup-cutover.md
-  role: normative
-- path: docs/live-drift-and-recovery.md
-  role: normative
 - path: docs/result-storage-layout-v009.md
   role: normative
+- path: docs/controlled-followup-cutover.md
+  role: reference
+- path: docs/live-drift-and-recovery.md
+  role: reference
 - path: docs/market-data.md
   role: reference
 - path: docs/manual-execution-ledger.md
@@ -72,7 +73,11 @@ only in the root `workflows/README.md` registry.
 
 ## Authoring basis
 
-Combine accepted v008/C001 guarded challenge-only execution, v008/C002 categorized result-layout migration, v008/C003 immutable Workflow Release Activation, and v008/C004 guarded workflow release-safety persistence. Preserve the v009 bootstrap and v010 explicit activation boundary; workflow-release-safety-v1 becomes effective only when v009 is active.
+本 v009 draft 是 v008 的自包含接替版。它保留 v006/S001 的 selection-boundary 教訓，以及 v007 已發布的 complete-family registration、evidence preservation 與 fail-closed retrospective 基線。
+
+直接 source changes 為 accepted v008/C001-C005：C001 guarded challenge-only execution；C002 categorized result-layout migration；C003 immutable Workflow Release Activation；C004 guarded workflow release-safety persistence；C005 fixed-calendar retrospective protocol。C005 將 study scope 固定為 2013 warmup、2014-2018 Development、2019 quarantine、2020-2024 Historical Evaluation 與 2025 retrospective execution replay，並移除 prospective Shadow、Controlled Activation、Active monitoring 及所有 promotion/live authority。
+
+Combined impact review 維持 v008/S001、v008/S002 completed bytes/outcomes 不變；paused v008/S003 繼續依 accepted continue-on-v008，不搬移、不重解、不恢復。Accepted changes 本身不是 implementation 或 release evidence；C001-C005 的 compiler、guards、migration、replay、atomic publication、compatibility 與 provider-free release tests 已另於 post-acceptance validation evidence 實作並驗證。v009 仍是 draft，這些證據不構成 release、activation 或 study authority；Workflow-version v009 bootstrap 與 v010 起 explicit release activation boundary 保持不變。
 
 ## Errata
 

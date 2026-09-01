@@ -55,11 +55,13 @@ from trading.research_data import (
     qualification_evidence_directory,
     trial_registry_path,
 )
+from trading.workflow.challenge_execution import run_fixed_study_challenges
 from trading.workflow.qualification import (
     LEGACY_QUALIFICATION_RETIREMENT_MESSAGE,
     register_forward_qualification_plan,
     run_registered_historical_screen,
 )
+from trading.workflow.retrospective_replay import run_fixed_calendar_retrospective_replay
 from trading.workflow.study_qualification import (
     STUDY_QUALIFICATION_CAPABILITY,
     compile_study_qualification_plan,
@@ -310,6 +312,54 @@ def cmd_qualification_screen_run(args: argparse.Namespace) -> None:
     print(f"  passed: {str(execution.screen.passed).lower()}")
 
 
+def cmd_qualification_replay_run_study(args: argparse.Namespace) -> None:
+    """Run the fixed 2025 provider-free replay without granting operational authority."""
+    publication = run_fixed_calendar_retrospective_replay(
+        study_path=args.study,
+        plan_id=args.plan_id,
+        selected_manifest_path=args.manifest,
+        challenge_manifest_path=args.challenge_manifest,
+        qualification_registry_path=args.path,
+        trial_registry_path=args.trial_registry_path,
+        research_data_store=create_default_research_data_store(),
+        definition_store=create_default_research_definition_store(),
+        output_root=args.output_root,
+        dry_run=args.dry_run,
+    )
+    action = "validated (dry-run)" if args.dry_run else "published"
+    print(f"retrospective execution replay {action}: {publication.replay_id}")
+    print(f"  path: {publication.replay_path}")
+    print(f"  passed: {str(publication.passed).lower()}")
+    print("  authority: non-actionable-historical-replay-only")
+
+
+def cmd_qualification_challenge_run_study(args: argparse.Namespace) -> None:
+    """Run the independent challenge-only operation from exact formal artifacts."""
+    family_manifests: dict[str, Path] = {}
+    for assignment in args.trial:
+        identity, separator, manifest = assignment.partition("=")
+        if separator != "=" or not identity.strip() or not manifest.strip():
+            raise ValueError("--trial must use IDENTITY=MANIFEST")
+        identity = identity.strip()
+        if identity in family_manifests:
+            raise ValueError(f"duplicate challenge trial identity: {identity}")
+        family_manifests[identity] = Path(manifest.strip())
+    manifest_path = run_fixed_study_challenges(
+        study_path=args.study,
+        plan_id=args.plan_id,
+        family_manifests=family_manifests,
+        qualification_registry_path=args.path,
+        trial_registry_path=args.trial_registry_path,
+        research_data_store=create_default_research_data_store(),
+        output_root=args.output_root,
+        dry_run=args.dry_run,
+    )
+    action = "validated (dry-run)" if args.dry_run else "published"
+    print(f"fixed-calendar challenges {action}: {manifest_path}")
+    print("  artifacts: 9")
+    print("  authority: challenge-only")
+
+
 def cmd_qualification(args: argparse.Namespace) -> None:
     """Dispatch qualification lifecycle workflows."""
     try:
@@ -323,6 +373,10 @@ def cmd_qualification(args: argparse.Namespace) -> None:
             cmd_qualification_evidence_snapshot(args)
         elif args.qualification_command == "screen" and args.screen_command == "run":
             cmd_qualification_screen_run(args)
+        elif args.qualification_command == "challenge" and args.challenge_command == "run-study":
+            cmd_qualification_challenge_run_study(args)
+        elif args.qualification_command == "replay" and args.replay_command == "run-study":
+            cmd_qualification_replay_run_study(args)
     except (KeyError, RuntimeError, ValueError) as exc:
         raise SystemExit(f"qualification error: {exc}") from exc
 
@@ -1649,6 +1703,66 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="IDENTITY=MANIFEST; repeat for every frozen family trial",
     )
+    qualification_challenge_p = qualification_sub.add_parser(
+        "challenge",
+        help="Run independent provider-free fixed Evaluation challenges",
+    )
+    qualification_challenge_sub = qualification_challenge_p.add_subparsers(
+        dest="challenge_command",
+        required=True,
+    )
+    qualification_challenge_run_p = qualification_challenge_sub.add_parser(
+        "run-study",
+        help="Publish nine frozen challenge artifacts without screen or registry authority",
+    )
+    qualification_challenge_run_p.add_argument("--study", type=Path, required=True)
+    qualification_challenge_run_p.add_argument("--plan-id", required=True)
+    qualification_challenge_run_p.add_argument(
+        "--trial",
+        action="append",
+        required=True,
+        help="IDENTITY=MANIFEST; repeat for the exact frozen family",
+    )
+    qualification_challenge_run_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_challenge_run_p.add_argument(
+        "--trial-registry-path",
+        type=Path,
+        default=trial_registry_path(),
+    )
+    qualification_challenge_run_p.add_argument("--output-root", type=Path)
+    qualification_challenge_run_p.add_argument("--dry-run", action="store_true")
+    qualification_replay_p = qualification_sub.add_parser(
+        "replay",
+        help="Run a non-actionable fixed-calendar retrospective execution replay",
+    )
+    qualification_replay_sub = qualification_replay_p.add_subparsers(
+        dest="replay_command",
+        required=True,
+    )
+    qualification_replay_run_p = qualification_replay_sub.add_parser(
+        "run-study",
+        help="Recompute and atomically publish the frozen 2025 historical replay",
+    )
+    qualification_replay_run_p.add_argument("--study", type=Path, required=True)
+    qualification_replay_run_p.add_argument("--plan-id", required=True)
+    qualification_replay_run_p.add_argument("--manifest", type=Path, required=True)
+    qualification_replay_run_p.add_argument("--challenge-manifest", type=Path, required=True)
+    qualification_replay_run_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
+    )
+    qualification_replay_run_p.add_argument(
+        "--trial-registry-path",
+        type=Path,
+        default=trial_registry_path(),
+    )
+    qualification_replay_run_p.add_argument("--output-root", type=Path)
+    qualification_replay_run_p.add_argument("--dry-run", action="store_true")
 
     workflow_commands.register_parser(sub)
 

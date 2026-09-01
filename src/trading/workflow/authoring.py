@@ -55,7 +55,12 @@ STUDY_STATUSES = frozenset(
 )
 STUDY_OUTCOMES = frozenset({"pass", "fail", "insufficient-evidence", "indeterminate"})
 STUDY_ROUTES = frozenset(
-    {"clean-historical", "retrospective-confirmatory", "study-time-retrospective"}
+    {
+        "clean-historical",
+        "retrospective-confirmatory",
+        "study-time-retrospective",
+        "fixed-calendar-retrospective",
+    }
 )
 SAFETY_RESOLVED_STUDY_STATUSES = frozenset({"paused", "completed", "cancelled"})
 WORKFLOW_SAFETY_CAPABILITY = "workflow-release-safety-v1"
@@ -3043,9 +3048,13 @@ class WorkflowRepository:
                 release_payload = json.loads(release_path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
                 release_payload = {}
-            structured_routes = isinstance(
-                release_payload, dict
-            ) and "study-time-retrospective-v1" in release_payload.get("capabilities", [])
+            structured_routes = isinstance(release_payload, dict) and bool(
+                {
+                    "study-time-retrospective-v1",
+                    "fixed-calendar-retrospective-v1",
+                }
+                & set(release_payload.get("capabilities", []))
+            )
         ids: set[str] = set()
         for study_path in sorted(path for path in root.iterdir() if path.is_dir()):
             match = STUDY_DIRECTORY_PATTERN.fullmatch(study_path.name)
@@ -3302,7 +3311,7 @@ class WorkflowRepository:
                     )
                 else:
                     self._validate_completion(completion, metadata, study_path, issues)
-                if route == "study-time-retrospective":
+                if route in {"study-time-retrospective", "fixed-calendar-retrospective"}:
                     self._validate_study_time_terminal(metadata, readme, issues)
             elif completion.exists():
                 issues.append(
@@ -3719,21 +3728,31 @@ class WorkflowRepository:
         outcome = metadata.get("outcome")
         disposition = metadata.get("disposition")
         stage = metadata.get("decision_stage")
+        fixed = metadata.get("route") == "fixed-calendar-retrospective"
         valid = False
         if outcome == "pass":
-            valid = (
-                disposition == "retrospectively-supported" and stage == "retrospective-evaluation"
+            valid = disposition == "retrospectively-supported" and stage == (
+                "retrospective-execution-replay" if fixed else "retrospective-evaluation"
             )
         elif outcome == "fail":
-            valid = (disposition, stage) in {
+            allowed_failures = {
                 ("development-selection-failed", "development"),
                 ("retrospective-screen-failed", "retrospective-evaluation"),
             }
+            if fixed:
+                allowed_failures = {
+                    ("development-selection-failed", "development"),
+                    ("fixed-evaluation-failed", "fixed-historical-evaluation"),
+                    ("retrospective-replay-failed", "retrospective-execution-replay"),
+                }
+            valid = (disposition, stage) in allowed_failures
         elif outcome == "indeterminate":
             valid = disposition is None and stage in {
                 "development",
                 "candidate-freeze",
                 "retrospective-evaluation",
+                "fixed-historical-evaluation",
+                "retrospective-execution-replay",
                 "independent-review",
             }
         if not valid:
@@ -3770,6 +3789,7 @@ class WorkflowRepository:
                 "qualification_absence_evidence",
                 "challenge_manifest",
                 "development_gate",
+                "retrospective_replay",
             ):
                 reference = terminal.get(field)
                 if isinstance(reference, dict) and isinstance(reference.get("path"), str):
@@ -3975,7 +3995,10 @@ class WorkflowRepository:
             "evidence_sha256": study_path / "EVIDENCE.md",
             "conclusion_sha256": study_path / "CONCLUSION.md",
         }
-        if metadata.get("route") == "study-time-retrospective":
+        if metadata.get("route") in {
+            "study-time-retrospective",
+            "fixed-calendar-retrospective",
+        }:
             digests["terminal_evidence_sha256"] = study_path / "TERMINAL_EVIDENCE.json"
         for field, artifact in digests.items():
             digest = payload.get(field)

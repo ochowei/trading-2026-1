@@ -609,6 +609,7 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         retrospective_roles = {
             "retrospective-confirmatory",
             "study-time-retrospective",
+            "fixed-calendar-retrospective",
         }
         if evidence_role not in {"historical", *retrospective_roles}:
             return "qualification plan evidence role is invalid"
@@ -646,7 +647,7 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         ):
             return "Historical Evaluation requires verified-clean complete provenance"
         if (
-            evidence_role == "study-time-retrospective"
+            evidence_role in {"study-time-retrospective", "fixed-calendar-retrospective"}
             and isinstance(evidence_audit, Mapping)
             and evidence_audit.get("classification") == "verified-clean"
         ):
@@ -656,7 +657,7 @@ def _qualification_evidence_error(payload: Mapping[str, object]) -> str | None:
         if evidence_role in retrospective_roles and created_at.date() <= last_outcome:
             return "retrospective qualification folds were not complete at plan freeze"
         if (
-            evidence_role == "study-time-retrospective"
+            evidence_role in {"study-time-retrospective", "fixed-calendar-retrospective"}
             and role_calendar is not None
             and role_development[-1] >= role_evaluation[0]
         ):

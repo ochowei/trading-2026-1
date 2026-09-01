@@ -42,6 +42,17 @@ from trading.workflow.qualification import register_forward_qualification_plan
 
 STUDY_QUALIFICATION_SPEC = "QUALIFICATION_SPEC.json"
 STUDY_QUALIFICATION_CAPABILITY = "study-time-retrospective-v1"
+FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY = "fixed-calendar-retrospective-v1"
+FIXED_CALENDAR_RETROSPECTIVE_ROUTE = "fixed-calendar-retrospective"
+FIXED_CALENDAR = {
+    "warmup_start": "2013-01-01",
+    "warmup_end": "2013-12-31",
+    "development_years": [2014, 2015, 2016, 2017, 2018],
+    "quarantine_years": [2019],
+    "evaluation_years": [2020, 2021, 2022, 2023, 2024],
+    "replay_start": "2025-01-01",
+    "replay_end": "2025-12-31",
+}
 CANDIDATE_FREEZE_AUTHORIZATION_SCOPE = (
     "Freeze the exact Development-selected candidate and complete preregistered trial family; "
     "no Evaluation, Shadow, broker, or order authority."
@@ -103,7 +114,12 @@ def _cost_policy_payload(policy: ExecutionCostPolicy) -> dict[str, float]:
 
 
 STRUCTURED_STUDY_ROUTES = frozenset(
-    {"clean-historical", "retrospective-confirmatory", "study-time-retrospective"}
+    {
+        "clean-historical",
+        "retrospective-confirmatory",
+        "study-time-retrospective",
+        FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+    }
 )
 REQUIRED_STUDY_TIME_CHALLENGES = frozenset(
     {
@@ -118,6 +134,86 @@ REQUIRED_STUDY_TIME_CHALLENGES = frozenset(
         "market-regimes",
     }
 )
+
+
+def fixed_challenge_method_contract(challenge_id: str) -> dict[str, Any]:
+    """Return the complete registered v1 method contract for one fixed-route challenge."""
+    parameters: dict[str, Any] = {
+        "cash": {"scenario": "base_net", "comparison": "total-return-greater-than-zero"},
+        "family-baseline": {
+            "scenario": "base_net",
+            "comparison": "selected-total-return-greater-than-target",
+        },
+        "random-entry": {
+            "scenario": "base_net",
+            "algorithm": "stationary-session-block-bootstrap",
+            "seed_source": "benchmarks.random_seed",
+            "sample_count_source": "benchmarks.random_samples",
+            "block_sessions_source": "benchmarks.bootstrap_block_sessions",
+            "comparison": "selected-total-return-greater-than-bootstrap-median",
+        },
+        "parameter-perturbation": {
+            "scenario": "base_net",
+            "aggregate": "all-target-total-returns-positive",
+        },
+        "delayed-entry": {
+            "scenario": "base_net",
+            "aggregate": "all-target-total-returns-positive",
+        },
+        "higher-costs": {
+            "scenario": "stress_net",
+            "requirements": ["total-return-positive", "profit-factor-greater-than-one"],
+        },
+        "worse-fills": {
+            "scenario": "stress_net",
+            "entry_transform": "canonical-stress-entry-slippage",
+            "exit_transform": "canonical-stress-exit-slippage",
+            "rounding": "engine-native-full-precision",
+            "gap_handling": "use-frozen-candidate-price",
+            "intrabar_ambiguity": "canonical-engine-order",
+            "fee_slippage_order": "slippage-then-fee-per-side",
+            "unavailable_price": "fail",
+            "unfilled": "retain-noncompleted-without-pnl",
+            "requirements": ["total-return-positive", "profit-factor-greater-than-one"],
+        },
+        "missed-entries": {
+            "scenario": "base_net",
+            "eligible_universe": "completed-selected-evaluation-trades",
+            "ordering": ["entry_date", "signal_date", "proposal_terms"],
+            "algorithm": "seeded-shuffle-drop-prefix",
+            "omission_fraction": "0.10",
+            "percentage_to_count_rounding": "floor",
+            "seed_source": "benchmarks.random_seed",
+            "tie_handling": "canonical-order-before-shuffle",
+            "zero_selected_allowed": False,
+            "replacement": False,
+            "ledger_behavior": "replay-kept-trades-without-replacement",
+            "comparison": "kept-trade-pnl-positive",
+        },
+        "market-regimes": {
+            "scenario": "base_net",
+            "window": "calendar-quarter",
+            "comparison": "positive-quarter-rate-at-least-half",
+        },
+    }.get(challenge_id, {})
+    if not parameters:
+        raise ValueError(f"unknown fixed challenge implementation: {challenge_id}")
+    return {
+        "schema_version": 1,
+        "implementation_id": challenge_id,
+        "implementation_version": "fixed-challenge-v1",
+        "input_schema": "evaluation-role-projection-v1",
+        "output_schema": "boolean-gate-observation-v1",
+        "parameters": parameters,
+        "allowed_dependency_roles": ["warmup"],
+        "failure_conditions": [
+            "missing-or-duplicate-source",
+            "mixed-data-generation",
+            "incomplete-evaluation-sessions",
+            "identity-or-policy-drift",
+            "role-leakage",
+        ],
+    }
 
 
 def validate_study_qualification_spec_for_preregistration(
@@ -224,6 +320,10 @@ def validate_study_qualification_spec_for_preregistration(
         "prior selection history disclosure",
     )
     calendar = _mapping(payload.get("calendar"), "calendar")
+    if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE and calendar != FIXED_CALENDAR:
+        raise ValueError(
+            "fixed-calendar-retrospective calendar must match the released 2013-2025 contract"
+        )
     development_years = _years(calendar.get("development_years"), "Development")
     evaluation_years = _years(calendar.get("evaluation_years"), "Evaluation")
     quarantine_years = _years(calendar.get("quarantine_years"), "quarantine", allow_empty=True)
@@ -239,7 +339,11 @@ def validate_study_qualification_spec_for_preregistration(
     role_years = set(development_years) | set(evaluation_years) | set(quarantine_years)
     if len(role_years) != len(development_years) + len(evaluation_years) + len(quarantine_years):
         raise ValueError("Development, Evaluation, and quarantine years must not overlap")
-    if route in {"clean-historical", "study-time-retrospective"}:
+    if route in {
+        "clean-historical",
+        "study-time-retrospective",
+        FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+    }:
         if warmup_end.year >= development_years[0]:
             raise ValueError("warmup must precede Development")
         if evaluation_years[0] <= development_years[-1]:
@@ -357,6 +461,11 @@ def validate_study_qualification_spec_for_preregistration(
             raise ValueError(f"{challenge_id} challenge has the wrong frozen target")
         if expected_target is None and identity_kind != "method":
             raise ValueError(f"{challenge_id} challenge must freeze a method identity")
+        if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE:
+            if challenge.get("method") != fixed_challenge_method_contract(challenge_id):
+                raise ValueError(
+                    f"{challenge_id} challenge lacks the registered executable method contract"
+                )
     challenge_targets = [
         (
             item["applies_to"]["kind"],
@@ -503,6 +612,8 @@ class FrozenStudyQualificationSpec:
     warmup_start: date
     warmup_end: date
     quarantine_years: tuple[int, ...]
+    replay_start: date | None
+    replay_end: date | None
     maximum_holding_sessions: int
     execution_lag_sessions: int
     dependency_sessions: int
@@ -840,6 +951,8 @@ def _load_legacy_s004(study: Path) -> FrozenStudyQualificationSpec:
         warmup_start=date(2013, 11, 6),
         warmup_end=date(2014, 12, 31),
         quarantine_years=(2026,),
+        replay_start=None,
+        replay_end=None,
         maximum_holding_sessions=20,
         execution_lag_sessions=1,
         dependency_sessions=21,
@@ -873,8 +986,13 @@ def _load_structured_spec(study: Path) -> FrozenStudyQualificationSpec:
     workflow = study.parents[2]
     release = _json_object(workflow / "RELEASE.json")
     capabilities = release.get("capabilities")
-    if not isinstance(capabilities, list) or STUDY_QUALIFICATION_CAPABILITY not in capabilities:
-        raise ValueError("released workflow lacks structured study-time qualification capability")
+    required_capability = (
+        FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY
+        if payload.get("route") == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+        else STUDY_QUALIFICATION_CAPABILITY
+    )
+    if not isinstance(capabilities, list) or required_capability not in capabilities:
+        raise ValueError("released workflow lacks the route's structured qualification capability")
     spec_sha = _sha256(study / STUDY_QUALIFICATION_SPEC)
     preregistration_sha = _sha256(study / "PREREGISTRATION.json")
     plan_sha = _sha256(study / "PLAN.md")
@@ -959,7 +1077,11 @@ def _load_structured_spec(study: Path) -> FrozenStudyQualificationSpec:
     development_years = _years(calendar.get("development_years"), "Development")
     evaluation_years = _years(calendar.get("evaluation_years"), "Evaluation")
     quarantine_years = _years(calendar.get("quarantine_years"), "quarantine", allow_empty=True)
-    if route in {"clean-historical", "study-time-retrospective"}:
+    if route in {
+        "clean-historical",
+        "study-time-retrospective",
+        FIXED_CALENDAR_RETROSPECTIVE_ROUTE,
+    }:
         if evaluation_years[0] <= development_years[-1]:
             raise ValueError("Evaluation must follow Development")
         expected_gap = tuple(range(development_years[-1] + 1, evaluation_years[0]))
@@ -1004,6 +1126,16 @@ def _load_structured_spec(study: Path) -> FrozenStudyQualificationSpec:
         warmup_start=date.fromisoformat(str(calendar["warmup_start"])),
         warmup_end=date.fromisoformat(str(calendar["warmup_end"])),
         quarantine_years=quarantine_years,
+        replay_start=(
+            date.fromisoformat(str(calendar["replay_start"]))
+            if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+            else None
+        ),
+        replay_end=(
+            date.fromisoformat(str(calendar["replay_end"]))
+            if route == FIXED_CALENDAR_RETROSPECTIVE_ROUTE
+            else None
+        ),
         maximum_holding_sessions=_nonnegative_int(
             execution.get("maximum_holding_sessions"), "maximum holding"
         ),
