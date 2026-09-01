@@ -137,7 +137,7 @@ def test_worktrees_resolve_one_shared_authority_and_preview_global_conflict(
     assert not main_state.paths.transaction_journal.exists()
 
 
-def test_draft_capability_cannot_switch_runtime_while_v010_stays_local() -> None:
+def test_effective_v011_switches_runtime_while_v010_stays_local() -> None:
     repository_root = Path(".").resolve()
 
     assert (
@@ -147,11 +147,10 @@ def test_draft_capability_cannot_switch_runtime_while_v010_stays_local() -> None
         )
         == repository_root / DEFAULT_LOGICAL_REGISTRY_IDENTITY
     )
-    with pytest.raises(SharedQualificationStateError, match="release is required"):
-        resolve_workflow_qualification_registry_path(
-            repository_root,
-            WORKFLOW_V011,
-        )
+    assert resolve_workflow_qualification_registry_path(
+        repository_root,
+        WORKFLOW_V011,
+    ) == SharedQualificationState(repository_root).paths.active_registry
 
 
 def test_preview_rejects_incomplete_inventory(

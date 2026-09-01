@@ -92,5 +92,5 @@ _No studies._
 
 | ID | Title | Status | Released in | Path |
 | --- | --- | --- | --- | --- |
-| `C001` | Worktree-Independent Shared Qualification State Authority | `accepted` | `-` | [shared-qualification-state-authority--c001](work/changes/shared-qualification-state-authority--c001/) |
+| `C001` | Worktree-Independent Shared Qualification State Authority | `released` | `v011` | [shared-qualification-state-authority--c001](work/changes/shared-qualification-state-authority--c001/) |
 <!-- GENERATED:WORK_INDEX_END -->
