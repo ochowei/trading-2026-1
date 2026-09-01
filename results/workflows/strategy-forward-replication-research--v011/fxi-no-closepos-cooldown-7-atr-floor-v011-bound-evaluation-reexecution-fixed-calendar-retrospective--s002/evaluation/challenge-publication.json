@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "v011-challenge-only-publication",
+  "study_path": "workflows/strategy-forward-replication-research--v011/work/studies/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002",
+  "qualification_plan_id": "retrospective-plan-97a56af83c3c034ee4e012385c0e03a48df625be69d7589dabecca391f567c44",
+  "approved_by": "ochowei@gmail.com",
+  "authorization_scope": "Publish challenge set c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978 from only the six observations bound by evaluation-observations.json SHA-256 8a43442ba38ded87a1fd5059dcef4dc18c77770dcc7dbec08f638dc42f62422b; publish exactly nine challenge artifacts and one manifest; do not execute screen.",
+  "published_at": "2026-09-01T18:09:21Z",
+  "observation_set_path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/evaluation/evaluation-observations.json",
+  "observation_set_sha256": "8a43442ba38ded87a1fd5059dcef4dc18c77770dcc7dbec08f638dc42f62422b",
+  "dry_run_record_path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/evaluation/challenge-dry-run.json",
+  "dry_run_record_sha256": "d8bd1d9005f1d55886c6b09d9579efa545163e6ce163333e738e3cf60f3ade83",
+  "authority": "challenge-only",
+  "publication": {
+    "challenge_set_id": "c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978",
+    "manifest_path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/fixed-historical-evaluation-challenges/challenges-c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978/MANIFEST.json",
+    "manifest_sha256": "286b05b89e8aab849ed7e476cd63752be533efbecea08f347a2952b89a592c25",
+    "artifact_count": 9,
+    "artifacts": [
+      {
+        "challenge_id": "cash",
+        "sha256": "769c75d4a9223ba0af530c9a1bb98a119d8bcb495dc9c13702d23ed8edd3a23b",
+        "observed": true,
+        "passed": true
+      },
+      {
+        "challenge_id": "delayed-entry",
+        "sha256": "dfc29db7a6e606a3c0c588ea249f9faab019c809e62d221569aa71c4bf9eac11",
+        "observed": false,
+        "passed": false
+      },
+      {
+        "challenge_id": "family-baseline",
+        "sha256": "e499532456a3109272ac4f2099a27804a85a25ca69c4f325f364218c9c89a378",
+        "observed": true,
+        "passed": true
+      },
+      {
+        "challenge_id": "higher-costs",
+        "sha256": "0b4988d759fc8aed999bf44913604bbc5882d18a9485396b83948e785d38ace4",
+        "observed": false,
+        "passed": false
+      },
+      {
+        "challenge_id": "market-regimes",
+        "sha256": "77bb9caee7df17295eb06f2c54eafc407230e5f6809e650502c265d89762cab5",
+        "observed": true,
+        "passed": true
+      },
+      {
+        "challenge_id": "missed-entries",
+        "sha256": "f265226546ba0ea471b596e2490351e85d5b346c9e30efb573b3171b03454628",
+        "observed": true,
+        "passed": true
+      },
+      {
+        "challenge_id": "parameter-perturbation",
+        "sha256": "d182dee5172654cbb9f3f349cc9d8c4d03f400af9d2c5aba7309f57b7fb6afa8",
+        "observed": true,
+        "passed": true
+      },
+      {
+        "challenge_id": "random-entry",
+        "sha256": "a1f0ffdb2d75d8e6b3d68c3db06fa435c0608be5e823c3a489f0fc8c7cf96912",
+        "observed": true,
+        "passed": true
+      },
+      {
+        "challenge_id": "worse-fills",
+        "sha256": "d15e06ffd4284469a9859a01f05d27f02d01d0e0b90967297560447c0f319897",
+        "observed": false,
+        "passed": false
+      }
+    ]
+  },
+  "mutation_verification": {
+    "published_challenge_artifact_count": 9,
+    "published_manifest_count": 1,
+    "trial_registry_sha256_before": "88bbc59db7bec1138b5ef53eaed45ca53d69d331610720821efa5808d1ce8d68",
+    "trial_registry_sha256_after": "88bbc59db7bec1138b5ef53eaed45ca53d69d331610720821efa5808d1ce8d68",
+    "observation_set_unchanged": true,
+    "shared_catalog_sha256_before": "9a919ec7506c72068d21096c106f752162bd600420afa0cf3e515bc1d47898cb",
+    "shared_catalog_sha256_after": "9a919ec7506c72068d21096c106f752162bd600420afa0cf3e515bc1d47898cb",
+    "shared_plan_count_before": 5,
+    "shared_plan_count_after": 5,
+    "shared_terminal_count_before": 3,
+    "shared_terminal_count_after": 3,
+    "qualification_registry_mutated": false,
+    "screen_executed": false
+  },
+  "disposition": null
+}

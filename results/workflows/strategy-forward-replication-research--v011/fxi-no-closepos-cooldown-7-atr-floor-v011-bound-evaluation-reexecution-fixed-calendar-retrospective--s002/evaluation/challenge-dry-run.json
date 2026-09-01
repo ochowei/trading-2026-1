@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "kind": "v011-challenge-only-dry-run",
+  "study_path": "workflows/strategy-forward-replication-research--v011/work/studies/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002",
+  "qualification_plan_id": "retrospective-plan-97a56af83c3c034ee4e012385c0e03a48df625be69d7589dabecca391f567c44",
+  "approved_by": "ochowei@gmail.com",
+  "executed_at": "2026-09-01T18:03:25Z",
+  "observation_set_path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/evaluation/evaluation-observations.json",
+  "observation_set_sha256": "8a43442ba38ded87a1fd5059dcef4dc18c77770dcc7dbec08f638dc42f62422b",
+  "dry_run": true,
+  "validation_result": "validated",
+  "authority": "challenge-only",
+  "preview": {
+    "challenge_set_id": "c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978",
+    "manifest_path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/fixed-historical-evaluation-challenges/challenges-c86547c5ac0041b0feaa3a9f9dc085276b5cf7c9f35a8e51e0fc4e6dcfc53978/MANIFEST.json",
+    "artifact_count": 9
+  },
+  "inputs": [
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/f794dc7257726f3ec2c505b52858fbf78b120a6fabdadbe7d4aa0f1de69bce8b.snapshot.json"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/85fd1408d50c4d3d647ac70f4aa8eb1d77b76da6a4aa9245a498d7bfa838f51c.snapshot.json"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/0c2647c20841a2fa886b897a9a0003d062321849478c5d75500ea81196b0de63.snapshot.json"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/17c15b08736c66319a5c193dce5f70d155531a59a01f432e556b63f644a1dddd.snapshot.json"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/7287ad60881a8a72b2ee94b4f1938ff80d60a71ce86f4fca0a6f64789a6edd64.snapshot.json"
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/a16c65426ae8a1d0f2e2664356f4402e91fb3d73cb4fe17e697bd196728031bd.snapshot.json"
+    }
+  ],
+  "mutation_verification": {
+    "trial_registry_sha256_before": "88bbc59db7bec1138b5ef53eaed45ca53d69d331610720821efa5808d1ce8d68",
+    "trial_registry_sha256_after": "88bbc59db7bec1138b5ef53eaed45ca53d69d331610720821efa5808d1ce8d68",
+    "observation_set_unchanged": true,
+    "published_challenge_artifact_count": 0,
+    "preview_manifest_exists": false,
+    "qualification_registry_mutated": false,
+    "screen_executed": false
+  },
+  "disposition": null
+}

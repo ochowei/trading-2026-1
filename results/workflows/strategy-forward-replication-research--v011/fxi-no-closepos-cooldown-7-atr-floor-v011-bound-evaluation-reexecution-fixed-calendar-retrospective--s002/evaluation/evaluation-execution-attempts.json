@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "kind": "v011-evaluation-offline-execution-attempts",
+  "study_path": "workflows/strategy-forward-replication-research--v011/work/studies/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002",
+  "qualification_plan_id": "retrospective-plan-97a56af83c3c034ee4e012385c0e03a48df625be69d7589dabecca391f567c44",
+  "approved_by": "ochowei@gmail.com",
+  "completed_at": "2026-09-01T17:49:26Z",
+  "inventory_path": "results/workflows/strategy-forward-replication-research--v011/fxi-no-closepos-cooldown-7-atr-floor-v011-bound-evaluation-reexecution-fixed-calendar-retrospective--s002/evaluation-preparation/evaluation-execution-inputs.json",
+  "inventory_sha256": "e7c5ba56cac6bff363362383b8f1ce721c2c58af88e6367693ce6cfa8a187f68",
+  "workflow_control_state": "N05",
+  "execution_git_head": "fd08db32d0b5f48664d79b9031387edec4d7e71a",
+  "batch_contract": {
+    "attempt_count": 6,
+    "completed_attempt_count": 6,
+    "output_withheld_until_all_attempts_completed": true,
+    "provider_access": false,
+    "challenge_published": false,
+    "screen_executed": false
+  },
+  "result": {
+    "status": "blocked-before-outcome",
+    "successful_observation_count": 0,
+    "failed_observation_count": 0,
+    "trial_registry_sha256_before": "46ac3080a16dd1e29e704737c0f3159f817ef27a39ceb307183577f8be0cfa79",
+    "trial_registry_sha256_after": "46ac3080a16dd1e29e704737c0f3159f817ef27a39ceb307183577f8be0cfa79",
+    "common_error": "research error: current exact research definition does not match snapshot evidence",
+    "outcome_inspected": false
+  },
+  "attempts": [
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/1b4f89fc896c136dca9677a75cec5401d4342dc861af738d3ebc2382860d998b.snapshot.json",
+      "manifest_definition_snapshot_id": "04d932ea50ee83f0fb5cdd673cb73273c088720edce0b5bbff379d2bede055a6",
+      "current_definition_snapshot_id": "0957d2f8298cb7ad899b2f47dfc0f2079f4e511e7233ca33ea0a5ca29d650288",
+      "definition_fingerprint": "af7b50d6949168d9ac2e4fe63743ed5d1f0539bd086b78cd4ac943bf72fdf577",
+      "exit_code": 1,
+      "outcome_created": false
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/b61abc07c82759799c65c4b3b233524cdaa41439a450fa473cf375ad2604cf38.snapshot.json",
+      "manifest_definition_snapshot_id": "fa81df9a1fe51386604363244d3b6e96cc2954a29e0389012d281ed9dc6b8745",
+      "current_definition_snapshot_id": "71a0c25319fe86024adc8380f26dd7c6f1e5fdb2adfe6803f419c5e9a27ce5d8",
+      "definition_fingerprint": "d60e82c6076bd89b910afd56434364a8717947aba23c743bd03d9a7158060131",
+      "exit_code": 1,
+      "outcome_created": false
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/50ed8598ddb68244a39ffe7e8a6a86b529db1c677c76b709fc16e615c37b80ec.snapshot.json",
+      "manifest_definition_snapshot_id": "4351e30eb0b4ad12eaadd70cd1591b4ab923922408a7d4a6dfa7a47323424f62",
+      "current_definition_snapshot_id": "33bb119072ac7a9dc91fc8b88e4d68788b18e8819a579635f45f8c86dade936e",
+      "definition_fingerprint": "84306c97f43a475c75d9bf348b19b1976b4a1b5d3e2e46dcb7813331a429dc34",
+      "exit_code": 1,
+      "outcome_created": false
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/375305110646174306fba2704a9160223cdde37f8383bc10720f9553935098dd.snapshot.json",
+      "manifest_definition_snapshot_id": "41c36e390bf08136d163ce86165c07794655d89101afb1bb0607cda11512106b",
+      "current_definition_snapshot_id": "dd577ada5de0b21fcdfc734526aaa6762769d4c4902e1fd2885c0b032a0af3f2",
+      "definition_fingerprint": "5f902af3dede1558af3d25a151f8fb56992f2a662d18ace69590f87202ac0f8a",
+      "exit_code": 1,
+      "outcome_created": false
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/76e4935dbe4a520db93329020f7e2caf9bbefbf7623c9d57f176377853eb5781.snapshot.json",
+      "manifest_definition_snapshot_id": "1d97575d282357035c8f9a87a0bd3b0a0b92f6e4447f0c8de75b93acbbadee7b",
+      "current_definition_snapshot_id": "2c4df84362d63676609f6cfaf24060a6a87d3c0b78c9f90389e8a29976f4dc3f",
+      "definition_fingerprint": "4824bdc6040b61362f7ee474dbb433ac54fd6d4a01961cad6b3974f3b8a3f0c3",
+      "exit_code": 1,
+      "outcome_created": false
+    },
+    {
+      "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+      "manifest_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/3c038a1357b12b2bae931b6bef4f0e21e0952e5ddf5ca525310952d8cab8628d.snapshot.json",
+      "manifest_definition_snapshot_id": "fc7aa5cd9eae4f656ed1b135c6b1eb3469a1bf388b9e6afbeb615434b0104778",
+      "current_definition_snapshot_id": "610045f3c799c45da28341cce0db52a43a6e9055888ca9168d8380b391a8c2a0",
+      "definition_fingerprint": "c0e4a6b7bccff12c63e62b2bf06e96d3222ae693536f32df547a092ede0e8516",
+      "exit_code": 1,
+      "outcome_created": false
+    }
+  ],
+  "diagnosis": {
+    "manifest_definition_git_head": "551b88c4a70315f41436abe90fdea1a98b02b032",
+    "current_definition_git_head": "fd08db32d0b5f48664d79b9031387edec4d7e71a",
+    "fingerprints_unchanged": true,
+    "reason": "The six prepared manifests retain v009 exact Research Definition Snapshot identities. The formal runner correctly requires byte-identical current definition evidence, whose Git context is bound to the current v011 execution commit."
+  }
+}

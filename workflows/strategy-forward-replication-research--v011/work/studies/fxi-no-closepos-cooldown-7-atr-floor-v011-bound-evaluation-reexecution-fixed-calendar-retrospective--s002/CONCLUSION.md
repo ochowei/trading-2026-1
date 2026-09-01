@@ -1,0 +1,13 @@
+# Conclusion: FXI No-ClosePos Cooldown-7 ATR-Floor v011-Bound Evaluation Reexecution Fixed-Calendar Retrospective Study
+
+## Outcome
+
+REPLACE_ME_SELECT_PASS_FAIL_INSUFFICIENT_EVIDENCE_OR_INDETERMINATE
+
+## Evidence trace
+
+REPLACE_ME_CONNECT_EACH_JUDGMENT_TO_EXACT_EVIDENCE
+
+## Limitations and follow-up
+
+REPLACE_ME_RECORD_UNCERTAINTY_WITHOUT_REPAIRING_THE_STUDY_RETROACTIVELY
