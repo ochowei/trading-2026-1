@@ -141,6 +141,111 @@ def test_qualification_status_is_read_only_and_reports_lifecycle(
     assert not registry_path.with_name(f".{registry_path.name}.lock").exists()
 
 
+def test_qualification_status_reports_plan_abandonment(capsys, monkeypatch) -> None:
+    state = {
+        "schema_version": 1,
+        "events": [
+            {
+                "event_type": "historical_plan",
+                "payload": {
+                    "plan_id": "plan-cancelled-study",
+                    "definition_fingerprint": "a" * 64,
+                },
+            },
+            {
+                "event_type": "historical_plan_abandoned",
+                "payload": {
+                    "plan_id": "plan-cancelled-study",
+                    "abandoned_at": "2026-09-01T09:00:00Z",
+                    "approved_by": "ochowei@gmail.com",
+                    "reason": "The owning study was cancelled.",
+                },
+            },
+        ],
+    }
+    monkeypatch.setattr(
+        "trading.cli.QualificationRegistry",
+        lambda _path: SimpleNamespace(read=lambda: state),
+    )
+
+    main(["qualification", "status"])
+
+    output = capsys.readouterr().out
+    assert "plan-cancelled-study: historical-plan-abandoned" in output
+    assert "2026-09-01T09:00:00Z by ochowei@gmail.com" in output
+    assert "reason: The owning study was cancelled." in output
+
+
+def test_qualification_plan_abandon_routes_verified_authority_and_derived_study(
+    tmp_path,
+    capsys,
+    monkeypatch,
+) -> None:
+    calls: dict[str, object] = {}
+    authority = SimpleNamespace(
+        workflow="strategy-forward-replication-research",
+        workflow_version="v010",
+        as_payload=lambda: {"capability": "qualification-plan-abandonment-v1"},
+    )
+
+    class FakeStudies:
+        def lifecycle_identity(self, study_path: Path) -> dict[str, str]:
+            calls["study_path"] = study_path
+            return {"status": "cancelled"}
+
+    class FakeRegistry:
+        def __init__(self, path: Path) -> None:
+            calls["registry_path"] = path
+
+        def abandon_historical_plan(self, plan_id: str, **kwargs) -> str:
+            calls["plan_id"] = plan_id
+            calls.update(kwargs)
+            resolver = kwargs["study_identity_resolver"]
+            resolver("workflows/example--v009/work/studies/example--s002")
+            return f"historical-plan-abandoned:{plan_id}"
+
+    def resolve_authority(workflow: Path):
+        calls["workflow"] = workflow
+        return authority
+
+    monkeypatch.setattr(
+        "trading.cli.resolve_qualification_plan_abandonment_authority",
+        resolve_authority,
+    )
+    monkeypatch.setattr("trading.cli.WorkflowStudyService", FakeStudies)
+    monkeypatch.setattr("trading.cli.QualificationRegistry", FakeRegistry)
+    registry_path = tmp_path / "qualification.json"
+
+    main(
+        [
+            "qualification",
+            "plan",
+            "abandon",
+            "--plan-id",
+            "plan-1",
+            "--workflow",
+            "workflows/example--v010",
+            "--approved-by",
+            "ochowei@gmail.com",
+            "--reason",
+            "Cancelled study has an invalid frozen envelope.",
+            "--path",
+            str(registry_path),
+        ]
+    )
+
+    assert calls["workflow"] == Path("workflows/example--v010")
+    assert calls["registry_path"] == registry_path
+    assert calls["plan_id"] == "plan-1"
+    assert calls["approved_by"] == "ochowei@gmail.com"
+    assert calls["reason"] == "Cancelled study has an invalid frozen envelope."
+    assert calls["authorization"] == {"capability": "qualification-plan-abandonment-v1"}
+    assert calls["study_path"] == Path("workflows/example--v009/work/studies/example--s002")
+    output = capsys.readouterr().out
+    assert "qualification plan abandoned: historical-plan-abandoned:plan-1" in output
+    assert "outcome authority: none" in output
+
+
 def test_legacy_experiment_qualification_fails_before_writing(tmp_path) -> None:
     qualification_path = tmp_path / "qualification.json"
     trial_path = tmp_path / "trials.json"

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "study_path": "workflows/strategy-forward-replication-research--v009/work/studies/fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001",
+  "route": "fixed-calendar-retrospective",
+  "decision_stage": "development",
+  "preregistration_sha256": "340c717b7ab275fb771788745cb2f91d3c07a72b1d2c5a3e2209edbb04be0872",
+  "qualification_spec_sha256": "b647fa848fcfec927a670aeede64d24920448751eea451a1ed163b2b7f9a4cef",
+  "development_authorization_sha256": "25a3a5cc812e62ef6f23a06a7902bc757fa335eef585ac109b5f582a4c8d7013",
+  "development_gate": {
+    "path": "results/workflows/strategy-forward-replication-research--v009/fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001/development/development-gate.json",
+    "sha256": "65cdf88b2666e53c2f48f5e9c7acbbbca0971a0a9df8ca0a9191cc9e5b3a7f4d"
+  },
+  "qualification_absence_evidence": {
+    "path": "results/evidence/qualification/f3ef0e023effd0f9ae11540b48c8d03ef548e52d67a79f1a31fca27b9ad8f791.json",
+    "sha256": "f3ef0e023effd0f9ae11540b48c8d03ef548e52d67a79f1a31fca27b9ad8f791"
+  }
+}

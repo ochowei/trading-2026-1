@@ -106,6 +106,7 @@ are archived under `legacy/claude/commands/`; new cross-Agent workflows should n
 | `docs/historical-qualification-and-shadow-v007.md` | Released v007 frozen selection-boundary contract for clean and retrospective qualification. |
 | `docs/historical-qualification-and-shadow-v008.md` | Versioned v008 exact-study readiness, explicit clean-calendar, study-time retrospective terminal-evidence, and unchanged Shadow-authority contract. |
 | `docs/historical-qualification-and-shadow-v009.md` | Versioned v009 fixed 2013-2025 calendar, executable challenge-only contracts, atomic evidence publication, and non-actionable retrospective replay boundary. |
+| `docs/historical-qualification-and-shadow-v010.md` | Proposed v010 capability-gated append-only qualification-plan abandonment and unchanged outcome/Shadow/live-authority boundaries. |
 | `docs/research-evidence-stages-and-outcomes.md` | Stable pointer to the full plus plain-language stage/outcome companion beside v008. |
 | `docs/research-evidence-preservation.md` | Reference explanation of tracked content-addressed candidate-freeze/qualification evidence, recoverable publication, and permanent-retention implementation. |
 | `docs/result-storage-layout-v009.md` | Normative categorized result namespaces, append-only path migration, historical compatibility resolution, canonical writer destinations, and retention boundary. |
@@ -218,6 +219,7 @@ process-global state remain compatible.
 | `authoring.py`, `studies.py` | Workflow/change/study governance, released capability routing, fixed-calendar study templates, and terminal lifecycle guards. |
 | `study_qualification.py` | Exact-study compiler, immutable 2013-2025 fixed calendar, capability checks, complete-family binding, and registered executable challenge-method schemas. |
 | `qualification.py` | Historical plan and screen orchestration over exact formal snapshot observations. |
+| `qualification_plan_abandonment.py` | Resolves the exact effective workflow release and capability that may authorize one qualification-plan abandonment command. |
 | `challenge_execution.py` | Independent provider-free challenge-only operation with exact Evaluation role projections and atomic nine-artifact publication. |
 | `retrospective_replay.py` | Fixed 2025 non-actionable simulated execution replay, provider-free evidence verification, and atomic publication. |
 | `terminal_evidence.py` | Exact registry/challenge/replay linkage and fail-closed terminal disposition validation. |
@@ -259,7 +261,7 @@ Immutable reproducibility evidence and formal run coordination.
 | `parity.py` | Fixed-snapshot parity evidence and immutable parity artifacts. |
 | `paths.py` | Canonical categorized result-directory helpers plus append-only, SHA-256-bound historical path migration. It preserves v009 one-hop mappings and permits only one additional byte-identical v010 retirement hop. |
 | `trial_registry.py` | Append-only experiment trial identities, observations, and tombstones. |
-| `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence, including canonical single plan/screen identities and empty-registry initialization for authoritative absence proofs. |
+| `qualification_registry.py` | Local append-only Historical and Shadow lifecycle evidence, including canonical plan, screen, and cancelled-study abandonment identities plus empty-registry initialization for authoritative absence proofs. |
 | `__init__.py` | Curated public research-data API exports. |
 
 ### `src/trading/policies/`
@@ -365,6 +367,7 @@ trading data must never be placed in `tests/` or committed anywhere.
 | `results/evidence/qualification/<sha256>.json` | Permanently retained tracked self-contained qualification registry/checkpoint snapshot replayed for terminal decisions and Development absence proofs. |
 | `results/registries/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
 | `results/registries/path-migrations.json` | Tracked append-only old-to-new result path registry. Entries pin source/destination identities, artifact class, migration version, and SHA-256. A v009 path may have exactly one additional byte-identical v010 retirement hop; readers reject longer chains, cycles, missing terminal bytes, or digest drift. |
+| `results/registries/history/<registry>--<sha256>.json` | Immutable migration-time registry bytes retained by the bounded, digest-identical second hop while the categorized append-only registry remains active. |
 
 The legacy experiment result authority is retired. All of its last retained results and manifests
 live under `legacy/results/`; `results/experiment-results/` must not exist or be recreated.

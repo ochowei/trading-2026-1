@@ -2383,15 +2383,24 @@ def test_capability_scoped_study_requires_explicit_route_at_creation(tmp_path, m
     assert (study / "QUALIFICATION_SPEC.json").is_file()
 
 
+@pytest.mark.parametrize(
+    ("capability", "route"),
+    [
+        ("study-time-retrospective-v1", "study-time-retrospective"),
+        ("fixed-calendar-retrospective-v1", "fixed-calendar-retrospective"),
+    ],
+)
 def test_first_development_transition_requires_separate_human_authorization(
     tmp_path,
     monkeypatch,
+    capability,
+    route,
 ) -> None:
     root, repository = _initialize_root(tmp_path)
     version = root / "example-workflow--v001"
     version.mkdir()
     (version / "RELEASE.json").write_text(
-        json.dumps({"capabilities": ["study-time-retrospective-v1"]}) + "\n",
+        json.dumps({"capabilities": [capability]}) + "\n",
         encoding="utf-8",
     )
     study = version / "work" / "studies" / "example--s001"
@@ -2400,7 +2409,7 @@ def test_first_development_transition_requires_separate_human_authorization(
     document = MarkdownDocument(
         {
             "status": "preregistered",
-            "route": "study-time-retrospective",
+            "route": route,
             "preregistered_by": "owner@example.com",
         },
         "# Study\n",

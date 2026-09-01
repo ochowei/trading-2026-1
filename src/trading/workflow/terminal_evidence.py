@@ -213,6 +213,18 @@ def _validate_registry_link(study: Path, terminal: dict[str, Any]) -> bool:
         ),
         None,
     )
+    abandonment = next(
+        (
+            item
+            for item in events
+            if item.get("event_type") == "historical_plan_abandoned"
+            and isinstance(item.get("payload"), dict)
+            and item["payload"].get("plan_id") == plan_id
+        ),
+        None,
+    )
+    if abandonment is not None:
+        raise ValueError("abandoned qualification plan cannot supply terminal Evaluation evidence")
     screen = next((item for item in events if item.get("event_id") == screen_event_id), None)
     if plan is None or screen is None or screen.get("event_type") != "historical_screen":
         raise ValueError("terminal evidence has no exact linked plan and screen")

@@ -50,6 +50,9 @@ workflows:
         status: active
         status_changed_at: '2026-09-01T05:46:22.658301Z'
         status_changed_by: ochowei@gmail.com
+      v010:
+        path: strategy-forward-replication-research--v010
+        status: draft
     activation_required_from: v010
 ---
 # Research Workflows
@@ -91,4 +94,5 @@ historical activation.
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v007` | `superseded` | [strategy-forward-replication-research--v007](strategy-forward-replication-research--v007/) |
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v008` | `superseded` | [strategy-forward-replication-research--v008](strategy-forward-replication-research--v008/) |
 | 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v009` | `active` | [strategy-forward-replication-research--v009](strategy-forward-replication-research--v009/) |
+| 策略前瞻驗證流程 (`strategy-forward-replication-research`) | `v010` | `draft` | [strategy-forward-replication-research--v010](strategy-forward-replication-research--v010/) |
 <!-- GENERATED:WORKFLOW_INDEX_END -->

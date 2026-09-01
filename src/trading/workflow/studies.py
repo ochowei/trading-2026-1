@@ -73,6 +73,22 @@ class WorkflowStudyService:
         self.root = root
         self.repo_root = root.parent
 
+    def lifecycle_identity(self, study_path: Path) -> dict[str, str]:
+        """Return canonical immutable routing identity and current study status."""
+        self.repository._require_structurally_valid()
+        path, _version_path, _record, document = self._study_context(study_path)
+        required = {
+            "workflow": document.metadata.get("workflow"),
+            "workflow_version": document.metadata.get("workflow_version"),
+            "status": document.metadata.get("status"),
+        }
+        if any(not isinstance(value, str) or not value for value in required.values()):
+            raise WorkflowAuthoringError("study lifecycle identity is incomplete")
+        return {
+            "study_path": self._repo_relative(path),
+            **required,
+        }
+
     def initialize(
         self,
         version_path: Path,
@@ -336,7 +352,13 @@ class WorkflowStudyService:
 
         occurred_at = timestamp_text(self.repository._current_time())
         release = self._release_payload(version_path)
-        structured_routes = STUDY_QUALIFICATION_CAPABILITY in release.get("capabilities", [])
+        structured_routes = bool(
+            {
+                STUDY_QUALIFICATION_CAPABILITY,
+                FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY,
+            }
+            & set(release.get("capabilities", []))
+        )
         if structured_routes and current == "preregistered" and target_status == "running":
             approver = self._required_identity(approved_by, "approved-by")
             if approver != metadata.get("preregistered_by"):

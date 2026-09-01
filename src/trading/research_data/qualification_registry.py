@@ -21,6 +21,7 @@ from trading.core.ledger_storage import atomic_write, locked_file
 from trading.core.qualification import (
     EVIDENCE_ROLES,
     HISTORICAL_QUALIFICATION_GATE_NAMES,
+    QUALIFICATION_PLAN_ABANDONMENT_CAPABILITY,
     RETROSPECTIVE_EVIDENCE_ROLES,
     SHADOW_ACTIVATION_GATE_NAMES,
     EvaluationEvidenceAudit,
@@ -330,16 +331,119 @@ class QualificationRegistry:
             and isinstance((event_payload := event.get("payload")), Mapping)
             and event_payload.get("experiment_family") == plan.experiment_family
             and not any(
-                screen.get("event_type") == "historical_screen"
-                and isinstance(screen.get("payload"), Mapping)
-                and screen["payload"].get("plan_id") == event_payload.get("plan_id")
-                for screen in _events(state)
+                terminal.get("event_type") in {"historical_screen", "historical_plan_abandoned"}
+                and isinstance(terminal.get("payload"), Mapping)
+                and terminal["payload"].get("plan_id") == event_payload.get("plan_id")
+                for terminal in _events(state)
             )
         }
         if open_plan_ids - {plan.plan_id}:
             raise QualificationRegistryError(
                 "experiment family already has an open forward or retrospective qualification plan"
             )
+
+    def abandon_historical_plan(
+        self,
+        plan_id: str,
+        *,
+        approved_by: str,
+        reason: str,
+        study_identity_resolver: Callable[[str], Mapping[str, str]],
+        authorization: Mapping[str, str],
+    ) -> str:
+        """Append an administrative terminal event for a cancelled study's open plan."""
+        plan_identity = _required_text(plan_id, "historical plan identity")
+        approver = _required_text(approved_by, "qualification plan abandonment approver")
+        concrete_reason = _required_text(reason, "qualification plan abandonment reason")
+        abandoned_at = self.now()
+        if abandoned_at.tzinfo is None or abandoned_at.utcoffset() is None:
+            raise QualificationRegistryError(
+                "qualification plan abandonment clock must be timezone-aware"
+            )
+        abandoned_at = abandoned_at.astimezone(UTC)
+        authority = _validated_abandonment_authority(authorization)
+        event_id = f"historical-plan-abandoned:{plan_identity}"
+        with locked_file(self.lock_path, self.lock_timeout_seconds):
+            state = self._load_unlocked()
+            events = _events(state)
+            plan_event = _event_for_identity(
+                state,
+                event_type="historical_plan",
+                identity_name="plan_id",
+                identity=plan_identity,
+            )
+            if any(
+                event.get("event_type") == "historical_screen"
+                and _payload(event).get("plan_id") == plan_identity
+                for event in events
+            ):
+                raise QualificationRegistryError("screened historical plan cannot be abandoned")
+            if any(
+                event.get("event_type") == "historical_plan_abandoned"
+                and _payload(event).get("plan_id") == plan_identity
+                for event in events
+            ):
+                raise QualificationRegistryError("historical plan already has an abandonment event")
+            plan_payload = _payload(plan_event)
+            study_identity = plan_payload.get("study_identity")
+            if not isinstance(study_identity, Mapping):
+                raise QualificationRegistryError(
+                    "historical plan abandonment requires exact frozen study binding"
+                )
+            frozen_study = _validated_frozen_study_identity(study_identity)
+            try:
+                resolved_study = dict(study_identity_resolver(frozen_study["study_path"]))
+            except Exception as exc:  # noqa: BLE001 - external identity boundary fails closed
+                raise QualificationRegistryError(
+                    f"cannot verify owning study for abandonment: {exc}"
+                ) from exc
+            expected_study = {
+                "study_path": frozen_study["study_path"],
+                "workflow": authority["workflow"],
+                "workflow_version": _required_text(
+                    resolved_study.get("workflow_version"),
+                    "owning study workflow version",
+                ),
+                "status": "cancelled",
+            }
+            actual_study = {
+                field: _required_text(resolved_study.get(field), f"owning study {field}")
+                for field in expected_study
+            }
+            if actual_study != expected_study:
+                raise QualificationRegistryError(
+                    "historical plan abandonment requires the exact cancelled owning study "
+                    "in the authorizing workflow family"
+                )
+            previous_hash = (
+                _required_text(events[-1].get("event_hash"), "qualification registry head hash")
+                if events
+                else _GENESIS_HASH
+            )
+            payload: dict[str, object] = {
+                "plan_id": plan_identity,
+                "experiment_family": _required_text(
+                    plan_payload.get("experiment_family"),
+                    "historical plan experiment family",
+                ),
+                "study_identity": frozen_study,
+                "study_lifecycle": actual_study,
+                "authorization": authority,
+                "abandoned_at": timestamp_text(abandoned_at),
+                "approved_by": approver,
+                "reason": concrete_reason,
+                "prior_registry": {
+                    "event_count": len(events),
+                    "head_hash": previous_hash,
+                },
+            }
+            self._append_unlocked(
+                state,
+                event_id=event_id,
+                event_type="historical_plan_abandoned",
+                payload=payload,
+            )
+        return event_id
 
     def record_historical_screen(
         self,
@@ -361,6 +465,14 @@ class QualificationRegistry:
                 identity=screen.plan_id,
             )
             plan_payload = _payload(plan_event)
+            if any(
+                event.get("event_type") == "historical_plan_abandoned"
+                and _payload(event).get("plan_id") == screen.plan_id
+                for event in _events(state)
+            ):
+                raise QualificationRegistryError(
+                    "abandoned historical plan cannot receive a screen"
+                )
             fold_payloads = plan_payload.get("folds")
             if not isinstance(fold_payloads, list) or not fold_payloads:
                 raise QualificationRegistryError("historical plan folds are malformed")
@@ -909,9 +1021,87 @@ def _missing_current_definition(_experiment_family: str, _trial_id: str) -> str:
     raise QualificationRegistryError("no current-definition resolver is configured")
 
 
+def _required_text(value: object, label: str) -> str:
+    if not isinstance(value, str) or not value.strip() or value != value.strip():
+        raise QualificationRegistryError(f"{label} is missing or non-canonical")
+    return value
+
+
+def _required_sha256(value: object, label: str) -> str:
+    digest = _required_text(value, label)
+    if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest):
+        raise QualificationRegistryError(f"{label} is not a canonical SHA-256 digest")
+    return digest
+
+
+def _required_repository_path(value: object, label: str) -> str:
+    text = _required_text(value, label)
+    path = Path(text)
+    if path.is_absolute() or ".." in path.parts or path.as_posix() != text:
+        raise QualificationRegistryError(f"{label} is not a safe repository-relative path")
+    return text
+
+
+def _validated_frozen_study_identity(identity: Mapping[str, object]) -> dict[str, str]:
+    return {
+        "study_path": _required_repository_path(identity.get("study_path"), "frozen study path"),
+        "preregistration_sha256": _required_sha256(
+            identity.get("preregistration_sha256"),
+            "frozen preregistration identity",
+        ),
+        "plan_sha256": _required_sha256(identity.get("plan_sha256"), "frozen plan identity"),
+        "candidate_freeze_sha256": _required_sha256(
+            identity.get("candidate_freeze_sha256"),
+            "candidate freeze identity",
+        ),
+        "qualification_spec_sha256": _required_sha256(
+            identity.get("qualification_spec_sha256"),
+            "qualification specification identity",
+        ),
+        "workflow_release_sha256": _required_sha256(
+            identity.get("workflow_release_sha256"),
+            "owning workflow release identity",
+        ),
+    }
+
+
+def _validated_abandonment_authority(authority: Mapping[str, object]) -> dict[str, str]:
+    payload = {
+        "workflow": _required_text(authority.get("workflow"), "authorizing workflow"),
+        "workflow_version": _required_text(
+            authority.get("workflow_version"),
+            "authorizing workflow version",
+        ),
+        "workflow_path": _required_repository_path(
+            authority.get("workflow_path"),
+            "authorizing workflow path",
+        ),
+        "workflow_release_sha256": _required_sha256(
+            authority.get("workflow_release_sha256"),
+            "authorizing workflow release identity",
+        ),
+        "capability": _required_text(
+            authority.get("capability"),
+            "qualification plan abandonment capability",
+        ),
+    }
+    if payload["capability"] != QUALIFICATION_PLAN_ABANDONMENT_CAPABILITY:
+        raise QualificationRegistryError(
+            "authorization does not grant qualification-plan abandonment"
+        )
+    if Path(payload["workflow_path"]).name != (
+        f"{payload['workflow']}--{payload['workflow_version']}"
+    ):
+        raise QualificationRegistryError(
+            "authorizing workflow path, family, and version are inconsistent"
+        )
+    return payload
+
+
 def _validate_lifecycle(events: list[dict[str, object]]) -> None:
-    plans: set[str] = set()
+    plans: dict[str, Mapping[str, object]] = {}
     screens: set[str] = set()
+    abandoned: set[str] = set()
     shadows: set[str] = set()
     evidence_dates: set[tuple[str, str]] = set()
     for event in events:
@@ -925,11 +1115,13 @@ def _validate_lifecycle(events: list[dict[str, object]]) -> None:
                 raise QualificationRegistryError("historical plan event identity is not canonical")
             if plan_id in plans:
                 raise QualificationRegistryError("qualification registry repeats a historical plan")
-            plans.add(plan_id)
+            plans[plan_id] = payload
         elif event_type == "historical_screen":
             plan_id = payload.get("plan_id")
             if plan_id not in plans:
                 raise QualificationRegistryError("historical screen precedes its frozen plan")
+            if plan_id in abandoned:
+                raise QualificationRegistryError("abandoned historical plan has a later screen")
             if event.get("event_id") != f"historical-screen:{plan_id}":
                 raise QualificationRegistryError(
                     "historical screen event identity is not canonical"
@@ -939,10 +1131,88 @@ def _validate_lifecycle(events: list[dict[str, object]]) -> None:
                     "qualification registry repeats a historical screen"
                 )
             screens.add(plan_id)
+        elif event_type == "historical_plan_abandoned":
+            plan_id = payload.get("plan_id")
+            if not isinstance(plan_id, str) or plan_id not in plans:
+                raise QualificationRegistryError(
+                    "historical plan abandonment precedes its frozen plan"
+                )
+            if event.get("event_id") != f"historical-plan-abandoned:{plan_id}":
+                raise QualificationRegistryError(
+                    "historical plan abandonment event identity is not canonical"
+                )
+            if plan_id in screens:
+                raise QualificationRegistryError("screened historical plan is later abandoned")
+            if plan_id in abandoned:
+                raise QualificationRegistryError(
+                    "qualification registry repeats a historical plan abandonment"
+                )
+            plan_payload = plans[plan_id]
+            if payload.get("experiment_family") != plan_payload.get("experiment_family"):
+                raise QualificationRegistryError(
+                    "historical plan abandonment family differs from its frozen plan"
+                )
+            plan_study = plan_payload.get("study_identity")
+            event_study = payload.get("study_identity")
+            if not isinstance(plan_study, Mapping) or not isinstance(event_study, Mapping):
+                raise QualificationRegistryError(
+                    "historical plan abandonment lacks exact frozen study binding"
+                )
+            if _validated_frozen_study_identity(event_study) != _validated_frozen_study_identity(
+                plan_study
+            ):
+                raise QualificationRegistryError(
+                    "historical plan abandonment study identity differs from its frozen plan"
+                )
+            lifecycle = payload.get("study_lifecycle")
+            authorization = payload.get("authorization")
+            if not isinstance(lifecycle, Mapping) or not isinstance(authorization, Mapping):
+                raise QualificationRegistryError(
+                    "historical plan abandonment authority is malformed"
+                )
+            authority = _validated_abandonment_authority(authorization)
+            if (
+                lifecycle.get("study_path") != event_study.get("study_path")
+                or lifecycle.get("workflow") != authority["workflow"]
+                or lifecycle.get("status") != "cancelled"
+                or not isinstance(lifecycle.get("workflow_version"), str)
+                or not lifecycle.get("workflow_version")
+            ):
+                raise QualificationRegistryError(
+                    "historical plan abandonment does not bind an exact cancelled owning study"
+                )
+            abandoned_at = _required_text(
+                payload.get("abandoned_at"),
+                "historical plan abandonment time",
+            )
+            try:
+                if timestamp_text(parse_timestamp(abandoned_at)) != abandoned_at:
+                    raise ValueError("non-canonical timestamp")
+            except ValueError as exc:
+                raise QualificationRegistryError(
+                    "historical plan abandonment time is malformed"
+                ) from exc
+            _required_text(payload.get("approved_by"), "historical plan abandonment approver")
+            _required_text(payload.get("reason"), "historical plan abandonment reason")
+            prior_registry = payload.get("prior_registry")
+            if (
+                not isinstance(prior_registry, Mapping)
+                or prior_registry.get("event_count") != event.get("sequence", 0) - 1
+                or prior_registry.get("head_hash") != event.get("previous_hash")
+            ):
+                raise QualificationRegistryError(
+                    "historical plan abandonment prior registry identity is malformed"
+                )
+            abandoned.add(plan_id)
         elif event_type == "shadow_registration":
             shadow_id = payload.get("shadow_id")
             plan_id = payload.get("historical_plan_id")
-            if not isinstance(shadow_id, str) or plan_id not in plans or plan_id not in screens:
+            if (
+                not isinstance(shadow_id, str)
+                or plan_id not in plans
+                or plan_id not in screens
+                or plan_id in abandoned
+            ):
                 raise QualificationRegistryError(
                     "Shadow registration precedes passing historical evidence"
                 )

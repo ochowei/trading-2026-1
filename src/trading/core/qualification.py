@@ -32,6 +32,8 @@ from trading.core.sleeve_engine import (
 )
 from trading.market_data.contracts import SessionCalendar
 
+QUALIFICATION_PLAN_ABANDONMENT_CAPABILITY = "qualification-plan-abandonment-v1"
+
 HISTORICAL_QUALIFICATION_GATE_NAMES = (
     "completed_trades",
     "traded_folds",

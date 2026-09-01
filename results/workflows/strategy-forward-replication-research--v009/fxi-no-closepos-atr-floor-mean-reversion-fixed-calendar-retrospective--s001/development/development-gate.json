@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "study_path": "workflows/strategy-forward-replication-research--v009/work/studies/fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001",
+  "route": "fixed-calendar-retrospective",
+  "preregistration_sha256": "340c717b7ab275fb771788745cb2f91d3c07a72b1d2c5a3e2209edbb04be0872",
+  "qualification_spec_sha256": "b647fa848fcfec927a670aeede64d24920448751eea451a1ed163b2b7f9a4cef",
+  "development_authorization_sha256": "25a3a5cc812e62ef6f23a06a7902bc757fa335eef585ac109b5f582a4c8d7013",
+  "evidence_generated_at": "2026-09-01T06:24:38.6NZ",
+  "execution_git_head": "ec1661fd54755bb58e265bb9643d78c83bcdda8a",
+  "policy_set_identity": "cac4973cf0055c772487b069c96f1cd2b488a2457636f8cfe2c812c89ad0f63e",
+  "data_cutoff": "2018-12-31",
+  "common_data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b",
+  "complete": true,
+  "trustworthy": true,
+  "eligible_candidate": null,
+  "disposition": "development-selection-failed",
+  "development_status": "no-eligible-candidate",
+  "trial_budget_exhausted": true,
+  "trial_budget": {
+    "maximum_trials": 6,
+    "complete_family_trials": 6
+  },
+  "candidate_eligibility": {
+    "identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+    "trial_id": "5f6b3693d559ab3f7e8cf4bf4dfc4fa22e6f79a10212c1a864bd98347a2793fa",
+    "all_gates_passed": false,
+    "gates": [
+      {
+        "metric": "completed_trades",
+        "operator": ">=",
+        "threshold": 20,
+        "observed": 19,
+        "passed": false
+      },
+      {
+        "metric": "traded_development_years",
+        "operator": ">=",
+        "threshold": 3,
+        "observed": 4,
+        "passed": true
+      },
+      {
+        "metric": "base_compounded_return",
+        "operator": ">",
+        "threshold": 0,
+        "observed": 0.2731811060826477,
+        "passed": true
+      },
+      {
+        "metric": "stress_compounded_return",
+        "operator": ">",
+        "threshold": 0,
+        "observed": 0.19807784506446158,
+        "passed": true
+      },
+      {
+        "metric": "base_profit_factor",
+        "operator": ">",
+        "threshold": 1.1,
+        "observed": 1.7395286629871463,
+        "passed": true
+      },
+      {
+        "metric": "stress_profit_factor",
+        "operator": ">",
+        "threshold": 1,
+        "observed": 1.5183958158015725,
+        "passed": true
+      },
+      {
+        "metric": "stress_max_drawdown_absolute",
+        "operator": "<=",
+        "threshold": 0.2,
+        "observed": 0.15388472580833878,
+        "passed": true
+      },
+      {
+        "metric": "valid_complete_family_observations",
+        "operator": "=",
+        "threshold": true,
+        "observed": true,
+        "passed": true
+      }
+    ]
+  },
+  "ranking": {
+    "rule": "Exclude ineligible candidates, then rank eligible candidates by canonical base-net daily-equity Sharpe descending with stable trial-ID tie-break.",
+    "eligible_candidates": [],
+    "selected_candidate": null,
+    "rationale": "The sole selection candidate failed the completed-trades gate (19 < 20); substitution from robustness members is prohibited."
+  },
+  "profit_factor_method": "For each completed canonical-sleeve net trade, net P&L equals quantity times executed exit price minus exit fee, less quantity times executed entry price plus entry fee. Profit factor is total positive net P&L divided by absolute total negative net P&L.",
+  "signal_funnel": {
+    "schema_version": 1,
+    "definition_fingerprint": "84306c97f43a475c75d9bf348b19b1976b4a1b5d3e2e46dcb7813331a429dc34",
+    "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b",
+    "data_cutoff": "2018-12-31",
+    "raw_signal_count": 21,
+    "raw_signal_sessions": [
+      "2015-01-30",
+      "2015-03-05",
+      "2015-05-29",
+      "2015-06-16",
+      "2015-07-01",
+      "2015-12-08",
+      "2016-01-04",
+      "2016-01-20",
+      "2016-04-07",
+      "2016-05-13",
+      "2016-06-13",
+      "2016-11-11",
+      "2016-12-15",
+      "2017-12-01",
+      "2018-02-02",
+      "2018-03-23",
+      "2018-05-29",
+      "2018-06-19",
+      "2018-08-15",
+      "2018-10-04",
+      "2018-10-29"
+    ],
+    "suppressed_signal_count": 2,
+    "suppressed_signals": [
+      {
+        "signal_date": "2015-07-01",
+        "status": "skipped",
+        "reason": "position_already_open"
+      },
+      {
+        "signal_date": "2016-01-04",
+        "status": "skipped",
+        "reason": "position_already_open"
+      }
+    ],
+    "completed_trade_count": 19,
+    "completed_trade_identities": [
+      {
+        "signal_date": "2015-01-30",
+        "entry_date": "2015-02-02",
+        "exit_date": "2015-03-04"
+      },
+      {
+        "signal_date": "2015-03-05",
+        "entry_date": "2015-03-06",
+        "exit_date": "2015-03-30"
+      },
+      {
+        "signal_date": "2015-05-29",
+        "entry_date": "2015-06-01",
+        "exit_date": "2015-06-16"
+      },
+      {
+        "signal_date": "2015-06-16",
+        "entry_date": "2015-06-17",
+        "exit_date": "2015-07-06"
+      },
+      {
+        "signal_date": "2015-12-08",
+        "entry_date": "2015-12-09",
+        "exit_date": "2016-01-06"
+      },
+      {
+        "signal_date": "2016-01-20",
+        "entry_date": "2016-01-21",
+        "exit_date": "2016-01-29"
+      },
+      {
+        "signal_date": "2016-04-07",
+        "entry_date": "2016-04-08",
+        "exit_date": "2016-04-13"
+      },
+      {
+        "signal_date": "2016-05-13",
+        "entry_date": "2016-05-16",
+        "exit_date": "2016-05-31"
+      },
+      {
+        "signal_date": "2016-06-13",
+        "entry_date": "2016-06-14",
+        "exit_date": "2016-06-23"
+      },
+      {
+        "signal_date": "2016-11-11",
+        "entry_date": "2016-11-14",
+        "exit_date": "2016-11-30"
+      },
+      {
+        "signal_date": "2016-12-15",
+        "entry_date": "2016-12-16",
+        "exit_date": "2017-01-19"
+      },
+      {
+        "signal_date": "2017-12-01",
+        "entry_date": "2017-12-04",
+        "exit_date": "2018-01-03"
+      },
+      {
+        "signal_date": "2018-02-02",
+        "entry_date": "2018-02-05",
+        "exit_date": "2018-02-06"
+      },
+      {
+        "signal_date": "2018-03-23",
+        "entry_date": "2018-03-26",
+        "exit_date": "2018-04-25"
+      },
+      {
+        "signal_date": "2018-05-29",
+        "entry_date": "2018-05-30",
+        "exit_date": "2018-06-06"
+      },
+      {
+        "signal_date": "2018-06-19",
+        "entry_date": "2018-06-20",
+        "exit_date": "2018-06-27"
+      },
+      {
+        "signal_date": "2018-08-15",
+        "entry_date": "2018-08-16",
+        "exit_date": "2018-08-27"
+      },
+      {
+        "signal_date": "2018-10-04",
+        "entry_date": "2018-10-05",
+        "exit_date": "2018-10-11"
+      },
+      {
+        "signal_date": "2018-10-29",
+        "entry_date": "2018-10-30",
+        "exit_date": "2018-11-01"
+      }
+    ],
+    "unavailable_decisions": [],
+    "unfilled_entries": [],
+    "open_candidates": [],
+    "audit_note": "The formal result retained every raw signal and canonical sleeve disposition. The two suppressed signals were explicit position conflicts; no unavailable decision, unfilled entry, or open candidate remained."
+  },
+  "complete_family": [
+    {
+      "source_identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate",
+      "role": "selection-candidate",
+      "source_sha256": "9e4d355b27517f389d1daf34c76b0bfbfa28cfd10f206d18de64f2f3a1810f6b",
+      "trial_id": "5f6b3693d559ab3f7e8cf4bf4dfc4fa22e6f79a10212c1a864bd98347a2793fa",
+      "definition_fingerprint": "84306c97f43a475c75d9bf348b19b1976b4a1b5d3e2e46dcb7813331a429dc34",
+      "manifest": {
+        "path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/665526a88b603071aee9bc77034e89c2fad9b2e6061a1b8841e6577432f8aeb7.snapshot.json",
+        "snapshot_id": "665526a88b603071aee9bc77034e89c2fad9b2e6061a1b8841e6577432f8aeb7",
+        "sha256": "ea2f0d1ae888eaff5729d9f720f7c2357b72f696dc6ee7e56f6db838f3174982",
+        "definition_snapshot_id": "7d353673b495c4396ad737e0d2e6d302b97e1ad11d846ed85cf39b07efc8dc3b",
+        "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b"
+      },
+      "observation": {
+        "observation_id": "10fddde648f2413d8a7723bca7f8e15f",
+        "observed_at": "2026-09-01T06:18:51.570561Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/20260901_061851_553320_offline_79f5ab5198e14fc683c1d637bd97628a.json",
+        "result_sha256": "af7401f3dcd5d2fc5acbf31880e23b748336100a5a57c84344dccbd0631e11d2"
+      },
+      "metrics": {
+        "completed_trades": 19,
+        "traded_years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "base_return": 0.2731811060826477,
+        "base_profit_factor": 1.7395286629871463,
+        "base_sharpe": 0.6756305089980961,
+        "base_max_drawdown": -0.14708703236773601,
+        "stress_return": 0.19807784506446158,
+        "stress_profit_factor": 1.5183958158015725,
+        "stress_max_drawdown": -0.15388472580833878
+      }
+    },
+    {
+      "source_identity": "fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline",
+      "role": "family-baseline",
+      "source_sha256": "f2a80bcb33700832a20b80af7b71c247db58da2c258a5fb82b562035e8dd6bb9",
+      "trial_id": "1be74640289ca88f39991bbdc961418b0cee94ffe92afce6efcd6833fb7b1c76",
+      "definition_fingerprint": "d60e82c6076bd89b910afd56434364a8717947aba23c743bd03d9a7158060131",
+      "manifest": {
+        "path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/c86d373c29148bee2800d30101bdc4386f030b04d81c2915de9b55d48981b27e.snapshot.json",
+        "snapshot_id": "c86d373c29148bee2800d30101bdc4386f030b04d81c2915de9b55d48981b27e",
+        "sha256": "12ed65a6b0c65ba91955180351fed267ab3ab70ada7d3c34b1f526e542cd03ae",
+        "definition_snapshot_id": "93a3e70c4736e24c4d6e59e04211b6ca7871242792981f86d9431207f64a3522",
+        "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b"
+      },
+      "observation": {
+        "observation_id": "310d3c6092e14996b0ca1f7b7cb7ac57",
+        "observed_at": "2026-09-01T06:18:53.282701Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/20260901_061853_264703_offline_b0b1b42a470e4996a75154e7cd926ba7.json",
+        "result_sha256": "060e72f7708be2941d7d813fa7510f3b7299653f38f389b91757da9bb0309538"
+      },
+      "metrics": {
+        "completed_trades": 27,
+        "traded_years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "base_return": 0.1934176939209893,
+        "base_profit_factor": 1.3437697132789812,
+        "base_sharpe": 0.40896275842166047,
+        "base_max_drawdown": -0.18069514621234972,
+        "stress_return": 0.09463509439274209,
+        "stress_profit_factor": 1.163470255358721,
+        "stress_max_drawdown": -0.20140319058092326
+      }
+    },
+    {
+      "source_identity": "fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference",
+      "role": "robustness",
+      "source_sha256": "149714e85b1e922ba310e5db944b07691401c51751cefdf4a8ac40db9fd3a18c",
+      "trial_id": "ce521d386544d3293cd8f8a973888942d06d6cafc89a373900656fbedff60857",
+      "definition_fingerprint": "5f902af3dede1558af3d25a151f8fb56992f2a662d18ace69590f87202ac0f8a",
+      "manifest": {
+        "path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/13f110825a0d82c783cf3d31adca470e7ee8d4cfdce6befd6219b03988d00adf.snapshot.json",
+        "snapshot_id": "13f110825a0d82c783cf3d31adca470e7ee8d4cfdce6befd6219b03988d00adf",
+        "sha256": "208fd077771cabd129f4b622b6f12e778ca40a4a88157188f7acbe94a3624a82",
+        "definition_snapshot_id": "c06d50cc73deed87f391be320bd59d7784404a1754b77a0109e13b6e946a21da",
+        "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b"
+      },
+      "observation": {
+        "observation_id": "7e34f4d6859b43799b345836a9a8c7f2",
+        "observed_at": "2026-09-01T06:18:54.981384Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/20260901_061854_962395_offline_3e2d6d9a2318493587cb250e2038d228.json",
+        "result_sha256": "9512f6722fa9fc49698f1280995c36dc65961b026b7954d7c71da3333fe83bc2"
+      },
+      "metrics": {
+        "completed_trades": 10,
+        "traded_years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "base_return": 0.10967970893661105,
+        "base_profit_factor": 1.4882435474153914,
+        "base_sharpe": 0.3330648057494801,
+        "base_max_drawdown": -0.12598776583733196,
+        "stress_return": 0.0747320456311098,
+        "stress_profit_factor": 1.3190567867882947,
+        "stress_max_drawdown": -0.13017462286183124
+      }
+    },
+    {
+      "source_identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness",
+      "role": "robustness",
+      "source_sha256": "d9a5a0d95e4537c5b1c8045ce9b8e9ce4b71aa29640b266a27654bc52851e7d9",
+      "trial_id": "76a5ec4c00363266c84c5aa6f814187eb33ceaccfc4e1025d727c0304d1b733f",
+      "definition_fingerprint": "4824bdc6040b61362f7ee474dbb433ac54fd6d4a01961cad6b3974f3b8a3f0c3",
+      "manifest": {
+        "path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/efcd1df84d7b6137b556298ca20ec13b0541a900febe943a229b16d4268a26b8.snapshot.json",
+        "snapshot_id": "efcd1df84d7b6137b556298ca20ec13b0541a900febe943a229b16d4268a26b8",
+        "sha256": "75922ca80d7358ce466a8b7ee121155aafe9ae0f974740c241429f29410bfe55",
+        "definition_snapshot_id": "da727ebf091b87645945fcfda8ebba7e156310c19ef0846f86493802188d79d4",
+        "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b"
+      },
+      "observation": {
+        "observation_id": "06f68619c36d4102961158110b1ac055",
+        "observed_at": "2026-09-01T06:18:56.682761Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/20260901_061856_665558_offline_2d9c4a2974204c2bb2087aa52bbb6fe9.json",
+        "result_sha256": "d36eb2323534da2b57dda363f55cd2dc69609f7b647aa3faa782c5e38ecd386a"
+      },
+      "metrics": {
+        "completed_trades": 17,
+        "traded_years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "base_return": 0.07973100219640528,
+        "base_profit_factor": 1.2068323832348722,
+        "base_sharpe": 0.26418120839295123,
+        "base_max_drawdown": -0.19070441844124753,
+        "stress_return": 0.022562619620861257,
+        "stress_profit_factor": 1.0562459904260828,
+        "stress_max_drawdown": -0.19971948615983204
+      }
+    },
+    {
+      "source_identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness",
+      "role": "robustness",
+      "source_sha256": "0e685eb68323bf38c5de9082cd204791f45e503473706857ef6a191d7f6d8de3",
+      "trial_id": "552ac20bb3b1a9fb5c5bd8ccfca90d51b2a2178b98c5e3677e1b9f4cbe37d50c",
+      "definition_fingerprint": "af7b50d6949168d9ac2e4fe63743ed5d1f0539bd086b78cd4ac943bf72fdf577",
+      "manifest": {
+        "path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/c519a7f23dedaf915dbf16056f5bc1eaa5a493fe8aa2879f6f856c9d3989c7e3.snapshot.json",
+        "snapshot_id": "c519a7f23dedaf915dbf16056f5bc1eaa5a493fe8aa2879f6f856c9d3989c7e3",
+        "sha256": "77e5d12c3fa3b1416ebaa72a045a9d1a34a17435b888971bf95703338a6183ab",
+        "definition_snapshot_id": "7084fc221caf40f60b08cb751179c97aed7c28cdd33cbbeb589a091ccf802ef8",
+        "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b"
+      },
+      "observation": {
+        "observation_id": "b7bc663434bc4ec5b12b62f6317699e6",
+        "observed_at": "2026-09-01T06:18:58.382583Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/20260901_061858_364975_offline_0e0e3899cf3745358d4507492ba882d5.json",
+        "result_sha256": "92b082205e405a7270bc566e103e1aa8cf892c7ae3d9fea775d27d89a359ce24"
+      },
+      "metrics": {
+        "completed_trades": 21,
+        "traded_years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "base_return": 0.31070521807196516,
+        "base_profit_factor": 1.7602757152064754,
+        "base_sharpe": 0.6737991913642113,
+        "base_max_drawdown": -0.14708703236773601,
+        "stress_return": 0.22551996654156858,
+        "stress_profit_factor": 1.5332656078111961,
+        "stress_max_drawdown": -0.15388472580833878
+      }
+    },
+    {
+      "source_identity": "fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness",
+      "role": "robustness",
+      "source_sha256": "a9e5895399b23894a878dc0823ca9590f79c36772242c954f24f8731a4269fcb",
+      "trial_id": "f8f67ddd9061b04d4ff9bce38f1c5a807400821fb27ba5b0eadd376431ead730",
+      "definition_fingerprint": "c0e4a6b7bccff12c63e62b2bf06e96d3222ae693536f32df547a092ede0e8516",
+      "manifest": {
+        "path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/2198cdb7891119d2963601517bbc1f0b9067e4b27afe6bdd95a16355eb199732.snapshot.json",
+        "snapshot_id": "2198cdb7891119d2963601517bbc1f0b9067e4b27afe6bdd95a16355eb199732",
+        "sha256": "9592f013b9339e29fea7bf3cd4a9902af1bc787e59a6ddc057e349e5d5bfb1e2",
+        "definition_snapshot_id": "253c267dd9a5b1f7141af30e73f72220d8981b34caf116cb3484f077df641605",
+        "data_blob_sha256": "8daa14877bba5425705061a64cf39950e354fd51cbc9c1280ff8f666d0eaf48b"
+      },
+      "observation": {
+        "observation_id": "c2f79f6905d74fbfab8be2dcce1e6cc0",
+        "observed_at": "2026-09-01T06:19:00.087852Z",
+        "outcome_status": "succeeded",
+        "validity_status": "valid",
+        "run_mode": "offline",
+        "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/20260901_061900_069865_offline_46e8b4ba9ba64cb4868897f96713c254.json",
+        "result_sha256": "4898ef4aa167ffe0795abf854d85de9014d7ccbf2be1d3ad1c7844a27613c456"
+      },
+      "metrics": {
+        "completed_trades": 18,
+        "traded_years": [
+          2015,
+          2016,
+          2017,
+          2018
+        ],
+        "base_return": -0.09880554729155544,
+        "base_profit_factor": 0.7698629974048032,
+        "base_sharpe": -0.15425812084401463,
+        "base_max_drawdown": -0.25070088807356605,
+        "stress_return": -0.14924774965788346,
+        "stress_profit_factor": 0.6680603892499203,
+        "stress_max_drawdown": -0.2625942924341873
+      }
+    }
+  ],
+  "development_selection": null,
+  "trial_registry": {
+    "path": "results/registries/trial_registry.json",
+    "sha256": "edc164f808994cc415a1f2fd3ecef43c68e8195a9cb340cf8ba23370c1d69a7f"
+  },
+  "prohibited_artifacts_absent": {
+    "candidate_freeze": true,
+    "qualification_plan": true,
+    "qualification_screen": true,
+    "evaluation": true,
+    "replay": true
+  }
+}
