@@ -120,6 +120,12 @@ uv run trading qualification plan register --research <family/trial> \
 # Capability-scoped workflow study 一律由 exact frozen study 編譯；dry-run 不寫 registry
 uv run trading qualification plan register-study --study <study-path> --dry-run
 
+# 只在 exact active workflow release 明列 qualification-plan-abandonment-v1 時，
+# 以新的當下人工批准關閉 cancelled study 遺留的 unscreened plan；不產生 outcome 或 live authority
+uv run trading qualification plan abandon --plan-id <exact-plan-id> \
+  --workflow <exact-active-version-path> --approved-by <stable-human-identity> \
+  --reason "<concrete-reason>"
+
 # 最後一個 frozen fold 完成後，以每個 family trial 的 exact manifest 重算 screen
 uv run trading qualification screen run --help
 

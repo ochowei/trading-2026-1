@@ -8307,7 +8307,7 @@
       "first_registered_at": "2026-08-18T05:19:34.673941Z",
       "hypothesis": "Removing the secondary ClosePos confirmation while retaining the FXI ATR floor improves sample coverage without weakening frozen eligibility gates.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-09-01T06:18:51.570561Z",
+      "last_observed_at": "2026-09-01T07:21:56.485621Z",
       "legacy": false,
       "observations": [
         {
@@ -8342,6 +8342,28 @@
           "run_mode": "offline",
           "snapshot_id": "665526a88b603071aee9bc77034e89c2fad9b2e6061a1b8841e6577432f8aeb7",
           "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "fc3b205d7e7a43619f47f84fba3e678f",
+          "observed_at": "2026-09-01T07:11:29.342348Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/20260901_071129_325214_offline_1ded57384095438d9d1ac129f1944729.json",
+          "run_mode": "offline",
+          "snapshot_id": "a231f15c1cafffb5d19181e97bfe22bbe3924296f5052216927d3fcd6440d5e8",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "200c95e1ebac4992b503ff889364c445",
+          "observed_at": "2026-09-01T07:21:56.485621Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-candidate/20260901_072156_441885_offline_5b37803ab8e84a35bb9132f16d80d51e.json",
+          "run_mode": "offline",
+          "snapshot_id": "50ed8598ddb68244a39ffe7e8a6a86b529db1c677c76b709fc16e615c37b80ec",
+          "validity_status": "valid"
         }
       ],
       "selection_history_incomplete": false,
@@ -8358,7 +8380,7 @@
       "first_registered_at": "2026-08-18T05:19:39.224656Z",
       "hypothesis": "A simple pullback and Williams-%R rule is the distinct FXI family baseline.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-09-01T06:18:53.282701Z",
+      "last_observed_at": "2026-09-01T07:21:53.838709Z",
       "legacy": false,
       "observations": [
         {
@@ -8393,6 +8415,28 @@
           "run_mode": "offline",
           "snapshot_id": "c86d373c29148bee2800d30101bdc4386f030b04d81c2915de9b55d48981b27e",
           "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "beca8e508834460cbd5b25f08c2c9a57",
+          "observed_at": "2026-09-01T07:11:26.827321Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/20260901_071126_809783_offline_11b24b5fc95b4119b8bc438394368648.json",
+          "run_mode": "offline",
+          "snapshot_id": "9414eddacf24284293d513a62745b3b999c2c2d290b30e9c214cb2793d177c26",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "d308bd66f73d4d69ae733ace213289be",
+          "observed_at": "2026-09-01T07:21:53.838709Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/pullback-wr-baseline/20260901_072153_796251_offline_583bf40ad6c04775989c8b70a523dd2a.json",
+          "run_mode": "offline",
+          "snapshot_id": "b61abc07c82759799c65c4b3b233524cdaa41439a450fa473cf375ad2604cf38",
+          "validity_status": "valid"
         }
       ],
       "selection_history_incomplete": false,
@@ -8409,7 +8453,7 @@
       "first_registered_at": "2026-08-18T05:19:43.932413Z",
       "hypothesis": "The exact S002 ClosePos-gated candidate is a non-selectable reference.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-09-01T06:18:54.981384Z",
+      "last_observed_at": "2026-09-01T07:21:59.148301Z",
       "legacy": false,
       "observations": [
         {
@@ -8444,6 +8488,28 @@
           "run_mode": "offline",
           "snapshot_id": "13f110825a0d82c783cf3d31adca470e7ee8d4cfdce6befd6219b03988d00adf",
           "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "4a91cbca12ba4b28bc167b0e66f4d063",
+          "observed_at": "2026-09-01T07:11:31.840851Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/20260901_071131_824303_offline_a9ba5af722774e3d8176b2602dbeaa42.json",
+          "run_mode": "offline",
+          "snapshot_id": "657cbd3b1e67bbcfa9d3cd8f3c4880162b59590ecf088f1486f7b5969d03bf14",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "02913714382f4dd187a2a8f9302fc5bd",
+          "observed_at": "2026-09-01T07:21:59.148301Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/s002-closepos-reference/20260901_072159_108811_offline_d41e6e0587474156a20d8e00ea3f9fe0.json",
+          "run_mode": "offline",
+          "snapshot_id": "375305110646174306fba2704a9160223cdde37f8383bc10720f9553935098dd",
+          "validity_status": "valid"
         }
       ],
       "selection_history_incomplete": false,
@@ -8460,7 +8526,7 @@
       "first_registered_at": "2026-08-18T05:19:48.277192Z",
       "hypothesis": "The no-ClosePos FXI candidate remains viable with an ATR floor of 1.10.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-09-01T06:18:56.682761Z",
+      "last_observed_at": "2026-09-01T07:22:01.796911Z",
       "legacy": false,
       "observations": [
         {
@@ -8495,6 +8561,28 @@
           "run_mode": "offline",
           "snapshot_id": "efcd1df84d7b6137b556298ca20ec13b0541a900febe943a229b16d4268a26b8",
           "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "7e67b9842c324b50afe470932fdbe6a7",
+          "observed_at": "2026-09-01T07:11:34.320936Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/20260901_071134_304067_offline_b768c77344dd465686ace7bec141c86f.json",
+          "run_mode": "offline",
+          "snapshot_id": "303d180fd4efe3b51b7177c8468acc10a9fbaf0a87e4f7e8ceba788d0d7eaa0c",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "7a0aca26afd2433982a2e30edfe7fe47",
+          "observed_at": "2026-09-01T07:22:01.796911Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-atr-floor-1p10-robustness/20260901_072201_751934_offline_9f289e8dd38b4b30ba17e261fb77aa50.json",
+          "run_mode": "offline",
+          "snapshot_id": "76e4935dbe4a520db93329020f7e2caf9bbefbf7623c9d57f176377853eb5781",
+          "validity_status": "valid"
         }
       ],
       "selection_history_incomplete": false,
@@ -8511,7 +8599,7 @@
       "first_registered_at": "2026-08-18T05:19:52.778626Z",
       "hypothesis": "The no-ClosePos FXI candidate remains viable with a seven-session cooldown.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-09-01T06:18:58.382583Z",
+      "last_observed_at": "2026-09-01T07:21:51.182570Z",
       "legacy": false,
       "observations": [
         {
@@ -8546,6 +8634,28 @@
           "run_mode": "offline",
           "snapshot_id": "c519a7f23dedaf915dbf16056f5bc1eaa5a493fe8aa2879f6f856c9d3989c7e3",
           "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "b591311b93854000b5bccfb56002a5be",
+          "observed_at": "2026-09-01T07:11:24.349519Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/20260901_071124_332501_offline_18a89c350ff04f2e8589da1237db981f.json",
+          "run_mode": "offline",
+          "snapshot_id": "e1ee0cbf04838d71ac52a17e89b4f0a3f7b490f6b15fc4f8d2bfc733ab2904f8",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "007483220f604bb2b13bf8cd853c3611",
+          "observed_at": "2026-09-01T07:21:51.182570Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-cooldown-7-robustness/20260901_072151_141840_offline_90f3156acbce4020ab4964cd9d06c8f7.json",
+          "run_mode": "offline",
+          "snapshot_id": "1b4f89fc896c136dca9677a75cec5401d4342dc861af738d3ebc2382860d998b",
+          "validity_status": "valid"
         }
       ],
       "selection_history_incomplete": false,
@@ -8562,7 +8672,7 @@
       "first_registered_at": "2026-08-18T05:19:57.447409Z",
       "hypothesis": "The no-ClosePos FXI candidate remains viable with entry delayed one session.",
       "identity_kind": "semantic-definition",
-      "last_observed_at": "2026-09-01T06:19:00.087852Z",
+      "last_observed_at": "2026-09-01T07:22:04.444803Z",
       "legacy": false,
       "observations": [
         {
@@ -8596,6 +8706,28 @@
           "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/20260901_061900_069865_offline_46e8b4ba9ba64cb4868897f96713c254.json",
           "run_mode": "offline",
           "snapshot_id": "2198cdb7891119d2963601517bbc1f0b9067e4b27afe6bdd95a16355eb199732",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "51ab82adde6e4c5cb7cd4ac39c4270ef",
+          "observed_at": "2026-09-01T07:11:36.812083Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/20260901_071136_794863_offline_5d539b4ab04a4f469d81056236f1023e.json",
+          "run_mode": "offline",
+          "snapshot_id": "9c983e9f81cb3fe60f6e8bcef4c854fe5c50f54d99221777ae38c17ebb86cf62",
+          "validity_status": "valid"
+        },
+        {
+          "event": "observation",
+          "failure_reason": null,
+          "observation_id": "cadf105fd3c0458c82455df7623a79d7",
+          "observed_at": "2026-09-01T07:22:04.444803Z",
+          "outcome_status": "succeeded",
+          "result_path": "results/research-trials/fxi-no-closepos-atr-floor-mean-reversion/no-closepos-delay-one-session-robustness/20260901_072204_404001_offline_0915fefa53734b7a864f90d8a928283e.json",
+          "run_mode": "offline",
+          "snapshot_id": "3c038a1357b12b2bae931b6bef4f0e21e0952e5ddf5ca525310952d8cab8628d",
           "validity_status": "valid"
         }
       ],

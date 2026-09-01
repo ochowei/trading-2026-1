@@ -91,8 +91,12 @@ None.
 | ID | Title | Status | Outcome | Path |
 | --- | --- | --- | --- | --- |
 | `S001` | FXI No-ClosePos ATR-Floor Mean-Reversion Fixed-Calendar Retrospective Study | `completed` | `fail` | [fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001](work/studies/fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001/) |
+| `S003` | FXI No-ClosePos Cooldown-7 ATR-Floor Dependency-Corrected Fixed-Calendar Retrospective Study | `paused` | `-` | [fxi-no-closepos-cooldown-7-atr-floor-dependency-corrected-fixed-calendar-retrospective--s003](work/studies/fxi-no-closepos-cooldown-7-atr-floor-dependency-corrected-fixed-calendar-retrospective--s003/) |
+| `S002` | FXI No-ClosePos Cooldown-7 ATR-Floor Fixed-Calendar Retrospective Study | `cancelled` | `-` | [fxi-no-closepos-cooldown-7-atr-floor-fixed-calendar-retrospective--s002](work/studies/fxi-no-closepos-cooldown-7-atr-floor-fixed-calendar-retrospective--s002/) |
 
 ### Changes
 
-_No changes._
+| ID | Title | Status | Released in | Path |
+| --- | --- | --- | --- | --- |
+| `C001` | Append-Only Qualification Plan Abandonment | `accepted` | `-` | [qualification-plan-abandonment--c001](work/changes/qualification-plan-abandonment--c001/) |
 <!-- GENERATED:WORK_INDEX_END -->

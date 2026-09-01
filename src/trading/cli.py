@@ -61,7 +61,11 @@ from trading.workflow.qualification import (
     register_forward_qualification_plan,
     run_registered_historical_screen,
 )
+from trading.workflow.qualification_plan_abandonment import (
+    resolve_qualification_plan_abandonment_authority,
+)
 from trading.workflow.retrospective_replay import run_fixed_calendar_retrospective_replay
+from trading.workflow.studies import WorkflowStudyService
 from trading.workflow.study_qualification import (
     STUDY_QUALIFICATION_CAPABILITY,
     compile_study_qualification_plan,
@@ -109,6 +113,13 @@ def cmd_qualification_status(args: argparse.Namespace) -> None:
         and event.get("event_type") == "historical_screen"
         and isinstance((payload := event.get("payload")), Mapping)
     }
+    abandonments = {
+        payload.get("plan_id"): payload
+        for event in events
+        if isinstance(event, Mapping)
+        and event.get("event_type") == "historical_plan_abandoned"
+        and isinstance((payload := event.get("payload")), Mapping)
+    }
     for event in events:
         if not isinstance(event, Mapping) or event.get("event_type") != "historical_plan":
             continue
@@ -117,9 +128,20 @@ def cmd_qualification_status(args: argparse.Namespace) -> None:
             continue
         plan_id = payload.get("plan_id")
         screen = screens.get(plan_id, {})
-        disposition = screen.get("disposition", "historical-screen-pending")
+        abandonment = abandonments.get(plan_id, {})
+        disposition = (
+            "historical-plan-abandoned"
+            if abandonment
+            else screen.get("disposition", "historical-screen-pending")
+        )
         print(f"{plan_id}: {disposition}")
         print(f"  definition fingerprint: {payload.get('definition_fingerprint', '-')}")
+        if abandonment:
+            print(
+                f"  abandoned at: {abandonment.get('abandoned_at', '-')} "
+                f"by {abandonment.get('approved_by', '-')}"
+            )
+            print(f"  reason: {abandonment.get('reason', '-')}")
     for event in events:
         if not isinstance(event, Mapping) or event.get("event_type") != "shadow_registration":
             continue
@@ -276,6 +298,22 @@ def cmd_qualification_plan_register_study(args: argparse.Namespace) -> None:
     print(f"  evidence role: {plan.evidence_role}")
 
 
+def cmd_qualification_plan_abandon(args: argparse.Namespace) -> None:
+    """Append one authorized terminal event for a cancelled study's open plan."""
+    authority = resolve_qualification_plan_abandonment_authority(args.workflow)
+    studies = WorkflowStudyService()
+    event_id = QualificationRegistry(args.path).abandon_historical_plan(
+        args.plan_id,
+        approved_by=args.approved_by,
+        reason=args.reason,
+        study_identity_resolver=lambda study_path: studies.lifecycle_identity(Path(study_path)),
+        authorization=authority.as_payload(),
+    )
+    print(f"qualification plan abandoned: {event_id}")
+    print(f"  authority: {authority.workflow}@{authority.workflow_version}")
+    print("  outcome authority: none")
+
+
 def cmd_qualification_evidence_snapshot(args: argparse.Namespace) -> None:
     """Publish one verified immutable qualification-registry snapshot."""
     path, digest = QualificationEvidenceStore(args.output_root).publish_registry(
@@ -369,6 +407,8 @@ def cmd_qualification(args: argparse.Namespace) -> None:
             cmd_qualification_plan_register(args)
         elif args.qualification_command == "plan" and args.plan_command == "register-study":
             cmd_qualification_plan_register_study(args)
+        elif args.qualification_command == "plan" and args.plan_command == "abandon":
+            cmd_qualification_plan_abandon(args)
         elif args.qualification_command == "evidence-snapshot":
             cmd_qualification_evidence_snapshot(args)
         elif args.qualification_command == "screen" and args.screen_command == "run":
@@ -1512,6 +1552,24 @@ def build_parser() -> argparse.ArgumentParser:
     qualification_plan_study_p = qualification_plan_sub.add_parser(
         "register-study",
         help="Compile or register a complete plan derived from one exact frozen study",
+    )
+    qualification_plan_abandon_p = qualification_plan_sub.add_parser(
+        "abandon",
+        help="Close an unscreened plan owned by an exactly bound cancelled study",
+    )
+    qualification_plan_abandon_p.add_argument("--plan-id", required=True)
+    qualification_plan_abandon_p.add_argument(
+        "--workflow",
+        type=Path,
+        required=True,
+        help="Exact active workflow version granting plan-abandonment capability",
+    )
+    qualification_plan_abandon_p.add_argument("--approved-by", required=True)
+    qualification_plan_abandon_p.add_argument("--reason", required=True)
+    qualification_plan_abandon_p.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_QUALIFICATION_REGISTRY_PATH,
     )
     qualification_plan_study_p.add_argument("--study", type=Path, required=True)
     qualification_plan_study_p.add_argument(

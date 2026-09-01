@@ -137,6 +137,67 @@ def _historical_lifecycle() -> tuple[HistoricalQualificationPlan, HistoricalScre
     return plan, screen
 
 
+def _study_linked_plan(frozen_at: datetime) -> HistoricalQualificationPlan:
+    plan, _screen = _historical_lifecycle()
+    return replace(
+        plan,
+        plan_id="study-linked-plan-1",
+        created_at=frozen_at,
+        evidence_role="fixed-calendar-retrospective",
+        retrospective_selection_checkpoint=RetrospectiveSelectionCheckpoint(
+            frozen_at=frozen_at,
+            selected_trial_id="trial-1",
+            included_trial_ids=("trial-1", "trial-baseline"),
+            prior_selection_history_incomplete=True,
+        ),
+        evidence_audit=EvaluationEvidenceAudit(
+            classification="known-contaminated",
+            frozen_at=frozen_at,
+            justification="All evidence is disclosed retrospective evidence.",
+            trial_history_complete=False,
+        ),
+        role_calendar=QualificationRoleCalendar(
+            development_sessions=tuple(
+                timestamp.date() for timestamp in pd.bdate_range("2018-01-01", "2020-12-31")
+            ),
+            warmup_sessions=tuple(
+                timestamp.date() for timestamp in pd.bdate_range("2017-01-01", "2017-12-31")
+            ),
+            evaluation_sessions=plan.evaluation_sessions,
+        ),
+        study_identity=StudyQualificationIdentity(
+            study_path=(
+                "workflows/strategy-forward-replication-research--v009/"
+                "work/studies/corrected-envelope--s002"
+            ),
+            preregistration_sha256="1" * 64,
+            plan_sha256="2" * 64,
+            candidate_freeze_sha256="3" * 64,
+            qualification_spec_sha256="4" * 64,
+            workflow_release_sha256="5" * 64,
+        ),
+    )
+
+
+def _abandonment_authority() -> dict[str, str]:
+    return {
+        "workflow": "strategy-forward-replication-research",
+        "workflow_version": "v010",
+        "workflow_path": "workflows/strategy-forward-replication-research--v010",
+        "workflow_release_sha256": "6" * 64,
+        "capability": "qualification-plan-abandonment-v1",
+    }
+
+
+def _cancelled_study_identity(study_path: str) -> dict[str, str]:
+    return {
+        "study_path": study_path,
+        "workflow": "strategy-forward-replication-research",
+        "workflow_version": "v009",
+        "status": "cancelled",
+    }
+
+
 def test_legacy_plan_with_additional_earlier_development_year_round_trips(tmp_path) -> None:
     registry = QualificationRegistry(tmp_path / "qualification_registry.json")
     plan, _screen = _historical_lifecycle()
@@ -151,6 +212,220 @@ def test_legacy_plan_with_additional_earlier_development_year_round_trips(tmp_pa
     assert registry.historical_plan(plan.plan_id) == plan
     event = registry.read()["events"][0]
     assert "role_calendar" not in event["payload"]
+
+
+def test_cancelled_study_plan_abandonment_is_terminal_and_releases_family_lock(
+    tmp_path,
+) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    plan = _study_linked_plan(frozen_at)
+    registry.register_historical_plan(plan)
+
+    event_id = registry.abandon_historical_plan(
+        plan.plan_id,
+        approved_by="ochowei@gmail.com",
+        reason="The cancelled study froze an invalid next-open execution envelope.",
+        study_identity_resolver=_cancelled_study_identity,
+        authorization=_abandonment_authority(),
+    )
+
+    assert event_id == f"historical-plan-abandoned:{plan.plan_id}"
+    event = registry.read()["events"][-1]
+    assert event["event_type"] == "historical_plan_abandoned"
+    assert event["payload"]["prior_registry"] == {
+        "event_count": 1,
+        "head_hash": event["previous_hash"],
+    }
+    assert event["payload"]["study_lifecycle"]["status"] == "cancelled"
+    assert event["payload"]["authorization"] == _abandonment_authority()
+
+    successor = replace(plan, plan_id="study-linked-plan-2")
+    registry.register_historical_plan(successor)
+
+    with pytest.raises(QualificationRegistryError, match="already has an abandonment"):
+        registry.abandon_historical_plan(
+            plan.plan_id,
+            approved_by="ochowei@gmail.com",
+            reason="Duplicate terminal event must fail.",
+            study_identity_resolver=_cancelled_study_identity,
+            authorization=_abandonment_authority(),
+        )
+
+
+@pytest.mark.parametrize(
+    "status",
+    ("draft", "preregistered", "running", "paused", "awaiting-review", "completed"),
+)
+def test_plan_abandonment_rejects_every_non_cancelled_study_status(tmp_path, status) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    plan = _study_linked_plan(frozen_at)
+    registry.register_historical_plan(plan)
+
+    def resolve(study_path: str) -> dict[str, str]:
+        identity = _cancelled_study_identity(study_path)
+        identity["status"] = status
+        return identity
+
+    with pytest.raises(QualificationRegistryError, match="exact cancelled owning study"):
+        registry.abandon_historical_plan(
+            plan.plan_id,
+            approved_by="ochowei@gmail.com",
+            reason="Only a cancelled owning study is eligible.",
+            study_identity_resolver=resolve,
+            authorization=_abandonment_authority(),
+        )
+
+    assert len(registry.read()["events"]) == 1
+
+
+@pytest.mark.parametrize(
+    ("approved_by", "reason", "message"),
+    (
+        ("", "Concrete reason.", "approver"),
+        ("ochowei@gmail.com", "", "reason"),
+        (" ochowei@gmail.com", "Concrete reason.", "approver"),
+    ),
+)
+def test_plan_abandonment_requires_canonical_current_human_authority(
+    tmp_path,
+    approved_by,
+    reason,
+    message,
+) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    plan = _study_linked_plan(frozen_at)
+    registry.register_historical_plan(plan)
+
+    with pytest.raises(QualificationRegistryError, match=message):
+        registry.abandon_historical_plan(
+            plan.plan_id,
+            approved_by=approved_by,
+            reason=reason,
+            study_identity_resolver=_cancelled_study_identity,
+            authorization=_abandonment_authority(),
+        )
+
+
+@pytest.mark.parametrize("mismatch", ("study_path", "workflow"))
+def test_plan_abandonment_rejects_mismatched_owning_study_identity(tmp_path, mismatch) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    plan = _study_linked_plan(frozen_at)
+    registry.register_historical_plan(plan)
+
+    def resolve(study_path: str) -> dict[str, str]:
+        identity = _cancelled_study_identity(study_path)
+        identity[mismatch] = "mismatched-identity"
+        return identity
+
+    with pytest.raises(QualificationRegistryError, match="exact cancelled owning study"):
+        registry.abandon_historical_plan(
+            plan.plan_id,
+            approved_by="ochowei@gmail.com",
+            reason="Mismatched identities must fail closed.",
+            study_identity_resolver=resolve,
+            authorization=_abandonment_authority(),
+        )
+
+
+def test_plan_abandonment_rejects_ungranted_capability_before_registry_mutation(tmp_path) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    plan = _study_linked_plan(frozen_at)
+    registry.register_historical_plan(plan)
+    authorization = _abandonment_authority()
+    authorization["capability"] = "study-time-retrospective-v1"
+
+    with pytest.raises(QualificationRegistryError, match="does not grant"):
+        registry.abandon_historical_plan(
+            plan.plan_id,
+            approved_by="ochowei@gmail.com",
+            reason="Wrong capability must fail closed.",
+            study_identity_resolver=_cancelled_study_identity,
+            authorization=authorization,
+        )
+
+    assert len(registry.read()["events"]) == 1
+
+
+def test_plan_abandonment_rejects_legacy_plan_existing_screen_and_later_screen(tmp_path) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    legacy_plan, _legacy_screen = _historical_lifecycle()
+    registry.register_historical_plan(legacy_plan)
+    with pytest.raises(QualificationRegistryError, match="exact frozen study binding"):
+        registry.abandon_historical_plan(
+            legacy_plan.plan_id,
+            approved_by="ochowei@gmail.com",
+            reason="Legacy plans cannot be rebound after registration.",
+            study_identity_resolver=_cancelled_study_identity,
+            authorization=_abandonment_authority(),
+        )
+
+    plan = replace(_study_linked_plan(frozen_at), experiment_family="qqq:mean-reversion")
+    registry.register_historical_plan(plan)
+    registry.abandon_historical_plan(
+        plan.plan_id,
+        approved_by="ochowei@gmail.com",
+        reason="The owning study is cancelled.",
+        study_identity_resolver=_cancelled_study_identity,
+        authorization=_abandonment_authority(),
+    )
+    _source_plan, source_screen = _historical_lifecycle()
+    abandoned_screen = replace(
+        source_screen,
+        plan_id=plan.plan_id,
+        disposition="retrospectively-supported",
+    )
+    with pytest.raises(QualificationRegistryError, match="cannot receive a screen"):
+        registry.record_historical_screen(abandoned_screen, evaluated_at=frozen_at)
+
+
+def test_plan_abandonment_rejects_a_plan_that_already_has_a_screen(tmp_path) -> None:
+    frozen_at = datetime(2026, 9, 1, 9, tzinfo=UTC)
+    registry = QualificationRegistry(
+        tmp_path / "qualification_registry.json",
+        now=lambda: frozen_at,
+    )
+    plan = _study_linked_plan(frozen_at)
+    _source_plan, source_screen = _historical_lifecycle()
+    screen = replace(
+        source_screen,
+        plan_id=plan.plan_id,
+        disposition="retrospectively-supported",
+    )
+    registry.register_historical_plan(plan)
+    registry.record_historical_screen(screen, evaluated_at=frozen_at)
+
+    with pytest.raises(QualificationRegistryError, match="cannot be abandoned"):
+        registry.abandon_historical_plan(
+            plan.plan_id,
+            approved_by="ochowei@gmail.com",
+            reason="A screened plan is already terminal.",
+            study_identity_resolver=_cancelled_study_identity,
+            authorization=_abandonment_authority(),
+        )
 
 
 def test_qualification_registry_appends_shadow_lifecycle_idempotently(tmp_path) -> None:
