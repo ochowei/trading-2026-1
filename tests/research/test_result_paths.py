@@ -101,6 +101,18 @@ def test_migration_appends_one_digest_identical_retirement_hop(tmp_path) -> None
     assert (
         resolve_result_path(tmp_path / categorized, repository_root=tmp_path) == terminal.resolve()
     )
+
+    # A mutable writer may continue at the categorized identity after its migration-time bytes
+    # have been retired. Historical callers still follow the two-hop chain, while current callers
+    # resolve the physically present active registry before consulting migrations.
+    active_content = b"append-only active registry\n"
+    active = tmp_path / categorized
+    active.parent.mkdir(parents=True, exist_ok=True)
+    active.write_bytes(active_content)
+
+    assert resolve_result_path(flat, repository_root=tmp_path) == terminal.resolve()
+    assert resolve_result_path(active, repository_root=tmp_path) == active.resolve()
+    assert active.read_bytes() == active_content
     assert load_path_migrations(tmp_path) == tuple(
         sorted((initial, retirement), key=lambda entry: entry.old_path)
     )

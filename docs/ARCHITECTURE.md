@@ -365,6 +365,7 @@ trading data must never be placed in `tests/` or committed anywhere.
 | `results/evidence/qualification/<sha256>.json` | Permanently retained tracked self-contained qualification registry/checkpoint snapshot replayed for terminal decisions and Development absence proofs. |
 | `results/registries/trial_registry.json` | Tracked append-only experiment-family/trial inventory and formal observations. |
 | `results/registries/path-migrations.json` | Tracked append-only old-to-new result path registry. Entries pin source/destination identities, artifact class, migration version, and SHA-256. A v009 path may have exactly one additional byte-identical v010 retirement hop; readers reject longer chains, cycles, missing terminal bytes, or digest drift. |
+| `results/registries/history/<registry>--<sha256>.json` | Immutable migration-time registry bytes retained by the bounded, digest-identical second hop while the categorized append-only registry remains active. |
 
 The legacy experiment result authority is retired. All of its last retained results and manifests
 live under `legacy/results/`; `results/experiment-results/` must not exist or be recreated.

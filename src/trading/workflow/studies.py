@@ -336,7 +336,13 @@ class WorkflowStudyService:
 
         occurred_at = timestamp_text(self.repository._current_time())
         release = self._release_payload(version_path)
-        structured_routes = STUDY_QUALIFICATION_CAPABILITY in release.get("capabilities", [])
+        structured_routes = bool(
+            {
+                STUDY_QUALIFICATION_CAPABILITY,
+                FIXED_CALENDAR_RETROSPECTIVE_CAPABILITY,
+            }
+            & set(release.get("capabilities", []))
+        )
         if structured_routes and current == "preregistered" and target_status == "running":
             approver = self._required_identity(approved_by, "approved-by")
             if approver != metadata.get("preregistered_by"):

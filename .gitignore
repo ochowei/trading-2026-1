@@ -214,6 +214,8 @@ results/**/*.json
 !results/**/*.snapshot.json
 !results/registries/trial_registry.json
 !results/registries/path-migrations.json
+!results/registries/history/
+!results/registries/history/*.json
 !results/migration-evidence/**/*.migration-parity.json
 !results/migration-evidence/**/*.migration-result.json
 !results/evidence/qualification/

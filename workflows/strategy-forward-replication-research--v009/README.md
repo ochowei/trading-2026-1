@@ -88,7 +88,9 @@ None.
 <!-- GENERATED:WORK_INDEX_START -->
 ### Studies
 
-_No studies._
+| ID | Title | Status | Outcome | Path |
+| --- | --- | --- | --- | --- |
+| `S001` | FXI No-ClosePos ATR-Floor Mean-Reversion Fixed-Calendar Retrospective Study | `completed` | `fail` | [fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001](work/studies/fxi-no-closepos-atr-floor-mean-reversion-fixed-calendar-retrospective--s001/) |
 
 ### Changes
 
